@@ -1,0 +1,193 @@
+{
+    "module_name": "Understanding Scale",
+    "description": "No Description Provided",
+    "is_a_quizzer_module": true,
+    "primary_subject": "Astronomy",
+    "all_subjects": [
+        "astronomy"
+    ],
+    "concepts_covered": {
+        "Understanding Scale": 1,
+        "universe": 3,
+        "galaxy": 2,
+        "element": 2,
+        "interstellar dust": 1,
+        "atom": 3,
+        "atomic nucleus": 1,
+        "electron": 1,
+        "oxygen": 1,
+        "intergalactic space": 1
+    },
+    "questions": {
+        "On average our universe is how many times more empty than our own galaxy?.md": {
+            "type": "question",
+            "subject": [
+                "astronomy"
+            ],
+            "related": [
+                "[[Understanding Scale]]",
+                "[[universe]]",
+                "[[galaxy]]"
+            ],
+            "module_name": "Understanding Scale",
+            "question_text": "On average our universe is how many times more empty than our own galaxy?",
+            "question_image": null,
+            "question_audio": null,
+            "question_video": null,
+            "answer_text": "10,000 times more empty than our galaxy",
+            "answer_image": null,
+            "answer_audio": null,
+            "answer_video": null,
+            "file_name": "On average our universe is how many times more empty than our own galaxy?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Astronomy/Understanding Scale/On average our universe is how many times more empty than our own galaxy?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "On average our universe is how many times more empty than our own galaxy?.md"
+        },
+        "What are the top four most abundant elements in the universe?.md": {
+            "type": "question",
+            "subject": [
+                "astronomy"
+            ],
+            "related": [
+                "[[element]]",
+                "[[universe]]"
+            ],
+            "module_name": "Understanding Scale",
+            "question_text": "What are the top four most abundant elements in the universe?",
+            "question_image": null,
+            "question_audio": null,
+            "question_video": null,
+            "answer_text": "Hydrogen\nHelium\nOxygen\nCarbon",
+            "answer_image": null,
+            "answer_audio": null,
+            "answer_video": null,
+            "file_name": "What are the top four most abundant elements in the universe?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Astronomy/Understanding Scale/What are the top four most abundant elements in the universe?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "What are the top four most abundant elements in the universe?.md"
+        },
+        "In the interstellar gas of the galaxy, there about how many atoms every cubic centimeter?.md": {
+            "type": "question",
+            "subject": [
+                "astronomy"
+            ],
+            "related": [
+                "[[interstellar dust]]",
+                "[[galaxy]]",
+                "[[atom]]"
+            ],
+            "module_name": "Understanding Scale",
+            "question_text": "In the interstellar gas of the galaxy, there about how many atoms every cubic centimeter?",
+            "question_image": null,
+            "question_audio": null,
+            "question_video": null,
+            "answer_text": "1 atom",
+            "answer_image": null,
+            "answer_audio": null,
+            "answer_video": null,
+            "file_name": "In the interstellar gas of the galaxy, there about how many atoms every cubic centimeter?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Astronomy/Understanding Scale/In the interstellar gas of the galaxy, there about how many atoms every cubic centimeter?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "In the interstellar gas of the galaxy, there about how many atoms every cubic centimeter?.md"
+        },
+        "The distance from an atomic nucleus to its electrons is typically how many times the size of the nucleus itself?.md": {
+            "type": "question",
+            "subject": [
+                "astronomy"
+            ],
+            "related": [
+                "[[atomic nucleus]]",
+                "[[electron]]"
+            ],
+            "module_name": "Understanding Scale",
+            "question_text": "The distance from an atomic nucleus to its electrons is typically how many times the size of the nucleus itself?",
+            "question_image": null,
+            "question_audio": null,
+            "question_video": null,
+            "answer_text": "Typically 100,000 times the size of the nucleus itself",
+            "answer_image": null,
+            "answer_audio": null,
+            "answer_video": null,
+            "file_name": "The distance from an atomic nucleus to its electrons is typically how many times the size of the nucleus itself?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Astronomy/Understanding Scale/The distance from an atomic nucleus to its electrons is typically how many times the size of the nucleus itself?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "The distance from an atomic nucleus to its electrons is typically how many times the size of the nucleus itself?.md"
+        },
+        "The air we breath has about how many atoms in each cubic centimeter?.md": {
+            "type": "question",
+            "subject": [
+                "astronomy"
+            ],
+            "related": [
+                "[[oxygen]]",
+                "[[atom]]"
+            ],
+            "module_name": "Understanding Scale",
+            "question_text": "The air we breath has about how many atoms in each cubic centimeter?",
+            "question_image": null,
+            "question_audio": null,
+            "question_video": null,
+            "answer_text": "10\u00b9\u2079 atoms in each cubic centimeter",
+            "answer_image": null,
+            "answer_audio": null,
+            "answer_video": null,
+            "file_name": "The air we breath has about how many atoms in each cubic centimeter?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Astronomy/Understanding Scale/The air we breath has about how many atoms in each cubic centimeter?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "The air we breath has about how many atoms in each cubic centimeter?.md"
+        },
+        "In intergalactic space, there are about how many atoms every cubic centimeter?.md": {
+            "type": "question",
+            "subject": [
+                "astronomy"
+            ],
+            "related": [
+                "[[intergalactic space]]",
+                "[[atom]]"
+            ],
+            "module_name": "Understanding Scale",
+            "question_text": "In intergalactic space, there are about how many atoms every cubic centimeter?",
+            "question_image": null,
+            "question_audio": null,
+            "question_video": null,
+            "answer_text": "one atom per cubic meter, 1/100 of an atom per cubic centimeter",
+            "answer_image": null,
+            "answer_audio": null,
+            "answer_video": null,
+            "file_name": "In intergalactic space, there are about how many atoms every cubic centimeter?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Astronomy/Understanding Scale/In intergalactic space, there are about how many atoms every cubic centimeter?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "In intergalactic space, there are about how many atoms every cubic centimeter?.md"
+        },
+        "The most common elements of the universe account for what percentage of elements?.md": {
+            "type": "question",
+            "subject": [
+                "astronomy"
+            ],
+            "related": [
+                "[[element]]",
+                "[[universe]]"
+            ],
+            "module_name": "Understanding Scale",
+            "question_text": "The most common elements of the universe account for what percentage of elements?",
+            "question_image": null,
+            "question_audio": null,
+            "question_video": null,
+            "answer_text": "More than 99% of everything with which we come in contact",
+            "answer_image": null,
+            "answer_audio": null,
+            "answer_video": null,
+            "file_name": "The most common elements of the universe account for what percentage of elements?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Astronomy/Understanding Scale/The most common elements of the universe account for what percentage of elements?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "The most common elements of the universe account for what percentage of elements?.md"
+        }
+    }
+}

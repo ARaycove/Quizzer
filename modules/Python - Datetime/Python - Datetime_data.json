@@ -1,0 +1,39 @@
+{
+    "module_name": "Python - Datetime",
+    "description": "No Description Provided",
+    "is_a_quizzer_module": true,
+    "primary_subject": "Computer_Science",
+    "all_subjects": [
+        "computer_science"
+    ],
+    "concepts_covered": {
+        "Concept Notes/computer_science/Python|Python": 1,
+        "datetime module": 1
+    },
+    "questions": {
+        "Write a python script that checks whether a datetime object is within 24 hours of date.now().md": {
+            "type": "question",
+            "subject": [
+                "computer_science"
+            ],
+            "related": [
+                "[[Concept Notes/computer_science/Python|Python]]",
+                "[[datetime module]]"
+            ],
+            "module_name": "Python - Datetime",
+            "question_text": "Write a python script that checks whether a datetime object is within 24 hours of date.now()",
+            "question_image": null,
+            "question_audio": null,
+            "question_video": null,
+            "answer_text": "def within_twenty_four_hours(datetime_object):\n    now = datetime.now()\n    time_delta = now - datetime_object\n    return abs(time_delta.total_seconds()) <= 24 * 3600",
+            "answer_image": null,
+            "answer_audio": null,
+            "answer_video": null,
+            "file_name": "Write a python script that checks whether a datetime object is within 24 hours of date.now().md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Computer_Science/Python - Datetime/Write a python script that checks whether a datetime object is within 24 hours of date.now().md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "Write a python script that checks whether a datetime object is within 24 hours of date.now().md"
+        }
+    }
+}

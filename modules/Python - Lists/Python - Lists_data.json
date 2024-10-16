@@ -1,0 +1,39 @@
+{
+    "module_name": "Python - Lists",
+    "description": "No Description Provided",
+    "is_a_quizzer_module": true,
+    "primary_subject": "Computer_Science",
+    "all_subjects": [
+        "computer_science"
+    ],
+    "concepts_covered": {
+        "list": 1,
+        "University of Montana - Education/Study Guides/Fields of Study/Science/Programming/Programming Languages/Python|Python": 1
+    },
+    "questions": {
+        "What is the difference between my_list.sort(reverse=True) and my_list.reverse().md": {
+            "type": "question",
+            "subject": [
+                "computer_science"
+            ],
+            "related": [
+                "[[list]]",
+                "[[University of Montana - Education/Study Guides/Fields of Study/Science/Programming/Programming Languages/Python|Python]]"
+            ],
+            "module_name": "Python - Lists",
+            "question_text": "What is the difference between my_list.sort(reverse=True) and my_list.reverse()",
+            "question_image": null,
+            "question_audio": null,
+            "question_video": null,
+            "answer_text": "my_list.sort(reverse=True), sorts the list in descending order\n\nmy_list.reverse() flips the list in place and does not sort the list",
+            "answer_image": null,
+            "answer_audio": null,
+            "answer_video": null,
+            "file_name": "What is the difference between my_list.sort(reverse=True) and my_list.reverse().md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Computer_Science/Python - Lists/What is the difference between my_list.sort(reverse=True) and my_list.reverse().md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "What is the difference between my_list.sort(reverse=True) and my_list.reverse().md"
+        }
+    }
+}

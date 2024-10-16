@@ -1,0 +1,29 @@
+{
+    "questions_answered_by_date": {
+        "2024-10-08 16:40:05.080644": 0,
+        "2024-10-08": 32,
+        "2024-10-09": 18
+    },
+    "total_questions_answered": 50,
+    "average_questions_per_day": 6.486629087107815,
+    "total_questions_in_database": {
+        "2024-10-08": 1491,
+        "2024-10-09": 1528,
+        "2024-10-10": 1528
+    },
+    "revision_streak_stats": {
+        "1": 2,
+        "2": 6,
+        "3": 2
+    },
+    "current_questions_in_circulation": 10,
+    "total_in_circulation_questions": {
+        "2024-10-08": 10,
+        "2024-10-09": 10,
+        "2024-10-10": 10
+    },
+    "average_num_questions_entering_circulation_daily": 0.0,
+    "non-circulating_questions": 1518,
+    "reserve_questions_exhaust_in_x_days": 0,
+    "current_eligible_questions": 7
+}

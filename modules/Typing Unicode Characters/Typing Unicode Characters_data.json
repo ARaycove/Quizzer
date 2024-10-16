@@ -1,0 +1,337 @@
+{
+    "module_name": "Typing Unicode Characters",
+    "description": "No Description Provided",
+    "is_a_quizzer_module": true,
+    "primary_subject": "Unicode",
+    "all_subjects": [
+        "computer_science",
+        "unicode"
+    ],
+    "concepts_covered": {
+        "Unicode hexidecimal table": 11,
+        "Linux": 1,
+        "Unicode": 3,
+        "superscript": 1,
+        "pi": 1
+    },
+    "questions": {
+        "what is the u+ code for superscript 1?.md": {
+            "type": "question",
+            "subject": [
+                "computer_science",
+                "unicode"
+            ],
+            "related": [
+                "[[Unicode hexidecimal table]]"
+            ],
+            "question_text": "what is the u+ code for superscript 1?",
+            "answer_text": "U+ 00b9 -> \u00b9",
+            "module_name": "Typing Unicode Characters",
+            "file_name": "what is the u+ code for superscript 1?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Computer_Science/Typing Unicode Characters/what is the u+ code for superscript 1?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "what is the u+ code for superscript 1?.md"
+        },
+        "What is the U+ code for Greek Letter Theta?.md": {
+            "type": "question",
+            "subject": [
+                "computer_science",
+                "unicode"
+            ],
+            "related": [
+                "[[Unicode hexidecimal table]]"
+            ],
+            "question_text": "What is the U+ code for Greek Letter Theta?",
+            "answer_text": "U+03B8",
+            "module_name": "Typing Unicode Characters",
+            "file_name": "What is the U+ code for Greek Letter Theta?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Computer_Science/Typing Unicode Characters/What is the U+ code for Greek Letter Theta?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "What is the U+ code for Greek Letter Theta?.md"
+        },
+        "what is the u+ code for degree character- \u00b0.md": {
+            "type": "question",
+            "subject": [
+                "computer_science",
+                "unicode"
+            ],
+            "related": [
+                "[[Unicode hexidecimal table]]"
+            ],
+            "question_text": "what is the u+ code for degree character- \u00b0",
+            "answer_text": "u+ 00b0 -> \u00b0",
+            "module_name": "Typing Unicode Characters",
+            "file_name": "what is the u+ code for degree character- \u00b0.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Computer_Science/Typing Unicode Characters/what is the u+ code for degree character- \u00b0.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "what is the u+ code for degree character- \u00b0.md"
+        },
+        "What is the unicode u+ code for the \u22c3 symbol? big cup or union.md": {
+            "type": "question",
+            "subject": [
+                "computer_science",
+                "unicode"
+            ],
+            "related": [
+                "[[Unicode hexidecimal table]]"
+            ],
+            "question_text": "What is the unicode u+ code for the \u22c3 symbol? big cup or union",
+            "answer_text": "U+22c3 -> \u22c3",
+            "module_name": "Typing Unicode Characters",
+            "file_name": "What is the unicode u+ code for the \u22c3 symbol? big cup or union.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Computer_Science/Typing Unicode Characters/What is the unicode u+ code for the \u22c3 symbol? big cup or union.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "What is the unicode u+ code for the \u22c3 symbol? big cup or union.md"
+        },
+        "what is the u+ code for subscript 1 or \u2081?.md": {
+            "type": "question",
+            "subject": [
+                "computer_science",
+                "unicode"
+            ],
+            "related": null,
+            "question_text": "what is the u+ code for subscript 1 or \u2081?",
+            "answer_text": "u+ 2081 -> \u2081",
+            "module_name": "Typing Unicode Characters",
+            "file_name": "what is the u+ code for subscript 1 or \u2081?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Computer_Science/Typing Unicode Characters/what is the u+ code for subscript 1 or \u2081?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "what is the u+ code for subscript 1 or \u2081?.md"
+        },
+        "what is the u+ code for subscript 2 or \u2082?.md": {
+            "type": "question",
+            "subject": [
+                "computer_science",
+                "unicode"
+            ],
+            "related": null,
+            "question_text": "what is the u+ code for subscript 2 or \u2082?",
+            "answer_text": "u+ 2082 -> \u2082",
+            "module_name": "Typing Unicode Characters",
+            "file_name": "what is the u+ code for subscript 2 or \u2082?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Computer_Science/Typing Unicode Characters/what is the u+ code for subscript 2 or \u2082?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "what is the u+ code for subscript 2 or \u2082?.md"
+        },
+        "what is the u+ code for superscript 2?.md": {
+            "type": "question",
+            "subject": [
+                "computer_science",
+                "unicode"
+            ],
+            "related": null,
+            "question_text": "what is the u+ code for superscript 2\u00b2?",
+            "answer_text": "u+ 00b2 -> \u00b2",
+            "module_name": "Typing Unicode Characters",
+            "file_name": "what is the u+ code for superscript 2?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Computer_Science/Typing Unicode Characters/what is the u+ code for superscript 2?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "what is the u+ code for superscript 2?.md"
+        },
+        "what is the u+ code for greek letter alpha?.md": {
+            "type": "question",
+            "subject": [
+                "computer_science",
+                "unicode"
+            ],
+            "related": [
+                "[[Unicode hexidecimal table]]"
+            ],
+            "question_text": "what is the u+ code for greek letter alpha?",
+            "answer_text": "u+ 03b1 -> \u03b1",
+            "module_name": "Typing Unicode Characters",
+            "file_name": "what is the u+ code for greek letter alpha?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Computer_Science/Typing Unicode Characters/what is the u+ code for greek letter alpha?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "what is the u+ code for greek letter alpha?.md"
+        },
+        "what is the u+ code for superscript -?.md": {
+            "type": "question",
+            "subject": [
+                "computer_science",
+                "unicode"
+            ],
+            "related": [
+                "[[Unicode hexidecimal table]]"
+            ],
+            "question_text": "what is the u+ code for superscript -?",
+            "answer_text": "U+ 207b -> \u207b",
+            "module_name": "Typing Unicode Characters",
+            "file_name": "what is the u+ code for superscript -?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Computer_Science/Typing Unicode Characters/what is the u+ code for superscript -?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "what is the u+ code for superscript -?.md"
+        },
+        "What is the u+ code for sqrt character- \u221a.md": {
+            "type": "question",
+            "subject": [
+                "computer_science",
+                "unicode"
+            ],
+            "related": [
+                "[[Unicode hexidecimal table]]"
+            ],
+            "question_text": "What is the u+ code for sqrt character- \u221a",
+            "answer_text": "u+ 221a -> \u221a",
+            "module_name": "Typing Unicode Characters",
+            "file_name": "What is the u+ code for sqrt character- \u221a.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Computer_Science/Typing Unicode Characters/What is the u+ code for sqrt character- \u221a.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "What is the u+ code for sqrt character- \u221a.md"
+        },
+        "What is the unicode character for infinity?.md": {
+            "type": "question",
+            "subject": [
+                "unicode",
+                "computer_science"
+            ],
+            "related": [
+                "[[Linux]]",
+                "[[Unicode hexidecimal table]]"
+            ],
+            "question_text": "What is the unicode U+ code for infinity?",
+            "answer_text": "U+221E = \u221e",
+            "module_name": "Typing Unicode Characters",
+            "file_name": "What is the unicode character for infinity?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Unicode/Typing Unicode Characters/What is the unicode character for infinity?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "What is the unicode character for infinity?.md"
+        },
+        "What is the unicode U+ code for superscript t, lowercase?.md": {
+            "type": "question",
+            "subject": [
+                "unicode"
+            ],
+            "related": [
+                "[[Unicode hexidecimal table]]"
+            ],
+            "question_text": "What is the unicode U+ code for superscript t, lowercase?",
+            "question_image": null,
+            "answer_text": "U+ 1d57 -> \u1d57",
+            "answer_image": null,
+            "module_name": "Typing Unicode Characters",
+            "file_name": "What is the unicode U+ code for superscript t, lowercase?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Unicode/Typing Unicode Characters/What is the unicode U+ code for superscript t, lowercase?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "What is the unicode U+ code for superscript t, lowercase?.md"
+        },
+        "What is the unicode U+ code for the \u2079 - superscript 9.md": {
+            "type": "question",
+            "subject": [
+                "unicode"
+            ],
+            "related": [
+                "[[Unicode]]",
+                "[[superscript]]"
+            ],
+            "module_name": "Typing Unicode Characters",
+            "question_text": "What is the unicode U+ code for the \u2079 - superscript 9",
+            "question_image": null,
+            "question_audio": null,
+            "question_video": null,
+            "answer_text": "U+2079 --> \u2079",
+            "answer_image": null,
+            "answer_audio": null,
+            "answer_video": null,
+            "file_name": "What is the unicode U+ code for the \u2079 - superscript 9.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Unicode/Typing Unicode Characters/What is the unicode U+ code for the \u2079 - superscript 9.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "What is the unicode U+ code for the \u2079 - superscript 9.md"
+        },
+        "What is the unicode U+ code for superscript h, lowercase?.md": {
+            "type": "question",
+            "subject": [
+                "unicode",
+                "computer_science"
+            ],
+            "related": [
+                "[[Unicode hexidecimal table]]"
+            ],
+            "question_text": "What is the unicode U+ code for superscript h, lowercase?",
+            "question_image": null,
+            "answer_text": "U+02b0 -> \u02b0",
+            "answer_image": null,
+            "module_name": "Typing Unicode Characters",
+            "file_name": "What is the unicode U+ code for superscript h, lowercase?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Unicode/Typing Unicode Characters/What is the unicode U+ code for superscript h, lowercase?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "What is the unicode U+ code for superscript h, lowercase?.md"
+        },
+        "What is the u+ code for the \u00b1 symbol?.md": {
+            "type": "question",
+            "subject": [
+                "unicode"
+            ],
+            "related": [
+                "[[Unicode]]"
+            ],
+            "question_text": "What is the u+ code for the \u00b1 symbol?",
+            "question_image": null,
+            "answer_text": "u+00b1 -> \u00b1",
+            "answer_image": null,
+            "module_name": "Typing Unicode Characters",
+            "file_name": "What is the u+ code for the \u00b1 symbol?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Unicode/Typing Unicode Characters/What is the u+ code for the \u00b1 symbol?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "What is the u+ code for the \u00b1 symbol?.md"
+        },
+        "What is the unicode U+ code for the \u2260 symbol?.md": {
+            "type": "question",
+            "subject": [
+                "unicode",
+                "computer_science"
+            ],
+            "related": [
+                "[[Unicode hexidecimal table]]"
+            ],
+            "question_text": "What is the unicode U+ code for the \u2260 symbol?",
+            "answer_text": "U+2260 -> \u2260",
+            "module_name": "Typing Unicode Characters",
+            "file_name": "What is the unicode U+ code for the \u2260 symbol?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Unicode/Typing Unicode Characters/What is the unicode U+ code for the \u2260 symbol?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "What is the unicode U+ code for the \u2260 symbol?.md"
+        },
+        "What is the unicode U+ code for \u03c0 or pi?.md": {
+            "type": "question",
+            "subject": [
+                "unicode",
+                "computer_science"
+            ],
+            "related": [
+                "[[Unicode]]",
+                "[[pi]]"
+            ],
+            "module_name": "Typing Unicode Characters",
+            "question_text": "What is the unicode U+ code for \u03c0 or pi?",
+            "question_image": null,
+            "question_audio": null,
+            "question_video": null,
+            "answer_text": "U+03c0 -> \u03c0",
+            "answer_image": null,
+            "answer_audio": null,
+            "answer_video": null,
+            "file_name": "What is the unicode U+ code for \u03c0 or pi?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Unicode/Typing Unicode Characters/What is the unicode U+ code for \u03c0 or pi?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "What is the unicode U+ code for \u03c0 or pi?.md"
+        }
+    }
+}

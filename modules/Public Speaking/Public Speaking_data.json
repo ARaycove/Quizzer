@@ -1,0 +1,31 @@
+{
+    "module_name": "Public Speaking",
+    "description": "No Description Provided",
+    "is_a_quizzer_module": true,
+    "primary_subject": "Communication",
+    "all_subjects": [
+        "communication"
+    ],
+    "concepts_covered": {
+        "informative speaking": 1
+    },
+    "questions": {
+        "What are five broad categories of informative speaking?.md": {
+            "type": "question",
+            "subject": [
+                "communication"
+            ],
+            "related": [
+                "[[informative speaking]]"
+            ],
+            "question_text": "What are five broad categories of informative speaking?",
+            "answer_text": "People, Objects, Events, Processes, or Ideas",
+            "module_name": "Public Speaking",
+            "file_name": "What are five broad categories of informative speaking?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Communication/Public Speaking/What are five broad categories of informative speaking?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "What are five broad categories of informative speaking?.md"
+        }
+    }
+}

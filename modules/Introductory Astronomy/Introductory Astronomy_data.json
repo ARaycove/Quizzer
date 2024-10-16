@@ -1,0 +1,144 @@
+{
+    "module_name": "Introductory Astronomy",
+    "description": "No Description Provided",
+    "is_a_quizzer_module": true,
+    "primary_subject": "Astronomy",
+    "all_subjects": [
+        "astronomy"
+    ],
+    "concepts_covered": {
+        "horizon": 1,
+        "Local Coordinates": 1,
+        "parallax": 1,
+        "Aristarchus of Samos": 1,
+        "Earth": 3,
+        "sun": 2,
+        "retrograde motion": 1,
+        "Perceived Motion": 1,
+        "sidereal month": 1
+    },
+    "questions": {
+        "When observing from the ground, what is the Horizon defined as?.md": {
+            "type": "question",
+            "subject": [
+                "astronomy"
+            ],
+            "related": [
+                "[[horizon]]",
+                "[[Local Coordinates]]"
+            ],
+            "question_text": "When observing from the ground, what is the Horizon defined as?",
+            "question_image": null,
+            "question_audio": null,
+            "question_video": null,
+            "answer_text": "Where the ground meets the sky \n\nOR\n\nThe plane tangent to Earth at observer",
+            "answer_image": null,
+            "answer_audio": null,
+            "answer_video": null,
+            "module_name": "Introductory Astronomy",
+            "file_name": "When observing from the ground, what is the Horizon defined as?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Astronomy/Introductory Astronomy/When observing from the ground, what is the Horizon defined as?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "When observing from the ground, what is the Horizon defined as?.md"
+        },
+        "Some philosophers in ancient times, such as Aristarchus of Samos, suggested that Earth was moving around the Sun. Why was this theory rejected?.md": {
+            "type": "question",
+            "subject": [
+                "astronomy"
+            ],
+            "related": [
+                "[[parallax]]",
+                "[[Aristarchus of Samos]]",
+                "[[Earth]]",
+                "[[sun]]"
+            ],
+            "module_name": "Introductory Astronomy",
+            "question_text": "Some philosophers in ancient times, such as Aristarchus of Samos, suggested that Earth was moving around the Sun. Why was this theory rejected?",
+            "question_image": null,
+            "question_audio": null,
+            "question_video": null,
+            "answer_text": "The theory suggested either that Earth was not moving or that the stars had to be so tremendously far away that the parallax shift was immeasurably small. A cosmos of such enormous extent required a leap of imagination that most ancient philosophers were not prepared to make, so they retreated to the safety of the Earth-centered view, which would dominate Western thinking for nearly two millennia.",
+            "answer_image": null,
+            "answer_audio": null,
+            "answer_video": null,
+            "file_name": "Some philosophers in ancient times, such as Aristarchus of Samos, suggested that Earth was moving around the Sun. Why was this theory rejected?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Astronomy/Introductory Astronomy/Some philosophers in ancient times, such as Aristarchus of Samos, suggested that Earth was moving around the Sun. Why was this theory rejected?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "Some philosophers in ancient times, such as Aristarchus of Samos, suggested that Earth was moving around the Sun. Why was this theory rejected?.md"
+        },
+        "What is Retrograde Motion?.md": {
+            "type": "question",
+            "subject": [
+                "astronomy"
+            ],
+            "related": [
+                "[[retrograde motion]]",
+                "[[Perceived Motion]]",
+                "[[Earth]]"
+            ],
+            "module_name": "Introductory Astronomy",
+            "question_text": "What is Retrograde Motion?",
+            "question_image": null,
+            "question_audio": null,
+            "question_video": null,
+            "answer_text": "The temporary apparent westward motion of a planet as Earth swings between it and the Sun",
+            "answer_image": "[[Pasted image 20240926130837.png]]",
+            "answer_audio": null,
+            "answer_video": null,
+            "file_name": "What is Retrograde Motion?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Astronomy/Introductory Astronomy/What is Retrograde Motion?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "What is Retrograde Motion?.md"
+        },
+        "How far is the Sun from the Earth?.md": {
+            "type": "question",
+            "subject": [
+                "astronomy"
+            ],
+            "related": [
+                "[[sun]]",
+                "[[Earth]]"
+            ],
+            "module_name": "Introductory Astronomy",
+            "question_text": "How far is the Sun from the Earth?",
+            "question_image": null,
+            "question_audio": null,
+            "question_video": null,
+            "answer_text": "150 million kilometers",
+            "answer_image": null,
+            "answer_audio": null,
+            "answer_video": null,
+            "file_name": "How far is the Sun from the Earth?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Astronomy/Introductory Astronomy/How far is the Sun from the Earth?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "How far is the Sun from the Earth?.md"
+        },
+        "What is a sidereal month?.md": {
+            "type": "question",
+            "subject": [
+                "astronomy"
+            ],
+            "related": [
+                "[[sidereal month]]"
+            ],
+            "module_name": "Introductory Astronomy",
+            "question_text": "What is a sidereal month",
+            "question_image": null,
+            "question_audio": null,
+            "question_video": null,
+            "answer_text": "the period of the Moon\u2019s revolution about Earth measured with respect to the stars",
+            "answer_image": null,
+            "answer_audio": null,
+            "answer_video": null,
+            "file_name": "What is a sidereal month?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Astronomy/Introductory Astronomy/What is a sidereal month?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "What is a sidereal month?.md"
+        }
+    }
+}

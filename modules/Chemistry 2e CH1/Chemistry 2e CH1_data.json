@@ -1,0 +1,176 @@
+{
+    "module_name": "Chemistry 2e CH1",
+    "description": "No Description Provided",
+    "is_a_quizzer_module": true,
+    "primary_subject": "Chemistry",
+    "all_subjects": [
+        "chemistry",
+        "physics"
+    ],
+    "concepts_covered": {
+        "weight": 1,
+        "gravity": 1,
+        "Mass": 3,
+        "matter": 4,
+        "plasma": 1,
+        "space": 1,
+        "water": 1,
+        "chemical formula": 1
+    },
+    "questions": {
+        "The term Weight refers to what?.md": {
+            "type": "question",
+            "subject": [
+                "chemistry",
+                "physics"
+            ],
+            "related": [
+                "[[weight]]",
+                "[[gravity]]",
+                "[[Mass]]"
+            ],
+            "module_name": "Chemistry 2e CH1",
+            "question_text": "The term Weight refers to what?",
+            "question_image": null,
+            "question_audio": null,
+            "question_video": null,
+            "answer_text": "The gravitational force of an object, directly proportional to the objects mass",
+            "answer_image": null,
+            "answer_audio": null,
+            "answer_video": null,
+            "academic_sources": "OpenStax Chemistry 2e",
+            "file_name": "The term Weight refers to what?.md",
+            "file_path": "/home/araycove/Documents/Education/Un-Sorted/The term Weight refers to what?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "The term Weight refers to what?.md"
+        },
+        "What is Chemistry the study of?.md": {
+            "type": "question",
+            "subject": [
+                "chemistry"
+            ],
+            "related": [
+                "[[matter]]"
+            ],
+            "module_name": "Chemistry 2e CH1",
+            "question_text": "What is Chemistry the study of?",
+            "question_image": null,
+            "question_audio": null,
+            "question_video": null,
+            "answer_text": "The study of the composition, properties, and interactions of matter",
+            "answer_image": null,
+            "answer_audio": null,
+            "answer_video": null,
+            "academic_sources": "OpenStax Chemistry 2e",
+            "file_name": "What is Chemistry the study of?.md",
+            "file_path": "/home/araycove/Documents/Education/Un-Sorted/What is Chemistry the study of?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "What is Chemistry the study of?.md"
+        },
+        "The fourth state of matter is called what? What defines it?.md": {
+            "type": "question",
+            "subject": [
+                "chemistry"
+            ],
+            "related": [
+                "[[plasma]]",
+                "[[matter]]"
+            ],
+            "module_name": "Chemistry 2e CH1",
+            "question_text": "The fourth state of matter is called what? What defines it?",
+            "question_image": null,
+            "question_audio": null,
+            "question_video": null,
+            "answer_text": "Plasma! Its the gaseous state of matter that contains appreciable numbers of electrically charged particles. \n\nThe presence of these charged particles imparts unique properties to plasmas that justify their classification as a state of matter distinct from gases.",
+            "answer_image": null,
+            "answer_audio": null,
+            "answer_video": null,
+            "academic_sources": "OpenStax Chemistry 2e",
+            "file_name": "The fourth state of matter is called what? What defines it?.md",
+            "file_path": "/home/araycove/Documents/Education/Un-Sorted/The fourth state of matter is called what? What defines it?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "The fourth state of matter is called what? What defines it?.md"
+        },
+        "What is matter defined as?.md": {
+            "type": "question",
+            "subject": [
+                "chemistry",
+                "physics"
+            ],
+            "related": [
+                "[[matter]]",
+                "[[space]]",
+                "[[Mass]]"
+            ],
+            "module_name": "Chemistry 2e CH1",
+            "question_text": "What is matter defined as?",
+            "question_image": null,
+            "question_audio": null,
+            "question_video": null,
+            "answer_text": "Anything that occupies space and has mass",
+            "answer_image": null,
+            "answer_audio": null,
+            "answer_video": null,
+            "academic_sources": "OpenStax Chemistry 2e",
+            "file_name": "What is matter defined as?.md",
+            "file_path": "/home/araycove/Documents/Education/Un-Sorted/What is matter defined as?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "What is matter defined as?.md"
+        },
+        "What is the mass of an object defined as?.md": {
+            "type": "question",
+            "subject": [
+                "chemistry",
+                "physics"
+            ],
+            "related": [
+                "[[Mass]]",
+                "[[matter]]"
+            ],
+            "module_name": "Chemistry 2e CH1",
+            "question_text": "What is the mass of an object defined as?",
+            "question_image": null,
+            "question_audio": null,
+            "question_video": null,
+            "answer_text": "The mass of an object is a measure of the amount of matter in it",
+            "answer_image": null,
+            "answer_audio": null,
+            "answer_video": null,
+            "academic_sources": "OpenStax Chemistry 2e",
+            "file_name": "What is the mass of an object defined as?.md",
+            "file_path": "/home/araycove/Documents/Education/Un-Sorted/What is the mass of an object defined as?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "What is the mass of an object defined as?.md"
+        },
+        "What is the formula for water?.md": {
+            "type": "question",
+            "subject": [
+                "chemistry"
+            ],
+            "related": [
+                "[[water]]",
+                "[[chemical formula]]"
+            ],
+            "module_name": "Chemistry 2e CH1",
+            "question_text": "What is the formula for water?",
+            "question_image": null,
+            "question_audio": null,
+            "question_video": null,
+            "answer_text": "H\u2082O",
+            "answer_image": null,
+            "answer_audio": null,
+            "answer_video": null,
+            "academic_sources": "OpenStax Chemistry 2e",
+            "file_name": "What is the formula for water?.md",
+            "file_path": "/home/araycove/Documents/Education/Un-Sorted/What is the formula for water?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "What is the formula for water?.md"
+        }
+    }
+}

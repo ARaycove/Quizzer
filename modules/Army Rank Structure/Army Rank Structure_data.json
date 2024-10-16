@@ -1,0 +1,29 @@
+{
+    "module_name": "Army Rank Structure",
+    "description": "No Description Provided",
+    "is_a_quizzer_module": true,
+    "primary_subject": "Us_Military",
+    "all_subjects": [
+        "us_military"
+    ],
+    "concepts_covered": {},
+    "questions": {
+        "What is this enlisted rank? Private (E-3).md": {
+            "type": "question",
+            "subject": [
+                "us_military"
+            ],
+            "related": null,
+            "question_text": "What is this enlisted rank? PayGrade?",
+            "question_image": "Pasted image 20240323184622.png",
+            "answer_text": "Private First Class (PFC), E-3",
+            "answer_image": null,
+            "module_name": "Army Rank Structure",
+            "file_name": "What is this enlisted rank? Private (E-3).md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Us_Military/Army Rank Structure/What is this enlisted rank? Private (E-3).md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "What is this enlisted rank? Private (E-3).md"
+        }
+    }
+}

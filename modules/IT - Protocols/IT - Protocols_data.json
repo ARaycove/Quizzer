@@ -1,0 +1,45 @@
+{
+    "module_name": "IT - Protocols",
+    "description": "No Description Provided",
+    "is_a_quizzer_module": true,
+    "primary_subject": "Information Technology",
+    "all_subjects": [
+        "information technology",
+        "computer_science"
+    ],
+    "concepts_covered": {
+        "World Wide Web": 1,
+        "The Internet": 1,
+        "Internet Protocol": 1,
+        "HyperText Transfer Protocol": 1
+    },
+    "questions": {
+        "The World Wide Web uses what protocol to transmit data?.md": {
+            "type": "question",
+            "subject": [
+                "information technology",
+                "computer_science"
+            ],
+            "related": [
+                "[[World Wide Web]]",
+                "[[The Internet]]",
+                "[[Internet Protocol]]",
+                "[[HyperText Transfer Protocol]]"
+            ],
+            "question_text": "The World Wide Web uses what protocol to transmit data?",
+            "question_image": null,
+            "question_audio": null,
+            "question_video": null,
+            "answer_text": "HTTP (Hypertext Transfer Protocol)",
+            "answer_image": null,
+            "answer_audio": null,
+            "answer_video": null,
+            "module_name": "IT - Protocols",
+            "file_name": "The World Wide Web uses what protocol to transmit data?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Information Technology/It - Protocols/The World Wide Web uses what protocol to transmit data?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "The World Wide Web uses what protocol to transmit data?.md"
+        }
+    }
+}

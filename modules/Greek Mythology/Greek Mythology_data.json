@@ -1,0 +1,1849 @@
+{
+    "module_name": "Greek Mythology",
+    "description": "No Description Provided",
+    "is_a_quizzer_module": true,
+    "primary_subject": "Mythology",
+    "all_subjects": [
+        "mythology"
+    ],
+    "concepts_covered": {
+        "Heracles": 6,
+        "Hebe": 2,
+        "Zeus": 15,
+        "Hera": 5,
+        "Pegasus": 3,
+        "Chimera": 4,
+        "Bellerophon": 3,
+        "Gorgon Medusa": 4,
+        "Perseus": 3,
+        "Athena": 4,
+        "Stheneboea": 1,
+        "Centaur": 1,
+        "horse": 1,
+        "human": 1,
+        "Thessaly": 1,
+        "Arcadia": 1,
+        "Ixion": 1,
+        "Lapiths": 1,
+        "Pirithous": 1,
+        "Orpheus": 2,
+        "Dryad": 1,
+        "nymph": 5,
+        "oak tree": 1,
+        "Romulus": 1,
+        "Remes": 1,
+        "Achilles": 2,
+        "Trojan War": 4,
+        "Peleus": 1,
+        "Myrmidon": 1,
+        "Thetis": 1,
+        "Illiad": 1,
+        "Pygmalion": 1,
+        "Adonis": 1,
+        "Metharme": 1,
+        "Hermes": 5,
+        "Pleiad Maia": 2,
+        "Mercury": 3,
+        "Casmilus": 1,
+        "Cadmilus": 1,
+        "Cabeiri": 1,
+        "Pan": 2,
+        "The Odyssey": 2,
+        "Hades": 4,
+        "dragon": 2,
+        "Poseidon": 4,
+        "Antaeus": 2,
+        "Helios": 1,
+        "sun": 1,
+        "chariot": 1,
+        "Cupid": 2,
+        "Venus": 2,
+        "love": 1,
+        "Hephaestus": 1,
+        "Olympus": 1,
+        "Dionysus": 3,
+        "Persephone": 3,
+        "Demeter": 1,
+        "Vale of Nysa": 1,
+        "Pleiades": 3,
+        "Atlas": 2,
+        "Pleione": 1,
+        "Minos": 2,
+        "king": 1,
+        "Paris": 1,
+        "pipes": 1,
+        "Circe": 1,
+        "Odysseus": 2,
+        "Aeaea": 1,
+        "moly": 1,
+        "Fortuna": 1,
+        "Tyche": 1,
+        "Eurystheus": 1,
+        "Orchomenus": 1,
+        "Boeotia": 1,
+        "Megara": 1,
+        "Creon": 1,
+        "Thebes": 2,
+        "Cerberus": 3,
+        "underworld": 2,
+        "Midas": 1,
+        "Phrygia": 1,
+        "Silenus": 1,
+        "satyr": 1,
+        "Pactolus River": 1,
+        "Sardis": 1,
+        "Turkey": 1,
+        "Homer": 1,
+        "Ithaca": 1,
+        "Prometheus": 1,
+        "Fire": 1,
+        "Titan": 3,
+        "Earth": 1,
+        "pomegranate": 1,
+        "Ares": 3,
+        "Mars": 3,
+        "Ancient Greece": 3,
+        "Chrysaor": 1,
+        "Echidna": 2,
+        "Sphinx": 3,
+        "Typhon": 2,
+        "Jupiter": 2,
+        "Romans": 5,
+        "Pantheon": 2,
+        "Jason and the Golden Fleece": 1,
+        "Argonauts": 1,
+        "Golden Fleece": 1,
+        "Hesiod": 2,
+        "Pandora": 1,
+        "Epimetheus": 1,
+        "Pandora's Box": 1,
+        "Erasmus": 1,
+        "Psyche": 1,
+        "Leto": 2,
+        "Artemis": 2,
+        "Apollo": 4,
+        "Island of Delos": 1,
+        "Maia": 4,
+        "God": 1,
+        "kairos": 1,
+        "serpent": 1,
+        "snake": 1,
+        "Diana": 1,
+        "Icarus": 1,
+        "Daedalus": 1,
+        "wine": 1,
+        "Androcles": 1,
+        "lion": 1,
+        "Andromeda": 1,
+        "Agamemnon": 1,
+        "Cassandra": 1,
+        "Parthenon": 1,
+        "Fates": 1,
+        "Aphrodite": 1,
+        "Sparta": 1,
+        "Cyprus": 1,
+        "Animism": 1,
+        "Janus": 1,
+        "Juno": 1,
+        "Egypt": 1,
+        "Mount Cyllene": 1,
+        "Hestia": 2,
+        "Cronus": 2,
+        "Rhea": 2,
+        "Theogony": 1,
+        "Gaea": 1,
+        "Saturn": 1,
+        "latin": 1,
+        "Marriage": 1,
+        "Ceres": 1,
+        "Mount Olympus": 1,
+        "judge": 1,
+        "Hecate": 1,
+        "Neptune": 1,
+        "Vulcan": 1,
+        "Art": 1,
+        "lyre": 1,
+        "Achelous": 1,
+        "thunderbolt": 1,
+        "Pluto": 1,
+        "Dioscuri": 1,
+        "Castor and Pollux": 1,
+        "Leda": 1,
+        "Tyndareus": 1,
+        "Lacedaemon": 1,
+        "swan": 1,
+        "Narcissus": 1,
+        "Cephissus": 1,
+        "Liriope": 1,
+        "Metamorphoses": 1,
+        "Tiresias": 1,
+        "Echo": 1,
+        "Ameinias": 1,
+        "Minerva": 1
+    },
+    "questions": {
+        "In Greek mythology, who was Heracles' wife after he died?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Heracles]]",
+                "[[Hebe]]",
+                "[[Zeus]]",
+                "[[Hera]]"
+            ],
+            "question_text": "In Greek mythology, who was Heracles' wife after he died?",
+            "question_image": null,
+            "answer_text": "Hebe \n\n\"After Hercules (Heracles in Greek) died, he was granted immortality and married Hebe, the goddess of youth and the daughter of Zeus and Hera. Hebe was known for her beauty and was often depicted as the cupbearer of the gods, serving them nectar and ambrosia. The marriage of Hercules and Hebe was a symbol of his transition from mortal life to the divine realm.\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "In Greek mythology, who was Heracles' wife after he died?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/In Greek mythology, who was Heracles' wife after he died?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "In Greek mythology, who was Heracles' wife after he died?.md"
+        },
+        "According to Greek Mythology, who captured Pegasus and rode him in his fight with the Chimera?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Pegasus]]",
+                "[[Chimera]]",
+                "[[Bellerophon]]",
+                "[[Gorgon Medusa]]",
+                "[[Perseus]]",
+                "[[Athena]]",
+                "[[Stheneboea]]",
+                "[[Zeus]]"
+            ],
+            "question_text": "According to Greek Mythology, who captured Pegasus and rode him in his fight with the Chimera?",
+            "question_image": null,
+            "answer_text": "Bellerophon \n\n\"The winged horse Pegasus sprang from the blood of the Gorgon Medusa as she was beheaded by the hero Perseus. With Athena\u2019s (or Poseidon\u2019s) help, another Greek hero, Bellerophon, captured Pegasus and rode him first in his fight with the Chimera and later while he was taking vengeance on Stheneboea (Anteia), who had falsely accused Bellerophon. Subsequently Bellerophon attempted to fly with Pegasus to heaven but was unseated and killed or, by some accounts, lamed. The winged horse became a constellation and the servant of Zeus.\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "According to Greek Mythology, who captured Pegasus and rode him in his fight with the Chimera?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/According to Greek Mythology, who captured Pegasus and rode him in his fight with the Chimera?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "According to Greek Mythology, who captured Pegasus and rode him in his fight with the Chimera?.md"
+        },
+        "Which legendary creature is part horse and part man?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Centaur]]",
+                "[[horse]]",
+                "[[human]]",
+                "[[Thessaly]]",
+                "[[Arcadia]]",
+                "[[Ixion]]",
+                "[[Lapiths]]",
+                "[[Pirithous]]"
+            ],
+            "question_text": "Which legendary creature is part horse and part man?",
+            "question_image": null,
+            "answer_text": "Centaur\n\n\"In Greek mythology, Centaurs are a race of creatures that are part horse and part man, dwelling in the mountains of Thessaly and Arcadia. Traditionally they were the offspring of Ixion, king of the neighboring Lapiths, and were best known for their fight (centauromachy) with the Lapiths, which resulted from their attempt to carry off the bride of Pirithous, son and successor of Ixion.\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "Which legendary creature is part horse and part man?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/Which legendary creature is part horse and part man?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "Which legendary creature is part horse and part man?.md"
+        },
+        "In Greek mythology, who traveled to the land of the dead in order to find his wife?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Orpheus]]"
+            ],
+            "question_text": "In Greek mythology, who traveled to the land of the dead in order to find his wife? What was his wife's name",
+            "question_image": null,
+            "answer_text": "Orpheus, his wife was Eurydice.\n\n\"In Greek legend, Orpheus travels to the underworld to retrieve the spirit of his dead bride, Eurydice. Their tragic story has been told and retold for thousands of years.\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "In Greek mythology, who traveled to the land of the dead in order to find his wife?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/In Greek mythology, who traveled to the land of the dead in order to find his wife?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "In Greek mythology, who traveled to the land of the dead in order to find his wife?.md"
+        },
+        "In Greek mythology, what is the term for a nature spirit who lives in trees and takes the form of a beautiful woman?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Dryad]]",
+                "[[nymph]]",
+                "[[oak tree]]"
+            ],
+            "question_text": "In Greek mythology, what is the term for a nature spirit who lives in trees and takes the form of a beautiful woman?",
+            "question_image": null,
+            "answer_text": "Dryad,\n\n\"A Dryad is a nymph or nature spirit who lives in trees and takes the form of a beautiful young woman. Dryads were originally the spirits of oak trees (drys: \u201coak\u201d), but the name was later applied to all tree nymphs. It was believed that they lived only as long as the trees they inhabited.\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "In Greek mythology, what is the term for a nature spirit who lives in trees and takes the form of a beautiful woman?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/In Greek mythology, what is the term for a nature spirit who lives in trees and takes the form of a beautiful woman?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "In Greek mythology, what is the term for a nature spirit who lives in trees and takes the form of a beautiful woman?.md"
+        },
+        "According to Roman legend, which of the following creatures suckled Romulus and Remes after they were abandoned?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Romulus]]",
+                "[[Remes]]"
+            ],
+            "question_text": "According to Roman legend, which of the following creatures suckled Romulus and Remes after they were abandoned?",
+            "question_image": null,
+            "answer_text": "A Wolf\n\n\"The origins of Rome, as of all ancient cities, are wrapped in fable. The Roman fable is of Romulus and Remus, twin sons of Mars, abandoned on the flooding Tiber and deposited by the receding waters at the foot of the Palatine. Suckled by a she-wolf, they were reared by a shepherd and grew up to found Rome. (The bronze statue of the maternally ferocious wolf, now in the city\u2019s Capitoline Museums, is one of the best-known works among the thousands of masterpieces in Rome.)\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "According to Roman legend, which of the following creatures suckled Romulus and Remes after they were abandoned?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/According to Roman legend, which of the following creatures suckled Romulus and Remes after they were abandoned?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "According to Roman legend, which of the following creatures suckled Romulus and Remes after they were abandoned?.md"
+        },
+        "In Greek Mythology, who is regarded as the strongest warrior and hero in the Greek army during the Trojan War?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Achilles]]",
+                "[[Trojan War]]",
+                "[[Peleus]]",
+                "[[Myrmidon]]",
+                "[[Thetis]]",
+                "[[nymph]]",
+                "[[Illiad]]"
+            ],
+            "question_text": "In Greek Mythology, who is regarded as the strongest warrior and hero in the Greek army during the Trojan War?",
+            "question_image": null,
+            "answer_text": "Achilles \n\n\"In Greek mythology, Achilles was the strongest warrior and hero in the Greek army during the Trojan War. He was the son of Peleus, king of the Myrmidons, and Thetis, a sea nymph. The story of Achilles appears in Homer\u2019s Iliad and elsewhere.\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "In Greek Mythology, who is regarded as the strongest warrior and hero in the Greek army during the Trojan War?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/In Greek Mythology, who is regarded as the strongest warrior and hero in the Greek army during the Trojan War?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "In Greek Mythology, who is regarded as the strongest warrior and hero in the Greek army during the Trojan War?.md"
+        },
+        "In Greek mythology, who falls in love with a statue?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Pygmalion]]",
+                "[[Adonis]]",
+                "[[Metharme]]"
+            ],
+            "question_text": "In Greek mythology, who falls in love with a statue? What did \"they\" name the statue?",
+            "question_image": null,
+            "answer_text": "Pygmalion, Galatea\n\n\"In Greek mythology, Pygmalion was a king who was the father of Metharme and the grandfather of Adonis. The Roman poet Ovid, in his Metamorphoses, Book X, relates that Pygmalion, a sculptor, makes an ivory statue representing his ideal of womanhood and then falls in love with his creation, which he names Galatea; the goddess Venus brings the statue to life in answer to his prayer.\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "In Greek mythology, who falls in love with a statue?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/In Greek mythology, who falls in love with a statue?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "In Greek mythology, who falls in love with a statue?.md"
+        },
+        "Who appears mainly as the messenger of the gods in the Odyssey, though in other literature he was associated with the protection of cattle and sheep?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Hermes]]",
+                "[[Zeus]]",
+                "[[Pleiad Maia]]",
+                "[[Mercury]]",
+                "[[Casmilus]]",
+                "[[Cadmilus]]",
+                "[[Cabeiri]]",
+                "[[Pan]]",
+                "[[nymph]]",
+                "[[The Odyssey]]",
+                "[[Hades]]"
+            ],
+            "question_text": "Who appears mainly as the messenger of the gods in the Odyssey, though in other literature he was associated with the protection of cattle and sheep?",
+            "question_image": null,
+            "answer_text": "Hermes,\n\n\"Hermes, son of Zeus and the Pleiad Maia, is often identified with the Roman Mercury and with Casmilus or Cadmilus, one of the Cabeiri. Both in literature and cult Hermes was constantly associated with the protection of cattle and sheep, and he was often closely connected with deities of vegetation, especially Pan and the nymphs. In the Odyssey, however, he appears mainly as the messenger of the gods and the conductor of the dead to Hades.\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "Who appears mainly as the messenger of the gods in the Odyssey, though in other literature he was associated with the protection of cattle and sheep?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/Who appears mainly as the messenger of the gods in the Odyssey, though in other literature he was associated with the protection of cattle and sheep?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "Who appears mainly as the messenger of the gods in the Odyssey, though in other literature he was associated with the protection of cattle and sheep?.md"
+        },
+        "What mythological creature has a lion''s head, a goat''s body, and a dragon''s tail?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Chimera]]",
+                "[[dragon]]"
+            ],
+            "question_text": "What mythological creature has a lion''s head, a goat''s body, and a dragon''s tail?",
+            "question_image": null,
+            "answer_text": "Chimera,\n\n\"In Greek mythology, the Chimera is a fire-breathing female monster resembling a lion in the forepart, a goat in the middle, and a dragon behind.\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "What mythological creature has a lion''s head, a goat''s body, and a dragon''s tail?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/What mythological creature has a lion''s head, a goat''s body, and a dragon''s tail?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "What mythological creature has a lion''s head, a goat''s body, and a dragon''s tail?.md"
+        },
+        "Antaeus the giant, is the son of which greek god?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Poseidon]]",
+                "[[Antaeus]]",
+                "[[Heracles]]"
+            ],
+            "question_text": "Antaeus the giant, is the son of which greek god?",
+            "question_image": null,
+            "answer_text": "Poseidon,\n\n\"Antaeus is the son of the sea god Poseidon and the Earth goddess Gaea. He compelled all strangers who were passing through the country to wrestle with him. Whenever Antaeus touched the Earth (his mother), his strength was renewed, so that even if thrown to the ground, he was invincible. Heracles, in combat with him, discovered the source of his strength and, lifting him up from Earth, crushed him to death.\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "Antaeus the giant, is the son of which greek god?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/Antaeus the giant, is the son of which greek god?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "Antaeus the giant, is the son of which greek god?.md"
+        },
+        "In Greek mythology, who drives a chariot across the sky each day?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Helios]]",
+                "[[sun]]",
+                "[[chariot]]"
+            ],
+            "question_text": "In Greek mythology, who drives a chariot across the sky each day?",
+            "question_image": null,
+            "answer_text": "Helios,\n\n\"In Greek religion, Helios, the sun god, drove a chariot daily from east to west across the sky and sailed around the northerly stream of Ocean each night in a huge cup.\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "In Greek mythology, who drives a chariot across the sky each day?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/In Greek mythology, who drives a chariot across the sky each day?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "In Greek mythology, who drives a chariot across the sky each day?.md"
+        },
+        "Which Roman god often appeared as a winged infant carrying a bow and a quiver of arrows?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Cupid]]",
+                "[[Mercury]]",
+                "[[Venus]]",
+                "[[love]]"
+            ],
+            "question_text": "Which Roman god often appeared as a winged infant carrying a bow and a quiver of arrows?",
+            "question_image": null,
+            "answer_text": "Cupid\n\n\"According to myth, Cupid was the son of Mercury, the winged messenger of the gods, and Venus, the goddess of love. He often appeared as a winged infant carrying a bow and a quiver of arrows whose wounds inspired love or passion in his every victim.\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "Which Roman god often appeared as a winged infant carrying a bow and a quiver of arrows?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/Which Roman god often appeared as a winged infant carrying a bow and a quiver of arrows?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "Which Roman god often appeared as a winged infant carrying a bow and a quiver of arrows?.md"
+        },
+        "Who is the Greek God of Fire?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Hephaestus]]",
+                "[[Zeus]]",
+                "[[Olympus]]",
+                "[[Dionysus]]"
+            ],
+            "question_text": "Who is the Greek God of Fire?",
+            "question_image": null,
+            "answer_text": "Hephaestus,\n\n\"According to myth, Hephaestus is the Greek god of fire. According to myth, Hephaestus was born lame and was cast from heaven in disgust by his mother, Hera, and again by his father, Zeus, after a family quarrel. He was brought back to Olympus by Dionysus and was one of the only gods to have returned after exile. As god of fire, Hephaestus became the divine smith and patron of craftsmen; the natural volcanic or gaseous fires already connected with him were often considered to be his workshops.\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "Who is the Greek God of Fire?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/Who is the Greek God of Fire?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "Who is the Greek God of Fire?.md"
+        },
+        "In Greek religion, who is the wife of Hades?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Hades]]",
+                "[[Persephone]]",
+                "[[Zeus]]",
+                "[[Demeter]]",
+                "[[Vale of Nysa]]"
+            ],
+            "question_text": "In Greek religion, who is the wife of Hades?",
+            "question_image": null,
+            "answer_text": "Persephone\n\n\"In Greek religion, Persephone , daughter of Zeus and Demeter, is the wife of Hades, king of the underworld. In the Homeric \u201cHymn to Demeter,\u201d the story is told of how Persephone was gathering flowers in the Vale of Nysa when she was seized by Hades and removed to the underworld.\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "In Greek religion, who is the wife of Hades?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/In Greek religion, who is the wife of Hades?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "In Greek religion, who is the wife of Hades?.md"
+        },
+        "In greek mythology, The Pleiades were the seven daughters of which two beings?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Pleiades]]",
+                "[[Atlas]]",
+                "[[Pleione]]"
+            ],
+            "question_text": "In greek mythology, The Pleiades were the seven daughters of which two beings?",
+            "question_image": null,
+            "answer_text": "Atlas and Pleione",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "In greek mythology, The Pleiades were the seven daughters of which two beings?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/In greek mythology, The Pleiades were the seven daughters of which two beings?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "In greek mythology, The Pleiades were the seven daughters of which two beings?.md"
+        },
+        "In Greek mythology, How does King Minos die?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Minos]]",
+                "[[king]]"
+            ],
+            "question_text": "In Greek mythology, How does King Minos die?",
+            "question_image": null,
+            "answer_text": "Boiled in a burning Bath,\n\n\"King Minos died by being boiled in a burning bath. This is a reference to the myth of King Minos from Greek mythology. According to the myth, King Minos was the ruler of Crete and had a labyrinth built to imprison the Minotaur, a half-human, half-bull creature. However, King Minos offended the gods, and as a punishment, his wife Pasiphae fell in love with the Minotaur and gave birth to its offspring. In retaliation, the gods caused King Minos to be scalded to death in a boiling bath.\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "In Greek mythology, How does King Minos die?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/In Greek mythology, How does King Minos die?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "In Greek mythology, How does King Minos die?.md"
+        },
+        "In Greek mythology, what immortal being gave Medusa snakes for hair and such an ugly appearance that anyone who looked her way would turn to stone?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Athena]]",
+                "[[Gorgon Medusa]]",
+                "[[Poseidon]]"
+            ],
+            "question_text": "In Greek mythology, what immortal being gave Medusa snakes for hair and such an ugly appearance that anyone who looked her way would turn to stone?",
+            "question_image": null,
+            "answer_text": "Athena \n\n\"Athena, the goddess of wisdom and warfare, is the immortal being who gave Medusa snakes for hair and an ugly appearance. In Greek mythology, Medusa was a beautiful woman who caught the attention of Poseidon. However, Athena was enraged by this and transformed Medusa into a monster as punishment. The snakes for hair and the power to turn anyone who looked at her into stone were part of this curse. Athena's act serves as a warning against the consequences of vanity and pride.\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "In Greek mythology, what immortal being gave Medusa snakes for hair and such an ugly appearance that anyone who looked her way would turn to stone?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/In Greek mythology, what immortal being gave Medusa snakes for hair and such an ugly appearance that anyone who looked her way would turn to stone?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "In Greek mythology, what immortal being gave Medusa snakes for hair and such an ugly appearance that anyone who looked her way would turn to stone?.md"
+        },
+        "In Greek mythology, who killed Achilles?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Achilles]]",
+                "[[Paris]]",
+                "[[Trojan War]]"
+            ],
+            "question_text": "In Greek mythology, who killed Achilles?",
+            "question_image": null,
+            "answer_text": "Paris \n\n\"Paris is the correct answer because in Greek mythology, Paris is the Trojan prince who killed Achilles. During the Trojan War, Achilles was shot in the heel, his only vulnerable spot, by Paris with an arrow. This act ultimately led to Achilles' death. Persephone, Athena, Helen, and Cadmus are not directly associated with Achilles' death in Greek mythology.\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "In Greek mythology, who killed Achilles?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/In Greek mythology, who killed Achilles?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "In Greek mythology, who killed Achilles?.md"
+        },
+        "What musical instrument is the Greek god Pan associated with?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Pan]]",
+                "[[pipes]]",
+                "[[nymph]]"
+            ],
+            "question_text": "What musical instrument is the Greek god Pan associated with?",
+            "question_image": null,
+            "answer_text": "pipes,\n\n\"Pan was a piper, and his great joy was to play music and dance with the nymphs in the forests.\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "What musical instrument is the Greek god Pan associated with?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/What musical instrument is the Greek god Pan associated with?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "What musical instrument is the Greek god Pan associated with?.md"
+        },
+        "According to Greek legend, who is the sorceress with the power to change humans into wolves, lions and swine?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Circe]]",
+                "[[Odysseus]]",
+                "[[Aeaea]]",
+                "[[Hermes]]",
+                "[[moly]]"
+            ],
+            "question_text": "According to Greek legend, who is the sorceress with the power to change humans into wolves, lions and swine?",
+            "question_image": null,
+            "answer_text": "Circe, \n\n\"In Greek legend, Circe is a sorceress who is able, by means of drugs and incantations, to change humans into wolves, lions, and swine. The Greek hero Odysseus visited her island, Aeaea, with his companions, whom she changed into swine. But Odysseus, protected by the herb moly (a gift from Hermes), compelled her to restore them to their original shape.\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "According to Greek legend, who is the sorceress with the power to change humans into wolves, lions and swine?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/According to Greek legend, who is the sorceress with the power to change humans into wolves, lions and swine?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "According to Greek legend, who is the sorceress with the power to change humans into wolves, lions and swine?.md"
+        },
+        "Who is the Greek goddess of chance, with whom the Roman Fortuna was later identified?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Fortuna]]",
+                "[[Tyche]]"
+            ],
+            "question_text": "Who is the Greek goddess of chance, with whom the Roman Fortuna was later identified?",
+            "question_image": null,
+            "answer_text": "Tyche,\n\n\"Tyche is the goddess of chance, with whom the Roman Fortuna was later identified; Tyche is a capricious dispenser of good and ill fortune.\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "Who is the Greek goddess of chance, with whom the Roman Fortuna was later identified?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/Who is the Greek goddess of chance, with whom the Roman Fortuna was later identified?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "Who is the Greek goddess of chance, with whom the Roman Fortuna was later identified?.md"
+        },
+        "How many Labours was Heracles given by Eurystheus?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Heracles]]",
+                "[[Eurystheus]]",
+                "[[Orchomenus]]",
+                "[[Boeotia]]",
+                "[[Megara]]",
+                "[[Creon]]",
+                "[[Thebes]]",
+                "[[Hera]]"
+            ],
+            "question_text": "How many Labours was Heracles given by Eurystheus?",
+            "question_image": null,
+            "answer_text": "12 labours,\n\n\"Heracles is one of the most famous Greco-Roman legendary heroes. Heracles waged a victorious war against the kingdom of Orchomenus in Boeotia and married Megara, daughter of Creon, king of Thebes, but he killed her and their children in a fit of madness sent by Hera and, consequently, was obliged to become the servant of Eurystheus. It was Eurystheus who imposed upon Heracles the famous Labours, later arranged in a cycle of 12.\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "How many Labours was Heracles given by Eurystheus?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/How many Labours was Heracles given by Eurystheus?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "How many Labours was Heracles given by Eurystheus?.md"
+        },
+        "In Greek mythology, what was the last labor of Heracles?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Heracles]]",
+                "[[Cerberus]]",
+                "[[underworld]]"
+            ],
+            "question_text": "In Greek mythology, what was the last labor of Heracles?",
+            "question_image": null,
+            "answer_text": "The Capture of Cerberus \n\n\"The last labor of Hercules was the Capture of Cerberus. Cerberus was a three-headed dog that guarded the entrance to the underworld. Hercules was tasked with bringing Cerberus back to the surface world as part of his twelve labors. He successfully subdued the fearsome beast and returned with him to complete his final labor.\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "In Greek mythology, what was the last labor of Heracles?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/In Greek mythology, what was the last labor of Heracles?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "In Greek mythology, what was the last labor of Heracles?.md"
+        },
+        "In Greek and Roman legend, who is gifted the power to transform all that he touches into gold?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Midas]]",
+                "[[Phrygia]]",
+                "[[Silenus]]",
+                "[[satyr]]",
+                "[[Dionysus]]",
+                "[[Pactolus River]]",
+                "[[Sardis]]",
+                "[[Turkey]]"
+            ],
+            "question_text": "In Greek and Roman legend, who is gifted the power to transform all that he touches into gold?",
+            "question_image": null,
+            "answer_text": "King Midas of Phyrgia,\n\n\"Midas, in Greek and Roman legend, is a king of Phrygia, known for his foolishness and greed. According to the myth, Midas found the wandering Silenus, the satyr and companion of the god Dionysus. For his kind treatment of Silenus Midas was rewarded by Dionysus with a wish. The king wished that all he touched might turn to gold, but when his food became gold and he nearly starved to death as a result, he realized his error. Dionysus then granted him release by having him bathe in the Pactolus River (near Sardis in modern Turkey), an action to which the presence of alluvial gold in that stream is attributed.\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "In Greek and Roman legend, who is gifted the power to transform all that he touches into gold?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/In Greek and Roman legend, who is gifted the power to transform all that he touches into gold?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "In Greek and Roman legend, who is gifted the power to transform all that he touches into gold?.md"
+        },
+        "What is the name of the hero of Homer's epic poem the Odyssey?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Homer]]",
+                "[[The Odyssey]]",
+                "[[Odysseus]]",
+                "[[Ithaca]]",
+                "[[Trojan War]]"
+            ],
+            "question_text": "What is the name of the hero of Homer's epic poem the Odyssey?",
+            "question_image": null,
+            "answer_text": "Odysseus,\n\n\"Odysseus is the hero of Homer\u2019s epic poem the Odyssey. The poem is the story of Odysseus, king of Ithaca, who wanders for 10 years (although the action of the poem covers only the final six weeks) trying to get home after the Trojan War. Homer portrayed Odysseus as a man of outstanding wisdom and shrewdness, eloquence, resourcefulness, courage, and endurance.\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "What is the name of the hero of Homer's epic poem the Odyssey?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/What is the name of the hero of Homer's epic poem the Odyssey?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "What is the name of the hero of Homer's epic poem the Odyssey?.md"
+        },
+        "What did Prometheus steal from Zeus to give to the humans?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Zeus]]",
+                "[[Prometheus]]",
+                "[[Fire]]",
+                "[[Titan]]",
+                "[[Earth]]"
+            ],
+            "question_text": "What did Prometheus steal from Zeus to give to the humans?",
+            "question_image": null,
+            "answer_text": "Fire\n\n\"In Greek religion, Prometheus is one of the Titans, the supreme trickster, and a god of fire. One of the principal legends concerning Prometheus relates that he stole fire from Zeus\u2014who had hidden it from the mortals\u2014and returned it to Earth once again.\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "What did Prometheus steal from Zeus to give to the humans?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/What did Prometheus steal from Zeus to give to the humans?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "What did Prometheus steal from Zeus to give to the humans?.md"
+        },
+        "What fruit is associated with the mythological figure Persephone?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[pomegranate]]",
+                "[[Persephone]]",
+                "[[Hades]]"
+            ],
+            "question_text": "What fruit is associated with the mythological figure Persephone?",
+            "question_image": null,
+            "answer_text": "A pomegranate \n\n\"Persephone is the Greek mythological figure who, after being kidnapped by the god of the underworld, eats a single pomegranate seed\u2014an act that becomes her downfall.\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "What fruit is associated with the mythological figure Persephone?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/What fruit is associated with the mythological figure Persephone?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "What fruit is associated with the mythological figure Persephone?.md"
+        },
+        "Who is the Greek God of War?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Ares]]",
+                "[[Mars]]",
+                "[[Ancient Greece]]"
+            ],
+            "question_text": "Who is the Greek God of War?",
+            "question_image": null,
+            "answer_text": "Ares \n\n\"Ares, in Greek religion, is the god of war or, more properly, the spirit of battle. Unlike his Roman counterpart, Mars, he was never very popular, and his worship was not extensive in Greece. He represented the distasteful aspects of brutal warfare and slaughter.\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "Who is the Greek God of War?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/Who is the Greek God of War?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "Who is the Greek God of War?.md"
+        },
+        "Pegasus is said to be born from whose blood?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Gorgon Medusa]]",
+                "[[Pegasus]]",
+                "[[Perseus]]",
+                "[[Bellerophon]]",
+                "[[Chrysaor]]"
+            ],
+            "question_text": "Pegasus is said to be born from whose blood?",
+            "question_image": null,
+            "answer_text": "The Medusa, \n\n\"Medusa, the most famous of the monster figures known as Gorgons, was killed by Perseus, who cut off her head. From the blood that spurted from her neck sprang Chrysaor and Pegasus, her two sons by Poseidon.\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "Pegasus is said to be born from whose blood?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/Pegasus is said to be born from whose blood?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "Pegasus is said to be born from whose blood?.md"
+        },
+        "In Greek Mythology, Echidna is sometimes referred to as?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Echidna]]",
+                "[[Sphinx]]",
+                "[[Typhon]]",
+                "[[Chimera]]",
+                "[[Cerberus]]"
+            ],
+            "question_text": "In Greek Mythology, Echidna is sometimes referred to as?",
+            "question_image": null,
+            "answer_text": "\"Echidna is sometimes referred to as the 'Mother of All Monsters' due to her role in giving birth to many of the mot fearsome creatures in Greek mythology.\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "In Greek Mythology, Echidna is sometimes referred to as?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/In Greek Mythology, Echidna is sometimes referred to as?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "In Greek Mythology, Echidna is sometimes referred to as?.md"
+        },
+        "The Roman god Jupiter is the equivalent of which Greek God?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Jupiter]]",
+                "[[Romans]]",
+                "[[Zeus]]",
+                "[[Pantheon]]"
+            ],
+            "question_text": "The Roman god Jupiter is the equivalent of which Greek God?",
+            "question_image": null,
+            "answer_text": "Zeus \n\n\"Zeus, the chief deity of the pantheon in ancient Greek religion, is identical with the Roman god Jupiter. Both Zeus and Jupiter are sky gods.\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "The Roman god Jupiter is the equivalent of which Greek God?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/The Roman god Jupiter is the equivalent of which Greek God?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "The Roman god Jupiter is the equivalent of which Greek God?.md"
+        },
+        "Who led the Argonauts in search of the Golden Fleece?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Jason and the Golden Fleece]]",
+                "[[Argonauts]]",
+                "[[Golden Fleece]]"
+            ],
+            "question_text": "Who led the Argonauts in search of the Golden Fleece?",
+            "question_image": null,
+            "answer_text": "Jason,\n\n\"In Greek mythology, Jason, in a bid to win the throne that rightfully belonged to him, leads the Argonauts in search of the legendary Golden Fleece.\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "Who led the Argonauts in search of the Golden Fleece?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/Who led the Argonauts in search of the Golden Fleece?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "Who led the Argonauts in search of the Golden Fleece?.md"
+        },
+        "According to Hesiod's Works and Days, who possessed a jar containing misery and evil?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Hesiod]]",
+                "[[Pandora]]",
+                "[[Zeus]]",
+                "[[Epimetheus]]",
+                "[[Pandora's Box]]",
+                "[[Erasmus]]",
+                "[[Cupid]]",
+                "[[Psyche]]"
+            ],
+            "question_text": "According to Hesiod's Works and Days, who possessed a jar containing misery and evil?",
+            "question_image": null,
+            "answer_text": "Pandora,\n\n\"In Greek mythology, Pandora is the first woman. In Hesiod\u2019s Works and Days, Pandora had a jar containing all manner of misery and evil. Zeus sent her to Epimetheus, who made Pandora his wife. She afterward opened the jar, from which the evils flew out over the earth. Pandora\u2019s jar became a box in the 16th century, when the Renaissance humanist Erasmus either mistranslated the Greek or confused the vessel with the box in the story of Cupid and Psyche.\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "According to Hesiod's Works and Days, who possessed a jar containing misery and evil?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/According to Hesiod's Works and Days, who possessed a jar containing misery and evil?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "According to Hesiod's Works and Days, who possessed a jar containing misery and evil?.md"
+        },
+        "In Greek mythology, who was the mother of Artemis and Apollo?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Leto]]",
+                "[[Titan]]",
+                "[[Artemis]]",
+                "[[Apollo]]",
+                "[[Island of Delos]]",
+                "[[Hera]]"
+            ],
+            "question_text": "In Greek mythology, who was the mother of Artemis and Apollo?",
+            "question_image": null,
+            "answer_text": "Leto \n\n\"Leto was the mother of Artemis and Apollo. In Greek mythology, she was a Titan goddess and the daughter of the Titans Coeus and Phoebe. Leto was known for her beauty and was pursued by Zeus, resulting in her becoming pregnant with his children. However, Hera, Zeus's wife, was jealous and made it difficult for Leto to find a place to give birth. Eventually, Leto found the island of Delos where she gave birth to Artemis and Apollo. Therefore, Leto is the correct answer as she is the mother of both Artemis and Apollo.\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "In Greek mythology, who was the mother of Artemis and Apollo?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/In Greek mythology, who was the mother of Artemis and Apollo?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "In Greek mythology, who was the mother of Artemis and Apollo?.md"
+        },
+        "In greek mythology, Maia is goddess of what?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Maia]]",
+                "[[God]]"
+            ],
+            "question_text": "In greek mythology, Maia is goddess of what?",
+            "question_image": null,
+            "answer_text": "The goddess of the fields",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "In greek mythology, Maia is goddess of what?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/In greek mythology, Maia is goddess of what?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "In greek mythology, Maia is goddess of what?.md"
+        },
+        "Who was the ancient Greek God of opportunity and perfect timing?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[kairos]]",
+                "[[Ancient Greece]]"
+            ],
+            "question_text": "Who was the ancient Greek God of opportunity and perfect timing?",
+            "answer_text": "Kairos, or Caerus",
+            "module_name": "Greek Mythology",
+            "file_name": "Who was the ancient Greek God of opportunity and perfect timing?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/Who was the ancient Greek God of opportunity and perfect timing?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "Who was the ancient Greek God of opportunity and perfect timing?.md"
+        },
+        "Who is the mother of Hermes?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Hermes]]",
+                "[[Maia]]",
+                "[[Atlas]]",
+                "[[Zeus]]"
+            ],
+            "question_text": "In Greek Mythology, Who is the mother of Hermes?",
+            "question_image": null,
+            "answer_text": "Maia \n\n\"Maia is the correct answer because in Greek mythology, she is known as the mother of Hermes. Maia was a nymph and the daughter of Atlas. She had a brief affair with Zeus, resulting in the birth of Hermes, the messenger of the gods.\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "Who is the mother of Hermes?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/Who is the mother of Hermes?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "Who is the mother of Hermes?.md"
+        },
+        "In Greek mythology, who is the wife of Typhon?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Typhon]]",
+                "[[Echidna]]",
+                "[[serpent]]",
+                "[[snake]]",
+                "[[dragon]]",
+                "[[Sphinx]]",
+                "[[Cerberus]]",
+                "[[Chimera]]"
+            ],
+            "question_text": "In Greek mythology, who is the wife of Typhon?",
+            "question_image": null,
+            "answer_text": "Echidna \n\n\"In Greek mythology, Typhon, a monstrous serpentine giant and one of the deadliest creatures, is often said to be the mate of Echidna. Echidna is a hybrid creature, typically depicted as a serpent or dragon with the upper body of a woman. Together, Typhon and Echidna became the parents of several other monstrous beings, including the Sphinx, Cerberus, and the Chimera. Echidna is sometimes referred to as the \"Mother of All Monsters\" due to her role in giving birth to many of the most fearsome creatures in Greek mythology.\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "In Greek mythology, who is the wife of Typhon?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/In Greek mythology, who is the wife of Typhon?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "In Greek mythology, who is the wife of Typhon?.md"
+        },
+        "Who is the Greek goddess of wild animals, the hunt, and vegetation?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Artemis]]",
+                "[[Diana]]",
+                "[[Zeus]]",
+                "[[Leto]]",
+                "[[Apollo]]"
+            ],
+            "question_text": "Who is the Greek goddess of wild animals, the hunt, and vegetation?",
+            "question_image": null,
+            "answer_text": "Artemis,\n\n\"Artemis is the goddess of wild animals, the hunt, and vegetation and of chastity and childbirth; she was identified by the Romans with Diana. Artemis is the daughter of Zeus and Leto and the twin sister of Apollo. Among the rural populace, Artemis was the favourite goddess.\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "Who is the Greek goddess of wild animals, the hunt, and vegetation?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/Who is the Greek goddess of wild animals, the hunt, and vegetation?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "Who is the Greek goddess of wild animals, the hunt, and vegetation?.md"
+        },
+        "In Greek mythology, who died after flying close to the sun?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Icarus]]",
+                "[[Daedalus]]"
+            ],
+            "question_text": "In Greek mythology, who died after flying close to the sun?",
+            "question_image": null,
+            "answer_text": "Icarus,\n\n\"In Greek mythology, Icarus, son of the inventor Daedalus, perished by flying too near the Sun with waxen wings.\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "In Greek mythology, who died after flying close to the sun?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/In Greek mythology, who died after flying close to the sun?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "In Greek mythology, who died after flying close to the sun?.md"
+        },
+        "Who is known as a god of wine in Greco-Roman religion?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Dionysus]]",
+                "[[Romans]]",
+                "[[wine]]"
+            ],
+            "question_text": "Who is known as a god of wine in Greco-Roman religion?",
+            "question_image": null,
+            "answer_text": "Dionysus \n\n\"Dionysus is a nature god of fruitfulness and vegetation, especially known as a god of wine and ecstasy. In Roman literature, his nature is often misunderstood, and he is simplistically portrayed as the jolly Bacchus who is invoked at drinking parties.\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "Who is known as a god of wine in Greco-Roman religion?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/Who is known as a god of wine in Greco-Roman religion?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "Who is known as a god of wine in Greco-Roman religion?.md"
+        },
+        "What animal did Androcles help by removing a thorn from its paw?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Androcles]]",
+                "[[lion]]"
+            ],
+            "question_text": "What animal did Androcles help by removing a thorn from its paw?",
+            "question_image": null,
+            "answer_text": "A Lion\n\n\"In the Greek folktale, Androcles, a Greek slave, helped a lion by removing a thorn from its paw. The lion later saved Androcles' life in return.\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "What animal did Androcles help by removing a thorn from its paw?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/What animal did Androcles help by removing a thorn from its paw?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "What animal did Androcles help by removing a thorn from its paw?.md"
+        },
+        "In Greek mythology, who slayed the Gorgon Medusa and saved Andromeda from a sea monster?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Gorgon Medusa]]",
+                "[[Perseus]]",
+                "[[Andromeda]]"
+            ],
+            "question_text": "In Greek mythology, who slayed the Gorgon Medusa and saved Andromeda from a sea monster?",
+            "question_image": null,
+            "answer_text": "Perseus",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "In Greek mythology, who slayed the Gorgon Medusa and saved Andromeda from a sea monster?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/In Greek mythology, who slayed the Gorgon Medusa and saved Andromeda from a sea monster?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "In Greek mythology, who slayed the Gorgon Medusa and saved Andromeda from a sea monster?.md"
+        },
+        "According to Aeschylus's tragedy Agamemnon, who gifted Cassandra the power of prophecy?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Agamemnon]]",
+                "[[Apollo]]",
+                "[[Cassandra]]",
+                "[[Trojan War]]"
+            ],
+            "question_text": "According to Aeschylus's tragedy Agamemnon, who gifted Cassandra the power of prophecy?",
+            "question_image": null,
+            "answer_text": "Apollo,\n\n\"According to Aeschylus\u2019s tragedy Agamemnon, Cassandra was loved by the god Apollo, who promised her the power of prophecy if she would comply with his desires. Cassandra accepted the proposal, received the gift, and then refused the god her favours. Apollo revenged himself by ordaining that her prophecies should never be believed. She accurately predicted such events as the fall of Troy and the death of Agamemnon, but her warnings went unheeded.\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "According to Aeschylus's tragedy Agamemnon, who gifted Cassandra the power of prophecy?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/According to Aeschylus's tragedy Agamemnon, who gifted Cassandra the power of prophecy?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "According to Aeschylus's tragedy Agamemnon, who gifted Cassandra the power of prophecy?.md"
+        },
+        "The parthenon is dedicated to which Greek goddess?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Parthenon]]",
+                "[[Athena]]"
+            ],
+            "question_text": "The Parthenon is dedicated to which Greek goddess?",
+            "question_image": null,
+            "answer_text": "Athena\n\nThe Parthenon was built in the mid-5th century BCE and dedicated to the Greek goddess Athena Parthenos (\u201cAthena the Virgin\u201d).",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "The parthenon is dedicated to which Greek goddess?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/The parthenon is dedicated to which Greek goddess?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "The parthenon is dedicated to which Greek goddess?.md"
+        },
+        "What is the name for the three goddesses who determine human destinies in Greek and Roman mythology?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Fates]]",
+                "[[Hesiod]]"
+            ],
+            "question_text": "What is the name for the three goddesses who determine human destinies in Greek and Roman mythology?",
+            "question_image": null,
+            "answer_text": "The Fates,\n\n\"In Greek and Roman mythology, the Fates are three goddesses who determine human destinies, and in particular the span of a person''s life and his allotment of misery and suffering. From the time of the poet Hesiod (8th century BC) on, however, the Fates were personified as three very old women who spin the threads of human destiny.\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "What is the name for the three goddesses who determine human destinies in Greek and Roman mythology?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/What is the name for the three goddesses who determine human destinies in Greek and Roman mythology?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "What is the name for the three goddesses who determine human destinies in Greek and Roman mythology?.md"
+        },
+        "Who is the Greek goddess of love and beauty?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Aphrodite]]",
+                "[[Venus]]",
+                "[[Sparta]]",
+                "[[Thebes]]",
+                "[[Cyprus]]"
+            ],
+            "question_text": "Who is the Greek goddess of love and beauty?",
+            "question_image": null,
+            "answer_text": "Aphrodite,\n\n\"Aphrodite is the Greek goddess of sexual love and beauty, identified with Venus by the Romans. Aphrodite was, in fact, widely worshipped as a goddess of the sea and of seafaring; she was also honoured as a goddess of war, especially at Sparta, Thebes, Cyprus, and other places. However, she was known primarily as a goddess of love and fertility and even occasionally presided over marriage.\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "Who is the Greek goddess of love and beauty?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/Who is the Greek goddess of love and beauty?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "Who is the Greek goddess of love and beauty?.md"
+        },
+        "In Roman religion, who is the spirit of doorways and archways?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Animism]]",
+                "[[Janus]]",
+                "[[Romans]]"
+            ],
+            "question_text": "In Roman religion, who is the spirit of doorways and archways?",
+            "question_image": null,
+            "answer_text": "Janus,\n\nIn Roman religion, Janus is the animistic spirit of doorways and archways",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "In Roman religion, who is the spirit of doorways and archways?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/In Roman religion, who is the spirit of doorways and archways?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "In Roman religion, who is the spirit of doorways and archways?.md"
+        },
+        "In Greek religion, who is the queen of the Olympian gods and the equivalent of Juno in Roman religion?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Hera]]",
+                "[[Juno]]",
+                "[[Romans]]",
+                "[[Zeus]]"
+            ],
+            "question_text": "In Greek religion, who is the queen of the Olympian gods and the equivalent of Juno in Roman religion?",
+            "question_image": null,
+            "answer_text": "Hera\n\n\"In ancient Greek religion, Hera is the queen of the Olympian gods. The Romans identified her with their own Juno. Hera was worshipped throughout the Greek world and played an important part in Greek literature, appearing most frequently as the jealous and rancorous wife of Zeus and pursuing with vindictive hatred the heroines who were beloved by him.\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "In Greek religion, who is the queen of the Olympian gods and the equivalent of Juno in Roman religion?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/In Greek religion, who is the queen of the Olympian gods and the equivalent of Juno in Roman religion?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "In Greek religion, who is the queen of the Olympian gods and the equivalent of Juno in Roman religion?.md"
+        },
+        "In Greek mythology, who is the oldest of the Pleiades?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Maia]]",
+                "[[Pleiades]]",
+                "[[Pleiad Maia]]"
+            ],
+            "question_text": "In Greek mythology, who is the oldest of the Pleiades?",
+            "question_image": null,
+            "answer_text": "Maia",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "In Greek mythology, who is the oldest of the Pleiades?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/In Greek mythology, who is the oldest of the Pleiades?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "In Greek mythology, who is the oldest of the Pleiades?.md"
+        },
+        "Which mythological creature has a lion's body and human head?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Sphinx]]",
+                "[[Egypt]]",
+                "[[Ancient Greece]]"
+            ],
+            "question_text": "Which mythological creature has a lion's body and human head?",
+            "question_image": null,
+            "answer_text": "Sphinx,\n\n\"The sphinx is a mythological creature with a lion\u2019s body and a human head, an important image in Egyptian and Greek art and legend.\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "Which mythological creature has a lion's body and human head?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/Which mythological creature has a lion's body and human head?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "Which mythological creature has a lion's body and human head?.md"
+        },
+        "In Greek mythology, Where were the Pleiades born?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Pleiades]]",
+                "[[Mount Cyllene]]"
+            ],
+            "question_text": "In Greek Mythology, Where were the Pleiades born?",
+            "question_image": null,
+            "answer_text": "Mount Cyllene, which is in Arcadia",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "In Greek mythology, Where were the Pleiades born?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/In Greek mythology, Where were the Pleiades born?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "In Greek mythology, Where were the Pleiades born?.md"
+        },
+        "Who is the Greek goddess of the hearth?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Hestia]]",
+                "[[Cronus]]",
+                "[[Rhea]]"
+            ],
+            "question_text": "Who is the Greek goddess of the hearth?",
+            "question_image": null,
+            "answer_text": "Hestia \n\nHestia is the goddess of the hearth, daughter of Cronus and Rhea, and one of the 12 Olympian deities.",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "Who is the Greek goddess of the hearth?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/Who is the Greek goddess of the hearth?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "Who is the Greek goddess of the hearth?.md"
+        },
+        "According to Hesiod's Theogony, how many original Titans were there?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Titan]]",
+                "[[Theogony]]"
+            ],
+            "question_text": "According to Hesiod's Theogony, how many original Titans were there? What is a Titan in greek mythology?",
+            "question_image": null,
+            "answer_text": "12 titans,\n\n\"In Greek mythology, a Titan is any of the children of Uranus (Heaven) and Gaea (Earth) and their descendants. According to Hesiod\u2019s Theogony, there were 12 original Titans: the brothers Oceanus, Coeus, Crius, Hyperion, Iapetus, and Cronus and the sisters Thea, Rhea, Themis, Mnemosyne, Phoebe, and Tethys.\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "According to Hesiod's Theogony, how many original Titans were there?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/According to Hesiod's Theogony, how many original Titans were there?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "According to Hesiod's Theogony, how many original Titans were there?.md"
+        },
+        "In Greek mythology, which giant compels strangers to wrestle with him and regains strength whenever he touches the Earth (his mother)?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Antaeus]]",
+                "[[Poseidon]]",
+                "[[Gaea]]",
+                "[[Heracles]]"
+            ],
+            "question_text": "In Greek mythology, which giant compels strangers to wrestle with him and regains strength whenever he touches the Earth (his mother)?",
+            "question_image": null,
+            "answer_text": "Antaeus,\n\n\"Antaeus is the son of the sea god Poseidon and the Earth goddess Gaea. He compelled all strangers who were passing through the country to wrestle with him. Whenever Antaeus touched the Earth (his mother), his strength was renewed, so that even if thrown to the ground, he was invincible. Heracles, in combat with him, discovered the source of his strength and, lifting him up from Earth, crushed him to death.\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "In Greek mythology, which giant compels strangers to wrestle with him and regains strength whenever he touches the Earth (his mother)?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/In Greek mythology, which giant compels strangers to wrestle with him and regains strength whenever he touches the Earth (his mother)?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "In Greek mythology, which giant compels strangers to wrestle with him and regains strength whenever he touches the Earth (his mother)?.md"
+        },
+        "Saturnalia, the most popular of Roman festivals, is dedicated to which Roman god?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Saturn]]",
+                "[[Romans]]"
+            ],
+            "question_text": "Saturnalia, the most popular of Roman festivals, is dedicated to which Roman god?",
+            "question_image": null,
+            "answer_text": "Saturn,\n\n\"Saturnalia, the most popular of Roman festivals, is dedicated to the Roman god Saturn. In Roman religion, Saturn is the god of sowing or seed.\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "Saturnalia, the most popular of Roman festivals, is dedicated to which Roman god?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/Saturnalia, the most popular of Roman festivals, is dedicated to which Roman god?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "Saturnalia, the most popular of Roman festivals, is dedicated to which Roman god?.md"
+        },
+        "In Greek mythology, who was the first to ride the Pegasus?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Pegasus]]",
+                "[[Bellerophon]]"
+            ],
+            "question_text": "In Greek mythology, who was the first to ride the Pegasus?",
+            "question_image": null,
+            "answer_text": "Bellerophon \n\n\"Bellerophon is the correct answer because in Greek mythology, he was the hero who tamed and rode the Pegasus. Bellerophon was known for his bravery and skill, and he was given the task of defeating the Chimera, a fearsome monster. With the help of Pegasus, Bellerophon was able to fly above the monster and defeat it, making him the first to ride the Pegasus.\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "In Greek mythology, who was the first to ride the Pegasus?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/In Greek mythology, who was the first to ride the Pegasus?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "In Greek mythology, who was the first to ride the Pegasus?.md"
+        },
+        "Hestia, was the daughter of which two Greek figures?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Hestia]]",
+                "[[Cronus]]",
+                "[[Rhea]]"
+            ],
+            "question_text": "Hestia, was the daughter of which two Greek gods?",
+            "question_image": null,
+            "answer_text": "She was the daughter of Cronus and Rhea",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "Hestia, was the daughter of which two Greek figures?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/Hestia, was the daughter of which two Greek figures?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "Hestia, was the daughter of which two Greek figures?.md"
+        },
+        "Who is the Roman equivalent of the Greek god Ares?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Ares]]",
+                "[[Mars]]"
+            ],
+            "question_text": "Who is the Roman equivalent of the Greek god Ares?",
+            "question_image": null,
+            "answer_text": "Mars,\n\nThe Roman god of war is Mars. His Greek counterpart is Ares",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "Who is the Roman equivalent of the Greek god Ares?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/Who is the Roman equivalent of the Greek god Ares?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "Who is the Roman equivalent of the Greek god Ares?.md"
+        },
+        "Which Greek god has winged sandals?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Hermes]]",
+                "[[latin]]",
+                "[[Mercury]]"
+            ],
+            "question_text": "Which Greek god has winged sandals?",
+            "question_image": null,
+            "answer_text": "Hermes\n\n\"Hermes, called Mercury in Latin, was a messenger god who wore winged sandals to speed him along.\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "Which Greek god has winged sandals?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/Which Greek god has winged sandals?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "Which Greek god has winged sandals?.md"
+        },
+        "In Greek mythology, who is married to Persephone?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Hades]]",
+                "[[Persephone]]",
+                "[[Marriage]]"
+            ],
+            "question_text": "In Greek mythology, who is married to Persephone?",
+            "question_image": null,
+            "answer_text": "Hades",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "In Greek mythology, who is married to Persephone?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/In Greek mythology, who is married to Persephone?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "In Greek mythology, who is married to Persephone?.md"
+        },
+        "What is the name of the Roman goddess of grain?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Ceres]]"
+            ],
+            "question_text": "What is the name of the Roman goddess of grain?",
+            "question_image": null,
+            "answer_text": "Ceres\n\n\"Ceres was the Roman goddess of grain. Her name gave us our word \"cereal\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "What is the name of the Roman goddess of grain?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/What is the name of the Roman goddess of grain?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "What is the name of the Roman goddess of grain?.md"
+        },
+        "Which mountain is regarded as the abode of the gods in Greek mythology?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Mount Olympus]]",
+                "[[Zeus]]"
+            ],
+            "question_text": "Which mountain is regarded as the abode of the gods in Greek mythology?",
+            "question_image": null,
+            "answer_text": "Mount Olympus,\n\n\"In Greek mythology, Mount Olympus in Greece was regarded as the abode of the gods and the site of the throne of Zeus.\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "Which mountain is regarded as the abode of the gods in Greek mythology?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/Which mountain is regarded as the abode of the gods in Greek mythology?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "Which mountain is regarded as the abode of the gods in Greek mythology?.md"
+        },
+        "In Greek mythology, What was Minos's job after he got to the underworld?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Minos]]",
+                "[[underworld]]",
+                "[[judge]]"
+            ],
+            "question_text": "In Greek mythology, What was Minos's job after he got to the underworld?",
+            "question_image": null,
+            "answer_text": "A judge of the dead \n\n\"Minos's job after he got to the underworld was to be a judge of the dead. As a judge, he would determine the fate of souls and decide whether they would go to the fields of punishment or be granted a place in the afterlife. This role was significant in the Greek mythology as it ensured that justice was served in the underworld and that the souls were appropriately punished or rewarded based on their actions in life.\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "In Greek mythology, What was Minos's job after he got to the underworld?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/In Greek mythology, What was Minos's job after he got to the underworld?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "In Greek mythology, What was Minos's job after he got to the underworld?.md"
+        },
+        "Which Greek goddess is associated with magic and spells?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Hecate]]"
+            ],
+            "question_text": "Which Greek goddess is associated with magic and spells?",
+            "question_image": null,
+            "answer_text": "Hecate \n\n\"Hecate is the chief goddess presiding over magic and spells.\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "Which Greek goddess is associated with magic and spells?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/Which Greek goddess is associated with magic and spells?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "Which Greek goddess is associated with magic and spells?.md"
+        },
+        "Who is the Roman god of the sea?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Neptune]]",
+                "[[Poseidon]]"
+            ],
+            "question_text": "Who is the Roman god of the sea?",
+            "question_image": null,
+            "answer_text": "Neptune,\n\n\"Neptune, in Roman religion, was originally the god of fresh water; by 399 BCE he was identified with the Greek Poseidon and thus became a deity of the sea.\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "Who is the Roman god of the sea?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/Who is the Roman god of the sea?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "Who is the Roman god of the sea?.md"
+        },
+        "Who is the Roman God of Fire?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Vulcan]]"
+            ],
+            "question_text": "Who is the Roman God of Fire?",
+            "answer_text": "Vulcan",
+            "module_name": "Greek Mythology",
+            "file_name": "Who is the Roman God of Fire?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/Who is the Roman God of Fire?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "Who is the Roman God of Fire?.md"
+        },
+        "What art was Orpheus famously skilled in?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Orpheus]]",
+                "[[Art]]",
+                "[[Apollo]]",
+                "[[lyre]]"
+            ],
+            "question_text": "What art was Orpheus famously skilled in?",
+            "question_image": null,
+            "answer_text": "Music,\n\n\"Orpheus was an ancient Greek legendary hero endowed with superhuman musical skills. According to some legends, Apollo gave Orpheus his first lyre. Orpheus\u2019s singing and playing were so beautiful that animals and even trees and rocks moved about him in dance.\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "What art was Orpheus famously skilled in?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/What art was Orpheus famously skilled in?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "What art was Orpheus famously skilled in?.md"
+        },
+        "In Greek Mythology, who is the shape-shifting river god?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Achelous]]"
+            ],
+            "question_text": "In Greek Mythology, who is the shape-shifting river god?",
+            "question_image": null,
+            "answer_text": "Achelous,\n\n\"Achelous is the shape-shifting Greek river god who is the personification of the Achelous River, one of the longest rivers in Greece. Achelous, who was worshipped as the god of fresh water, was chief among his 3,000 brothers, and all springs, rivers, and oceans were believed to issue from him.\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "In Greek Mythology, who is the shape-shifting river god?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/In Greek Mythology, who is the shape-shifting river god?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "In Greek Mythology, who is the shape-shifting river god?.md"
+        },
+        "Which Greek God is considered the chief deity of the pantheon and the father of gods and humans?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Zeus]]",
+                "[[Pantheon]]",
+                "[[Jupiter]]",
+                "[[thunderbolt]]"
+            ],
+            "question_text": "Which Greek God is considered the chief deity of the pantheon and the father of gods and humans?",
+            "question_image": null,
+            "answer_text": "Zeus,\n\n\"Zeus, in ancient Greek religion, is the chief deity of the pantheon, a sky and weather god who was identical with the Roman god Jupiter. He was called the father (i.e., the ruler and protector) of both gods and men and regarded as the sender of thunder and lightning, rain, and winds, and his traditional weapon was the thunderbolt.\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "Which Greek God is considered the chief deity of the pantheon and the father of gods and humans?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/Which Greek God is considered the chief deity of the pantheon and the father of gods and humans?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "Which Greek God is considered the chief deity of the pantheon and the father of gods and humans?.md"
+        },
+        "Who is the Roman God of the Underworld?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Pluto]]"
+            ],
+            "question_text": "Who is the Roman God of the Underworld",
+            "answer_text": "Pluto",
+            "module_name": "Greek Mythology",
+            "file_name": "Who is the Roman God of the Underworld?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/Who is the Roman God of the Underworld?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "Who is the Roman God of the Underworld?.md"
+        },
+        "In Greek and Roman mythology, who are the twin deities who aid shipwrecked sailors?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Dioscuri]]",
+                "[[Castor and Pollux]]",
+                "[[Leda]]",
+                "[[Zeus]]",
+                "[[Tyndareus]]",
+                "[[Lacedaemon]]",
+                "[[swan]]"
+            ],
+            "question_text": "In Greek and Roman mythology, who are the twin deities who aid shipwrecked sailors?",
+            "question_image": null,
+            "answer_text": "The Dioscuri (Castor and Pollux)\n\n\"The Dioscuri (Castor and Pollux) are twin deities who succour shipwrecked sailors and receive sacrifices for favourable winds. They are the children of Leda and either Zeus, the king of the gods, or Tyndareus, Leda\u2019s mortal husband and the king of Lacedaemon. According to the usual version, Castor is the son of Tyndareus and thus is mortal, while Pollux is the son of Zeus (who famously had approached Leda in the form of a swan).\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "In Greek and Roman mythology, who are the twin deities who aid shipwrecked sailors?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/In Greek and Roman mythology, who are the twin deities who aid shipwrecked sailors?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "In Greek and Roman mythology, who are the twin deities who aid shipwrecked sailors?.md"
+        },
+        "In Greek mythology, who fell in love with his own reflection in the waters of a spring?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Narcissus]]",
+                "[[Cephissus]]",
+                "[[nymph]]",
+                "[[Liriope]]",
+                "[[Metamorphoses]]",
+                "[[Tiresias]]",
+                "[[Echo]]",
+                "[[Ameinias]]"
+            ],
+            "question_text": "In Greek mythology, who fell in love with his own reflection in the waters of a spring?",
+            "question_image": null,
+            "answer_text": "Narcissus,\n\n\"In Greek mythology, Narcissus, the son of the river god Cephissus and the nymph Liriope, was distinguished for his beauty. According to Ovid\u2019s Metamorphoses, Book III, Narcissus\u2019s mother was told by the blind seer Tiresias that he would have a long life, provided he never recognized himself. However, his rejection of the love of the nymph Echo or (in an earlier version) of the young man Ameinias drew upon him the vengeance of the gods. He fell in love with his own reflection in the waters of a spring and pined away (or killed himself); the flower that bears his name sprang up where he died.\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "In Greek mythology, who fell in love with his own reflection in the waters of a spring?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/In Greek mythology, who fell in love with his own reflection in the waters of a spring?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "In Greek mythology, who fell in love with his own reflection in the waters of a spring?.md"
+        },
+        "In greek mythology, Who did Maia give birth to?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Maia]]",
+                "[[Hermes]]"
+            ],
+            "question_text": "In greek mythology, Who did Maia give birth to?",
+            "question_image": null,
+            "answer_text": "Hermes",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "In greek mythology, Who did Maia give birth to?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/In greek mythology, Who did Maia give birth to?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "In greek mythology, Who did Maia give birth to?.md"
+        },
+        "In Greek Mythology, Hebe was often depicted as what to the god?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Hebe]]",
+                "[[Heracles]]",
+                "[[Zeus]]",
+                "[[Hera]]"
+            ],
+            "question_text": "In Greek Mythology, Hebe was often depicted as what to the god?",
+            "question_image": null,
+            "answer_text": "The Cupbear of the Gods\n\n\"Hebe was known for her beauty and was often depicted as the cupbearer of the gods, serving them nectar and ambrosia.\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "In Greek Mythology, Hebe was often depicted as what to the god?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/In Greek Mythology, Hebe was often depicted as what to the god?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "In Greek Mythology, Hebe was often depicted as what to the god?.md"
+        },
+        "In Greek mythology, who is known as the goddess of war?.md": {
+            "type": "question",
+            "subject": [
+                "mythology"
+            ],
+            "related": [
+                "[[Athena]]",
+                "[[Ares]]",
+                "[[Mars]]",
+                "[[Minerva]]"
+            ],
+            "question_text": "In Greek mythology, who is known as the goddess of war?",
+            "question_image": null,
+            "answer_text": "Athena,\n\n\"Athena is the goddess of war, handicraft, and practical reason, identified by the Romans with Minerva. Athena was probably a pre-Hellenic goddess and was later taken over by the Greeks. Yet the Greek economy, unlike that of the Minoans, was largely military, so that Athena, while retaining her earlier domestic functions, became a goddess of war.\"",
+            "answer_image": null,
+            "module_name": "Greek Mythology",
+            "file_name": "In Greek mythology, who is known as the goddess of war?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mythology/Greek Mythology/In Greek mythology, who is known as the goddess of war?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "In Greek mythology, who is known as the goddess of war?.md"
+        }
+    }
+}

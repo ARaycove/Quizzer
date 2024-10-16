@@ -1,0 +1,91 @@
+{
+    "module_name": "Linux Command Line",
+    "description": "No Description Provided",
+    "is_a_quizzer_module": true,
+    "primary_subject": "Linux",
+    "all_subjects": [
+        "linux",
+        "command_line"
+    ],
+    "concepts_covered": {
+        "Linux Commands": 3,
+        "Linux": 1
+    },
+    "questions": {
+        "What is the Linux command to open a new tab inside the terminal window?.md": {
+            "type": "question",
+            "subject": [
+                "linux"
+            ],
+            "related": [
+                "[[Linux Commands]]"
+            ],
+            "question_text": "What is the Linux command to open a new tab inside the terminal window?",
+            "question_image": null,
+            "answer_text": "SHIFT - CTRL - T\n\nThis also works in browsers and other programs",
+            "answer_image": null,
+            "module_name": "Linux Command Line",
+            "file_name": "What is the Linux command to open a new tab inside the terminal window?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Linux/Linux Command Line/What is the Linux command to open a new tab inside the terminal window?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "What is the Linux command to open a new tab inside the terminal window?.md"
+        },
+        "What is the Linux command to close the current tab inside the terminal window?.md": {
+            "type": "question",
+            "subject": [
+                "linux"
+            ],
+            "related": [
+                "[[Linux Commands]]"
+            ],
+            "question_text": "What is the Linux command to close the current tab inside the terminal window?",
+            "question_image": null,
+            "answer_text": "SHIFT - CTRL - W\n\nAlso works in browsers and other programs",
+            "answer_image": null,
+            "module_name": "Linux Command Line",
+            "file_name": "What is the Linux command to close the current tab inside the terminal window?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Linux/Linux Command Line/What is the Linux command to close the current tab inside the terminal window?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "What is the Linux command to close the current tab inside the terminal window?.md"
+        },
+        "How to install a .deb package?.md": {
+            "type": "question",
+            "subject": [
+                "linux",
+                "command_line"
+            ],
+            "related": [
+                "[[Linux]]"
+            ],
+            "question_text": "How to install a .deb package?",
+            "answer_text": "sudo dpkg -i filename.deb",
+            "module_name": "Linux Command Line",
+            "file_name": "How to install a .deb package?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Linux/Linux Command Line/How to install a .deb package?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "How to install a .deb package?.md"
+        },
+        "In Linux, how do you use the terminal to convert an epub file to a pdf?.md": {
+            "type": "question",
+            "subject": [
+                "linux"
+            ],
+            "related": [
+                "[[Linux Commands]]"
+            ],
+            "question_text": "In Linux, how do you use the terminal to convert an epub file to a pdf?",
+            "question_image": null,
+            "answer_text": "ebook-convert file.epub file.pdf",
+            "answer_image": null,
+            "module_name": "Linux Command Line",
+            "file_name": "In Linux, how do you use the terminal to convert an epub file to a pdf?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Linux/Linux Command Line/In Linux, how do you use the terminal to convert an epub file to a pdf?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "In Linux, how do you use the terminal to convert an epub file to a pdf?.md"
+        }
+    }
+}

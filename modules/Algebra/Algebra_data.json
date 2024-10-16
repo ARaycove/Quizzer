@@ -1,0 +1,128 @@
+{
+    "module_name": "Algebra",
+    "description": "No Description Provided",
+    "is_a_quizzer_module": true,
+    "primary_subject": "Mathematics",
+    "all_subjects": [
+        "mathematics",
+        "algebra"
+    ],
+    "concepts_covered": {
+        "identity": 2,
+        "unit circle": 2
+    },
+    "questions": {
+        "-1 over \u221a2 is also equal to what?.md": {
+            "type": "question",
+            "subject": [
+                "mathematics",
+                "algebra"
+            ],
+            "related": [
+                "[[identity]]"
+            ],
+            "question_text": "-1 over \u221a2 is also equal to what?",
+            "question_image": null,
+            "answer_text": "-\u221a2/2",
+            "answer_image": null,
+            "module_name": "Algebra",
+            "file_name": "-1 over \u221a2 is also equal to what?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mathematics/Algebra/-1 over \u221a2 is also equal to what?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "-1 over \u221a2 is also equal to what?.md"
+        },
+        "\u221a3 = ?.md": {
+            "type": "question",
+            "subject": [
+                "mathematics",
+                "algebra"
+            ],
+            "related": [
+                "[[unit circle]]"
+            ],
+            "question_text": "\u221a3 = ?",
+            "question_image": null,
+            "answer_text": "1.732",
+            "answer_image": null,
+            "module_name": "Algebra",
+            "file_name": "\u221a3 = ?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mathematics/Algebra/\u221a3 = ?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "\u221a3 = ?.md"
+        },
+        "\u221a3%2 = ?.md": {
+            "type": "question",
+            "subject": [
+                "mathematics",
+                "algebra"
+            ],
+            "related": null,
+            "question_text": "\u221a3/2 = ?",
+            "answer_text": "~0.866025",
+            "module_name": "Algebra",
+            "file_name": "\u221a3%2 = ?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mathematics/Algebra/\u221a3%2 = ?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "\u221a3%2 = ?.md"
+        },
+        "1 over the \u221ax is also equal to?.md": {
+            "type": "question",
+            "subject": [
+                "mathematics",
+                "algebra"
+            ],
+            "related": [
+                "[[identity]]"
+            ],
+            "question_text": "1 over the \u221ax is also equal to?",
+            "question_image": null,
+            "answer_text": "\u221ax / x",
+            "answer_image": null,
+            "module_name": "Algebra",
+            "file_name": "1 over the \u221ax is also equal to?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mathematics/Algebra/1 over the \u221ax is also equal to?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "1 over the \u221ax is also equal to?.md"
+        },
+        "\u221a2 = ?.md": {
+            "type": "question",
+            "subject": [
+                "mathematics",
+                "algebra"
+            ],
+            "related": [
+                "[[unit circle]]"
+            ],
+            "question_text": "\u221a2 = ?",
+            "question_image": null,
+            "answer_text": "1.414",
+            "answer_image": null,
+            "module_name": "Algebra",
+            "file_name": "\u221a2 = ?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mathematics/Algebra/\u221a2 = ?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "\u221a2 = ?.md"
+        },
+        "\u221a2%2 = ?.md": {
+            "type": "question",
+            "subject": [
+                "mathematics",
+                "algebra"
+            ],
+            "related": null,
+            "question_text": "\u221a2/2 = ?",
+            "answer_text": "~0.707106",
+            "module_name": "Algebra",
+            "file_name": "\u221a2%2 = ?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mathematics/Algebra/\u221a2%2 = ?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "\u221a2%2 = ?.md"
+        }
+    }
+}

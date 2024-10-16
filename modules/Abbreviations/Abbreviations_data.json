@@ -1,0 +1,46 @@
+{
+    "module_name": "Abbreviations",
+    "description": "No Description Provided",
+    "is_a_quizzer_module": true,
+    "primary_subject": "Chemistry",
+    "all_subjects": [
+        "chemistry",
+        "physics",
+        "engineering",
+        "computer_science",
+        "mathematics"
+    ],
+    "concepts_covered": {
+        "STEM": 1
+    },
+    "questions": {
+        "What does the abbreviation STEM stand for?.md": {
+            "type": "question",
+            "subject": [
+                "chemistry",
+                "physics",
+                "engineering",
+                "computer_science",
+                "mathematics"
+            ],
+            "related": [
+                "[[STEM]]"
+            ],
+            "module_name": "Abbreviations",
+            "question_text": "What does the abbreviation STEM stand for?",
+            "question_image": null,
+            "question_audio": null,
+            "question_video": null,
+            "answer_text": "Science, Technology, Engineering, Math",
+            "answer_image": null,
+            "answer_audio": null,
+            "answer_video": null,
+            "academic_sources": "OpenStax Chemistry 2e",
+            "file_name": "What does the abbreviation STEM stand for?.md",
+            "file_path": "/home/araycove/Documents/Education/Un-Sorted/What does the abbreviation STEM stand for?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "What does the abbreviation STEM stand for?.md"
+        }
+    }
+}

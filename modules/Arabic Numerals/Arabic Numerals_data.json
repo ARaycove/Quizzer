@@ -1,0 +1,264 @@
+{
+    "module_name": "Arabic Numerals",
+    "description": "No Description Provided",
+    "is_a_quizzer_module": true,
+    "primary_subject": "Mathematics",
+    "all_subjects": [
+        "mathematics"
+    ],
+    "concepts_covered": {
+        "numeral": 10,
+        "Numbers": 9
+    },
+    "questions": {
+        "What Number is this? 7.md": {
+            "type": "question",
+            "subject": [
+                "mathematics"
+            ],
+            "related": [
+                "[[numeral]]",
+                "[[Numbers]]"
+            ],
+            "module_name": "Arabic Numerals",
+            "question_text": "What Number is this?",
+            "question_image": "[[Pasted image 20241008161339.png]]",
+            "question_audio": null,
+            "question_video": null,
+            "answer_text": "Seven",
+            "answer_image": null,
+            "answer_audio": null,
+            "answer_video": null,
+            "academic_sources": null,
+            "file_name": "What Number is this? 7.md",
+            "file_path": "/home/araycove/Documents/Education/Un-Sorted/What Number is this? 7.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "What Number is this? 7.md"
+        },
+        "What Number is this? 4.md": {
+            "type": "question",
+            "subject": [
+                "mathematics"
+            ],
+            "related": [
+                "[[numeral]]",
+                "[[Numbers]]"
+            ],
+            "module_name": "Arabic Numerals",
+            "question_text": "What Number is this?",
+            "question_image": "[[Pasted image 20241008161012.png]]",
+            "question_audio": null,
+            "question_video": null,
+            "answer_text": "Four",
+            "answer_image": null,
+            "answer_audio": null,
+            "answer_video": null,
+            "academic_sources": null,
+            "file_name": "What Number is this? 4.md",
+            "file_path": "/home/araycove/Documents/Education/Un-Sorted/What Number is this? 4.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "What Number is this? 4.md"
+        },
+        "What Number is this? 5.md": {
+            "type": "question",
+            "subject": [
+                "mathematics"
+            ],
+            "related": [
+                "[[numeral]]",
+                "[[Numbers]]"
+            ],
+            "module_name": "Arabic Numerals",
+            "question_text": "What Number is this?",
+            "question_image": "[[Pasted image 20241008161118.png]]",
+            "question_audio": null,
+            "question_video": null,
+            "answer_text": "Five",
+            "answer_image": null,
+            "answer_audio": null,
+            "answer_video": null,
+            "academic_sources": null,
+            "file_name": "What Number is this? 5.md",
+            "file_path": "/home/araycove/Documents/Education/Un-Sorted/What Number is this? 5.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "What Number is this? 5.md"
+        },
+        "What Number is this? 6.md": {
+            "type": "question",
+            "subject": [
+                "mathematics"
+            ],
+            "related": [
+                "[[numeral]]",
+                "[[Numbers]]"
+            ],
+            "module_name": "Arabic Numerals",
+            "question_text": "What Number is this?",
+            "question_image": "[[Pasted image 20241008161223.png]]",
+            "question_audio": null,
+            "question_video": null,
+            "answer_text": "Six",
+            "answer_image": null,
+            "answer_audio": null,
+            "answer_video": null,
+            "academic_sources": null,
+            "file_name": "What Number is this? 6.md",
+            "file_path": "/home/araycove/Documents/Education/Un-Sorted/What Number is this? 6.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "What Number is this? 6.md"
+        },
+        "What Number is this? 0.md": {
+            "type": "question",
+            "subject": [
+                "mathematics"
+            ],
+            "related": [
+                "[[numeral]]"
+            ],
+            "module_name": "Arabic Numerals",
+            "question_text": "What Number is this?",
+            "question_image": "[[Pasted image 20241008160602.png]]",
+            "question_audio": null,
+            "question_video": null,
+            "answer_text": "Zero",
+            "answer_image": null,
+            "answer_audio": null,
+            "answer_video": null,
+            "academic_sources": null,
+            "file_name": "What Number is this? 0.md",
+            "file_path": "/home/araycove/Documents/Education/Un-Sorted/What Number is this? 0.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "What Number is this? 0.md"
+        },
+        "What Number is this? 2.md": {
+            "type": "question",
+            "subject": [
+                "mathematics"
+            ],
+            "related": [
+                "[[numeral]]",
+                "[[Numbers]]"
+            ],
+            "module_name": "Arabic Numerals",
+            "question_text": "What Number is this?",
+            "question_image": "[[Pasted image 20241008160808.png]]",
+            "question_audio": null,
+            "question_video": null,
+            "answer_text": "Two",
+            "answer_image": null,
+            "answer_audio": null,
+            "answer_video": null,
+            "academic_sources": null,
+            "file_name": "What Number is this? 2.md",
+            "file_path": "/home/araycove/Documents/Education/Un-Sorted/What Number is this? 2.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "What Number is this? 2.md"
+        },
+        "What Number is this? 8.md": {
+            "type": "question",
+            "subject": [
+                "mathematics"
+            ],
+            "related": [
+                "[[numeral]]",
+                "[[Numbers]]"
+            ],
+            "module_name": "Arabic Numerals",
+            "question_text": "What Number is this?",
+            "question_image": "[[Pasted image 20241008161427.png]]",
+            "question_audio": null,
+            "question_video": null,
+            "answer_text": "Eight",
+            "answer_image": null,
+            "answer_audio": null,
+            "answer_video": null,
+            "academic_sources": null,
+            "file_name": "What Number is this? 8.md",
+            "file_path": "/home/araycove/Documents/Education/Un-Sorted/What Number is this? 8.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "What Number is this? 8.md"
+        },
+        "What Number is this? 9.md": {
+            "type": "question",
+            "subject": [
+                "mathematics"
+            ],
+            "related": [
+                "[[numeral]]",
+                "[[Numbers]]"
+            ],
+            "module_name": "Arabic Numerals",
+            "question_text": "What Number is this?",
+            "question_image": "[[Pasted image 20241008161538.png]]",
+            "question_audio": null,
+            "question_video": null,
+            "answer_text": "Nine",
+            "answer_image": null,
+            "answer_audio": null,
+            "answer_video": null,
+            "academic_sources": null,
+            "file_name": "What Number is this? 9.md",
+            "file_path": "/home/araycove/Documents/Education/Un-Sorted/What Number is this? 9.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "What Number is this? 9.md"
+        },
+        "What Number is this? 3.md": {
+            "type": "question",
+            "subject": [
+                "mathematics"
+            ],
+            "related": [
+                "[[numeral]]",
+                "[[Numbers]]"
+            ],
+            "module_name": "Arabic Numerals",
+            "question_text": "What Number is this?",
+            "question_image": "[[Pasted image 20241008160916.png]]",
+            "question_audio": null,
+            "question_video": null,
+            "answer_text": "Three",
+            "answer_image": null,
+            "answer_audio": null,
+            "answer_video": null,
+            "academic_sources": null,
+            "file_name": "What Number is this? 3.md",
+            "file_path": "/home/araycove/Documents/Education/Un-Sorted/What Number is this? 3.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "What Number is this? 3.md"
+        },
+        "What Number is this? 1.md": {
+            "type": "question",
+            "subject": [
+                "mathematics"
+            ],
+            "related": [
+                "[[numeral]]",
+                "[[Numbers]]"
+            ],
+            "module_name": "Arabic Numerals",
+            "question_text": "What Number is this?",
+            "question_image": "[[Pasted image 20241008160716.png]]",
+            "question_audio": null,
+            "question_video": null,
+            "answer_text": "one",
+            "answer_image": null,
+            "answer_audio": null,
+            "answer_video": null,
+            "academic_sources": null,
+            "file_name": "What Number is this? 1.md",
+            "file_path": "/home/araycove/Documents/Education/Un-Sorted/What Number is this? 1.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "What Number is this? 1.md"
+        }
+    }
+}

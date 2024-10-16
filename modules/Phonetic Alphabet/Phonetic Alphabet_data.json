@@ -1,0 +1,152 @@
+{
+    "module_name": "Phonetic Alphabet",
+    "description": "No Description Provided",
+    "is_a_quizzer_module": true,
+    "primary_subject": "Us_Military",
+    "all_subjects": [
+        "us_military"
+    ],
+    "concepts_covered": {
+        "Phonetic alphabet": 1
+    },
+    "questions": {
+        "In the Phonetic alphabet, how do you pronounce D?.md": {
+            "type": "question",
+            "subject": [
+                "us_military"
+            ],
+            "related": null,
+            "question_text": "In the Phonetic alphabet, how do you pronounce D?",
+            "question_image": null,
+            "answer_text": "Delta",
+            "answer_image": null,
+            "file_name": "In the Phonetic alphabet, how do you pronounce D?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Us_Military/Phonetic Alphabet/In the Phonetic alphabet, how do you pronounce D?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "In the Phonetic alphabet, how do you pronounce D?.md",
+            "module_name": "Phonetic Alphabet"
+        },
+        "In the Phonetic alphabet, how do you pronounce E?.md": {
+            "type": "question",
+            "subject": [
+                "us_military"
+            ],
+            "related": [
+                "[[Phonetic alphabet]]"
+            ],
+            "question_text": "In the Phonetic alphabet, how do you pronounce E?",
+            "question_image": null,
+            "answer_text": "Echo",
+            "answer_image": null,
+            "file_name": "In the Phonetic alphabet, how do you pronounce E?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Us_Military/Phonetic Alphabet/In the Phonetic alphabet, how do you pronounce E?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "In the Phonetic alphabet, how do you pronounce E?.md",
+            "module_name": "Phonetic Alphabet"
+        },
+        "In the Phonetic alphabet, how do you pronounce H?.md": {
+            "type": "question",
+            "subject": [
+                "us_military"
+            ],
+            "related": null,
+            "question_text": "In the Phonetic alphabet, how do you pronounce H?",
+            "question_image": null,
+            "answer_text": "Hotel",
+            "answer_image": null,
+            "file_name": "In the Phonetic alphabet, how do you pronounce H?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Us_Military/Phonetic Alphabet/In the Phonetic alphabet, how do you pronounce H?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "In the Phonetic alphabet, how do you pronounce H?.md",
+            "module_name": "Phonetic Alphabet"
+        },
+        "In the Phonetic alphabet, how do you pronounce F?.md": {
+            "type": "question",
+            "subject": [
+                "us_military"
+            ],
+            "related": null,
+            "question_text": "In the Phonetic alphabet, how do you pronounce F?",
+            "question_image": null,
+            "answer_text": "Foxtrot",
+            "answer_image": null,
+            "file_name": "In the Phonetic alphabet, how do you pronounce F?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Us_Military/Phonetic Alphabet/In the Phonetic alphabet, how do you pronounce F?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "In the Phonetic alphabet, how do you pronounce F?.md",
+            "module_name": "Phonetic Alphabet"
+        },
+        "In the Phonetic alphabet, how do you pronounce G?.md": {
+            "type": "question",
+            "subject": [
+                "us_military"
+            ],
+            "related": null,
+            "question_text": "In the Phonetic alphabet, how do you pronounce G?",
+            "question_image": null,
+            "answer_text": "Golf",
+            "answer_image": null,
+            "file_name": "In the Phonetic alphabet, how do you pronounce G?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Us_Military/Phonetic Alphabet/In the Phonetic alphabet, how do you pronounce G?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "In the Phonetic alphabet, how do you pronounce G?.md",
+            "module_name": "Phonetic Alphabet"
+        },
+        "In the Phonetic alphabet, how do you pronounce C?.md": {
+            "type": "question",
+            "subject": [
+                "us_military"
+            ],
+            "related": null,
+            "question_text": "In the Phonetic alphabet, how do you pronounce C?",
+            "question_image": null,
+            "answer_text": "Charlie",
+            "answer_image": null,
+            "file_name": "In the Phonetic alphabet, how do you pronounce C?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Us_Military/Phonetic Alphabet/In the Phonetic alphabet, how do you pronounce C?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "In the Phonetic alphabet, how do you pronounce C?.md",
+            "module_name": "Phonetic Alphabet"
+        },
+        "In the Phonetic alphabet, how do you pronounce A?.md": {
+            "type": "question",
+            "subject": [
+                "us_military"
+            ],
+            "related": null,
+            "question_text": "In the Phonetic alphabet, how do you pronounce A?",
+            "question_image": null,
+            "answer_text": "Alpha",
+            "answer_image": null,
+            "file_name": "In the Phonetic alphabet, how do you pronounce A?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Us_Military/Phonetic Alphabet/In the Phonetic alphabet, how do you pronounce A?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "In the Phonetic alphabet, how do you pronounce A?.md",
+            "module_name": "Phonetic Alphabet"
+        },
+        "In the Phonetic alphabet, how do you pronounce B?.md": {
+            "type": "question",
+            "subject": [
+                "us_military"
+            ],
+            "related": null,
+            "question_text": "In the Phonetic alphabet, how do you pronounce B?",
+            "question_image": null,
+            "answer_text": "Bravo",
+            "answer_image": null,
+            "file_name": "In the Phonetic alphabet, how do you pronounce B?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Us_Military/Phonetic Alphabet/In the Phonetic alphabet, how do you pronounce B?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "In the Phonetic alphabet, how do you pronounce B?.md",
+            "module_name": "Phonetic Alphabet"
+        }
+    }
+}

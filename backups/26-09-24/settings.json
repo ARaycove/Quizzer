@@ -1,0 +1,242 @@
+{
+    "quiz_length": 35,
+    "time_between_revisions": 1.2,
+    "due_date_sensitivity": 12,
+    "vault_path": [
+        "/home/karibar/Documents/Education"
+    ],
+    "desired_daily_questions": 146,
+    "subject_settings": {
+        "anatomy": {
+            "interest_level": 55,
+            "priority": 3,
+            "total_questions": 1,
+            "num_questions_in_circulation": 1
+        },
+        "astronomy": {
+            "interest_level": 65,
+            "priority": 3,
+            "total_questions": 58,
+            "num_questions_in_circulation": 39
+        },
+        "biology": {
+            "interest_level": 90,
+            "priority": 2,
+            "total_questions": 17,
+            "num_questions_in_circulation": 17
+        },
+        "command_line": {
+            "interest_level": 80,
+            "priority": 1,
+            "total_questions": 2,
+            "num_questions_in_circulation": 2
+        },
+        "communication": {
+            "interest_level": 10,
+            "priority": 6,
+            "total_questions": 68,
+            "num_questions_in_circulation": 6
+        },
+        "computer_science": {
+            "interest_level": 300,
+            "priority": 1,
+            "total_questions": 354,
+            "num_questions_in_circulation": 184
+        },
+        "ecology": {
+            "interest_level": 55,
+            "priority": 3,
+            "total_questions": 5,
+            "num_questions_in_circulation": 5
+        },
+        "english": {
+            "interest_level": 10,
+            "priority": 6,
+            "total_questions": 5,
+            "num_questions_in_circulation": 5
+        },
+        "french": {
+            "interest_level": 5,
+            "priority": 9,
+            "total_questions": 2,
+            "num_questions_in_circulation": 2
+        },
+        "food": {
+            "interest_level": 15,
+            "priority": 9,
+            "total_questions": 4,
+            "num_questions_in_circulation": 4
+        },
+        "geography": {
+            "interest_level": 45,
+            "priority": 5,
+            "total_questions": 11,
+            "num_questions_in_circulation": 11
+        },
+        "geology": {
+            "interest_level": 35,
+            "priority": 3,
+            "total_questions": 2,
+            "num_questions_in_circulation": 2
+        },
+        "history": {
+            "interest_level": 75,
+            "priority": 5,
+            "total_questions": 98,
+            "num_questions_in_circulation": 45
+        },
+        "information_technology": {
+            "interest_level": 25,
+            "priority": 9,
+            "total_questions": 1,
+            "num_questions_in_circulation": 1
+        },
+        "latin": {
+            "interest_level": 20,
+            "priority": 9,
+            "total_questions": 11,
+            "num_questions_in_circulation": 11
+        },
+        "linux": {
+            "interest_level": 80,
+            "priority": 1,
+            "total_questions": 5,
+            "num_questions_in_circulation": 5
+        },
+        "mathematics": {
+            "interest_level": 100,
+            "priority": 1,
+            "total_questions": 284,
+            "num_questions_in_circulation": 62
+        },
+        "memory_science": {
+            "interest_level": 100,
+            "priority": 2,
+            "total_questions": 17,
+            "num_questions_in_circulation": 17
+        },
+        "miscellaneous": {
+            "interest_level": 5,
+            "priority": 9,
+            "total_questions": 14,
+            "num_questions_in_circulation": 3
+        },
+        "mythology": {
+            "interest_level": 65,
+            "priority": 5,
+            "total_questions": 77,
+            "num_questions_in_circulation": 39
+        },
+        "neuroscience": {
+            "interest_level": 80,
+            "priority": 9,
+            "total_questions": 3,
+            "num_questions_in_circulation": 3
+        },
+        "philosophy": {
+            "interest_level": 80,
+            "priority": 4,
+            "total_questions": 119,
+            "num_questions_in_circulation": 48
+        },
+        "pop_culture": {
+            "interest_level": 5,
+            "priority": 9,
+            "total_questions": 10,
+            "num_questions_in_circulation": 4
+        },
+        "psychology": {
+            "interest_level": 70,
+            "priority": 4,
+            "total_questions": 77,
+            "num_questions_in_circulation": 48
+        },
+        "religion": {
+            "interest_level": 65,
+            "priority": 5,
+            "total_questions": 2,
+            "num_questions_in_circulation": 2
+        },
+        "scottish": {
+            "interest_level": 5,
+            "priority": 9,
+            "total_questions": 1,
+            "num_questions_in_circulation": 1
+        },
+        "sociology": {
+            "interest_level": 60,
+            "priority": 4,
+            "total_questions": 53,
+            "num_questions_in_circulation": 36
+        },
+        "theology": {
+            "interest_level": 65,
+            "priority": 5,
+            "total_questions": 6,
+            "num_questions_in_circulation": 6
+        },
+        "trigonometry": {
+            "interest_level": 75,
+            "priority": 9,
+            "total_questions": 3,
+            "num_questions_in_circulation": 3
+        },
+        "unicode": {
+            "interest_level": 50,
+            "priority": 1,
+            "total_questions": 14,
+            "num_questions_in_circulation": 14
+        },
+        "us_military": {
+            "interest_level": 100,
+            "priority": 1,
+            "total_questions": 66,
+            "num_questions_in_circulation": 60
+        },
+        "web_design": {
+            "interest_level": 5,
+            "priority": 5,
+            "total_questions": 150,
+            "num_questions_in_circulation": 21
+        },
+        "writing": {
+            "interest_level": 10,
+            "priority": 6,
+            "total_questions": 8,
+            "num_questions_in_circulation": 7
+        },
+        "physiology": {
+            "interest_level": 10,
+            "priority": 9,
+            "total_questions": 7,
+            "num_questions_in_circulation": 7
+        },
+        "chemistry": {
+            "interest_level": 10,
+            "priority": 9,
+            "total_questions": 2,
+            "num_questions_in_circulation": 2
+        },
+        "algebra": {
+            "interest_level": 10,
+            "priority": 9,
+            "total_questions": 3,
+            "num_questions_in_circulation": 3
+        },
+        "education": {
+            "interest_level": 10,
+            "priority": 9,
+            "total_questions": 1,
+            "num_questions_in_circulation": 1
+        }
+    },
+    "is_module_activated": {
+        "Multiplication Table": true,
+        "Periodic Table of Elements": true,
+        "obsidian_default": true,
+        "Typing Unicode Characters": true,
+        "Understanding Scale": true,
+        "Trigonometry": true,
+        "Python - Lists": true
+    }
+}

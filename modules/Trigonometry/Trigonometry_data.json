@@ -1,0 +1,147 @@
+{
+    "module_name": "Trigonometry",
+    "description": "No Description Provided",
+    "is_a_quizzer_module": true,
+    "primary_subject": "Mathematics",
+    "all_subjects": [
+        "trigonometry",
+        "mathematics"
+    ],
+    "concepts_covered": {
+        "sine": 1,
+        "factor": 1,
+        "right triangle": 2,
+        "triangle": 1,
+        "sinusoidal function": 1,
+        "period": 1,
+        "double angle identity": 1,
+        "cannon": 1,
+        "cannonball": 1,
+        "Ballistics": 1
+    },
+    "questions": {
+        "Solve 2sin\u00b2(t) + 3sin(t) + 1 = 0 for all solutions with 0 \u2264 t < 2\u03c0.md": {
+            "type": "question",
+            "subject": [
+                "trigonometry",
+                "mathematics"
+            ],
+            "related": [
+                "[[sine]]",
+                "[[factor]]"
+            ],
+            "question_text": "Solve 2sin\u00b2(t) + 3sin(t) + 1 = 0 for all solutions with 0 \u2264 t < 2\u03c0",
+            "question_image": null,
+            "answer_text": "7\u03c0/6, 3\u03c0/2, 11\u03c0/6",
+            "answer_image": null,
+            "module_name": "Trigonometry",
+            "file_name": "Solve 2sin\u00b2(t) + 3sin(t) + 1 = 0 for all solutions with 0 \u2264 t < 2\u03c0.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Trigonometry/Trigonometry/Solve 2sin\u00b2(t) + 3sin(t) + 1 = 0 for all solutions with 0 \u2264 t < 2\u03c0.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "Solve 2sin\u00b2(t) + 3sin(t) + 1 = 0 for all solutions with 0 \u2264 t < 2\u03c0.md"
+        },
+        "A 33-ft ladder leans against a building so that the angle between the ground and the ladder is 80\u00b0. How high does the ladder reach up the side of the building?.md": {
+            "type": "question",
+            "subject": [
+                "mathematics",
+                "trigonometry"
+            ],
+            "related": [
+                "[[right triangle]]"
+            ],
+            "question_text": "A 33-ft ladder leans against a building so that the angle between the ground and the ladder is 80\u00b0. How high does the ladder reach up the side of the building?",
+            "answer_text": "sin(80) = H/33 \n33 * sin(80) = H",
+            "module_name": "Trigonometry",
+            "file_name": "A 33-ft ladder leans against a building so that the angle between the ground and the ladder is 80\u00b0. How high does the ladder reach up the side of the building?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mathematics/Trigonometry/A 33-ft ladder leans against a building so that the angle between the ground and the ladder is 80\u00b0. How high does the ladder reach up the side of the building?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "A 33-ft ladder leans against a building so that the angle between the ground and the ladder is 80\u00b0. How high does the ladder reach up the side of the building?.md"
+        },
+        "A 23ft ladder leans up against a building so that the angle between the ground and the ladder is 73\u00b0. How high does the ladder reach up the building?.md": {
+            "type": "question",
+            "subject": [
+                "mathematics",
+                "trigonometry"
+            ],
+            "related": [
+                "[[right triangle]]"
+            ],
+            "question_text": "A 23ft ladder leans up against a building so that the angle between the ground and the ladder is 73\u00b0. How high does the ladder reach up the building?",
+            "module_name": "Trigonometry",
+            "file_name": "A 23ft ladder leans up against a building so that the angle between the ground and the ladder is 73\u00b0. How high does the ladder reach up the building?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mathematics/Trigonometry/A 23ft ladder leans up against a building so that the angle between the ground and the ladder is 73\u00b0. How high does the ladder reach up the building?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "A 23ft ladder leans up against a building so that the angle between the ground and the ladder is 73\u00b0. How high does the ladder reach up the building?.md"
+        },
+        "A cable that anchors the center of the London Eye Ferris wheel to the ground must be replaced. what angle and how long is the cable?.md": {
+            "type": "question",
+            "subject": [
+                "mathematics",
+                "trigonometry"
+            ],
+            "related": [
+                "[[triangle]]"
+            ],
+            "question_text": "A cable that anchors the center of the London Eye Ferris wheel to the ground must be replaced. The center of the Ferris wheel is 70 meters above the ground and the second anchor on the ground is 23 meters from the base of the wheel. What is the angle from the ground up to the center of the Ferris wheel? and how long is the cable?",
+            "question_image": null,
+            "answer_text": "tan(\u03b8) = 70/23 \nso the angle is \u03b8 = tan\u207b\u00b9(70/23)\nthe length of the cable can be found with the pythagoreum theorum\nlength = \u221a(70\u00b2+23\u00b2)\n\n71.83\u00b0 and 73.68m long",
+            "answer_image": null,
+            "module_name": "Trigonometry",
+            "file_name": "A cable that anchors the center of the London Eye Ferris wheel to the ground must be replaced. what angle and how long is the cable?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mathematics/Trigonometry/A cable that anchors the center of the London Eye Ferris wheel to the ground must be replaced. what angle and how long is the cable?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "A cable that anchors the center of the London Eye Ferris wheel to the ground must be replaced. what angle and how long is the cable?.md"
+        },
+        "In a sinusoidal function, what is the formula for the period of the function?.md": {
+            "type": "question",
+            "subject": [
+                "mathematics",
+                "trigonometry"
+            ],
+            "related": [
+                "[[sinusoidal function]]",
+                "[[period]]"
+            ],
+            "module_name": "Trigonometry",
+            "question_text": "In a sinusoidal function, what is the formula for the period of the function?",
+            "question_image": null,
+            "question_audio": null,
+            "question_video": null,
+            "answer_text": " P = 2pi / B",
+            "answer_image": null,
+            "answer_audio": null,
+            "answer_video": null,
+            "file_name": "In a sinusoidal function, what is the formula for the period of the function?.md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mathematics/Trigonometry/In a sinusoidal function, what is the formula for the period of the function?.md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "In a sinusoidal function, what is the formula for the period of the function?.md"
+        },
+        "A cannonball is fired with velocity of 100 meters per second . . ..md": {
+            "type": "question",
+            "subject": [
+                "mathematics"
+            ],
+            "related": [
+                "[[double angle identity]]",
+                "[[cannon]]",
+                "[[cannonball]]",
+                "[[Ballistics]]"
+            ],
+            "question_text": "A cannonball is fired with velocity of 100 meters per second. If it is launched at an angle of \u03b8, the vertical component of the velocity will be 100sin(\u03b8) and the horizontal component will be 100 cos(\u03b8). Ignoring wind resistance, the height of the cannonball will follow the equation h(t) = -4.9t\u00b2 + 100sin(\u03b8)t and horizontal position will follow the equation x(t) = 100cos(\u03b8)t. If you want to hit a target 900 meter away at what angle should you aim the cannon.",
+            "question_image": null,
+            "answer_text": "To hit the target 900 meters away, we want x(t) = 900 at the time when the cannonball hits the ground, when h(t) = 0. To solve this problem, we will first solve for the time, t, when the cannonball hits the ground. Our answer will depend upon the angle \u03b8\nh(t) = 0\n-4.9t\u00b2+100sin(\u03b8)t) = 0\nt(-4.9t+100sin(\u03b8)) = 0 ---- Factor here\nt = 0 or 4.9t + 100sin(\u03b8) = 0\nt = 100sin\u03b8 / 4.9 ---- solve for t, since 0 twice use the second value\nx(t) = 900\n100cos(\u03b8)*(100sin(\u03b8)/4.9) = 900\n100\u00b2/4.9 * cos(\u03b8) * sin(\u03b8) = 900\ncos(\u03b8)sin(\u03b8) = 900 / (100\u00b2/4.9)\n2cos(\u03b8)sin(\u03b8) = 2 * (900 / 100\u00b2/4.9) --- multiply by two on both sides to take advantage of our identity\nsin(2\u03b8) = 8820/10000\n2\u03b8 = sin\u207b\u00b9(8820/10000) == 2\u03b8/2 = sin\u207b\u00b9(8820/10000)/2\n\u03b8 = 1.080/2 = 0.54 = 30.94\u00b0",
+            "answer_image": null,
+            "module_name": "Trigonometry",
+            "file_name": "A cannonball is fired with velocity of 100 meters per second . . ..md",
+            "file_path": "/home/araycove/Documents/Education/Question Notes/Mathematics/Trigonometry/A cannonball is fired with velocity of 100 meters per second . . ..md",
+            "object_type": "question",
+            "is_obsidian_md_question_note": true,
+            "id": "A cannonball is fired with velocity of 100 meters per second . . ..md"
+        }
+    }
+}
