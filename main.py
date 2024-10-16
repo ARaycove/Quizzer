@@ -653,12 +653,19 @@ def main(page: ft.Page):
                         for nest_two_key, nest_two_val in nest_one_val.items():
                             if nest_two_key == "priority":
                                 nest_two_row.controls.append(
-                                    ft.TextField(label="Priority", value=nest_two_val, width=70)
+                                    ft.TextField(label="Priority", value=nest_two_val, width=70, data={
+                                        "full_settings_key": f"settings_data[{option}][{nest_one_key}][{nest_two_key}]",
+                                        "key": f"{nest_two_key}"
+                                    }, on_change=update_user_settings)
                                 )
                             if nest_two_key == "interest_level":
                                 nest_two_row.controls.append(
-                                    ft.TextField(label="Interest Level", value=nest_two_val, width=100)
+                                    ft.TextField(label="Interest Level", value=nest_two_val, width=100, data={
+                                        "full_settings_key": f"settings_data[{option}][{nest_one_key}][{nest_two_key}]",
+                                        "key": f"{nest_two_key}"
+                                    }, on_change=update_user_settings)
                                 )
+                                
                         temp_cont_column.controls.append(nest_two_row)
                 settings_column.controls.append(temp_cont_column)
         settings_page = settings_column

@@ -93,6 +93,15 @@ def update_setting(key, value, data): # Public Function
         if valid_status == False:
             return valid_status
         settings_data["is_module_activated"][key] = value
+    elif full_key.startswith("settings_data[subject_settings]"):
+        valid_status, value = handle_integer_settings(key, value)
+        if valid_status == False:
+            return valid_status
+        # parse out subject from full key
+        parsed_subject = str(full_key[len("settings_data[subject_settings]")+1:])
+        parsed_subject = parsed_subject[:parsed_subject.find("]")]
+        settings_data["subject_settings"][parsed_subject][key] = value
+
     # value has been validated and mutated into its appropriate type:
     # If the value passed was invalid, thus would cause an error, we will have already returned a valid_status = False code, therefore no udpate will occur
     
