@@ -592,7 +592,6 @@ def main(page: ft.Page):
     #############################################################################
     #############################################################################
     # Settings Button & Settings Page
-    #FIXME No Settings Page built yet
     settings_page_header = ft.Row(controls=[menu_button], alignment=ft.MainAxisAlignment.START, expand=True)
     settings_column = ft.Column(wrap=True, expand=True, controls=[settings_page_header])
     settings_page = ft.Container(content=settings_column)
@@ -673,7 +672,7 @@ def main(page: ft.Page):
     
     settings_icon = ft.Icon(name=ft.icons.SETTINGS, color=ft.colors.WHITE)
     settings_text = ft.Text(value="SETTINGS")
-    settings_row = ft.Row(controls=[settings_icon,settings_text,under_construction_icon])
+    settings_row = ft.Row(controls=[settings_icon,settings_text])
     settings_button = ft.ElevatedButton(content=settings_row, on_click=display_settings_page)
 
 
