@@ -645,6 +645,21 @@ def main(page: ft.Page):
                         temp_cont_column.controls.append(
                             check_box_row
                         )
+
+
+                    if isinstance(nest_one_val, dict):
+                        nest_two_text = ft.Text(value=nest_one_key)
+                        nest_two_row = ft.Row(controls=[nest_two_text])
+                        for nest_two_key, nest_two_val in nest_one_val.items():
+                            if nest_two_key == "priority":
+                                nest_two_row.controls.append(
+                                    ft.TextField(label="Priority", value=nest_two_val, width=70)
+                                )
+                            if nest_two_key == "interest_level":
+                                nest_two_row.controls.append(
+                                    ft.TextField(label="Interest Level", value=nest_two_val, width=100)
+                                )
+                        temp_cont_column.controls.append(nest_two_row)
                 settings_column.controls.append(temp_cont_column)
         settings_page = settings_column
         page.add(settings_page)
