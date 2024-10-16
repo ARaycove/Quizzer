@@ -160,3 +160,4 @@ cython_debug/
 
 user_profiles/
 media_files/
+backups/

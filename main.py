@@ -621,7 +621,8 @@ def main(page: ft.Page):
         for option, option_value in settings_data.items():
             if isinstance(option_value, int):
                 settings_column.controls.append(ft.TextField(label=str(option), value=str(option_value), data={
-                    "full_settings_key": f"settings_data[{option}]"
+                    "full_settings_key": f"settings_data[{option}]",
+                    "key": f"{option}"
                 }, on_change=lambda e: update_user_settings(e)))
 
 
@@ -637,7 +638,8 @@ def main(page: ft.Page):
                     if isinstance(nest_one_val, bool):
                         check_box_text = ft.Text(value=nest_one_key,size=16)
                         check_box = ft.Checkbox(value=nest_one_val, data={
-                            "full_settings_key": f"settings_data[{option}][{nest_one_key}]"
+                            "full_settings_key": f"settings_data[{option}][{nest_one_key}]",
+                            "key": f"{nest_one_key}"
                         }, on_change=update_user_settings)
                         check_box_row = ft.Row(controls=[check_box_text,check_box])
                         temp_cont_column.controls.append(

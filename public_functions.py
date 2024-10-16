@@ -22,7 +22,7 @@ import json
 
 def print_key(key):
     print(f"Key is: {key}")
-def handle_integer_settings(key, value) -> bool:
+def handle_integer_settings(key, value):
         '''
         Settings Value should be an integer, validates whether the passed string is of type int
         '''
@@ -41,6 +41,20 @@ def handle_integer_settings(key, value) -> bool:
             valid_status = False
         print(f"Value is: {value} and of Type:{type(value)}")
         return valid_status, value
+def handle_boolean_settings(key, value):
+    '''
+    Ensure the passed value is a boolean
+    '''
+    valid_status = True
+    print_key(key)
+    print(f"Value is: {value} and of Type:{type(value)}")
+    try:
+        value = bool(value)
+    except ValueError:
+        valid_status = False
+
+    print(f"Value is: {value} and of Type:{type(value)}")
+    return valid_status, value
 def update_setting(key, value, data): # Public Function
     '''
     takes a key (setting) and a new value to be updated
@@ -49,7 +63,10 @@ def update_setting(key, value, data): # Public Function
     # First load in settings.json
     settings_data = helper.get_settings_data()
     valid_status = True
+    key = data["key"]
     full_key = data["full_settings_key"]
+    print_key(key)
+    print(full_key)
     # Check functions for specific settings:
     # int Value settings:
     ## Quiz Length Settings
@@ -57,23 +74,29 @@ def update_setting(key, value, data): # Public Function
         valid_status, value = handle_integer_settings(key, value)
         if valid_status == False:
             return valid_status
+        settings_data["quiz_length"] = value
     ## Due Date Sensitivity Setting
-    elif full_key.endswith("due_date_sensitivity"):
+    elif full_key.endswith("[due_date_sensitivity]"):
         valid_status, value = handle_integer_settings(key, value)
         if valid_status == False:
             return valid_status
+        settings_data["due_date_sensitivty"] = value
     ## Desired Daily Questions Settings
-    elif full_key.endswith("desired_daily_questions"):
+    elif full_key.endswith("[desired_daily_questions]"):
         valid_status, value = handle_integer_settings(key, value)
         if valid_status == False:
             return valid_status
+        settings_data["desired_daily_questions"] = value
     ## Activate and Deactive Modules in databanks
-    elif full_key.startswith("settings_data[is_module_active]"):
-        print("YES")
+    elif full_key.startswith("settings_data[is_module_activated]"):
+        valid_status, value = handle_boolean_settings(key, value)
+        if valid_status == False:
+            return valid_status
+        settings_data["is_module_activated"][key] = value
     # value has been validated and mutated into its appropriate type:
     # If the value passed was invalid, thus would cause an error, we will have already returned a valid_status = False code, therefore no udpate will occur
-    settings_data[key] = value
-    # helper.update_settings_json(settings_data)    
+    
+    helper.update_settings_json(settings_data)    
     
 def initialize_quizzer(user_profile_name="default"): #Public Function ⁹
     '''
