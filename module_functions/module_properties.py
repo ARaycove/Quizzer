@@ -34,5 +34,10 @@ def update_module_primary_subject_property(module_data):
                 subject_counts[subject] = 1
             else:
                 subject_counts[subject] += 1
+    # We got an error because one of the modules had an empty questions list,
+    # To handle for this we will check if the questions field has data or is still an empty dictionary
+    # If it is an empty dictionary, we will immediately return module_data, otherwise we'll be able to determine a primary subject
+    if module_data["questions"] == {}:
+        return module_data
     module_data["primary_subject"] = str(max(subject_counts, key=subject_counts.get)).title()
     return module_data

@@ -1,0 +1,27 @@
+{
+    "question_object_template": 
+    {
+    "subject": [
+        "<subject or field of study>"
+    ],
+    "related": [
+        "<name of concept>",
+        "<name of concept>"
+    ],
+
+    "question_text": "Can you think of other ways of defending human dignity and sacredness, that aren't Reason?",
+    "question_image": "Error",
+    "question_audio": null,
+    "question_video": null,
+
+    "answer_text": "Error",
+    "answer_image": null,
+    "answer_audio": null,
+    "answer_video": null,
+
+    "module_name": "default_user_module",
+
+    "id": "Can you think of other ways of defending human dignity and sacredness, that aren't Reason?.md",
+    "academic_sources": []
+}
+}

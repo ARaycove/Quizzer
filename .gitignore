@@ -163,3 +163,4 @@ media_files/
 backups/
 instance_data/
 modules/
+scratchpad.py

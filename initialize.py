@@ -140,3 +140,14 @@ def copy_media_into_local_dir(modules_raw): #Private Function
     print(f"Error: expected str, bytes or os.PathLike object, not NoneType Error -- Appeared {count_of_expected_str_error} times")      
     print(f"Total Media files detected in questions data is {total_media_files_to_load}")
     print("END OF MEDIA TRANSFER ERROR LOG")
+
+def remove_invalid_question_objects(questions_data):
+    count = 0
+    question_objects_to_remove = []
+    for unique_id, question_object in questions_data.items():
+        is_valid = questions.verify_question_object(question_object)
+        if is_valid == False:
+            question_objects_to_remove.append(unique_id)
+    for id in question_objects_to_remove:
+        del questions_data[id]
+    return questions_data

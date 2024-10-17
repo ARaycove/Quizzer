@@ -615,7 +615,7 @@ def main(page: ft.Page):
         # Multiple for loops
         ## In order, display settings with int values, then string values, then list values, then dict values ⋃
         # Display int based settings
-        settings_column.controls.append(ft.Text(value="Settings Page", size=36))
+        settings_column.controls.append(ft.Text(value="Settings Page", size = 36))
         settings_column.controls.append(ft.Text(value="Integer Settings", size = 24))
         for option, option_value in settings_data.items():
             if isinstance(option_value, int):

@@ -3,6 +3,7 @@ import json
 from lib import helper
 import initialize
 from module_functions import module_properties
+import questions
 # Initial Planning
 # Each module will be assigned a folder
 # Each module is a class that contains question objects
@@ -157,13 +158,23 @@ def build_raw_questions():
     for module_name in module_list:
         module_data = helper.get_module_data(module_name)
         module_question_list = module_data["questions"]
+        # Notice we're pulling an id already, but we're calculating it down below
         for unique_id, question_object in module_question_list.items():
             write_data = {unique_id: question_object}
             # Define the question_id here:
-            if question_object.get("file_name") != None: # file_name is used for Obsidian md integration
-                question_object["id"] = question_object["file_name"]
-            raw_master_question_list.update(write_data)
+            #NOTE This recalculates the id on initialization, a second "redundant" call (in the update_system function) ensures that if id is deleted mid program that it will "regenerate"
+            question_object = questions.calculate_question_id(question_object)
+            # if question_object.get("file_name") != None: # file_name is used for Obsidian md integration
+            #     question_object["id"] = question_object["file_name"]
+            # Before writing to the raw_master_list, we need to verify the question_object is valid:
+            is_valid = questions.verify_question_object(question_object)
+            if is_valid == True:
+                raw_master_question_list.update(write_data)
     # return the master_question_list (this way we can avoid future read operations)
+    
+
+
+
     return raw_master_question_list
         
 
@@ -410,3 +421,28 @@ def update_module_profile():
         module_data = module_properties.update_module_all_subjects_property(module_data)
         module_data = module_properties.update_module_all_concepts_property(module_data)
         helper.update_module_data(module_data)
+
+def update_modules_with_proper_ids():
+    '''
+    Updates the old system of id's from Obsidian with the new encoded id system, this ensures all id's are unique and more readable by the machine
+    '''
+    module_list = update_list_of_modules()
+    for module_name in module_list:
+        new_questions_list = {}
+        module_data = helper.get_module_data(module_name)
+        module_question_list = module_data["questions"]
+        # Notice we're pulling an id already, but we're calculating it down below
+        for unique_id, question_object in module_question_list.items():
+            question_object = questions.calculate_question_id(question_object) #NOTE if the question id has already been calculated, then it will remain the same
+            # The question object now has a new id
+            # Update the unique_id with the new id
+            unique_id = question_object["id"] #NOTE Since the question_object["id"] doesn't change, this line will not change either, but does ensure the unique id key always matches the question["id"] value
+            write_data = {unique_id: question_object}
+            new_questions_list.update(write_data) # add the updated pair to a new set
+        # We now have the original module data
+        # We now have a new set to replace the old set with:
+        module_data["questions"] = new_questions_list
+        # Update made within function
+        # Now update the module folder itself
+        helper.update_module_data(module_data)
+        #NOTE in the future, adds and edits will need to be made both to the module itself and to the users questions.json

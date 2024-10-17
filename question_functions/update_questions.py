@@ -9,13 +9,6 @@ from datetime import (
 # AI determination functions
 #########################################################
 # just function stubs for now
-def determine_question_id(question_object):
-    if question_object.get("file_name") != None: # belongs to Obsidian or any other future integration
-        question_object["id"] = question_object["file_name"]
-    return question_object
-
-
-
 def determine_related_concepts_for_question(question_object=dict):
     '''
     Use AI to determine what concepts are referred to in the question

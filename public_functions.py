@@ -145,13 +145,15 @@ def initialize_quizzer(user_profile_name="default"): #Public Function ⁹
     settings_data = helper.get_settings_data()
     questions_data = helper.get_question_data()
     # Build initial master list of every question across all modules
+    modules.update_modules_with_proper_ids()
     raw_master_question_list = modules.build_raw_questions()
 
 
     # Update master list of questions with any questions extracted from integrations
     #FIXME Test with new user with default value, ensure no errors exists
-    existing_database = obsidian.scan_directory(settings_data["vault_path"])
-    raw_master_question_list = obsidian.extract_questions_from_raw_data(existing_database, raw_master_question_list)
+    # FIXME Re-evaluate Obsidian Integration
+    # existing_database = obsidian.scan_directory(settings_data["vault_path"])
+    # raw_master_question_list = obsidian.extract_questions_from_raw_data(existing_database, raw_master_question_list)
 
     # Rewrite the master list into a different data format, (makes it easier for the following function to write to each module)
     modules_list = modules.update_list_of_modules()
@@ -174,13 +176,13 @@ def initialize_quizzer(user_profile_name="default"): #Public Function ⁹
     modules.update_module_profile() # After verifying modules, update metadata for each module
     # Health check question objects
     stats_data = helper.get_stats_data()
+    questions_data = initialize.remove_invalid_question_objects(questions_data)
     return_data = update_system_data(questions_data, stats_data)
     stats_data = return_data["stats_data"]
     print(return_data.keys())
     subject_question_index = return_data["questions_by_subject_index"]
     
     print(stats_data)
-    print(initialize.count_files_in_directory("media_files/"), "media files loaded")
     print("#" * 25)
     # Initialize settings keys (subject keys)
     settings_data = settings.initialize_subject_settings(settings_data,subject_question_index)
@@ -193,6 +195,7 @@ def initialize_quizzer(user_profile_name="default"): #Public Function ⁹
     print(f"Success: initialization takes {int(minutes)} minutes and {int(seconds)} seconds.")
 
 def update_score(status, id): #Public Function
+    # A strange bug occured where the id is the old file_name
     check_variable = ""
     questions_data = helper.get_question_data()
     stats_data = helper.get_stats_data()

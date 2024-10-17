@@ -97,7 +97,8 @@ def initialize_and_update_question_properties(questions_data, settings_data):
 
         # To accomplish a minimal time complexity we will update each function so that the function takes the question object, modifies it, then returns it: For one operation per object
         # Old system scans every question in the list for every property, creating far more operations than necessary
-        # # First initialize properties that don't exist with first time values:
+        # # First initialize properties that don't exist with first time values:    
+
         question_object = update_questions.initialize_in_circulation_property(question_object)
         
         question_object = update_questions.initialize_revision_streak_property(question_object)
@@ -118,7 +119,9 @@ def initialize_and_update_question_properties(questions_data, settings_data):
 
         question_object = update_questions.update_is_module_active_property(question_object, settings_data)
         # Add question to index of eligible questions for the populate_quiz function to use:
-        question_object = update_questions.determine_question_id(question_object)
+        # Only calculate id once
+        if question_object.get("id") != None:
+            question_object = calculate_question_id(question_object)
         question_object = update_questions.determine_question_subjects(question_object)
         question_object = update_questions.determine_related_concepts(question_object)
         question_object = update_questions.calculate_average_shown(question_object)
@@ -202,18 +205,86 @@ def calculate_next_revision_date(status, dictionary): #Private Function
         dictionary["next_revision_due"] = datetime.now()
     return dictionary["next_revision_due"]
 
-def calculate_question_id(): #Private Function
+def calculate_question_id(question_object: dict) -> dict: #Private Function
     '''
     Deprecated, does nothing: is a function stub
     question id is based on the users questions.json
     question id does not exist in the "clean" variant of the question object
     This method prevents duplicate ids, since the id will be determined once the once the user "collects" a given question so will never interfere with others version of the id
     '''
-    #FIXME
-    # This would be a function to call with the add_question() function
-    questions_data = helper.get_question_data()
-    # Scan the existing keys in questions_data
-    # We call this when we add a question through the interface so we need to [int(i) for i in questions_data.keys() if i.isdigit()] All the file name keys will be filtered out
-    # with the filtered list we can generate a numerical id, id is only used for local reference so it does not need to compatible with server side questions
-    # Will need to figure out server side id system later
-    # What if we generate an id for modules within the write to function that scans the modules and updates the master. Do the id generation check there #FIXME
+    # if the question_object has already gotten an id then we don't need to recalculate it:
+    if question_object.get("id") != None:
+        return question_object
+
+    # Generate Unique Id's based on the content of the question objects question and answer fields
+    # If all fields are empty then the object is invalid
+    # first try to get a question
+    if question_object.get("question_text") != None:
+        id = str(question_object["question_text"])
+
+    elif question_object.get("answer_text") != None:
+        id = str(question_object["answer_text"])
+
+    elif question_object.get("question_image") != None:
+        id = str(question_object["question_image"])
+    
+    elif question_object.get("answer_image") != None:
+        id = str(question_object["answer_image"])
+
+    elif question_object.get("question_audio") != None:
+        id = str(question_object["question_audio"])
+
+    elif question_object.get("answer_audio") != None:
+        id = str(question_object["answer_audio"])
+
+    elif question_object.get("question_video") != None:
+        id = str(question_object("question_video"))
+    
+    elif question_object.get("answer_video") != None:
+        id = str(question_object["answer_video"])
+
+    else:
+        #All question object fields are empty
+        # Clear invalid object
+        question_object.clear()
+        return question_object
+
+    encoded_val = [str(ord(i)) for i in id]
+    encoded_val = ".".join(encoded_val)
+    id = encoded_val
+    question_object["id"] = id
+    return question_object
+
+
+def verify_question_object(question_object: dict) -> bool:
+    # qf = question field
+    # af = answer field
+
+    #Question treated as invalid by default
+    qf_is_valid = False
+    af_is_valid = False
+    is_valid = False
+    # Validate question field
+    if question_object.get("question_text") != None:
+        qf_is_valid = True
+    elif question_object.get("question_image") != None:
+        qf_is_valid = True
+    elif question_object.get("question_audio") != None:
+        qf_is_valid = True
+    elif question_object.get("question_video") != None:
+        qf_is_valid = True
+    # Validate Answer Field
+    if question_object.get("answer_text") != None:
+        af_is_valid = True
+    elif question_object.get("answer_image") != None:
+        af_is_valid = True
+    elif question_object.get("answer_audio") != None:
+        af_is_valid = True
+    elif question_object.get("answer_video") != None:
+        af_is_valid = True
+    
+    if qf_is_valid == True or af_is_valid == True:
+        is_valid = True
+        return is_valid
+    else:
+        return is_valid
