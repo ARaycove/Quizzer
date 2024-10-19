@@ -41,6 +41,21 @@ def generate_first_time_stats_dictionary(user_profile_data:dict) -> dict:
     stats_data = initial_stats_defines.build_first_time_stats_data(user_profile_data)
     return stats_data
 
+def remove_invalid_question_objects(questions_data: dict) -> dict:
+    '''
+    takes the questions_data from user_profile_data as input, scans the profile and deletes any questions that do not pass validation
+    questions.verify_question_object(question_object) function to ensure the minimal requirements for a question object are met
+    '''
+    count = 0
+    question_objects_to_remove = []
+    for unique_id, question_object in questions_data.items():
+        is_valid = questions.verify_question_object(question_object)
+        if is_valid == False:
+            question_objects_to_remove.append(unique_id)
+    for id in question_objects_to_remove:
+        del questions_data[id]
+    return questions_data
+
 def initialize_quizzer(user_profile_name: str) -> None: #Public Function ⁹
     '''
     Main Entry Point for program,
@@ -60,6 +75,7 @@ def initialize_quizzer(user_profile_name: str) -> None: #Public Function ⁹
 
     # Load in user settings data, if the profile is new, then there are default values
     user_profile_data = helper.get_user_data(user_profile_name)
+
     
     ###########################################################################################
     # External Application Integrations
@@ -68,23 +84,16 @@ def initialize_quizzer(user_profile_name: str) -> None: #Public Function ⁹
 
     # Gather a list of modules:
     modules_list = modules.update_list_of_modules()
+    # Add in questions that exist in modules but not in the user's questions list
+    raw_master_question_list = modules.build_raw_questions()
+    user_profile_data = modules.write_module_questions_to_users_questions(raw_master_question_list, user_profile_data)
     # Update the user settings to ensure there is an activation setting for each module that exists in the profile
     # NOTE This allows the user to activate or deactivate modules individually
-    modules.build_activated_setting(modules_list, user_profile_data)
+    user_profile_data = modules.build_activated_setting(modules_list, user_profile_data)
     modules.update_module_profile() # After verifying modules, update metadata for each module
+    user_profile_data["questions"] = remove_invalid_question_objects(user_profile_data["questions"])
+    user_profile_data = public_functions.update_system_data(user_profile_data)
 
-    # Health check question objects
-    questions_data = remove_invalid_question_objects(questions_data)
-    return_data = public_functions.update_system_data(questions_data, stats_data)
-    stats_data = return_data["stats_data"]
-    print(return_data.keys())
-    subject_question_index = return_data["questions_by_subject_index"]
-    
-    print(stats_data)
-    print("#" * 25)
-    # Initialize settings keys (subject keys)
-    settings_data = settings.initialize_subject_settings(settings_data,subject_question_index)
-    
     # End Initialization
     timer_end = datetime.now()
     elapsed_time = timer_end - timer_start
@@ -232,13 +241,3 @@ def copy_media_into_local_dir(modules_raw): #Private Function
     print(f"Total Media files detected in questions data is {total_media_files_to_load}")
     print("END OF MEDIA TRANSFER ERROR LOG")
 
-def remove_invalid_question_objects(questions_data):
-    count = 0
-    question_objects_to_remove = []
-    for unique_id, question_object in questions_data.items():
-        is_valid = questions.verify_question_object(question_object)
-        if is_valid == False:
-            question_objects_to_remove.append(unique_id)
-    for id in question_objects_to_remove:
-        del questions_data[id]
-    return questions_data

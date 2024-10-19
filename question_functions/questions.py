@@ -102,29 +102,18 @@ def add_new_question(
 #######################################################################
 #######################################################################
 
-def initialize_and_update_question_properties(questions_data, settings_data):
-    # Reduce time complexity and update to match new data structure:
-    # To aid in reducing complexity, i'm designing my own data_base system, for learning sake
-    # Each property the system will need to look up later will have its own index which will be quicker
-    # data_feed = {}
-
-    # for unique_id, question_object in questions_data.items():
-    #     if data_feed.get(type(question_object)) == None:
-    #         data_feed[type(question_object)] = 1
-    #     else:
-    #         data_feed[type(question_object)] += 1
-    #     if data_feed.get(type(unique_id)) == None:
-    #         data_feed[type(unique_id)] = 1
-    #     else:
-    #         data_feed[type(unique_id)] += 1
-    # print("#" * 50)
-    # print(data_feed) #We've verified there are no NoneType objects in questions_data
-    # Instantiate an instance of each index as an empty dictionary
+def initialize_and_update_question_properties(user_profile_data: dict) -> dict:
+    '''
+    Update all questions in the user's profile data
+    Updates each index as well for quicker lookup by other functions
+    '''
+    indices = {}
     eligiblity_index = {}
     revision_streak_index = {}
     subject_question_index = {}
     subject_in_circulation_index = {}
-    
+    questions_data = user_profile_data["questions"]
+    settings_data = user_profile_data["settings"]
     for unique_id, question_object in questions_data.items():
         file_question = {unique_id: question_object}
         # I'm getting a strange bug where the question object morphs into a NoneType object
@@ -133,7 +122,7 @@ def initialize_and_update_question_properties(questions_data, settings_data):
         # Old system scans every question in the list for every property, creating far more operations than necessary
         # # First initialize properties that don't exist with first time values:    
 
-        question_object = update_questions.initialize_in_circulation_property(question_object)
+        question_object = update_questions.initialize_in_circulation_property(question_object, settings_data)
         
         question_object = update_questions.initialize_revision_streak_property(question_object)
         
@@ -145,17 +134,14 @@ def initialize_and_update_question_properties(questions_data, settings_data):
         
         question_object = update_questions.initialize_answer_media_properties(question_object)
         
-        question_object = update_questions.initialize_time_between_revisions_property(question_object)
+        question_object = update_questions.initialize_time_between_revisions_property(question_object, settings_data)
         
         question_object = update_questions.initialize_academic_sources_property(question_object)
 
-        question_object = update_questions.determine_eligibility_of_questions(question_object)
+        question_object = update_questions.determine_eligibility_of_questions(question_object, settings_data)
 
         question_object = update_questions.update_is_module_active_property(question_object, settings_data)
         # Add question to index of eligible questions for the populate_quiz function to use:
-        # Only calculate id once
-        if question_object.get("id") != None:
-            question_object = calculate_question_id(question_object)
         question_object = update_questions.determine_question_subjects(question_object)
         question_object = update_questions.determine_related_concepts(question_object)
         question_object = update_questions.calculate_average_shown(question_object)
@@ -192,17 +178,14 @@ def initialize_and_update_question_properties(questions_data, settings_data):
                     subject_in_circulation_index[sub].update(file_question)
         
         
-    # Update questions.json
-    # Write indices to instance_data/
-    # Time sink of .35 seconds to perform all these write operations:
-    returned_data = {}
-    returned_data["eligibility_index"] = eligiblity_index
-    returned_data["revision_streak_index"] = revision_streak_index
-    returned_data["questions_by_subject_index"] = subject_question_index
-    returned_data["subject_in_circulation_index"] = subject_in_circulation_index
-    returned_data["questions_data"] = questions_data
-    returned_data["settings_data"] = settings_data
-    return returned_data
+    indices["eligibility_index"] = eligiblity_index
+    indices["revision_streak_index"] = revision_streak_index
+    indices["questions_by_subject_index"] = subject_question_index
+    indices["subject_in_circulation_index"] = subject_in_circulation_index
+    user_profile_data["indices"] = indices
+    user_profile_data["questions"] = questions_data
+    user_profile_data["settings"] = settings_data
+    return user_profile_data
 
 def calculate_next_revision_date(status, dictionary): #Private Function
     '''

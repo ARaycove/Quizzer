@@ -202,15 +202,7 @@ def populate_question_list(questions_data, stats_data, settings_data):
     print(stats_data)
     return question_list
 
-def update_system_data(questions_data, stats_data):
-    settings_data = helper.get_settings_data()
-    returned_data = questions.initialize_and_update_question_properties(questions_data, settings_data)
-    eligiblity_index = returned_data["eligibility_index"]
-    revision_streak_index = returned_data["revision_streak_index"]
-    subject_question_index = returned_data["questions_by_subject_index"]
-    subject_in_circulation_index = returned_data["subject_in_circulation_index"]
-    questions_data = returned_data["questions_data"]
-    settings_data = returned_data["settings_data"]
-    
-    returned_data = stats.update_stats(questions_data, stats_data, settings_data, revision_streak_index, eligiblity_index, subject_question_index, subject_in_circulation_index)
-    return returned_data
+def update_system_data(user_profile_data: dict) -> dict:
+    user_profile_data = questions.initialize_and_update_question_properties(user_profile_data)
+    user_profile_data = stats.update_stats(user_profile_data)
+    return user_profile_data

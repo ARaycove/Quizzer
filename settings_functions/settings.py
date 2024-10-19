@@ -2,8 +2,10 @@ import json
 import os
 from lib import helper
 
-def initialize_subject_settings(settings_data, questions_by_subject_index): #Private Function
-    settings_data = helper.get_settings_data()
+def initialize_subject_settings(user_profile_data: dict) -> dict: #Private Function
+
+    questions_by_subject_index = user_profile_data["indices"]["questions_by_subject_index"]
+    settings_data = user_profile_data["settings"]
     # serves as a template for later
     initial_subject_setting = {}
     initial_subject_setting["interest_level"] = 10

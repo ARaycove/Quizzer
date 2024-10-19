@@ -9,7 +9,7 @@ from datetime import (
 # AI determination functions
 #########################################################
 # just function stubs for now
-def determine_related_concepts_for_question(question_object=dict):
+def determine_related_concepts_for_question(question_object=dict) -> list:
     '''
     Use AI to determine what concepts are referred to in the question
     '''
@@ -17,7 +17,7 @@ def determine_related_concepts_for_question(question_object=dict):
 
 
 
-def determine_individual_subjects_for_question(question_object=dict):
+def determine_individual_subjects_for_question(question_object=dict) -> list:
     '''
     Use AI to determine what subjects and fields are referred to in the question
     '''
@@ -25,7 +25,7 @@ def determine_individual_subjects_for_question(question_object=dict):
 
 
 
-def determine_question_subjects(question_object):
+def determine_question_subjects(question_object:dict) -> dict:
     '''
     Logic is not implemented, only sets the subject value to miscellaneous if no subject was entered
     '''
@@ -37,7 +37,7 @@ def determine_question_subjects(question_object):
 
 
 
-def determine_related_concepts(question_object):
+def determine_related_concepts(question_object: dict) -> dict:
     '''
     Logic is not implemented, only sets the related value to None if no related concepts were entered
     '''
@@ -49,7 +49,7 @@ def determine_related_concepts(question_object):
 
 
 
-def determine_eligibility_of_questions(question_object):
+def determine_eligibility_of_questions(question_object: dict, settings_data: dict) -> dict:
     '''
     Determines whether or not questions are eligible to be put into 
     circulation and shown to the user
@@ -58,7 +58,6 @@ def determine_eligibility_of_questions(question_object):
     # - The due date is within x amount of hours of the current time
     # - The question has been placed into circulation to be answered
     count = 0
-    settings_data = helper.get_settings_data()
     due_date_sensitivity = settings_data["due_date_sensitivity"]
     next_revision_due_date = question_object["next_revision_due"]
     next_revision_due_date = helper.convert_to_datetime_object(next_revision_due_date)
@@ -85,7 +84,7 @@ def determine_eligibility_of_questions(question_object):
 # Calculation functions are grouped below:
 #########################################################
 # See the initialize_and_update_question_properties to see the master function that calls everything below:
-def calculate_average_shown(question_object): #Private Function
+def calculate_average_shown(question_object: dict) -> dict: #Private Function
     if question_object["revision_streak"] == 1:
         additional_time = (sum([i for i in range(1, 5)])/4)/24 #hours divided by 24 to get days
         
@@ -111,7 +110,7 @@ def calculate_average_shown(question_object): #Private Function
 #########################################################
 # Initialization functions are grouped below:
 #########################################################
-def initialize_revision_streak_property(question_object):
+def initialize_revision_streak_property(question_object: dict) -> dict:
     '''
     If the question is new, initializes the streak to 1
     '''
@@ -119,7 +118,7 @@ def initialize_revision_streak_property(question_object):
         question_object["revision_streak"] = 1
     return question_object
     
-def initialize_last_revised_property(question_object):
+def initialize_last_revised_property(question_object: dict) -> dict:
     '''
     If the question is new, initializes the last_revised to right now
     '''
@@ -127,7 +126,7 @@ def initialize_last_revised_property(question_object):
         question_object["last_revised"] = helper.stringify_date(datetime.now())
     return question_object
     
-def initialize_next_revision_due_property(question_object):
+def initialize_next_revision_due_property(question_object: dict) -> dict:
     '''
     if the question is new, initializes the next_revision_due to right now
     '''
@@ -135,7 +134,7 @@ def initialize_next_revision_due_property(question_object):
         question_object["next_revision_due"] = helper.stringify_date(datetime.now() - timedelta(hours=8760)) # This is due immediately and of the highest priority
     return question_object
 
-def initialize_question_media_properties(question_object):
+def initialize_question_media_properties(question_object:dict) -> dict:
     '''
     If question object is missing properties for question text, image, audio, or video, sets the value to None so the property exists in the object
     '''
@@ -149,7 +148,7 @@ def initialize_question_media_properties(question_object):
         question_object["question_video"] = None
     return question_object
     
-def initialize_answer_media_properties(question_object):
+def initialize_answer_media_properties(question_object: dict) -> dict:
     '''
     If question object is missing properties for answer text, image, audio, or video, sets the value to None so the property exists in the object
     '''
@@ -163,15 +162,13 @@ def initialize_answer_media_properties(question_object):
         question_object["answer_video"] = None    
     return question_object
 
-def initialize_in_circulation_property(question_object):
+def initialize_in_circulation_property(question_object: dict, settings_data: dict) -> dict:
     '''
     If the question is new: sets the in_circulation property to False
     New question objects are never in in_circulation until determined to be so
     '''
     if question_object.get("in_circulation") == None:
         question_object["in_circulation"] = False
-    settings_data = helper.get_settings_data()
-
     # If a question_object references a module that does not exist, such as the Quizzer Tutorial module, then it will throw a key Error
     # In such cases we should catch the error and set the question to not in circulation
     try:
@@ -182,11 +179,13 @@ def initialize_in_circulation_property(question_object):
         question_object["in_circulation"] = False
     return question_object
 
-def initialize_time_between_revisions_property(question_object):
+
+
+
+def initialize_time_between_revisions_property(question_object: dict, settings_data: dict) -> dict:
     '''
     If the question is New: Initializes the default time_between_revisions to what is determined in the settings
     '''
-    settings_data = helper.get_settings_data()
     if question_object.get("time_between_revisions") == None:
         question_object["time_between_revisions"] = settings_data["time_between_revisions"]
     return question_object
@@ -201,7 +200,7 @@ def initialize_academic_sources_property(question_object):
     return question_object
 
 
-def update_question_history(question_object, status):
+def update_question_history(question_object:dict, status:str) -> dict:
     '''
     Creates a history of when a question was answered correctly
     Used in conjunction with in_correct attempt and revision streak value history
@@ -238,7 +237,7 @@ def update_question_history(question_object, status):
         print("invalid status provided")
     return question_object
 
-def update_is_module_active_property(question_object, settings_data):
+def update_is_module_active_property(question_object: dict, settings_data: dict) -> dict:
     module_name = question_object["module_name"]
     try:
         activated = settings_data["is_module_activated"][module_name]
