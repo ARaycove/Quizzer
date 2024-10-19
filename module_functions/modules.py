@@ -1,7 +1,7 @@
 import os
 import json
 from lib import helper
-import initialize
+from initialization_functions import initialize
 from module_functions import module_properties,new_module_defines
 from question_functions import questions
 
@@ -30,8 +30,7 @@ def verify_and_initialize_module(module_name: str) -> dict:
     # module_name_data.json defines the module and the comprised data for that module
     try:
         with open(f"modules/{module_name}/{module_name}_data.json", "r"):
-            # print(f"Module: {module_name} exists")
-            pass
+            return {}
     except:
         with open(f"modules/{module_name}/{module_name}_data.json", "x") as f:
             print(f"Module: {module_name} does not exist; initializing {module_name}_data.json")
@@ -65,11 +64,10 @@ def update_list_of_modules():
         json.dump(module_list, f, indent=4)
     return module_list
 
-def build_activated_setting(modules_list):
+def build_activated_setting(modules_list: dict, user_profile_data: dict) -> None:
     '''
     Looks up instance_module_list.json and ensures the is_activated setting for each module exists in the user's subject settings.json
     '''
-    settings_data = helper.get_settings_data()
     #Ensure is_activated key value pair exists:
     #NOTE Example structure:
     # "is_module_activated": {
@@ -82,6 +80,7 @@ def build_activated_setting(modules_list):
     #     "Python - Lists": true,
     #     "Intro Web Design": false
     # }
+    settings_data = user_profile_data["settings"]
     if settings_data.get("is_module_activated") == None:
         settings_data["is_module_activated"] = {} # empty dictionary to be filled later
     for module_name, module_file_path in modules_list.items():
@@ -94,7 +93,8 @@ def build_activated_setting(modules_list):
             pass
         else:
             raise Exception("is_module_activated setting both exists and doesn't exist. How?")
-    helper.update_settings_json(settings_data)
+    user_profile_data["settings"] = settings_data
+    helper.update_user_profile(user_profile_data)
             
 def build_raw_questions():
     '''
@@ -313,28 +313,3 @@ def update_module_profile():
         module_data = module_properties.update_module_all_subjects_property(module_data)
         module_data = module_properties.update_module_all_concepts_property(module_data)
         helper.update_module_data(module_data)
-
-def update_modules_with_proper_ids():
-    '''
-    Updates the old system of id's from Obsidian with the new encoded id system, this ensures all id's are unique and more readable by the machine
-    '''
-    module_list = update_list_of_modules()
-    for module_name in module_list:
-        new_questions_list = {}
-        module_data = helper.get_module_data(module_name)
-        module_question_list = module_data["questions"]
-        # Notice we're pulling an id already, but we're calculating it down below
-        for unique_id, question_object in module_question_list.items():
-            question_object = questions.calculate_question_id(question_object) #NOTE if the question id has already been calculated, then it will remain the same
-            # The question object now has a new id
-            # Update the unique_id with the new id
-            unique_id = question_object["id"] #NOTE Since the question_object["id"] doesn't change, this line will not change either, but does ensure the unique id key always matches the question["id"] value
-            write_data = {unique_id: question_object}
-            new_questions_list.update(write_data) # add the updated pair to a new set
-        # We now have the original module data
-        # We now have a new set to replace the old set with:
-        module_data["questions"] = new_questions_list
-        # Update made within function
-        # Now update the module folder itself
-        helper.update_module_data(module_data)
-        #NOTE in the future, adds and edits will need to be made both to the module itself and to the users questions.json

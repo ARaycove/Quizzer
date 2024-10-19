@@ -2,11 +2,15 @@ import os
 import json
 from datetime import datetime, timedelta
 from lib import helper
-import settings_functions.settings as settings
-from module_functions import quizzer_tutorial_module
+from settings_functions import initial_settings_defines
+from stats_functions import initial_stats_defines
+from module_functions import quizzer_tutorial_module, modules
+from user_profile_functions import user_profiles
 from question_functions import questions
+from settings_functions import settings
 from stats_functions import stats
 from integrations import obsidian
+import public_functions
 import shutil
 def generate_first_time_questions_dictionary(user_profile_data: dict) -> dict:
     '''
@@ -21,22 +25,72 @@ def generate_first_time_questions_dictionary(user_profile_data: dict) -> dict:
     except:
         quizzer_tutorial = quizzer_tutorial_module.generate_quizzer_tutorial(user_profile_data) #FIXME
     # Add the questions in the quizzer_tutorial to the user's questions data field
-    
+
     questions_data.update(quizzer_tutorial["questions"])
 
     # Send the data back to the add_new_user(user_name) function which calls this
     return questions_data
 
 def generate_first_time_settings_dictionary(user_profile_data:dict) -> dict:
-    #FIXME
     settings_data = {}
+    settings_data = initial_settings_defines.build_first_time_settings_data(user_profile_data)
     return settings_data
 
 def generate_first_time_stats_dictionary(user_profile_data:dict) -> dict:
-    #FIXME
     stats_data = {}
+    stats_data = initial_stats_defines.build_first_time_stats_data(user_profile_data)
     return stats_data
 
+def initialize_quizzer(user_profile_name: str) -> None: #Public Function ⁹
+    '''
+    Main Entry Point for program,
+    calls health check functions
+    '''
+
+    # FIXME Handle Edge Case where user deletes their user_profile:
+    # call_server for user data
+    # if no user data exists? then user never saved thier data,
+    # kick user back to login screen if edge case occurs (Highly unlikely)
+    
+    # To initialize the program:
+    timer_start = datetime.now()
+    ###########################################################################################
+    user_profiles.verify_user_profile(user_profile_name)
+
+
+    # Load in user settings data, if the profile is new, then there are default values
+    user_profile_data = helper.get_user_data(user_profile_name)
+    
+    ###########################################################################################
+    # External Application Integrations
+    obsidian_integration = False
+    notion_integration = False
+
+    # Gather a list of modules:
+    modules_list = modules.update_list_of_modules()
+    # Update the user settings to ensure there is an activation setting for each module that exists in the profile
+    # NOTE This allows the user to activate or deactivate modules individually
+    modules.build_activated_setting(modules_list, user_profile_data)
+    modules.update_module_profile() # After verifying modules, update metadata for each module
+
+    # Health check question objects
+    questions_data = remove_invalid_question_objects(questions_data)
+    return_data = public_functions.update_system_data(questions_data, stats_data)
+    stats_data = return_data["stats_data"]
+    print(return_data.keys())
+    subject_question_index = return_data["questions_by_subject_index"]
+    
+    print(stats_data)
+    print("#" * 25)
+    # Initialize settings keys (subject keys)
+    settings_data = settings.initialize_subject_settings(settings_data,subject_question_index)
+    
+    # End Initialization
+    timer_end = datetime.now()
+    elapsed_time = timer_end - timer_start
+    total_seconds = elapsed_time.total_seconds()
+    minutes, seconds = divmod(total_seconds, 60)
+    print(f"Success: initialization takes {int(minutes)} minutes and {int(seconds)} seconds.")
 
 #############################################################################################################
 #############################################################################################################

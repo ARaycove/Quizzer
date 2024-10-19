@@ -22,7 +22,6 @@ def get_instance_user_profile() -> str:
         instance_user_profile = json.load(out_file)
         out_file.close()
     except:
-        user_profiles.verify_or_generate_user_profile() # User Default and try again
         with open("instance_data/instance_user_profile.json", "r") as f:
             instance_user_profile = json.load(f)
     return instance_user_profile
@@ -32,64 +31,11 @@ def get_module_data(module_name: str) -> dict: # Fun Fact, this is the first get
         module_data = json.load(f)
     return module_data
 
-def get_question_data() -> dict:
-    '''
-    Returns the user's questions list, if the file does not exist, returns an empty dictionary
-    '''
-    user_profile_name = get_instance_user_profile()
-    if os.path.exists(f"user_profiles/{user_profile_name}/json_data/questions.json"):
-        with open(f"user_profiles/{user_profile_name}/json_data/questions.json", "r") as f:
-            questions_data = json.load(f)
-        return questions_data
-    elif not os.path.exists(f"user_profiles/{user_profile_name}/json_data/questions.json"):
-        questions_data = {}
-        return questions_data
-    else:
-        raise Exception(f"Unexpected error: Could not determine the existence of settings.json for USER:{user_profile_name}")
-    
-    
-    
-def get_stats_data() -> dict:
-    user_profile_name = get_instance_user_profile()
-    if os.path.exists(f"user_profiles/{user_profile_name}/json_data/stats.json"):
-        with open(f"user_profiles/{user_profile_name}/json_data/stats.json", "r") as f:
-            stats_data = json.load(f)
-        return stats_data
-    elif not os.path.exists(f"user_profiles/{user_profile_name}/json_data/stats.json"):
-        stats.initialize_first_time_stats()
-        with open(f"user_profiles/{user_profile_name}/json_data/stats.json", "r") as f:
-            stats_data = json.load(f)
-        return stats_data
-    else:
-        raise Exception(f"Unexpected error: Could not determine the existence of settings.json for USER:{user_profile_name}")
-
-
-
-def get_settings_data() -> dict:
-    user_profile_name = get_instance_user_profile()
-    if os.path.exists(f"user_profiles/{user_profile_name}/json_data/settings.json"):
-        with open(f"user_profiles/{user_profile_name}/json_data/settings.json") as f:
-            settings_data = json.load(f)
-        return settings_data
-    elif not os.path.exists(f"user_profiles/{user_profile_name}/json_data/settings.json"):
-        print(f"User {user_profile_name}, has no settings.json")
-        print(f"Initializing settings.json")
-        settings.create_first_time_settings_json()
-        with open(f"user_profiles/{user_profile_name}/json_data/settings.json") as f:
-            settings_data = json.load(f)
-        return settings_data
-    else:
-        raise Exception(f"Unexpected error: Could not determine the existence of settings.json for USER:{user_profile_name}")
-
-
-
 def get_obsidian_data() -> dict:
     user_profile_name = get_instance_user_profile()
     with open(f"user_profiles/{user_profile_name}/json_data/obsidian_data.json", "r") as f:
         obsidian_data = json.load(f)
     return obsidian_data
-
-
 
 def get_obsidian_media_paths() -> dict:
     user_profile_name = get_instance_user_profile()
@@ -97,8 +43,12 @@ def get_obsidian_media_paths() -> dict:
         obsidian_media_paths = json.load(f)
     return obsidian_media_paths
 
-def get_user_data() -> dict:
-    pass
+def get_user_data(user_profile_name: str) -> dict:
+    # data in the format of user_profile_name_data.json
+    with open(f"user_profiles/{user_profile_name}/{user_profile_name}_data.json", "r") as f:
+        user_profile_data = json.load(f)
+    return user_profile_data
+
 
 def get_user_uuid(user_profile_data: dict = None) -> str:
     if user_profile_data == None:
@@ -133,7 +83,7 @@ def add_question_object_to_module(question_object: dict) -> None:
     module_data = get_module_data(module_name)
     # Define the dictionary we will update with
     write_data = {unique_id: question_object}
-    module_data["questions"].update(write_data)
+    module_data["questions"].update(write_data) # NOTE this ensures against duplication
     # Now that the question has been added to the module's questions field, write the module data back to its json file
     update_module_data(module_data)
 
@@ -142,8 +92,10 @@ def add_question_object_to_user_profile(question_object: dict, user_profile_data
     if user_profile_data == None:
         user_profile_data = get_user_data()
 
-def update_user_profile(user_profile_data):
-    pass
+def update_user_profile(user_profile_data: dict) -> None:
+    user_name = user_profile_data["user_name"]
+    with open(f"user_profiles/{user_name}/{user_name}_data.json", "w+") as f:
+        json.dump(user_profile_data, f, indent=4)
 
 def update_obsidian_data_json(data):
     user_profile_name = get_instance_user_profile()

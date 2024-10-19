@@ -3,6 +3,7 @@ import time
 import os
 from lib import helper
 import public_functions
+from initialization_functions import initialize
 from user_profile_functions import user_profiles
 from datetime import date, datetime, time
 # FUTURE PLANS AND IMPLEMENTATIONS:
@@ -110,6 +111,9 @@ has_seen = False
 #NOTE helps determine what should happen when the menu button is clicked
 menu_active = False
 
+#NOTE Detect whether or not any users actually exist (For first time users)
+first_time_user = True
+
 def main(page: ft.Page):
     page.title="Quizzer"
     page.theme_mode=ft.ThemeMode.DARK
@@ -138,7 +142,7 @@ def main(page: ft.Page):
     def generate_user_profile(e: ft.ControlEvent):
         user_name = user_name_field.value
         password = password_field.value
-        user_profiles.verify_or_generate_user_profile(user_name)
+        user_profiles.add_new_user(user_name)
         submit_add_profile.visible=False
         user_name_field.visible=False
         cancel_add_profile.visible=False
@@ -156,7 +160,7 @@ def main(page: ft.Page):
         global current_question
         user_name = user_name_dropdown_select.value
         password = password_field.value
-        public_functions.initialize_quizzer(user_name)
+        initialize.initialize_quizzer(user_name)
         questions_data = helper.get_question_data()
         stats_data = helper.get_settings_data()
         settings_data = helper.get_settings_data()
@@ -173,7 +177,13 @@ def main(page: ft.Page):
         '''
         Updates the current list of users to provide to the drop down menu
         '''
-        current_user_list = helper.get_immediate_subdirectories(helper.get_user_profiles_directory())
+        global first_time_user
+        try:
+            current_user_list = helper.get_immediate_subdirectories(helper.get_user_profiles_directory())
+            first_time_user = False
+        except:
+            current_user_list = ["No Users Detected"]
+            first_time_user = True
         return current_user_list
     current_user_list = determine_user_list()
     ## Functions relating to main program body
@@ -190,6 +200,9 @@ def main(page: ft.Page):
         width=250,
         options=[ft.dropdown.Option(i) for i in current_user_list]
     )
+    if first_time_user == True:
+        user_name_dropdown_select.disabled = True
+        user_name_dropdown_select.label = "Create a New User"
     #NOTE Allows the user to create a new user profile
     add_profile = ft.ElevatedButton(text="Add New User", on_click=new_profile_screen, visible=True)
     #NOTE provides a field to enter a password #FIXME Does not currently connect to anything

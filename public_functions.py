@@ -9,7 +9,7 @@ from settings_functions import settings
 from module_functions import modules
 import quiz_functions
 
-import initialize
+from initialization_functions import initialize
 
 
 
@@ -105,93 +105,6 @@ def update_setting(key, value, data): # Public Function
     # If the value passed was invalid, thus would cause an error, we will have already returned a valid_status = False code, therefore no udpate will occur
     
     helper.update_settings_json(settings_data)    
-    
-def initialize_quizzer(user_profile_name="default"): #Public Function ⁹
-    '''
-    Main Entry Point for program,
-    calls health check functions
-    initializes json data if necessary
-    '''
-    user_profiles.verify_or_generate_user_profile(user_profile_name)
-    # To initialize the program:
-    timer_start = datetime.now()
-    # Very first check in initialization is to ensure the user profile directories are made,
-    # The front end should provide a user profile to work from, if nothing provided (for the sake of testing without a frontend) there is a default user_profile.
-    
-    
-    # NOTE:
-    # Ensure these functions initialize based on the above user_profile_name
-    # the user_profile_name is stored inside the instance_data/instance_user_profile.json file so we can use the helper library to pull this in any given function
-    # Should also make transition to database system smoother
-    
-    ###########################################################################################
-    # NOTE:
-    # These function ensure the json file for either the master questions.json, stats.json, or settings.json actually exists
-    # These functions do not ensure all properties that should exist do exist. They only aid in avoiding file not found errors:
-    print(f"Checking if JSON files exist for user: {user_profile_name}")
-    settings.initialize_settings_json() # [ ] updated to write to user_profiles/profile_name
-    questions.initialize_questions_json() # [ ] updated to write to user_profiles/profile_name
-    stats.initialize_stats_json() # [ ] updated to write to user_profiles/profile_name
-    ###########################################################################################
-    # Load in user settings data, if the profile is new, then there are default values
-    settings_data = helper.get_settings_data()
-    
-    ###########################################################################################
-    # External Application Integrations
-    obsidian_integration = False
-    notion_integration = False
-    # Load Settings Data
-    settings_data = helper.get_settings_data()
-    questions_data = helper.get_question_data()
-    # Build initial master list of every question across all modules
-    modules.update_modules_with_proper_ids()
-    raw_master_question_list = modules.build_raw_questions()
-
-
-    # Update master list of questions with any questions extracted from integrations
-    #FIXME Test with new user with default value, ensure no errors exists
-    # FIXME Re-evaluate Obsidian Integration
-    # existing_database = obsidian.scan_directory(settings_data["vault_path"])
-    # raw_master_question_list = obsidian.extract_questions_from_raw_data(existing_database, raw_master_question_list)
-
-    # Rewrite the master list into a different data format, (makes it easier for the following function to write to each module)
-    modules_list = modules.update_list_of_modules()
-    modules_raw = modules.parse_questions_to_appropriate_modules(raw_master_question_list, modules_list)
-    # Overwrite existing modules with data in modules_raw (This is a safe operation since the questions contained were derived from the data we are now overwriting)
-    # In such a case where a question_object has been modified to where a different module name is defined, the rebuilt data will remove, update, or add as necessary.
-    # The key here is that we are compiling all the question objects together, updating those objects with new information, then sorting them back out into desired modules.
-    # When a user imports a module, those questions will get pulled and not have a risk of being deleted.
-    # Final Note, the operation where we write all questions from modules to the users master question list, we can simply pull raw_master_question_list and update user's questions.json with that data
-    questions_data = modules.write_module_questions_to_users_questions_json(raw_master_question_list, questions_data)
-    #FIXME create modules.write_user_questions_to_modules() 
-    #FIXME This functions purpose would grab questions that exist in questions.json but not within any existing module
-    # With that list of questions, we write them to modules (Essentially we could do a for loop over the questions.json O(n) time. and check if the question
-    #  is in the raw_master_question_list (if it's not in their we strip out any statistical data from the object then write it to the 
-    # raw_master_question_list)) #FIXME Would need a lib.helper function that determines what properties get stripped and what doesn't (pass each 
-    # question object to this function and get out a "cleaned" object) The purpose of this "cleaning" is to prevent any user_data from entering the modules.
-    # Since the purpose of modules is to be shared, having user_data embedded in the module would overwrite another user's data with someone elses data (Which is not desirable behavior)
-    modules_list = modules.update_list_of_modules() # Need to update it twice
-    modules.build_activated_setting(modules_list) # This function relys on the above list data
-    modules.update_module_profile() # After verifying modules, update metadata for each module
-    # Health check question objects
-    stats_data = helper.get_stats_data()
-    questions_data = initialize.remove_invalid_question_objects(questions_data)
-    return_data = update_system_data(questions_data, stats_data)
-    stats_data = return_data["stats_data"]
-    print(return_data.keys())
-    subject_question_index = return_data["questions_by_subject_index"]
-    
-    print(stats_data)
-    print("#" * 25)
-    # Initialize settings keys (subject keys)
-    settings_data = settings.initialize_subject_settings(settings_data,subject_question_index)
-    
-    # End Initialization
-    timer_end = datetime.now()
-    elapsed_time = timer_end - timer_start
-    total_seconds = elapsed_time.total_seconds()
-    minutes, seconds = divmod(total_seconds, 60)
-    print(f"Success: initialization takes {int(minutes)} minutes and {int(seconds)} seconds.")
 
 def update_score(status, id): #Public Function
     # A strange bug occured where the id is the old file_name

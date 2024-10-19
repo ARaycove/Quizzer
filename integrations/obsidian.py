@@ -3,7 +3,7 @@ import json
 import obsidiantools
 from datetime import datetime, date
 import os
-import initialize
+from initialization_functions import initialize
 from module_functions import modules
 
 def scan_directory(vault_path): #Private Function
