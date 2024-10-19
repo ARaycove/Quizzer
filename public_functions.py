@@ -163,22 +163,17 @@ def update_score(status, id): #Public Function
     questions_data[id] = question_object
     update_system_data(questions_data, stats_data)
     
-def populate_question_list(questions_data, stats_data, settings_data):
-    quiz_functions.update_questions_in_circulation() # Start by ensuring questions are put into circulation if we can fit them in the average
-    questions_data = helper.get_question_data()
-    stats_data = helper.get_stats_data()
-    settings_data = helper.get_settings_data()
-    returned_data = update_system_data(questions_data, stats_data) # update stats every time we go to get a new list of questions
-    eligibility_index = returned_data["eligibility_index"]
+def populate_question_list(user_profile_data: dict) -> list:
+    user_profile_data = quiz_functions.update_questions_in_circulation(user_profile_data) # Start by ensuring questions are put into circulation if we can fit them in the average
+    user_profile_data = update_system_data(user_profile_data) # update stats every time we go to get a new list of questions
+    eligibility_index = user_profile_data["indices"]["eligibility_index"]
     eligibility_index = helper.shuffle_dictionary_keys(eligibility_index)
-    questions_data = returned_data["questions_data"]
-    stats_data = returned_data["stats_data"]
-    settings_data = returned_data["settings_data"]
+
     # We've already built out an index of all eligible questions, which gets rebuilt when we call update_system_data
     # We the eligible questions are also proportional to interest and priority because of the update_questions_in_circulation function
     # Therefore most of what this function does can be completely stripped away
     # A Quiz Length should still be adhered to, so that every quiz_length num of questions, the system goes to check for new questions to put into circulation, rather than all at once
-    quiz_length = settings_data["quiz_length"]
+    quiz_length = user_profile_data["settings"]["quiz_length"]
     
     ##################################################
     # filter out questions based on criteria
@@ -192,14 +187,13 @@ def populate_question_list(questions_data, stats_data, settings_data):
     if question_list == None:
         sorted_questions = None
     else:
-        print(f"Total questions in database : {len(questions_data)}")
+        print(f"Total questions in database : {len(user_profile_data['questions'])}")
         print(f"Number of eligible questions: {len(sorted_questions)}")
         print(f"Number of questions in this round: {quiz_length}")
         random.shuffle(question_list) # ensures there is some level of randomization, so users don't notice this is just a cycling list
         question_list = question_list[::-1] # Reverse the list
         random.shuffle(question_list) # Shuffle it again
         print(f"List of {len(question_list)} questions has been shuffled for pseudorandomness.")
-    print(stats_data)
     return question_list
 
 def update_system_data(user_profile_data: dict) -> dict:

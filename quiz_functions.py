@@ -83,8 +83,9 @@ def determine_questions_to_skip(tier_number, settings_data):
 
 
 ###############################################################
-def add_questions_into_circulation(average_daily_questions, desired_daily_questions, settings_data): #Private Function
+def add_questions_into_circulation(average_daily_questions: float, desired_daily_questions: int, user_profile_data: dict) -> dict: #Private Function
     # Logic, check for each subject, the total amount of questions existing and the total amount in circulation, if these numbers are equal for every subject then we terminate this function since there is nothing to add
+    settings_data = user_profile_data["settings"]
     length_to_check = len(settings_data["subject_settings"].keys())
     should_terminate_counter = 0
     total_activated_qs_in_database = 0
@@ -105,8 +106,8 @@ def add_questions_into_circulation(average_daily_questions, desired_daily_questi
     
     ##########################################################################################
     print("Adding questions into circulation")
-    stats_data = helper.get_stats_data()
-    questions_data = helper.get_question_data()
+    stats_data = user_profile_data["stats"]
+    questions_data = user_profile_data["questions"]
     # First we need to get a list of all subject matters sorted by priority
     subject_list = [i for i in settings_data["subject_settings"].keys()]
     original_list = sorted(subject_list, key=lambda x: settings_data['subject_settings'][x]['priority'])
@@ -149,10 +150,14 @@ def add_questions_into_circulation(average_daily_questions, desired_daily_questi
                 continue
             # Every time we iterate over a subject, we will refresh the data to ensure accuracy (This is the largest time sink in the whole program)
             print(f"Refreshing Data, subject: {subject}")
-            returned_data = public_functions.update_system_data(questions_data, stats_data) # Update data now also returns the data it updated as well as writes to the json, therefore we do not need to fetch it again
-            questions_data = returned_data["questions_data"]
-            stats_data = returned_data["stats_data"]
-            settings_data = returned_data["settings_data"]
+
+            user_profile_data["questions"] = questions_data
+            user_profile_data["stats"] = stats_data
+            user_profile_data["settings"] = settings_data
+            user_profile_data = public_functions.update_system_data(user_profile_data) # Update data now also returns the data it updated as well as writes to the json, therefore we do not need to fetch it again
+            questions_data = user_profile_data["questions"]
+            stats_data = user_profile_data["stats"]
+            settings_data = user_profile_data["settings"]
             
             # returned_data["eligibility_index"] = eligiblity_index
             # Variables used for calculations
@@ -193,51 +198,53 @@ def add_questions_into_circulation(average_daily_questions, desired_daily_questi
                     # After every question is added we need to check our targets
                 
                 if target <= 0:
-                    returned_data = public_functions.update_system_data(questions_data, stats_data)
-                    questions_data = returned_data["questions_data"]
-                    stats_data = returned_data["stats_data"]
-                    settings_data = returned_data["settings_data"]
+                    user_profile_data["questions"] = questions_data
+                    user_profile_data["stats"] = stats_data
+                    user_profile_data["settings"] = settings_data
+                    user_profile_data = public_functions.update_system_data(user_profile_data)
                     print(f"Parent module marked as inactive, skipping question. Occured: {count}")
-                    return None
+                    return user_profile_data
                 if num_questions_to_choose <= 0:
-                    returned_data = public_functions.update_system_data(questions_data, stats_data)
-                    questions_data = returned_data["questions_data"]
-                    stats_data = returned_data["stats_data"]
-                    settings_data = returned_data["settings_data"]
+                    user_profile_data["questions"] = questions_data
+                    user_profile_data["stats"] = stats_data
+                    user_profile_data["settings"] = settings_data
+                    user_profile_data = public_functions.update_system_data(user_profile_data)
+                    questions_data = user_profile_data["questions"]
+                    stats_data = user_profile_data["stats"]
+                    settings_data = user_profile_data["settings"]
                     print(f"Parent module marked as inactive, skipping question. Occured: {count}")
                     break
         
         elapsed_time = datetime.now() - time_start
         if elapsed_time >= timedelta(seconds=timer):
             print("Times Up, Sorry took too long")
-            returned_data = public_functions.update_system_data(questions_data, stats_data)
-            questions_data = returned_data["questions_data"]
-            stats_data = returned_data["stats_data"]
-            settings_data = returned_data["settings_data"]
-            return None
+            user_profile_data["questions"] = questions_data
+            user_profile_data["stats"] = stats_data
+            user_profile_data["settings"] = settings_data
+            user_profile_data = public_functions.update_system_data(user_profile_data)
+            return user_profile_data
 
-def remove_questions_from_circulation(average_daily_questions, desired_daily_questions): #Private Function
+def remove_questions_from_circulation(average_daily_questions, desired_daily_questions, user_profile_data: dict) -> dict: #Private Function
     print("Removing questions from circulation")
     target = average_daily_questions - (desired_daily_questions * 1.05) # if 100 is desired and 111 exist then 5% above threshold is the target, the count variable would then be 111-105 = 6.                                                               
-    questions_data = helper.get_question_data()
+    questions_data = user_profile_data["questions"]
     # We would then subtract from 6 until target <= 0
     for qa in questions_data:
         if qa["in_circulation"] == True:
             qa["in_circulation"] = False
             target -= qa["average_times_shown_per_day"]
         if target <= 0:
-            helper.update_questions_json(questions_data)
-            public_functions.update_system_data()
-            return None
+            user_profile_data["questions"] = questions_data
+            return user_profile_data
         
-def update_questions_in_circulation(): #Private Function
+def update_questions_in_circulation(user_profile_data: dict) -> dict: #Private Function
     '''
     Determines whether questions should be pulled from circulation or added into circulation, based on the desired daily questions settings and the current average daily shown stat
     after determination is made, function calls either remove_questions_from_circulation() or add_questions_into_circulation
     '''
     # Load in user data
-    settings_data = helper.get_settings_data()
-    stats_data = helper.get_stats_data()
+    settings_data = user_profile_data["settings"]
+    stats_data = user_profile_data["stats"]
     
     # assign variables with user data we are working with.
     average_daily_questions = stats_data["average_questions_per_day"]
@@ -245,12 +252,13 @@ def update_questions_in_circulation(): #Private Function
     print(f"Current average daily questions being shown is: {average_daily_questions}")
     print(f"Current desired daily questions to be shown is: {desired_daily_questions}")
     if average_daily_questions >= desired_daily_questions * 1.10: # 10% threshold, so if desired is 100, if we exceed 110 the script will reduce the amount of questions in circulation
-        remove_questions_from_circulation(average_daily_questions, desired_daily_questions) # For ease of reading, seperate the removal process into its own function
-               
+        user_profile_data = remove_questions_from_circulation(average_daily_questions, desired_daily_questions, user_profile_data) # For ease of reading, seperate the removal process into its own function
         print("Finished updating list of circulating questions")
+        return user_profile_data
     elif average_daily_questions < desired_daily_questions: # Indicating we need to add questions
-        add_questions_into_circulation(average_daily_questions, desired_daily_questions, settings_data)
+        user_profile_data = add_questions_into_circulation(average_daily_questions, desired_daily_questions, user_profile_data)
         print("Finished updating list of circulating questions")
+        return user_profile_data
     else:
         print("Finished updating list of circulating questions")
         return None

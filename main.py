@@ -114,6 +114,9 @@ menu_active = False
 #NOTE Detect whether or not any users actually exist (For first time users)
 first_time_user = True
 
+#NOTE
+CURRENT_USER = ""
+
 def main(page: ft.Page):
     page.title="Quizzer"
     page.theme_mode=ft.ThemeMode.DARK
@@ -158,13 +161,13 @@ def main(page: ft.Page):
     def initialize_program(e: ft.ControlEvent):
         global questions_list
         global current_question
+        global CURRENT_USER
         user_name = user_name_dropdown_select.value
         password = password_field.value
         initialize.initialize_quizzer(user_name)
-        questions_data = helper.get_question_data()
-        stats_data = helper.get_settings_data()
-        settings_data = helper.get_settings_data()
-        questions_list = public_functions.populate_question_list(questions_data, stats_data, settings_data)
+        user_profile_data = helper.get_user_data(user_name)
+        CURRENT_USER = user_name
+        questions_list = public_functions.populate_question_list(user_profile_data)
         current_question = questions_list.pop()
         page.clean()
         # page.bgcolor="black"

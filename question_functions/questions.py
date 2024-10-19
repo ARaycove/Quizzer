@@ -222,7 +222,7 @@ def calculate_next_revision_date(status, dictionary): #Private Function
         dictionary["next_revision_due"] = datetime.now()
     return dictionary["next_revision_due"]
 
-def calculate_question_id(question_object: dict) -> dict: #Private Function
+def calculate_question_id(question_object: dict, user_profile_data: dict) -> dict: #Private Function
     '''
     Deprecated, does nothing: is a function stub
     question id is based on the users questions.json
@@ -233,43 +233,12 @@ def calculate_question_id(question_object: dict) -> dict: #Private Function
     if question_object.get("id") != None:
         return question_object
 
-    # Generate Unique Id's based on the content of the question objects question and answer fields
-    # If all fields are empty then the object is invalid
-    # first try to get a question
-    if question_object.get("question_text") != None:
-        id = str(question_object["question_text"])
+    # The always unique id is the time in which the id was created alongside the user's uuid who made it, this method is gauranteed to always be unique except if a single user is able to create two objects in the space in time
+    current_time = str(datetime.now())
+    user_uuid = str(user_profile_data["uuid"])
+    unique_id = current_time + "_" + user_uuid
+    question_object["id"] = unique_id
 
-    elif question_object.get("answer_text") != None:
-        id = str(question_object["answer_text"])
-
-    elif question_object.get("question_image") != None:
-        id = str(question_object["question_image"])
-    
-    elif question_object.get("answer_image") != None:
-        id = str(question_object["answer_image"])
-
-    elif question_object.get("question_audio") != None:
-        id = str(question_object["question_audio"])
-
-    elif question_object.get("answer_audio") != None:
-        id = str(question_object["answer_audio"])
-
-    elif question_object.get("question_video") != None:
-        id = str(question_object("question_video"))
-    
-    elif question_object.get("answer_video") != None:
-        id = str(question_object["answer_video"])
-
-    else:
-        #All question object fields are empty
-        # Clear invalid object
-        question_object.clear()
-        return question_object
-
-    encoded_val = [str(ord(i)) for i in id]
-    encoded_val = ".".join(encoded_val)
-    id = encoded_val
-    question_object["id"] = id
     return question_object
 
 

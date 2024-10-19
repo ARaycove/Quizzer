@@ -9,19 +9,19 @@
         "<name of concept>"
     ],
 
-    "question_text": "Can you think of other ways of defending human dignity and sacredness, that aren't Reason?",
-    "question_image": "Error",
+    "question_text": "Question Text is absolutely required",
+    "question_image": null,
     "question_audio": null,
     "question_video": null,
 
-    "answer_text": "Error",
+    "answer_text": "Answer Text or some form of answer is required for a valid question object",
     "answer_image": null,
     "answer_audio": null,
     "answer_video": null,
 
     "module_name": "default_user_module",
 
-    "id": "Can you think of other ways of defending human dignity and sacredness, that aren't Reason?.md",
+    "id": "2024-10-19 15:02:40.372429_600c35dc-efe2-4b87-9306-6bb703749bc6",
     "academic_sources": []
 }
 }

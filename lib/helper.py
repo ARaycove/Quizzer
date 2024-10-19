@@ -74,8 +74,17 @@ def update_module_data(module_data: dict) -> None:
     with open(f"modules/{module_name}/{module_name}_data.json", "w+") as f:
         json.dump(module_data, f, indent=4)
 
+def clean_question_object(question_object: dict) -> dict:
+    with open("question_object_template.json", "r") as f:
+        template_question_object = json.load(f)
+    for key in question_object.keys():
+        if key not in template_question_object.keys():
+            del question_object[key]
+
+    return question_object
 def add_question_object_to_module(question_object: dict) -> None:
     # Get the name of the module embedded in the question object
+    question_object = clean_question_object(question_object)
     module_name = question_object["module_name"]
     # Get the unique id embedded in the question object
     unique_id = question_object["id"]
