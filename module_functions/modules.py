@@ -2,95 +2,53 @@ import os
 import json
 from lib import helper
 import initialize
-from module_functions import module_properties
-import questions
-# Initial Planning
-# Each module will be assigned a folder
-# Each module is a class that contains question objects
-# At this point OOP has not been implemented, instead a series of functions ensures each dictionary object contains the appropriate properties for the type of object.
-# Until I take a proper study of how to implement OOP and do some practice problems and programs this will not be implemented, but is still a planned overhaul
-# Obsidian integration needs to dump questions into a default obsidian questions modules
-# Questions added through the add_question function needs to dump questions into a default user_default module if a module is not specified.
-
-# We could implement this solely through the add_question function (not yet made)
-
-#FIXME Create the add_question function inside public_functions.py
-
-###########################################################################################################################################################
-# Make sure modules are placed inside the backend/modules/ folder #FIXME
-# Modules themselves will be stored in the modules/ folder inside the backend/ folder, this will avoid duplication of modules
-# This means a user_profile simply needs to point to specific modules in that folder to have them included in their questions.json master file
-# storing them altogether also means that all profiles can share and see every module on the system
+from module_functions import module_properties,new_module_defines
+from question_functions import questions
 
 
 
-###########################################################################################################################################################
-# Update initialization functions so media files are placed in their appropriate module/media_files/ folder #FIXME
-# Update Obsidian integration so scanned questions are stored in a default module if not specified #FIXME
-# Media files however, instead of being stored directly in backend/media_files/ will be stored:
-# backend/modules/module_name/media_files/
-# Doing this ensures media for questions is packaged with the module they are a part of.
-# Requires that we update initialization function so that questions scanned from Obsidian are placed into a module instead of questions.json
+################################################################################################################################
+def verify_modules_folder(module_name: str) -> None:
+    '''
+    Given the module's name, generates the directory structure for that module
+    If the structure already exists, then function does nothing
+    '''
+    # First ensure the module folder itself exists:
+    if not os.path.exists(f"modules/"):
+        os.makedirs(f"modules/")
+    # Second ensure the folder for that module exists:
+    if not os.path.exists(f"modules/{module_name}"):
+        os.makedirs(f"modules/{module_name}")
+    # Third ensure the media_files/ folder exists for that module
+    if not os.path.exists(f"modules/{module_name}/media_files/"):
+        os.makedirs(f"modules/{module_name}/media_files")
 
-
-###########################################################################################################################################################
-# Each module will also have a record of file_name: file_path; inside them. #FIXME
-# Create a master file in backend/ that contains all the file paths for all media across all modules #FIXME
-# master file will be constructed by compiling all the individual file_name: file_path records inside each module
-
-###########################################################################################################################################################
-# Need to construct a data structure for a module
-# Properties
-# module = {
-#     "is_a_quizzer_module": True; #Quizzer will check this value and terminate if it equals False, this ensures if the user doesn't import something that isn't a quizzer module
-#     "activated": bool;
-#     "media_file_record": {"file_name": "file_path"}; #the key is the file_name, so we can search for the file_name using module_name["media_file_record"][file_name] to get the file_path
-#     "module_questions": [{question_object}, {question_object}];                                                # Should be more efficient on system resources
+################################################################################################################################      
+def verify_and_initialize_module(module_name: str) -> dict:
+    verify_modules_folder(module_name)
+    # Fourth ensure the module_name_data.json exists
+    # module_name_data.json defines the module and the comprised data for that module
+    try:
+        with open(f"modules/{module_name}/{module_name}_data.json", "r"):
+            # print(f"Module: {module_name} exists")
+            pass
+    except:
+        with open(f"modules/{module_name}/{module_name}_data.json", "x") as f:
+            print(f"Module: {module_name} does not exist; initializing {module_name}_data.json")
+            module_name_data = new_module_defines.defines_initial_module_data(module_name)
+        try:
+            with open(f"modules/{module_name}/{module_name}_data.json", "w") as f:
+                json.dump(module_name_data, f, indent=4)
+        except TypeError:
+            # print("This threw a type error, because of the index argument, but it still worked?") That's why the try except was placed around the write_to function
+            pass
     
-# } 
-
-###########################################################################################################################################################
-#FIXME ID generation functionality
-# take a string being the file name
-# "."join([ord(i) for i in string if i.isalpha].extend(determine_module_qa_id()))
-# last digit is an incremented integer: 001 002 003 004 005 etc.
-# use rfind(.) to get index and parse out the end of the string, increment the number and 
-#FIXME ID generated here will be the permanent id for that given question object, therefore need to update the generate question_id function in update_questions.py
-
-###########################################################################################################################################################
-#FIXME Edit module from within GUI
-#FIXME if questions will now be added/removed dynamically from the master_list then where to store the scoring metrics?
-# We can't store it in the individual module.
-# The question object itself is raw text and doesn't take much data, so we can implement a new property activated: bool; and module_name: "module_question_belongs_to";
-#FIXME update determine question eligibility to take into account whether a question is activated or not 
-# This way we can keep the scoring metrics inside the individual questions, and if the question is "not activated" then we can just make it invisible inside quizzer altogether
-
-
-# Two overall phases
-# Phase 1:
-# Create the system, but don't integrate it with the existing question storage and integration
-# So make a compiled_questions.json file to work with leaving the questions.json master untouched.
-# Once we have a working module system then we can integrate and merge data (compiled_questions.json(update(questions.json)))
-# Phase 2: 
-# Optimize and integrate the module systeme so the populate question functionality used our new compiled_questions.json to pull questions
-# Update the library so data thats pulled and written to is the new compiled_questions.json instead of the old questions.json
-
-# So how do we get this done?
-# Step 1, change the obsidian integration file to write modules/ instead of questions.json
-# Initialize_module function is needed,
-# check if question object scanned has a module property value, if not module_name == "obsidian_default_module";
-# 
-# Step 2, Create the add_question function and test it, making sure it calls our initialize_module function
-# Let's get started:
-
-# See scratchpad for current iteration
-################################################################################################################################
-################################################################################################################################
-################################################################################################################################
-# Two functions are here to define what the initial module data looks like:
-# FIXME create a set of verification functions that ensure the data inside a module is of the correct format, similar to what we do for question objects
-# SOLVED with a is_quizzer_module boolean
-
+    return module_name_data
+###############################################################################################
+###############################################################################################
+###############################################################################################
+###############################################################################################
+###############################################################################################
 def update_list_of_modules():
     '''
     function scans the modules/ folder and writes instance_data/instance_module_list.json
@@ -176,30 +134,6 @@ def build_raw_questions():
 
 
     return raw_master_question_list
-        
-
-
-def defines_initial_module_data(module_name=str):
-    initial_module_data = {}
-    # Series of initial properties
-    if module_name == "obsidian_default":
-        initial_module_data["module_name"] = "Obsidian Default Module"
-        initial_module_data["description"] = "This module means no module was defined in the yaml property, quizzer by default creates this module to store such questions"
-    else:
-        initial_module_data["module_name"] = module_name
-        initial_module_data["description"] = "No Description Provided"
-    
-    initial_module_data["is_a_quizzer_module"] = True
-    initial_module_data["primary_subject"] = "" #FIXME gather all questions in the module, the subject name that appears the most is the primary subject
-    initial_module_data["all_subjects"] = [] #FIXME gather all questions in the module, result is a set of all subjects mentioned
-    initial_module_data["concepts_covered"] = [] #FIXME gather all questions in the module, create a set of all items in the related fields
-    initial_module_data["questions"] = {}
-    # initial_module_data["activated"] = False # modules deactivated by default when added, modules to be actived by users not within the module itself
-    # media_file_record and module_questions will be added later with different functions
-    
-    
-    # This is a return statement :'( <--- this is a crying face in case you didn't get the joke.
-    return initial_module_data
 
 def defines_initial_module_mindmap_data():
     initial_module_mindmap_data = {}
@@ -210,49 +144,7 @@ def defines_initial_module_mindmap_data():
 
 
 
-################################################################################################################################
-def verify_and_initialize_module(module_name):
-    # First ensure the module folder itself exists:
-    if not os.path.exists(f"modules/"):
-        os.makedirs(f"modules/")
-    # Second ensure the folder for that module exists:
-    if not os.path.exists(f"modules/{module_name}"):
-        os.makedirs(f"modules/{module_name}")
-    # Third ensure the media_files/ folder exists for that module
-    if not os.path.exists(f"modules/{module_name}/media_files/"):
-        os.makedirs(f"modules/{module_name}/media_files")
-    # Fourth ensure the module_name_data.json exists
-    # module_name_data.json defines the module and the comprised data for that module
-    try:
-        with open(f"modules/{module_name}/{module_name}_data.json", "r"):
-            # print(f"Module: {module_name} exists")
-            pass
-    except:
-        with open(f"modules/{module_name}/{module_name}_data.json", "x") as f:
-            print(f"Module: {module_name} does not exist; initializing {module_name}_data.json")
-            module_name_data = defines_initial_module_data(module_name)
-        try:
-            with open(f"modules/{module_name}/{module_name}_data.json", "w") as f:
-                json.dump(module_name_data, f, indent=4)
-        except TypeError:
-            # print("This threw a type error, because of the index argument, but it still worked?") That's why the try except was placed around the write_to function
-            pass
-    # Fourth ensure the module_name_mindmap.json exists:
-    # module_name_mindmap.json is the individual mindmap data for that module for helping determine relations of ideas
-    try:
-        with open(f"modules/{module_name}/{module_name}_mindmap.json", "r"):
-            # print(f"Module: {module_name} exists")
-            pass
-    except:
-        with open(f"modules/{module_name}/{module_name}_mindmap.json", "x") as f:
-            print(f"Module: {module_name} does not exist; initializing {module_name}_data.json")
-            module_name_mindmap = defines_initial_module_mindmap_data()
-        try:
-            with open(f"modules/{module_name}/{module_name}_mindmap.json", "w") as f:
-                json.dump(module_name_mindmap, f, index=4)
-        except TypeError:
-            # print("This threw a type error, because of the index argument, but it still worked?") That's why the try except was placed around the write_to function
-            pass
+
 
 
 def check_existing_questions_against_modules():

@@ -2,8 +2,8 @@ from lib import helper
 from datetime import datetime, date, timedelta
 import json
 import time
-import questions
-import settings
+from question_functions import questions
+from settings_functions import settings
 import math
 # One function per stat should exist
 # each function should print the value of that stat to stats.jon

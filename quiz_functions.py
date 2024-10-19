@@ -1,9 +1,9 @@
 import json
 import random
 from lib import helper
-import settings
-import stats
-import questions
+from settings_functions import settings
+from stats_functions import stats
+from question_functions import questions
 import public_functions
 from datetime import datetime, timedelta
 ##################################################################

@@ -3,6 +3,9 @@
 import json
 import os
 from lib import helper
+
+#FIXME Settings key got duplicated, either run check that deletes duplicates or investigate how it got duplicated
+
 def initialize_subject_settings(settings_data, questions_by_subject_index): #Private Function
     settings_data = helper.get_settings_data()
     # serves as a template for later

@@ -2,14 +2,13 @@
 # Custom Modules
 from lib import helper
 from integrations import obsidian
-from stats_functions import update_statistics
+from stats_functions import update_statistics, stats
 from user_profile_functions import user_profiles
-from question_functions import update_questions
+from question_functions import update_questions, questions
+from settings_functions import settings
 from module_functions import modules
 import quiz_functions
-import settings
-import questions
-import stats
+
 import initialize
 
 

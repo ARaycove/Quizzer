@@ -277,6 +277,7 @@ def main(page: ft.Page):
         new_average_daily_questions = ft.Text(value=f"AVG New Daily Questions: {stats_data['average_num_questions_entering_circulation_daily']:.2f}")
         revision_streak = ft.Text(value=f"Rev. Streak: {current_question['revision_streak']}")
         last_revised = ft.Text(value=f"Last Revised: {current_question['last_revised']}")
+        due_date = ft.Text(value=f"Due Date: {current_question['next_revision_due']}")
         current_eligible_questions = ft.Text(value=f"Qa's today: {stats_data['current_eligible_questions']}")
         total_questions_answered = ft.Text(value=f"Total Answered: {stats_data['total_questions_answered']}")
         try:
@@ -286,7 +287,7 @@ def main(page: ft.Page):
         
         stat_list.append(questions_in_quiz)
         stat_list.append(new_average_daily_questions)
-        stat_list.append(last_revised)
+        stat_list.append(due_date)
         stat_list.append(current_eligible_questions)
         stat_list.append(total_questions_answered)
         stat_list.append(answered_today)
@@ -489,17 +490,17 @@ def main(page: ft.Page):
         # Construct each field only if data for that field exists
         if current_question.get("question_text") != None:
             question_object_text_display = ft.Text(value=current_question["question_text"], size=30)
-            main_page_qo_text_row = ft.Row(alignment=ft.MainAxisAlignment.CENTER,controls=[question_object_text_display], wrap=True)
+            main_page_qo_text_row = ft.Row(alignment=ft.MainAxisAlignment.SPACE_AROUND,controls=[question_object_text_display], wrap=True)
             controls_list.append(main_page_qo_text_row)
         if current_question.get("question_audio") != None:
             question_object_audio = ft.Audio(src=current_question["question_audio"], autoplay=True,)
-            main_page_qo_audio_row = ft.Row(alignment=ft.MainAxisAlignment.CENTER,controls=[question_object_audio])
+            main_page_qo_audio_row = ft.Row(alignment=ft.MainAxisAlignment.SPACE_AROUND,controls=[question_object_audio])
             controls_list.append(main_page_qo_audio_row)
         if current_question.get("question_image") != None:
             print("We have an image!!!")
             source = helper.get_absolute_media_path(current_question["question_image"], current_question)
-            question_object_image_display = ft.Image(src=source, fit=ft.ImageFit.FIT_HEIGHT)
-            main_page_qo_image_row = ft.Row(alignment=ft.MainAxisAlignment.CENTER,controls=[question_object_image_display])
+            question_object_image_display = ft.Image(src=source, fit=ft.ImageFit.SCALE_DOWN)
+            main_page_qo_image_row = ft.Row(alignment=ft.MainAxisAlignment.SPACE_AROUND,controls=[question_object_image_display])
             controls_list.append(main_page_qo_image_row)
         if current_question.get("question_video") != None:
             #FIXME
@@ -507,15 +508,32 @@ def main(page: ft.Page):
             question_object_video_display = ft.Video()
             main_page_qo_video_row = ft.Row(expand=True,alignment=ft.MainAxisAlignment.CENTER,controls=[question_object_video_display])
             controls_list.append(main_page_qo_video_row)
-        # Optional condition, if the text is the only thing existing, then let it expand to fill the container #FIXME
-        
-        main_page_question_object_data = ft.Column(expand=True,
-                                                   alignment=ft.MainAxisAlignment.CENTER,
+        # Optional condition, if the text is the only thing existing, then let it expand to fill the container
+        if ((current_question.get("question_image") == None) and
+            (current_question.get("question_video") == None)):
+            main_page_qo_text_row.expand = True
+        main_page_question_object_data = ft.Column(expand=False,
                                                    controls=controls_list,
-                                                   scroll=ft.ScrollMode.ALWAYS)
-
-        main_page_question_object_display = ft.Container(expand=True,padding=20,ink=True,ink_color=ft.colors.GREY_500,content=main_page_question_object_data,on_click=flip_question_answer)
-        main_page_answer_bar = ft.Row(alignment=ft.MainAxisAlignment.SPACE_AROUND,spacing=25,controls=[yes_button,skip_button,no_button])
+                                                   scroll=ft.ScrollMode.ALWAYS,
+                                                   alignment=ft.MainAxisAlignment.SPACE_AROUND,
+                                                   horizontal_alignment=ft.MainAxisAlignment.SPACE_AROUND)
+        
+        main_page_question_object_button = ft.Container(expand=False,
+                                                        ink=True,
+                                                        ink_color=ft.colors.GREY_500,
+                                                        content=main_page_question_object_data,
+                                                        on_click=flip_question_answer,
+                                                        )
+        
+        main_page_question_object_display = ft.Column(alignment=ft.MainAxisAlignment.SPACE_AROUND,
+                                                      horizontal_alignment=ft.MainAxisAlignment.SPACE_AROUND,
+                                                      expand=True,
+                                                      controls=[main_page_question_object_button])
+        main_page_question_object_button.width = page.width
+        main_page_question_object_button.height = (page.height)
+        
+        # Bottom of Page
+        main_page_answer_bar = ft.Row(alignment=ft.MainAxisAlignment.SPACE_AROUND,spacing=25,controls=[yes_button,skip_button,no_button],height=50)
         main_page = ft.Column(expand=True,controls=[main_page_header,main_page_question_object_display,main_page_answer_bar])
         page.clean()
         page.add(main_page)
@@ -540,16 +558,16 @@ def main(page: ft.Page):
         # Construct each field only if data for that field exists
         if current_question.get("answer_text") != None:
             question_object_text_display = ft.Text(value=current_question["answer_text"], size=30)
-            main_page_qo_text_row = ft.Row(alignment=ft.MainAxisAlignment.CENTER,controls=[question_object_text_display], wrap=True)
+            main_page_qo_text_row = ft.Row(alignment=ft.MainAxisAlignment.SPACE_AROUND,controls=[question_object_text_display], wrap=True)
             controls_list.append(main_page_qo_text_row)
         if current_question.get("answer_audio") != None:
             question_object_audio = ft.Audio(src=current_question["answer_audio"], autoplay=True,)
-            main_page_qo_audio_row = ft.Row(alignment=ft.MainAxisAlignment.CENTER,controls=[question_object_audio])
+            main_page_qo_audio_row = ft.Row(alignment=ft.MainAxisAlignment.SPACE_AROUND,controls=[question_object_audio])
             controls_list.append(main_page_qo_audio_row)
         if current_question.get("answer_image") != None:
             source = helper.get_absolute_media_path(current_question["answer_image"], current_question)
-            question_object_image_display = ft.Image(src=source, fit=ft.ImageFit.FIT_HEIGHT)
-            main_page_qo_image_row = ft.Row(alignment=ft.MainAxisAlignment.CENTER,controls=[question_object_image_display])
+            question_object_image_display = ft.Image(src=source, fit=ft.ImageFit.SCALE_DOWN)
+            main_page_qo_image_row = ft.Row(alignment=ft.MainAxisAlignment.SPACE_AROUND,controls=[question_object_image_display])
             controls_list.append(main_page_qo_image_row)
         if current_question.get("answer_video") != None:
             #FIXME
@@ -558,12 +576,25 @@ def main(page: ft.Page):
             main_page_qo_video_row = ft.Row(expand=True,alignment=ft.MainAxisAlignment.CENTER,controls=[question_object_video_display])
             controls_list.append(main_page_qo_video_row)
         
-        main_page_question_object_data = ft.Column(expand=True,
-                                                   alignment=ft.MainAxisAlignment.CENTER,
+        main_page_question_object_data = ft.Column(expand=False,
                                                    controls=controls_list,
-                                                   scroll=ft.ScrollMode.ALWAYS)
-
-        main_page_question_object_display = ft.Container(expand=True,padding=20,ink=True,ink_color=ft.colors.GREY_500,content=main_page_question_object_data,on_click=flip_question_answer)
+                                                   scroll=ft.ScrollMode.ALWAYS,
+                                                   alignment=ft.MainAxisAlignment.SPACE_AROUND,
+                                                   horizontal_alignment=ft.MainAxisAlignment.SPACE_AROUND)
+        
+        main_page_question_object_button = ft.Container(expand=False,
+                                                        ink=True,
+                                                        ink_color=ft.colors.GREY_500,
+                                                        content=main_page_question_object_data,
+                                                        on_click=flip_question_answer,
+                                                        )
+        
+        main_page_question_object_display = ft.Column(alignment=ft.MainAxisAlignment.SPACE_AROUND,
+                                                      horizontal_alignment=ft.MainAxisAlignment.SPACE_AROUND,
+                                                      expand=True,
+                                                      controls=[main_page_question_object_button])
+        main_page_question_object_button.width = page.width
+        main_page_question_object_button.height = (page.height)
         main_page_answer_bar = ft.Row(alignment=ft.MainAxisAlignment.SPACE_AROUND,spacing=25,controls=[yes_button,skip_button,no_button])
         main_page = ft.Column(expand=True,controls=[main_page_header,main_page_question_object_display,main_page_answer_bar])
         page.clean()
@@ -605,6 +636,7 @@ def main(page: ft.Page):
         public_functions.update_setting(key, field_value, data)
 
     def display_settings_page(e: ft.ControlEvent) -> None:
+        #FIXME scrolling clock display for due_date_sensitivity
         # Dynamically generated page based on the users settings.json
         page.clean()
         settings_data = helper.get_settings_data()

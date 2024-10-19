@@ -1,72 +1,106 @@
 from lib import helper
 from question_functions import update_questions
-import stats
+from stats_functions import stats, update_statistics
 from datetime import datetime, date, timedelta
 from module_functions import modules
 import time
 import json
 import math
 import random
+def verify_question_object(question_object: dict) -> bool:
+    '''
+    Returns True if the question object has all minimum required properties
+    Returns False if the question object is missing required properties
+    '''
+    # qf = question field
+    # af = answer field
+
+    #Question treated as invalid by default
+    qf_is_valid = False
+    af_is_valid = False
+    is_valid = False
+    # Validate question_object has a module_name attached NOTE Every question_object must belong to a module
+    if question_object["module_name"] == "":
+        return is_valid
+    if question_object["module_name"] == None:
+        return is_valid
+    
+    # Validate question field
+    if question_object.get("question_text") != None:
+        qf_is_valid = True
+    elif question_object.get("question_image") != None:
+        qf_is_valid = True
+    elif question_object.get("question_audio") != None:
+        qf_is_valid = True
+    elif question_object.get("question_video") != None:
+        qf_is_valid = True
+
+    # Validate Answer Field
+    if question_object.get("answer_text") != None:
+        af_is_valid = True
+    elif question_object.get("answer_image") != None:
+        af_is_valid = True
+    elif question_object.get("answer_audio") != None:
+        af_is_valid = True
+    elif question_object.get("answer_video") != None:
+        af_is_valid = True
+    
+    # Question objects need both a question and an answer to the question to be valid
+    # NOTE This is because questions without answers are not entirely helpful
+    # NOTE However philisophical questions don't have defined answers, however such questions should indicate that in the answer field
+    if qf_is_valid == True and af_is_valid:
+        is_valid = True
+        return is_valid
+    else:
+        return is_valid
+    
+
+def add_new_question(
+        user_profile_data: dict = None, #Not required, but does pass through for some functions, more efficient
+        id: str = None,
+        primary_subject: str = "miscellaneous",
+        subject: list = ["miscellaneous"],
+        related: list = None,
+        question_text = None, question_image = None, question_audio = None, question_video = None,
+        answer_text = None, answer_image = None, answer_audio = None, answer_video = None,
+        module_name: str = None) -> dict:
+    question_object = {}
+    # Make exception for "Quizzer Tutorial Module", all other questions running through this function will get assigned a question_id proper
+    if module_name != "Quizzer Tutorial":
+        user_uuid = helper.get_user_uuid()
+        question_object["id"] = calculate_question_id(user_uuid)
+    else:
+        question_object["id"] = id
+    question_object["primary_subject"] = primary_subject
+    question_object["subject"] = subject
+    question_object["related"] = related
+    question_object["question_text"] = question_text
+    question_object["question_audio"] = question_audio
+    question_object["question_image"] = question_image
+    question_object["question_video"] = question_video
+    question_object["answer_text"] = answer_text
+    question_object["answer_audio"] = answer_audio
+    question_object["answer_image"] = answer_image
+    question_object["answer_video"] = answer_video
+    question_object["module_name"] = module_name
+    # question object is now constructed
+    # question object needs to be validated
+    is_valid = verify_question_object(question_object)
+    if is_valid == False:
+        return None
+    # Write question to module that it belongs to
+    helper.add_question_object_to_module(question_object)
+    # Write question to the current user's questions_data
+    if module_name != "Quizzer Tutorial": # If we are adding the initial tutorial functions then this won't need to be called
+        helper.add_question_object_to_user_profile(question_object, user_profile_data)
+    return question_object
+
+
+
 # This module holds any function that governs or alters a question object
 #######################################################################
 #######################################################################
 #######################################################################
-def create_questions_json_file(): #Private Function
-    '''
-    Initializes Quizzer Tutorial Module, also includes all the tutorial questions that will get entered
-    '''
-    questions = {}
-    id_key = "tutorial question 01"
-    settings = helper.get_settings_data()
-    dummy = {}
-    # define initial question metadata
-    dummy["id"] = "tutorial question 01"
-    dummy["file_path"] = None
-    dummy["file_path"] = None
-    dummy["object_type"] = "question"
-    dummy["subject"] = ["miscellaneous"]
-    dummy["related"] = ["tutorial"]
-    # define main details of the question presented
-    dummy["question_text"] = "Hello, welcome to quizzer, You can click show to see the answer, If you get the question correct press yes, otherwise press no"
-    dummy["question_image"] = None
-    dummy["question_audio"] = None
-    dummy["question_video"] = None
-    # define main details of the answer to the question
-    dummy["answer_text"] = "Congratulations, thats it. press the menu and add your own questions"
-    dummy["answer_image"] = None
-    dummy["answer_audio"] = None
-    dummy["answer_video"] = None
-    # define question stats
-    dummy["module_name"] = "Quizzer Tutorial"
-    dummy["revision_streak"] = 100
-    dummy["last_revised"] = helper.stringify_date(datetime.now())
-    dummy["next_revision_due"] = helper.stringify_date(datetime.now())
-    dummy["in_circulation"] = False
-    dummy["time_between_revisions"] = settings["time_between_revisions"]
-    # add dummy question to initialize data structure
-    questions[id_key] = dummy
-    modules.verify_and_initialize_module("Quizzer Tutorial")
-    with open(f"modules/Quizzer Tutorial/Quizzer Tutorial_data.json", "r") as f:
-        initial_module = json.load(f)
-    
-    if initial_module["questions"] == {}:
-        write_data = {dummy["id"]: dummy}
-        initial_module["questions"].update(write_data)
-    
-    with open(f"modules/Quizzer Tutorial/Quizzer Tutorial_data.json", "w+") as f:
-        json.dump(initial_module, f, indent=4)
-
-        
-def initialize_questions_json(): #Private Function
-    """Checks if question.json exists. If not, create it.
-    """
-    try:
-        questions = helper.get_question_data()
-        print("questions.json exists")
-    except:
-        print("questions.json not found")
-        print("creating questions.json with default values")
-        create_questions_json_file()
 
 def initialize_and_update_question_properties(questions_data, settings_data):
     # Reduce time complexity and update to match new data structure:
@@ -256,35 +290,3 @@ def calculate_question_id(question_object: dict) -> dict: #Private Function
     return question_object
 
 
-def verify_question_object(question_object: dict) -> bool:
-    # qf = question field
-    # af = answer field
-
-    #Question treated as invalid by default
-    qf_is_valid = False
-    af_is_valid = False
-    is_valid = False
-    # Validate question field
-    if question_object.get("question_text") != None:
-        qf_is_valid = True
-    elif question_object.get("question_image") != None:
-        qf_is_valid = True
-    elif question_object.get("question_audio") != None:
-        qf_is_valid = True
-    elif question_object.get("question_video") != None:
-        qf_is_valid = True
-    # Validate Answer Field
-    if question_object.get("answer_text") != None:
-        af_is_valid = True
-    elif question_object.get("answer_image") != None:
-        af_is_valid = True
-    elif question_object.get("answer_audio") != None:
-        af_is_valid = True
-    elif question_object.get("answer_video") != None:
-        af_is_valid = True
-    
-    if qf_is_valid == True or af_is_valid == True:
-        is_valid = True
-        return is_valid
-    else:
-        return is_valid

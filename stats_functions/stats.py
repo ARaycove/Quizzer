@@ -1,10 +1,9 @@
 import json
 import math
-import settings
-import questions
+from settings_functions import settings
+from question_functions import questions, update_questions
 from stats_functions import update_statistics
 from lib import helper
-import questions
 from datetime import date, datetime
 ##########################################################################################
 # Calculation functions:

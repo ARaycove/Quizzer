@@ -2,11 +2,48 @@ import os
 import json
 from datetime import datetime, timedelta
 from lib import helper
-import settings
-import questions
-import stats
+import settings_functions.settings as settings
+from module_functions import quizzer_tutorial_module
+from question_functions import questions
+from stats_functions import stats
 from integrations import obsidian
 import shutil
+def generate_first_time_questions_dictionary(user_profile_data: dict) -> dict:
+    '''
+    Every new user gets the quizzer tutorial as a module added into their profile
+    Called by add_new_user(user_name)
+    '''
+    # Initialize an empty dict
+    questions_data = {}
+    # Load in the quizzer_tutorial_module
+    try:
+        quizzer_tutorial = helper.get_module_data("quizzer_tutorial")
+    except:
+        quizzer_tutorial = quizzer_tutorial_module.generate_quizzer_tutorial(user_profile_data) #FIXME
+    # Add the questions in the quizzer_tutorial to the user's questions data field
+    
+    questions_data.update(quizzer_tutorial["questions"])
+
+    # Send the data back to the add_new_user(user_name) function which calls this
+    return questions_data
+
+def generate_first_time_settings_dictionary(user_profile_data:dict) -> dict:
+    #FIXME
+    settings_data = {}
+    return settings_data
+
+def generate_first_time_stats_dictionary(user_profile_data:dict) -> dict:
+    #FIXME
+    stats_data = {}
+    return stats_data
+
+
+#############################################################################################################
+#############################################################################################################
+#############################################################################################################
+#############################################################################################################
+#############################################################################################################
+# NOTE OLD PROGRAM, May not need any of these functions
 def count_files_in_directory(directory_path): #Private Function
     try:
         if not os.path.isdir(directory_path):

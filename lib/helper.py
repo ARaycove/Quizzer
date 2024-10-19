@@ -1,9 +1,9 @@
 import json
 from datetime import datetime, date, timedelta
 from user_profile_functions import user_profiles
-import settings
-import questions
-import stats
+from settings_functions import settings
+from question_functions import questions
+from stats_functions import stats
 import mimetypes
 import os
 import random
@@ -27,7 +27,7 @@ def get_instance_user_profile() -> str:
             instance_user_profile = json.load(f)
     return instance_user_profile
 
-def get_module_data(module_name): # Fun Fact, this is the first get data function that'll require an argument to work:
+def get_module_data(module_name: str) -> dict: # Fun Fact, this is the first get data function that'll require an argument to work:
     with open(f"modules/{module_name}/{module_name}_data.json", "r") as f:
         module_data = json.load(f)
     return module_data
@@ -97,13 +97,21 @@ def get_obsidian_media_paths() -> dict:
         obsidian_media_paths = json.load(f)
     return obsidian_media_paths
 
+def get_user_data() -> dict:
+    pass
+
+def get_user_uuid(user_profile_data: dict = None) -> str:
+    if user_profile_data == None:
+        user_profile_data = get_user_data()
+    user_profile_name = user_profile_data[""]
+
 
 
 ##################################################################################################
 ##################################################################################################
 ##################################################################################################
 # Write to database functions
-def update_module_data(module_data):
+def update_module_data(module_data: dict) -> None:
     '''
     feed this function the data to be written back to the modules/ folder
     each module has a module name property, so you can't fuck up and feed in the wrong module name
@@ -115,6 +123,27 @@ def update_module_data(module_data):
         module_name = "obsidian_default"
     with open(f"modules/{module_name}/{module_name}_data.json", "w+") as f:
         json.dump(module_data, f, indent=4)
+
+def add_question_object_to_module(question_object: dict) -> None:
+    # Get the name of the module embedded in the question object
+    module_name = question_object["module_name"]
+    # Get the unique id embedded in the question object
+    unique_id = question_object["id"]
+    # Pull up that modules data so we can add the question to it
+    module_data = get_module_data(module_name)
+    # Define the dictionary we will update with
+    write_data = {unique_id: question_object}
+    module_data["questions"].update(write_data)
+    # Now that the question has been added to the module's questions field, write the module data back to its json file
+    update_module_data(module_data)
+
+
+def add_question_object_to_user_profile(question_object: dict, user_profile_data: dict = None) -> None:
+    if user_profile_data == None:
+        user_profile_data = get_user_data()
+
+def update_user_profile(user_profile_data):
+    pass
 
 def update_obsidian_data_json(data):
     user_profile_name = get_instance_user_profile()
