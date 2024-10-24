@@ -52,8 +52,9 @@ def add_new_user(user_name: str, question_object_data) -> dict: #Public Function
         user_profile_data["questions"] = initialize.generate_first_time_questions_dictionary()
         user_profile_data["settings"] = initialize.generate_first_time_settings_dictionary(user_profile_data, question_object_data)
         user_profile_data["stats"] = initialize.generate_first_time_stats_dictionary(user_profile_data)
-        for unique_id, question_object in user_profile_data["questions"].items():
-            question_object = questions.update_user_question_stats(question_object, unique_id, user_profile_data, question_object_data)
+        for pile_name, pile in user_profile_data["questions"].items():
+            for unique_id, question_object in pile.items():
+                question_object = questions.update_user_question_stats(question_object, unique_id, user_profile_data, question_object_data)
         helper.update_user_profile(user_profile_data)
     return user_profile_data
 

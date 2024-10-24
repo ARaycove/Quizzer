@@ -115,6 +115,7 @@ menu_active = False
 first_time_user = True
 #NOTE
 CURRENT_USER = ""
+CURRENT_UUID = ""
 def main(page: ft.Page):
     page.title="Quizzer"
     page.theme_mode=ft.ThemeMode.DARK
@@ -130,24 +131,28 @@ def main(page: ft.Page):
 
     def generate_user_profile(e: ft.ControlEvent, user_name):
         print(user_name)
-        user_profiles.add_new_user(user_name)
+        user_profiles.add_new_user(user_name, question_object_data)
         display_login_screen()
         
-    def initialize_program(e: ft.ControlEvent):
+    def initialize_program(e: ft.ControlEvent, user_name: str):
         global questions_list
         global current_question
         global CURRENT_USER
-        user_name = ""
-        password = ""
+        global CURRENT_UUID
         user_profile_data = helper.get_user_data(user_name)
-        CURRENT_USER = user_name
+        # Assign Constants with appropriate values
+        CURRENT_USER = user_profile_data["user_name"]
+        CURRENT_UUID = user_profile_data["uuid"]
+        print(f"Current User: <{CURRENT_USER}> WITH UUID: <{CURRENT_UUID}>")
+        # Health Check functions
+        # user_profile_data["questions"] = initialize.remove_invalid_question_objects(user_profile_data["questions"], question_object_data)
+        # FIXME rebuilding how questions are structured in the user profile for quicker selection by algorithm
+        user_profile_data["questions"] = initialize.sort_questions(user_profile_data["questions"], question_object_data)
+        # Populate the question list, then assign the current question object to be displayed
         questions_list = public_functions.populate_question_list(user_profile_data)
         current_question = questions_list.pop()
         page.clean()
         # page.bgcolor="black"
-        page.add(
-            main_page
-        )
         refresh_question_object_display_with_question()
         
     def determine_user_list():
@@ -184,7 +189,7 @@ def main(page: ft.Page):
             user_name_dropdown_select = ft.Dropdown(visible=True,label="User Name",width=250,options=[ft.dropdown.Option(i) for i in current_user_list])
         else:
             user_name_dropdown_select = ft.Dropdown(visible=True,disabled=True,label="Create a New User",width=250,options=[])
-        submit_login = ft.ElevatedButton(text="Login", on_click=initialize_program, visible=True)
+        submit_login = ft.ElevatedButton(text="Login", on_click=lambda e: initialize_program(e, user_name_dropdown_select.value), visible=True)
         add_profile = ft.ElevatedButton(text="Add New User", on_click=new_profile_screen, visible=True)
         password_field = ft.TextField(label="Password", value="Not Implemented Yet", width=250, disabled=True)
         user_name_row = ft.Row(alignment=ft.MainAxisAlignment.CENTER,controls=[user_name_dropdown_select])

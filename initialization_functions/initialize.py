@@ -36,13 +36,18 @@ def generate_first_time_questions_dictionary() -> dict:
     '''
     # Initialize an empty dict 
     questions_data = {}
+    questions_data["unsorted"] = {}                         # Newly added questions go here
+    questions_data["deactivated"] = {}                      # Questions with deactivated modules go here
+    questions_data["reserve_bank"] = {}                     # Questions not circulating currently go here -> will get checked by add questions to circulation
+    questions_data["in_circulation_not_eligible"] = {}      # Questions placed into circulation but not eligible to be answered go here -> subdivided further by due date to minimize unneccessary operations
+    questions_data["in_circulation_is_eligible"] = {}       # Questions placed into circulation AND are eligible to be answered go here -> will be displayed to the user immediately
     # Load in the quizzer_tutorial_module 
     module_data = helper.get_all_module_data()
     # Build first question set based on the questions in the Quizzer Tutorial Module 
     quizzer_tutorial = module_data["Quizzer Tutorial"]
     for unique_id in quizzer_tutorial["questions"]:
         write_data = {unique_id: {}}
-        questions_data.update(write_data)
+        questions_data["unsorted"].update(write_data) #NOTE tutorial questions will immediately go into the unsorted "pile"
     # Send the data back to the add_new_user(user_name) function which calls this 
     return questions_data
 
@@ -56,21 +61,38 @@ def generate_first_time_stats_dictionary(user_profile_data:dict) -> dict:
     stats_data = initial_stats_defines.build_first_time_stats_data(user_profile_data)
     return stats_data
 
-def remove_invalid_question_objects(questions_data: dict) -> dict:
+def remove_invalid_question_objects(questions_data: dict, question_object_data: dict) -> dict:
     '''
     takes the questions_data from user_profile_data as input, scans the profile and deletes any questions that do not pass validation
     questions.verify_question_object(question_object) function to ensure the minimal requirements for a question object are met
     '''
+    # question_object_data[unique_id] fetches the actual question and answer from the server's master list
+    # NOTE master list is shared across all users
     count = 0
     question_objects_to_remove = []
     for unique_id, question_object in questions_data.items():
-        is_valid = questions.verify_question_object(question_object)
+        is_valid = questions.verify_question_object(question_object_data[unique_id])
         if is_valid == False:
             question_objects_to_remove.append(unique_id)
     for id in question_objects_to_remove:
         del questions_data[id]
     return questions_data
+def sort_questions(questions_data: dict, question_object_data: dict):
+    pass
+    # Questions will be sorted into multiple "piles"
+    # Piles:
+    # Unsorted: the default place where newly added questions will be put
+    # Deactivated:                      If the question's module is deactivated we should place the entry here so we can avoid unneccessary operations
+    # in_circulation - not eligible:    If the question has been placed into circulation but is not currently eligible place it in this pile
+    # NOTE circulating but non-eligible questions will be stored under a key by the name of str(datetime.today())
+    # in_circulation - is eligible:     If the question has been placed into circulation and is also eligible then place it here, sorted by due_date (where due_date is the key, we need only check items that are within or before today's date) delete empty keys
+    # when the program starts a function will decide what to put into circulation, that function will put things into circulation, update properties for those questions and then recall this function to sort them out before sending back to user
 
+    for unique_id, question_object in questions_data.items():
+        print(unique_id, ":", question_object)
+
+    helper.throw_exception()
+    return questions_data
 def initialize_quizzer(user_profile_name: str) -> None: #Public Function ⁹
     '''
     Main Entry Point for program,
@@ -106,7 +128,7 @@ def initialize_quizzer(user_profile_name: str) -> None: #Public Function ⁹
     # NOTE This allows the user to activate or deactivate modules individually
     user_profile_data = modules.build_activated_setting(modules_list, user_profile_data)
     modules.update_module_profile() # After verifying modules, update metadata for each module
-    user_profile_data["questions"] = remove_invalid_question_objects(user_profile_data["questions"])
+    
     user_profile_data = public_functions.update_system_data(user_profile_data)
 
     # End Initialization

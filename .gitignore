@@ -164,4 +164,4 @@ backups/
 instance_data/
 modules/
 scratchpad.py
-system_data/
+system_data/user_profiles/

@@ -15,30 +15,31 @@ def build_subject_settings(user_profile_data: dict, question_object_data) -> dic
     initial_subject_setting["total_activated_questions"] = 0
     # print(initial_subject_setting)
     # Iterate over every question id contained in the user's 
-    for unique_id, question_object in user_profile_data["questions"].items():
+    for pile_name, pile in user_profile_data["questions"].items():
         # Get all the subjects mentioned in each question
-        subject_list = question_object_data[unique_id]["subject"]
-        for subject in subject_list:
-            if subject not in subject_settings:
-                subject_settings[subject] = initial_subject_setting
-                # Tally up the questions that are in_circulation
-                if question_object.get("in_circulation") == True:
-                    subject_settings[subject]["num_questions_in_circulation"] += 1
-                # Build an index of user questions sorted by subject
-                subject_settings[subject]["questions"] = []
-                subject_settings[subject]["questions"].append(unique_id)
-                # Tally Total questions
-                subject_settings[subject]["total_questions"] += 1
-                # Tally Total activated questions
-                if question_object.get("is_module_active") == True:
-                    subject_settings[subject]["total_activated_questions"] += 1
-            else:
-                subject_settings[subject]["questions"].append(unique_id)
-                if question_object.get("in_circulation") == True:
-                    subject_settings[subject]["num_questions_in_circulation"] += 1
-                subject_settings[subject]["total_questions"] += 1
-                if question_object.get("is_module_active") == True:
-                    subject_settings[subject]["total_activated_questions"] += 1
+        for unique_id, question_object in pile.items():
+            subject_list = question_object_data[unique_id]["subject"]
+            for subject in subject_list:
+                if subject not in subject_settings:
+                    subject_settings[subject] = initial_subject_setting
+                    # Tally up the questions that are in_circulation
+                    if question_object.get("in_circulation") == True:
+                        subject_settings[subject]["num_questions_in_circulation"] += 1
+                    # Build an index of user questions sorted by subject
+                    subject_settings[subject]["questions"] = []
+                    subject_settings[subject]["questions"].append(unique_id)
+                    # Tally Total questions
+                    subject_settings[subject]["total_questions"] += 1
+                    # Tally Total activated questions
+                    if question_object.get("is_module_active") == True:
+                        subject_settings[subject]["total_activated_questions"] += 1
+                else:
+                    subject_settings[subject]["questions"].append(unique_id)
+                    if question_object.get("in_circulation") == True:
+                        subject_settings[subject]["num_questions_in_circulation"] += 1
+                    subject_settings[subject]["total_questions"] += 1
+                    if question_object.get("is_module_active") == True:
+                        subject_settings[subject]["total_activated_questions"] += 1
     return subject_settings
 
 
@@ -52,10 +53,13 @@ def build_module_settings(user_profile_data: dict, question_object_data: dict) -
         module_settings["module_status"] = {} # {module_name: bool}
     default_status = module_settings["is_module_active_by_default"]
     # Iterate over every question id and add the module_name to module_status with the default status of ["is_module_active_by_default"]
-    for unique_id, question_object in user_profile_data["questions"].items():
-        module_name = question_object_data[unique_id]["module_name"]
-        # Only add to list, never delete from it
-        if module_name not in module_settings["module_status"]:
-            module_settings["module_status"][module_name] = default_status
+    for pile_name, pile in user_profile_data["questions"].items():
+        if pile_name != "unsorted": #Only scan through newly added questions
+            continue
+        for unique_id, question_object in pile.items():
+            module_name = question_object_data[unique_id]["module_name"]
+            # Only add to list, never delete from it
+            if module_name not in module_settings["module_status"]:
+                module_settings["module_status"][module_name] = default_status
     return module_settings
     
