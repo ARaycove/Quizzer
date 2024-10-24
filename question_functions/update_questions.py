@@ -6,6 +6,7 @@ from datetime import (
     datetime,
     timedelta
 )
+from settings_functions import settings
 # AI determination functions
 #########################################################
 # just function stubs for now
@@ -49,7 +50,7 @@ def determine_related_concepts(question_object: dict) -> dict:
 
 
 
-def determine_eligibility_of_questions(question_object: dict, settings_data: dict) -> dict:
+def determine_eligibility_of_question_object(question_object: dict, settings_data: dict) -> dict:
     '''
     Determines whether or not questions are eligible to be put into 
     circulation and shown to the user
@@ -134,34 +135,6 @@ def initialize_next_revision_due_property(question_object: dict) -> dict:
         question_object["next_revision_due"] = helper.stringify_date(datetime.now() - timedelta(hours=8760)) # This is due immediately and of the highest priority
     return question_object
 
-def initialize_question_media_properties(question_object:dict) -> dict:
-    '''
-    If question object is missing properties for question text, image, audio, or video, sets the value to None so the property exists in the object
-    '''
-    if question_object.get("question_text") == None:
-        question_object["question_text"] = None
-    if question_object.get("question_image") == None:
-        question_object["question_image"] = None
-    if question_object.get("question_audio") == None:
-        question_object["question_audio"] = None
-    if question_object.get("question_video") == None:
-        question_object["question_video"] = None
-    return question_object
-    
-def initialize_answer_media_properties(question_object: dict) -> dict:
-    '''
-    If question object is missing properties for answer text, image, audio, or video, sets the value to None so the property exists in the object
-    '''
-    if question_object.get("answer_text") == None:
-        question_object["answer_text"] = None
-    if question_object.get("answer_image") == None:
-        question_object["answer_image"] = None
-    if question_object.get("answer_audio") == None:
-        question_object["answer_audio"] = None
-    if question_object.get("answer_video") == None:
-        question_object["answer_video"] = None    
-    return question_object
-
 def initialize_in_circulation_property(question_object: dict, settings_data: dict) -> dict:
     '''
     If the question is new: sets the in_circulation property to False
@@ -189,16 +162,6 @@ def initialize_time_between_revisions_property(question_object: dict, settings_d
     if question_object.get("time_between_revisions") == None:
         question_object["time_between_revisions"] = settings_data["time_between_revisions"]
     return question_object
-
-def initialize_academic_sources_property(question_object):
-    '''
-    If the question object does not have a "academic_sources" key value pair, initialize an empty list:
-    Academic sources will be list of citations, webpages or any other reference to where the information was sourced
-    '''
-    if question_object.get("academic_sources") == None:
-        question_object["academic_sources"] = []
-    return question_object
-
 
 def update_question_history(question_object:dict, status:str) -> dict:
     '''
@@ -237,12 +200,11 @@ def update_question_history(question_object:dict, status:str) -> dict:
         print("invalid status provided")
     return question_object
 
-def update_is_module_active_property(question_object: dict, settings_data: dict) -> dict:
-    module_name = question_object["module_name"]
-    try:
-        activated = settings_data["is_module_activated"][module_name]
-    except KeyError:
-        activated = False
+def update_is_module_active_property(question_object: dict, unique_id: str, user_profile_data: dict, question_object_data: dict) -> dict:
+    module_name = question_object_data[unique_id]["module_name"]
+    print(module_name)
+    print(user_profile_data)
+    activated = user_profile_data["settings"]["module_settings"]["module_status"][module_name]
     question_object["is_module_active"] = activated
     return question_object
 

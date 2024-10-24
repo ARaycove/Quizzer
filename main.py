@@ -101,70 +101,44 @@ from datetime import date, datetime, time
 #NOTE questions list gets popped to determine what the current question is
 questions_list = []
 current_question = {}
+user_profile_data = {}
+question_object_data = helper.get_question_object_data()
+all_module_data = helper.get_all_module_data()
 
 #NOTE is_displayed is a status variable, and will switch from question to answer, when the interface is clicked this variable will determine what gets showed next
 currently_displayed = "question"
-
 #NOTE has_seen is a status variable, this variable determines whether or not the answer bar buttons are enabled or disabled
 has_seen = False
-
 #NOTE helps determine what should happen when the menu button is clicked
 menu_active = False
-
 #NOTE Detect whether or not any users actually exist (For first time users)
 first_time_user = True
-
 #NOTE
 CURRENT_USER = ""
-
 def main(page: ft.Page):
     page.title="Quizzer"
     page.theme_mode=ft.ThemeMode.DARK
-    
     ###################################################################################################################################################
     # Function Defines
     ##NOTE For best practice, these functions listed should only include logic necessary to call a full function written in public_functions.py
     ## Functions relating to Login Screen
     def cancel_new_profile_entry(e: ft.ControlEvent):
-        submit_add_profile.visible=False
-        user_name_field.visible=False
-        cancel_add_profile.visible=False
-        submit_login.visible=True
-        user_name_dropdown_select.visible=True
-        add_profile.visible=True
-        page.update()
+        display_login_screen()
+
     def new_profile_screen(e: ft.ControlEvent):
-        submit_login.visible=False
-        user_name_dropdown_select.visible=False
-        add_profile.visible=False
-        submit_add_profile.visible=True
-        user_name_field.visible=True
-        cancel_add_profile.visible=True
-        page.update()
-        print("Update button visibility")
-    def generate_user_profile(e: ft.ControlEvent):
-        user_name = user_name_field.value
-        password = password_field.value
+        display_new_profile_input_screen()
+
+    def generate_user_profile(e: ft.ControlEvent, user_name):
+        print(user_name)
         user_profiles.add_new_user(user_name)
-        submit_add_profile.visible=False
-        user_name_field.visible=False
-        cancel_add_profile.visible=False
-        submit_login.visible=True
-        user_name_dropdown_select.visible=True
-        add_profile.visible=True
+        display_login_screen()
         
-        current_user_list = determine_user_list()
-        #NOTE to update a property just update the damn thing, it's not that complicated, update the variable then update the page
-        # property is local scope, but in case of this embedded function, it works as a global scope already
-        user_name_dropdown_select.options=[ft.dropdown.Option(i)for i in current_user_list]
-        page.update()
     def initialize_program(e: ft.ControlEvent):
         global questions_list
         global current_question
         global CURRENT_USER
-        user_name = user_name_dropdown_select.value
-        password = password_field.value
-        initialize.initialize_quizzer(user_name)
+        user_name = ""
+        password = ""
         user_profile_data = helper.get_user_data(user_name)
         CURRENT_USER = user_name
         questions_list = public_functions.populate_question_list(user_profile_data)
@@ -180,81 +154,49 @@ def main(page: ft.Page):
         '''
         Updates the current list of users to provide to the drop down menu
         '''
-        global first_time_user
-        try:
-            current_user_list = helper.get_immediate_subdirectories(helper.get_user_profiles_directory())
-            first_time_user = False
-        except:
-            current_user_list = ["No Users Detected"]
-            first_time_user = True
+        current_user_list = helper.get_user_list()
         return current_user_list
-    current_user_list = determine_user_list()
-    ## Functions relating to main program body
-    ###################################################################################################################################################
-    # Element Defines
-    ## For Login Screen
-    ### Visible by default
-    #NOTE submission triggers main program initialization
-    submit_login = ft.ElevatedButton(text="Login", on_click=initialize_program, visible=True)
-    #NOTE Provides a list of all current user profiles that exists on the user system
-    user_name_dropdown_select = ft.Dropdown(
-        visible=True,
-        label="User Name", 
-        width=250,
-        options=[ft.dropdown.Option(i) for i in current_user_list]
-    )
-    if first_time_user == True:
-        user_name_dropdown_select.disabled = True
-        user_name_dropdown_select.label = "Create a New User"
-    #NOTE Allows the user to create a new user profile
-    add_profile = ft.ElevatedButton(text="Add New User", on_click=new_profile_screen, visible=True)
-    #NOTE provides a field to enter a password #FIXME Does not currently connect to anything
-    password_field = ft.TextField(label="Password", value="Not Implemented Yet", width=250, disabled=True)
-    ### Not Visible by default
-    submit_add_profile = ft.ElevatedButton(text="Submit", on_click=generate_user_profile, visible=False)
-    user_name_field = ft.TextField(label="User Name", width=250,visible=False)
-    cancel_add_profile = ft.ElevatedButton(text="Cancel", on_click=cancel_new_profile_entry, visible=False)
-    ###################################################################################################################################################
-    # Container Defines
-    ## For Login Screen
-    user_name_row = ft.Row(
-        alignment=ft.MainAxisAlignment.CENTER,
-        # expand=True,
-        controls=[
-            user_name_field,
-            user_name_dropdown_select
-            ]
-    )
-    password_row = ft.Row(
-        alignment=ft.MainAxisAlignment.CENTER,
-        # expand=True,
-        controls=[password_field]
-    )
-    login_button_row = ft.Row(
-        alignment=ft.MainAxisAlignment.CENTER,
-        controls=[
-            add_profile,
-            submit_login,
-            submit_add_profile,
-            cancel_add_profile
-        ]
-    )
-    ###################################################################################################################################################
-    # Page Defines
-    login_screen = ft.Column(
-        alignment=ft.MainAxisAlignment.CENTER,
-        expand=True,
-        spacing=25,
-        controls=[
-            user_name_row,
-            password_row,
-            login_button_row
-        ]
-    )
-    def display_login_screen(e):
+    def display_new_profile_input_screen(e: ft.ControlEvent = None):
         page.clean()
+        current_user_list = determine_user_list()
+        if current_user_list != []:
+            user_name_dropdown_select = ft.Dropdown(visible=True,label="User Name",width=250,options=[ft.dropdown.Option(i) for i in current_user_list])
+        else:
+            user_name_dropdown_select = ft.Dropdown(visible=True,disabled=True,label="Create a New User",width=250,options=[])
+        submit_add_profile = ft.ElevatedButton(text="Submit", on_click=lambda e: generate_user_profile(e, user_name_field.value), visible=True)
+
+        user_name_field = ft.TextField(label="User Name", width=250,visible=True)
+
+        cancel_add_profile = ft.ElevatedButton(text="Cancel", on_click=cancel_new_profile_entry, visible=True)
+
+        user_name_row = ft.Row(alignment=ft.MainAxisAlignment.CENTER,controls=[user_name_field])
+
+        login_button_row = ft.Row(alignment=ft.MainAxisAlignment.CENTER,controls=[submit_add_profile,cancel_add_profile])
+        ###################################################################################################################################################
+        # Page Defines
+        new_profile_screen = ft.Column(alignment=ft.MainAxisAlignment.CENTER,expand=True,spacing=25,controls=[user_name_row,login_button_row])
+        page.add(new_profile_screen)
+        page.update()
+    def display_login_screen(e: ft.ControlEvent = None):
+        page.clean()
+        current_user_list = determine_user_list()
+        if current_user_list != []:
+            user_name_dropdown_select = ft.Dropdown(visible=True,label="User Name",width=250,options=[ft.dropdown.Option(i) for i in current_user_list])
+        else:
+            user_name_dropdown_select = ft.Dropdown(visible=True,disabled=True,label="Create a New User",width=250,options=[])
+        submit_login = ft.ElevatedButton(text="Login", on_click=initialize_program, visible=True)
+        add_profile = ft.ElevatedButton(text="Add New User", on_click=new_profile_screen, visible=True)
+        password_field = ft.TextField(label="Password", value="Not Implemented Yet", width=250, disabled=True)
+        user_name_row = ft.Row(alignment=ft.MainAxisAlignment.CENTER,controls=[user_name_dropdown_select])
+        password_row = ft.Row(alignment=ft.MainAxisAlignment.CENTER,controls=[password_field])
+        login_button_row = ft.Row(alignment=ft.MainAxisAlignment.CENTER,controls=[add_profile,submit_login])
+        ###################################################################################################################################################
+        # Page Defines
+        login_screen = ft.Column(alignment=ft.MainAxisAlignment.CENTER,expand=True,spacing=25,controls=[user_name_row,password_row,login_button_row])
         page.add(login_screen)
         page.update()
+
+    display_login_screen()
     ###################################################################################################################################################
     ###################################################################################################################################################
     ###################################################################################################################################################
@@ -284,7 +226,8 @@ def main(page: ft.Page):
         '''
         global questions_list
         global current_question
-        stats_data = helper.get_stats_data()
+        user_profile_data = helper.get_user_data(CURRENT_USER)
+        stats_data = user_profile_data["stats"]
         todays_date = str(date.today())
         stat_list = []
         print("building list of stats to display to the user")
@@ -350,21 +293,16 @@ def main(page: ft.Page):
         has_seen = False
         currently_displayed = "question"
         # Update score and data with correct attempt
-        public_functions.update_score("correct", current_question["id"])
+        user_profile_data = helper.get_user_data(CURRENT_USER)
+        public_functions.update_score("correct", current_question["id"], user_profile_data)
         # Ensure question_list has questions:
         if len(questions_list) <= 0:
-            questions_data = helper.get_question_data()
-            stats_data = helper.get_stats_data()
-            settings_data = helper.get_settings_data()
-            questions_list = public_functions.populate_question_list(questions_data, stats_data, settings_data)
+            questions_list = public_functions.populate_question_list(user_profile_data)
         # Present next question (update variable then refresh the main interface)
         current_question = questions_list.pop()
         refresh_question_object_display_with_question()
         if len(questions_list) <= 0: # No this is not redundant. The counter will hit zero right after displaying to the user, so we can pop the question list now eliminating user perceived lag
-            questions_data = helper.get_question_data()
-            stats_data = helper.get_stats_data()
-            settings_data = helper.get_settings_data()
-            questions_list = public_functions.populate_question_list(questions_data, stats_data, settings_data)
+            questions_list = public_functions.populate_question_list(user_profile_data)
 
     def update_answer_incorrect(e: ft.ControlEvent):
         '''
@@ -382,21 +320,16 @@ def main(page: ft.Page):
         has_seen = False
         currently_displayed = "question"
         # Update score and data with correct attempt
-        public_functions.update_score("incorrect", current_question["id"])
+        user_profile_data = helper.get_user_data(CURRENT_USER)
+        public_functions.update_score("incorrect", current_question["id"], user_profile_data)
         # Ensure question_list has questions:
         if len(questions_list) <= 0:
-            questions_data = helper.get_question_data()
-            stats_data = helper.get_stats_data()
-            settings_data = helper.get_settings_data()
-            questions_list = public_functions.populate_question_list(questions_data, stats_data, settings_data)
+            questions_list = public_functions.populate_question_list(user_profile_data)
         # Present next question (update variable then refresh the main interface)
         current_question = questions_list.pop()
         refresh_question_object_display_with_question()     
         if len(questions_list) <= 0: # No this is not redundant. The counter will hit zero right after displaying to the user, so we can pop the question list now eliminating user perceived lag
-            questions_data = helper.get_question_data()
-            stats_data = helper.get_stats_data()
-            settings_data = helper.get_settings_data()
-            questions_list = public_functions.populate_question_list(questions_data, stats_data, settings_data)
+            questions_list = public_functions.populate_question_list(user_profile_data)
 
     def skip_to_next_question(e: ft.ControlEvent):
         '''
@@ -649,13 +582,15 @@ def main(page: ft.Page):
         data = e.control.data
         # print(e.control)
         # print(e.control.data)
-        public_functions.update_setting(key, field_value, data)
+        user_profile_data = helper.get_user_data(CURRENT_USER)
+        public_functions.update_setting(key, field_value, data, user_profile_data)
 
     def display_settings_page(e: ft.ControlEvent) -> None:
         #FIXME scrolling clock display for due_date_sensitivity
         # Dynamically generated page based on the users settings.json
         page.clean()
-        settings_data = helper.get_settings_data()
+        user_profile_data = helper.get_user_data(CURRENT_USER)
+        settings_data = user_profile_data["settings"]
         settings_data["is_module_activated"] = helper.sort_dictionary_keys(settings_data["is_module_activated"])
         # Load in menu button at top
         settings_page_header = ft.Row(controls=[menu_button], alignment=ft.MainAxisAlignment.START)
@@ -818,10 +753,5 @@ def main(page: ft.Page):
     ###################################################################################################################################################
     ###################################################################################################################################################
     ###################################################################################################################################################
-    # Initial Condition
-    page.clean
-    page.add (
-        login_screen
-    )
 
 ft.app(main)

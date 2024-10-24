@@ -4,6 +4,8 @@ from user_profile_functions import user_profiles
 from settings_functions import settings
 from question_functions import questions
 from stats_functions import stats
+from module_functions import modules, new_module_defines
+from initialization_functions import initialize
 import mimetypes
 import os
 import random
@@ -16,47 +18,257 @@ import random
 ##################################################################################################
 # Read from database functions
 # Had to update the helper library to check if files exist and to recreate those files if they don't exist (i.e. got deleted for some reason)
-def get_instance_user_profile() -> str:
+############################################
+# Master questions list
+# All question objects are stored once in this json file
+# Distributed to every user, contains the entirety of the Quizzer Directory
+def get_question_object_data() -> dict:
     try:
-        out_file = open("instance_data/instance_user_profile.json", "r")
-        instance_user_profile = json.load(out_file)
-        out_file.close()
+        
+        with open("system_data/question_object_data.json", "r") as f:
+            question_object_data = json.load(f)
+        print("Question Object Data exists:")
+        return question_object_data
     except:
-        with open("instance_data/instance_user_profile.json", "r") as f:
-            instance_user_profile = json.load(f)
-    return instance_user_profile
+        # We fail to open, which means the question_object_data does not exist
+        # Create the question_object_data.json
+        print("Question Object Data does not exist, initializing question_object_data.json")
+        initialize.initialize_question_object_data_json()
+        with open("system_data/question_object_data.json", "r") as f:
+            question_object_data = json.load(f)
+        return question_object_data
 
-def get_module_data(module_name: str) -> dict: # Fun Fact, this is the first get data function that'll require an argument to work:
-    with open(f"modules/{module_name}/{module_name}_data.json", "r") as f:
-        module_data = json.load(f)
-    return module_data
+def update_question_object_data(question_object_data: dict) -> None:
+    '''
+    Updates the master question_object_data with the updated information
+    '''
+    try:
+        # Place lock on file
+        # Run in seperate thread?
+        with open("system_data/question_object_data.json", "w+") as f:
+            json.dump(question_object_data, f, indent=4)
+        # Indices that should be recalculated when question_object_data changes
+        build_module_data()
+        build_subject_data()
+        build_concept_data()
 
-def get_obsidian_data() -> dict:
-    user_profile_name = get_instance_user_profile()
-    with open(f"user_profiles/{user_profile_name}/json_data/obsidian_data.json", "r") as f:
-        obsidian_data = json.load(f)
-    return obsidian_data
+        print("Question Object Data exists:")
+    except:
+        # We fail to open, which means the question_object_data does not exist
+        # Create the question_object_data.json
+        print("Question Object Data does not exist, initializing question_object_data.json")
+        initialize.initialize_question_object_data_json()
+        with open("system_data/question_object_data.json", "w+") as f:
+            json.dump(question_object_data, f, indent=4)
 
-def get_obsidian_media_paths() -> dict:
-    user_profile_name = get_instance_user_profile()
-    with open(f"user_profiles/{user_profile_name}/json_data/obsidian_media_paths.json", "r") as f:
-        obsidian_media_paths = json.load(f)
-    return obsidian_media_paths
+def add_question_object(question_object: dict) -> None:
+    '''
+    Gets the question_object_data.json file
+    adds the provided question_object to question_object_data
+    Updates the question_object_data.json file
+    '''
+    print("Oh Yeah")
+    question_object_data = get_question_object_data()
+    unique_id = question_object["id"]
+    write_data = {unique_id: question_object}
+    question_object_data.update(write_data)
+    update_question_object_data(question_object_data)
+    
+
+############################################
+# Module data
+## Modules contain a list of question id's not the question objects themselves
+## returned data is a single json file
+## Designed so that this file can be shared
+## Distributed to every user, contains the entirety of the Quizzer Database
+## Allows offline browsing of community modules
+def calculate_num_questions_in_module(module_name: str, all_module_data) -> int:
+    num_questions = len(all_module_data[module_name]["questions"])
+    return num_questions
+def build_module_data() -> dict:
+    '''
+    Builds the module_data.json based on the master question_object_data file
+    Should be called only when a change is made to question_object_data
+    '''
+    all_module_data = {}
+    # Build module data based on question object data
+    question_object_data = get_question_object_data()
+    for unique_id, question_object in question_object_data.items():
+        # Each key is the module_name, followed by a dictionary containing all the data of that module
+        if questions.verify_question_object(question_object) == False:
+            continue #handle exception where question_object does not have a module_name
+        module_name = question_object["module_name"]
+        # Check if we've already added that module name to all_module_data:
+        if module_name not in all_module_data: 
+            module_name_data = new_module_defines.defines_initial_module_data(module_name)
+            # Ensure we add the module_name key before editing it (we can't edit something that doesn't exist)
+            all_module_data[module_name] = module_name_data
+        else:
+            module_name_data = all_module_data[module_name]
+        # Add question object id to module_data["questions"] field
+        module_name_data["questions"].append(question_object["id"])
+        module_name_data["num_questions"] = calculate_num_questions_in_module(module_name, all_module_data)
+        all_module_data[module_name].update(module_name_data)
+
+    with open("system_data/module_data.json", "w+") as f:
+        json.dump(all_module_data, f, indent=4)
+    # Write to system_data
+    return all_module_data    
+
+def get_all_module_data() -> dict: # Fun Fact, this is the first get data function that'll require an argument to work:
+    try:
+        with open(f"system_data/module_data.json", "r") as f:
+            all_module_data = json.load(f)
+        print("module_data exists")
+        for module_name in all_module_data:
+            all_module_data[module_name]["num_questions"] = calculate_num_questions_in_module(module_name, all_module_data)
+        return all_module_data
+    except FileNotFoundError as e:
+        print(e, "initializing module_data")
+        all_module_data = build_module_data()
+        with open("system_data/module_data.json", "w+") as f:
+            json.dump(all_module_data, f, indent=4)
+        return all_module_data
+############################################
+# Subject Data
+# Dictionary, where each key is a subject, data is a nested dictionary relating to that subject
+# Each subject references question objects that contain that subject
+# Each subject or "field of study" will reference:
+# - question object id's that contain that subject
+# - Number of times subject is mentioned by question objects (get sum of id's for each field)
+# - FIXME Related subjects (i.e. biology would reference anatomy and physiology)
+# - FIXME Related concepts (i.e. biology would reference every term under the umbrella of biology, including terms belonging to anatomy: anatomy would only reference terms related to anatomy and any terms relating to subjects that fall under anatomy "niche subjects")
+def build_subject_data():
+    subject_data = {}
+    question_object_data = get_question_object_data()
+    for unique_id, question_object in question_object_data.items():
+        for subject in question_object["subject"]:
+            if subject not in subject_data:
+                # initialize subject as a dictionary
+                subject_data[subject] = {}
+                # initialize questions field as a list
+                subject_data[subject]["questions"] = []
+                # append the id for that question to the list
+                subject_data[subject]["questions"].append(unique_id)
+            else:
+                subject_data[subject]["questions"].append(unique_id)
+    # Less operations to run a second for loop for this calculation
+    for subject in subject_data:
+        subject_data[subject]["num_questions"] = len(subject_data[subject]["questions"])
+    with open("system_data/subject_data.json", "w+") as f:
+        json.dump(subject_data, f, indent=4)
+    return subject_data
+
+def get_subject_data() -> dict:
+    try:
+        with open("system_data/subject_data.json", "r") as f:
+            subject_data = json.load(f)
+        return subject_data
+    except FileNotFoundError as e:
+        print(e, "Now initializing subject_data.json")
+        subject_data = build_subject_data()
+        return subject_data
+
+############################################
+# concept_data
+# Each Concept or Term will contain:
+# - question object id's that reference that concept
+# - Number of times that concept is mentioned by the resulting question_id's
+# - FIXME Related concepts and terms
+# - FIXME Related subjects and field of study (Should only be one, but could be multiple, such as the term "memory" relates to both computer science and neuroscience and biology)
+# - FIXME A description string
+# - FIXME A list of sources that mention this concept
+def build_concept_data() -> dict:
+    concept_data = {}
+    question_object_data = get_question_object_data()
+    for unique_id, question_object in question_object_data.items():
+        if question_object["related"] == None:
+            continue
+        for concept in question_object["related"]:
+            if concept not in concept_data:
+                concept_data[concept] = {}
+                concept_data[concept]["questions"] = []
+                concept_data[concept]["questions"].append(unique_id)
+            else:
+                concept_data[concept]["questions"].append(unique_id)
+    
+    for concept in concept_data:
+        concept_data[concept]["num_questions"] = len(concept_data[concept]["questions"])
+    
+    with open("system_data/concept_data.json", "w+") as f:
+        json.dump(concept_data, f, indent=4)
+    return concept_data
+
+def get_concept_data() -> dict:
+    try:
+        with open("system_data/concept_data.json", "r") as f:
+            concept_data = json.load(f)
+        return concept_data
+    except FileNotFoundError as e:
+        print(e, "Now initializing concept_data.json")
+        concept_data = build_concept_data()
+        return concept_data
+
+
+############################################
+# user_data indices
+# System will contain a list of user_profiles
+# Each user profile json file will contain:
+# - uuid
+# - user profile data
+# - settings
+# - stats
+# - all questions (is a list of id's)
+# - eligible questions
+# - ineligible questions
+# - modules (is a list of modules that were at any point activated by the user)
+def get_user_profiles_directory() -> str:
+    return "system_data/user_profiles"
+
+def get_user_list():
+    '''
+    Updates the current list of users to provide to the drop down menu
+    '''
+    current_user_list = get_immediate_subdirectories(get_user_profiles_directory())
+    return current_user_list
+
+def get_all_user_data():
+    all_user_data = {}
+    user_list = get_user_list()
+    if user_list == []:
+        return all_user_data
+    for user in user_list:
+        user_profile_data = get_user_data(user)
+        user_uuid = user["uuid"]
+    #FIXME gather all data, this will be a server side function to get all the users across all instances
 
 def get_user_data(user_profile_name: str) -> dict:
     # data in the format of user_profile_name_data.json
-    with open(f"user_profiles/{user_profile_name}/{user_profile_name}_data.json", "r") as f:
-        user_profile_data = json.load(f)
-    return user_profile_data
+    # system_data/user_profiles/karibar/karibar_data.json
+    user_profile_name = user_profile_name.lower()
+    try:
+        with open(f"system_data/user_profiles/{user_profile_name}/{user_profile_name}_data.json", "r") as f:
+            user_profile_data = json.load(f)
+        return user_profile_data
+    except FileNotFoundError as e:
+        print(e, f"Generating user_profile: {user_profile_name}")
+        question_object_data = get_question_object_data()
+        user_profile_data = user_profiles.add_new_user(user_profile_name, question_object_data)
+        return user_profile_data
 
+def update_user_question_stats(user_profile_data: dict) -> None:
+    for question in user_profile_data["questions"]:
+        pass
 
-def get_user_uuid(user_profile_data: dict = None) -> str:
-    if user_profile_data == None:
-        user_profile_data = get_user_data()
-    user_profile_name = user_profile_data[""]
+def update_user_profile(user_profile_data: dict) -> None:
+    user_name = user_profile_data["user_name"]
+    with open(f"system_data/user_profiles/{user_name}/{user_name}_data.json", "w+") as f:
+        json.dump(user_profile_data, f, indent=4)
 
-
-
+# From within the interface, the user can browse all available modules defined in system_data/module_data.json
+# So interface should fire up only based on the initial user_profile_data
+############################################
+# Miscellaneous / Old
 ##################################################################################################
 ##################################################################################################
 ##################################################################################################
@@ -73,63 +285,6 @@ def update_module_data(module_data: dict) -> None:
         module_name = "obsidian_default"
     with open(f"modules/{module_name}/{module_name}_data.json", "w+") as f:
         json.dump(module_data, f, indent=4)
-
-def clean_question_object(question_object: dict) -> dict:
-    with open("question_object_template.json", "r") as f:
-        template_question_object = json.load(f)
-    for key in question_object.keys():
-        if key not in template_question_object.keys():
-            del question_object[key]
-
-    return question_object
-def add_question_object_to_module(question_object: dict) -> None:
-    # Get the name of the module embedded in the question object
-    question_object = clean_question_object(question_object)
-    module_name = question_object["module_name"]
-    # Get the unique id embedded in the question object
-    unique_id = question_object["id"]
-    # Pull up that modules data so we can add the question to it
-    module_data = get_module_data(module_name)
-    # Define the dictionary we will update with
-    write_data = {unique_id: question_object}
-    module_data["questions"].update(write_data) # NOTE this ensures against duplication
-    # Now that the question has been added to the module's questions field, write the module data back to its json file
-    update_module_data(module_data)
-
-
-def add_question_object_to_user_profile(question_object: dict, user_profile_data: dict = None) -> None:
-    if user_profile_data == None:
-        user_profile_data = get_user_data()
-
-def update_user_profile(user_profile_data: dict) -> None:
-    user_name = user_profile_data["user_name"]
-    with open(f"user_profiles/{user_name}/{user_name}_data.json", "w+") as f:
-        json.dump(user_profile_data, f, indent=4)
-
-def update_obsidian_data_json(data):
-    user_profile_name = get_instance_user_profile()
-    with open(f"user_profiles/{user_profile_name}/json_data/obsidian_data.json", "w+") as f:
-        json.dump(data, f, indent=4)
-        
-def update_obsidian_media_paths(data):
-    user_profile_name = get_instance_user_profile()
-    with open(f"user_profiles/{user_profile_name}/json_data/obsidian_media_paths.json", "w+") as f:
-        json.dump(data, f, indent=4)
-
-def update_questions_json(data):
-    user_profile_name = get_instance_user_profile()
-    with open(f"user_profiles/{user_profile_name}/json_data/questions.json", "w") as f:
-        json.dump(data, f, indent=4)
-        
-def update_stats_json(data):
-    user_profile_name = get_instance_user_profile()
-    with open(f"user_profiles/{user_profile_name}/json_data/stats.json", "w") as f:
-        json.dump(data, f, indent=4)
-        
-def update_settings_json(data):
-    user_profile_name = get_instance_user_profile()
-    with open(f"user_profiles/{user_profile_name}/json_data/settings.json", "w") as f:
-        json.dump(data, f, indent=4)
 ##################################################################################################
 ##################################################################################################
 ##################################################################################################
@@ -209,14 +364,16 @@ def get_immediate_subdirectories(directory):
     Returns a list of all directories immediately referenced in the given directory.
     """
     subdirectories = []
-    for entry in os.listdir(directory):
-        path = os.path.join(directory, entry)
-        if os.path.isdir(path):
-            subdirectories.append(entry)
+    try:
+        for entry in os.listdir(directory):
+            path = os.path.join(directory, entry)
+            if os.path.isdir(path):
+                subdirectories.append(entry)
+    except FileNotFoundError as e:
+        subdirectories = []
     return subdirectories
 
-def get_user_profiles_directory() -> str:
-    return os.getcwd()+"/user_profiles"
+
 
 def get_absolute_media_path(media_file_name, question_object):
     print(f"{media_file_name} has type {type(media_file_name)}")

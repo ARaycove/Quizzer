@@ -1,6 +1,7 @@
 import json
 import random
 from lib import helper
+from initialization_functions import initialize
 from settings_functions import settings
 from stats_functions import stats
 from question_functions import questions
@@ -86,7 +87,12 @@ def determine_questions_to_skip(tier_number, settings_data):
 def add_questions_into_circulation(average_daily_questions: float, desired_daily_questions: int, user_profile_data: dict) -> dict: #Private Function
     # Logic, check for each subject, the total amount of questions existing and the total amount in circulation, if these numbers are equal for every subject then we terminate this function since there is nothing to add
     settings_data = user_profile_data["settings"]
-    length_to_check = len(settings_data["subject_settings"].keys())
+    try:
+        length_to_check = len(settings_data["subject_settings"].keys())
+    except KeyError as e:
+        print(e, "Now Initializing Subject Settings")
+        settings.build_subject_settings(user_profile_data)
+        length_to_check = len(settings_data["subject_settings"].keys())
     should_terminate_counter = 0
     total_activated_qs_in_database = 0
     for subject in settings_data["subject_settings"]:
@@ -226,10 +232,11 @@ def add_questions_into_circulation(average_daily_questions: float, desired_daily
 
 def remove_questions_from_circulation(average_daily_questions, desired_daily_questions, user_profile_data: dict) -> dict: #Private Function
     print("Removing questions from circulation")
+    
     target = average_daily_questions - (desired_daily_questions * 1.05) # if 100 is desired and 111 exist then 5% above threshold is the target, the count variable would then be 111-105 = 6.                                                               
     questions_data = user_profile_data["questions"]
     # We would then subtract from 6 until target <= 0
-    for qa in questions_data:
+    for unique_id, qa in questions_data.items():
         if qa["in_circulation"] == True:
             qa["in_circulation"] = False
             target -= qa["average_times_shown_per_day"]
@@ -242,6 +249,7 @@ def update_questions_in_circulation(user_profile_data: dict) -> dict: #Private F
     Determines whether questions should be pulled from circulation or added into circulation, based on the desired daily questions settings and the current average daily shown stat
     after determination is made, function calls either remove_questions_from_circulation() or add_questions_into_circulation
     '''
+    
     # Load in user data
     settings_data = user_profile_data["settings"]
     stats_data = user_profile_data["stats"]
@@ -252,16 +260,19 @@ def update_questions_in_circulation(user_profile_data: dict) -> dict: #Private F
     print(f"Current average daily questions being shown is: {average_daily_questions}")
     print(f"Current desired daily questions to be shown is: {desired_daily_questions}")
     if average_daily_questions >= desired_daily_questions * 1.10: # 10% threshold, so if desired is 100, if we exceed 110 the script will reduce the amount of questions in circulation
+        print("Too many in circulation, removing questions. . .")
         user_profile_data = remove_questions_from_circulation(average_daily_questions, desired_daily_questions, user_profile_data) # For ease of reading, seperate the removal process into its own function
         print("Finished updating list of circulating questions")
         return user_profile_data
     elif average_daily_questions < desired_daily_questions: # Indicating we need to add questions
+        print("Not enough questions in circulation, adding questions. . .")
         user_profile_data = add_questions_into_circulation(average_daily_questions, desired_daily_questions, user_profile_data)
         print("Finished updating list of circulating questions")
         return user_profile_data
     else:
+        print("No need to add or remove questions right now")
         print("Finished updating list of circulating questions")
-        return None
+        return user_profile_data
 
 ##################################################################
 

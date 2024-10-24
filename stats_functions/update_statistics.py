@@ -182,9 +182,9 @@ def increment_questions_answered(user_profile_data: dict) -> dict:#Private Funct
     return user_profile_data
     
 #####################################################################################    
-# def update_average_questions_per_day():#Private Function
+# def update_average_questions_per_day():#Private Function ≠2264 ≥≤
 #     '''
-#     Updates stats.json
+#     Updates stats.jsonπ
 #     Stat answers: How many questions on average (per day) are being shown to the user?
 #     Also updates the stat showing the total amount of in_circulation questions == True
 #     in_circulation stat is by date so it can graphed over time and allow for deriving a stat showing the average number of questions that get changed to in_circulation per day/month/year

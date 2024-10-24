@@ -12,28 +12,43 @@ from stats_functions import stats
 from integrations import obsidian
 import public_functions
 import shutil
-def generate_first_time_questions_dictionary(user_profile_data: dict) -> dict:
+def verify_system_data_directory():
+    if not os.path.exists("system_data"):
+        os.makedirs("system_data")
+def initialize_question_object_data_json():
     '''
-    Every new user gets the quizzer tutorial as a module added into their profile
-    Called by add_new_user(user_name)
+    Creates the template for which user_profiles can initialize their question list
     '''
-    # Initialize an empty dict
+    question_object_data = {}
+    quizzer_tutorial_questions = quizzer_tutorial_module.generate_quizzer_tutorial_question_objects()
+    for question_object in quizzer_tutorial_questions:
+        unique_id = question_object["id"]
+        write_data = {unique_id: question_object}
+    question_object_data.update(write_data)
+    verify_system_data_directory()
+    with open("system_data/question_object_data.json", "w+") as f:
+        json.dump(question_object_data, f)
+
+def generate_first_time_questions_dictionary() -> dict:
+    '''
+    Every new user gets the quizzer tutorial as a module added into their profile  
+    Called by add_new_user(user_name)  
+    '''
+    # Initialize an empty dict 
     questions_data = {}
-    # Load in the quizzer_tutorial_module
-    try:
-        quizzer_tutorial = helper.get_module_data("quizzer_tutorial")
-    except:
-        quizzer_tutorial = quizzer_tutorial_module.generate_quizzer_tutorial(user_profile_data) #FIXME
-    # Add the questions in the quizzer_tutorial to the user's questions data field
-
-    questions_data.update(quizzer_tutorial["questions"])
-
-    # Send the data back to the add_new_user(user_name) function which calls this
+    # Load in the quizzer_tutorial_module 
+    module_data = helper.get_all_module_data()
+    # Build first question set based on the questions in the Quizzer Tutorial Module 
+    quizzer_tutorial = module_data["Quizzer Tutorial"]
+    for unique_id in quizzer_tutorial["questions"]:
+        write_data = {unique_id: {}}
+        questions_data.update(write_data)
+    # Send the data back to the add_new_user(user_name) function which calls this 
     return questions_data
 
-def generate_first_time_settings_dictionary(user_profile_data:dict) -> dict:
-    settings_data = {}
-    settings_data = initial_settings_defines.build_first_time_settings_data(user_profile_data)
+def generate_first_time_settings_dictionary(user_profile_data:dict, question_object_data: dict) -> dict:
+    settings_data = {} 
+    settings_data = initial_settings_defines.build_first_time_settings_data(user_profile_data, question_object_data)
     return settings_data
 
 def generate_first_time_stats_dictionary(user_profile_data:dict) -> dict:

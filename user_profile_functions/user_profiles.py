@@ -1,7 +1,7 @@
 import os
 import json
 import uuid
-from question_functions import questions
+from question_functions import questions, update_questions
 from settings_functions import settings
 from stats_functions import stats
 from initialization_functions import initialize
@@ -16,27 +16,29 @@ def verify_user_profiles_directory(user_name) -> None:
     '''
     Ensures the os path for the user_profiles exists
     '''
-    if not os.path.exists(f"user_profiles"):
-        os.makedirs("user_profiles")
-    if not os.path.exists(f"user_profiles/{user_name}"):
-        os.makedirs(f"user_profiles/{user_name}")
+    if not os.path.exists(f"system_data/user_profiles"):
+        os.makedirs("system_data/user_profiles")
+    if not os.path.exists(f"system_data/user_profiles/{user_name}"):
+        os.makedirs(f"system_data/user_profiles/{user_name}")
 
 def verify_user_dir_doesnt_exist(user_name) -> bool:
     '''
     returns True if the user_profile already exists
     returns False if the user_profile doesn't exist
     '''
-    if os.path.exists(f"user_profiles/{user_name}/{user_name}_data.json") == True:
+    if os.path.exists(f"system_data/user_profiles/{user_name}/{user_name}_data.json") == True:
         print(f"Profile {user_name} already exists")
         return True
     else:
         return False
 
 
-def add_new_user(user_name: str) -> dict: #Public Function
+def add_new_user(user_name: str, question_object_data) -> dict: #Public Function
     '''
     Adds a new user to the local system, returns the default data
     '''
+    if user_name == "":
+        return None
     user_name = user_name.lower()
     # All data for the user is stored in a master dictionary
     does_exist = verify_user_dir_doesnt_exist(user_name)
@@ -47,9 +49,11 @@ def add_new_user(user_name: str) -> dict: #Public Function
         user_profile_data["uuid"] = str(generate_unique_id_for_user())
         user_profile_data["user_name"] = user_name
         # These only need to return a predefined dictionary, so nothing is fed into them
-        user_profile_data["questions"] = initialize.generate_first_time_questions_dictionary(user_profile_data)
-        user_profile_data["settings"] = initialize.generate_first_time_settings_dictionary(user_profile_data)
-        user_profile_data["stats"] = initialize.generate_first_time_stats_dictionary(user_profile_data) #FIXME
+        user_profile_data["questions"] = initialize.generate_first_time_questions_dictionary()
+        user_profile_data["settings"] = initialize.generate_first_time_settings_dictionary(user_profile_data, question_object_data)
+        user_profile_data["stats"] = initialize.generate_first_time_stats_dictionary(user_profile_data)
+        for unique_id, question_object in user_profile_data["questions"].items():
+            question_object = questions.update_user_question_stats(question_object, unique_id, user_profile_data, question_object_data)
         helper.update_user_profile(user_profile_data)
     return user_profile_data
 
@@ -89,4 +93,3 @@ def verify_user_profile(user_profile_name: str) -> None:
     #User Profile folder is now created, now we should generate the user_profile.json with appropriate fields
     # if user's user_profile.json exists:
     return user_profile_name
-    

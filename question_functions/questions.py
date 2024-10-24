@@ -55,7 +55,7 @@ def verify_question_object(question_object: dict) -> bool:
         return is_valid
     
 
-def add_new_question(
+def verify_new_question(
         user_profile_data: dict = None, #Not required, but does pass through for some functions, more efficient
         id: str = None,
         primary_subject: str = "miscellaneous",
@@ -64,6 +64,12 @@ def add_new_question(
         question_text = None, question_image = None, question_audio = None, question_video = None,
         answer_text = None, answer_image = None, answer_audio = None, answer_video = None,
         module_name: str = None) -> dict:
+    '''
+    receives data as input and outputs a question object with all fields not defined set to None
+    Used in conjunction with the helper.add_question_object(question_object) function
+    Returns a question_object if it's valid
+    Returns None if the question_object is not valid
+    '''
     question_object = {}
     # Make exception for "Quizzer Tutorial Module", all other questions running through this function will get assigned a question_id proper
     if module_name != "Quizzer Tutorial":
@@ -88,11 +94,6 @@ def add_new_question(
     is_valid = verify_question_object(question_object)
     if is_valid == False:
         return None
-    # Write question to module that it belongs to
-    helper.add_question_object_to_module(question_object)
-    # Write question to the current user's questions_data
-    if module_name != "Quizzer Tutorial": # If we are adding the initial tutorial functions then this won't need to be called
-        helper.add_question_object_to_user_profile(question_object, user_profile_data)
     return question_object
 
 
@@ -241,4 +242,14 @@ def calculate_question_id(question_object: dict, user_profile_data: dict) -> dic
 
     return question_object
 
-
+def update_user_question_stats(question_object: dict, unique_id, user_profile_data: dict, question_object_data: dict) -> dict:
+    settings_data = user_profile_data["settings"]
+    question_object = update_questions.initialize_revision_streak_property(question_object)
+    question_object = update_questions.initialize_last_revised_property(question_object)
+    question_object = update_questions.initialize_next_revision_due_property(question_object)
+    question_object = update_questions.initialize_in_circulation_property(question_object, settings_data)
+    question_object = update_questions.initialize_time_between_revisions_property(question_object, settings_data)
+    question_object = update_questions.calculate_average_shown(question_object)
+    question_object = update_questions.determine_eligibility_of_question_object(question_object, settings_data)
+    question_object = update_questions.update_is_module_active_property(question_object, unique_id, user_profile_data, question_object_data)
+    return question_object

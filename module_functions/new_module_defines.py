@@ -12,8 +12,7 @@ def defines_initial_module_data(module_name=str) -> dict:
     initial_module_data["primary_subject"] = ""
     initial_module_data["all_subjects"] = []
     initial_module_data["concepts_covered"] = []
-    initial_module_data["questions"] = {}
-    initial_module_data["mindmap"] = {}
+    initial_module_data["questions"] = []
     
 
 

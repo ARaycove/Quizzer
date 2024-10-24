@@ -54,13 +54,13 @@ def handle_boolean_settings(key, value):
 
     print(f"Value is: {value} and of Type:{type(value)}")
     return valid_status, value
-def update_setting(key, value, data): # Public Function
+def update_setting(key, value, data:dict, user_profile_data: dict): # Public Function
     '''
     takes a key (setting) and a new value to be updated
     checks to see if the value is appropriate, then updates settings.json with the new value if appropriate
     '''
     # First load in settings.json
-    settings_data = helper.get_settings_data()
+    settings_data = user_profile_data["settings"]
     valid_status = True
     key = data["key"]
     full_key = data["full_settings_key"]
@@ -79,7 +79,7 @@ def update_setting(key, value, data): # Public Function
         valid_status, value = handle_integer_settings(key, value)
         if valid_status == False:
             return valid_status
-        settings_data["due_date_sensitivty"] = value
+        settings_data["due_date_sensitivity"] = value
     ## Desired Daily Questions Settings
     elif full_key.endswith("[desired_daily_questions]"):
         valid_status, value = handle_integer_settings(key, value)
@@ -104,13 +104,13 @@ def update_setting(key, value, data): # Public Function
     # value has been validated and mutated into its appropriate type:
     # If the value passed was invalid, thus would cause an error, we will have already returned a valid_status = False code, therefore no udpate will occur
     
-    helper.update_settings_json(settings_data)    
+    user_profile_data["settings"] = settings_data
+    helper.update_user_profile(user_profile_data)    
 
-def update_score(status, id): #Public Function
+def update_score(status:str, id:str, user_profile_data: dict): #Public Function
     # A strange bug occured where the id is the old file_name
     check_variable = ""
-    questions_data = helper.get_question_data()
-    stats_data = helper.get_stats_data()
+    questions_data = user_profile_data["questions"]
     # load config.json into memory, I get the feeling this is poor memory management, but it's only 1000 operations.
     question_object = questions_data[id]
 
@@ -136,7 +136,7 @@ def update_score(status, id): #Public Function
             question_object["revision_streak"] = 1
         
     print(f"Revision streak was {check_variable}, streak is now {question_object['revision_streak']}")
-    update_statistics.increment_questions_answered(stats_data)
+    user_profile_data = update_statistics.increment_questions_answered(user_profile_data)
 
 
     check_variable = question_object["last_revised"]
@@ -161,9 +161,12 @@ def update_score(status, id): #Public Function
     # Update question's history stats
     question_object = update_questions.update_question_history(question_object, status)
     questions_data[id] = question_object
-    update_system_data(questions_data, stats_data)
+    user_profile_data["questions"] = questions_data
+    update_system_data(user_profile_data)
     
 def populate_question_list(user_profile_data: dict) -> list:
+    # New system simply grabs x amount of questions that are eligible
+    # If no eligible questions returns an empty list
     user_profile_data = quiz_functions.update_questions_in_circulation(user_profile_data) # Start by ensuring questions are put into circulation if we can fit them in the average
     user_profile_data = update_system_data(user_profile_data) # update stats every time we go to get a new list of questions
     eligibility_index = user_profile_data["indices"]["eligibility_index"]

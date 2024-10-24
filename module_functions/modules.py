@@ -68,12 +68,6 @@ def build_raw_questions() -> dict:
         # Notice we're pulling an id already, but we're calculating it down below
         for unique_id, question_object in module_question_list.items():
             write_data = {unique_id: question_object}
-            # Define the question_id here:
-            #NOTE This recalculates the id on initialization, a second "redundant" call (in the update_system function) ensures that if id is deleted mid program that it will "regenerate"
-            question_object = questions.calculate_question_id(question_object)
-            # if question_object.get("file_name") != None: # file_name is used for Obsidian md integration
-            #     question_object["id"] = question_object["file_name"]
-            # Before writing to the raw_master_list, we need to verify the question_object is valid:
             is_valid = questions.verify_question_object(question_object)
             if is_valid == True:
                 raw_master_question_list.update(write_data)
