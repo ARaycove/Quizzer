@@ -1,11 +1,9 @@
 import flet as ft
-import time
-import os
 from lib import helper
 import public_functions
 from initialization_functions import initialize
 from user_profile_functions import user_profiles
-from datetime import date, datetime, time
+from datetime import date
 # FUTURE PLANS AND IMPLEMENTATIONS:
 #FIXME, future code (when connecting to the main server) user profiles on the user system will need to be registered to the Quizzer account, otherwise the user
 # may remain offline without any online features. Similar to many mobile games out there, account registration optional
@@ -116,6 +114,7 @@ first_time_user = True
 #NOTE
 CURRENT_USER = ""
 CURRENT_UUID = ""
+
 def main(page: ft.Page):
     page.title="Quizzer"
     page.theme_mode=ft.ThemeMode.DARK
@@ -137,6 +136,7 @@ def main(page: ft.Page):
     def initialize_program(e: ft.ControlEvent, user_name: str):
         global questions_list
         global current_question
+        global user_profile_data
         global CURRENT_USER
         global CURRENT_UUID
         user_profile_data = helper.get_user_data(user_name)
@@ -145,9 +145,9 @@ def main(page: ft.Page):
         CURRENT_UUID = user_profile_data["uuid"]
         print(f"Current User: <{CURRENT_USER}> WITH UUID: <{CURRENT_UUID}>")
         # Health Check functions
-        # user_profile_data["questions"] = initialize.remove_invalid_question_objects(user_profile_data["questions"], question_object_data)
-        # FIXME rebuilding how questions are structured in the user profile for quicker selection by algorithm
-        user_profile_data["questions"] = initialize.sort_questions(user_profile_data["questions"], question_object_data)
+        # Sort out any unsorted questions into their respective "piles"
+        user_profile_data["questions"] = initialize.sort_questions(user_profile_data, question_object_data)
+        helper.update_user_profile(user_profile_data) #updating is always a great idea
         # Populate the question list, then assign the current question object to be displayed
         questions_list = public_functions.populate_question_list(user_profile_data)
         current_question = questions_list.pop()

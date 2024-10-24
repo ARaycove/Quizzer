@@ -1,7 +1,6 @@
 import os
 import json
 from lib import helper
-from initialization_functions import initialize
 from module_functions import module_properties,new_module_defines
 from question_functions import questions
 

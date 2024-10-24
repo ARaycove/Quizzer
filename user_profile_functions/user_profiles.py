@@ -1,9 +1,7 @@
 import os
 import json
 import uuid
-from question_functions import questions, update_questions
-from settings_functions import settings
-from stats_functions import stats
+from question_functions import questions
 from initialization_functions import initialize
 from lib import helper
 

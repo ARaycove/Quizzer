@@ -1,23 +1,16 @@
 
 # Custom Modules
 from lib import helper
-from integrations import obsidian
 from stats_functions import update_statistics, stats
-from user_profile_functions import user_profiles
 from question_functions import update_questions, questions
 from settings_functions import settings
-from module_functions import modules
 import quiz_functions
-
-from initialization_functions import initialize
 
 
 
 # Common Libraries
-from datetime import datetime, timedelta
-import time
+from datetime import datetime
 import random
-import json
 
 def print_key(key):
     print(f"Key is: {key}")
@@ -164,40 +157,25 @@ def update_score(status:str, id:str, user_profile_data: dict): #Public Function
     user_profile_data["questions"] = questions_data
     update_system_data(user_profile_data)
     
-def populate_question_list(user_profile_data: dict) -> list:
+def populate_question_list(user_profile_data: dict, question_object_data: dict) -> list:
     # New system simply grabs x amount of questions that are eligible
     # If no eligible questions returns an empty list
-    user_profile_data = quiz_functions.update_questions_in_circulation(user_profile_data) # Start by ensuring questions are put into circulation if we can fit them in the average
-    user_profile_data = update_system_data(user_profile_data) # update stats every time we go to get a new list of questions
-    eligibility_index = user_profile_data["indices"]["eligibility_index"]
-    eligibility_index = helper.shuffle_dictionary_keys(eligibility_index)
-
-    # We've already built out an index of all eligible questions, which gets rebuilt when we call update_system_data
-    # We the eligible questions are also proportional to interest and priority because of the update_questions_in_circulation function
-    # Therefore most of what this function does can be completely stripped away
-    # A Quiz Length should still be adhered to, so that every quiz_length num of questions, the system goes to check for new questions to put into circulation, rather than all at once
-    quiz_length = user_profile_data["settings"]["quiz_length"]
-    
+    print("def public_functions.populate_question_list(user_profile_data: dict, question_object_data: dict) -> list")
+    print("    Calling settings.build_subject_settings()")
+    user_profile_data["settings"]["subject_settings"] = settings.build_subject_settings(user_profile_data, question_object_data)
+    print("    Calling quiz_functions.update_questions_in_circulation(user_profile_data)")
+    user_profile_data = quiz_functions.update_questions_in_circulation(user_profile_data, question_object_data) # Start by ensuring questions are put into circulation if we can fit them in the average
+    user_profile_data["stats"] = stats.update_stats(user_profile_data, question_object_data)
     ##################################################
     # filter out questions based on criteria
-    sorted_questions = eligibility_index
+    question_list = [unique_id for unique_id in user_profile_data["questions"]["in_circulation_is_eligible"].keys()]
     
-    #############################################
-    # Sort question objects by next_revision_due key value
-    quiz_length = quiz_functions.ensure_quiz_length(sorted_questions, quiz_length)
-    question_list = quiz_functions.select_questions_to_be_returned(sorted_questions, quiz_length)
-    # print(f"number of questions chosen: {len(question_list)}")
-    if question_list == None:
-        sorted_questions = None
-    else:
-        print(f"Total questions in database : {len(user_profile_data['questions'])}")
-        print(f"Number of eligible questions: {len(sorted_questions)}")
-        print(f"Number of questions in this round: {quiz_length}")
-        random.shuffle(question_list) # ensures there is some level of randomization, so users don't notice this is just a cycling list
-        question_list = question_list[::-1] # Reverse the list
-        random.shuffle(question_list) # Shuffle it again
-        print(f"List of {len(question_list)} questions has been shuffled for pseudorandomness.")
-    return question_list
+    random.shuffle(question_list) # ensures there is some level of randomization, so users don't notice this is just a cycling list
+    question_list = question_list[::-1] # Reverse the list
+    random.shuffle(question_list) # Shuffle it again
+    print(f"    List of {len(question_list)} questions has been shuffled for pseudorandomness.")
+    print(f"    {question_list}")
+    return question_list, user_profile_data
 
 def update_system_data(user_profile_data: dict) -> dict:
     user_profile_data = questions.initialize_and_update_question_properties(user_profile_data)

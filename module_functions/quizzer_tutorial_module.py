@@ -1,5 +1,3 @@
-from lib import helper
-from module_functions import modules
 from question_functions import questions
 def generate_quizzer_tutorial_question_objects()-> list:
     '''

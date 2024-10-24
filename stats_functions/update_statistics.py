@@ -1,10 +1,4 @@
-from lib import helper
 from datetime import datetime, date, timedelta
-import json
-import time
-from question_functions import questions
-from settings_functions import settings
-import math
 # One function per stat should exist
 # each function should print the value of that stat to stats.jon
 # API Calls should then only need to reference stats.json for statistics information.
@@ -14,22 +8,21 @@ def update_stat_total_questions_in_database(user_profile_data: dict) -> dict:#Pr
     Scans the questions database and updates stats with the total number of question objects
     returns stats_data
     '''
-    questions_data = user_profile_data["questions"]
-    stats_data = user_profile_data["stats"]
+    print("def update_stat_total_questions_in_database(user_profile_data: dict) -> dict")
     todays_date = date.today()
     todays_date = str(todays_date)
-    total_questions_in_database = len(questions_data) #Time O(1)
+    total_questions_in_database = 0
+    # Tally up the length of every pile, there are five piles
+    for pile_name, pile in user_profile_data["questions"].items():
+        total_questions_in_database += len(pile)
     metric = {todays_date: total_questions_in_database}
-    if stats_data.get("total_questions_in_database") == None:
-        print("initializing first intance of stat 'total_questions_in_database'")
-        stats_data["total_questions_in_database"] = metric
+    if user_profile_data["stats"].get("total_questions_in_database") == None:
+        print("initializing first instance of stat 'total_questions_in_database'")
+        user_profile_data["stats"]["total_questions_in_database"] = metric
     else:
         # print("updating total_questions_in_database stat")
-        stats_data["total_questions_in_database"][todays_date] = total_questions_in_database
-
-
-    user_profile_data["questions"]=questions_data
-    user_profile_data["stats"]=stats_data
+        user_profile_data["stats"]["total_questions_in_database"][todays_date] = total_questions_in_database
+    print(f"    Return object has new value {user_profile_data['stats']['total_questions_in_database']}")
     return user_profile_data
     
 def determine_total_eligible_questions(user_profile_data: dict):
@@ -37,8 +30,10 @@ def determine_total_eligible_questions(user_profile_data: dict):
     returns stats_data
     calculates based on the index, the total number of eligible questions
     '''
-    total_eligible_questions = len(user_profile_data["indices"]["eligibility_index"])
+    print("def determine_total_eligible_questions(user_profile_data: dict)")
+    total_eligible_questions = len(user_profile_data["questions"]["in_circulation_is_eligible"])
     user_profile_data["stats"]["current_eligible_questions"] = total_eligible_questions
+    print(f"    Total eligible questions is {user_profile_data['stats']['current_eligible_questions']}")
     return user_profile_data
     
 #####################################################################################
@@ -49,10 +44,19 @@ def print_and_update_revision_streak_stats(user_profile_data: dict) -> dict:#Pri
     and the value represents the total number of questions that are at that current revision streak
     Revision Streak is part of the formula that determines when each question object will be reviewed again after answering
     '''
-    revision_streak_index = user_profile_data["indices"]["revision_streak_index"]
+    print("def update_statistics.print_and_update_revision_streak_stats(user_profile_data: dict) -> dict")
     revision_streak_stats = {}
-    for revision_streak_value, data in revision_streak_index.items():
-        revision_streak_stats[revision_streak_value] = len(data)
+    for pile_name, pile in user_profile_data["questions"].items():
+        if pile_name != "in_circulation_not_eligible" and pile_name != "in_circulation_is_eligible":
+            continue
+        for unique_id, question_object in pile.items():
+            revision_streak_value = question_object["revision_streak"]
+            if revision_streak_value not in revision_streak_stats:
+                revision_streak_stats[revision_streak_value] = 1
+            else:
+                revision_streak_stats[revision_streak_value] += 1
+
+    # sort the dictionary, so it reads 1-> ∞
     list_of_keys = revision_streak_stats.keys() # make a copy of the keys
     sorted_revision_streak_stats = {}
     list_of_keys = sorted([int(i) for i in list_of_keys])
@@ -61,100 +65,44 @@ def print_and_update_revision_streak_stats(user_profile_data: dict) -> dict:#Pri
         sorted_revision_streak_stats[number] = revision_streak_stats[number]
     user_profile_data["stats"]["revision_streak_stats"] = sorted_revision_streak_stats
     # Update stats.json with new information
+    print(f"    Revision Streak stats are now: {user_profile_data['stats']['revision_streak_stats']}")
     return user_profile_data
     
-    
-    
 #####################################################################################
-def update_number_of_questions_by_subject(user_profile_data: dict) -> dict:#Private Function
-    '''
-    returns settings_data
-    This stat calculates how many questions are in_circulation within a given subject
-    This stat calculates how many questions in total are within a given subject
-    data is written to settings.json
-    Function returns None
-    '''
-    #NOTE Old code was twice as long, inclusion of index allowed the operation to be quicker and more readable
-    questions_data = user_profile_data["questions"]
-    settings_data = user_profile_data["settings"]
-    subject_question_index = user_profile_data["indices"]["questions_by_subject_index"]
-    subject_in_circulation_index = user_profile_data["indices"]["subject_in_circulation_index"]
-
-
-    settings_data = settings.initialize_subject_settings(user_profile_data)
-    update_data = {}
-    initial_subject_setting = {}
-    initial_subject_setting["total_questions"] = 0
-    initial_subject_setting["num_questions_in_circulation"] = 0
-    # settings_data =
-    for subject in settings_data["subject_settings"].keys():
-        total_activated = 0
-        try:
-            total_count = len(subject_question_index[subject])
-        except KeyError:
-            total_count = 0
-        for unique_id, question_object in questions_data.items():
-            try:
-                activated = settings_data["is_module_activated"][question_object["module_name"]]
-            except KeyError: # The question_object references a module that doesn't exist, assume that the question should not be put into circulation and is not activated
-                activated = False
-            if subject in question_object["subject"] and activated == True:
-                total_activated += 1
-        try:
-            in_circulation_count = len(subject_in_circulation_index[subject])
-        except KeyError as e:
-            in_circulation_count = 0
-        settings_data["subject_settings"][subject]["total_questions"] = total_count
-        settings_data["subject_settings"][subject]["num_questions_in_circulation"] = in_circulation_count
-        settings_data["subject_settings"][subject]["total_activated_questions"] = total_activated # total number of questions whose parent module is active
-        if total_activated == in_circulation_count:
-            settings_data["subject_settings"][subject]["has_available_questions"] = False
-        else:
-            settings_data["subject_settings"][subject]["has_available_questions"] = True
-        # print(f"{subject.title():25} has {in_circulation_count:5}/{total_count:<5} currently in circulation")
-    settings_data["subject_settings"] = helper.sort_dictionary_keys(settings_data["subject_settings"])
-
-    user_profile_data["settings"] = settings_data
-    return user_profile_data
-    
-    
-    
-
-
-#####################################################################################
-def calculate_average_questions_per_day(user_profile_data: dict) -> float:#Private Function
+def calculate_average_questions_per_day(user_profile_data: dict) -> dict:#Private Function
     '''
     Returns the average_questions_per_day stat,
     Does not update stats.json
     '''
-
+    print("def calculate_average_questions_per_day(user_profile_data: dict) -> float")
     average_questions_per_day = 0
-    for question in user_profile_data["questions"]:
-        if question["in_circulation"] == True:
-            average_questions_per_day += question["average_times_shown_per_day"]
-    return average_questions_per_day
+    for pile_name, pile in user_profile_data["questions"].items():
+        if pile_name != "in_circulation_not_eligible" and pile_name != "in_circulation_is_eligible":
+            continue
+        for unique_id, question_object in pile.items():
+            average_questions_per_day += question_object["average_times_shown_per_day"]
+    user_profile_data["stats"]["average_questions_per_day"] = average_questions_per_day
+
+    print(f"    Return value is {user_profile_data['stats']['average_questions_per_day']}")
+    return user_profile_data
 
 def initialize_and_update_questions_exhausted_in_x_days_stat(user_profile_data: dict) -> dict:
-        count = 0
-        questions_data = user_profile_data["questions"]
-        stats_data = user_profile_data["stats"]
-
-        for unique_id, question in questions_data.items():
-            if question["in_circulation"] == False:
-                    count += 1              
-        questions_not_in_circulation = count
-        stats_data["non-circulating_questions"] = questions_not_in_circulation
-        # The number of questions that are not in circulation divided by the average amount of questions that get put into circulation gives us the amount of days until there are no more questions left to add based on user performance
-        # Figure can also be used to determine when the user will learn all of the material currently in their database
-        if stats_data["average_num_questions_entering_circulation_daily"] != 0:
-            stats_data["reserve_questions_exhaust_in_x_days"] = questions_not_in_circulation / stats_data["average_num_questions_entering_circulation_daily"]
-        else:
-            stats_data["reserve_questions_exhaust_in_x_days"] = 0
-        # print(f"Number left to add is {questions_not_in_circulation}")
-        # print(f"Average amount being added is {stats_data['average_num_questions_entering_circulation_daily']}")
-        # print(f"User will get through all material in {stats_data['reserve_questions_exhaust_in_x_days']} days")
-        user_profile_data["stats"] = stats_data
-        return user_profile_data
+    print("def initialize_and_update_questions_exhausted_in_x_days_stat(user_profile_data: dict) -> dict")            
+    questions_not_in_circulation = len(user_profile_data["questions"]["reserve_bank"])
+    user_profile_data["stats"]["non_circulating_questions"] = questions_not_in_circulation
+    # The number of questions that are not in circulation divided by the average amount of questions that get put into circulation gives us the amount of days until there are no more questions left to add based on user performance
+    # Figure can also be used to determine when the user will learn all of the material currently in their database
+    if user_profile_data["stats"]["average_num_questions_entering_circulation_daily"] != 0:
+        user_profile_data["stats"]["reserve_questions_exhaust_in_x_days"] = questions_not_in_circulation / user_profile_data["stats"]["average_num_questions_entering_circulation_daily"]
+    else:
+        user_profile_data["stats"]["reserve_questions_exhaust_in_x_days"] = 0
+    # print(f"Number left to add is {questions_not_in_circulation}")
+    # print(f"Average amount being added is {stats_data['average_num_questions_entering_circulation_daily']}")
+    # print(f"User will get through all material in {stats_data['reserve_questions_exhaust_in_x_days']} days")
+    print(f"    Return Values are:")
+    print(f"    Non Circulating Questions: {user_profile_data['stats']['non_circulating_questions']}")
+    print(f"    Questions exhaust in < {user_profile_data['stats']['reserve_questions_exhaust_in_x_days']} > days")
+    return user_profile_data
 ######################################################################################
 # Statistics that involve dates and figures (able to be graphed visually)
 ######################################################################################
@@ -206,41 +154,36 @@ def increment_questions_answered(user_profile_data: dict) -> dict:#Private Funct
     
 #     helper.update_stats_json(stats)
 ############################################################################################3
-def update_average_questions_per_day(user_profile_data: dict) -> dict:#Private Function
+def calculate_total_in_circulation(user_profile_data: dict) -> dict:#Private Function
     '''
     Updates stats.json
     Stat answers: How many questions on average (per day) are being shown to the user?
     Also updates the stat showing the total amount of in_circulation questions == True
     in_circulation stat is by date so it can graphed over time and allow for deriving a stat showing the average number of questions that get changed to in_circulation per day/month/year
-    '''
-    questions_data = user_profile_data["questions"]
-    stats_data = user_profile_data["stats"]
-    
+    '''    
+    print("def calculate_total_in_circulation(user_profile_data: dict) -> dict")
     todays_date = date.today()
     todays_date = str(todays_date)
-    average = 0
-    count = 0
-    for unique_id, qa in questions_data.items():
-        if qa["in_circulation"] == True:
-            # recalculating makes this redundant, since it's already been calculated
-            # qa["average_times_shown_per_day"] = 1 / math.pow(qa["time_between_revisions"], qa["revision_streak"])
-            average += qa["average_times_shown_per_day"]
-            count += 1
-    # average stat is updated
-    stats_data["average_questions_per_day"] = average
-    stats_data["current_questions_in_circulation"] = count
-    # Two variables the above, shows how many are in circulation right now
-    # The variable below is a record of how many were in circulation on any given date
-    # now determine first if a date exists at all in the stat:
-    if stats_data.get("total_in_circulation_questions") == None:
+    total_in_circulation = 0
+    for pile_name, pile in user_profile_data["questions"].items():
+        if pile_name != "in_circulation_not_eligible" and pile_name != "in_circulation_is_eligible":
+            continue
+        total_in_circulation += len(pile) # The total number of questions in these two piles is the total number questions that are in circulation
+    user_profile_data["stats"]["current_questions_in_circulation"] = total_in_circulation
+        # Two variables the above, shows how many are in circulation right now
+        # The variable below is a record of how many were in circulation on any given date
+        # now determine first if a date exists at all in the stat:
+    if user_profile_data["stats"].get("total_in_circulation_questions") == None:
         print("total_in_circulation_questions record does not exist, creating entry")
-        stats_data["total_in_circulation_questions"] = {todays_date: count}
+        user_profile_data["stats"]["total_in_circulation_questions"] = {todays_date: total_in_circulation}
     else:
         # print("Updating total_in_circulation_questions")
-        stats_data["total_in_circulation_questions"][todays_date] = count
-    # At this point
+        user_profile_data["stats"]["total_in_circulation_questions"][todays_date] = total_in_circulation
+        # At this point
 
-    user_profile_data["stats"] = stats_data 
+    print(f"    Return Values are")
+    print(f"    {user_profile_data['stats']['current_questions_in_circulation']}")
+    print(f"    {user_profile_data['stats']['total_in_circulation_questions']}")
     return user_profile_data
     
 def calculate_average_num_questions_entering_circulation(user_profile_data: dict) -> dict:
@@ -249,6 +192,7 @@ def calculate_average_num_questions_entering_circulation(user_profile_data: dict
     That is, how many new questions per day on average is the user being shown?
     Stat helps to determine user pacing and how quickly they are learning new things
     '''
+    print("def calculate_average_num_questions_entering_circulation(user_profile_data: dict) -> dict")
     # It is my hope that development of a more advanced algorithm can increase this pace, but for now we can track speed of learning:
     stats_data = user_profile_data["stats"]
     begin_date = datetime.now() - timedelta(days=90)
@@ -271,8 +215,10 @@ def calculate_average_num_questions_entering_circulation(user_profile_data: dict
     if total_days != 0:
         average_num_daily = count / total_days
     else:
+        # Don't divide by zero!
         average_num_daily = 0
     stats_data["average_num_questions_entering_circulation_daily"] = average_num_daily
 
     user_profile_data["stats"] = stats_data
+    print(f"    Return value is: {user_profile_data['stats']['average_num_questions_entering_circulation_daily']}")
     return user_profile_data

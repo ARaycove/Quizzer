@@ -1,10 +1,9 @@
-import json
-import os
 from lib import helper
 def build_subject_settings(user_profile_data: dict, question_object_data) -> dict: #Private Function
     '''
     Builds or rebuilds the subject settings for the specific user
     '''
+    print("def settings.build_subject_settings(user_profile_data: dict, question_object_data) -> dict")
     subject_settings = {}
     # serves as a template for later
     initial_subject_setting = {}
@@ -40,11 +39,26 @@ def build_subject_settings(user_profile_data: dict, question_object_data) -> dic
                     subject_settings[subject]["total_questions"] += 1
                     if question_object.get("is_module_active") == True:
                         subject_settings[subject]["total_activated_questions"] += 1
+
+    print("    Determining if subjects has available questions")
+    for subject in subject_settings:
+        if subject_settings[subject]["total_activated_questions"] == subject_settings[subject]["num_questions_in_circulation"]:
+            subject_settings[subject]["has_available_questions"] = False
+        else:
+            subject_settings[subject]["has_available_questions"] = True
+        # print(f"{subject.title():25} has {in_circulation_count:5}/{total_count:<5} currently in circulation")
+    subject_settings = helper.sort_dictionary_keys(subject_settings)
+    print()
+    print(f"    The user's subject settings are now:")
+    for key, value in subject_settings.items():
+        print(f"    {key:50}: {value}")
     return subject_settings
 
 
 def build_module_settings(user_profile_data: dict, question_object_data: dict) -> dict:
-    # First check if we've already built module_settings for this user, since we will reuse this function for subsequent 
+    # First check if we've already built module_settings for this user, since we will reuse this function for subsequent
+    print()
+    print("def settings.build_module_settings(user_profile_data:dict, question_object_data: dict) -> dict") 
     if user_profile_data.get("module_settings") != None:
         module_settings = user_profile_data["module_settings"]
     else:
@@ -61,5 +75,6 @@ def build_module_settings(user_profile_data: dict, question_object_data: dict) -
             # Only add to list, never delete from it
             if module_name not in module_settings["module_status"]:
                 module_settings["module_status"][module_name] = default_status
+    
     return module_settings
     

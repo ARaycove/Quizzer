@@ -1,14 +1,10 @@
-import json
-from datetime import datetime, date, timedelta
-from user_profile_functions import user_profiles
-from settings_functions import settings
-from question_functions import questions
-from stats_functions import stats
-from module_functions import modules, new_module_defines
-from initialization_functions import initialize
+# Outside Libraries
+from datetime import datetime
 import mimetypes
 import os
 import random
+# User libraries
+
 # This file contains library functions used across all modules
 # also any miscellaneous functions are also stored here if not specific to a particular goal
 #   for example, is_media just checks if a filetype is a media file or not
@@ -23,8 +19,9 @@ import random
 # All question objects are stored once in this json file
 # Distributed to every user, contains the entirety of the Quizzer Directory
 def get_question_object_data() -> dict:
+    import json
+    from initialization_functions import initialize
     try:
-        
         with open("system_data/question_object_data.json", "r") as f:
             question_object_data = json.load(f)
         print("Question Object Data exists:")
@@ -42,6 +39,8 @@ def update_question_object_data(question_object_data: dict) -> None:
     '''
     Updates the master question_object_data with the updated information
     '''
+    import json
+    from initialization_functions import initialize
     try:
         # Place lock on file
         # Run in seperate thread?
@@ -90,6 +89,9 @@ def build_module_data() -> dict:
     Builds the module_data.json based on the master question_object_data file
     Should be called only when a change is made to question_object_data
     '''
+    from question_functions import questions
+    from module_functions import new_module_defines
+    import json
     all_module_data = {}
     # Build module data based on question object data
     question_object_data = get_question_object_data()
@@ -116,6 +118,7 @@ def build_module_data() -> dict:
     return all_module_data    
 
 def get_all_module_data() -> dict: # Fun Fact, this is the first get data function that'll require an argument to work:
+    import json
     try:
         with open(f"system_data/module_data.json", "r") as f:
             all_module_data = json.load(f)
@@ -139,6 +142,7 @@ def get_all_module_data() -> dict: # Fun Fact, this is the first get data functi
 # - FIXME Related subjects (i.e. biology would reference anatomy and physiology)
 # - FIXME Related concepts (i.e. biology would reference every term under the umbrella of biology, including terms belonging to anatomy: anatomy would only reference terms related to anatomy and any terms relating to subjects that fall under anatomy "niche subjects")
 def build_subject_data():
+    import json
     subject_data = {}
     question_object_data = get_question_object_data()
     for unique_id, question_object in question_object_data.items():
@@ -160,6 +164,7 @@ def build_subject_data():
     return subject_data
 
 def get_subject_data() -> dict:
+    import json
     try:
         with open("system_data/subject_data.json", "r") as f:
             subject_data = json.load(f)
@@ -179,6 +184,7 @@ def get_subject_data() -> dict:
 # - FIXME A description string
 # - FIXME A list of sources that mention this concept
 def build_concept_data() -> dict:
+    import json
     concept_data = {}
     question_object_data = get_question_object_data()
     for unique_id, question_object in question_object_data.items():
@@ -200,6 +206,7 @@ def build_concept_data() -> dict:
     return concept_data
 
 def get_concept_data() -> dict:
+    import json
     try:
         with open("system_data/concept_data.json", "r") as f:
             concept_data = json.load(f)
@@ -243,6 +250,8 @@ def get_all_user_data():
     #FIXME gather all data, this will be a server side function to get all the users across all instances
 
 def get_user_data(user_profile_name: str) -> dict:
+    import json
+    from user_profile_functions import user_profiles
     # data in the format of user_profile_name_data.json
     # system_data/user_profiles/karibar/karibar_data.json
     user_profile_name = user_profile_name.lower()
@@ -261,6 +270,7 @@ def update_user_question_stats(user_profile_data: dict) -> None:
         pass
 
 def update_user_profile(user_profile_data: dict) -> None:
+    import json
     user_name = user_profile_data["user_name"]
     with open(f"system_data/user_profiles/{user_name}/{user_name}_data.json", "w+") as f:
         json.dump(user_profile_data, f, indent=4)
@@ -279,6 +289,7 @@ def update_module_data(module_data: dict) -> None:
     each module has a module name property, so you can't fuck up and feed in the wrong module name
     Just provide the data you need to write back and this function figures out where it belongs
     '''
+    import json
     module_name = module_data["module_name"]
     # Patch fix, lol
     if module_name == "Obsidian Default Module":
@@ -346,6 +357,8 @@ def shuffle_dictionary_keys(dictionary_to_shuffle: dict) -> dict:
     Returns a new dictionary
     O(2n) complexity, or about 1 second per 350,000 items in the dictionary
     '''
+    print()
+    print("def helper.shuffle_dictionary_keys(dictionary_to_shuffle: dict) -> dict")
     sort_list = []
     for key, value in dictionary_to_shuffle.items():
         sort_list.append({key: value})
@@ -353,10 +366,14 @@ def shuffle_dictionary_keys(dictionary_to_shuffle: dict) -> dict:
     return_data = {}
     for value in sort_list:
         return_data.update(value)
+    print(f"    Dictionary had {len(dictionary_to_shuffle)} items to shuffle")
     return return_data
 
 def sort_dictionary_keys(dictionary_to_sort: dict) -> dict:
+    print()
+    print("def helper.sort_dictionary_keys(dictionary_to_sort: dict) -> dict")
     sorted_keys = sorted(dictionary_to_sort.keys())
+    print(f"    Dictionary had {len(dictionary_to_sort)} items to sort")
     return {key: dictionary_to_sort[key] for key in sorted_keys}
 
 def get_immediate_subdirectories(directory):
@@ -388,3 +405,7 @@ def get_absolute_media_path(media_file_name, question_object):
     media_files_directory = f"modules/{module_name}/media_files/{media_file_name}"
     file_path = media_files_directory
     return file_path
+
+def all_zero(data):
+    print("def all_zero(data)")
+    return all([x == 0 for x in data])

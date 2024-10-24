@@ -1,10 +1,6 @@
 from lib import helper
 from question_functions import update_questions
-from stats_functions import stats, update_statistics
-from datetime import datetime, date, timedelta
-from module_functions import modules
-import time
-import json
+from datetime import datetime, timedelta
 import math
 import random
 def verify_question_object(question_object: dict) -> bool:
@@ -243,6 +239,7 @@ def calculate_question_id(question_object: dict, user_profile_data: dict) -> dic
     return question_object
 
 def update_user_question_stats(question_object: dict, unique_id, user_profile_data: dict, question_object_data: dict) -> dict:
+    print("def update_user_question_stats(question_object: dict, unique_id, user_profile_data: dict, question_object_data: dict) -> dict")
     settings_data = user_profile_data["settings"]
     question_object = update_questions.initialize_revision_streak_property(question_object)
     question_object = update_questions.initialize_last_revised_property(question_object)
@@ -252,4 +249,7 @@ def update_user_question_stats(question_object: dict, unique_id, user_profile_da
     question_object = update_questions.calculate_average_shown(question_object)
     question_object = update_questions.determine_eligibility_of_question_object(question_object, settings_data)
     question_object = update_questions.update_is_module_active_property(question_object, unique_id, user_profile_data, question_object_data)
+    if type(question_object) != type({}):
+        print(f"Question Object has type {type(question_object)}")
+        raise Exception("Question Object is not a dictionary, one of the properties is returning the wrong object")
     return question_object

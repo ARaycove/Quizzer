@@ -1,4 +1,3 @@
-from user_profile_functions import update_user_profile
 from settings_functions import settings
 def build_first_time_settings_data(user_profile_data, question_object_data) -> dict:
     settings_data = {}
