@@ -1,9 +1,10 @@
 import flet as ft
 from lib import helper
-import public_functions
-from initialization_functions import initialize
-from user_profile_functions import user_profiles
 from datetime import date
+import system_data
+import generate_quiz
+import public_functions
+
 # FUTURE PLANS AND IMPLEMENTATIONS:
 #FIXME, future code (when connecting to the main server) user profiles on the user system will need to be registered to the Quizzer account, otherwise the user
 # may remain offline without any online features. Similar to many mobile games out there, account registration optional
@@ -100,8 +101,8 @@ from datetime import date
 questions_list = []
 current_question = {}
 user_profile_data = {}
-question_object_data = helper.get_question_object_data()
-all_module_data = helper.get_all_module_data()
+question_object_data = system_data.get_question_object_data()
+all_module_data = system_data.get_all_module_data()
 
 #NOTE is_displayed is a status variable, and will switch from question to answer, when the interface is clicked this variable will determine what gets showed next
 currently_displayed = "question"
@@ -130,7 +131,7 @@ def main(page: ft.Page):
 
     def generate_user_profile(e: ft.ControlEvent, user_name):
         print(user_name)
-        user_profiles.add_new_user(user_name, question_object_data)
+        system_data.add_new_user(user_name, question_object_data)
         display_login_screen()
         
     def initialize_program(e: ft.ControlEvent, user_name: str):
@@ -139,17 +140,18 @@ def main(page: ft.Page):
         global user_profile_data
         global CURRENT_USER
         global CURRENT_UUID
-        user_profile_data = helper.get_user_data(user_name)
+        user_profile_data = system_data.get_user_data(user_name)
         # Assign Constants with appropriate values
         CURRENT_USER = user_profile_data["user_name"]
         CURRENT_UUID = user_profile_data["uuid"]
         print(f"Current User: <{CURRENT_USER}> WITH UUID: <{CURRENT_UUID}>")
         # Health Check functions
         # Sort out any unsorted questions into their respective "piles"
-        user_profile_data["questions"] = initialize.sort_questions(user_profile_data, question_object_data)
-        helper.update_user_profile(user_profile_data) #updating is always a great idea
+        user_profile_data["questions"] = system_data.sort_questions(user_profile_data, question_object_data)
+         #updating is always a great idea
         # Populate the question list, then assign the current question object to be displayed
-        questions_list = public_functions.populate_question_list(user_profile_data)
+        questions_list = generate_quiz.populate_question_list(user_profile_data)
+        system_data.update_user_profile(user_profile_data)
         current_question = questions_list.pop()
         page.clean()
         # page.bgcolor="black"
@@ -159,7 +161,7 @@ def main(page: ft.Page):
         '''
         Updates the current list of users to provide to the drop down menu
         '''
-        current_user_list = helper.get_user_list()
+        current_user_list = system_data.get_user_list()
         return current_user_list
     def display_new_profile_input_screen(e: ft.ControlEvent = None):
         page.clean()

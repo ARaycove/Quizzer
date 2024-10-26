@@ -1,48 +1,8 @@
 from lib import helper
-from question_functions import questions
+import system_data
 from datetime import datetime, timedelta
-##################################################################
-# This file will determine how the quiz object is populated,
-# The quiz object consists of question objects
-##################################################################
-##################################################################
-def ensure_quiz_length(sorted_questions, quiz_length): #Private Function
-    '''
-    function provides that the attempted number of questions to be populated into the quiz is <= the number of questions available for selection:
-    '''
-    if len(sorted_questions) < quiz_length:
-        quiz_length = len(sorted_questions)
-    if quiz_length <= 0:
-        return None
-    return quiz_length
-
-
-
-##################################################################
-def get_number_of_revision_streak_one_questions(sorted_questions):#Private Function
-    num_questions = 0
-    for unique_id, question in sorted_questions.items():
-        if question["revision_streak"] == 1:
-            num_questions += 1
-    return num_questions
-# selection algorithm
-
-
-
-##################################################################
-def select_questions_to_be_returned(sorted_questions, quiz_length): #Private Function
-## questions filled first, if revision streak is 1, always fill these
-    question_list = []
-    if len(sorted_questions) == 0:
-        return []
-    # Very simplified logic, since we already determined proportions and eligiblity all we're going to do is as questions from sorted_questions until we meet the quiz length
-    for unique_id, question in sorted_questions.items():
-        question_list.append(question)
-        if len(question_list) >= quiz_length:
-            return question_list
-        
-
-
+import system_data_user_stats
+import random
 ###############################################################
 def determine_questions_to_skip(tier_number: int, ratio_for_tier: dict, user_profile_data: dict) -> dict:
     print("def determine_questions_to_skip(tier_number, settings_data)")
@@ -68,7 +28,14 @@ def calculate_ratio_for_tier(tier_number: int, sorted_subject_list: list, user_p
     print("def calculate_ratio_for_tier(tier_number: int, sorted_subject_list: list, user_profile_data)")
     ratio_for_tier = {}
     for subject in sorted_subject_list:
+        # Calculate how many we should have in this tier
         ratio_for_tier[subject] = tier_number * int(round((user_profile_data["settings"]["subject_settings"][subject]["interest_level"]/5)))
+        # Subtract how many we currently have in circulation
+        ratio_for_tier[subject] -= user_profile_data["settings"]["subject_settings"][subject]["num_questions_in_circulation"]
+        # Result should be the remaining number of questions to add for that subject (Could result in a negative)
+        # If the resulting value is negative, we should set the value to zero, so the all_zero function picks it up
+        if ratio_for_tier[subject] < 0:
+            ratio_for_tier = 0
     print(f"    Tier number: < {tier_number} > ratios are:")
     for key, value in ratio_for_tier.items():
         print(f"    {key:^25}:{value}")
@@ -108,7 +75,7 @@ def add_questions_into_circulation(average_daily_questions: float, desired_daily
     target_met = False
     
     # "us_military": {"interest_level": 100, "priority": 1, "total_questions": 66, "num_questions_in_circulation": 66}
-    timer = 10 #NOTE Purpose of timer is a bit redundant now, loop has safeguards to prevent infinite loops, but for now we'll keep the timer until such time where it's safe to remove this failsafe, or this message can be removed if we decide that the failsafe is better left in. (I'm leaning towards this conclusion)
+    timer = 2 #NOTE Purpose of timer is a bit redundant now, loop has safeguards to prevent infinite loops, but for now we'll keep the timer until such time where it's safe to remove this failsafe, or this message can be removed if we decide that the failsafe is better left in. (I'm leaning towards this conclusion)
     time_start = datetime.now()
     subjects_to_skip = []
     questions_to_remove_from_reserve_bank = []
@@ -119,15 +86,15 @@ def add_questions_into_circulation(average_daily_questions: float, desired_daily
         total_questions_in_reserve_bank = len(user_profile_data["questions"]["reserve_bank"])
         print(f"    There are {total_questions_in_reserve_bank} total questions in the reserve_bank pile")
         ratio_for_tier = calculate_ratio_for_tier(tier_number, sorted_subject_list, user_profile_data)
-        all_zero = helper.all_zero(ratio_for_tier) # will be False
-        # reset the termination count after scan. Otherwise the tier number will increment when it's not supposed to.
-        termination_count = 0
+         # will be False
         # Determine what subjects should be skipped for this iteration
         subjects_to_skip = determine_questions_to_skip(tier_number, ratio_for_tier, user_profile_data)
         # Now Mutate the ratio_for_tier variable so each key value pair reads {subject: num_questions_to_add}
-        # 1st delete any subjects we need to skip over
+        # 1st set any subjects we are skipping to a goal of 0
         for subject in subjects_to_skip:
-            del ratio_for_tier[subject]
+            ratio_for_tier[subject] = 0
+        # determine if all subjects are 0
+        all_zero = helper.all_zero(ratio_for_tier)
         # 2nd subtract the current circulating questions from the value of each subject
         for subject, value in ratio_for_tier.items():
             num_in_circ = user_profile_data["settings"]["subject_settings"][subject]["num_questions_in_circulation"]
@@ -159,9 +126,12 @@ def add_questions_into_circulation(average_daily_questions: float, desired_daily
                         # Switch the question to True
                         question_object["in_circulation"] = True
                         # update the question's properties
-                        question_object = questions.update_user_question_stats(question_object, unique_id, user_profile_data, question_object_data)
+                        question_object = system_data.update_user_question_stats(question_object, unique_id, user_profile_data, question_object_data)
                         # Add the question to either "in_circulation_not_eligible" or "in_circulation_is_eligible" pile
                         write_data = {unique_id: question_object}
+                        if question_object["in_circulation"] == True:
+                            # Manually increment and decrement values in subject_settings so we don't need to rebuild the whole data structure
+                            user_profile_data["settings"]["subject_settings"][subject]["num_questions_in_circulation"] += 1
                         if question_object["in_circulation"] == True and question_object["is_eligible"] == True:
                             questions_to_remove_from_reserve_bank.append(unique_id)
                             total_questions_in_reserve_bank -= 1
@@ -189,13 +159,24 @@ def add_questions_into_circulation(average_daily_questions: float, desired_daily
         print(f"    Removing {len(questions_to_remove_from_reserve_bank)} from reserve_bank")
         for unique_id in questions_to_remove_from_reserve_bank:
             del user_profile_data["questions"]["reserve_bank"][unique_id]
-        if target_met == True:
-            return user_profile_data
+            # Question pile is now accurate
+            
+
+
         if all_zero == True: # Meaning the target has not been met and we've met the ratio for the current tier
             # Increment the tier number, we then go back to the header while loop and recalculate
-            tier_number += 1    
+            tier_number += 1
+        # Conditions Required to exit the loop
         elapsed_time = datetime.now() - time_start
-        if elapsed_time >= timedelta(seconds=timer):
+        # If there are no questions in the reserve bank:
+        if len(user_profile_data["questions"]["reserve_bank"]) == 0:
+            print("    No remaining questions in the reserve bank")
+            return user_profile_data
+        # If we've met the target to put in
+        elif target_met == True:
+            return user_profile_data    
+        # If the process takes too long
+        elif elapsed_time >= timedelta(seconds=timer):
             print("Times Up, Sorry took too long")
             return user_profile_data
 
@@ -287,6 +268,25 @@ def update_questions_in_circulation(user_profile_data: dict, question_object_dat
         print("    Finished updating list of circulating questions")
         return user_profile_data
 
-##################################################################
 
-
+def populate_question_list(user_profile_data: dict, question_object_data: dict) -> list:
+    # New system simply grabs x amount of questions that are eligible
+    # If no eligible questions returns an empty list
+    print("def public_functions.populate_question_list(user_profile_data: dict, question_object_data: dict) -> list")
+    print("    Calling settings.build_subject_settings()")
+    user_profile_data["settings"]["subject_settings"] = system_data.build_subject_settings(user_profile_data, question_object_data)
+    print("    Calling quiz_functions.update_questions_in_circulation(user_profile_data)")
+    
+    user_profile_data = update_questions_in_circulation(user_profile_data, question_object_data) # Start by ensuring questions are put into circulation if we can fit them in the average
+    user_profile_data = system_data.update_stats(user_profile_data, question_object_data)
+    
+    ##################################################
+    # filter out questions based on criteria
+    question_list = [unique_id for unique_id in user_profile_data["questions"]["in_circulation_is_eligible"].keys()]
+    
+    random.shuffle(question_list) # ensures there is some level of randomization, so users don't notice this is just a cycling list
+    question_list = question_list[::-1] # Reverse the list
+    random.shuffle(question_list) # Shuffle it again
+    print(f"    List of {len(question_list)} questions has been shuffled for pseudorandomness.")
+    print(f"    {question_list}")
+    return (question_list, user_profile_data)

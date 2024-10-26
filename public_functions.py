@@ -1,11 +1,7 @@
 
 # Custom Modules
 from lib import helper
-from stats_functions import update_statistics, stats
-from question_functions import update_questions, questions
-from settings_functions import settings
-import quiz_functions
-
+import system_data
 
 
 # Common Libraries
@@ -129,7 +125,7 @@ def update_score(status:str, id:str, user_profile_data: dict): #Public Function
             question_object["revision_streak"] = 1
         
     print(f"Revision streak was {check_variable}, streak is now {question_object['revision_streak']}")
-    user_profile_data = update_statistics.increment_questions_answered(user_profile_data)
+    user_profile_data = system_data.increment_questions_answered(user_profile_data)
 
 
     check_variable = question_object["last_revised"]
@@ -144,7 +140,7 @@ def update_score(status:str, id:str, user_profile_data: dict): #Public Function
     question_object["next_revision_due"] = helper.convert_to_datetime_object(question_object["next_revision_due"])
     # Next revision due is based on the schedule that was outputted from the generate_revision_schedule() function:
     # If question was correct, update according to schedule, otherwise set next due date according to sensitivity settings so question is immediately available again for review regardless of what the user enters
-    question_object["next_revision_due"] = questions.calculate_next_revision_date(status, question_object)
+    question_object["next_revision_due"] = system_data.calculate_next_revision_date(status, question_object)
     # Convert value back to a string so it can be written back to the json file
     question_object["next_revision_due"] = helper.stringify_date(question_object["next_revision_due"])
     # dictionary["next_revision_due"] = dictionary["next_revision_due"].strftime("%Y-%m-%d %H:%M:%S")
@@ -152,32 +148,13 @@ def update_score(status:str, id:str, user_profile_data: dict): #Public Function
     print(f"The next revision is due on {check_variable}")
     # calculate_average_shown()
     # Update question's history stats
-    question_object = update_questions.update_question_history(question_object, status)
+    question_object = system_data.update_question_history(question_object, status)
     questions_data[id] = question_object
     user_profile_data["questions"] = questions_data
-    update_system_data(user_profile_data)
     
-def populate_question_list(user_profile_data: dict, question_object_data: dict) -> list:
-    # New system simply grabs x amount of questions that are eligible
-    # If no eligible questions returns an empty list
-    print("def public_functions.populate_question_list(user_profile_data: dict, question_object_data: dict) -> list")
-    print("    Calling settings.build_subject_settings()")
-    user_profile_data["settings"]["subject_settings"] = settings.build_subject_settings(user_profile_data, question_object_data)
-    print("    Calling quiz_functions.update_questions_in_circulation(user_profile_data)")
-    user_profile_data = quiz_functions.update_questions_in_circulation(user_profile_data, question_object_data) # Start by ensuring questions are put into circulation if we can fit them in the average
-    user_profile_data["stats"] = stats.update_stats(user_profile_data, question_object_data)
-    ##################################################
-    # filter out questions based on criteria
-    question_list = [unique_id for unique_id in user_profile_data["questions"]["in_circulation_is_eligible"].keys()]
-    
-    random.shuffle(question_list) # ensures there is some level of randomization, so users don't notice this is just a cycling list
-    question_list = question_list[::-1] # Reverse the list
-    random.shuffle(question_list) # Shuffle it again
-    print(f"    List of {len(question_list)} questions has been shuffled for pseudorandomness.")
-    print(f"    {question_list}")
-    return question_list, user_profile_data
 
-def update_system_data(user_profile_data: dict) -> dict:
-    user_profile_data = questions.initialize_and_update_question_properties(user_profile_data)
-    user_profile_data = stats.update_stats(user_profile_data)
-    return user_profile_data
+
+# def update_system_data(user_profile_data: dict) -> dict:
+#     user_profile_data = questions.initialize_and_update_question_properties(user_profile_data)
+#     user_profile_data = stats.update_stats(user_profile_data)
+#     return user_profile_data
