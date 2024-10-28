@@ -258,7 +258,7 @@
             "mathematics"
         ],
         "related": [
-            "Lippman_Trig_Text Section 5.5 Right Triangle Trigonometry"
+            "cosine"
         ],
         "question_text": "What is the cofunction identity of cos(\u03b8)?",
         "answer_text": "cos(\u03b8) = sin( (\u03c0/2) - \u03b8)",

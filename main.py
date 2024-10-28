@@ -93,7 +93,58 @@ import public_functions
 # - FIXME Also update the subject field
 # - FIXME Also make sure every field is filled if possible
 # - NOTE At least one question field and one answer field needs to be filled or the question object is not valid
+# Custom Widgets:
+class CustomAutoComplete_Widget():
+    def __init__(self, page, items,col):
+        self.page = page
+        self.items = items
+        self.col = col
+        self.filtered_items = items.copy()
+        self._build()
 
+    def _build(self):
+        self._assets()
+        self.stack = ft.Stack(
+            controls=[
+                self.col,  # Base layer
+                self.list_cont,     
+            ],
+        )
+        self.page.add(self.text_field, self.stack)  # Add the stack
+
+    def _assets(self):
+        self.list_view = ft.ListView(
+            expand=1,
+            spacing=10,
+            controls=[],
+        )
+        self.list_cont = ft.Container(
+            content = self.list_view,
+            bgcolor= ft.colors.WHITE,
+        )
+        self.text_field = ft.TextField(label="Filter list")
+        self.text_field.on_change = self._filter_list
+
+    def _filter_list(self, e):
+        query = e.control.value.lower()
+        if query:
+            self.filtered_items = [item for item in self.items if query in item.lower()]
+        else:
+            self.filtered_items = []
+        self.list_view.controls = [
+            ft.ListTile(
+                title=ft.Text(item),
+                on_click=lambda e, item=item: self._on_list_item_click(item)
+            ) for item in self.filtered_items
+        ]
+        self.page.update()
+
+    def _on_list_item_click(self, item):
+        self.text_field.value = item
+        self.filtered_items = []
+        self.list_view.controls = [] 
+        self.page.update()
+        print(f"Selected item: {item}") 
 
 ######################################################################################
 #GLOBALS
@@ -469,7 +520,12 @@ def main(page: ft.Page):
         
         stat_list = build_stat_list()
         main_page_header_stat_display = ft.Column(expand=True,height=80,controls=stat_list,wrap=True)#FIXME
-        main_page_header = ft.Row(expand=False,alignment=ft.MainAxisAlignment.START,controls= [menu_button,main_page_header_stat_display])
+        main_page_header = ft.Row(expand=False,alignment=ft.MainAxisAlignment.START,controls= [
+            menu_button,
+            main_page_header_stat_display,
+            ft.Row(expand=True, alignment=ft.MainAxisAlignment.END, controls=[ft.IconButton(icon=ft.icons.ADD, icon_color=ft.colors.BLACK, tooltip="Add A New Question", bgcolor=ft.colors.WHITE,
+                                                                                            on_click=display_add_question_interface)])
+            ])
         
         # Set all fields to None
         controls_list = []
@@ -539,7 +595,12 @@ def main(page: ft.Page):
         '''
         stat_list = build_stat_list()
         main_page_header_stat_display = ft.Column(expand=True,height=80,controls=stat_list,wrap=True)#FIXME
-        main_page_header = ft.Row(expand=False,alignment=ft.MainAxisAlignment.START,controls= [menu_button,main_page_header_stat_display])
+        main_page_header = ft.Row(expand=False,alignment=ft.MainAxisAlignment.START,controls= [
+            menu_button,
+            main_page_header_stat_display,
+            ft.Row(expand=True, alignment=ft.MainAxisAlignment.END, controls=[ft.IconButton(icon=ft.icons.ADD, icon_color=ft.colors.BLACK, tooltip="Add A New Question", bgcolor=ft.colors.WHITE,
+                                                                                            on_click=display_add_question_interface)])
+            ])
         
         controls_list = []
         question_object_text_display = None
@@ -601,54 +662,202 @@ def main(page: ft.Page):
     ###################################################################################################################################################
     ###################################################################################################################################################
     # Add and Edit Question pages
+
     def display_add_question_interface(e: ft.ControlEvent):
         global currently_displayed
         global user_profile_data
         global question_object_data
         global all_module_data
-
+        #FIXME conditional tutorial page
         # Define the controls
         ############################
         # No option will be provided to enter own unique id
-        add_question_main_header = ft.Text(value="General Information")
-        primary_subject = ft.TextField(label="Primary Subject")
-        subject = ft.TextField(label="Related Subjects")
-        related = ft.TextField(label="Related Concepts and Terms")
+        print(f"The width of the page is: {page.width}")
+        subject_data = system_data.get_subject_data()
+        concept_data = system_data.get_concept_data()
+
+        add_question_main_header = ft.Row(alignment=ft.MainAxisAlignment.CENTER, controls=[ft.Text(value="Add New Question", size=36)])
+
+        form_fields = ft.Row(alignment=ft.MainAxisAlignment.SPACE_BETWEEN)
+        left_side_column = ft.Column(alignment=ft.MainAxisAlignment.START, horizontal_alignment=ft.CrossAxisAlignment.START)
+        right_side_column = ft.Column(alignment=ft.MainAxisAlignment.START, horizontal_alignment=ft.CrossAxisAlignment.START)
+        form_fields.controls = [left_side_column, right_side_column]
+        ######
+        def replace_primary_subject_with_textfield(e: ft.ControlEvent):
+            del left_side_column.controls[1]
+            left_side_column.controls.insert(1, primary_subject_textfield_row)
+            page.update()
+        def primary_subject_back(e:ft.ControlEvent):
+            del left_side_column.controls[1]
+            left_side_column.controls.insert(1, primary_subject_line)
+            page.update()
+
+        primary_subject_textfield = ft.TextField(width=200)
+        primary_subject_back_button = ft.IconButton(icon=ft.icons.ARROW_BACK, icon_color=ft.colors.BLACK, tooltip="Select from from list", bgcolor=ft.colors.WHITE, on_click=primary_subject_back)
+        primary_subject_textfield_row = ft.Row(controls=[primary_subject_textfield, primary_subject_back_button])
+
+        primary_subject_text = ft.Text(value="Primary Subject", size=24,
+                                        tooltip="What is the Primary Subject, or Field of Study, of this question?\n For example is this a biology question, anatomy, mathematics, calculus, history, etc.")
         
+        primary_subject_input = ft.AutoComplete(suggestions=[ft.AutoCompleteSuggestion(key=i, value=i) for i in subject_data.keys()])
+        add_new_primary_subject_button = ft.IconButton(icon=ft.icons.ADD, icon_color=ft.colors.BLACK, tooltip="Add a subject that isn't in the list", bgcolor=ft.colors.WHITE, on_click=replace_primary_subject_with_textfield)
+        primary_subject_line = ft.Row(controls=[ft.Column(controls=[ft.Stack(controls=[primary_subject_input],width=200), add_new_primary_subject_button], height=75, wrap=True)])
+        left_side_column.controls.append(primary_subject_text)
+        left_side_column.controls.append(primary_subject_line)
+
+        ######
+        def replace_module_name_with_textfield(e: ft.ControlEvent):
+            del right_side_column.controls[1]
+            right_side_column.controls.insert(1, module_name_textfield_row)
+            page.update()
+        def module_name_back(e: ft.ControlEvent):
+            del right_side_column.controls[1]
+            right_side_column.controls.insert(1, module_line)
+            page.update()
+
+        module_name_textfield = ft.TextField(width=200)
+        module_name_back_button = ft.IconButton(icon=ft.icons.ARROW_BACK, icon_color=ft.colors.BLACK, tooltip="Add a subject that isn't in the list", bgcolor=ft.colors.WHITE, on_click=module_name_back)
+        module_name_textfield_row = ft.Row(controls=[module_name_textfield, module_name_back_button])
+
+        module_name_text = ft.Text(value="Define the Module:", size=24, tooltip="What module does the question belong to?\n Begin by typing the name of the module, you'll be given a list of suggestions based on what modules already exist by that name\n You can contribute to any module \n BE AWARE: adding a question to a pre-existing module, will import that module into your profile\n Please Avoid adding duplicate questions to a module")
+        module_name_input = ft.AutoComplete(suggestions=[ft.AutoCompleteSuggestion(key=i, value=i) for i in all_module_data.keys()])
+        add_new_module_button = ft.IconButton(icon=ft.icons.ADD, icon_color=ft.colors.BLACK, tooltip="Add a subject that isn't in the list", bgcolor=ft.colors.WHITE, on_click=replace_module_name_with_textfield)
+        module_line = ft.Row(controls=[ft.Column(controls=[ft.Stack(controls=[module_name_input],width=200), add_new_module_button], height=75, wrap=True)])
+        right_side_column.controls.append(module_name_text)
+        right_side_column.controls.append(module_line)
+
+        # single_field_row = ft.Row(alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+        #                           controls=[ft.Column(controls=[ft.Stack(controls=[module_name_input],width=250), add_new_module_button],     height=75, wrap=True)])
+        # Need to be able to delete entries before submission
+        ###
+        def replace_related_subjects_with_textfield(e: ft.ControlEvent):
+            del left_side_column.controls[3]
+            left_side_column.controls.insert(3, related_subjects_textfield_row)
+            page.update()
+        def related_subjects_back(e: ft.ControlEvent):
+            del left_side_column.controls[3]
+            left_side_column.controls.insert(3, subject_entry_row)
+            page.update()
+        def add_to_related_subjects(e: ft.ControlEvent, subject_inputted):
+            current_subject_list = [i for i in subject.value.split("\n")]
+            # Avoid duplication
+            if subject_inputted not in current_subject_list:
+                if subject.value == None or subject.value == "":
+                    subject.value += f"{subject_inputted}"
+                else:
+                    subject.value += f"\n{subject_inputted}"
+            page.update()
+        def clear_related_subjects_field(e: ft.ControlEvent):
+            subject.value=""
+            page.update()
+        related_subjects_textfield = ft.TextField(width=200, on_submit=lambda e: add_to_related_subjects(e, related_subjects_textfield.value))
+        related_subjects_back_button = ft.IconButton(icon=ft.icons.ARROW_BACK, icon_color=ft.colors.BLACK, tooltip="Clear The Related Subjects Input Field", bgcolor=ft.colors.WHITE, on_click=related_subjects_back)
+        related_subjects_textfield_row = ft.Row(controls=[related_subjects_textfield, related_subjects_back_button])
+        subject = ft.TextField(label="Related Subjects",
+                               tooltip="What other subjects relate to this question?\n For example it might be a calculus question, but calculus also falls under mathematics, \nThe question may also be referrencing a historical event, thus related to history as well",
+                               multiline=True, disabled=True, width=200)
+        clear_subject_button = ft.IconButton(icon=ft.icons.CLEAR, icon_color=ft.colors.BLACK, tooltip="Clear The Related Subjects Input Field", bgcolor=ft.colors.WHITE, on_click=clear_related_subjects_field)
+        subject_input_row = ft.Row(controls=[subject, clear_subject_button])
+        left_side_column.controls.append(subject_input_row)
+
+
+        subject_auto_complete = ft.AutoComplete(suggestions=[ft.AutoCompleteSuggestion(key=i, value=i) for i in subject_data.keys()],on_select=lambda e: add_to_related_subjects(e, e.selection.value))
+        add_new_subject_button = ft.IconButton(icon=ft.icons.ADD, icon_color=ft.colors.BLACK, tooltip="Add a subject that isn't in the list", bgcolor=ft.colors.WHITE, on_click=replace_related_subjects_with_textfield)
+        subject_entry_row = ft.Row(controls=[ft.Column(controls=[ft.Stack(controls=[subject_auto_complete],width=200), add_new_subject_button], height=75, wrap=True)])
+        left_side_column.controls.append(subject_entry_row)
         
+        ###
+        def replace_related_concepts_with_textfield(e: ft.ControlEvent):
+            del right_side_column.controls[3]
+            right_side_column.controls.insert(3, related_concepts_textfield_row)
+            page.update()
+        def related_concepts_back(e: ft.ControlEvent):
+            del right_side_column.controls[3]
+            right_side_column.controls.insert(3, concept_entry_row)
+            page.update()
+        def add_to_related_concepts(e: ft.ControlEvent, concept_inputted):
+            current_concept_list = [i for i in related.value.split("\n")]
+            # Avoid duplication
+            if concept_inputted not in current_concept_list:
+                if related.value == None or related.value == "":
+                    related.value += f"{concept_inputted}"
+                else:
+                    related.value += f"\n{concept_inputted}"
+            page.update()
+        def clear_related_concepts_field(e: ft.ControlEvent):
+            related.value=""
+            page.update()
+
+        related_concepts_textfield = ft.TextField(width=200, on_submit=lambda e: add_to_related_concepts(e, related_concepts_textfield.value))
+        related_concepts_back_button = ft.IconButton(icon=ft.icons.ARROW_BACK, icon_color=ft.colors.BLACK, tooltip="Clear the Related Concepts Input Field", bgcolor=ft.colors.WHITE, on_click=related_concepts_back)
+        related_concepts_textfield_row = ft.Row(controls=[related_concepts_textfield, related_concepts_back_button])
+
+        related = ft.TextField(label="Related Concepts and Terms",
+                               tooltip="What concepts and terms are related to this question?\nFor example the question What year was xyz invented and who invented it? points to the term xyz, to the historical period, and to the individual\n",
+                               multiline=True, disabled=True, width=200)
+        clear_related_button = ft.IconButton(icon=ft.icons.CLEAR, icon_color=ft.colors.BLACK, tooltip="Clear the Related Concepts Input Field", bgcolor=ft.colors.WHITE, on_click=clear_related_concepts_field)
+        related_concepts_input_row = ft.Row(controls=[related, clear_related_button])
+        right_side_column.controls.append(related_concepts_input_row)
+
+        concept_auto_complete = ft.AutoComplete(suggestions=[ft.AutoCompleteSuggestion(key=i, value=i) for i in concept_data.keys()],on_select=lambda e: add_to_related_concepts(e, e.selection.value))
+        add_new_concept_button = ft.IconButton(icon=ft.icons.ADD, icon_color=ft.colors.BLACK, tooltip="Add a concept that isn't in the list", bgcolor=ft.colors.WHITE, on_click=replace_related_concepts_with_textfield)
+        concept_entry_row = ft.Row(controls=[ft.Column(controls=[ft.Stack(controls=[concept_auto_complete],width=200), add_new_concept_button], height=75, wrap=True)])
+        right_side_column.controls.append(concept_entry_row)
+
         ############################
-        add_question_sub_header_module = ft.Text(value="What module does the question belong to?")
-        module_name = ft.Dropdown(label="Define the Module") #FIXME
-        #   drop down list is user_profile_data["settings"]["module_settings"]["module_status"]
-        new_module_edit_button = ft.IconButton(icon=ft.icons.EDIT) 
-        #   When pressed brings up a textfield to enter a new module name
-        new_module_text_field = ft.TextField(label="Enter New Module Name")
-        #   Text determines new module_name to add into user's module_status list
-        new_module_submit_button = ft.IconButton(icon=ft.icons.UPLOAD)
+        question_text = ft.TextField(label="Question Text", multiline=True, tooltip="What's the Question?",width=400) #FIXME multiline text box
+        question_image = ft.Text(value="Question Image", tooltip="Is there an image that goes with the question?")
+        question_image_upload_button = ft.ElevatedButton(text="Upload Question's Image")
+        question_audio = ft.Text(value="Question Audio", tooltip="Is there audio that goes with the question?")
+        question_audio_upload_button = ft.ElevatedButton(text="Upload Question's Audio")
+        question_video = ft.Text(value="Question Video", tooltip="Is there a video that goes with the question?")
+        question_video_upload_button = ft.ElevatedButton(text="Upload Question's Video")
+        question_image_upload_row = ft.Row(controls=[question_image, question_image_upload_button])
+        question_audio_upload_row = ft.Row(controls=[question_audio, question_audio_upload_button])
+        question_video_upload_row = ft.Row(controls=[question_video, question_video_upload_button])
+        
 
 
         ############################
-        add_question_main_header_question = ft.Text(value="What's the Question?")
-        question_text = ft.TextField(label="Question Text")
-        question_image = ft.TextField(label="Question Image")
-        question_audio = ft.TextField(label="Question Audio")
-        question_video = ft.TextField(label="Question Video")
-
+        answer_text = ft.TextField(label="Answer Text") #FIXME multiline text box
+        answer_image = ft.Text(value="Answer Image")
+        answer_image_upload_button = ft.ElevatedButton(text="Upload Answer's Image")
+        answer_audio = ft.Text(value="Answer Audio")
+        answer_audio_upload_button = ft.ElevatedButton(text="Upload Answer's Audio")
+        answer_video = ft.Text(value="Answer Video")
+        answer_video_upload_button = ft.ElevatedButton(text="Upload Answer's Video")
+        answer_image_upload_row = ft.Row(controls=[answer_image, answer_image_upload_button])
+        answer_audio_upload_row = ft.Row(controls=[answer_audio, answer_audio_upload_button])
+        answer_video_upload_row = ft.Row(controls=[answer_video, answer_video_upload_button])
 
         ############################
-        add_question_main_header_answer = ft.Text(value="What's the Answer?")
-        answer_text = ft.TextField(label="Answer Text")
-        answer_image = ft.TextField(label="Answer Image")
-        answer_audio = ft.TextField(label="Answer Audio")
-        answer_video = ft.TextField(label="Answer Video")
+        # Submission Buttons
+        submit_button = ft.IconButton(icon=ft.icons.UPLOAD, icon_color=ft.colors.WHITE)
+        def exit_add_question_interface(e):
+            if currently_displayed == "question":
+                refresh_question_object_display_with_question()
+            else:
+                refresh_question_object_display_with_answer()
+        cancel_button = ft.IconButton(icon=ft.icons.CANCEL, icon_color=ft.colors.WHITE, on_click=exit_add_question_interface)
+        submission_button_row = ft.Row(alignment=ft.MainAxisAlignment.SPACE_AROUND, controls=[submit_button, cancel_button])
 
-
-        submit_button = ft.IconButton(icon=ft.Icon(name=ft.icons.PLUS_ONE, color=ft.colors.BLACK))
-
-
-        header = ft.Row(expand=False,alignment=ft.MainAxisAlignment.START,controls=[menu_button])
-        row_one = ft.Row(expand=False,alignment=ft.MainAxisAlignment.START,)
-
+        page.clean()
+        page.add(
+            menu_button,
+            add_question_main_header,
+            form_fields,
+            ft.Text(value="Question Fields", tooltip="At least one question field must be filled", size=24),
+            question_text,
+            question_image_upload_row,
+            question_audio_upload_row,
+            question_video_upload_row,
+            ft.Text(value="Answer Fields", tooltip="At least one answer field must be filled", size=24),
+            answer_text,
+            answer_image_upload_row,
+            answer_audio_upload_row,
+            answer_video_upload_row,
+            submission_button_row
+        )
 
 
 

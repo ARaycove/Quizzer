@@ -514,7 +514,7 @@ def generate_first_time_questions_dictionary() -> dict:
     # Load in the quizzer_tutorial_module 
     module_data = get_all_module_data()
     # Build first question set based on the questions in the Quizzer Tutorial Module 
-    quizzer_tutorial = module_data["Quizzer Tutorial"]
+    quizzer_tutorial = module_data["quizzer tutorial"]
     for unique_id in quizzer_tutorial["questions"]:
         write_data = {unique_id: {}}
         questions_data["unsorted"].update(write_data) #NOTE tutorial questions will immediately go into the unsorted "pile"
@@ -891,13 +891,15 @@ def add_new_question_object(
     user_profile_data = sort_questions(user_profile_data, question_object_data)
     user_profile_data = update_stats(user_profile_data, question_object_data)
 
+# Two design philosophies from this point on:
 
-
+# Closed authorship
 # Only the original author of a module can modify that module
 # Modules are unique by title
 # When modules are built, they check the author of the question object to determine the author of the module
 # When question objects are added, only modules the user has authored may be selected for entry
 
+# Opensource Community System
 # Alternatively each module could adopt the open-source model
 # User's can author a module
 # User's can pull in community modules
@@ -907,3 +909,21 @@ def add_new_question_object(
 # Individual questions can be disabled by the user, for that user #FIXME
 # Questions can be rated in the future #FIXME
 # Bad rating mark a question for takedown -> community consensus will determine whether questions stay in the database or not
+# Allow user's to delete their own questions and edit all questions
+
+# The zeitgeist would be of community collaboration, this would allow information to disseminate freely, anyone who spots a falsehood can edit a question to be better.
+# Poorly rated questions that fall below 50% consensus would be removed, but a minimum number of rating would be required. Say at least 25% of the people who have the module need to vote on it before the removal can be triggered.
+#   This way a mechanism still exists to remove shit quality questions
+#   This also leaves the door for the entire community to improve the quality of question objects
+
+# So WHAT?
+#   To start off when a new question is entered by a user, it's entered into the server database
+#   The server list of modules and all questions are issued to every user
+#       This list of modules is accessible by an option in the menu
+#       Selecting a module imports all of those questions in the module into the user's "pile" of questions
+#   The add_new_question objects needs to:
+#   - add the object to the server database -> which rebuilds the module_data list as well
+#   - fetch the new module_list and return it to the user
+#   - Add the question to the user's unsorted pile
+#   - sort the user's questions["unsorted"]
+#   - return question_object_data, all_module_data, user_profile_data
