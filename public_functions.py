@@ -96,61 +96,7 @@ def update_setting(key, value, data:dict, user_profile_data: dict): # Public Fun
     user_profile_data["settings"] = settings_data
     helper.update_user_profile(user_profile_data)    
 
-def update_score(status:str, id:str, user_profile_data: dict): #Public Function
-    # A strange bug occured where the id is the old file_name
-    check_variable = ""
-    questions_data = user_profile_data["questions"]
-    # load config.json into memory, I get the feeling this is poor memory management, but it's only 1000 operations.
-    question_object = questions_data[id]
 
-    # Alternatively this could have been a seperate function for initializing, both work:
-    ############# We Have Three Values to Update ########################################
-    check_variable = question_object["revision_streak"]
-    print(f"received id value of {id} of type {type(id)}")
-    if status == "correct":
-        # Sometimes we are able to answer something correctly, even though the projection would say we should have forgotten about it:
-        # In such instances we will increment the time_between_revisions so the questions shows less often
-        if helper.within_twenty_four_hours(helper.convert_to_datetime_object(question_object["next_revision_due"])) == False:
-            print("Task failed successfully: Incrementing time between revisions")
-            question_object["time_between_revisions"] += 0.005 # Increment spacing by .5%
-        question_object["revision_streak"] = question_object["revision_streak"] + 1
-    elif status == "incorrect":
-        # The projection was set, but the user answers it incorrectly despite the fact that the algorithm predicted they should still remember it.
-        # In such a case we will decrement the time between revisions so it shows more often
-        if helper.within_twenty_four_hours(helper.convert_to_datetime_object(question_object["next_revision_due"])) == True:
-            question_object["time_between_revisions"] -= 0.005 # Decrement by 0.5%
-        question_object["revision_streak"] -= 3 #Less discouraging then completely resetting the streak, if questions aren't getting completely reset we make room for more knowledge faster
-        # At this point revision streak is no longer representative of a streak of correct replies, but rather a value to help determine spacing
-        if question_object["revision_streak"] < 1:
-            question_object["revision_streak"] = 1
-        
-    print(f"Revision streak was {check_variable}, streak is now {question_object['revision_streak']}")
-    user_profile_data = system_data.increment_questions_answered(user_profile_data)
-
-
-    check_variable = question_object["last_revised"]
-    print(f"This question was last revised on {check_variable}")
-    # Convert string json value back to a <class 'datetime.datetime'> type variable so it can be worked with:
-    question_object["last_revised"] = helper.convert_to_datetime_object(question_object["last_revised"])
-    # dictionary["last_revised"] = datetime.strptime(dictionary["last_revised"], "%Y-%m-%d %H:%M:%S")
-    question_object["last_revised"] = datetime.now()
-    # Convert value back to a string so it can be written back to the json file
-    question_object["last_revised"] = helper.stringify_date(question_object["last_revised"])
-
-    question_object["next_revision_due"] = helper.convert_to_datetime_object(question_object["next_revision_due"])
-    # Next revision due is based on the schedule that was outputted from the generate_revision_schedule() function:
-    # If question was correct, update according to schedule, otherwise set next due date according to sensitivity settings so question is immediately available again for review regardless of what the user enters
-    question_object["next_revision_due"] = system_data.calculate_next_revision_date(status, question_object)
-    # Convert value back to a string so it can be written back to the json file
-    question_object["next_revision_due"] = helper.stringify_date(question_object["next_revision_due"])
-    # dictionary["next_revision_due"] = dictionary["next_revision_due"].strftime("%Y-%m-%d %H:%M:%S")
-    check_variable = question_object["next_revision_due"]
-    print(f"The next revision is due on {check_variable}")
-    # calculate_average_shown()
-    # Update question's history stats
-    question_object = system_data.update_question_history(question_object, status)
-    questions_data[id] = question_object
-    user_profile_data["questions"] = questions_data
     
 
 

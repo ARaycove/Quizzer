@@ -100,6 +100,7 @@ import public_functions
 #NOTE questions list gets popped to determine what the current question is
 questions_list = []
 current_question = {}
+current_question_id = ""
 user_profile_data = {}
 question_object_data = system_data.get_question_object_data()
 all_module_data = system_data.get_all_module_data()
@@ -112,7 +113,8 @@ has_seen = False
 menu_active = False
 #NOTE Detect whether or not any users actually exist (For first time users)
 first_time_user = True
-#NOTE
+#NOTE Track whether or not there are any eligible questions remaining or not
+questions_available_to_answer = False
 CURRENT_USER = ""
 CURRENT_UUID = ""
 
@@ -136,7 +138,9 @@ def main(page: ft.Page):
         
     def initialize_program(e: ft.ControlEvent, user_name: str):
         global questions_list
+        global questions_available_to_answer
         global current_question
+        global current_question_id
         global user_profile_data
         global CURRENT_USER
         global CURRENT_UUID
@@ -150,11 +154,22 @@ def main(page: ft.Page):
         user_profile_data["questions"] = system_data.sort_questions(user_profile_data, question_object_data)
          #updating is always a great idea
         # Populate the question list, then assign the current question object to be displayed
-        questions_list = generate_quiz.populate_question_list(user_profile_data)
+        questions_list, user_profile_data = generate_quiz.populate_question_list(user_profile_data, question_object_data)
         system_data.update_user_profile(user_profile_data)
-        current_question = questions_list.pop()
+        # The items in the questions list are references to the actual question objects in question object data
+        # Therefore we can create this hierarchical function
+        # handle no remaining questions to answer condition
+        try:
+            current_question_id = questions_list.pop()
+            current_question = question_object_data[current_question_id]
+            questions_available_to_answer = True
+        except IndexError as e:
+            print(f"    {e}, There are no remaining questions left to answer")
+            # We should display some default information to the question object display to indicate the issue to the user
+            questions_available_to_answer = False
+        print(current_question_id)
+        print(current_question)
         page.clean()
-        # page.bgcolor="black"
         refresh_question_object_display_with_question()
         
     def determine_user_list():
@@ -226,24 +241,59 @@ def main(page: ft.Page):
     ###################################################################################################################################################
     ## For Main Body Application (Question Answer Loop)
     # Function Defines
+    def get_next_question():
+        print(f"def get_next_question()")
+        global questions_available_to_answer
+        global questions_list
+        global user_profile_data
+        global question_object_data
+        global current_question
+        global current_question_id
+        # If the current list is empty then
+        if len(questions_list) <= 0:
+            # Get a new list
+            questions_list, user_profile_data = generate_quiz.populate_question_list(user_profile_data, question_object_data)
+        # List may or may not be empty still
+        if questions_list == []:
+            # If the list is still empty, then we likely have no remaining questions in our is_eligible pile
+            # Check the circulating_not_eligible pile for eligible questions
+            user_profile_data = system_data.update_circulating_non_eligible_questions(user_profile_data, question_object_data)
+            # Try and get another list
+            questions_list, user_profile_data = generate_quiz.populate_question_list(user_profile_data, question_object_data)
+        # This list could be empty if no eligible questions were found, so . . .
+        try:
+            # Attempt to grab a question from the list which may or may not be empty
+            current_question_id = questions_list.pop()
+            current_question = question_object_data[current_question_id]
+            questions_available_to_answer = True
+            # Whenever we get a new_questioin we will need to reset the display with the question, ensure you are calling refresh_display when you get_next_question
+        except IndexError as e:
+            # If there are no remaining question even still, then we should notify the user. Set a boolean value to track this
+            print(f"    {e}, There are no remaining questions left to answer")
+            # We should display some default information to the question object display to indicate the issue to the user
+            questions_available_to_answer = False
     def build_stat_list():
         '''
         Used to define what stats will appear in the header of the program, if any at all.
         These will likely be stats relating to the existing question, how many questions are left, and other immediately relevant information
         '''
+        global questions_available_to_answer
+        global user_profile_data
         global questions_list
         global current_question
-        user_profile_data = helper.get_user_data(CURRENT_USER)
+        global current_question_id
+        stat_list = []
+        if questions_available_to_answer == False:
+            # If there are no questions to answer right now then we have no stats to display, return an empty list
+            return stat_list
         stats_data = user_profile_data["stats"]
         todays_date = str(date.today())
-        stat_list = []
+        
         print("building list of stats to display to the user")
         question_subject = ft.Text(value=f"Subject: {current_question['subject']}")
         questions_in_quiz = ft.Text(value=f"Questions in Current Quiz: {len(questions_list)}")
+        revision_streak = ft.Text(value=f"RS: {user_profile_data['questions']['in_circulation_is_eligible'][current_question_id]['revision_streak']}")
         new_average_daily_questions = ft.Text(value=f"AVG New Daily Questions: {stats_data['average_num_questions_entering_circulation_daily']:.2f}")
-        revision_streak = ft.Text(value=f"Rev. Streak: {current_question['revision_streak']}")
-        last_revised = ft.Text(value=f"Last Revised: {current_question['last_revised']}")
-        due_date = ft.Text(value=f"Due Date: {current_question['next_revision_due']}")
         current_eligible_questions = ft.Text(value=f"Qa's today: {stats_data['current_eligible_questions']}")
         total_questions_answered = ft.Text(value=f"Total Answered: {stats_data['total_questions_answered']}")
         try:
@@ -253,11 +303,10 @@ def main(page: ft.Page):
         
         stat_list.append(questions_in_quiz)
         stat_list.append(new_average_daily_questions)
-        stat_list.append(due_date)
+        stat_list.append(revision_streak)
         stat_list.append(current_eligible_questions)
         stat_list.append(total_questions_answered)
         stat_list.append(answered_today)
-        stat_list.append(revision_streak)
         stat_list.append(question_subject)    
         return stat_list
     
@@ -283,83 +332,60 @@ def main(page: ft.Page):
 
         else:
             print("Something unexpected?")
-    
-    def update_answer_correct(e: ft.ControlEvent):
+    def question_answered(e: ft.ControlEvent, status: int) -> None:
         '''
         Calls backend update_score function with status of correct
         '''
-        global current_question
-        global questions_list
-        global currently_displayed
-        global has_seen
-        # Disable answer buttons
-        yes_button.disabled=True
-        no_button.disabled=True
-        page.update()
-        # reset variables
-        has_seen = False
-        currently_displayed = "question"
-        # Update score and data with correct attempt
-        user_profile_data = helper.get_user_data(CURRENT_USER)
-        public_functions.update_score("correct", current_question["id"], user_profile_data)
-        # Ensure question_list has questions:
-        if len(questions_list) <= 0:
-            questions_list = public_functions.populate_question_list(user_profile_data)
-        # Present next question (update variable then refresh the main interface)
-        current_question = questions_list.pop()
-        refresh_question_object_display_with_question()
-        if len(questions_list) <= 0: # No this is not redundant. The counter will hit zero right after displaying to the user, so we can pop the question list now eliminating user perceived lag
-            questions_list = public_functions.populate_question_list(user_profile_data)
+        print(f"def question_answered(e: ft.ControlEvent, status: int) -> None")
+        
+        global questions_available_to_answer
+        # If the case is that there are no questions able to answered then we simply disable the function, when button is pressed, go ahead and attempt to get_next_question
+        if questions_available_to_answer == False:
+            get_next_question()
+            return None
 
-    def update_answer_incorrect(e: ft.ControlEvent):
-        '''
-        Calls backend update_score function with status of incorrect
-        '''
+        global user_profile_data
         global current_question
         global questions_list
+        global current_question_id
         global currently_displayed
         global has_seen
-        # Disable answer buttons
         yes_button.disabled=True
         no_button.disabled=True
         page.update()
-        # reset variables
         has_seen = False
         currently_displayed = "question"
-        # Update score and data with correct attempt
-        user_profile_data = helper.get_user_data(CURRENT_USER)
-        public_functions.update_score("incorrect", current_question["id"], user_profile_data)
-        # Ensure question_list has questions:
-        if len(questions_list) <= 0:
-            questions_list = public_functions.populate_question_list(user_profile_data)
-        # Present next question (update variable then refresh the main interface)
-        current_question = questions_list.pop()
-        refresh_question_object_display_with_question()     
-        if len(questions_list) <= 0: # No this is not redundant. The counter will hit zero right after displaying to the user, so we can pop the question list now eliminating user perceived lag
-            questions_list = public_functions.populate_question_list(user_profile_data)
+        print(f"    Updating question <{current_question_id}> with status of <{status}>")
+        user_profile_data = system_data.update_score(status, current_question_id, user_profile_data, question_object_data)
+        system_data.update_user_profile(user_profile_data) # Save information every time a question is answered
+        get_next_question()
+        refresh_question_object_display_with_question()
 
     def skip_to_next_question(e: ft.ControlEvent):
         '''
         Skips to next question, does not update any statistics on the backend
         '''
-        print("Skipping question")
+        print(f"def skip_to_next_question(e: ft.ControlEvent)")
+        print("    Skipping question")
+        # Disable skip button when it's pressed
+        skip_button.disabled=True
+        global user_profile_data
+        global questions_available_to_answer
+        # Attempt to get next_question if we have none available
+        if questions_available_to_answer == False:
+            get_next_question()
+            return None
         global current_question
         global questions_list
         global currently_displayed
         global has_seen
-        if len(questions_list) <= 0:
-            questions_data = helper.get_question_data()
-            stats_data = helper.get_stats_data()
-            settings_data = helper.get_settings_data()
-            print("Fetching new set of questions, Please Wait. . .")
-            skip_button.disabled=True
-            page.update()
-            questions_list = public_functions.populate_question_list(questions_data, stats_data, settings_data)
-            skip_button.disabled=False
-            
-        current_question = questions_list.pop()
+        
+        page.update()
+        get_next_question()
         currently_displayed = "question"
         has_seen = False
+        # Reenable skip button once all functions are done processing -> this prevents erros caused by running this function before the last iteration is complete
+        skip_button.disabled=False
         refresh_question_object_display_with_question()
         
         
@@ -367,8 +393,14 @@ def main(page: ft.Page):
         '''
         Changes the display to show the question objects question or answer, whichever is not currently displayed
         '''
+        global questions_available_to_answer
+        global current_question
+        global current_question_id
         global currently_displayed
         global has_seen
+        # If we end up in a situation where there are no questions to answer, we will check if there are questions everytime we flip the card
+        if questions_available_to_answer == False:
+            get_next_question()
         # Determine whether we should change the display to the answer or question fields
         if currently_displayed == "question":
             refresh_question_object_display_with_answer()
@@ -380,7 +412,7 @@ def main(page: ft.Page):
             print("hardcoded variable has different value than expected?")
             raise ValueError
         
-        # enable yes, no and skip buttons 
+        # enable yes and no buttons once the user sees the answer -> You can't decide on whether you got it right or not before you've seen the answer (no matter how confident you might be)
         if has_seen == False:
             yes_button.disabled = False
             no_button.disabled = False
@@ -414,8 +446,8 @@ def main(page: ft.Page):
     main_page_question_object_display = ft.Container(expand=True,padding=20,ink=True,ink_color=ft.colors.GREY_500,content=main_page_question_object_data,on_click=flip_question_answer)
     
     # Main Interface (User Scoring Mechanism), will not need refreshed, contains buttons to skip the current question, answer is correct or incorrect defined by a green or red buttons.
-    yes_button = ft.ElevatedButton(content=yes_icon, bgcolor="green", on_click=update_answer_correct, disabled=True)
-    no_button = ft.ElevatedButton(content=no_icon, bgcolor="red", on_click=update_answer_incorrect, disabled=True)
+    yes_button = ft.ElevatedButton(content=yes_icon, bgcolor="green", on_click=lambda e: question_answered(e , status="correct"), disabled=True)
+    no_button = ft.ElevatedButton(content=no_icon, bgcolor="red", on_click=lambda e: question_answered(e , status="incorrect"), disabled=True)
     skip_button = ft.ElevatedButton(content=skip_icon, bgcolor="white", on_click=skip_to_next_question, disabled=False) #Always allow skip function
     main_page_answer_bar = ft.Row(alignment=ft.MainAxisAlignment.SPACE_AROUND,spacing=25,controls=[yes_button,skip_button,no_button])
     
@@ -427,7 +459,14 @@ def main(page: ft.Page):
         '''
         #NOTE, tried to break this up into functions, but that didn't work for some reason, I'm assuming it has to do with scope, but I haven't quite learned how to properly manipulate scope just yet.
         # Refresh stats header
+        global questions_available_to_answer
         global current_question
+        # Boolean was set by functions called by the buttons
+        if questions_available_to_answer == False:
+            current_question = {}
+            current_question["question_text"] = "There are no questions available to answer, consider adding more, or take a break for the day"
+            current_question["answer_text"] = "You can flip this all day long, but there are no questions available to show right now"
+        
         stat_list = build_stat_list()
         main_page_header_stat_display = ft.Column(expand=True,height=80,controls=stat_list,wrap=True)#FIXME
         main_page_header = ft.Row(expand=False,alignment=ft.MainAxisAlignment.START,controls= [menu_button,main_page_header_stat_display])
@@ -555,6 +594,68 @@ def main(page: ft.Page):
         main_page = ft.Column(expand=True,controls=[main_page_header,main_page_question_object_display,main_page_answer_bar])
         page.clean()
         page.add(main_page)
+    ###################################################################################################################################################
+    ###################################################################################################################################################
+    ###################################################################################################################################################
+    ###################################################################################################################################################
+    ###################################################################################################################################################
+    ###################################################################################################################################################
+    # Add and Edit Question pages
+    def display_add_question_interface(e: ft.ControlEvent):
+        global currently_displayed
+        global user_profile_data
+        global question_object_data
+        global all_module_data
+
+        # Define the controls
+        ############################
+        # No option will be provided to enter own unique id
+        add_question_main_header = ft.Text(value="General Information")
+        primary_subject = ft.TextField(label="Primary Subject")
+        subject = ft.TextField(label="Related Subjects")
+        related = ft.TextField(label="Related Concepts and Terms")
+        
+        
+        ############################
+        add_question_sub_header_module = ft.Text(value="What module does the question belong to?")
+        module_name = ft.Dropdown(label="Define the Module") #FIXME
+        #   drop down list is user_profile_data["settings"]["module_settings"]["module_status"]
+        new_module_edit_button = ft.IconButton(icon=ft.icons.EDIT) 
+        #   When pressed brings up a textfield to enter a new module name
+        new_module_text_field = ft.TextField(label="Enter New Module Name")
+        #   Text determines new module_name to add into user's module_status list
+        new_module_submit_button = ft.IconButton(icon=ft.icons.UPLOAD)
+
+
+        ############################
+        add_question_main_header_question = ft.Text(value="What's the Question?")
+        question_text = ft.TextField(label="Question Text")
+        question_image = ft.TextField(label="Question Image")
+        question_audio = ft.TextField(label="Question Audio")
+        question_video = ft.TextField(label="Question Video")
+
+
+        ############################
+        add_question_main_header_answer = ft.Text(value="What's the Answer?")
+        answer_text = ft.TextField(label="Answer Text")
+        answer_image = ft.TextField(label="Answer Image")
+        answer_audio = ft.TextField(label="Answer Audio")
+        answer_video = ft.TextField(label="Answer Video")
+
+
+        submit_button = ft.IconButton(icon=ft.Icon(name=ft.icons.PLUS_ONE, color=ft.colors.BLACK))
+
+
+        header = ft.Row(expand=False,alignment=ft.MainAxisAlignment.START,controls=[menu_button])
+        row_one = ft.Row(expand=False,alignment=ft.MainAxisAlignment.START,)
+
+
+
+
+
+
+
+
 
     ###################################################################################################################################################
     ###################################################################################################################################################
@@ -584,21 +685,21 @@ def main(page: ft.Page):
     settings_page = ft.Container(content=settings_column)
 
     def update_user_settings(e: ft.ControlEvent):
+        global user_profile_data
         key = e.control.label
         field_value = e.control.value
         data = e.control.data
         # print(e.control)
         # print(e.control.data)
-        user_profile_data = helper.get_user_data(CURRENT_USER)
         public_functions.update_setting(key, field_value, data, user_profile_data)
 
     def display_settings_page(e: ft.ControlEvent) -> None:
         #FIXME scrolling clock display for due_date_sensitivity
         # Dynamically generated page based on the users settings.json
+        global user_profile_data
         page.clean()
-        user_profile_data = helper.get_user_data(CURRENT_USER)
         settings_data = user_profile_data["settings"]
-        settings_data["is_module_activated"] = helper.sort_dictionary_keys(settings_data["is_module_activated"])
+        settings_data["module_settings"]["module_status"] = helper.sort_dictionary_keys(settings_data["module_settings"]["module_status"])
         # Load in menu button at top
         settings_page_header = ft.Row(controls=[menu_button], alignment=ft.MainAxisAlignment.START)
         settings_column = ft.Column(expand=True, controls=[settings_page_header],scroll=ft.ScrollMode.ALWAYS)

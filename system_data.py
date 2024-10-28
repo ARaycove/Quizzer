@@ -2,6 +2,7 @@
 # Dev Modules
 from lib import helper
 import system_data_user_stats
+import system_data_question_stats # Any function that works directly with the user question stats, scoring metrics related to the question object
 # External Libs
 import json
 import os
@@ -89,41 +90,6 @@ def calculate_question_id(question_object: dict, user_profile_data: dict) -> dic
 # Functions relating to question objects
 ############################################################################
 # Individual property Updates
-def calculate_next_revision_date(status, dictionary): #Private Function
-    '''
-    The core of Quizzer, predicated when the user will forget the information contained in the questions helps us accelerate learning to the max extent possible
-    Runs the algorithm necessary for predicting when the User will forget the information and projects a date on which the user should revise next.
-    '''
-    # Function is isolated because algorithm for determining the next due date
-    # is very much in need of an update to a more advanced determination system.
-    # Needs to consider factors like what other questions and concepts the user knows and are related to question at hand
-    
-    ################################################################################################################3
-    # I noticed that the same questions would always appear next to each other:
-    # To offset this we will add a random amount of hours to the next_revision_due
-    # Based on the current revision_streak we will select a range:
-    if dictionary["revision_streak"] == 1:
-        random_variation = random.randint(1,4)
-    elif dictionary["revision_streak"] <= 3:
-        random_variation = random.randint(1,6)
-    elif dictionary["revision_streak"] <= 6:
-        random_variation = random.randint(1,8)
-    elif dictionary["revision_streak"] <= 10:
-        random_variation = random.randint(1,12)
-    elif dictionary["revision_streak"] <= 15:
-        random_variation = random.randint(1,14)
-    else:
-        random_variation = random.randint(6, 24)
-    if status == "correct":
-        # Forgetting Curve study formula
-        dictionary["next_revision_due"] = datetime.now() + timedelta(hours=(24 * math.pow(dictionary["time_between_revisions"],dictionary["revision_streak"]))) + timedelta(hours=random_variation) #principle * (1.nn)^x
-        # print(f"adding {random_variation} hours to next_revision_due")
-        # print(f"{timedelta(hours=random_variation)}")
-    else: # if not correct then incorrect, function should error out if status is not fed into properly:
-        # Intent is to make an incorrect question due immediately and of top priority
-        dictionary["next_revision_due"] = datetime.now()
-    return dictionary["next_revision_due"]
-
 def determine_related_concepts_for_question(question_object=dict) -> list:
     '''
     Use AI to determine what concepts are referred to in the question
@@ -155,169 +121,7 @@ def determine_related_concepts(question_object: dict) -> dict:
         return question_object
     else:
         return question_object
-    
-def initialize_revision_streak_property(question_object: dict) -> dict:
-    print("def initialize_revision_streak_property(question_object: dict) -> dict")
-    '''
-    If the question is new, initializes the streak to 1
-    '''
-    if question_object.get("revision_streak") == None:
-        print("    Question object did not have revision streak property")
-        question_object["revision_streak"] = 1
-        print("    Initializing revision_streak to 1")
-    return question_object
 
-def initialize_last_revised_property(question_object: dict) -> dict:
-    '''
-    If the question is new, initializes the last_revised to right now
-    '''
-    print("def initialize_last_revised_property(question_object: dict) -> dict")
-    if question_object.get("last_revised") == None:
-        question_object["last_revised"] = helper.stringify_date(datetime.now())
-    return question_object
-
-def initialize_next_revision_due_property(question_object: dict) -> dict:
-    '''
-    if the question is new, initializes the next_revision_due to right now
-    '''
-    print("def initialize_next_revision_due_property(question_object: dict) -> dict")
-    if question_object.get("next_revision_due") == None:
-        question_object["next_revision_due"] = helper.stringify_date(datetime.now() - timedelta(hours=8760)) # This is due immediately and of the highest priority
-    return question_object
-
-def initialize_in_circulation_property(question_object: dict, settings_data: dict) -> dict:
-    '''
-    If the question is new: sets the in_circulation property to False
-    New question objects are never in in_circulation until determined to be so
-    '''
-    print("def initialize_in_circulation_property(question_object: dict, settings_data: dict) -> dict")
-    if question_object.get("in_circulation") == None:
-        question_object["in_circulation"] = False
-    # If a question_object references a module that does not exist, such as the Quizzer Tutorial module, then it will throw a key Error
-    # In such cases we should catch the error and set the question to not in circulation
-    if question_object.get("is_module_active") == False:
-        question_object["in_circulation"] = False
-    # If for whatever reason question_object still does not have the property, this print statement will throw an error
-    print(f"    Return object has in_circulation property of {question_object['in_circulation']}")
-    return question_object
-
-def initialize_time_between_revisions_property(question_object: dict, settings_data: dict) -> dict:
-    '''
-    If the question is New: Initializes the default time_between_revisions to what is determined in the settings
-    '''
-    print("def initialize_time_between_revisions_property(question_object: dict, settings_data: dict) -> dict")
-    if question_object.get("time_between_revisions") == None:
-        question_object["time_between_revisions"] = settings_data["time_between_revisions"]
-    print(f"    Return object has value of {question_object['time_between_revisions']}")
-    return question_object
-
-def update_question_history(question_object:dict, status:str) -> dict:
-    '''
-    Creates a history of when a question was answered correctly
-    Used in conjunction with in_correct attempt and revision streak value history
-    '''
-    todays_date = str(date.today())
-    # Initialize property if properties don't exists:
-    # date is keys, value is number of attempts that day
-    if question_object.get("correct_attempt_history") == None:
-        question_object["correct_attempt_history"] = {}
-    if question_object["correct_attempt_history"].get(todays_date) == None:
-        question_object["correct_attempt_history"][todays_date] = 0
-
-
-
-    if question_object.get("incorrect_attempt_history") == None:
-        question_object["incorrect_attempt_history"] = {}
-    if question_object["incorrect_attempt_history"].get(todays_date) == None:
-        question_object["incorrect_attempt_history"][todays_date] = 0
-
-
-
-    # This is a record of what the revision streak was on that day, but only the final value
-    if question_object.get("revision_streak_history") == None:
-        question_object["revision_streak_history"] = {}
-    question_object["revision_streak_history"][todays_date] = question_object["revision_streak"]
-
-
-    # Conditional based on status provided
-    if status == "correct":
-        question_object["correct_attempt_history"][todays_date] += 1
-    elif status == "incorrect":
-        question_object["incorrect_attempt_history"][todays_date] += 1
-    else:
-        print("invalid status provided")
-    return question_object
-
-def calculate_average_shown(question_object: dict) -> dict: #Private Function
-    print(f"calculate_average_shown(question_object: dict) -> dict")
-    if question_object["revision_streak"] == 1:
-        additional_time = (sum([i for i in range(1, 5)])/4)/24 #hours divided by 24 to get days
-        
-    elif question_object["revision_streak"] <= 3:
-        additional_time = (sum([i for i in range(1, 7)])/6)/24
-        
-    elif question_object["revision_streak"] <= 6:
-        additional_time = (sum([i for i in range(1, 9)])/8)/24
-        
-    elif question_object["revision_streak"] <= 10:
-        additional_time = (sum([i for i in range(1, 13)])/12)/24
-    
-    elif question_object["revision_streak"] <= 15:
-        additional_time = (sum([i for i in range(1, 15)])/14)/24
-        
-    else:
-        additional_time = (sum([i for i in range(1, 25)])/24)/24
-    # calculation is in days
-    average = 1 / (math.pow(question_object["time_between_revisions"], question_object["revision_streak"]) + additional_time)
-    question_object["average_times_shown_per_day"] = average
-    print(f"    Return object has value of {question_object['average_times_shown_per_day']}")
-    return question_object
-
-def determine_eligibility_of_question_object(question_object: dict, settings_data: dict) -> dict:
-    '''
-    Determines whether or not questions are eligible to be put into 
-    circulation and shown to the user
-    '''
-    print(f"def determine_eligibility_of_question_object(question_object: dict, settings_data: dict) -> dict")
-    # Eligibility
-    # - The due date is within x amount of hours of the current time
-    # - The question has been placed into circulation to be answered
-    count = 0
-    due_date_sensitivity = settings_data["due_date_sensitivity"]
-    next_revision_due_date = question_object["next_revision_due"]
-    next_revision_due_date = helper.convert_to_datetime_object(next_revision_due_date)
-    
-    #First we set the question as ineligible status by default:
-    question_object["is_eligible"] = False
-    # Decide on factors that Qualify the question in a nested if statement block, Astrociously ugly I know
-    # Check the due date, does it fall within the allotted time?
-    if next_revision_due_date >= (datetime.now() + timedelta(hours=due_date_sensitivity)):
-        pass # The question's due date is in the future and does not fall within the allotted timeframe, therefore the question is not eligible, hit the pass statement then return the object
-        print(f"    Due Date does not fall within allotted timeframe, not eligible")
-        print(f"    Return object has value of {question_object['is_eligible']}")
-    elif question_object["in_circulation"] == False:
-        pass # question has not been placed into circulation therefore the question is not eligible, hit the pass statement then return the object
-        print(f"    Question is not in circulation, not eligible")
-        print(f"    Return object has value of {question_object['is_eligible']}")
-    elif question_object["is_module_active"] == False:
-        pass # question's module is not active therefore the question is not eligible, hit the pass statement then return the object
-        print(f"    Module is not active, not eligible")
-        print(f"    Return object has value of {question_object['is_eligible']}")
-    else:
-        # All conditions met, question is eligible to be shown
-        question_object["is_eligible"] = True
-        print(f"    All conditions met, question is eligible to be shown")
-        print(f"    Return object has value of {question_object['is_eligible']}")
-    return question_object
-
-def update_is_module_active_property(question_object: dict, unique_id: str, user_profile_data: dict, question_object_data: dict) -> dict:
-    module_name = question_object_data[unique_id]["module_name"]
-    activated = user_profile_data["settings"]["module_settings"]["module_status"][module_name]
-    question_object["is_module_active"] = activated
-    # Unit Test Print Statement
-    print(f"def update_questions.update_is_module_active_property:")
-    print(f"    Processed: <{module_name}>'s QO: \n    <{unique_id}> \n    with status of <{activated}>")
-    return question_object
 ############################################################################
 def verify_question_object(question_object: dict) -> bool:
     '''
@@ -367,7 +171,7 @@ def verify_question_object(question_object: dict) -> bool:
         return is_valid
     
 def verify_new_question(
-        user_profile_data: dict = None, #Not required, but does pass through for some functions, more efficient
+        user_profile_data: dict, # We need the uuid to mark the author of the question object, prevent users from modifying other people's questions
         id: str = None,
         primary_subject: str = "miscellaneous",
         subject: list = ["miscellaneous"],
@@ -377,14 +181,14 @@ def verify_new_question(
         module_name: str = None) -> dict:
     '''
     receives data as input and outputs a question object with all fields not defined set to None
-    Used in conjunction with the helper.add_question_object(question_object) function
+    Used in conjunction with the add_new_question_object function
     Returns a question_object if it's valid
     Returns None if the question_object is not valid
     '''
     question_object = {}
     # Make exception for "Quizzer Tutorial Module", all other questions running through this function will get assigned a question_id proper
     if module_name != "Quizzer Tutorial":
-        user_uuid = helper.get_user_uuid()
+        user_uuid = user_profile_data["uuid"]
         question_object["id"] = calculate_question_id(user_uuid)
     else:
         question_object["id"] = id
@@ -476,22 +280,9 @@ def update_question_object_data(question_object_data: dict) -> None:
         # We fail to open, which means the question_object_data does not exist
         # Create the question_object_data.json
         print("Question Object Data does not exist, initializing question_object_data.json")
-        initialize.initialize_question_object_data_json()
+        initialize_question_object_data_json()
         with open("system_data/question_object_data.json", "w+") as f:
             json.dump(question_object_data, f, indent=4)
-
-def add_question_object(question_object: dict) -> None:
-    '''
-    Gets the question_object_data.json file
-    adds the provided question_object to question_object_data
-    Updates the question_object_data.json file
-    '''
-    print("Oh Yeah")
-    question_object_data = get_question_object_data()
-    unique_id = question_object["id"]
-    write_data = {unique_id: question_object}
-    question_object_data.update(write_data)
-    update_question_object_data(question_object_data)
 
 ############################################################################
 ############################################################################
@@ -574,7 +365,7 @@ def build_module_data() -> dict:
         # Each key is the module_name, followed by a dictionary containing all the data of that module
         if verify_question_object(question_object) == False:
             continue #handle exception where question_object does not have a module_name
-        module_name = question_object["module_name"]
+        module_name = question_object["module_name"].lower()
         # Check if we've already added that module name to all_module_data:
         if module_name not in all_module_data: 
             module_name_data = defines_initial_module_data(module_name)
@@ -706,48 +497,7 @@ def get_all_user_data():
         user_profile_data = get_user_data(user)
         user_uuid = user["uuid"]
 
-def increment_questions_answered(user_profile_data: dict) -> dict:#Private Function
-    '''
-    Embeds inside the update score function, 
-    increments the questions answered stat. 
-    Questions answered is stored by date, so the user can see a record of usage over time.
-    '''
-    stats_data = user_profile_data["stats"]
-    # Do not call this within the update_stats function, is only designed to be called while updating the score for a question
-    todays_date = str(date.today())
-    if stats_data.get("questions_answered_by_date") == None: # First check, if the variable isn't there at all create the questioned answer dict stat
-        print("questions_answered object does not exist, creating entry")
-        stats_data["questions_answered_by_date"] = {todays_date: 1}
-    elif todays_date not in stats_data["questions_answered_by_date"]: # Second check, if the user hasn't answered a questioned today then todays date will not be in the dictionary
-        print("first question of the day, initializing new key: value for today's date")
-        stats_data["questions_answered_by_date"][todays_date] = 1
-    else: # No check needed here, if the variable exists and the todays date exists as key we can safely access the key
-        print("incrementing score for today")
-        stats_data["questions_answered_by_date"][todays_date] += 1
-    stats_data["total_questions_answered"] = sum(stats_data["questions_answered_by_date"].values())
 
-    user_profile_data["stats"] = stats_data
-    return user_profile_data
-
-
-
-
-
-def update_user_question_stats(question_object: dict, unique_id, user_profile_data: dict, question_object_data: dict) -> dict:
-    print("def update_user_question_stats(question_object: dict, unique_id, user_profile_data: dict, question_object_data: dict) -> dict")
-    settings_data = user_profile_data["settings"]
-    question_object = initialize_revision_streak_property(question_object)
-    question_object = initialize_last_revised_property(question_object)
-    question_object = initialize_next_revision_due_property(question_object)
-    question_object = initialize_in_circulation_property(question_object, settings_data)
-    question_object = initialize_time_between_revisions_property(question_object, settings_data)
-    question_object = calculate_average_shown(question_object)
-    question_object = determine_eligibility_of_question_object(question_object, settings_data)
-    question_object = update_is_module_active_property(question_object, unique_id, user_profile_data, question_object_data)
-    if type(question_object) != type({}):
-        print(f"Question Object has type {type(question_object)}")
-        raise Exception("Question Object is not a dictionary, one of the properties is returning the wrong object")
-    return question_object
 
 def generate_first_time_questions_dictionary() -> dict:
     '''
@@ -871,46 +621,6 @@ def generate_first_time_stats_dictionary(user_profile_data:dict) -> dict:
     stats_data = build_first_time_stats_data(user_profile_data)
     return stats_data
 
-def add_new_user(user_name: str, question_object_data) -> dict: #Public Function
-    '''
-    Adds a new user to the local system, returns the default data
-    '''
-    if user_name == "":
-        return None
-    user_name = user_name.lower()
-    # All data for the user is stored in a master dictionary
-    does_exist = verify_user_dir_doesnt_exist(user_name)
-    verify_user_profiles_directory(user_name)
-    user_profile_data = {}
-    if does_exist == False:
-        print(f"Creating user profile with name {user_name}")
-        user_profile_data["uuid"] = str(generate_unique_id_for_user())
-        user_profile_data["user_name"] = user_name
-        # These only need to return a predefined dictionary, so nothing is fed into them
-        user_profile_data["questions"] = generate_first_time_questions_dictionary()
-        user_profile_data["settings"] = generate_first_time_settings_dictionary(user_profile_data, question_object_data)
-        user_profile_data["stats"] = generate_first_time_stats_dictionary(user_profile_data)
-        for pile_name, pile in user_profile_data["questions"].items():
-            for unique_id, question_object in pile.items():
-                question_object = update_user_question_stats(question_object, unique_id, user_profile_data, question_object_data)
-        update_user_profile(user_profile_data)
-    return user_profile_data
-
-def get_user_data(user_profile_name: str) -> dict:
-    # data in the format of user_profile_name_data.json
-    # system_data/user_profiles/karibar/karibar_data.json
-    user_profile_name = user_profile_name.lower()
-    try:
-        with open(f"system_data/user_profiles/{user_profile_name}/{user_profile_name}_data.json", "r") as f:
-            user_profile_data = json.load(f)
-        return user_profile_data
-    except FileNotFoundError as e:
-        print(e, f"Generating user_profile: {user_profile_name}")
-        question_object_data = get_question_object_data()
-        user_profile_data = add_new_user(user_profile_name, question_object_data)
-        return user_profile_data
-    
-
 def sort_questions(user_profile_data: dict, question_object_data: dict):
     '''
     Goes through any questions in the unsorted pile, updates them, then moves them to an appropriate "pile"
@@ -959,13 +669,68 @@ def sort_questions(user_profile_data: dict, question_object_data: dict):
         del questions_data["unsorted"][unique_id]
     return questions_data
 
-
-
-
-
-###################################
+############################################################################################################################################
+############################################################################################################################################
+############################################################################################################################################
+############################################################################################################################################
+############################################################################################################################################
 # Slowly going to sort this file out so that only functions directly used by the main program will be in system_data.py
+# This also includes function modules directly used by the main program such as generate_quiz.py
 # All other functions will be split out into highly specific modules (All the functions required by the "master" functions)
+def update_user_question_stats(question_object: dict, unique_id, user_profile_data: dict, question_object_data: dict) -> dict:
+    print("def update_user_question_stats(question_object: dict, unique_id, user_profile_data: dict, question_object_data: dict) -> dict")
+    settings_data = user_profile_data["settings"]
+    question_object = system_data_question_stats.initialize_revision_streak_property(question_object)
+    question_object = system_data_question_stats.initialize_last_revised_property(question_object)
+    question_object = system_data_question_stats.initialize_next_revision_due_property(question_object)
+    question_object = system_data_question_stats.initialize_in_circulation_property(question_object, settings_data)
+    question_object = system_data_question_stats.initialize_time_between_revisions_property(question_object, settings_data)
+    question_object = system_data_question_stats.calculate_average_shown(question_object)
+    question_object = system_data_question_stats.determine_eligibility_of_question_object(question_object, settings_data)
+    question_object = system_data_question_stats.update_is_module_active_property(question_object, unique_id, user_profile_data, question_object_data)
+    if type(question_object) != type({}):
+        print(f"Question Object has type {type(question_object)}")
+        raise Exception("Question Object is not a dictionary, one of the properties is returning the wrong object")
+    return question_object
+
+def add_new_user(user_name: str, question_object_data) -> dict: #Public Function
+    '''
+    Adds a new user to the local system, returns the default data
+    '''
+    if user_name == "":
+        return None
+    user_name = user_name.lower()
+    # All data for the user is stored in a master dictionary
+    does_exist = verify_user_dir_doesnt_exist(user_name)
+    verify_user_profiles_directory(user_name)
+    user_profile_data = {}
+    if does_exist == False:
+        print(f"Creating user profile with name {user_name}")
+        user_profile_data["uuid"] = str(generate_unique_id_for_user())
+        user_profile_data["user_name"] = user_name
+        # These only need to return a predefined dictionary, so nothing is fed into them
+        user_profile_data["questions"] = generate_first_time_questions_dictionary()
+        user_profile_data["settings"] = generate_first_time_settings_dictionary(user_profile_data, question_object_data)
+        user_profile_data["stats"] = generate_first_time_stats_dictionary(user_profile_data)
+        for pile_name, pile in user_profile_data["questions"].items():
+            for unique_id, question_object in pile.items():
+                question_object = update_user_question_stats(question_object, unique_id, user_profile_data, question_object_data)
+        update_user_profile(user_profile_data)
+    return user_profile_data
+
+def get_user_data(user_profile_name: str) -> dict:
+    # data in the format of user_profile_name_data.json
+    # system_data/user_profiles/karibar/karibar_data.json
+    user_profile_name = user_profile_name.lower()
+    try:
+        with open(f"system_data/user_profiles/{user_profile_name}/{user_profile_name}_data.json", "r") as f:
+            user_profile_data = json.load(f)
+        return user_profile_data
+    except FileNotFoundError as e:
+        print(e, f"Generating user_profile: {user_profile_name}")
+        question_object_data = get_question_object_data()
+        user_profile_data = add_new_user(user_profile_name, question_object_data)
+        return user_profile_data
 
 def update_stats(user_profile_data: dict, question_object_data: dict) -> dict:#Private Function
     user_profile_data = system_data_user_stats.update_stat_total_questions_in_database(user_profile_data)
@@ -977,3 +742,168 @@ def update_stats(user_profile_data: dict, question_object_data: dict) -> dict:#P
     user_profile_data = system_data_user_stats.initialize_and_update_questions_exhausted_in_x_days_stat(user_profile_data)
     user_profile_data = system_data_user_stats.determine_total_eligible_questions(user_profile_data)
     return user_profile_data
+
+
+def update_score(status:str, unique_id:str, user_profile_data: dict, question_object_data: dict) -> dict: #Public Function
+    print(f"def update_score(status:str, id:str, user_profile_data: dict) -> dict")
+    print(f"    Updating < {unique_id} > with status of < {status} >")
+    # The question just answered will be sitting in the "in_circulation_is_eligible" pile
+    # We need to update the metrics, then place it in the "in_circulation_not_eligible" pile
+    check_variable = "" # Used to aid in print statements, a temporary place to store values
+    # We will be moving the question anyway so we're going to extract the question object
+    question_object = user_profile_data['questions']["in_circulation_is_eligible"].pop(unique_id) #Removes the question from the in_circulation_is_eligible pile
+    module_name = question_object_data[unique_id]["module_name"]
+    print(f"    Question is from module < {module_name} >")
+    ############# We Have Multiple Values to Update ########################################
+    ###################
+    # Increment Revision Streak by 1 if correct, or decrement by 3 if not correct
+    check_variable = question_object["revision_streak"]
+    if status == "correct":
+        # Sometimes we are able to answer something correctly, even though the projection would say we should have forgotten about it:
+        # In such instances we will increment the time_between_revisions so the questions shows less often
+        if helper.within_twenty_four_hours(helper.convert_to_datetime_object(question_object["next_revision_due"])) == False:
+            print("Task failed successfully: Incrementing time between revisions")
+            question_object["time_between_revisions"] += 0.005 # Increment spacing by .5%
+        question_object["revision_streak"] += 1
+        if module_name == "Quizzer Tutorial":
+            question_object["revision_streak"] = 1000 # Never show this again
+    elif status == "incorrect":
+        # The projection was set, but the user answers it incorrectly despite the fact that the algorithm predicted they should still remember it.
+        # In such a case we will decrement the time between revisions so it shows more often
+        if helper.within_twenty_four_hours(helper.convert_to_datetime_object(question_object["next_revision_due"])) == True:
+            question_object["time_between_revisions"] -= 0.005 # Decrement by 0.5%
+        question_object["revision_streak"] -= 3 #Less discouraging then completely resetting the streak, if questions aren't getting completely reset we make room for more knowledge faster
+        # At this point revision streak is no longer representative of a streak of correct replies, but rather a value to help determine spacing
+        if question_object["revision_streak"] < 1:
+            question_object["revision_streak"] = 1
+    print(f"Revision streak was {check_variable}, streak is now {question_object['revision_streak']}")
+
+
+
+    ###################
+    # User stat representing how many questions the user has answered over lifetime
+    user_profile_data = system_data_user_stats.increment_questions_answered(user_profile_data)
+    
+
+    
+    ###################
+    # Change the last_revised property to datetime.now() since we just revised it at time of now
+    check_variable = question_object["last_revised"]
+    print(f"This question was last revised on {check_variable}")
+    question_object["last_revised"] = helper.stringify_date(datetime.now())
+    
+    
+    
+    ###################
+    # Calculate the next time the question will be due for revision
+    # That is, predict when the user will forget the answer to the question and set the due date to right before that point in time
+    question_object["next_revision_due"] = helper.convert_to_datetime_object(question_object["next_revision_due"])
+    question_object = system_data_question_stats.calculate_next_revision_date(status, question_object)
+    question_object["next_revision_due"] = helper.stringify_date(question_object["next_revision_due"])
+    check_variable = question_object["next_revision_due"]
+    print(f"The next revision is due on {check_variable}")
+
+    ###################
+    # Update question's history stats
+    question_object = system_data_question_stats.update_question_history(question_object, status)
+
+    ###################
+    # Update all the other stats
+    # redetermines eligibility, if the question was given a status of incorrect this will show the question as eligible to answer
+    question_object = update_user_question_stats(question_object, unique_id, user_profile_data, question_object_data)
+
+    ###################
+    # Update data structure
+    # We need to move the question we just answered from the "in_circulation_is_eligible" pile to the "in_circulation_not_eligible" pile
+    # We've already removed it from the "in_circulation_is_eligible_pile"
+    write_data = {unique_id: question_object}
+    if question_object["is_eligible"] == False:
+        user_profile_data["questions"]["in_circulation_not_eligible"].update(write_data)
+    else:
+        user_profile_data["questions"]["in_circulation_is_eligible"].update(write_data)
+
+    # We also need to update any stats directly relating whats in the piles
+    # Most of these stats just use O(1) functions
+    user_profile_data = update_stats(user_profile_data, question_object_data)
+    # FIXME potential time sinks
+    # So update stats iterates the entire question list twice
+    # calculation of average_questions_per_day, subtract old value, add new value
+    # print_and_update_revision_streak_stats has for loops
+    return user_profile_data
+
+def update_circulating_non_eligible_questions(user_profile_data, question_object_data):
+    '''
+    Looks over the questions in the "in_circulation_non_eligible" pile, updates them, and if any are eligible moves them to the "in_circulation_is_eligible" pile
+    '''
+    print(f"def update_circulating_non_eligible_questions(user_profile_data, question_object_data)")
+    questions_to_remove_from_not_eligible_pile = []
+    questions_data = user_profile_data["questions"]["in_circulation_not_eligible"].copy()
+    for unique_id, question_object in questions_data.items():
+        question_object = update_user_question_stats(question_object, unique_id, user_profile_data, question_object_data)
+        write_data = {unique_id: question_object}
+        if question_object["is_eligible"] == True:
+            # If the question is now eligible then add it to the is_eligible pile
+            user_profile_data["questions"]["in_circulation_is_eligible"].update(write_data)
+            questions_to_remove_from_not_eligible_pile.append(unique_id)
+
+    print(f"    Moving {len(questions_to_remove_from_not_eligible_pile)} questions from in_circulation_not_eligible pile to in_circulation_is_eligible pile")
+    for unique_id in questions_to_remove_from_not_eligible_pile:
+        # We've already added this pair to the is_eligible pile, therefore we need to delete it from the in_circulation_not_eligible pile
+        del user_profile_data["questions"]["in_circulation_not_eligible"][unique_id]
+
+    return user_profile_data
+
+def add_new_question_object(
+        user_profile_data: dict, #Not required, but does pass through for some functions, more efficient
+        question_object_data: dict, 
+        all_module_data: dict,
+        unique_id: str = None, #For admin only, when entering new questions for the tutorial module
+        primary_subject: str = "miscellaneous",
+        subject: list = ["miscellaneous"],
+        related: list = None,
+        question_text = None, question_image = None, question_audio = None, question_video = None,
+        answer_text = None, answer_image = None, answer_audio = None, answer_video = None,
+        module_name: str = None) -> dict:
+    print(f"def add_new_question_object(<properties>)")
+    # This is the system data version, verify_new_question builds the question object based on the inputs and checks if its valid,
+    # First we need to generate the complete object
+    
+    question_object = verify_new_question(user_profile_data, unique_id, primary_subject, subject, related, question_text, question_image, question_audio, question_video, answer_text, answer_image, answer_audio, answer_video, module_name)
+    if question_object == None:
+        # if verification failed, then the result is a None value, check for this
+        return None
+    # Assign the question_object with an author field which is the user's uuid
+    user_uuid = user_profile_data["uuid"]
+    question_object["author"] = user_uuid # match the question to the user
+
+
+    # Now we have a complete question object
+    # We need to add it to the server question_object_data -> update the server and fetch new data
+    unique_id = question_object["id"]
+    write_data = {unique_id: question_object}
+    question_object_data.update(write_data)
+    update_question_object_data(question_object_data) # Save the new question to the server
+    #FIXME proper server logic to fetch and send data between it
+    # Current functionality allows anyone to add questions to a pre-existing module filtered by name
+    # Check if the module name already exists and the property in the module name matches the user's uuid -> Should be done on the front-end?
+    data = update_user_question_stats({}, unique_id, user_profile_data, question_object_data)
+    user_profile_data["questions"]["unsorted"].update({unique_id: data})
+    user_profile_data = sort_questions(user_profile_data, question_object_data)
+    user_profile_data = update_stats(user_profile_data, question_object_data)
+
+
+
+# Only the original author of a module can modify that module
+# Modules are unique by title
+# When modules are built, they check the author of the question object to determine the author of the module
+# When question objects are added, only modules the user has authored may be selected for entry
+
+# Alternatively each module could adopt the open-source model
+# User's can author a module
+# User's can pull in community modules
+# Either way all user's can add to any module
+# Each question in the module will have the author attached to it -> you would be able to see the major and minor contributors to a module
+
+# Individual questions can be disabled by the user, for that user #FIXME
+# Questions can be rated in the future #FIXME
+# Bad rating mark a question for takedown -> community consensus will determine whether questions stay in the database or not

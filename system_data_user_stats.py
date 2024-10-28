@@ -168,3 +168,25 @@ def update_stat_total_questions_in_database(user_profile_data: dict) -> dict:#Pr
     print(f"    Return object has new value {user_profile_data['stats']['total_questions_in_database']}")
     return user_profile_data
 
+def increment_questions_answered(user_profile_data: dict) -> dict:#Private Function
+    '''
+    Embeds inside the update score function, 
+    increments the questions answered stat. 
+    Questions answered is stored by date, so the user can see a record of usage over time.
+    '''
+    stats_data = user_profile_data["stats"]
+    # Do not call this within the update_stats function, is only designed to be called while updating the score for a question
+    todays_date = str(date.today())
+    if stats_data.get("questions_answered_by_date") == None: # First check, if the variable isn't there at all create the questioned answer dict stat
+        print("questions_answered object does not exist, creating entry")
+        stats_data["questions_answered_by_date"] = {todays_date: 1}
+    elif todays_date not in stats_data["questions_answered_by_date"]: # Second check, if the user hasn't answered a questioned today then todays date will not be in the dictionary
+        print("first question of the day, initializing new key: value for today's date")
+        stats_data["questions_answered_by_date"][todays_date] = 1
+    else: # No check needed here, if the variable exists and the todays date exists as key we can safely access the key
+        print("incrementing score for today")
+        stats_data["questions_answered_by_date"][todays_date] += 1
+    stats_data["total_questions_answered"] = sum(stats_data["questions_answered_by_date"].values())
+
+    user_profile_data["stats"] = stats_data
+    return user_profile_data

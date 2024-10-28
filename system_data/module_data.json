@@ -1,6 +1,6 @@
 {
-    "Quizzer Tutorial": {
-        "module_name": "Quizzer Tutorial",
+    "quizzer tutorial": {
+        "module_name": "quizzer tutorial",
         "description": "No Description Provided",
         "author": "",
         "is_a_quizzer_module": true,
@@ -835,8 +835,8 @@
         ],
         "num_questions": 809
     },
-    "Introductory Computer Science with Python": {
-        "module_name": "Introductory Computer Science with Python",
+    "introductory computer science with python": {
+        "module_name": "introductory computer science with python",
         "description": "No Description Provided",
         "author": "",
         "is_a_quizzer_module": true,
@@ -1128,8 +1128,8 @@
         ],
         "num_questions": 280
     },
-    "Greek Mythology": {
-        "module_name": "Greek Mythology",
+    "greek mythology": {
+        "module_name": "greek mythology",
         "description": "No Description Provided",
         "author": "",
         "is_a_quizzer_module": true,
@@ -1218,8 +1218,8 @@
         ],
         "num_questions": 77
     },
-    "Intro Web Design": {
-        "module_name": "Intro Web Design",
+    "intro web design": {
+        "module_name": "intro web design",
         "description": "No Description Provided",
         "author": "",
         "is_a_quizzer_module": true,
@@ -1381,8 +1381,8 @@
         ],
         "num_questions": 150
     },
-    "Algebra": {
-        "module_name": "Algebra",
+    "algebra": {
+        "module_name": "algebra",
         "description": "No Description Provided",
         "author": "",
         "is_a_quizzer_module": true,
@@ -1400,8 +1400,8 @@
         ],
         "num_questions": 6
     },
-    "Public Speaking": {
-        "module_name": "Public Speaking",
+    "public speaking": {
+        "module_name": "public speaking",
         "description": "No Description Provided",
         "author": "",
         "is_a_quizzer_module": true,
@@ -1414,8 +1414,8 @@
         ],
         "num_questions": 1
     },
-    "Typing Unicode Characters": {
-        "module_name": "Typing Unicode Characters",
+    "typing unicode characters": {
+        "module_name": "typing unicode characters",
         "description": "No Description Provided",
         "author": "",
         "is_a_quizzer_module": true,
@@ -1444,8 +1444,8 @@
         ],
         "num_questions": 17
     },
-    "Linux Command Line": {
-        "module_name": "Linux Command Line",
+    "linux command line": {
+        "module_name": "linux command line",
         "description": "No Description Provided",
         "author": "",
         "is_a_quizzer_module": true,
@@ -1461,8 +1461,8 @@
         ],
         "num_questions": 4
     },
-    "Trigonometry": {
-        "module_name": "Trigonometry",
+    "trigonometry": {
+        "module_name": "trigonometry",
         "description": "No Description Provided",
         "author": "",
         "is_a_quizzer_module": true,
@@ -1480,8 +1480,8 @@
         ],
         "num_questions": 6
     },
-    "Python - Spacy Library": {
-        "module_name": "Python - Spacy Library",
+    "python - spacy library": {
+        "module_name": "python - spacy library",
         "description": "No Description Provided",
         "author": "",
         "is_a_quizzer_module": true,
@@ -1502,8 +1502,8 @@
         ],
         "num_questions": 9
     },
-    "Python - Pillow Library": {
-        "module_name": "Python - Pillow Library",
+    "python - pillow library": {
+        "module_name": "python - pillow library",
         "description": "No Description Provided",
         "author": "",
         "is_a_quizzer_module": true,
@@ -1536,8 +1536,8 @@
         ],
         "num_questions": 21
     },
-    "Identifying Code Errors": {
-        "module_name": "Identifying Code Errors",
+    "identifying code errors": {
+        "module_name": "identifying code errors",
         "description": "No Description Provided",
         "author": "",
         "is_a_quizzer_module": true,
@@ -1550,8 +1550,8 @@
         ],
         "num_questions": 1
     },
-    "Python - Classes": {
-        "module_name": "Python - Classes",
+    "python - classes": {
+        "module_name": "python - classes",
         "description": "No Description Provided",
         "author": "",
         "is_a_quizzer_module": true,
@@ -1581,8 +1581,8 @@
         ],
         "num_questions": 18
     },
-    "Python - CSCI 151": {
-        "module_name": "Python - CSCI 151",
+    "python - csci 151": {
+        "module_name": "python - csci 151",
         "description": "No Description Provided",
         "author": "",
         "is_a_quizzer_module": true,
@@ -1600,8 +1600,8 @@
         ],
         "num_questions": 6
     },
-    "Phonetic Alphabet": {
-        "module_name": "Phonetic Alphabet",
+    "phonetic alphabet": {
+        "module_name": "phonetic alphabet",
         "description": "No Description Provided",
         "author": "",
         "is_a_quizzer_module": true,
@@ -1621,8 +1621,8 @@
         ],
         "num_questions": 8
     },
-    "IT - Protocols": {
-        "module_name": "IT - Protocols",
+    "it - protocols": {
+        "module_name": "it - protocols",
         "description": "No Description Provided",
         "author": "",
         "is_a_quizzer_module": true,
@@ -1635,8 +1635,8 @@
         ],
         "num_questions": 1
     },
-    "Introductory Astronomy": {
-        "module_name": "Introductory Astronomy",
+    "introductory astronomy": {
+        "module_name": "introductory astronomy",
         "description": "No Description Provided",
         "author": "",
         "is_a_quizzer_module": true,
@@ -1653,8 +1653,8 @@
         ],
         "num_questions": 5
     },
-    "Understanding Scale": {
-        "module_name": "Understanding Scale",
+    "understanding scale": {
+        "module_name": "understanding scale",
         "description": "No Description Provided",
         "author": "",
         "is_a_quizzer_module": true,
@@ -1673,8 +1673,8 @@
         ],
         "num_questions": 7
     },
-    "Periodic Table of Elements": {
-        "module_name": "Periodic Table of Elements",
+    "periodic table of elements": {
+        "module_name": "periodic table of elements",
         "description": "No Description Provided",
         "author": "",
         "is_a_quizzer_module": true,
@@ -1687,8 +1687,8 @@
         ],
         "num_questions": 1
     },
-    "Multiplication Table": {
-        "module_name": "Multiplication Table",
+    "multiplication table": {
+        "module_name": "multiplication table",
         "description": "No Description Provided",
         "author": "",
         "is_a_quizzer_module": true,
@@ -1703,8 +1703,8 @@
         ],
         "num_questions": 3
     },
-    "Python - Lists": {
-        "module_name": "Python - Lists",
+    "python - lists": {
+        "module_name": "python - lists",
         "description": "No Description Provided",
         "author": "",
         "is_a_quizzer_module": true,
@@ -1717,8 +1717,8 @@
         ],
         "num_questions": 1
     },
-    "Python - Datetime": {
-        "module_name": "Python - Datetime",
+    "python - datetime": {
+        "module_name": "python - datetime",
         "description": "No Description Provided",
         "author": "",
         "is_a_quizzer_module": true,
@@ -1731,8 +1731,8 @@
         ],
         "num_questions": 1
     },
-    "Intermediate Computer Science with Python": {
-        "module_name": "Intermediate Computer Science with Python",
+    "intermediate computer science with python": {
+        "module_name": "intermediate computer science with python",
         "description": "No Description Provided",
         "author": "",
         "is_a_quizzer_module": true,
@@ -1748,8 +1748,8 @@
         ],
         "num_questions": 4
     },
-    "Arabic Numerals": {
-        "module_name": "Arabic Numerals",
+    "arabic numerals": {
+        "module_name": "arabic numerals",
         "description": "No Description Provided",
         "author": "",
         "is_a_quizzer_module": true,
@@ -1762,8 +1762,8 @@
         ],
         "num_questions": 1
     },
-    "Python - Flutter with Flet": {
-        "module_name": "Python - Flutter with Flet",
+    "python - flutter with flet": {
+        "module_name": "python - flutter with flet",
         "description": "No Description Provided",
         "author": "",
         "is_a_quizzer_module": true,
@@ -1827,8 +1827,8 @@
         ],
         "num_questions": 52
     },
-    "Chemistry 2e CH1": {
-        "module_name": "Chemistry 2e CH1",
+    "chemistry 2e ch1": {
+        "module_name": "chemistry 2e ch1",
         "description": "No Description Provided",
         "author": "",
         "is_a_quizzer_module": true,
@@ -1846,8 +1846,8 @@
         ],
         "num_questions": 6
     },
-    "World Wonders": {
-        "module_name": "World Wonders",
+    "world wonders": {
+        "module_name": "world wonders",
         "description": "No Description Provided",
         "author": "",
         "is_a_quizzer_module": true,
@@ -1862,8 +1862,8 @@
         ],
         "num_questions": 3
     },
-    "Abbreviations": {
-        "module_name": "Abbreviations",
+    "abbreviations": {
+        "module_name": "abbreviations",
         "description": "No Description Provided",
         "author": "",
         "is_a_quizzer_module": true,
