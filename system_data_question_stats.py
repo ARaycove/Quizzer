@@ -76,7 +76,7 @@ def calculate_next_revision_date(status: str, question_object:dict): #Private Fu
     return question_object
 
 def initialize_revision_streak_property(question_object: dict) -> dict:
-    print("def initialize_revision_streak_property(question_object: dict) -> dict")
+    # print("def initialize_revision_streak_property(question_object: dict) -> dict")
     '''
     If the question is new, initializes the streak to 1
     '''
@@ -90,7 +90,7 @@ def initialize_last_revised_property(question_object: dict) -> dict:
     '''
     If the question is new, initializes the last_revised to right now
     '''
-    print("def initialize_last_revised_property(question_object: dict) -> dict")
+    # print("def initialize_last_revised_property(question_object: dict) -> dict")
     if question_object.get("last_revised") == None:
         question_object["last_revised"] = helper.stringify_date(datetime.now())
     return question_object
@@ -99,7 +99,7 @@ def initialize_next_revision_due_property(question_object: dict) -> dict:
     '''
     if the question is new, initializes the next_revision_due to right now
     '''
-    print("def initialize_next_revision_due_property(question_object: dict) -> dict")
+    # print("def initialize_next_revision_due_property(question_object: dict) -> dict")
     if question_object.get("next_revision_due") == None:
         question_object["next_revision_due"] = helper.stringify_date(datetime.now() - timedelta(hours=8760)) # This is due immediately and of the highest priority
     return question_object
@@ -109,7 +109,7 @@ def initialize_in_circulation_property(question_object: dict, settings_data: dic
     If the question is new: sets the in_circulation property to False
     New question objects are never in in_circulation until determined to be so
     '''
-    print("def initialize_in_circulation_property(question_object: dict, settings_data: dict) -> dict")
+    # print("def initialize_in_circulation_property(question_object: dict, settings_data: dict) -> dict")
     if question_object.get("in_circulation") == None:
         question_object["in_circulation"] = False
     # If a question_object references a module that does not exist, such as the Quizzer Tutorial module, then it will throw a key Error
@@ -117,21 +117,21 @@ def initialize_in_circulation_property(question_object: dict, settings_data: dic
     if question_object.get("is_module_active") == False:
         question_object["in_circulation"] = False
     # If for whatever reason question_object still does not have the property, this print statement will throw an error
-    print(f"    Return object has in_circulation property of {question_object['in_circulation']}")
+    # print(f"    Return object has in_circulation property of {question_object['in_circulation']}")
     return question_object
 
 def initialize_time_between_revisions_property(question_object: dict, settings_data: dict) -> dict:
     '''
     If the question is New: Initializes the default time_between_revisions to what is determined in the settings
     '''
-    print("def initialize_time_between_revisions_property(question_object: dict, settings_data: dict) -> dict")
+    # print("def initialize_time_between_revisions_property(question_object: dict, settings_data: dict) -> dict")
     if question_object.get("time_between_revisions") == None:
         question_object["time_between_revisions"] = settings_data["time_between_revisions"]
-    print(f"    Return object has value of {question_object['time_between_revisions']}")
+    # print(f"    Return object has value of {question_object['time_between_revisions']}")
     return question_object
 
 def calculate_average_shown(question_object: dict) -> dict: #Private Function
-    print(f"calculate_average_shown(question_object: dict) -> dict")
+    # print(f"calculate_average_shown(question_object: dict) -> dict")
     if question_object["revision_streak"] == 1:
         additional_time = (sum([i for i in range(1, 5)])/4)/24 #hours divided by 24 to get days
         
@@ -152,7 +152,7 @@ def calculate_average_shown(question_object: dict) -> dict: #Private Function
     # calculation is in days
     average = 1 / (math.pow(question_object["time_between_revisions"], question_object["revision_streak"]) + additional_time)
     question_object["average_times_shown_per_day"] = average
-    print(f"    Return object has value of {question_object['average_times_shown_per_day']}")
+    # print(f"    Return object has value of {question_object['average_times_shown_per_day']}")
     return question_object
 
 def determine_eligibility_of_question_object(question_object: dict, settings_data: dict) -> dict:
@@ -160,7 +160,7 @@ def determine_eligibility_of_question_object(question_object: dict, settings_dat
     Determines whether or not questions are eligible to be put into 
     circulation and shown to the user
     '''
-    print(f"def determine_eligibility_of_question_object(question_object: dict, settings_data: dict) -> dict")
+    # print(f"def determine_eligibility_of_question_object(question_object: dict, settings_data: dict) -> dict:")
     # Eligibility
     # - The due date is within x amount of hours of the current time
     # - The question has been placed into circulation to be answered
@@ -174,22 +174,18 @@ def determine_eligibility_of_question_object(question_object: dict, settings_dat
     # Decide on factors that Qualify the question in a nested if statement block, Astrociously ugly I know
     # Check the due date, does it fall within the allotted time?
     if next_revision_due_date >= (datetime.now() + timedelta(hours=due_date_sensitivity)):
+        # print("    Does not meet time req")
         pass # The question's due date is in the future and does not fall within the allotted timeframe, therefore the question is not eligible, hit the pass statement then return the object
-        print(f"    Due Date does not fall within allotted timeframe, not eligible")
-        print(f"    Return object has value of {question_object['is_eligible']}")
     elif question_object["in_circulation"] == False:
+        # print("    Question not in circulation")
         pass # question has not been placed into circulation therefore the question is not eligible, hit the pass statement then return the object
-        print(f"    Question is not in circulation, not eligible")
-        print(f"    Return object has value of {question_object['is_eligible']}")
     elif question_object["is_module_active"] == False:
+        # print("    Module Inactive?")
         pass # question's module is not active therefore the question is not eligible, hit the pass statement then return the object
-        print(f"    Module is not active, not eligible")
-        print(f"    Return object has value of {question_object['is_eligible']}")
     else:
         # All conditions met, question is eligible to be shown
         question_object["is_eligible"] = True
-        print(f"    All conditions met, question is eligible to be shown")
-        print(f"    Return object has value of {question_object['is_eligible']}")
+        print("Found, an eligible Question", end="")
     return question_object
 
 def update_is_module_active_property(question_object: dict, unique_id: str, user_profile_data: dict, question_object_data: dict) -> dict:
@@ -202,22 +198,4 @@ def update_is_module_active_property(question_object: dict, unique_id: str, user
         activated = True
     question_object["is_module_active"] = activated
     # Unit Test Print Statement
-    print(f"def update_questions.update_is_module_active_property:")
-    print(f"    Processed: <{module_name}>'s QO: \n    <{unique_id}> \n    with status of <{activated}>")
-    return question_object
-
-def update_user_question_stats(question_object: dict, unique_id, user_profile_data: dict, question_object_data: dict) -> dict:
-    print("def update_user_question_stats(question_object: dict, unique_id, user_profile_data: dict, question_object_data: dict) -> dict")
-    settings_data = user_profile_data["settings"]
-    question_object = initialize_revision_streak_property(question_object)
-    question_object = initialize_last_revised_property(question_object)
-    question_object = initialize_next_revision_due_property(question_object)
-    question_object = initialize_in_circulation_property(question_object, settings_data)
-    question_object = initialize_time_between_revisions_property(question_object, settings_data)
-    question_object = calculate_average_shown(question_object)
-    question_object = determine_eligibility_of_question_object(question_object, settings_data)
-    question_object = update_is_module_active_property(question_object, unique_id, user_profile_data, question_object_data)
-    if type(question_object) != type({}):
-        print(f"Question Object has type {type(question_object)}")
-        raise Exception("Question Object is not a dictionary, one of the properties is returning the wrong object")
     return question_object

@@ -278,6 +278,7 @@ class HomePage(ft.View):
                 self.user_profile_data,
                 self.question_object_data
             )
+            system_data.update_user_profile(self.user_profile_data)
         # After these checks we should have new questions available,
         #   If the value is still 0 then we have no new questions to introduce
         current_eligible_questions = len(self.user_profile_data["questions"]["in_circulation_is_eligible"])

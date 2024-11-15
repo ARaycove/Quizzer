@@ -688,7 +688,7 @@ def sort_questions(user_profile_data: dict, question_object_data: dict):
 # This also includes function modules directly used by the main program such as generate_quiz.py
 # All other functions will be split out into highly specific modules (All the functions required by the "master" functions)
 def update_user_question_stats(question_object: dict, unique_id, user_profile_data: dict, question_object_data: dict) -> dict:
-    print("def update_user_question_stats(question_object: dict, unique_id, user_profile_data: dict, question_object_data: dict) -> dict")
+    # print("def update_user_question_stats(question_object: dict, unique_id, user_profile_data: dict, question_object_data: dict) -> dict")
     settings_data = user_profile_data["settings"]
     question_object = system_data_question_stats.initialize_revision_streak_property(question_object)
     question_object = system_data_question_stats.initialize_last_revised_property(question_object)
@@ -849,21 +849,22 @@ def update_circulating_non_eligible_questions(user_profile_data, question_object
     Looks over the questions in the "in_circulation_non_eligible" pile, updates them, and if any are eligible moves them to the "in_circulation_is_eligible" pile
     '''
     print(f"def update_circulating_non_eligible_questions(user_profile_data, question_object_data)")
-    questions_to_remove_from_not_eligible_pile = []
-    questions_data = user_profile_data["questions"]["in_circulation_not_eligible"].copy()
-    for unique_id, question_object in questions_data.items():
-        question_object = update_user_question_stats(question_object, unique_id, user_profile_data, question_object_data)
-        write_data = {unique_id: question_object}
+    # questions_to_remove_from_not_eligible_pile = []
+    eligible_questions_counter = 0
+    user_question_list = user_profile_data["questions"]["in_circulation_not_eligible"].copy()
+    # We are directly going through questions that are in circulation
+    print("   ",len(user_question_list), "Questions in the in_eligible pile")
+    for question_id in user_question_list.keys():
+        question_object = user_profile_data["questions"]["in_circulation_not_eligible"][question_id]
+        question_object["in_circulation"] = True # Error handling, some questions are in here, but marked not in circulation
+        question_object = update_user_question_stats(question_object, question_id, user_profile_data, question_object_data)
         if question_object["is_eligible"] == True:
-            # If the question is now eligible then add it to the is_eligible pile
+            eligible_questions_counter += 1
+            write_data = {question_id: question_object}
             user_profile_data["questions"]["in_circulation_is_eligible"].update(write_data)
-            questions_to_remove_from_not_eligible_pile.append(unique_id)
+            del user_profile_data["questions"]["in_circulation_not_eligible"][question_id]
 
-    print(f"    Moving {len(questions_to_remove_from_not_eligible_pile)} questions from in_circulation_not_eligible pile to in_circulation_is_eligible pile")
-    for unique_id in questions_to_remove_from_not_eligible_pile:
-        # We've already added this pair to the is_eligible pile, therefore we need to delete it from the in_circulation_not_eligible pile
-        del user_profile_data["questions"]["in_circulation_not_eligible"][unique_id]
-
+    print(f"    Moving {eligible_questions_counter} questions from in_circulation_not_eligible pile to in_circulation_is_eligible pile")
     return user_profile_data
 
 def add_new_question_object(

@@ -1,5 +1,8 @@
 import flet as ft
 import system_data
+import os
+from lib import helper
+from datetime import datetime, date, timedelta
 from flet_custom_containers import custom_controls
 
 class EditQuestionPage(ft.View):
@@ -191,5 +194,47 @@ class EditQuestionPage(ft.View):
         print("Answer Image:    ",  self.answer_entry.image_submission)
         self.question_object_data[self.current_question_id]["answer_image"]     = self.answer_entry.image_submission
         system_data.update_question_object_data(self.question_object_data)
+
+
+
+        media_files_input = set([])
+        if self.question_entry.image_submission != None:
+            media_files_input.add(self.question_entry.image_submission)
+        if self.answer_entry.image_submission != None:
+            media_files_input.add(self.answer_entry.image_submission)
+
+        current_media_files = []
+        for filename in os.listdir("system_data/media_files"):
+            current_media_files.append(filename)
+
+        for filename in media_files_input:
+            if filename in current_media_files:
+                index_val = filename.rfind(".")
+                extension = filename[index_val:]
+                file_no_ext = filename[:index_val]
+                current_time = str(datetime.now())
+                file_no_ext = current_time + self.CURRENT_UUID
+                new_file_name = file_no_ext + extension
+                # Change the name of the file in the question object
+                if self.question_entry.image_submission == filename:
+                    self.question_entry.image_submission = new_file_name
+                if self.answer_entry.image_submission == filename:
+                    self.answer_entry.image_submission = new_file_name
+                # Change the name of the file itself               
+                os.rename(f"uploads/{filename}", (f"uploads/{new_file_name}"))
+
+
+        files_to_move = set([])
+        if self.question_entry.image_submission != None:
+            files_to_move.add(self.question_entry.image_submission)
+        if self.answer_entry.image_submission != None:
+            files_to_move.add(self.answer_entry.image_submission)
+        
+        # Move and Clear the uploads folder after submission
+        for filename in os.listdir("uploads"):
+            if filename in files_to_move:
+                helper.copy_file(f"uploads/{filename}", f"system_data/media_files/")
+                os.remove(f"uploads/{filename}")
+        
         self.go_to_home_screen()
         
