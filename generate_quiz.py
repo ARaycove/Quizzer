@@ -35,150 +35,111 @@ def calculate_ratio_for_tier(tier_number: int, sorted_subject_list: list, user_p
         # Result should be the remaining number of questions to add for that subject (Could result in a negative)
         # If the resulting value is negative, we should set the value to zero, so the all_zero function picks it up
         if ratio_for_tier[subject] < 0:
-            ratio_for_tier = 0
+            ratio_for_tier[subject] = 0
     print(f"    Tier number: < {tier_number} > ratios are:")
     for key, value in ratio_for_tier.items():
         print(f"    {key:^25}:{value}")
     return ratio_for_tier
 ###############################################################
-def add_questions_into_circulation(average_daily_questions: float, desired_daily_questions: int, user_profile_data: dict, question_object_data: dict) -> dict: #Private Function
-    print("def add_questions_into_circulation(average_daily_questions: float, desired_daily_questions: int, user_profile_data: dict, question_object_data: dict) -> dict:")
-    # Logic, check for each subject, the total amount of questions existing and the total amount in circulation, if these numbers are equal for every subject then we terminate this function since there is nothing to add
-    settings_data = user_profile_data["settings"]
-    length_to_check = len(settings_data["subject_settings"].keys())
-    for subject in settings_data["subject_settings"]:
-        num_in_circ = settings_data["subject_settings"][subject]["num_questions_in_circulation"]
-        total_activated_qs = settings_data["subject_settings"][subject]["total_activated_questions"]
-        # Tally up how many questions that are currently activated by a module
-        
-        if settings_data["subject_settings"][subject]["has_available_questions"] == False:
-            print(f"    ALERT!!! Subject: {subject} has no remaining questions to add, consider getting more questions related to this subject")
-        else:
-            print(f"    Subject <{subject:^25}> has < {total_activated_qs-num_in_circ} > remaining questions in reserve")    
-    
-    ##########################################################################################
-    print("    Adding questions into circulation")
-    stats_data = user_profile_data["stats"]
-    questions_data = user_profile_data["questions"]
-    # First we need to get a list of all subject matters sorted by priority
-    print("    Subject List:")
-    subject_list = [i for i in settings_data["subject_settings"].keys()]
-    original_list = sorted(subject_list, key=lambda x: settings_data['subject_settings'][x]['priority'])
-    sorted_subject_list = original_list # Create a copy and an original
-    for sub in sorted_subject_list:
-        print(f"        {sub}")
-    # Second we need to determine the target number of questions to enter, this target is modified by a float value representing the average times per day a question is shown. 
-    # Each question has a value less than 1
-    # So essentially a target of 10 does not mean we add in only ten questions, but however many we need to get the average figure to the desired figure
-    target = desired_daily_questions - average_daily_questions # so if desired is 100, and average is 90, target is 10. We subtract from the target until we reach 0
-    tier_number = 1
-    target_met = False
-    
-    # "us_military": {"interest_level": 100, "priority": 1, "total_questions": 66, "num_questions_in_circulation": 66}
-    timer = 2 #NOTE Purpose of timer is a bit redundant now, loop has safeguards to prevent infinite loops, but for now we'll keep the timer until such time where it's safe to remove this failsafe, or this message can be removed if we decide that the failsafe is better left in. (I'm leaning towards this conclusion)
-    time_start = datetime.now()
-    subjects_to_skip = []
-    questions_to_remove_from_reserve_bank = []
-
-    print("    Entering addition loop")
-    # After this point we should only deal in user_profile_data object so we can update it directly
+def configure_initial_tier_value(actual_composition, master_ratio, questions_remaining_by_subject):
+    tier_value = 1
+    for sub in questions_remaining_by_subject:
+        if questions_remaining_by_subject[sub] <= 0:
+            print(f"Subject: {sub} has no remaining questions")
+            actual_composition[sub] = 9999999
     while True:
-        total_questions_in_reserve_bank = len(user_profile_data["questions"]["reserve_bank"])
-        print(f"    There are {total_questions_in_reserve_bank} total questions in the reserve_bank pile")
-        ratio_for_tier = calculate_ratio_for_tier(tier_number, sorted_subject_list, user_profile_data)
-         # will be False
-        # Determine what subjects should be skipped for this iteration
-        subjects_to_skip = determine_questions_to_skip(tier_number, ratio_for_tier, user_profile_data)
-        # Now Mutate the ratio_for_tier variable so each key value pair reads {subject: num_questions_to_add}
-        # 1st set any subjects we are skipping to a goal of 0
-        for subject in subjects_to_skip:
-            ratio_for_tier[subject] = 0
-        # determine if all subjects are 0
-        all_zero = helper.all_zero(ratio_for_tier)
-        # 2nd subtract the current circulating questions from the value of each subject
-        for subject, value in ratio_for_tier.items():
-            num_in_circ = user_profile_data["settings"]["subject_settings"][subject]["num_questions_in_circulation"]
-            value -= num_in_circ # if the target for the tier is 10 and the number in circulation is 8 then the new value becomes 2, representing the number of questions left to choose to meet the target for that tier
-            print(f"    Subject: <{subject:^25}> Needs < {value} >  questions to meet target")
-        # Now that we have a dictionary representing the total amount of questions to add for each subject for current tier, we need to iterate over the reserve_bank of questions:
-        # OMG A TRIPLE NESTED FOR LOOP!!!!!
-        # Access the reserve_bank of questions only -> these questions should be marked not in circulation
-        for pile_name, pile in user_profile_data["questions"].items():
-            if target_met == True:
-                print("    Target Met: breaking from loop <for pile_name, pile in user_profile_data['questions'].items()>")
-                break
-            if all_zero == True:
-                print("    Tier Values met: breaking from loop <for pile_name, pile in user_profile_data['questions'].items()>")
-                break
-            if pile_name != "reserve_bank":
-                continue
-            # Add <value> questions for each subject
-            for subject, value in ratio_for_tier.items():
-                if target_met == True:
-                    print("    Target Met: breaking from loop <for subject, value in ratio_for_tier.items()>")
-                    break
-                if all_zero == True:
-                    print("    Tier Values met: breaking from loop <for pile_name, pile in user_profile_data['questions'].items()>")
-                    break
-                for unique_id, question_object in pile.items():
-                    if subject in question_object_data[unique_id]["subject"]:
-                        # If we find a qualifying question:
-                        # Switch the question to True
-                        question_object["in_circulation"] = True
-                        # update the question's properties
-                        question_object = system_data.update_user_question_stats(question_object, unique_id, user_profile_data, question_object_data)
-                        # Add the question to either "in_circulation_not_eligible" or "in_circulation_is_eligible" pile
-                        write_data = {unique_id: question_object}
-                        if question_object["in_circulation"] == True:
-                            # Manually increment and decrement values in subject_settings so we don't need to rebuild the whole data structure
-                            user_profile_data["settings"]["subject_settings"][subject]["num_questions_in_circulation"] += 1
-                        if question_object["in_circulation"] == True and question_object["is_eligible"] == True:
-                            questions_to_remove_from_reserve_bank.append(unique_id)
-                            total_questions_in_reserve_bank -= 1
-                            user_profile_data["questions"]["in_circulation_is_eligible"].update(write_data)
-                            print(f"    Added question with id <{unique_id}> to in_circulation_is_eligible pile")
-                        if question_object["in_circulation"] == True and question_object["is_eligible"] == False:
-                            questions_to_remove_from_reserve_bank.append(unique_id)
-                            total_questions_in_reserve_bank -= 1
-                            user_profile_data["questions"]["in_circulation_not_eligible"].update(write_data)
-                            print(f"    Added question with id <{unique_id}> to in_circulation_not_eligible pile")
-                        ratio_for_tier[subject] -= 1 # This is the value
-                        target -= question_object["average_times_shown_per_day"]
-                        # Conditions for breaking the loop
-                        if target <= 0:
-                            print(f"    Target met! Leaving the loop (target hit 0 -> {target})")
-                            target_met = True
-                            break
-                        if total_questions_in_reserve_bank <= 0:
-                            print("    Target met! Leaving the loop (no questions left in reserve bank)")
-                            target_met = True
-                            break
-                        if helper.all_zero(ratio_for_tier.values) == True:
-                            all_zero = True
-                            break
-        print(f"    Removing {len(questions_to_remove_from_reserve_bank)} from reserve_bank")
-        for unique_id in questions_to_remove_from_reserve_bank:
-            del user_profile_data["questions"]["reserve_bank"][unique_id]
-            # Question pile is now accurate
-            
+        # Scan at this tier level:
+        for subject in master_ratio.copy():
+            target_ratio = master_ratio[subject] * tier_value
+            if actual_composition[subject] < target_ratio:
+                print(f"Initial Tier Value is: {tier_value}")
+                return tier_value
+        # If we don't hit the condition, increment the tier value
+        tier_value += 1
+        
+###############################################################
+def should_increment_tier_value(actual_composition, master_ratio, tier_value):
 
+    for subject in master_ratio.copy():
+        target_ratio = master_ratio[subject] * tier_value
+        if actual_composition[subject] < target_ratio:
+            print("Should not Increment Tier")
+            return False
+    return True
+###############################################################
+def add_questions_into_circulation(average_daily_questions: float, desired_daily_questions: int, user_profile_data: dict, question_object_data: dict) -> dict: #Private Function
+    # How many questions are we adding?
+    target = desired_daily_questions - average_daily_questions
+    # Every question has a average_daily value, when we add it we will subtract the target value, if the target falls below zero then we're done
 
-        if all_zero == True: # Meaning the target has not been met and we've met the ratio for the current tier
-            # Increment the tier number, we then go back to the header while loop and recalculate
-            tier_number += 1
-        # Conditions Required to exit the loop
-        elapsed_time = datetime.now() - time_start
-        # If there are no questions in the reserve bank:
-        if len(user_profile_data["questions"]["reserve_bank"]) == 0:
-            print("    No remaining questions in the reserve bank")
+    # What if there aren't enough questions to meet the target?
+    amount_reserve_bank = len(user_profile_data["questions"]["reserve_bank"])
+    if amount_reserve_bank <= 0:
+        return user_profile_data
+    #   we'll break the loop if the amount in the reserve bank hits 0
+
+    # I want to maintain a ratio of questions so the composition of the questions reflects the interests of the user!
+    # Store this master ratio in a dictionary {math: 1, english: 1, astronomy: 5}
+    master_ratio                    = {}
+    actual_composition              = {}
+    working_ratio_targets           = {}
+    questions_remaining_by_subject  = {}
+    for subject, subject_values in user_profile_data["settings"]["subject_settings"].items():
+        ratio_value = round(subject_values["interest_level"] / 5)# divide the value -> ensures other subjects still get into circulation
+        master_ratio.update({subject: ratio_value})
+    # We have an object to track what the ratio should be, but how do we track what actually is?
+        circulating_questions       = subject_values["num_questions_in_circulation"]
+        total_activated_questions   = subject_values["total_activated_questions"]
+        # What if there aren't any more questions to add for that subject?
+        #   For the sake of the calculation we'll say there are a billion circulating questions, immediately overwriting any counts
+        questions_remaining_by_subject.update({subject: (total_activated_questions - circulating_questions)})
+        actual_composition.update({subject: circulating_questions})
+    working_ratio_targets = master_ratio.copy()
+
+    # Configure initial tier_value
+    tier_value = configure_initial_tier_value(actual_composition,master_ratio,questions_remaining_by_subject)
+    print(tier_value)
+    print(working_ratio_targets)
+    print(actual_composition)
+    print(questions_remaining_by_subject)
+    for question_id in user_profile_data["questions"]["reserve_bank"].copy():
+        for sub in questions_remaining_by_subject:
+            working_ratio_targets[sub] = master_ratio[sub] * tier_value
+            if questions_remaining_by_subject[sub] <= 0:
+                print(sub)
+                actual_composition[sub] = 9999999
+
+        # print(actual_composition)
+        # print(questions_remaining_by_subject)
+        # print(f"Current Tier is: {tier_value} -> {working_ratio_targets}")
+        subjects_list = question_object_data[question_id]["subject"]
+        subject_value = subjects_list[0]
+        current_subject_target = working_ratio_targets[subject_value]
+        current_amount_circulating = actual_composition[subject_value]
+        question_stat_block = user_profile_data["questions"]["reserve_bank"][question_id]
+        question_to_move = {question_id: question_stat_block}
+
+        if current_amount_circulating < current_subject_target:
+            print("Did we hit this?")
+            user_profile_data["questions"]["in_circulation_is_eligible"].update(question_to_move)
+            del user_profile_data["questions"]["reserve_bank"][question_id]
+            for sub in subjects_list:
+                actual_composition[sub]             += 1
+                questions_remaining_by_subject[sub] -= 1
+            target -= question_stat_block["average_times_shown_per_day"]
+            print(f"    The target is now: {target}")
+
+        elif current_amount_circulating >= current_subject_target:
+            if should_increment_tier_value(actual_composition, master_ratio,tier_value):
+                tier_value += 1
+                    
+
+        if target <= 0:
             return user_profile_data
-        # If we've met the target to put in
-        elif target_met == True:
-            return user_profile_data    
-        # If the process takes too long
-        elif elapsed_time >= timedelta(seconds=timer):
-            print("Times Up, Sorry took too long")
+        elif len(user_profile_data["questions"]["reserve_bank"]) <= 0:
             return user_profile_data
+    
+    return user_profile_data
 
 def remove_questions_from_circulation(average_daily_questions, desired_daily_questions, user_profile_data: dict) -> dict: #Private Function
     print("def quiz_functions.remove_questions_from_circulation(average_daily_questions, desired_daily_questions, user_profile_data: dict) ->")
@@ -257,29 +218,31 @@ def update_questions_in_circulation(user_profile_data: dict, question_object_dat
         print("    Too many in circulation, removing questions. . .")
         user_profile_data = remove_questions_from_circulation(average_daily_questions, desired_daily_questions, user_profile_data) # For ease of reading, seperate the removal process into its own function
         print("    Finished updating list of circulating questions")
+        user_profile_data = system_data.update_stats(user_profile_data, question_object_data)
         return user_profile_data
     elif average_daily_questions < desired_daily_questions: # Indicating we need to add questions
         print("    Not enough questions in circulation, adding questions. . .")
         user_profile_data = add_questions_into_circulation(average_daily_questions, desired_daily_questions, user_profile_data, question_object_data)
         print("    Finished updating list of circulating questions")
+        user_profile_data = system_data.update_stats(user_profile_data, question_object_data)
         return user_profile_data
     else:
         print("    No need to add or remove questions right now")
         print("    Finished updating list of circulating questions")
+        user_profile_data = system_data.update_stats(user_profile_data, question_object_data)
         return user_profile_data
 
 
 def populate_question_list(user_profile_data: dict, question_object_data: dict) -> list:
     # New system simply grabs x amount of questions that are eligible
     # If no eligible questions returns an empty list
+    # FIXME Deprecated!
     print("def public_functions.populate_question_list(user_profile_data: dict, question_object_data: dict) -> list")
     print("    Calling settings.build_subject_settings()")
     user_profile_data["settings"]["subject_settings"] = system_data.build_subject_settings(user_profile_data, question_object_data)
     print("    Calling quiz_functions.update_questions_in_circulation(user_profile_data)")
     
     user_profile_data = update_questions_in_circulation(user_profile_data, question_object_data) # Start by ensuring questions are put into circulation if we can fit them in the average
-    user_profile_data = system_data.update_stats(user_profile_data, question_object_data)
-    
     ##################################################
     # filter out questions based on criteria
     question_list = [unique_id for unique_id in user_profile_data["questions"]["in_circulation_is_eligible"].keys()]

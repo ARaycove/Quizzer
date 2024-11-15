@@ -4,6 +4,7 @@ from datetime import date
 import system_data
 import generate_quiz
 import public_functions
+import os
 
 # FUTURE PLANS AND IMPLEMENTATIONS:
 #FIXME, future code (when connecting to the main server) user profiles on the user system will need to be registered to the Quizzer account, otherwise the user
@@ -94,57 +95,7 @@ import public_functions
 # - FIXME Also make sure every field is filled if possible
 # - NOTE At least one question field and one answer field needs to be filled or the question object is not valid
 # Custom Widgets:
-class CustomAutoComplete_Widget():
-    def __init__(self, page, items,col):
-        self.page = page
-        self.items = items
-        self.col = col
-        self.filtered_items = items.copy()
-        self._build()
-
-    def _build(self):
-        self._assets()
-        self.stack = ft.Stack(
-            controls=[
-                self.col,  # Base layer
-                self.list_cont,     
-            ],
-        )
-        self.page.add(self.text_field, self.stack)  # Add the stack
-
-    def _assets(self):
-        self.list_view = ft.ListView(
-            expand=1,
-            spacing=10,
-            controls=[],
-        )
-        self.list_cont = ft.Container(
-            content = self.list_view,
-            bgcolor= ft.colors.WHITE,
-        )
-        self.text_field = ft.TextField(label="Filter list")
-        self.text_field.on_change = self._filter_list
-
-    def _filter_list(self, e):
-        query = e.control.value.lower()
-        if query:
-            self.filtered_items = [item for item in self.items if query in item.lower()]
-        else:
-            self.filtered_items = []
-        self.list_view.controls = [
-            ft.ListTile(
-                title=ft.Text(item),
-                on_click=lambda e, item=item: self._on_list_item_click(item)
-            ) for item in self.filtered_items
-        ]
-        self.page.update()
-
-    def _on_list_item_click(self, item):
-        self.text_field.value = item
-        self.filtered_items = []
-        self.list_view.controls = [] 
-        self.page.update()
-        print(f"Selected item: {item}") 
+os.environ["FLET_SECRET_KEY"] = os.urandom(12).hex()
 
 ######################################################################################
 #GLOBALS
@@ -229,6 +180,7 @@ def main(page: ft.Page):
         '''
         current_user_list = system_data.get_user_list()
         return current_user_list
+    
     def display_new_profile_input_screen(e: ft.ControlEvent = None):
         page.clean()
         current_user_list = determine_user_list()
@@ -247,7 +199,11 @@ def main(page: ft.Page):
         login_button_row = ft.Row(alignment=ft.MainAxisAlignment.CENTER,controls=[submit_add_profile,cancel_add_profile])
         ###################################################################################################################################################
         # Page Defines
-        new_profile_screen = ft.Column(alignment=ft.MainAxisAlignment.CENTER,expand=True,spacing=25,controls=[user_name_row,login_button_row])
+        new_profile_screen = ft.Column(
+            alignment=ft.MainAxisAlignment.CENTER,
+            expand=True,
+            spacing=25,
+            controls=[user_name_row,login_button_row])
         page.add(new_profile_screen)
         page.update()
     def display_login_screen(e: ft.ControlEvent = None):
@@ -265,7 +221,9 @@ def main(page: ft.Page):
         login_button_row = ft.Row(alignment=ft.MainAxisAlignment.CENTER,controls=[add_profile,submit_login])
         ###################################################################################################################################################
         # Page Defines
-        login_screen = ft.Column(alignment=ft.MainAxisAlignment.CENTER,expand=True,spacing=25,controls=[user_name_row,password_row,login_button_row])
+        login_screen = ft.Column(alignment=ft.MainAxisAlignment.CENTER,
+                                 expand=True,spacing=25,
+                                 controls=[user_name_row,password_row,login_button_row])
         page.add(login_screen)
         page.update()
 
@@ -477,30 +435,84 @@ def main(page: ft.Page):
     # Main Interface (Header) #NOTE Includes a brief display of important metrics, and the menu button
     menu_button = ft.ElevatedButton(content=menu_icon, bgcolor="white", on_click=display_menu_page)
     stat_list = []
-    main_page_header_stat_display = ft.Column(expand=True,height=50,controls=stat_list,wrap=True)#FIXME
-    main_page_header = ft.Row(expand=False,alignment=ft.MainAxisAlignment.START,controls= [menu_button,main_page_header_stat_display])
+    main_page_header_stat_display = ft.Column(
+        expand=True,
+        height=50,
+        controls=stat_list,
+        wrap=True)#FIXME
+    main_page_header = ft.Row(
+        expand=False,
+        alignment=ft.MainAxisAlignment.START,
+        controls= [
+            menu_button,
+            main_page_header_stat_display])
     
     # Main Interface (Question Answer Display Box) #NOTE The container is constructed, using the data derived from the question object.
     question_object_text_display = ft.Text(value="No Question Loaded")
-    main_page_qo_text_row = ft.Row(alignment=ft.MainAxisAlignment.CENTER,controls=[question_object_text_display])
+    main_page_qo_text_row = ft.Row(
+        alignment=ft.MainAxisAlignment.CENTER,
+        controls=[
+            question_object_text_display
+            ])
     
     question_object_audio_controls = ft.Text(value="No Questions Loaded")
-    main_page_qo_audio_row = ft.Row(alignment=ft.MainAxisAlignment.CENTER,controls=[question_object_audio_controls])
+    main_page_qo_audio_row = ft.Row(
+        alignment=ft.MainAxisAlignment.CENTER,
+        controls=[
+            question_object_audio_controls])
     
     question_object_image_display = ft.Text(value="No Questions Loaded")
-    main_page_qo_image_row = ft.Row(expand=True,alignment=ft.MainAxisAlignment.CENTER,controls=[question_object_image_display])
+    main_page_qo_image_row = ft.Row(
+        expand=True,
+        alignment=ft.MainAxisAlignment.CENTER,
+        controls=[
+            question_object_image_display])
     
     question_object_video_display = ft.Text(value="No Questions Loaded")
-    main_page_qo_video_row = ft.Row(expand=True,alignment=ft.MainAxisAlignment.CENTER,controls=[question_object_video_display])
+    main_page_qo_video_row = ft.Row(
+        expand=True,
+        alignment=ft.MainAxisAlignment.CENTER,
+        controls=[
+            question_object_video_display])
     
-    main_page_question_object_data = ft.Column(expand=True,alignment=ft.MainAxisAlignment.CENTER,controls=[main_page_qo_text_row,main_page_qo_audio_row,main_page_qo_image_row,main_page_qo_video_row])
-    main_page_question_object_display = ft.Container(expand=True,padding=20,ink=True,ink_color=ft.colors.GREY_500,content=main_page_question_object_data,on_click=flip_question_answer)
+    main_page_question_object_data = ft.Column(
+        expand=True,
+        alignment=ft.MainAxisAlignment.CENTER,
+        controls=[main_page_qo_text_row,
+                  main_page_qo_audio_row,
+                  main_page_qo_image_row,
+                  main_page_qo_video_row])
+    main_page_question_object_display = ft.Container(
+        expand=True,
+        padding=20,
+        ink=True,
+        ink_color=ft.colors.GREY_500,
+        content=main_page_question_object_data,
+        on_click=flip_question_answer)
     
     # Main Interface (User Scoring Mechanism), will not need refreshed, contains buttons to skip the current question, answer is correct or incorrect defined by a green or red buttons.
-    yes_button = ft.ElevatedButton(content=yes_icon, bgcolor="green", on_click=lambda e: question_answered(e , status="correct"), disabled=True)
-    no_button = ft.ElevatedButton(content=no_icon, bgcolor="red", on_click=lambda e: question_answered(e , status="incorrect"), disabled=True)
-    skip_button = ft.ElevatedButton(content=skip_icon, bgcolor="white", on_click=skip_to_next_question, disabled=False) #Always allow skip function
-    main_page_answer_bar = ft.Row(alignment=ft.MainAxisAlignment.SPACE_AROUND,spacing=25,controls=[yes_button,skip_button,no_button])
+    yes_button = ft.ElevatedButton(
+        content=yes_icon, 
+        bgcolor="green", 
+        on_click=lambda e: question_answered(e , status="correct"), 
+        disabled=True)
+    no_button = ft.ElevatedButton(
+        content=no_icon, 
+        bgcolor="red", 
+        on_click=lambda e: question_answered(e , status="incorrect"), 
+        disabled=True)
+    skip_button = ft.ElevatedButton(
+        content=skip_icon, 
+        bgcolor="white", 
+        on_click=skip_to_next_question, 
+        disabled=False) #Always allow skip function
+    main_page_answer_bar = ft.Row(
+        alignment=ft.MainAxisAlignment.SPACE_AROUND,
+        spacing=25,
+        controls=[
+            yes_button,
+            skip_button,no_button
+            ])
     
     main_page = ft.Column(expand=True,controls=[main_page_header,main_page_question_object_display,main_page_answer_bar])
     
@@ -523,7 +535,14 @@ def main(page: ft.Page):
         main_page_header = ft.Row(expand=False,alignment=ft.MainAxisAlignment.START,controls= [
             menu_button,
             main_page_header_stat_display,
-            ft.Row(expand=True, alignment=ft.MainAxisAlignment.END, controls=[ft.IconButton(icon=ft.icons.ADD, icon_color=ft.colors.BLACK, tooltip="Add A New Question", bgcolor=ft.colors.WHITE,
+            ft.Row(
+                expand=True, 
+                alignment=ft.MainAxisAlignment.END, 
+                controls=[
+                    ft.IconButton(
+                        icon=ft.icons.ADD, icon_color=ft.colors.BLACK, 
+                        tooltip="Add A New Question", 
+                        bgcolor=ft.colors.WHITE,
                                                                                             on_click=display_add_question_interface)])
             ])
         
@@ -673,26 +692,43 @@ def main(page: ft.Page):
         ############################
         # No option will be provided to enter own unique id
         print(f"The width of the page is: {page.width}")
+        print(f"Window width = {page.window.width}")
         subject_data = system_data.get_subject_data()
         concept_data = system_data.get_concept_data()
+        if page.window.width == 0: # Is being run as web app
+            form_fields_width = 300
+        elif page.window.width < 600:
+            form_fields_width = 500
+        else:
+            form_fields_width = 300
+        text_input_width = 400
 
         add_question_main_header = ft.Row(alignment=ft.MainAxisAlignment.CENTER, controls=[ft.Text(value="Add New Question", size=36)])
 
         form_fields = ft.Row(alignment=ft.MainAxisAlignment.SPACE_BETWEEN)
-        left_side_column = ft.Column(alignment=ft.MainAxisAlignment.START, horizontal_alignment=ft.CrossAxisAlignment.START)
+        if page.window.width <= 670 or page.width <= 670:
+            form_fields_width = 375
+            if page.window.width == 0: 
+                form_fields.wrap == False
+            else:
+                form_fields.wrap=True
+        left_side_column = ft.Column(alignment=ft.MainAxisAlignment.START, 
+                                     horizontal_alignment=ft.CrossAxisAlignment.START)
         right_side_column = ft.Column(alignment=ft.MainAxisAlignment.START, horizontal_alignment=ft.CrossAxisAlignment.START)
         form_fields.controls = [left_side_column, right_side_column]
+
         ######
         def replace_primary_subject_with_textfield(e: ft.ControlEvent):
             del left_side_column.controls[1]
             left_side_column.controls.insert(1, primary_subject_textfield_row)
             page.update()
+
         def primary_subject_back(e:ft.ControlEvent):
             del left_side_column.controls[1]
             left_side_column.controls.insert(1, primary_subject_line)
             page.update()
 
-        primary_subject_textfield = ft.TextField(width=200)
+        primary_subject_textfield = ft.TextField(width=form_fields_width)
         primary_subject_back_button = ft.IconButton(icon=ft.icons.ARROW_BACK, icon_color=ft.colors.BLACK, tooltip="Select from from list", bgcolor=ft.colors.WHITE, on_click=primary_subject_back)
         primary_subject_textfield_row = ft.Row(controls=[primary_subject_textfield, primary_subject_back_button])
 
@@ -701,7 +737,7 @@ def main(page: ft.Page):
         
         primary_subject_input = ft.AutoComplete(suggestions=[ft.AutoCompleteSuggestion(key=i, value=i) for i in subject_data.keys()])
         add_new_primary_subject_button = ft.IconButton(icon=ft.icons.ADD, icon_color=ft.colors.BLACK, tooltip="Add a subject that isn't in the list", bgcolor=ft.colors.WHITE, on_click=replace_primary_subject_with_textfield)
-        primary_subject_line = ft.Row(controls=[ft.Column(controls=[ft.Stack(controls=[primary_subject_input],width=200), add_new_primary_subject_button], height=75, wrap=True)])
+        primary_subject_line = ft.Row(controls=[ft.Column(controls=[ft.Stack(controls=[primary_subject_input],width=form_fields_width), add_new_primary_subject_button], height=75, wrap=True)])
         left_side_column.controls.append(primary_subject_text)
         left_side_column.controls.append(primary_subject_line)
 
@@ -715,14 +751,14 @@ def main(page: ft.Page):
             right_side_column.controls.insert(1, module_line)
             page.update()
 
-        module_name_textfield = ft.TextField(width=200)
+        module_name_textfield = ft.TextField(width=form_fields_width)
         module_name_back_button = ft.IconButton(icon=ft.icons.ARROW_BACK, icon_color=ft.colors.BLACK, tooltip="Add a subject that isn't in the list", bgcolor=ft.colors.WHITE, on_click=module_name_back)
         module_name_textfield_row = ft.Row(controls=[module_name_textfield, module_name_back_button])
 
         module_name_text = ft.Text(value="Define the Module:", size=24, tooltip="What module does the question belong to?\n Begin by typing the name of the module, you'll be given a list of suggestions based on what modules already exist by that name\n You can contribute to any module \n BE AWARE: adding a question to a pre-existing module, will import that module into your profile\n Please Avoid adding duplicate questions to a module")
         module_name_input = ft.AutoComplete(suggestions=[ft.AutoCompleteSuggestion(key=i, value=i) for i in all_module_data.keys()])
         add_new_module_button = ft.IconButton(icon=ft.icons.ADD, icon_color=ft.colors.BLACK, tooltip="Add a subject that isn't in the list", bgcolor=ft.colors.WHITE, on_click=replace_module_name_with_textfield)
-        module_line = ft.Row(controls=[ft.Column(controls=[ft.Stack(controls=[module_name_input],width=200), add_new_module_button], height=75, wrap=True)])
+        module_line = ft.Row(controls=[ft.Column(controls=[ft.Stack(controls=[module_name_input],width=form_fields_width), add_new_module_button], height=75, wrap=True)])
         right_side_column.controls.append(module_name_text)
         right_side_column.controls.append(module_line)
 
@@ -750,12 +786,12 @@ def main(page: ft.Page):
         def clear_related_subjects_field(e: ft.ControlEvent):
             subject.value=""
             page.update()
-        related_subjects_textfield = ft.TextField(width=200, on_submit=lambda e: add_to_related_subjects(e, related_subjects_textfield.value))
+        related_subjects_textfield = ft.TextField(width=form_fields_width, on_submit=lambda e: add_to_related_subjects(e, related_subjects_textfield.value))
         related_subjects_back_button = ft.IconButton(icon=ft.icons.ARROW_BACK, icon_color=ft.colors.BLACK, tooltip="Clear The Related Subjects Input Field", bgcolor=ft.colors.WHITE, on_click=related_subjects_back)
         related_subjects_textfield_row = ft.Row(controls=[related_subjects_textfield, related_subjects_back_button])
         subject = ft.TextField(label="Related Subjects",
                                tooltip="What other subjects relate to this question?\n For example it might be a calculus question, but calculus also falls under mathematics, \nThe question may also be referrencing a historical event, thus related to history as well",
-                               multiline=True, disabled=True, width=200)
+                               multiline=True, disabled=True, width=form_fields_width)
         clear_subject_button = ft.IconButton(icon=ft.icons.CLEAR, icon_color=ft.colors.BLACK, tooltip="Clear The Related Subjects Input Field", bgcolor=ft.colors.WHITE, on_click=clear_related_subjects_field)
         subject_input_row = ft.Row(controls=[subject, clear_subject_button])
         left_side_column.controls.append(subject_input_row)
@@ -763,7 +799,7 @@ def main(page: ft.Page):
 
         subject_auto_complete = ft.AutoComplete(suggestions=[ft.AutoCompleteSuggestion(key=i, value=i) for i in subject_data.keys()],on_select=lambda e: add_to_related_subjects(e, e.selection.value))
         add_new_subject_button = ft.IconButton(icon=ft.icons.ADD, icon_color=ft.colors.BLACK, tooltip="Add a subject that isn't in the list", bgcolor=ft.colors.WHITE, on_click=replace_related_subjects_with_textfield)
-        subject_entry_row = ft.Row(controls=[ft.Column(controls=[ft.Stack(controls=[subject_auto_complete],width=200), add_new_subject_button], height=75, wrap=True)])
+        subject_entry_row = ft.Row(controls=[ft.Column(controls=[ft.Stack(controls=[subject_auto_complete],width=form_fields_width), add_new_subject_button], height=75, wrap=True)])
         left_side_column.controls.append(subject_entry_row)
         
         ###
@@ -788,48 +824,141 @@ def main(page: ft.Page):
             related.value=""
             page.update()
 
-        related_concepts_textfield = ft.TextField(width=200, on_submit=lambda e: add_to_related_concepts(e, related_concepts_textfield.value))
+        related_concepts_textfield = ft.TextField(width=form_fields_width, on_submit=lambda e: add_to_related_concepts(e, related_concepts_textfield.value))
         related_concepts_back_button = ft.IconButton(icon=ft.icons.ARROW_BACK, icon_color=ft.colors.BLACK, tooltip="Clear the Related Concepts Input Field", bgcolor=ft.colors.WHITE, on_click=related_concepts_back)
         related_concepts_textfield_row = ft.Row(controls=[related_concepts_textfield, related_concepts_back_button])
 
         related = ft.TextField(label="Related Concepts and Terms",
                                tooltip="What concepts and terms are related to this question?\nFor example the question What year was xyz invented and who invented it? points to the term xyz, to the historical period, and to the individual\n",
-                               multiline=True, disabled=True, width=200)
+                               multiline=True, disabled=True, width=form_fields_width)
         clear_related_button = ft.IconButton(icon=ft.icons.CLEAR, icon_color=ft.colors.BLACK, tooltip="Clear the Related Concepts Input Field", bgcolor=ft.colors.WHITE, on_click=clear_related_concepts_field)
         related_concepts_input_row = ft.Row(controls=[related, clear_related_button])
         right_side_column.controls.append(related_concepts_input_row)
 
         concept_auto_complete = ft.AutoComplete(suggestions=[ft.AutoCompleteSuggestion(key=i, value=i) for i in concept_data.keys()],on_select=lambda e: add_to_related_concepts(e, e.selection.value))
         add_new_concept_button = ft.IconButton(icon=ft.icons.ADD, icon_color=ft.colors.BLACK, tooltip="Add a concept that isn't in the list", bgcolor=ft.colors.WHITE, on_click=replace_related_concepts_with_textfield)
-        concept_entry_row = ft.Row(controls=[ft.Column(controls=[ft.Stack(controls=[concept_auto_complete],width=200), add_new_concept_button], height=75, wrap=True)])
+        concept_entry_row = ft.Row(controls=[ft.Column(controls=[ft.Stack(controls=[concept_auto_complete],width=form_fields_width), add_new_concept_button], height=75, wrap=True)])
         right_side_column.controls.append(concept_entry_row)
 
         ############################
-        question_text = ft.TextField(label="Question Text", multiline=True, tooltip="What's the Question?",width=400) #FIXME multiline text box
-        question_image = ft.Text(value="Question Image", tooltip="Is there an image that goes with the question?")
-        question_image_upload_button = ft.ElevatedButton(text="Upload Question's Image")
-        question_audio = ft.Text(value="Question Audio", tooltip="Is there audio that goes with the question?")
-        question_audio_upload_button = ft.ElevatedButton(text="Upload Question's Audio")
-        question_video = ft.Text(value="Question Video", tooltip="Is there a video that goes with the question?")
-        question_video_upload_button = ft.ElevatedButton(text="Upload Question's Video")
-        question_image_upload_row = ft.Row(controls=[question_image, question_image_upload_button])
-        question_audio_upload_row = ft.Row(controls=[question_audio, question_audio_upload_button])
-        question_video_upload_row = ft.Row(controls=[question_video, question_video_upload_button])
-        
+        # File upload utility functions
+        def upload_file(e):
+            upload_list = []
+            if file_picker.result != None and file_picker.result.files != None:
+                for f in file_picker.result.files:
+                    upload_list.append(
+                        ft.FilePickerUploadFile(f.name, upload_url=page.get_upload_url(f.name, 600))
+                    )
+                file_picker.upload(upload_list)
+        def dialog_result(e: ft.FilePickerResultEvent):
+            # Construct the file path, and put the to-be uploaded file in staging area
+            print(file_picker.result.files[0].path)
+            if file_picker.result.files[0].path != None: # for desktop version
+                helper.copy_file(file_picker.result.files[0].path, "uploads")
+            else: # for web apps
+                upload_file(e)
+            file_path = f"uploads/{file_picker.result.files[0].name}"
+            # Determine mime type
+            media_type = helper.detect_media_type(file_path)
+            if media_type.startswith("image"):
+                media_type="image"
+            elif media_type.startswith("audio"):
+                media_type="audio"
+            elif media_type.startswith("video"):
+                media_type="video"
+            else:
+                media_type="other"
+                return # if other we exit the dialog
+            # assign file_path to appropriate question or answer media file
+            #   Will later be used by the actual upload_question button to move the media into the system_data/media_files dir -> media_file_name may need to be updated when adding to the main database
+            #   when exiting this interface, we should clear the uploads folder
+            if q_or_a.value == "question_media":
+                print("Question being uploaded")
+                if media_type == "image":
+                    question_image.data = file_path
+                    question_preview_image.src = file_path
+                    question_preview_image.height = 100
+                    question_image.icon_color = ft.colors.GREEN
+                elif media_type == "audio":
+                    # Audio not currently supported
+                    pass #FIXME
+                    # question_audio.data = file_path
+                    # question_preview_audio.src = file_path
+                    # question_preview_audio.autoplay=True
+                    # question_preview_audio.volume = 1
+                    # question_audio.icon_color = ft.colors.GREEN
+                elif media_type == "video":
+                    # Video not currently supported
+                    pass #FIXME
+                    # question_video.data = file_path
+                    # question_video.icon_color = ft.colors.GREEN
+            elif q_or_a.value =="answer_media":
+                print("Answer being uploaded")
+                if media_type == "image":
+                    answer_image.data = file_path
+                    answer_preview_image.src = file_path
+                    answer_preview_image.height = 100
+                    answer_image.icon_color = ft.colors.GREEN
+                elif media_type == "audio":
+                    # Audio not currently supported
+                    pass #FIXME
+                    # answer_audio.data = file_path
+                    # answer_audio.icon_color = ft.colors.GREEN
+                elif media_type == "video":
+                    # Video not currently supported
+                    pass #FIXME
+                    # answer_video.data = file_path
+                    # answer_video.icon_color = ft.colors.GREEN
+            print("q_img:", question_image.data)
+            print("q_aud:",question_audio.data)
+            print("q_vid:",question_video.data)
+            print("a_img:",answer_image.data)
+            print("a_aud:",answer_audio.data)
+            print("a_vid:",answer_video.data)
+            print(question_media_preview.controls)
+            page.update()
 
+        def upload_media(status):
+            file_picker.pick_files()
+            page.update()
+
+            q_or_a.value=status
+        q_or_a = ft.Text(value="")
+        file_picker = ft.FilePicker(on_result=dialog_result, on_upload=upload_file)
+        page.overlay.append(file_picker)
+        page.update()        
+        ############################
+        question_text = ft.TextField(label="Question Text", multiline=True, tooltip="What's the Question?", expand=True)
+        question_preview_image = ft.Image()
+        question_preview_audio = ft.Text(value="Audio not currently supported")
+        # question_preview_audio_controls = ft.Row(alignment=ft.MainAxisAlignment.CENTER,controls=[
+        #     ft.ElevatedButton("Play", on_click=lambda _: question_preview_audio.play()),
+        #     ft.ElevatedButton("Pause", on_click=lambda _: question_preview_audio.pause()),
+        #     ft.ElevatedButton("Resume", on_click=lambda _: question_preview_audio.resume()),
+        #     ft.ElevatedButton("Release", on_click=lambda _: question_preview_audio.release()),
+        #     ft.ElevatedButton("Seek 2s", on_click=lambda _: question_preview_audio.seek(2000))            
+        # ])
+        question_preview_video = ft.Text(value="Video not currently supported")
+        question_media_preview = ft.Column(controls=[question_preview_image, question_preview_audio, question_preview_video])
+        question_media_upload_button = ft.ElevatedButton(text="Upload Question Media", 
+        tooltip="Quizzer will automatically detect whether the media you upload is an image, audio, or video file,\n Alternatively you can drag and drop the media into the interface\nRED indicates no media for that type (image, audio, video)\n GREEN indicates you've added that type of media to the question",
+        data="question_media", on_click=lambda _: upload_media(question_media_upload_button.data))
+        question_image = ft.IconButton(icon=ft.icons.IMAGE, icon_color=ft.colors.RED, data="")
+        question_audio = ft.IconButton(icon=ft.icons.AUDIO_FILE, icon_color=ft.colors.RED, data="")
+        question_video = ft.IconButton(icon=ft.icons.VIDEO_FILE, icon_color=ft.colors.RED, data="")
 
         ############################
-        answer_text = ft.TextField(label="Answer Text") #FIXME multiline text box
-        answer_image = ft.Text(value="Answer Image")
-        answer_image_upload_button = ft.ElevatedButton(text="Upload Answer's Image")
-        answer_audio = ft.Text(value="Answer Audio")
-        answer_audio_upload_button = ft.ElevatedButton(text="Upload Answer's Audio")
-        answer_video = ft.Text(value="Answer Video")
-        answer_video_upload_button = ft.ElevatedButton(text="Upload Answer's Video")
-        answer_image_upload_row = ft.Row(controls=[answer_image, answer_image_upload_button])
-        answer_audio_upload_row = ft.Row(controls=[answer_audio, answer_audio_upload_button])
-        answer_video_upload_row = ft.Row(controls=[answer_video, answer_video_upload_button])
-
+        answer_text = ft.TextField(label="Answer Text", multiline=True, tooltip="What's the Answer?", expand=True)
+        answer_preview_image = ft.Image()
+        answer_preview_audio = ft.Text()
+        answer_preview_video = ft.Text()
+        answer_media_preview = ft.Column(controls=[answer_preview_image])
+        answer_media_upload_button = ft.ElevatedButton(text="Upload Answer Media", 
+        tooltip="Quizzer will automatically detect whether the media you upload is an image, audio, or video file\n Alternatively you can drag and drop the media into the interface\nRED indicates no media for that type (image, audio, video)\n GREEN indicates you've added that type of media to the question",
+        data="answer_media", on_click=lambda _: upload_media(answer_media_upload_button.data))
+        answer_image = ft.IconButton(icon=ft.icons.IMAGE, on_click=lambda e: print(e), icon_color=ft.colors.RED,data="")
+        answer_audio = ft.IconButton(icon=ft.icons.AUDIO_FILE, on_click=lambda e: print(e), icon_color=ft.colors.RED,data="")
+        answer_video = ft.IconButton(icon=ft.icons.VIDEO_FILE, on_click=lambda e: print(e), icon_color=ft.colors.RED,data="")
         ############################
         # Submission Buttons
         submit_button = ft.IconButton(icon=ft.icons.UPLOAD, icon_color=ft.colors.WHITE)
@@ -838,26 +967,40 @@ def main(page: ft.Page):
                 refresh_question_object_display_with_question()
             else:
                 refresh_question_object_display_with_answer()
+
         cancel_button = ft.IconButton(icon=ft.icons.CANCEL, icon_color=ft.colors.WHITE, on_click=exit_add_question_interface)
         submission_button_row = ft.Row(alignment=ft.MainAxisAlignment.SPACE_AROUND, controls=[submit_button, cancel_button])
 
+
         page.clean()
         page.add(
-            menu_button,
-            add_question_main_header,
-            form_fields,
-            ft.Text(value="Question Fields", tooltip="At least one question field must be filled", size=24),
-            question_text,
-            question_image_upload_row,
-            question_audio_upload_row,
-            question_video_upload_row,
-            ft.Text(value="Answer Fields", tooltip="At least one answer field must be filled", size=24),
-            answer_text,
-            answer_image_upload_row,
-            answer_audio_upload_row,
-            answer_video_upload_row,
-            submission_button_row
+            ft.Column(scroll=ft.ScrollMode.ALWAYS, controls=[
+            # Main menu button goes in first
+                menu_button,
+                # Header Text
+                add_question_main_header,
+                # Meta Data fields (optional)
+                form_fields,
+                # Question fields (the actual question side of the question_object)
+                ft.Row(alignment=ft.MainAxisAlignment.CENTER, controls=[ft.Text(value="Question Fields", tooltip="At least one question field must be filled", size=24)]),
+                # Text, media preview, upload button, status icons
+                ft.Row(alignment=ft.MainAxisAlignment.CENTER, controls=[question_text]),
+                ft.Row(alignment=ft.MainAxisAlignment.CENTER, controls=[question_media_preview]),
+                ft.Row(alignment=ft.MainAxisAlignment.CENTER, controls=[question_media_upload_button]),
+                ft.Row(alignment=ft.MainAxisAlignment.SPACE_AROUND, controls=[question_image, question_audio, question_video]),
+                # # Answer fields (the actual answer side of the question_object)
+                ft.Row(alignment=ft.MainAxisAlignment.CENTER, controls=[ft.Text(value="Answer Fields", tooltip="At least one answer field must be filled", size=24)]),
+                ft.Row(alignment=ft.MainAxisAlignment.CENTER, controls=[answer_text]),
+                ft.Row(alignment=ft.MainAxisAlignment.CENTER, controls=[answer_media_preview]),
+                ft.Row(alignment=ft.MainAxisAlignment.CENTER, controls=[answer_media_upload_button]),
+                ft.Row(alignment=ft.MainAxisAlignment.SPACE_AROUND, controls=[
+                        answer_image, answer_audio, answer_video
+                ]
+                ),
+                submission_button_row                
+            ])
         )
+        
 
 
 
@@ -1071,4 +1214,4 @@ def main(page: ft.Page):
     ###################################################################################################################################################
     ###################################################################################################################################################
 
-ft.app(main)
+ft.app(target=main,upload_dir="uploads")

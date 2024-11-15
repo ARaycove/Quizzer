@@ -3,6 +3,7 @@ from datetime import datetime
 import mimetypes
 import os
 import random
+import shutil
 def get_user_profiles_directory() -> str:
     return "system_data/user_profiles"
 
@@ -115,3 +116,15 @@ def all_zero(data):
 
     print(f"    < {data} > returned status of {status}")
     return status
+
+def detect_media_type(file_path):
+    media_type, _ = mimetypes.guess_type(file_path)
+    return media_type
+
+def copy_file(file_to_copy, location):
+    print(f"def copy_file(file_to_move, location)")
+    try:
+        shutil.copy(file_to_copy, location)
+        print(f"    File '{file_to_copy}' copied successfully to '{location}'.")
+    except shutil.Error as e:
+        print(f"    Error when copying file {e}")

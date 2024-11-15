@@ -64,7 +64,7 @@ def update_user_profile(user_profile_data: dict) -> None:
     with open(f"system_data/user_profiles/{user_name}/{user_name}_data.json", "w+") as f:
         json.dump(user_profile_data, f, indent=4)
 
-def calculate_question_id(question_object: dict, user_profile_data: dict) -> dict: #Private Function
+def calculate_question_id(question_object: dict, user_uuid) -> dict: #Private Function
     '''
     Deprecated, does nothing: is a function stub
     question id is based on the users questions.json
@@ -77,7 +77,6 @@ def calculate_question_id(question_object: dict, user_profile_data: dict) -> dic
 
     # The always unique id is the time in which the id was created alongside the user's uuid who made it, this method is gauranteed to always be unique except if a single user is able to create two objects in the space in time
     current_time = str(datetime.now())
-    user_uuid = str(user_profile_data["uuid"])
     unique_id = current_time + "_" + user_uuid
     question_object["id"] = unique_id
 
@@ -187,9 +186,9 @@ def verify_new_question(
     '''
     question_object = {}
     # Make exception for "Quizzer Tutorial Module", all other questions running through this function will get assigned a question_id proper
-    if module_name != "Quizzer Tutorial":
+    if module_name != "quizzer tutorial":
         user_uuid = user_profile_data["uuid"]
-        question_object["id"] = calculate_question_id(user_uuid)
+        question_object = calculate_question_id(question_object, user_uuid)
     else:
         question_object["id"] = id
     question_object["primary_subject"] = primary_subject
@@ -223,7 +222,7 @@ def generate_quizzer_tutorial_question_objects()-> list:
         id = "tutorial_question_one",
         question_text = "Welcome to Quizzer: Click the question to flip over to the answer",
         answer_text = "Now press the checkmark if you get a question correct, or press the cancel circle if you got it wrong. Quizzer is self-scored, and relies on you being honest with yourself!",
-        module_name = "Quizzer Tutorial"
+        module_name = "quizzer tutorial"
     ))
 
     questions_list.extend([question_one])
@@ -526,7 +525,15 @@ def build_subject_settings(user_profile_data: dict, question_object_data) -> dic
     Builds or rebuilds the subject settings for the specific user
     '''
     print("def settings.build_subject_settings(user_profile_data: dict, question_object_data) -> dict")
-    subject_settings = {}
+    try:
+        subject_settings            = user_profile_data["settings"]["subject_settings"]
+    except KeyError:
+        subject_settings            = {}
+    total_all_list              = []
+    num_questions_in_circ_list  = []
+    total_activated_list        = []
+    all_subjects_set            = set([])
+
     # serves as a template for later
     initial_subject_setting = {}
     initial_subject_setting["interest_level"] = 10
@@ -536,44 +543,44 @@ def build_subject_settings(user_profile_data: dict, question_object_data) -> dic
     initial_subject_setting["total_activated_questions"] = 0
     # print(initial_subject_setting)
     # Iterate over every question id contained in the user's 
+    all_user_questions = {}
     for pile_name, pile in user_profile_data["questions"].items():
-        # Get all the subjects mentioned in each question
-        for unique_id, question_object in pile.items():
-            subject_list = question_object_data[unique_id]["subject"]
-            for subject in subject_list:
-                if subject not in subject_settings:
-                    subject_settings[subject] = initial_subject_setting
-                    # Tally up the questions that are in_circulation
-                    if question_object.get("in_circulation") == True:
-                        subject_settings[subject]["num_questions_in_circulation"] += 1
-                    # Build an index of user questions sorted by subject
-                    subject_settings[subject]["questions"] = []
-                    subject_settings[subject]["questions"].append(unique_id)
-                    # Tally Total questions
-                    subject_settings[subject]["total_questions"] += 1
-                    # Tally Total activated questions
-                    if question_object.get("is_module_active") == True:
-                        subject_settings[subject]["total_activated_questions"] += 1
-                else:
-                    subject_settings[subject]["questions"].append(unique_id)
-                    if question_object.get("in_circulation") == True:
-                        subject_settings[subject]["num_questions_in_circulation"] += 1
-                    subject_settings[subject]["total_questions"] += 1
-                    if question_object.get("is_module_active") == True:
-                        subject_settings[subject]["total_activated_questions"] += 1
+        all_user_questions.update(pile)
 
-    print("    Determining if subjects has available questions")
-    for subject in subject_settings:
-        if subject_settings[subject]["total_activated_questions"] == subject_settings[subject]["num_questions_in_circulation"]:
-            subject_settings[subject]["has_available_questions"] = False
+    # Talley up the the three values we need
+    for question_id, user_question_data in all_user_questions.items():
+        question_object = question_object_data[question_id].copy()
+        module_name = question_object["module_name"]
+        for subject_val in question_object["subject"]:
+            total_all_list.append(subject_val)
+            all_subjects_set.add(subject_val)
+            if question_id in user_profile_data["questions"]["in_circulation_not_eligible"] or question_id in user_profile_data["questions"]["in_circulation_is_eligible"]:
+                num_questions_in_circ_list.append(subject_val)
+            try:
+                if user_profile_data["settings"]["module_settings"]["module_status"][module_name] == True:
+                    total_activated_list.append(subject_val)
+            except KeyError: # Likely due to first time user
+                pass
+
+    for sub in all_subjects_set:
+        if sub not in subject_settings:
+            subject_settings[sub] = {}
+            subject_settings[sub]["interest_level"]             = 10
+            subject_settings[sub]["priority"]                   = 9
+            subject_settings[sub]["total_questions"]                 = 0
+            subject_settings[sub]["num_questions_in_circulation"]    = 0
+            subject_settings[sub]["total_activated_questions"]       = 0
+        subject_settings[sub]["total_questions"]                = total_all_list.count(sub)
+        subject_settings[sub]["num_questions_in_circulation"]   = num_questions_in_circ_list.count(sub)
+        subject_settings[sub]["total_activated_questions"]      = total_activated_list.count(sub)
+        print("    Determining if subjects has available questions")
+        if subject_settings[sub]["total_activated_questions"] == subject_settings[sub]["num_questions_in_circulation"]:
+            subject_settings[sub]["has_available_questions"] = False
         else:
-            subject_settings[subject]["has_available_questions"] = True
+            subject_settings[sub]["has_available_questions"] = True
+    
         # print(f"{subject.title():25} has {in_circulation_count:5}/{total_count:<5} currently in circulation")
     subject_settings = helper.sort_dictionary_keys(subject_settings)
-    print()
-    print(f"    The user's subject settings are now:")
-    for key, value in subject_settings.items():
-        print(f"    {key:50}: {value}")
     return subject_settings
 
 def build_module_settings(user_profile_data: dict, question_object_data: dict) -> dict:
@@ -592,9 +599,9 @@ def build_module_settings(user_profile_data: dict, question_object_data: dict) -
         if pile_name != "unsorted": #Only scan through newly added questions
             continue
         for unique_id, question_object in pile.items():
-            module_name = question_object_data[unique_id]["module_name"]
+            module_name = question_object_data[unique_id]["module_name"].lower()
             # Only add to list, never delete from it
-            if module_name not in module_settings["module_status"]:
+            if module_name.lower() not in module_settings["module_status"].keys():
                 module_settings["module_status"][module_name] = default_status
     
     return module_settings
@@ -633,16 +640,18 @@ def sort_questions(user_profile_data: dict, question_object_data: dict):
     # NOTE circulating but non-eligible questions will be stored under a key by the name of str(datetime.today())
     # in_circulation - is eligible:     If the question has been placed into circulation and is also eligible then place it here, sorted by due_date (where due_date is the key, we need only check items that are within or before today's date) delete empty keys
     '''
-
     # when the program starts a function will decide what to put into circulation, that function will put things into circulation, update properties for those questions and then recall this function to sort them out before sending back to user
     questions_data = user_profile_data["questions"]
+    # We will first do a check against the module questions, if a question is referenced in a module, but does not exist in the user profile, then we will add that question to the user profile
+    all_module_data = get_all_module_data()
+    user_profile_data = verify_module_in_user_profile(user_profile_data, all_module_data)
+
     questions_to_remove_from_unsorted_pile = [] # list of id's since we can't mutate a dictionary while iterating over it
     for pile_name, pile in questions_data.items():
         if pile_name == "unsorted":
             for unique_id, question_object in pile.items():
                 # First update the question properties, ensuring data we are evaluating is accurate
                 question_object = update_user_question_stats(question_object, unique_id, user_profile_data, question_object_data)
-
 
                 # First check if the module that the question belongs to is active, if the
                 if question_object["is_module_active"] == False:
@@ -667,6 +676,7 @@ def sort_questions(user_profile_data: dict, question_object_data: dict):
     # Batch delete these id's from the unsorted pile now that they've been moved to the appropriate pile
     for unique_id in questions_to_remove_from_unsorted_pile:
         del questions_data["unsorted"][unique_id]
+    user_profile_data["questions"] = questions_data
     return questions_data
 
 ############################################################################################################################################
@@ -743,7 +753,6 @@ def update_stats(user_profile_data: dict, question_object_data: dict) -> dict:#P
     user_profile_data = system_data_user_stats.determine_total_eligible_questions(user_profile_data)
     return user_profile_data
 
-
 def update_score(status:str, unique_id:str, user_profile_data: dict, question_object_data: dict) -> dict: #Public Function
     print(f"def update_score(status:str, id:str, user_profile_data: dict) -> dict")
     print(f"    Updating < {unique_id} > with status of < {status} >")
@@ -751,7 +760,11 @@ def update_score(status:str, unique_id:str, user_profile_data: dict, question_ob
     # We need to update the metrics, then place it in the "in_circulation_not_eligible" pile
     check_variable = "" # Used to aid in print statements, a temporary place to store values
     # We will be moving the question anyway so we're going to extract the question object
-    question_object = user_profile_data['questions']["in_circulation_is_eligible"].pop(unique_id) #Removes the question from the in_circulation_is_eligible pile
+    try:
+        question_object = user_profile_data['questions']["in_circulation_is_eligible"].pop(unique_id) #Removes the question from the in_circulation_is_eligible pile
+    except KeyError:
+        # Attempting to update the score of a question that has already been updated
+        return user_profile_data
     module_name = question_object_data[unique_id]["module_name"]
     print(f"    Question is from module < {module_name} >")
     ############# We Have Multiple Values to Update ########################################
@@ -765,7 +778,7 @@ def update_score(status:str, unique_id:str, user_profile_data: dict, question_ob
             print("Task failed successfully: Incrementing time between revisions")
             question_object["time_between_revisions"] += 0.005 # Increment spacing by .5%
         question_object["revision_streak"] += 1
-        if module_name == "Quizzer Tutorial":
+        if module_name == "Quizzer Tutorial" or module_name == "quizzer tutorial":
             question_object["revision_streak"] = 1000 # Never show this again
     elif status == "incorrect":
         # The projection was set, but the user answers it incorrectly despite the fact that the algorithm predicted they should still remember it.
@@ -867,29 +880,124 @@ def add_new_question_object(
     print(f"def add_new_question_object(<properties>)")
     # This is the system data version, verify_new_question builds the question object based on the inputs and checks if its valid,
     # First we need to generate the complete object
-    
-    question_object = verify_new_question(user_profile_data, unique_id, primary_subject, subject, related, question_text, question_image, question_audio, question_video, answer_text, answer_image, answer_audio, answer_video, module_name)
+    module_name = module_name.lower()
+    question_object = verify_new_question(
+        user_profile_data   = user_profile_data,
+        subject             = subject,
+        related             = related,
+        question_text       = question_text,
+        question_image      = question_image,
+        question_audio      = question_audio,
+        question_video      = question_video,
+        answer_text         = answer_text,
+        answer_image        = answer_image,
+        answer_audio        = answer_audio,
+        answer_video        = answer_video,
+        module_name         = module_name
+    )
     if question_object == None:
         # if verification failed, then the result is a None value, check for this
         return None
     # Assign the question_object with an author field which is the user's uuid
     user_uuid = user_profile_data["uuid"]
     question_object["author"] = user_uuid # match the question to the user
-
-
-    # Now we have a complete question object
-    # We need to add it to the server question_object_data -> update the server and fetch new data
     unique_id = question_object["id"]
+    print(user_uuid)
+    print(question_object)
+
     write_data = {unique_id: question_object}
+    # Add the verified question object to the master question object database
     question_object_data.update(write_data)
-    update_question_object_data(question_object_data) # Save the new question to the server
-    #FIXME proper server logic to fetch and send data between it
-    # Current functionality allows anyone to add questions to a pre-existing module filtered by name
-    # Check if the module name already exists and the property in the module name matches the user's uuid -> Should be done on the front-end?
+    update_question_object_data(question_object_data) 
+    # Add the id to the user's profile
     data = update_user_question_stats({}, unique_id, user_profile_data, question_object_data)
     user_profile_data["questions"]["unsorted"].update({unique_id: data})
-    user_profile_data = sort_questions(user_profile_data, question_object_data)
+    user_profile_data["questions"] = sort_questions(user_profile_data, question_object_data)
     user_profile_data = update_stats(user_profile_data, question_object_data)
+    update_user_profile(user_profile_data)
+
+    return question_object
+
+def verify_module_in_user_profile(user_profile_data, all_module_data):
+    '''
+    Scans the module questions (all of the the user modules)
+    If any are missing from the user_profile add them
+    '''
+    user_modules = user_profile_data["settings"]["module_settings"]["module_status"].keys()
+    all_user_questions = {}
+    for pile_name, pile in user_profile_data["questions"].items():
+        all_user_questions.update(pile)
+    deletion_queue = [] # List of module names
+    for module_name in user_modules:
+        try:
+            module_data = all_module_data[module_name].copy()
+        except KeyError:
+            # This error was introduced on account of editing every question of one module, changing the module names, so that no questions were left in that module
+            #   This caused the deletion of the empty module
+            #   In Turn The program went to check for missing questions in that module and could not find the module
+            # So what do we need to do fix this?
+            # First handle the exception with this try except block
+            # Since the module name exists in the user file, but not in the system, we should delete it from the module_status setting
+            deletion_queue.append(module_name)
+        module_questions = module_data["questions"]
+        for question_id in module_questions: # module_questions is a list of id's
+            # if we find a question_id in the module that a user owns, but the user doesn't have it, throw it in the unsorted pile
+            if question_id not in all_user_questions:
+                user_profile_data["questions"]["unsorted"].update({question_id: {}})  
+
+    # To avoid a RunTimeError: dictionary changed size during iteration error  
+    for module_name in deletion_queue:
+        del user_profile_data["settings"]["module_settings"]["module_status"][module_name]
+
+    return user_profile_data
+
+def activate_module_in_user_profile(name_of_module, user_profile_data, all_module_data, question_object_data):
+    '''
+    adds the module to the user settings
+    Verifies the user has all the questions for that module
+    Sorts the new questions into the reserve bank
+    Scans the deactivated pile for any questions belonging to that module, then puts them in the reserve bank
+    '''
+    status = user_profile_data["settings"]["module_settings"]["is_module_active_by_default"]
+    user_profile_data["settings"]["module_settings"]["module_status"].update({name_of_module: True})
+    sort_questions(user_profile_data, question_object_data) # Calls verification -> moves questions to reserve bank
+    module_to_activate = all_module_data[name_of_module]["questions"]
+    for question_id in module_to_activate:
+        if question_id in user_profile_data["questions"]["deactivated"]:
+            # Move the question to the reserve_bank
+            user_profile_data["questions"]["reserve_bank"].update({question_id: user_profile_data["questions"]["deactivated"][question_id]})
+            # Delete from deactivated pile
+            del user_profile_data["questions"]["deactivated"][question_id]
+    update_user_profile(user_profile_data)
+    return user_profile_data
+
+def deactivate_module_in_user_profile(name_of_module, user_profile_data, all_module_data, question_object_data):
+    '''
+    Can't deactivate something unless we've first added it, this is controlled in the frontend
+    Verifies the user has all questions for that module
+    Sorts the nwe questions into the reserve bank
+    Sets the status to false
+    Scans three piles, reserve_bank, in_circulation_not_eligible, in_circulation_is_eligible, moves those questions to the deactivated pile
+    '''
+    print(f"def deactivate_module")
+    user_profile_data["settings"]["module_settings"]["module_status"].update({name_of_module: False})
+    sort_questions(user_profile_data, question_object_data)
+    module_to_deactivate = all_module_data[name_of_module]["questions"]
+    for question_id in module_to_deactivate:
+        # Scan the reserve bank
+        if question_id in user_profile_data["questions"]["reserve_bank"]:
+            user_profile_data["questions"]["deactivated"].update({question_id: user_profile_data["questions"]["reserve_bank"][question_id]})
+            del user_profile_data["questions"]["reserve_bank"][question_id]
+        # Scan the "in_circulation_not_eligible" pile
+        elif question_id in user_profile_data["questions"]["in_circulation_not_eligible"]:
+            user_profile_data["questions"]["deactivated"].update({question_id: user_profile_data["questions"]["in_circulation_not_eligible"][question_id]})
+            del user_profile_data["questions"]["in_circulation_not_eligible"][question_id]   
+        # Scan the "in_circulation_is_eligible"
+        elif question_id in user_profile_data["questions"]["in_circulation_is_eligible"]:
+            user_profile_data["questions"]["deactivated"].update({question_id: user_profile_data["questions"]["in_circulation_is_eligible"][question_id]})
+            del user_profile_data["questions"]["in_circulation_is_eligible"][question_id]                       
+    update_user_profile(user_profile_data)
+    return user_profile_data
 
 # Two design philosophies from this point on:
 

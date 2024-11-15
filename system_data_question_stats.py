@@ -194,9 +194,30 @@ def determine_eligibility_of_question_object(question_object: dict, settings_dat
 
 def update_is_module_active_property(question_object: dict, unique_id: str, user_profile_data: dict, question_object_data: dict) -> dict:
     module_name = question_object_data[unique_id]["module_name"]
-    activated = user_profile_data["settings"]["module_settings"]["module_status"][module_name]
+    try:
+        activated = user_profile_data["settings"]["module_settings"]["module_status"][module_name]
+    except KeyError as e:
+        # if the question has a module_name that doesn't exist we will import that module into their settings
+        user_profile_data["settings"]["module_settings"]["module_status"][module_name] = True
+        activated = True
     question_object["is_module_active"] = activated
     # Unit Test Print Statement
     print(f"def update_questions.update_is_module_active_property:")
     print(f"    Processed: <{module_name}>'s QO: \n    <{unique_id}> \n    with status of <{activated}>")
+    return question_object
+
+def update_user_question_stats(question_object: dict, unique_id, user_profile_data: dict, question_object_data: dict) -> dict:
+    print("def update_user_question_stats(question_object: dict, unique_id, user_profile_data: dict, question_object_data: dict) -> dict")
+    settings_data = user_profile_data["settings"]
+    question_object = initialize_revision_streak_property(question_object)
+    question_object = initialize_last_revised_property(question_object)
+    question_object = initialize_next_revision_due_property(question_object)
+    question_object = initialize_in_circulation_property(question_object, settings_data)
+    question_object = initialize_time_between_revisions_property(question_object, settings_data)
+    question_object = calculate_average_shown(question_object)
+    question_object = determine_eligibility_of_question_object(question_object, settings_data)
+    question_object = update_is_module_active_property(question_object, unique_id, user_profile_data, question_object_data)
+    if type(question_object) != type({}):
+        print(f"Question Object has type {type(question_object)}")
+        raise Exception("Question Object is not a dictionary, one of the properties is returning the wrong object")
     return question_object
