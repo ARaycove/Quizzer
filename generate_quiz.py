@@ -63,7 +63,6 @@ def should_increment_tier_value(actual_composition, master_ratio, tier_value):
     for subject in master_ratio.copy():
         target_ratio = master_ratio[subject] * tier_value
         if actual_composition[subject] < target_ratio:
-            print("Should not Increment Tier")
             return False
     return True
 ###############################################################
@@ -98,41 +97,46 @@ def add_questions_into_circulation(average_daily_questions: float, desired_daily
 
     # Configure initial tier_value
     tier_value = configure_initial_tier_value(actual_composition,master_ratio,questions_remaining_by_subject)
+    for sub in questions_remaining_by_subject:
+        working_ratio_targets[sub] = master_ratio[sub] * tier_value
+        if questions_remaining_by_subject[sub] <= 0:
+            actual_composition[sub] = 9999999
     print(tier_value)
     print(working_ratio_targets)
     print(actual_composition)
     print(questions_remaining_by_subject)
     for question_id in user_profile_data["questions"]["reserve_bank"].copy():
+        # Determine whether or not a subject has remaining questions in it
+        #    Set the actual composition value to 10 million to inform the computer that we should ignore this subject going forward
         for sub in questions_remaining_by_subject:
             working_ratio_targets[sub] = master_ratio[sub] * tier_value
             if questions_remaining_by_subject[sub] <= 0:
-                print(sub)
                 actual_composition[sub] = 9999999
 
-        # print(actual_composition)
-        # print(questions_remaining_by_subject)
-        # print(f"Current Tier is: {tier_value} -> {working_ratio_targets}")
+        # get the list of subjects the specific question covers
+        #   In subject settings, if a question has 5 subjects, that question contributes to incrementing each of those fiver subjects
         subjects_list = question_object_data[question_id]["subject"]
-        subject_value = subjects_list[0]
-        current_subject_target = working_ratio_targets[subject_value]
-        current_amount_circulating = actual_composition[subject_value]
-        question_stat_block = user_profile_data["questions"]["reserve_bank"][question_id]
-        question_to_move = {question_id: question_stat_block}
+        for subject_value in subjects_list: # We need to evaluate every subject that might exist for that question:
+            # Gather the information for that subject
+            current_subject_target = working_ratio_targets[subject_value]
+            current_amount_circulating = actual_composition[subject_value]
+            question_stat_block = user_profile_data["questions"]["reserve_bank"][question_id]
+            question_to_move = {question_id: question_stat_block}
+            
+            if current_amount_circulating < current_subject_target:
+                user_profile_data["questions"]["in_circulation_is_eligible"].update(question_to_move)
+                del user_profile_data["questions"]["reserve_bank"][question_id]
+                for sub in subjects_list:
+                    actual_composition[sub]             += 1
+                    questions_remaining_by_subject[sub] -= 1
+                target -= question_stat_block["average_times_shown_per_day"]
+                print(f"    The target is now: {target}")
+                break # If we decide to add the question to circulation then we need to stop iterating over its subjects
 
-        if current_amount_circulating < current_subject_target:
-            print("Did we hit this?")
-            user_profile_data["questions"]["in_circulation_is_eligible"].update(question_to_move)
-            del user_profile_data["questions"]["reserve_bank"][question_id]
-            for sub in subjects_list:
-                actual_composition[sub]             += 1
-                questions_remaining_by_subject[sub] -= 1
-            target -= question_stat_block["average_times_shown_per_day"]
-            print(f"    The target is now: {target}")
-
-        elif current_amount_circulating >= current_subject_target:
-            if should_increment_tier_value(actual_composition, master_ratio,tier_value):
-                tier_value += 1
-                    
+            elif current_amount_circulating >= current_subject_target:
+                if should_increment_tier_value(actual_composition, master_ratio,tier_value):
+                    tier_value += 1      
+                # if we decide it should be added because of the subjeect then we should proceed to the next subject for evaluation 
 
         if target <= 0:
             return user_profile_data

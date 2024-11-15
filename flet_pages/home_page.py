@@ -2,6 +2,7 @@ import flet as ft
 import random
 import system_data
 import generate_quiz
+from datetime import datetime, date, timedelta
 
 class HomePage(ft.View):
     def __init__(self, page: ft.Page, questions_available_to_answer, 
@@ -111,7 +112,7 @@ class HomePage(ft.View):
             disabled    = True
         )
         
-        self.text_object           = ft.Text(value="",text_align="center")
+        self.text_object           = ft.Text(value="",text_align="left")
         self.image_object          = ft.Image(src=f"system_data/media_files/", width=300)
         ############################################################
         # Define Composite Components -> rely on above container elements and data
@@ -173,14 +174,22 @@ class HomePage(ft.View):
                 self.edit_current_question_button
             ]
         )
+        # Statistics
+        self.todays_date = str(date.today())
         self.remaining_questions_counter = ft.Text(
-            value=str(len(self.user_profile_data["questions"]["in_circulation_is_eligible"]))
+            value=str(f"Rem: {len(self.user_profile_data['questions']['in_circulation_is_eligible'])}"),
+            tooltip="The amount of questions remaining to be answered,\n When this value hits zero, Quizzer will determine if it will put more questions in front of you."
+        )
+        self.total_answered_today = ft.Text(
+            value=str(f"TAT:{self.user_profile_data['stats']['questions_answered_by_date'][self.todays_date]}"),
+            tooltip="This number represents the amount of questions you've answered just for today"
         )
         self.first_row = ft.Row(
             alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
             controls=[
                 self.menu_button,
                 self.remaining_questions_counter,
+                self.total_answered_today,
                 self.row_one # contains add and edit question button
             ],
             height=50
@@ -312,7 +321,9 @@ class HomePage(ft.View):
         self.skip_button.disabled=False
         system_data.update_user_profile(self.user_profile_data)
         self.verify_if_remaining_questions()
-        self.remaining_questions_counter.value = str(len(self.user_profile_data["questions"]["in_circulation_is_eligible"]))
+        # Refresh stats when a question is answered
+        self.remaining_questions_counter.value  = str(f"Rem: {len(self.user_profile_data['questions']['in_circulation_is_eligible'])}")
+        self.total_answered_today.value         = str(f"TAT:{self.user_profile_data['stats']['questions_answered_by_date'][self.todays_date]}")
         self.page.update()
 
 

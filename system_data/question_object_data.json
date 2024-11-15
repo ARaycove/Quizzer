@@ -866,10 +866,13 @@
         "related": [
             "float",
             "round()",
-            "scientific notation"
+            "scientific notation",
+            "field width",
+            "fill character",
+            "alignment character"
         ],
         "question_text": "Ask the user for a floating-point number. Prints the number in decimal form with 4 decimal places. Prints the number in scientific notation with 2 decimal places.",
-        "answer_text": "Error",
+        "answer_text": "print(f\"{value:.4f}\") -> cuts off the print statement at 4 decimal points\n\nprint(f\"{value:.2e}\") -> cuts off the print statement at 2 places in scientific notation",
         "question_image": null,
         "question_audio": null,
         "question_video": null,
@@ -878,7 +881,8 @@
         "answer_video": null,
         "module_name": "introductory computer science with python",
         "academic_sources": [],
-        "id": "65.115.107.32.116.104.101.32.117.115.101.114.32.102.111.114.32.97.32.102.108.111.97.116.105.110.103.45.112.111.105.110.116.32.110.117.109.98.101.114.46.32.80.114.105.110.116.115.32.116.104.101.32.110.117.109.98.101.114.32.105.110.32.100.101.99.105.109.97.108.32.102.111.114.109.32.119.105.116.104.32.52.32.100.101.99.105.109.97.108.32.112.108.97.99.101.115.46.32.80.114.105.110.116.115.32.116.104.101.32.110.117.109.98.101.114.32.105.110.32.115.99.105.101.110.116.105.102.105.99.32.110.111.116.97.116.105.111.110.32.119.105.116.104.32.50.32.100.101.99.105.109.97.108.32.112.108.97.99.101.115.46"
+        "id": "65.115.107.32.116.104.101.32.117.115.101.114.32.102.111.114.32.97.32.102.108.111.97.116.105.110.103.45.112.111.105.110.116.32.110.117.109.98.101.114.46.32.80.114.105.110.116.115.32.116.104.101.32.110.117.109.98.101.114.32.105.110.32.100.101.99.105.109.97.108.32.102.111.114.109.32.119.105.116.104.32.52.32.100.101.99.105.109.97.108.32.112.108.97.99.101.115.46.32.80.114.105.110.116.115.32.116.104.101.32.110.117.109.98.101.114.32.105.110.32.115.99.105.101.110.116.105.102.105.99.32.110.111.116.97.116.105.111.110.32.119.105.116.104.32.50.32.100.101.99.105.109.97.108.32.112.108.97.99.101.115.46",
+        "primary_subject": "computer_science"
     },
     "83.105.109.112.108.105.102.121.32.115.105.110.40.45.952.41.47.116.97.110.40.952.41": {
         "subject": [
@@ -10363,7 +10367,8 @@
             "computer_science"
         ],
         "related": [
-            "print() function"
+            "print() function",
+            "newline character"
         ],
         "question_text": "In python, when using the print statement you want to omit the newline character, how do you do this? In other words by default the print statement generates a newline, how do you prevent this?",
         "answer_text": "print(var, end=\"\")",
@@ -10375,7 +10380,8 @@
         "answer_video": null,
         "module_name": "introductory computer science with python",
         "academic_sources": [],
-        "id": "73.110.32.112.121.116.104.111.110.44.32.119.104.101.110.32.117.115.105.110.103.32.116.104.101.32.112.114.105.110.116.32.115.116.97.116.101.109.101.110.116.32.121.111.117.32.119.97.110.116.32.116.111.32.111.109.105.116.32.116.104.101.32.110.101.119.108.105.110.101.32.99.104.97.114.97.99.116.101.114.44.32.104.111.119.32.100.111.32.121.111.117.32.100.111.32.116.104.105.115.63.32.73.110.32.111.116.104.101.114.32.119.111.114.100.115.32.98.121.32.100.101.102.97.117.108.116.32.116.104.101.32.112.114.105.110.116.32.115.116.97.116.101.109.101.110.116.32.103.101.110.101.114.97.116.101.115.32.97.32.110.101.119.108.105.110.101.44.32.104.111.119.32.100.111.32.121.111.117.32.112.114.101.118.101.110.116.32.116.104.105.115.63"
+        "id": "73.110.32.112.121.116.104.111.110.44.32.119.104.101.110.32.117.115.105.110.103.32.116.104.101.32.112.114.105.110.116.32.115.116.97.116.101.109.101.110.116.32.121.111.117.32.119.97.110.116.32.116.111.32.111.109.105.116.32.116.104.101.32.110.101.119.108.105.110.101.32.99.104.97.114.97.99.116.101.114.44.32.104.111.119.32.100.111.32.121.111.117.32.100.111.32.116.104.105.115.63.32.73.110.32.111.116.104.101.114.32.119.111.114.100.115.32.98.121.32.100.101.102.97.117.108.116.32.116.104.101.32.112.114.105.110.116.32.115.116.97.116.101.109.101.110.116.32.103.101.110.101.114.97.116.101.115.32.97.32.110.101.119.108.105.110.101.44.32.104.111.119.32.100.111.32.121.111.117.32.112.114.101.118.101.110.116.32.116.104.105.115.63",
+        "primary_subject": "computer_science"
     },
     "87.104.97.116.32.105.115.32.65.112.112.114.101.99.105.97.116.105.118.101.32.76.105.115.116.101.110.105.110.103.63": {
         "subject": [
@@ -11533,7 +11539,7 @@
             "sort()"
         ],
         "question_text": "In python, what does the list method sort() do? What arguments does it take?",
-        "answer_text": "Sort the items of list in-place, ascending order.\nlist.sort()",
+        "answer_text": "Sort the items of list in-place, ascending order.\nlist.sort(\nkey=<method>\nreverse=<bool>))",
         "question_image": null,
         "answer_image": null,
         "question_audio": null,
@@ -11542,7 +11548,8 @@
         "answer_video": null,
         "module_name": "introductory computer science with python",
         "academic_sources": [],
-        "id": "73.110.32.112.121.116.104.111.110.44.32.119.104.97.116.32.100.111.101.115.32.116.104.101.32.108.105.115.116.32.109.101.116.104.111.100.32.115.111.114.116.40.41.32.100.111.63.32.87.104.97.116.32.97.114.103.117.109.101.110.116.115.32.100.111.101.115.32.105.116.32.116.97.107.101.63"
+        "id": "73.110.32.112.121.116.104.111.110.44.32.119.104.97.116.32.100.111.101.115.32.116.104.101.32.108.105.115.116.32.109.101.116.104.111.100.32.115.111.114.116.40.41.32.100.111.63.32.87.104.97.116.32.97.114.103.117.109.101.110.116.115.32.100.111.101.115.32.105.116.32.116.97.107.101.63",
+        "primary_subject": "computer_science"
     },
     "87.104.97.116.32.100.111.101.115.32.116.104.101.32.116.101.114.109.32.100.101.118.105.99.101.45.112.105.120.101.108.45.114.97.116.105.111.32.109.101.97.110.63": {
         "subject": [
@@ -12729,10 +12736,12 @@
             "computer_science"
         ],
         "related": [
-            "open()"
+            "open()",
+            "with keyword",
+            ".write() method"
         ],
         "question_text": "How do you create a new file using Python?",
-        "answer_text": "f = open(\"myfile.txt\", \"x\")",
+        "answer_text": "data_to_write_var = \"something here\"\n\nwith open(\"file_name.txt\", \"x\") as f:\n    f.write(data_to_write_var)",
         "question_image": null,
         "question_audio": null,
         "question_video": null,
@@ -12741,7 +12750,8 @@
         "answer_video": null,
         "module_name": "introductory computer science with python",
         "academic_sources": [],
-        "id": "72.111.119.32.100.111.32.121.111.117.32.99.114.101.97.116.101.32.97.32.110.101.119.32.102.105.108.101.32.117.115.105.110.103.32.80.121.116.104.111.110.63"
+        "id": "72.111.119.32.100.111.32.121.111.117.32.99.114.101.97.116.101.32.97.32.110.101.119.32.102.105.108.101.32.117.115.105.110.103.32.80.121.116.104.111.110.63",
+        "primary_subject": "computer_science"
     },
     "87.104.97.116.32.105.115.32.116.104.101.32.68.111.114.109.97.110.116.32.73.100.101.97.115.32.65.114.103.117.109.101.110.116.63": {
         "subject": [
@@ -30608,5 +30618,30 @@
         "answer_video": null,
         "module_name": "basic math",
         "author": "7a03fe74-c42a-4e0f-9fd8-b0835945b753"
+    },
+    "2024-11-15 09:01:00.445280_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-11-15 09:01:00.445280_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "computer_science"
+        ],
+        "related": [
+            "list comprehension",
+            "string literal|string",
+            "split() method",
+            ".isspace()",
+            ".isalnum()",
+            ".islower()"
+        ],
+        "question_text": "You have a string \"This String\",\nIn python, convert this string so that it is all lower case and has no spaces\nResult: \"thisstring\"",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "my_string = \"This String\"\nmy_string.lower()\nmy_string = \"\".join[i for i in my_string if i.isspace() == False]",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "introductory computer science with python",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
     }
 }
