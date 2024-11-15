@@ -159,7 +159,6 @@ cython_debug/
 #.idea/
 
 user_profiles/
-media_files/
 backups/
 instance_data/
 modules/
