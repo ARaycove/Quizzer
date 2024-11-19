@@ -641,42 +641,58 @@ def sort_questions(user_profile_data: dict, question_object_data: dict):
     # in_circulation - is eligible:     If the question has been placed into circulation and is also eligible then place it here, sorted by due_date (where due_date is the key, we need only check items that are within or before today's date) delete empty keys
     '''
     # when the program starts a function will decide what to put into circulation, that function will put things into circulation, update properties for those questions and then recall this function to sort them out before sending back to user
-    questions_data = user_profile_data["questions"]
+    
     # We will first do a check against the module questions, if a question is referenced in a module, but does not exist in the user profile, then we will add that question to the user profile
     all_module_data = get_all_module_data()
     user_profile_data = verify_module_in_user_profile(user_profile_data, all_module_data)
+    #   Any missing questions are not in the unsorted pile
+    # Criteria
+    user_profile_data_copy = user_profile_data.copy()
+    if user_profile_data_copy is user_profile_data:
+        print("ITS NOT COPYING")
+    elif user_profile_data_copy is not user_profile_data:
+        print("ITS A COPY FOR SURE")
+    # Iterate over every question in the user's profile
+    for pile_name, pile in user_profile_data_copy["questions"].items():
+        for question_id, question_object in pile.copy().items():
+            question_object = update_user_question_stats(question_object, question_id, user_profile_data, question_object_data)
+                # Ensure the question object is updated -> checks eligibility
+            user_question_object = {question_id: question_object} # Add this to the pile that it belongs to
+            module_name = question_object_data[question_id]["module_name"]
+            try:
+                user_module_status = user_profile_data["settings"]["module_settings"]["module_status"][module_name]
+            except KeyError: # If the user doesn't own the module in question we will get a key error
+                # We will not activate the module in this case, only if the user contributes to a module will we activate the module for that user
+                user_module_status = False # user doesn't own, but a false status puts it in the deactivated pile
+            question_in_circulation = question_object["in_circulation"]
+            eligible_status         = question_object["is_eligible"]
+            # Unsorted Pile
+            #   Question has just been added to the user's profile, is not accessed, no questions should remain in this pile
 
-    questions_to_remove_from_unsorted_pile = [] # list of id's since we can't mutate a dictionary while iterating over it
-    for pile_name, pile in questions_data.items():
-        if pile_name == "unsorted":
-            for unique_id, question_object in pile.items():
-                # First update the question properties, ensuring data we are evaluating is accurate
-                question_object = update_user_question_stats(question_object, unique_id, user_profile_data, question_object_data)
-
-                # First check if the module that the question belongs to is active, if the
-                if question_object["is_module_active"] == False:
-                    write_data = {unique_id: question_object}
-                    questions_data["deactivated"].update(write_data)
-                    questions_to_remove_from_unsorted_pile.append(unique_id)
-                # Module is active, therefore eligible to be placed into circulation
-                elif question_object["in_circulation"] == False:
-                    write_data = {unique_id: question_object}
-                    questions_data["reserve_bank"].update(write_data)
-                    questions_to_remove_from_unsorted_pile.append(unique_id)
-                # Conditions if in_circulation == True
-                elif question_object["is_eligible"] == True and question_object["in_circulation"] == True:
-                    write_data = {unique_id: question_object}
-                    questions_data["in_circulation_is_eligible"].update(write_data)
-                    questions_to_remove_from_unsorted_pile.append(unique_id)
-                elif question_object["is_eligible"] == False and question_object["in_circulation"] == True:
-                    write_data = {unique_id: question_object}
-                    questions_data["in_circulation_not_eligible"].update(write_data)
-                    questions_to_remove_from_unsorted_pile.append(unique_id)
-    
-    # Batch delete these id's from the unsorted pile now that they've been moved to the appropriate pile
-    for unique_id in questions_to_remove_from_unsorted_pile:
-        del questions_data["unsorted"][unique_id]
-    user_profile_data["questions"] = questions_data
+            if user_module_status == False:
+                # deactivated Pile
+                #   The module that the question belongs to is deactivated OR user does not own it  
+                del user_profile_data["questions"][pile_name][question_id]
+                user_profile_data["questions"]["deactivated"].update(user_question_object)
+            else: # user_module_status == True:
+                # reserve_bank Pile
+                #   The module that the question belongs to is active BUT has not been placed into the circulation pile yet
+                if question_in_circulation == False:
+                    del user_profile_data["questions"][pile_name][question_id]
+                    user_profile_data["questions"]["reserve_bank"].update(user_question_object)
+                else: # question_in_circulation == True:
+                    # in_circulation_not_eligible Pile
+                    #   Question has been placed into circulation by add_questions_to_circulation function AND module is active AND question[is_eligible] == False
+                    if eligible_status == False:
+                        del user_profile_data["questions"][pile_name][question_id]
+                        user_profile_data["questions"]["in_circulation_not_eligible"].update(user_question_object)
+                    else: # eligible_status = True, all of the above are true
+                    # in_circulation_is_eligible Pile
+                    #   Question has been placed into circulation by add_questions_to_circulation function AND module is active AND question[is_eligible] == True
+                        del user_profile_data["questions"][pile_name][question_id]
+                        user_profile_data["questions"]["in_circulation_is_eligible"].update(user_question_object)
+    #####################################################################################
+    questions_data = user_profile_data["questions"]
     return questions_data
 
 ############################################################################################################################################
@@ -923,6 +939,7 @@ def verify_module_in_user_profile(user_profile_data, all_module_data):
     '''
     Scans the module questions (all of the the user modules)
     If any are missing from the user_profile add them
+    After adding missing questions, scans through questions in the reserve bank, and circulating piles. and verifies where the question should be based on the module
     '''
     user_modules = user_profile_data["settings"]["module_settings"]["module_status"].keys()
     all_user_questions = {}
@@ -949,7 +966,6 @@ def verify_module_in_user_profile(user_profile_data, all_module_data):
     # To avoid a RunTimeError: dictionary changed size during iteration error  
     for module_name in deletion_queue:
         del user_profile_data["settings"]["module_settings"]["module_status"][module_name]
-
     return user_profile_data
 
 def activate_module_in_user_profile(name_of_module, user_profile_data, all_module_data, question_object_data):

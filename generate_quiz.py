@@ -124,6 +124,8 @@ def add_questions_into_circulation(average_daily_questions: float, desired_daily
             question_to_move = {question_id: question_stat_block}
             
             if current_amount_circulating < current_subject_target:
+                question_stat_block["in_circulation"] = True
+                question_to_move = {question_id: question_stat_block}
                 user_profile_data["questions"]["in_circulation_is_eligible"].update(question_to_move)
                 del user_profile_data["questions"]["reserve_bank"][question_id]
                 for sub in subjects_list:

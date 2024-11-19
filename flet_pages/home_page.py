@@ -181,9 +181,14 @@ class HomePage(ft.View):
             tooltip="The amount of questions remaining to be answered,\n When this value hits zero, Quizzer will determine if it will put more questions in front of you."
         )
         self.total_answered_today = ft.Text(
-            value=str(f"TAT:{self.user_profile_data['stats']['questions_answered_by_date'][self.todays_date]}"),
             tooltip="This number represents the amount of questions you've answered just for today"
         )
+        try:
+            self.total_answered_today.value = str(f"TAT:{self.user_profile_data['stats']['questions_answered_by_date'][self.todays_date]}")
+        except KeyError: # If the user just logged in today, that entry won't exist so we need to update stats first
+            # Total is 0, the entry is made when the first question is answered
+            system_data.update_stats(self.user_profile_data,self.question_object_data)
+            self.total_answered_today.value = "0"
         self.first_row = ft.Row(
             alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
             controls=[
@@ -239,12 +244,17 @@ class HomePage(ft.View):
         self.page.go("/DisplayModulePage")
 
     def build_initial_state(self):
-        self.get_next_question()
-        self.user_profile_data["questions"] = system_data.sort_questions(self.user_profile_data, self.question_object_data)
-        self.user_profile_data = system_data.update_circulating_non_eligible_questions(
-            self.user_profile_data,
-            self.question_object_data
-        )        
+        try:
+            # Current question is residing in the is_eligible pile, use this one, otherwise get a new question
+            valid_check = self.user_profile_data["questions"]["in_circulation_is_eligible"][self.current_question_id]
+            self.current_question = self.question_object_data[self.current_question_id]
+        except KeyError:
+            self.get_next_question()
+            self.user_profile_data["questions"] = system_data.sort_questions(self.user_profile_data, self.question_object_data)
+            # self.user_profile_data = system_data.update_circulating_non_eligible_questions(
+            #     self.user_profile_data,
+            #     self.question_object_data
+            # )        
         if self.questions_available_to_answer == False:
             return None
         # Execute these if there are available questions
@@ -253,7 +263,6 @@ class HomePage(ft.View):
         self.text_object.size   = 16
         self.image_object.src   = f"system_data/media_files/{self.current_question['question_image']}"
         self.user_profile_data  = system_data.update_stats(self.user_profile_data,self.question_object_data)
-        
         self.page.update()
 
     def verify_if_remaining_questions(self) -> bool:

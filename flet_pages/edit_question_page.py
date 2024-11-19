@@ -19,6 +19,8 @@ class EditQuestionPage(ft.View):
         self.all_module_data                = all_module_data
         self.current_question               = current_question
         self.current_question_id            = current_question_id
+        if current_question_id == None or current_question_id == "":
+            self.go_to_home_screen()
         self.question_object_data           = question_object_data
         self.user_profile_data              = user_profile_data
         self.CURRENT_USER                   = CURRENT_USER
@@ -194,7 +196,7 @@ class EditQuestionPage(ft.View):
         print("Answer Image:    ",  self.answer_entry.image_submission)
         self.question_object_data[self.current_question_id]["answer_image"]     = self.answer_entry.image_submission
         system_data.update_question_object_data(self.question_object_data)
-
+        self.all_module_data = system_data.get_all_module_data()
 
 
         media_files_input = set([])
@@ -204,10 +206,19 @@ class EditQuestionPage(ft.View):
             media_files_input.add(self.answer_entry.image_submission)
 
         current_media_files = []
+        uploading_files     = []
         for filename in os.listdir("system_data/media_files"):
             current_media_files.append(filename)
+        for bullshit in os.listdir("uploads"):
+            uploading_files = []
+        
 
         for filename in media_files_input:
+            if filename not in uploading_files and (filename in current_media_files):
+                # Why wouldn't the given filename be in the uploads folder?
+                # The file would not be in the uploads folder if were referencing a question that already has media attached
+                #   In such cases the file would be found in the media_files/ directory
+                continue # don't edit the file_name, since we haven't changed it
             if filename in current_media_files:
                 index_val = filename.rfind(".")
                 extension = filename[index_val:]
@@ -220,8 +231,13 @@ class EditQuestionPage(ft.View):
                     self.question_entry.image_submission = new_file_name
                 if self.answer_entry.image_submission == filename:
                     self.answer_entry.image_submission = new_file_name
-                # Change the name of the file itself               
-                os.rename(f"uploads/{filename}", (f"uploads/{new_file_name}"))
+                # Change the name of the file itself
+                try:           
+                    os.rename(f"uploads/{filename}", (f"uploads/{new_file_name}"))
+                except FileNotFoundError:
+                    pass
+                    # code failed because, submission of media did not change. Media is located in media_files not uploads
+                    # In this case we should not rename the file_name
 
 
         files_to_move = set([])

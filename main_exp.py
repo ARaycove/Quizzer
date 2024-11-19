@@ -28,6 +28,7 @@ current_question        = {}
 current_question_id     = ""
 user_profile_data       = {}
 question_object_data    = system_data.get_question_object_data()
+system_data.update_question_object_data(question_object_data) # Regenerates the all_modules block
 all_module_data         = system_data.get_all_module_data()
 current_page_data       = ""
 pages_visited           = [] # When a new route is detected we append the link to this variable

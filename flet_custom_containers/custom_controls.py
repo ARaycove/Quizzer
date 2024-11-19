@@ -12,7 +12,7 @@ class module_card(ft.Row):
     '''
     def __init__(self, name_of_module, user_profile_data, all_module_data, question_object_data):
         super().__init__()
-        self.name                   = name_of_module
+        self.name                   = name_of_module[:] # Ensure we create a copy of the string so we don't mutate it elsewhere
         self.all_module_data        = all_module_data
         self.user_profile_data      = user_profile_data
         self.question_object_data   = question_object_data
@@ -26,6 +26,7 @@ class module_card(ft.Row):
         self.alignment = ft.MainAxisAlignment.START
         # Module metadata
         # the name of the module displays first
+
         self.name_bar = ft.Text(value=self.name.title())
         # The primary subject gets displayed
         self.primary_subject = ft.Text(value=f"Primary Subject: {all_module_data[name_of_module]['primary_subject']}")
@@ -118,8 +119,11 @@ class PrimarySubjectField(ft.Container):
         # Defines
         self.current_question_id            = current_question_id
         self.question_object_data           = question_object_data
-        self.question_object                = question_object_data[current_question_id]
         self.form_fields_width              = form_fields_width
+        if current_question_id != None:
+            self.question_object            = question_object_data[current_question_id]
+        else:
+            self.question_object            = {}
         try:
             self.submission                 = self.question_object["primary_subject"]
         except KeyError:
@@ -221,10 +225,13 @@ class ModuleNameField(ft.Container):
         self.current_question_id            = current_question_id
         self.question_object_data           = question_object_data
         self.all_module_data                = all_module_data
-        self.question_object                = question_object_data[current_question_id]
         self.form_fields_width              = form_fields_width
-        self.submission                     = self.question_object["module_name"]
 
+        if current_question_id != None:
+            self.submission                 = self.question_object["module_name"]
+            self.question_object            = question_object_data[current_question_id]
+        else:
+            self.submission                 = ""
         self.module_name_text               = ft.Text(
             value       = "Define the Module:",
             size        = 24,
@@ -315,11 +322,15 @@ class RelatedSubjectsField(ft.Container):
         # Defines
         self.current_question_id            = current_question_id
         self.question_object_data           = question_object_data
-        self.question_object                = question_object_data[current_question_id]
+        
         self.form_fields_width              = form_fields_width
         self.subject_data                   = system_data.get_subject_data()
-        self.submission                     = self.question_object["subject"]
-
+        
+        if current_question_id != None:
+            self.question_object                = question_object_data[current_question_id]
+            self.submission                     = self.question_object["subject"]
+        else:
+            self.submission                     = None
         self.related_subjects_textfield             = ft.TextField(
             width=self.form_fields_width, 
             on_submit=lambda e: self.add_to_related_subjects(e, self.related_subjects_textfield.value))
@@ -330,7 +341,11 @@ class RelatedSubjectsField(ft.Container):
             multiline=True, 
             disabled=True, 
             width=self.form_fields_width)
-        self.related_subjects_display.value="\n".join(self.submission)
+        try:
+            self.related_subjects_display.value ="\n".join(self.submission)
+        except TypeError: # If the value for submission is none, the above causes a type error since you join a None Type object
+            # Set display to None if no question is fed in
+            self.related_subjects_display.value = None
 
         self.clear_related_subject_display_button           = ft.IconButton(
             icon=ft.icons.CLEAR, 
@@ -433,10 +448,15 @@ class RelatedConceptsField(ft.Container):
         # Defines
         self.current_question_id            = current_question_id
         self.question_object_data           = question_object_data
-        self.question_object                = question_object_data[current_question_id]
+        
         self.form_fields_width              = form_fields_width
-        self.submission                     = self.question_object["related"]
+        
         self.concept_data                   = system_data.get_concept_data()
+        if current_question_id != None:
+            self.question_object            = question_object_data[current_question_id]
+            self.submission                 = self.question_object["related"]
+        else:
+            self.submission                 = None
 
         self.related_concepts_textfield             = ft.TextField(
             width=self.form_fields_width, 
@@ -448,7 +468,10 @@ class RelatedConceptsField(ft.Container):
             multiline=True, 
             disabled=True, 
             width=self.form_fields_width)
-        self.related_concepts.value="\n".join(self.submission)
+        try:
+            self.related_concepts.value = "\n".join(self.submission)
+        except TypeError:
+            self.related_concepts.value = None
         
         self.related_concepts_back_button                   = ft.IconButton(
             icon=ft.icons.ARROW_BACK, 
@@ -555,12 +578,19 @@ class QuestionEntryField(ft.Container):
         self.page                           = page
         self.current_question_id            = current_question_id
         self.question_object_data           = question_object_data
-        self.question_object                = question_object_data[current_question_id]
+        
         self.form_fields_width              = form_fields_width
-        self.text_submission                = self.question_object["question_text"]
-        self.image_submission               = self.question_object["question_image"]
-        self.audio_submission               = self.question_object["question_audio"]
-        self.video_submission               = self.question_object["question_video"]
+        if current_question_id != None:
+            self.question_object                = question_object_data[current_question_id]
+            self.text_submission                = self.question_object["question_text"]
+            self.image_submission               = self.question_object["question_image"]
+            self.audio_submission               = self.question_object["question_audio"]
+            self.video_submission               = self.question_object["question_video"]
+        else:
+            self.text_submission                = None
+            self.image_submission               = None
+            self.audio_submission               = None
+            self.video_submission               = None
         self.file_picker = ft.FilePicker(
             on_result=self.dialog_result,
             on_upload=self.upload_file)
@@ -577,8 +607,9 @@ class QuestionEntryField(ft.Container):
         self.text_field.value = self.text_submission
 
         self.preview_image                              = ft.Image(
-            src="system_data/media_files/no_file.png"
+            src=f"system_data/media_files/{self.image_submission}"
         )
+
         if self.image_submission != None:
             self.preview_image.src = self.image_submission
 
@@ -717,12 +748,18 @@ class AnswerEntryField(ft.Container):
         self.page                           = page
         self.current_question_id            = current_question_id
         self.question_object_data           = question_object_data
-        self.question_object                = question_object_data[current_question_id]
         self.form_fields_width              = form_fields_width
-        self.text_submission                = self.question_object["answer_text"]
-        self.image_submission               = self.question_object["answer_image"]
-        self.audio_submission               = self.question_object["answer_audio"]
-        self.video_submission               = self.question_object["answer_video"]
+        if current_question_id != None:
+            self.question_object                = question_object_data[current_question_id]
+            self.text_submission                = self.question_object["answer_text"]
+            self.image_submission               = self.question_object["answer_image"]
+            self.audio_submission               = self.question_object["answer_audio"]
+            self.video_submission               = self.question_object["answer_video"]
+        else:
+            self.text_submission                = None
+            self.image_submission               = None
+            self.audio_submission               = None
+            self.video_submission               = None
 
         self.file_picker = ft.FilePicker(
             on_result=self.dialog_result,
@@ -740,10 +777,8 @@ class AnswerEntryField(ft.Container):
         self.text_field.value = self.text_submission
 
         self.preview_image                              = ft.Image(
-            src="system_data/media_files/no_file.png"
+            src=f"system_data/media_files/{self.image_submission}"
         )
-        if self.image_submission != None:
-            self.preview_image.src = self.image_submission
 
         self.preview_audio                              = ft.Text(
             value="Audio Not Currently Supported"

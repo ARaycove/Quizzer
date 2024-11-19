@@ -3,6 +3,7 @@ import system_data
 import os
 from lib import helper
 from datetime import datetime, date, timedelta
+from flet_custom_containers import custom_controls
 
 class AddQuestionPage(ft.View):
     def __init__(self, 
@@ -27,8 +28,7 @@ class AddQuestionPage(ft.View):
         ############################################################
         # Define General Data
         self.page.title             = "Quizzer - Add New Question"
-        self.form_fields_width      = 300
-        self.text_input_width       = 300
+        self.form_fields_width      = 400
         self.q_or_a                 = ""
         self.file_picker = ft.FilePicker(
             on_result=self.dialog_result,
@@ -77,299 +77,6 @@ class AddQuestionPage(ft.View):
 ############################################################
 ############################################################
 ############################################################
-        # Primary Subject Field
-        self.primary_subject_text                   = ft.Text(
-            value   = "Primary Subject", 
-            size    = 24,
-            tooltip = "What is the Primary Subject, or Field of Study, of this question?\n For example is this a biology question, anatomy, mathematics, calculus, history, etc.")
-        
-        self.primary_subject_textfield              = ft.TextField(
-            width=self.form_fields_width,
-            on_change=lambda e: self.update_primary_subject(e.data)
-            )
-        
-        self.primary_subject_back_button            = ft.IconButton(
-            icon=ft.icons.ARROW_BACK, 
-            icon_color=ft.colors.BLACK, 
-            tooltip="Select from from list", 
-            bgcolor=ft.colors.WHITE, 
-            on_click=self.show_primary_subject_autocomplete_option)
-        
-        self.add_new_primary_subject_button         = ft.IconButton(
-            icon=ft.icons.ADD, 
-            icon_color=ft.colors.BLACK, 
-            tooltip="Add a subject that isn't in the list", 
-            bgcolor=ft.colors.WHITE, 
-            on_click=self.show_primary_subject_textfield_option)
-        
-        self.primary_subject_input                  = ft.AutoComplete(
-            suggestions=[ft.AutoCompleteSuggestion(key=i, value=i) for i in self.subject_data.keys()],
-            on_select=lambda e: self.update_primary_subject(e.selection.value))
-        
-        self.primary_subject_textfield_option       = ft.Row(
-            controls=[
-                self.primary_subject_textfield, 
-                self.primary_subject_back_button])
-        
-        self.primary_subject_autocomplete_option    = ft.Row(
-            controls=[ft.Column(
-                controls=[
-                    ft.Stack(
-                        controls=[self.primary_subject_input],
-                        width=self.form_fields_width), 
-                    self.add_new_primary_subject_button], 
-                height=75, 
-                wrap=True)])      
-        
-
-############################################################
-############################################################
-############################################################
-        # Module Name Field
-        self.module_name_text                       = ft.Text(
-            value   ="Define the Module:", 
-            size    =24, 
-            tooltip ="What module does the question belong to?\n Begin by typing the name of the module, you'll be given a list of suggestions based on what modules already exist by that name\n You can contribute to any module \n BE AWARE: adding a question to a pre-existing module, will import that module into your profile\n Please Avoid adding duplicate questions to a module")
-        
-        self.module_name_textfield                  = ft.TextField(
-            width=self.form_fields_width,
-            on_submit=lambda e: self.update_module_name(e.data))
-        
-        self.module_name_back_button                = ft.IconButton(
-            icon=ft.icons.ARROW_BACK, 
-            icon_color=ft.colors.BLACK, 
-            tooltip="Add a subject that isn't in the list", 
-            bgcolor=ft.colors.WHITE, 
-            on_click=self.show_module_name_autocomplete_option)
-        
-        self.add_new_module_button                  = ft.IconButton(
-            icon=ft.icons.ADD, 
-            icon_color=ft.colors.BLACK, 
-            tooltip="Add a subject that isn't in the list", 
-            bgcolor=ft.colors.WHITE, 
-            on_click=self.show_module_name_textfield_option) 
-
-        self.module_name_input                      = ft.AutoComplete(
-            suggestions=[ft.AutoCompleteSuggestion(key=i, value=i) for i in self.all_module_data.keys()],
-            on_select=lambda e: self.update_module_name(e.selection.value))
-
-        self.module_name_textfield_option           = ft.Row(
-            controls=[
-                self.module_name_textfield, 
-                self.module_name_back_button])
-        
-        self.module_name_autocomplete_option        = ft.Row(
-            controls=[ft.Column(
-                controls=[
-                    ft.Stack(
-                        controls=[self.module_name_input],
-                        width=self.form_fields_width), 
-                    self.add_new_module_button], 
-                height=75, 
-                wrap=True)])
-
-
-############################################################
-############################################################
-############################################################
-        # Related Subjects Field
-        self.related_subjects_textfield             = ft.TextField(
-            width=self.form_fields_width, 
-            on_submit=lambda e: self.add_to_related_subjects(e, self.related_subjects_textfield.value))
-        
-        self.related_subjects_display               = ft.TextField(
-            label="Related Subjects",
-            tooltip="What other subjects relate to this question?\n For example it might be a calculus question, but calculus also falls under mathematics, \nThe question may also be referrencing a historical event, thus related to history as well",
-            multiline=True, 
-            disabled=True, 
-            width=self.form_fields_width)
-        
-        self.clear_related_subject_display_button           = ft.IconButton(
-            icon=ft.icons.CLEAR, 
-            icon_color=ft.colors.BLACK, 
-            tooltip="Clear The Related Subjects Input Field", 
-            bgcolor=ft.colors.WHITE, 
-            on_click=self.clear_related_subjects_field)
-        
-        self.related_subjects_back_button                   = ft.IconButton(
-            icon=ft.icons.ARROW_BACK, 
-            icon_color=ft.colors.BLACK, 
-            tooltip="Clear The Related Subjects Input Field", 
-            bgcolor=ft.colors.WHITE, 
-            on_click=self.show_related_subject_autocomplete_option)
-        
-        self.add_new_related_subject_button                 = ft.IconButton(
-            icon=ft.icons.ADD, 
-            icon_color=ft.colors.BLACK, 
-            tooltip="Add a subject that isn't in the list", 
-            bgcolor=ft.colors.WHITE, 
-            on_click=self.show_related_subject_textfield_option)
-        
-        self.related_subjects_autocomplete_input    = ft.AutoComplete(
-            suggestions=[ft.AutoCompleteSuggestion(key=i, value=i) for i in self.subject_data.keys()],
-            on_select=lambda e: self.add_to_related_subjects(e, e.selection.value))
-        
-        self.related_subjects_display_row = ft.Row(
-            controls=[
-                self.related_subjects_display, 
-                self.clear_related_subject_display_button])
-        
-        self.related_subjects_autocomplete_option   = ft.Row(
-            controls=[
-                ft.Column(
-                    controls=[
-                        ft.Stack(
-                            controls=[self.related_subjects_autocomplete_input],
-                            width=self.form_fields_width), 
-                        self.add_new_related_subject_button], 
-                    height=75, 
-                    wrap=True)])
-        
-        self.related_subjects_textfield_option      = ft.Row(
-            controls=[
-                self.related_subjects_textfield, 
-                self.related_subjects_back_button])
-
-############################################################
-############################################################
-############################################################
-        # Related Concepts Field
-        self.related_concepts_textfield             = ft.TextField(
-            width=self.form_fields_width, 
-            on_submit=lambda e: self.add_to_related_concepts(e, self.related_concepts_textfield.value))
-        
-        self.related_concepts = ft.TextField(
-            label="Related Concepts and Terms",           
-            tooltip="What concepts and terms are related to this question?\nFor example the question What year was xyz invented and who invented it? points to the term xyz, to the historical period, and to the individual\n",
-            multiline=True, 
-            disabled=True, 
-            width=self.form_fields_width)
-        
-        self.related_concepts_back_button                   = ft.IconButton(
-            icon=ft.icons.ARROW_BACK, 
-            icon_color=ft.colors.BLACK, 
-            tooltip="Clear the Related Concepts Input Field", 
-            bgcolor=ft.colors.WHITE, 
-            on_click=self.show_related_concepts_autocomplete_option)
-        
-        self.clear_related_button                           = ft.IconButton(
-            icon=ft.icons.CLEAR, 
-            icon_color=ft.colors.BLACK, 
-            tooltip="Clear the Related Concepts Input Field", 
-            bgcolor=ft.colors.WHITE, 
-            on_click=self.clear_related_concepts_field)
-        
-        self.add_new_concept_button                         = ft.IconButton(
-            icon=ft.icons.ADD, 
-            icon_color=ft.colors.BLACK, 
-            tooltip="Add a concept that isn't in the list", 
-            bgcolor=ft.colors.WHITE, 
-            on_click=self.show_related_concepts_textfield_option)
-        
-        self.concept_auto_complete                       = ft.AutoComplete(
-            suggestions=[ft.AutoCompleteSuggestion(key=i, value=i) for i in self.concept_data.keys()],
-            on_select=lambda e: self.add_to_related_concepts(e, e.selection.value))
-        
-        self.related_concepts_display_row           = ft.Row(
-            controls=[
-                self.related_concepts, 
-                self.clear_related_button])
-        
-        self.related_concepts_autocomplete_option   = ft.Row(
-            controls=[
-                ft.Column(
-                    controls=[
-                        ft.Stack(
-                            controls=[self.concept_auto_complete],
-                            width=self.form_fields_width), 
-                        self.add_new_concept_button], 
-                    height=75, 
-                    wrap=True)])
-        self.related_concepts_textfield_option      = ft.Row(
-            controls=[
-                self.related_concepts_textfield, 
-                self.related_concepts_back_button])
-############################################################
-############################################################
-############################################################
-        # Question value Fields
-        self.question_text                          = ft.TextField(
-            label="Question Text",
-            multiline=True, 
-            tooltip="What's the Question?", 
-            expand=True,
-            on_change=lambda e: self.update_question_text(e.data))
-        
-        self.question_preview_image = ft.Image()
-        
-        self.question_preview_audio = ft.Text(
-            value="Audio not currently supported")
-        
-        self.question_preview_video = ft.Text(
-            value="Video not currently supported")
-        
-        self.question_image                                 = ft.IconButton(
-            icon=ft.icons.IMAGE, 
-            icon_color=ft.colors.RED, 
-            data="")
-        
-        self.question_audio                                 = ft.IconButton(
-            icon=ft.icons.AUDIO_FILE, 
-            icon_color=ft.colors.RED, 
-            data="")
-        
-        self.question_video                                 = ft.IconButton(
-            icon=ft.icons.VIDEO_FILE, 
-            icon_color=ft.colors.RED, 
-            data="")
-        
-        self.question_media_upload_button           = ft.ElevatedButton(
-            text="Upload Question Media", 
-            tooltip="Quizzer will automatically detect whether the media you upload is an image, audio, or video file,\n Alternatively you can drag and drop the media into the interface\nRED indicates no media for that type (image, audio, video)\n GREEN indicates you've added that type of media to the question",
-            data="question_media", 
-            on_click=lambda _: self.upload_media(self.question_media_upload_button.data))
-############################################################
-############################################################
-############################################################
-        # Answer value Fields       
-        self.answer_text                            = ft.TextField(
-            label="Answer Text", 
-            multiline=True, 
-            tooltip="What's the Answer?", 
-            expand=True,
-            on_change=lambda e: self.update_answer_text(e.data))
-        self.answer_preview_audio   = ft.Text()
-
-        self.answer_preview_image   = ft.Image()
-
-        self.answer_preview_video = ft.Text()
-
-        self.answer_image                                   = ft.IconButton(
-            icon=ft.icons.IMAGE, 
-            on_click=lambda e: print(e), 
-            icon_color=ft.colors.RED,
-            data="")
-        
-        self.answer_audio                                   = ft.IconButton(
-            icon=ft.icons.AUDIO_FILE, 
-            on_click=lambda e: print(e), 
-            icon_color=ft.colors.RED,
-            data="")
-        
-        self.answer_video                                   = ft.IconButton(
-            icon=ft.icons.VIDEO_FILE, 
-            on_click=lambda e: print(e), 
-            icon_color=ft.colors.RED,
-            data="")
-        
-        self.answer_media_upload_button                     = ft.ElevatedButton(
-            text="Upload Answer Media", 
-            tooltip="Quizzer will automatically detect whether the media you upload is an image, audio, or video file\n Alternatively you can drag and drop the media into the interface\nRED indicates no media for that type (image, audio, video)\n GREEN indicates you've added that type of media to the question",
-            data="answer_media", 
-            on_click=lambda _: self.upload_media(self.answer_media_upload_button.data))
-############################################################
-############################################################
-############################################################
         # Submission Row       
         self.submit_button                                  = ft.IconButton(
             icon        = ft.icons.UPLOAD, 
@@ -385,12 +92,6 @@ class AddQuestionPage(ft.View):
             on_click    = lambda e: self.clear_form_fields(e)
             )
 
-        ############################################################
-        # Form is divided by:
-        #   Header
-        #   Middle Scrollable Form
-        #   Submission and Cancel Button
-        # Define Container elements for organization
         self.header_row                 = ft.Row(
             controls=[
                 self.menu_button,
@@ -398,88 +99,15 @@ class AddQuestionPage(ft.View):
                 self.exit_button
             ],
             alignment           =ft.MainAxisAlignment.SPACE_BETWEEN
-        )
-        self.left_side_column           = ft.Column(
-            alignment           =ft.MainAxisAlignment.START,
-            horizontal_alignment=ft.CrossAxisAlignment.START,
-            controls=[
-                self.primary_subject_text,
-                self.primary_subject_autocomplete_option,
-                self.related_subjects_display_row,
-                self.related_subjects_autocomplete_option
-            ]
-        )
+        )    
 
-        self.right_side_column          = ft.Column(
-            alignment           =ft.MainAxisAlignment.START,
-            horizontal_alignment=ft.CrossAxisAlignment.START,
-            controls=[
-                self.module_name_text,
-                self.module_name_autocomplete_option,
-                self.related_concepts_display_row,
-                self.related_concepts_autocomplete_option
-            ]
-        )        
+        self.primary_subject_entry_box  = custom_controls.PrimarySubjectField(self.question_object_data, self.form_fields_width)
+        self.module_name_entry_box      = custom_controls.ModuleNameField(self.question_object_data,self.form_fields_width,self.all_module_data)
+        self.related_subjects_entry_box = custom_controls.RelatedSubjectsField(self.question_object_data, self.form_fields_width)
+        self.related_concepts_entry_box  = custom_controls.RelatedConceptsField(self.question_object_data, self.form_fields_width)
+        self.question_entry_box         = custom_controls.QuestionEntryField(self.page, self.question_object_data, self.form_fields_width)
+        self.answer_entry_box           = custom_controls.AnswerEntryField(self.page, self.question_object_data, self.form_fields_width)
 
-        self.form_fields                = ft.Row(
-            alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
-            controls=[self.left_side_column,self.right_side_column],
-            wrap=True
-        )
-        if self.page.width >= 2 * self.form_fields_width:
-            self.form_fields.wrap = False
-
-        self.question_media_status      = ft.Row(
-            alignment=ft.MainAxisAlignment.SPACE_AROUND,
-            controls=[
-                self.question_image,
-                self.question_audio,
-                self.question_video
-            ]
-        )
-
-        self.answer_media_status        = ft.Row(
-            alignment=ft.MainAxisAlignment.SPACE_AROUND,
-            controls = [
-                self.answer_image,
-                self.answer_audio,
-                self.answer_video
-            ]
-        )
-
-        self.question_entry_box         = ft.Column(
-            controls=[
-                self.question_text,
-                self.question_preview_image,
-                self.question_preview_audio,
-                self.question_preview_video,
-                self.question_media_status,
-                self.question_media_upload_button
-            ],
-            horizontal_alignment=ft.CrossAxisAlignment.CENTER           
-        )
-
-        self.answer_entry_box           = ft.Column(
-            controls=[
-                self.answer_text,
-                self.answer_preview_image,
-                # self.answer_preview_audio,
-                # self.answer_preview_video,
-                self.answer_media_status,
-                self.answer_media_upload_button
-            ],
-            horizontal_alignment=ft.CrossAxisAlignment.CENTER
-        )
-
-        self.add_question_column        = ft.Column(
-            controls=[
-                self.form_fields,
-                self.question_entry_box,
-                self.answer_entry_box
-            ],
-            on_scroll=ft.ScrollMode.ALWAYS,
-            alignment=ft.MainAxisAlignment.START,
-        )
 
         self.submission_row             = ft.Row(
             controls=[
@@ -493,10 +121,16 @@ class AddQuestionPage(ft.View):
         # Piece it all together with self.controls
         self.controls=[
             self.header_row,
-            self.add_question_column,
+            self.primary_subject_entry_box,
+            self.module_name_entry_box,
+            self.related_subjects_entry_box,
+            self.related_concepts_entry_box,
+            self.question_entry_box,
+            self.answer_entry_box,
             self.submission_row
         ]
-        self.scroll = ft.ScrollMode.HIDDEN
+        self.scroll                 = ft.ScrollMode.HIDDEN
+        self.horizontal_alignment   = ft.CrossAxisAlignment.CENTER
 
 
     # Page Functionality below:
@@ -523,83 +157,6 @@ class AddQuestionPage(ft.View):
         self.page.go("/DisplayModulePage")
     def go_to_ai_question_generator_page    (self, e: ft.ControlEvent = None):
         self.page.go("/AIQuestionGeneratorPage")
-
-
-    # These functions effect the displayed form elements
-    def show_primary_subject_textfield_option       (self, e: ft.ControlEvent):
-        del self.left_side_column.controls[1]
-        self.left_side_column.controls.insert(1, self.primary_subject_textfield_option)
-        self.primary_subject = "Miscellaneous"
-        self.page.update()
-    def show_primary_subject_autocomplete_option    (self, e:ft.ControlEvent):
-        del self.left_side_column.controls[1]
-        self.left_side_column.controls.insert(1, self.primary_subject_autocomplete_option)
-        self.primary_subject = "Miscellaneous"
-        self.page.update()
-
-
-
-    def show_module_name_textfield_option           (self, e: ft.ControlEvent):
-        del self.right_side_column.controls[1]
-        self.right_side_column.controls.insert(1, self.module_name_textfield_option)
-        self.page.update()
-    def show_module_name_autocomplete_option        (self, e: ft.ControlEvent):
-        del self.right_side_column.controls[1]
-        self.right_side_column.controls.insert(1, self.module_name_autocomplete_option)
-        self.page.update()
-
-
-
-    def show_related_subject_textfield_option       (self, e: ft.ControlEvent):
-        del self.left_side_column.controls[3]
-        self.left_side_column.controls.insert(3, self.related_subjects_textfield_option)
-        self.page.update()
-    def show_related_subject_autocomplete_option    (self,e: ft.ControlEvent):
-        del self.left_side_column.controls[3]
-        self.left_side_column.controls.insert(3, self.related_subjects_autocomplete_option)
-        self.page.update()
-    def add_to_related_subjects                     (self,e: ft.ControlEvent, subject_inputted):
-        current_subject_list = [i for i in self.related_subjects_display.value.split("\n")]
-        # Avoid duplication
-        if subject_inputted not in current_subject_list:
-            if self.related_subjects_display.value == None or self.related_subjects_display.value == "":
-                self.related_subjects_display.value += f"{subject_inputted}"
-            else:
-                self.related_subjects_display.value += f"\n{subject_inputted}"
-        self.update_related_subject([i for i in self.related_subjects_display.value.split("\n")])
-        self.page.update()
-    def clear_related_subjects_field                (self,e: ft.ControlEvent):
-        self.related_subjects_display.value=""
-        self.update_related_subject(None)
-        self.page.update()
-
-
-
-    def show_related_concepts_textfield_option      (self,e: ft.ControlEvent):
-        del self.right_side_column.controls[3]
-        self.right_side_column.controls.insert(3, self.related_concepts_textfield_option)
-        self.page.update()
-
-    def show_related_concepts_autocomplete_option   (self,e: ft.ControlEvent):
-        del self.right_side_column.controls[3]
-        self.right_side_column.controls.insert(3, self.related_concepts_autocomplete_option)
-        self.page.update()
-
-    def add_to_related_concepts                     (self,e: ft.ControlEvent, concept_inputted):
-        current_concept_list = [i for i in self.related_concepts.value.split("\n")]
-        # Avoid duplication
-        if concept_inputted not in current_concept_list:
-            if self.related_concepts.value == None or self.related_concepts.value == "":
-                self.related_concepts.value += f"{concept_inputted}"
-            else:
-                self.related_concepts.value += f"\n{concept_inputted}"
-        self.update_related_concepts([i for i in self.related_concepts.value.split("\n")])
-        self.page.update()
-    def clear_related_concepts_field                (self, e: ft.ControlEvent):
-        self.related_concepts.value=""
-        self.update_related_concepts(None)
-        self.page.update()
-
 ############################
 # File upload utility functions
     def upload_file(self, e):
@@ -677,64 +234,44 @@ class AddQuestionPage(ft.View):
         self.page.update()
         self.q_or_a = status
 ############################
-# Update internal form value functions
-#   These functions update the hidden variable inside the page, which are accessed when the submit button is pressed
-    def update_primary_subject(self, new_data):
-        self.primary_subject_submission = new_data
-        print("New Primary subject value:",self.primary_subject_submission)
-
-    def update_module_name(self, new_data):
-        self.module_name_submission = new_data
-        print(f"New Module Name value: {self.module_name_submission}")
-
-    def update_related_subject(self, new_data):
-        self.related_subjects_submission = new_data
-        print(f"New related_subjects field value: {self.related_subjects_submission}")
-
-    def update_related_concepts(self, new_data):
-        self.related_concepts_submission = new_data
-        print(f"New related concepts value: {self.related_concepts_submission}")
-
-    def update_question_text(self, new_data):
-        self.question_text_submission = new_data
-        print(f"New Question Text Value: {self.question_text_submission}")
-
-    def update_question_image(self, new_data):
-        self.question_image_submission = new_data
-        print(f"New Question Image Value: {self.question_image_submission}")
-
-    def update_question_audio(self, new_data):
-        self.question_audio_submission = new_data
-        print(f"New Question Audio Value: {self.question_audio_submission}")
-
-    def update_question_video(self, new_data):
-        self.question_video_submission = new_data
-        print(f"New Question Video Value: {self.question_video_submission}")
-
-    def update_answer_text(self, new_data):
-        self.answer_text_submission = new_data
-        print(f"New Answer Text Value: {self.answer_text_submission}")
-
-    def update_answer_image(self, new_data):
-        self.answer_image_submission = new_data
-        print(f"New Answer Image Value: {self.answer_image_submission}")
-
-    def update_answer_audio(self, new_data):
-        self.answer_audio_submission = new_data
-        print(f"New Answer Audio Value: {self.answer_audio_submission}")
-
-    def update_answer_video(self, new_data):
-        self.answer_video_submission = new_data
-        print(f"New Answer Video Value: {self.answer_video_submission}")
 
 ################
 # Submission Button functions
     def clear_form_fields(self, e = None):
-        # Leave the page, then reload the same page
-        self.go_to_home_screen()
-        self.go_to_add_question_page()
+        self.primary_subject_entry_box  = custom_controls.PrimarySubjectField(self.question_object_data, self.form_fields_width)
+        self.module_name_entry_box      = custom_controls.ModuleNameField(self.question_object_data,self.form_fields_width,self.all_module_data)
+        self.related_subjects_entry_box = custom_controls.RelatedSubjectsField(self.question_object_data, self.form_fields_width)
+        self.related_concepts_entry_box  = custom_controls.RelatedConceptsField(self.question_object_data, self.form_fields_width)
+        self.question_entry_box         = custom_controls.QuestionEntryField(self.page, self.question_object_data, self.form_fields_width)
+        self.answer_entry_box           = custom_controls.AnswerEntryField(self.page, self.question_object_data, self.form_fields_width)
+        self.controls=[
+            self.header_row,
+            self.primary_subject_entry_box,
+            self.module_name_entry_box,
+            self.related_subjects_entry_box,
+            self.related_concepts_entry_box,
+            self.question_entry_box,
+            self.answer_entry_box,
+            self.submission_row
+        ]
+        self.scroll                 = ft.ScrollMode.HIDDEN
+        self.horizontal_alignment   = ft.CrossAxisAlignment.CENTER
+        self.page.update()
+        
 
     def submit_question(self, e):
+        self.primary_subject_submission     = self.primary_subject_entry_box.submission
+        self.module_name_submission         = self.module_name_entry_box.submission
+        self.related_subjects_submission    = self.related_subjects_entry_box.submission
+        self.related_concepts_submission    = self.related_concepts_entry_box.submission
+        self.question_text_submission       = self.question_entry_box.text_submission
+        self.question_image_submission      = self.question_entry_box.image_submission
+        self.question_audio_submission      = self.question_entry_box.audio_submission
+        self.question_video_submission      = self.question_entry_box.video_submission
+        self.answer_text_submission         = self.answer_entry_box.text_submission
+        self.answer_image_submission        = self.answer_entry_box.image_submission
+        self.answer_audio_submission        = self.answer_entry_box.audio_submission
+        self.answer_video_submission        = self.answer_entry_box.video_submission
         print(f"self.primary_subject_submission has value of    : {self.primary_subject_submission} of type {type(self.primary_subject_submission)}")
         print(f"self.module_name_submission has value of        : {self.module_name_submission} of type {type(self.module_name_submission)}")
         print(f"self.related_subjects_submission has value of   : {self.related_subjects_submission} of type {type(self.related_subjects_submission)}")
@@ -839,5 +376,7 @@ class AddQuestionPage(ft.View):
                 os.remove(f"uploads/{filename}")
 
         
-
+        system_data.update_question_object_data(self.question_object_data)
+        self.all_module_data = system_data.get_all_module_data()
+        self.concept_data = system_data.get_concept_data()
         self.clear_form_fields()
