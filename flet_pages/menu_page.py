@@ -74,8 +74,8 @@ class MenuPage(ft.View):
                 self.settings_text])
         self.settings_button                = ft.ElevatedButton(
             content     =self.settings_row, 
-            on_click    =self.go_to_settings_page,
-            disabled=True)
+            on_click    =self.go_to_settings_page
+            )
 
 
         self.stats_row                      = ft.Row(

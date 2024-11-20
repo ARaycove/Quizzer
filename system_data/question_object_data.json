@@ -32292,7 +32292,7 @@
         "primary_subject": "miscellaneous",
         "subject": [
             "history",
-            "US History"
+            "us history"
         ],
         "related": [
             "World War One"
@@ -32335,7 +32335,7 @@
         "primary_subject": "miscellaneous",
         "subject": [
             "history",
-            "US History"
+            "us history"
         ],
         "related": [
             "World War One",
@@ -33833,7 +33833,7 @@
         "primary_subject": "miscellaneous",
         "subject": [
             "history",
-            "US History"
+            "us history"
         ],
         "related": [
             "World War One",
@@ -34135,6 +34135,1020 @@
         "question_image": null,
         "question_video": null,
         "answer_text": "As the battle came to a close, the Second Army was led by Aleksander Samsonov. With no help from his fellow generals, Samsonov\u2019s men were outmaneuvered and found themselves running to the cover of the forests, but it was too late; the defeat was imminent.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "world war one",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-11-19 11:45:06.549535_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-11-19 11:45:06.549535_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "history"
+        ],
+        "related": null,
+        "question_text": "During WW I, The defeat at Tannenberg was cemented by the tactics and strategies of the German leader of the opposition army, the Eighth Army. Who was this leader?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Paul von Hindenburg led the Eighth Army. Hindenburg had retired but was recalled to duty after the war began. He led the Eighth Army in conjunction with Erich Ludendorff, who sat in the position of chief of staff. Hindenburg would go on to become president of the Weimar Republic and was also the man who named Adolf Hitler as the German chancellor. In contrast, Ludendorff would end his military career in defeat and go on to serve in parliament.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "world war one",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-11-19 11:50:11.866480_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-11-19 11:50:11.866480_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "history"
+        ],
+        "related": null,
+        "question_text": "During WWI, How many Russians died during the Battle of Tannenberg?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "The losses of the Russian Second Army were significant, which gave the Central Powers a boost of confidence going into the following months. Fifty thousand men were killed or injured, and almost 100,000 men were taken as prisoners.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "world war one",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-11-19 11:50:46.409356_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-11-19 11:50:46.409356_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "history"
+        ],
+        "related": null,
+        "question_text": "During WW I, What happened to the leader of the Russian forces at the Battle of Tannenburg?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "This type of defeat was not acceptable to Samsonov, the general in charge of this arm of the attack, so early on the morning of August 30, he walked unnoticed into the forest and ended his life.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "world war one",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-11-19 11:51:20.602995_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-11-19 11:51:20.602995_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "history"
+        ],
+        "related": null,
+        "question_text": "Many battles in WW I and others are known by different names. What is another name for the Battle of Tannenberg?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Because it took place near a town called Allenstein, it is also known as the Battle of Allenstein.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "world war one",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-11-19 11:52:00.347727_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-11-19 11:52:00.347727_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "history"
+        ],
+        "related": null,
+        "question_text": "During WW I, What was the date that the pivotal Battle of Tannenberg began?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "The opening salvos of the battle began on August 26, and the battle waged for four long days before coming to an end on August 30. It was one of the very first and most famous battles of the first year of war and set the tone for quite a while to come.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "world war one",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-11-19 11:53:40.215483_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-11-19 11:53:40.215483_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "history"
+        ],
+        "related": null,
+        "question_text": "After WW I, the boundaries of countries were redrawn. If you wanted to visit Tannenberg today, where would it be located?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Tannenberg is no longer called Tannenberg. Today you would find this city on the map by looking for St\u0119bark, Poland.",
+        "answer_audio": null,
+        "answer_image": "Screenshot from 2024-11-19 11-53-28.png",
+        "answer_video": null,
+        "module_name": "world war one",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-11-19 11:54:11.354473_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-11-19 11:54:11.354473_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "history"
+        ],
+        "related": null,
+        "question_text": "During WW I, What advantages did Lieutenant Colonel Max Hoffman have that helped the German forces defeat the Russians at the Battle of Tannenberg?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Hoffman knew the Russian politicals amongst the generals. He obtained this information after Schlieffen sent him to observe the Russians during the Russo-Japanese war. Here, he learned that the two Russian generals executing the movements in this area, Rennenkampf and Samsonov, did not share the same views nor like each other. This dislike would leave communication, for which the Russian Army was known to be careless with anyway, few and far between.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "world war one",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-11-19 11:54:40.964473_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-11-19 11:54:40.964473_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "history"
+        ],
+        "related": null,
+        "question_text": "During WW I, Who was the general in charge of the XX Corps who fought against Samsonov?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "General Friedrich von Schulz led the 20th Army Division of the Eighth Army at the Battle of Tannenberg. He would later become the commander of the Eighth Army when it moved east to fortify the lines at the Battle of Verdun.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "world war one",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-11-19 11:55:04.789926_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-11-19 11:55:04.789926_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "history"
+        ],
+        "related": null,
+        "question_text": "During WW I, Where was Samsonov\u2019s Second Army based out of?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "The Second Russian Army had to march from their stationed base in Warsaw.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "world war one",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-11-19 11:55:35.252940_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-11-19 11:55:35.252940_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "history",
+            "military science"
+        ],
+        "related": null,
+        "question_text": "During WW I, What limited General Rennenkampf\u2019s ability to advance and carry out his part of the Battle of Tannenberg?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Several factors hampered his troop's advancement. With the fortifications of Konigsberg and the Masurian Lakes, which made communication with Samsonov practically impossible, he only had a small 40-mile gap to move his troops through.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "world war one",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-11-19 11:56:16.759658_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-11-19 11:56:16.759658_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "history"
+        ],
+        "related": null,
+        "question_text": "During WW I, The Turkish forces needed help with their organization and asked for help from their ally, Germany. Who was the German general that helped lead the Turkish forces?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "After being asked for help, the Kaiser could see no one better for the job of reorganizing the Turkish forces in Constantinople than Otto Liman von Sanders. The Russians saw this move as a threat and soon realized that they were right as the Turkish began to move in to help the Balkans and the Caucuses.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "world war one",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-11-19 11:56:43.806669_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-11-19 11:56:43.806669_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "history"
+        ],
+        "related": null,
+        "question_text": "Relating to WWI, What was the first battle of the Brusilov Offensive?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "The Brusilov Offensive would end up being a very successful campaign for the Russian forces. The campaign would begin on June 4, 1916, with the Battle of Lutsk.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "world war one",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-11-19 11:59:19.971041_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-11-19 11:59:19.971041_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "history"
+        ],
+        "related": null,
+        "question_text": "During WW I, What did the French ask their allies to do in February of 1916?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "The French wanted to weaken the German forces, so they reached out to both the British and the Russians to ask them to plan significant attacks at different points. They believed this would split up the German forces and help them gain some ground. Both parties agreed, with the British beginning the planning of the Battle of Somme and the Russians looking to attack both Lake Narocz and Vilna.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "world war one",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-11-19 11:59:49.102869_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-11-19 11:59:49.102869_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "history"
+        ],
+        "related": null,
+        "question_text": "During WW I, What did General Brusilov push for?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Brusilov was a strategist, and knowing that the attack of Vilna was planned, he knew a way to ensure the defeat of the enemy soldiers. He reached out to the Russian command and pleaded with them to allow him to move his troops to attack in the southwest. He knew this would cause the enemy troops to be split up and, therefore, weaken the Vilna line allowing for victory.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "world war one",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-11-19 12:00:23.002240_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-11-19 12:00:23.002240_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "history"
+        ],
+        "related": null,
+        "question_text": "During WW I, The north may have been a campaign against the Germans on the eastern front, but in the south, it was all about the Austro-Hungarian forces. Who led these forces at the Battle of Lutsk?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "The heir to the Habsburg throne, Archduke Joseph Ferdinand, led 200,000 men against Brusilov.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "world war one",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-11-19 12:00:49.510773_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-11-19 12:00:49.510773_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "history"
+        ],
+        "related": null,
+        "question_text": "During WW I, The forces that marched against the Hapsburg Prince numbered how many?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Brusilov was outmatched when it came to numbers as he only marched with 150,000. This difference would mean he had to be more strategic and use his years of experience, which is what he did and why the Offensive was so successful.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "world war one",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-11-19 12:06:36.425328_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-11-19 12:06:36.425328_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "history"
+        ],
+        "related": null,
+        "question_text": "During WW I, How long was the front that Brusilov wanted to attack?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Brusilov felt that if he were able to attack a line that went from the Pripet Marshes to Bucovina, he would be able to draw enough troops from the other front that it would give his comrades up north a good-sized advantage. That led him to attack a 200-mile front with just 2,000 guns. Along his push, he would capture over 20,000 prisoners before the Offensive came to a close.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "world war one",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-11-19 12:08:07.577378_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-11-19 12:08:07.577378_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "history"
+        ],
+        "related": null,
+        "question_text": "During WW I, After the first two days of Brusilov's Offensive, how many casualties were there?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "The battle was fierce for the first two days and left the field and field hospitals with approximately 130,000 casualties.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "world war one",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-11-19 12:08:50.423393_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-11-19 12:08:50.423393_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "history"
+        ],
+        "related": null,
+        "question_text": "During WW I, The success of the Brusilov Offensive led to what two events elsewhere in the war?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Because of the loss of forces by the Austro-Hungarian Army, the offensive on the Italian city of Trieste by General Franz Conrad von H\u00f6tzendorf had to be ceased so he could send reinforcements to the line. There were also four divisions of the German Army relocated from the front lines of the Battle of Verdun to reinforce the Austro-Hungarian forces further. The loss of this division can be directly linked to the German's defeat at Verdun.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "world war one",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-11-19 12:09:27.442991_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-11-19 12:09:27.442991_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "history"
+        ],
+        "related": null,
+        "question_text": "Relating to WWI, When did the Brusilov Offensive end?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "The offensive lost steam and officially came to an end on September 20, 1916. After pushing his way along that 200-mile front, Brusilov and the Russian forces gained 9,650 square miles of territory and cost their adversary quite a few soldiers.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "world war one",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-11-19 12:11:17.442491_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-11-19 12:11:17.442491_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "history"
+        ],
+        "related": null,
+        "question_text": "During WW I, How did Brusilov train his troops for the upcoming offensive?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "The first and most important aspect of the plan was total secrecy. Except for Brusilov and his troops, no one knew what the plan was. Along with this, Brusilov used life-sized replicas of the places he planned on attacking. Starting with artillery, he made sure that the sighting of these guns was seen by air reconnaissance.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "world war one",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-11-19 12:16:11.425213_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-11-19 12:16:11.425213_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "history"
+        ],
+        "related": null,
+        "question_text": "During WW I, What was the Central Powers' objective at the Battle of M\u0103r\u0103\u0219e\u0219ti?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "The Romanian forces had been causing some trouble, and to take Romania, they knew they had to defeat the forces. The plan was for the German Ninth Army and the Austro-Hungarian First Army to encircle the Romanian Second Army and wipe them out.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "world war one",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-11-19 12:16:38.279900_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-11-19 12:16:38.279900_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "history"
+        ],
+        "related": null,
+        "question_text": "During WW I, Who were the opposing forces at the Battle of M\u0103r\u0103\u0219e\u0219ti?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "On one side, you had the Romanians and the Russians. The Russians had begun to feel the weight of events back home and would eventually leave the Romanians to fight. The other side of the line was a combination of troops from Germany and the Austro-Hungarian Empire.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "world war one",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-11-19 12:17:36.802261_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-11-19 12:17:36.802261_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "history"
+        ],
+        "related": null,
+        "question_text": "During WW I, Each side(Battle of Marasesti) had many generals leading their respective armies and divisions. Who were the commanders on each side?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "On the Central Powers side, the big names leading the two armies were August von Mackensen and Karl von Wenninger.\nOn the Romanian front, the two significant leaders were Alexandru Averescu and Eremia Grigorescu. Dmitry Shcherbachev led the Russian forces.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "world war one",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-11-19 12:21:54.539160_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-11-19 12:21:54.539160_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "history"
+        ],
+        "related": null,
+        "question_text": "During WW I, at the Battle of Battle of Marasesti, The battle was intense, and though the Romanians were outgunned, they still held the advancing enemy off. How many troops, guns, and heavy guns did each side have?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "The Romanians started the battle with just over 200,000 soldiers, 280 guns, and 36 heavy guns. On the other side of the front, \nthe Central Powers rolled in with almost 250,000 soldiers, 223 guns, and 122 heavy guns. Along with that, the Central Powers also brought with them 1,135 heavy machine guns, two armored vehicles, and 365 mortars.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "world war one",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-11-19 12:23:02.168590_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-11-19 12:23:02.168590_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "history"
+        ],
+        "related": null,
+        "question_text": "During WW I, How many troops were lost on both sides during the Battle of M\u0103r\u0103\u0219e\u0219ti?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Even though the Central Powers had the advantage militarily, the Romanians knew the land and used this for their benefit. Because of this, the Romanians had fewer casualties when the smoke cleared. They only lost 27,410 soldiers in comparison to the 47,000 on the other side.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "world war one",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-11-19 12:23:37.694080_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-11-19 12:23:37.694080_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "history"
+        ],
+        "related": null,
+        "question_text": "During WW I, What strongholds and cities did the Allied Forces take after the Battle of Sharon?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "By the end, the Ottomans had lost Afulah, Beisan, and Jenin as well as the cities of Nazareth, Haifa, and Samakh.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "world war one",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-11-19 12:24:06.827556_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-11-19 12:24:06.827556_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "history"
+        ],
+        "related": null,
+        "question_text": "During WW I, What was the unit called that was a mixed division that captured the Jordan River crossing in the Battle of Nablus?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "The unit was a division comprised of both infantry and mounted cavalry. The force was named after its commander Edward Chaytor and became known as Chaytor\u2019s Force.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "world war one",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-11-19 12:24:42.918367_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-11-19 12:24:42.918367_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "history"
+        ],
+        "related": null,
+        "question_text": "During WW I, What type of unit was Richthofen assigned to after graduating from military school?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Though he became known for his aerial superiority, he started his illustrious military career with the First Uhlan Cavalry Unit.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "world war one",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-11-19 12:25:22.489383_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-11-19 12:25:22.489383_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "history"
+        ],
+        "related": null,
+        "question_text": "During WW I, Why did Richthofen request reassignment to an air unit?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "He had success in his cavalry unit at the beginning of the war, even winning an Iron Cross for his service. This unit had moved from the eastern front to the western front, where they were used for supply delivery. Feeling that this was not prestigious enough for him, he looked for a change.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "world war one",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-11-19 12:26:13.587784_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-11-19 12:26:13.587784_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "history"
+        ],
+        "related": null,
+        "question_text": "During WW I, What was the first flying squadron Richthofen was assigned to, and who commanded it?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Planes were new to war, and there was not a lot of units, but Richthofen found his way into one of the flying squadrons. His reassignment was to the Jasta 2, under the leadership of Oswald Boelcke.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "world war one",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-11-19 12:26:36.959946_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-11-19 12:26:36.959946_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "history"
+        ],
+        "related": null,
+        "question_text": "What type of plane was the iconic Red Baron best known for flying?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "The first plane he painted red and flew into battle was the Albatross D.111, but toward the end of the war, he upgraded to the Fokker Dr.1.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "world war one",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-11-19 12:27:06.593638_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-11-19 12:27:06.593638_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "history"
+        ],
+        "related": null,
+        "question_text": "When the Baron crashed and died, he was behind enemy lines. What happened to his body?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Allied troops recovered his body. Knowing who this was and his service to his country, he was laid to rest with full military honors.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "world war one",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-11-19 12:27:56.494821_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-11-19 12:27:56.494821_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "history"
+        ],
+        "related": [
+            "Red Baron",
+            "Red Battle Flier",
+            "Red Knight",
+            "le Petit Rouge"
+        ],
+        "question_text": "Like with so many things, this iconic aerial ace was not only known by his famous moniker. What other names was the \u201cRed Baron\u201d known as?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Richthofen was also known as le Petit Rouge, the Red Battle Flier, or the Red Knight.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "world war one",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-11-19 12:28:22.392085_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-11-19 12:28:22.392085_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "history"
+        ],
+        "related": null,
+        "question_text": "What was the name of the school Edith Cavell helped find?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "She left England and made a name for herself teaching nurses in Belgium and eventually helped open the Berkendael Institute.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "world war one",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-11-19 12:28:44.278113_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-11-19 12:28:44.278113_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "history"
+        ],
+        "related": null,
+        "question_text": "During WW I, What two countries fought for a reprieve for Cavell?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Both countries that fought for the commuting of her sentence were both neutral at the time, but they felt that the punishment was harsh, seeing as she was a medical professional. The two countries that fought for her were the U.S. and Spain.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "world war one",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-11-19 12:29:13.248033_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-11-19 12:29:13.248033_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "history"
+        ],
+        "related": null,
+        "question_text": "Where is there a statue to commemorate Cavell\u2019s bravery in WW I?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "There is a statue in her home country of England in London. The statue is located in St. Martin\u2019s Place.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "world war one",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-11-19 12:29:42.562057_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-11-19 12:29:42.562057_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "history"
+        ],
+        "related": null,
+        "question_text": "During WWI, What village was An\u00edbal Milhais\u2019 unit stationed in?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "His Portuguese infantry unit was stationed in the city of La Couture.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "world war one",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-11-19 12:30:16.970515_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-11-19 12:30:16.970515_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "history"
+        ],
+        "related": null,
+        "question_text": "Relating to WW I, What was the German name for the battle that An\u00edbal made his heroic stand?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "It was one of the pushes during the Spring Offensive. This stage of the attack was dubbed Operation Georgette.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "world war one",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-11-19 12:30:40.565861_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-11-19 12:30:40.565861_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "history"
+        ],
+        "related": null,
+        "question_text": "For his bravery in WW I, what medals did An\u00edbal earn?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "He earned a medal from not only Portugal but also France. From his mother country, he received the Ordem Militar da Torre e Espada. From the French, he was also awarded the L\u00e9gion d'honneur.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "world war one",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-11-19 12:31:14.698330_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-11-19 12:31:14.698330_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "history"
+        ],
+        "related": null,
+        "question_text": "Relating to WWI, When did An\u00edbal Milhais die?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "The Machin Gun Milhais lived to the ripe old age of 74, passing in 1970.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "world war one",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-11-19 12:31:38.265972_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-11-19 12:31:38.265972_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "history"
+        ],
+        "related": null,
+        "question_text": "What profession was Ecaterina Teodoroiu studying before WW I broke out?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Ecaterina had been studying at a girl\u2019s school in Bucharest to become a teacher before the war began, and then she volunteered to fight for her country.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "world war one",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-11-19 12:32:09.992405_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-11-19 12:32:09.992405_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "history"
+        ],
+        "related": null,
+        "question_text": "Relating to WWI, What made Ecaterina decide to ask for a transfer from being a nurse to fighting on the front line?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "There were two main factors in her decision. As she treated the men that made their way back to the hospital, she was a nurse and was inspired by their patriotism. Then her brother was killed in action, and she felt she needed to avenge his death.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "world war one",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-11-19 12:32:36.705253_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-11-19 12:32:36.705253_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "history"
+        ],
+        "related": null,
+        "question_text": "Relating to WWI, What rank did Ecaterina end her career as?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "She ended up leading a 25-man platoon as a Second Lieutenant.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "world war one",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-11-19 12:33:21.693355_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-11-19 12:33:21.693355_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "history"
+        ],
+        "related": null,
+        "question_text": "Relating to WWI, Where did Ecaterina die?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Ecaterina fought at the Battle of M\u0103r\u0103\u0219e\u0219ti. During the battle, she was shot in the chest or head, the stories conflict. But it is said, however, her last words were, \u201cForward men, I\u2019m still with you.\u201d",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "world war one",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-11-19 12:34:01.355983_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-11-19 12:34:01.355983_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "history"
+        ],
+        "related": null,
+        "question_text": "During WW I, What was the name of another ocean liner sunk by a German U-boat not long after the Lusitania?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "The Lusitania was one strike, but once the SS Arabic was sunk as well and the Zimmermann Telegram was intercepted, the U.S. was in a position where there was no other choice but to throw their support behind the Allied Forces of the French and British.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "world war one",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-11-19 12:34:34.689825_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-11-19 12:34:34.689825_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "history"
+        ],
+        "related": null,
+        "question_text": "How many tons of war munitions was the Lusitania carrying when it went down?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Though at first, there was a denial of any munitions on board, eventually, it was exposed that the Lusitania carried approximately 173 tons of war munitions and supplies.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "world war one",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-11-19 12:35:11.732938_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-11-19 12:35:11.732938_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "history"
+        ],
+        "related": null,
+        "question_text": "During WW I, What pope suggested a temporary stay of combat to allow the troops to celebrate Christmas in 1914?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "On December 7, 1914, Pope Benedict XV stated that he felt it would be a sign of good nature of the men to lay down arms to celebrate the birth of the Lord. It was not received well by the higher-ups of either side.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "world war one",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-11-19 12:35:55.764599_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-11-19 12:35:55.764599_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "history"
+        ],
+        "related": null,
+        "question_text": "During WW I, Which side initiated the Christmas Truce of 1914?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "The night before Christmas, carols floated over the land known as No Man\u2019s Land, and in the early hours of Christmas Day, the Allied troops heard the faint tiding of Merry Christmas. The Germans crossed No Man\u2019s Land without weapons to start a day of celebration.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "world war one",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-11-19 12:36:33.259773_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-11-19 12:36:33.259773_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "history"
+        ],
+        "related": null,
+        "question_text": "During WW I's Christmas Truce in 1914, What were some of the things exchanged between the soldiers as gifts?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "There wasn\u2019t much to gift, but the soldiers used their ingenuity and gifted each other things like cigarettes and plum pudding.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "world war one",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-11-19 12:37:21.845549_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-11-19 12:37:21.845549_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "history"
+        ],
+        "related": null,
+        "question_text": "During WW I's Christmas Truce of 1914, What other more somber activity did some soldiers do during the truce?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Many fallen brethren\u2019s bodies had been stuck in No Man\u2019s Land that were unable to retrieve normally. So, to ensure their brothers had their way of having an honorable burial, some soldiers took this time to recover those bodies.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "world war one",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-11-19 12:38:04.464303_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-11-19 12:38:04.464303_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "history"
+        ],
+        "related": null,
+        "question_text": "Why did the Japanese enter WW I on the side of the Allied Forces?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Not only did they have an agreement with the British from 1902, but they wanted to begin expanding their power in the far east. This move was challenging to do with a German presence in China. So, they joined the Allied Forces to help but also to gain help in their expansion as well.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "world war one",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-11-19 12:38:31.990972_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-11-19 12:38:31.990972_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "history"
+        ],
+        "related": null,
+        "question_text": "Why was the entrance of Japan into WW I so pivotal?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Like the Germans, the Russians were faced with having to defend themselves on two fronts as the Germans had soldiers in Tsingtao in China. By Japan entering the war, not only were the Germans neutralized, but also having an ally on their eastern borders was helpful.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "world war one",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-11-19 12:39:04.727879_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-11-19 12:39:04.727879_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "history"
+        ],
+        "related": null,
+        "question_text": "During WWI, How many Zeppelin attacks in total were there on Britain?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "There were fifty plus attacks executed on the nation of England.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "world war one",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-11-19 12:39:36.136295_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-11-19 12:39:36.136295_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "history"
+        ],
+        "related": null,
+        "question_text": "During WW I, What type of unit did Churchill serve in after he resigned his cabinet position in 1916?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Churchill picked up a gun and headed to the front to serve with the Royal Scots Fusiliers in France.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "world war one",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-11-19 12:40:09.325336_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-11-19 12:40:09.325336_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "history"
+        ],
+        "related": null,
+        "question_text": "Relating to WW I, How much money was Germany tasked with reparations? When did they make the last payment?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "The Germans were found to be the sole aggressor and were charged with paying reparations for the damages caused by the war. The bill came to 132 billion Reichsmarks or 33 billion U.S. Dollars. This large sum took decades to repay, and the final reparations for WWI were paid in September of 2010.",
         "answer_audio": null,
         "answer_image": null,
         "answer_video": null,

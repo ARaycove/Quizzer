@@ -14,6 +14,7 @@ from flet_pages.menu_page               import MenuPage
 from flet_pages.add_question_page       import AddQuestionPage
 from flet_pages.edit_question_page      import EditQuestionPage
 from flet_pages.display_modules_page    import DisplayModulePage
+from flet_pages.settings_page           import SettingsPage
 
 
 # GLOBAL CONSTANTS
@@ -130,7 +131,14 @@ def main(page: ft.Page):
 
         elif page.route == "/SettingPage": #FIXME
             print("Going to Settings Page")
-            next_display = ft.View()
+            next_display = SettingsPage(page,
+                                        questions_available_to_answer,
+                                        current_question,
+                                        current_question_id,
+                                        question_object_data,
+                                        user_profile_data,
+                                        CURRENT_USER,
+                                        CURRENT_UUID)
 
 
         elif page.route == "/UserProfilePage": #FIXME
@@ -159,8 +167,8 @@ def main(page: ft.Page):
         global currently_displayed              # In List
         global has_seen                         # In List
         global all_module_data                  # In List
-        for key in vars(current_page_data).keys():
-            print(key)
+        # for key in vars(current_page_data).keys():
+        #     print(key)
         # Error Handling while updating each one, if the page didn't use the global then we will get an Attribute Error
         try:
             questions_available_to_answer = current_page_data.questions_available_to_answer

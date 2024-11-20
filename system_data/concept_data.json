@@ -9232,9 +9232,10 @@
         "questions": [
             "2024-11-19 10:02:38.599591_47d39d7b-37ff-461b-aeec-ca52e36c101d",
             "2024-11-19 10:05:06.686426_47d39d7b-37ff-461b-aeec-ca52e36c101d",
-            "2024-11-19 11:02:14.424586_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+            "2024-11-19 11:02:14.424586_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+            "2024-11-19 12:27:56.494821_47d39d7b-37ff-461b-aeec-ca52e36c101d"
         ],
-        "num_questions": 3
+        "num_questions": 4
     },
     "Second Lieutenant Eddie Rickenbacker": {
         "questions": [
@@ -9361,6 +9362,24 @@
     "Battle of Skagerrak": {
         "questions": [
             "2024-11-19 11:31:33.378550_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 1
+    },
+    "Red Battle Flier": {
+        "questions": [
+            "2024-11-19 12:27:56.494821_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 1
+    },
+    "Red Knight": {
+        "questions": [
+            "2024-11-19 12:27:56.494821_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 1
+    },
+    "le Petit Rouge": {
+        "questions": [
+            "2024-11-19 12:27:56.494821_47d39d7b-37ff-461b-aeec-ca52e36c101d"
         ],
         "num_questions": 1
     }

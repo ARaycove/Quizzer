@@ -264,6 +264,8 @@ def update_question_object_data(question_object_data: dict) -> None:
     '''
     import json
     from initialization_functions import initialize
+    for unique_id, question_object in question_object_data.items():
+        question_object_data[unique_id]["subject"] = [i.lower() for i in question_object_data[unique_id]["subject"]]
     try:
         # Place lock on file
         # Run in seperate thread?

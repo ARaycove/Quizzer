@@ -1,11 +1,25 @@
 import flet as ft
+from flet_custom_containers import settings_controls
 import system_data
 
 class SettingsPage(ft.View):
-    def __init__(self, page: ft.Page, questions_list, questions_available_to_answer, 
+    def __init__(self, page: ft.Page, questions_available_to_answer, 
                  current_question,current_question_id,question_object_data,
                  user_profile_data,CURRENT_USER,CURRENT_UUID) -> None:
         super().__init__()
+        self.page                           = page
+        self.questions_available_to_answer  = questions_available_to_answer
+        self.user_profile_data              = user_profile_data
+        self.current_question               = current_question
+        self.current_question_id            = current_question_id
+        self.question_object_data           = question_object_data
+        self.CURRENT_USER                   = CURRENT_USER
+        self.CURRENT_UUID                   = CURRENT_UUID
+
+        self.page.title                     = "Settings Page"
+        self.subject_list                   = list(self.user_profile_data["settings"]["subject_settings"].keys())
+        self.subject_list.sort()
+        print(self.subject_list)
         # CONSTRUCT THE PAGE
         # Assign passed globals to instance
 
@@ -25,6 +39,13 @@ class SettingsPage(ft.View):
             content=self.menu_icon, 
             bgcolor="white", 
             on_click=self.go_to_menu_page)
+        
+        self.exit_button                            = ft.IconButton(
+            icon=ft.icons.ARROW_BACK,
+            icon_color=ft.colors.BLACK,
+            bgcolor=ft.colors.WHITE,
+            on_click=self.go_to_home_screen
+        )
                 
         ############################################################
         # Define Composite Components -> ft.Container buttons
@@ -32,44 +53,75 @@ class SettingsPage(ft.View):
         ############################################################
         # Define Container elements for organization
 
+        self.time_between_revisions_card    = settings_controls.IntegerSettingCard("time_between_revisions", 
+                                                                                   self.user_profile_data["settings"]["time_between_revisions"],
+                                                                                   self.user_profile_data
+                                                                                   )
+        self.desired_daily_questions_card   = settings_controls.IntegerSettingCard("desired_daily_questions",
+                                                                                   self.user_profile_data["settings"]["desired_daily_questions"],
+                                                                                   self.user_profile_data                                                                                   
+                                                                                   )
+        self.due_date_sensitivity_card      = settings_controls.IntegerSettingCard("due_date_sensitivity",
+                                                                                   self.user_profile_data["settings"]["due_date_sensitivity"],
+                                                                                   self.user_profile_data
+                                                                                   )
+        self.header_bar                     = ft.Row(
+            controls=[
+                self.menu_button,
+                ft.Text(value="Settings", size=24),
+                self.exit_button
+            ],
+            alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+            width = 400
+        )
 
-
+        self.subject_setting_header         = ft.Row(
+            width       = 400,
+            controls    =[
+                ft.Text(
+                    value   = "Subject Name",
+                    width   = 200,
+                    tooltip = "The Name of the Subject whose setting you're changing"
+                ),
+                ft.Text(
+                    value   = "Interest Level",
+                    width   = 100,
+                    tooltip = "On a Scale of 0 - 100, how interested are you in this subject? Set 0 to disable questions of this subject, Quizzer uses this value to determine the ratio of questions shown based on YOUR level of interest in each subject"
+                ),
+                ft.Text(
+                    value   = "Priority Level",
+                    width   = 100,
+                    tooltip = "Give an integer value, A value of 1 marks highest priority, a value of 9 or higher marks low priority. Quizzer uses this value to determine which subjects will get questions added before others"
+                )
+            ]
+        )
+        self.subject_setting_cards          = ft.Column(
+            controls= [],
+            width   = 400,
+            scroll  = ft.ScrollMode.ALWAYS
+        )
+        for subject_name in self.subject_list:
+            self.subject_setting_cards.controls.append(settings_controls.SubjectSettingCard(subject_name,self.user_profile_data))
         ############################################################
         # Piece it all together with self.controls
-        self.controls=[self.menu_button]
+        self.controls=[
+            self.header_bar,
+            ft.Text(value="General Settings", size = 16),
+            self.time_between_revisions_card,
+            self.desired_daily_questions_card,
+            self.due_date_sensitivity_card,
+            self.subject_setting_header,
+            self.subject_setting_cards
+        ]
+        self.scroll = ft.ScrollMode.ALWAYS
 
 
     # Page Functionality below:
     # Navigation Functions Built In
-    def go_to_new_profile_screen            (self, e: ft.ControlEvent = None):
-        self.page.go("/NewProfilePage")
-
     def go_to_home_screen                   (self, e: ft.ControlEvent = None):
+        system_data.update_user_profile(self.user_profile_data)
         self.page.go("/HomePage")
 
-    def go_to_login_page                    (self, e: ft.ControlEvent = None):
-        self.page.go("/LoginPage")
-
     def go_to_menu_page                     (self, e: ft.ControlEvent = None):
+        system_data.update_user_profile(self.user_profile_data)
         self.page.go("/Menu")
-
-    def go_to_add_question_page             (self, e: ft.ControlEvent = None):
-        self.page.go("/AddQuestionPage")
-
-    def go_to_edit_question_page            (self, e: ft.ControlEvent = None):
-        self.page.go("/EditQuestionPage")
-
-    def go_to_settings_page                 (self, e: ft.ControlEvent = None):
-        self.page.go("/SettingPage")
-
-    def go_to_stats_page                    (self, e: ft.ControlEvent = None):
-        self.page.go("/StatsPage")
-
-    def go_to_user_profile_page             (self, e: ft.ControlEvent = None):
-        self.page.go("/UserProfilePage")
-
-    def go_to_display_modules_page             (self, e: ft.ControlEvent = None):
-        self.page.go("/DisplayModulePage")
-    
-    def go_to_ai_question_generator_page    (self, e: ft.ControlEvent = None):
-        self.page.go("/AIQuestionGeneratorPage")
