@@ -35154,5 +35154,28 @@
         "answer_video": null,
         "module_name": "world war one",
         "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-11-20 09:45:34.008717_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-11-20 09:45:34.008717_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "command_line",
+            "linux"
+        ],
+        "related": [
+            ".tar.gz",
+            "ubuntu",
+            "debian"
+        ],
+        "question_text": "On a debian based linux machine, what command do you use to install a .tar.gz file?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "A .tar.gz file is a zipped folder not an application/executable:\n____________\n1. First Extract:\ntar -xvzf filename.tar.gz\n2. Navigate to extracted file\n3. follow installation instructions in readme (if found)",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "linux command line",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
     }
 }

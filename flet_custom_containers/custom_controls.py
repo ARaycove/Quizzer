@@ -228,8 +228,8 @@ class ModuleNameField(ft.Container):
         self.form_fields_width              = form_fields_width
 
         if current_question_id != None:
-            self.submission                 = self.question_object["module_name"]
             self.question_object            = question_object_data[current_question_id]
+            self.submission                 = self.question_object["module_name"]
         else:
             self.submission                 = ""
         self.module_name_text               = ft.Text(
