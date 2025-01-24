@@ -1203,11 +1203,14 @@ def get_next_question(user_profile_data, amount_of_rs_one_questions):
     if amount_of_rs_one_questions == None:
         amount_of_rs_one_questions = 0
     prioritize_rs_one_questions = False
-    if amount_of_rs_one_questions >= 5:
+    if amount_of_rs_one_questions > 1:
         prioritize_rs_one_questions = True
     for i in range(1, 101):
         for question_id, question_object_user_data in user_questions.items():
             check_var = question_object_user_data["revision_streak"]
+            if check_var == 1 and i == 1:
+                print(f"Selected question with RS of {check_var}")
+                return question_id
             # Grab any question within 4 points of each other
             # Doing so prevents a wrongly answered question from becoming immediately avaialable, nullifying the effect of learning it for the day
             # In effect, if there are revision one questions available:
@@ -1219,7 +1222,7 @@ def get_next_question(user_profile_data, amount_of_rs_one_questions):
                 print("Prioritizing RS: 1 questions")
                 print(f"Selected question with RS of {check_var}")
                 return question_id
-            elif prioritize_rs_one_questions == False:
+            elif prioritize_rs_one_questions == False and i != 1:
                 print(f"Selected question with RS of {check_var}")
                 return question_id
 # Two design philosophies from this point on:
