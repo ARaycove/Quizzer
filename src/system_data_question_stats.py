@@ -104,6 +104,7 @@ def calculate_next_revision_date(status: str, question_object:dict): #Private Fu
     # Based on the status, decide whether to use the calculation or not
     if status == "correct":
         question_object["next_revision_due"] = datetime.now() + timedelta(days=number_of_days)
+        print(f"To be reviewed in {number_of_days:.2f} days or {(number_of_days*24):.2f} hours")
     else: # if not correct then incorrect, function should error out if status is not fed into properly:
         # Intent is to make an incorrect question due immediately and of top priority
         question_object["next_revision_due"] = datetime.now()    
