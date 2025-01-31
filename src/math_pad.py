@@ -101,10 +101,29 @@ def memory_formula(x):
     number_of_days = fraction+g
     return number_of_days
 
-for x in range(0, 31):
-    num_days = memory_formula(x)
-    if num_days != 0 or num_days != 0.0:
-        avg_shown = 1 / num_days
-        next_due_date = datetime.now() + timedelta(days=num_days)
-        print(f"{x:5} reps: {num_days:10.2f}, next_due: {next_due_date}")
+# for x in range(0, 31):
+#     num_days = memory_formula(x)
+#     if num_days != 0 or num_days != 0.0:
+#         avg_shown = 1 / num_days
+#         next_due_date = datetime.now() + timedelta(days=num_days)
+#         print(f"{x:5} reps: {num_days:10.2f}, next_due: {next_due_date}")
 
+import random
+a = []
+for i in range(3):
+
+    row = [(random.randint(1, 5)) for i in range(5)]
+    a.append(row)
+print(a)
+print("##########################")
+b = []
+# how many columns and row b will have
+columns = len(a)
+rows    = len(a[0])
+print(columns, rows)
+for i in range(rows):
+    row = []
+    for j in range(columns):
+        row.append(a[j][i])
+    b.append(row)
+print(b)

@@ -1205,8 +1205,8 @@ def get_next_question(user_profile_data, amount_of_rs_one_questions):
     # RS 14+ Questions are spaced more than a month apart 
     # So we have 4 weight groups, RS 1 is already covered, so let's calculated three weights each weight is percentile/quartile
     two_six_weight          = 0
-    seven_thirteen_weight   = .75
-    fourteen_plus_weight    = .95
+    seven_thirteen_weight   = .50
+    fourteen_plus_weight    = .90
     # We can generate a random number between 0 and 1 using random.random()
     random_weight = random.random()
     # Now based on the random_weight we will choose a question within the range
@@ -1219,14 +1219,28 @@ def get_next_question(user_profile_data, amount_of_rs_one_questions):
         # On second iteration we target question in random range
         # on third and fourth we target any question available
         if i == 3:
-            random_weight = 0.75
+            random_weight = seven_thirteen_weight
         if i == 4:
-            random_weight = 1
+            random_weight = fourteen_plus_weight
         for question_id, question_object_user_data in user_questions.items():
             check_var = question_object_user_data["revision_streak"]
-            if check_var == 1 and i == 1:
-                print(f"Selected question with RS of {check_var}")
-                return question_id
+            due_date = helper.convert_to_datetime_object(question_object_user_data["next_revision_due"])
+            overdue = False
+            # Questions that are not close to the due date won't be presented
+            # If the question hits this condition it indicates it is overdue for revision, beyond the acceptable margin
+            if helper.within_twenty_four_hours(helper.convert_to_datetime_object(question_object_user_data["next_revision_due"])) == False:
+                overdue = True
+                print(due_date)
+            # Define which questions get immediate priority
+            if i == 1:
+                if check_var == 1:
+                    print(f"Selected question with RS of {check_var}")
+                    return question_id
+                elif overdue == True:
+                    print(f"Selected question with RS of {check_var}")
+                    print(f"Question is overdue")
+                    return question_id         
+            # Ensure distribution of questions selected based on current revision streak           
             if i > 1:
                 # Check range in reverse order
                 if (random_weight >= fourteen_plus_weight) and check_var >= 14:

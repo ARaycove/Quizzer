@@ -21474,7 +21474,7 @@
             "class",
             "instance"
         ],
-        "question_text": "How can you check if an object is an instance of a specific class in Python?",
+        "question_text": "How can you check if an object is an instance of a specific class in Python?\nWhat is the proper syntax?",
         "question_image": null,
         "answer_text": "isinstance()\n\n\"\nYou can use the isinstance() function to check if an object is an instance of a specific class.The function takes two arguments: the object and the class. It returns True if the object is an instance of the class, and False otherwise:\n\n>>> isinstance(\"hello\", str)\nTrue\n\"",
         "answer_image": null,
@@ -40255,7 +40255,7 @@
         "related": [
             "constant variable"
         ],
-        "question_text": "If you never intend to change a variable, what modifier should you use?",
+        "question_text": "In Dart, If you never intend to change a variable, what modifier should you use?",
         "question_audio": null,
         "question_image": null,
         "question_video": null,
@@ -43700,7 +43700,7 @@
             "computer_science"
         ],
         "related": null,
-        "question_text": "You need to populate a table in your database. Which SQL subset should you use to add the data?",
+        "question_text": "You need to populate a table in your database. Which SQL(language) subset should you use to add the data?",
         "question_audio": null,
         "question_image": null,
         "question_video": null,
@@ -44076,7 +44076,7 @@
         "question_audio": null,
         "question_image": null,
         "question_video": null,
-        "answer_text": "CREATE TABLE table_name (column_name1 datatype(size), column_name2 datatype(size), column_name3 datatype(size));",
+        "answer_text": "CREATE TABLE table_name (\ncolumn_name1 datatype(size),\ncolumn_name2 datatype(size),\ncolumn_name3 datatype(size)\n);",
         "answer_audio": null,
         "answer_image": null,
         "answer_video": null,
@@ -45345,7 +45345,7 @@
         "question_audio": null,
         "question_image": null,
         "question_video": null,
-        "answer_text": "MySQL:\nALTER TABLE table_name\nCHANGE name_one name_two;\nPostgreSQL\nALTER TABLE table_name\nRENAME COLUMN name_one TO name_two",
+        "answer_text": "ALTER TABLE table_name\nRENAME COLUMN name_one TO name_two",
         "answer_audio": null,
         "answer_image": null,
         "answer_video": null,
@@ -45697,7 +45697,7 @@
             "computer_science"
         ],
         "related": null,
-        "question_text": "In SQL, what is proper syntax to user the INSERT INTO SELECT command?",
+        "question_text": "In SQL, what is proper syntax to user the INSERT INTO SELECT command?\n\nTake a column from one table and insert it into another table.",
         "question_audio": null,
         "question_image": null,
         "question_video": null,
@@ -63113,7 +63113,7 @@
             "anthropology"
         ],
         "related": null,
-        "question_text": "Scientists predict what change in global temperatures by the year 2100?",
+        "question_text": "As of 2020, Scientists predict what change in global temperatures by the year 2100?",
         "question_audio": null,
         "question_image": null,
         "question_video": null,
@@ -66168,7 +66168,7 @@
         "question_audio": null,
         "question_image": null,
         "question_video": null,
-        "answer_text": "Because his son would establish that the next heir to the throne would yet another catholic",
+        "answer_text": "Because his son would establish that the next heir to the throne would be yet another catholic",
         "answer_audio": null,
         "answer_image": null,
         "answer_video": null,
@@ -66185,7 +66185,7 @@
             "european history"
         ],
         "related": null,
-        "question_text": "Who was invited to England to replace King James II? and When?",
+        "question_text": "Who was invited to England to replace King James II?",
         "question_audio": null,
         "question_image": null,
         "question_video": null,
@@ -66248,7 +66248,7 @@
             "world history"
         ],
         "related": null,
-        "question_text": "The appointment of William and Mary was accompanied by a declaration rights? What was the name for this?",
+        "question_text": "The appointment of William of Orange and Mary was accompanied by a declaration rights? What was the name for this?",
         "question_audio": null,
         "question_image": null,
         "question_video": null,
@@ -77228,6 +77228,2191 @@
         "answer_image": null,
         "answer_video": null,
         "module_name": "computational cognitive neuroscience",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-28 09:47:34.454842_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-28 09:47:34.454842_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "At the end of the seventeenth century there was an (on-again, off-again) century of warfare between France and Britain. Where was the majority of these conflicts fought?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Overseas, In India, the Carribean, and North America)",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-28 09:48:26.091349_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-28 09:48:26.091349_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "What led France to brink of bankruptcy by the end of the 17th century and beginning of the 18th?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "The colonial wars fought against Britain",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-28 09:50:57.103384_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-28 09:50:57.103384_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "Out of all the colonials battles France fought with Britain, they only won one of them. Which war was it?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "The American Revolutionary War",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-28 09:57:06.668948_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-28 09:57:06.668948_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "In France, spring of 1789, Before the estates met, many voters and their representatives drew up lists of grievances demanding relief from unfair financial burdens imposed by the nobility, of better representation of townsfolk and peasants, and of royal intervention on behalf of the people of France, among other things.  These political expectations rose at the very moment when the price of what was skyrocketing? Why were they skyrocketing?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Bread, because the agricultural harvests of 1787 and 1788 were extremely poor. widespread fear of outright famine was growing.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-28 10:00:37.070860_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-28 10:00:37.070860_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "After the Third Estate (in France) formed the \"National Assembly\" in June of 1789:\nThen, discovering on the morning of June 20 that their meeting hall was locked (by accident, as it turned out, although they feared royal interference), they occupied the tennis court of Versailles and pledged not to leave until they had drafted a constitution and the king had accepted it. This came to be known as _______________?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "The Tennis Court Oath",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-28 10:01:32.068956_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-28 10:01:32.068956_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "What is this image a depiction of?",
+        "question_audio": null,
+        "question_image": "Screenshot from 2025-01-28 10-00-55.png",
+        "question_video": null,
+        "answer_text": "The Tennis Court Oath\nCaption Reads:\nThe greatest painter of the revolutionary era, Jacques-Louis David, captured the moment in which the Tennis Court Oath was declared.  Note the Catholic priest, Protestant minister, and agnostic \u201cfreethinker\u201d embracing in the front of the crowd: religious divisions were to be laid aside in the name of national unity.",
+        "answer_audio": null,
+        "answer_image": "Screenshot from 2025-01-28 10-00-55.png",
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-28 10:05:12.100550_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-28 10:05:12.100550_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "Why did crowds take to the Streets on July 12th 1789, then eventually storm the Bastille in France on the 14th?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Rumors spread that the king was going to crush the new National Assembly with force.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-28 10:09:21.349133_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-28 10:09:21.349133_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "How did the National Assembly react to the Great Fear during the French Revolution?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "On August 4th, 1789, it voted to end feudal privilege, On August 14th it abolished the sale of offices, and on August 26th it issued a Declaration of the Rights of Man and Citizen. Then in October went on to sieze and auction off the church lands and property. In early 1790 it abolished noble titles altogether.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-28 10:10:36.212114_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-28 10:10:36.212114_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "French Revolutionaries summarized their ideals with the motto of ___________?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Liberty, Equality, Fraternity",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-28 10:12:58.766784_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-28 10:12:58.766784_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "When did French Jews win their rights as French citizens?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "1791, under the ideal of equality.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-28 10:21:35.534570_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-28 10:21:35.534570_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "Why did many in the National Assembly of France in 1791 balk at the idea of abolishing slavery?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Because a vast amount of France's wealth came from slave economies. A clash between the ideals of the revolution and the (perceived) importance of clinging to a market economy",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-28 10:23:23.142315_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-28 10:23:23.142315_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "How did the slave populations in St. Domingue (now Haiti) respond to learning about the National Assemblies reluctance to extend rights to them?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "They rebelled in the summer of 1791.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-28 10:23:54.174029_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-28 10:23:54.174029_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "Who led the rebellion in St. Domingue, summer of 1791?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Toussaint L'Ouverture",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-28 10:24:46.342029_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-28 10:24:46.342029_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "How did the National Assembly respond to the rebellion in St. Domingue?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "They voted to abolish slavery entirely in 1794",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-28 10:26:42.602392_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-28 10:26:42.602392_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "Why did Olympe de Gouges write her \"Declaration of the Rights of Woman\"? In what year?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "1791\n\nShe drafted it, because the rights of women were completely left out of the discourse in the National Assembly.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-28 10:31:01.584119_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-28 10:31:01.584119_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "This image is a depiction of what?",
+        "question_audio": null,
+        "question_image": "Screenshot from 2025-01-28 10-30-30.png",
+        "question_video": null,
+        "answer_text": "The aftermath of the execution of Louis XVI, with his head displayed to the crowd.  He was executed by guillotine, the newly-invented \u2018humane\u2019 method of execution favored by the Revolutionary government.",
+        "answer_audio": null,
+        "answer_image": "Screenshot from 2025-01-28 10-30-30.png",
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-28 10:32:53.204975_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-28 10:32:53.204975_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "Who sponsored the creation of the metric system?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Maxmilien Robespierre",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-28 10:38:43.258469_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-28 10:38:43.258469_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "What event led Napoleon Bonaparte to come to the attention of ambitious politicians within the Directory?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "In October of 1795, he put down a royalist insurrection in Paris.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-28 11:15:12.303867_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-28 11:15:12.303867_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous"
+        ],
+        "related": null,
+        "question_text": "What is the difference between a power function and an exponential function?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "power vs exponential\nx\u00b2 vs 2\u02e3",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "calculus 1",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-28 11:18:36.003849_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-28 11:18:36.003849_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "calculus"
+        ],
+        "related": null,
+        "question_text": "What is the degree of this polynomial:\nf(x) = 2x\u00b3+7x\u00b2+x\u2078+7",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "8,\nthe degree of a polynomial is the largest exponent",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "calculus 1",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-28 11:21:23.469702_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-28 11:21:23.469702_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "calculus"
+        ],
+        "related": null,
+        "question_text": "n-degree polynomials have at most how many turns?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "n-1 turns",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "calculus 1",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-28 11:23:04.232050_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-28 11:23:04.232050_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "calculus"
+        ],
+        "related": null,
+        "question_text": "A graph of a polynomial has 6 x-intercepts. What is the degree of the polynomial",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "At least a 5th degree polynomial. But could be greater.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "calculus 1",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-29 09:20:05.127178_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-29 09:20:05.127178_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "When did the Battle of the Pyramids take place? Who led the conflict?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "1798, led by Napoleon Bonaparte's French Forces",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-29 09:21:53.240315_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-29 09:21:53.240315_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "When does Napoleon take control of France, what was the name of the old government he overthrew?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "1799, overthrowing the Directory",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-29 09:22:52.581800_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-29 09:22:52.581800_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "Napoleon took this title in France in  1804",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Emperor of France",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-29 12:21:26.011329_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-29 12:21:26.011329_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "neuroscience"
+        ],
+        "related": null,
+        "question_text": "Is Voltage Clamp Recording an Intra or Extra Cellular recording",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Intracellular",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "computational cognitive neuroscience",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-29 12:22:05.522706_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-29 12:22:05.522706_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "neuroscience"
+        ],
+        "related": null,
+        "question_text": "Is Current Clamp Recording an Intra or Extra Cellular method?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Intracellular",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "computational cognitive neuroscience",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-29 12:22:48.171146_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-29 12:22:48.171146_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "neuroscience"
+        ],
+        "related": null,
+        "question_text": "Is Patch Clamp Recording an Intra or Extra Cellular recording technique?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Intracellular",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "computational cognitive neuroscience",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-29 12:23:37.480647_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-29 12:23:37.480647_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "neuroscience"
+        ],
+        "related": null,
+        "question_text": "Is Sharp Electrode Recording an Intra or Extra Cellular recording technique?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Intracellular",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "computational cognitive neuroscience",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-29 12:25:04.801481_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-29 12:25:04.801481_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "neuroscience"
+        ],
+        "related": null,
+        "question_text": "Is Single Unit Recording an Intra or Extra Cellular recording technique?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Extracellular",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "computational cognitive neuroscience",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-29 12:25:38.007825_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-29 12:25:38.007825_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "neuroscience"
+        ],
+        "related": null,
+        "question_text": "Is Multi-unit Recording an Intra or Extra Cellular recording technique?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Extracellular",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "computational cognitive neuroscience",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-29 12:26:08.639958_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-29 12:26:08.639958_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "neuroscience"
+        ],
+        "related": null,
+        "question_text": "Is Local Field Potential Recording an Intra or Extra Cellular recording technique?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Extracellular",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "computational cognitive neuroscience",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-29 18:28:08.337122_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-29 18:28:08.337122_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "What are the birth and death years of Madame de Stael?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "1766-1817",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-29 18:29:13.825528_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-29 18:29:13.825528_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "What did Madame de Stael do to get banished to Switzerland in 1804?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Advocated for political liberty and intellectual freedom, She refused to support Napoleon's one-man rule.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-29 18:30:49.300387_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-29 18:30:49.300387_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "When was Madame de Stael's Critic of Napoleon \"Consideration on the Principle Events of the French Revolution\" published?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "posthumously in 1818",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-29 18:35:22.974888_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-29 18:35:22.974888_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "How does Madame de Stael critique the press under Napoleon's rule?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "She claimed that the press was no longer free, and now heavily censored.\n\n\"The many newspapers in France were soon subjected to the most rigourous but cleverly devised censorship . . . So Bonaparte esetablished that prattling tyranny from which he later derived so much benefit. All the press repeated the same thing each day, without any one being allowed to contradict them.\"",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-29 18:37:29.002844_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-29 18:37:29.002844_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "How does Madame de Stael describe \"The power to exile without trial\" in her critique of Napoleon?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "As the most favorable to tyranny\n\n\"Among all the prerogatives of authority, one of the most favorable to tyranny is the power to exile without trial\"",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-29 20:13:48.939500_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-29 20:13:48.939500_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "Where was Napoleon Bonaparte born?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "The island of Corsica in the Mediterranean",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-29 20:15:29.350434_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-29 20:15:29.350434_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "Napoleon Bonaparte was a member of which royal family at birth?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "The minor Corsican noble family",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-29 20:19:27.677702_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-29 20:19:27.677702_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "Napoleon Bonaparte lead French Armies to major victories in 1796 and 1797. Where?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "In Northern Italy against the Austrians",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-29 20:19:54.702157_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-29 20:19:54.702157_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "When was Napoleon's French Armies active in Northern Italy?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "1796-1797",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-29 20:20:35.008347_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-29 20:20:35.008347_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "In 1797, Napoleon led an attack on which forces in Egypt?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Ottoman Turkish forces",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-29 20:22:03.985916_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-29 20:22:03.985916_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "When did Napoleon join in seizing power in a coup d'etat? What was the name of this new government?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "In 1799, establishing the Consulate",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-29 20:23:34.622490_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-29 20:23:34.622490_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "After Napoleon siezed power in a coup d'etat, The Consulate named it's members \"consuls\" named after what?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "It was a homage to Rome,\n\"consul\" was named after the most powerful politicians in the ancient Roman Republic",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-29 20:24:35.118968_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-29 20:24:35.118968_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "Napoleon thought of himself as the spiritual heir to which historical figures?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Alexander the Great and Julius Caesar",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-29 20:25:32.716466_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-29 20:25:32.716466_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "What is this image a depiction of?",
+        "question_audio": null,
+        "question_image": "Screenshot from 2025-01-29 20-25-03.png",
+        "question_video": null,
+        "answer_text": "Napoleon on his imperial throne. He was not one for subtlety",
+        "answer_audio": null,
+        "answer_image": "Screenshot from 2025-01-29 20-25-03.png",
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-29 20:26:15.019880_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-29 20:26:15.019880_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "How many soldiers did Napoleon control by 1812?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "1 million",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-29 20:27:12.385098_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-29 20:27:12.385098_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "From 1799-1802, Napoleon secured a peace treaty from both the British and the Austrians. When was this peace broken?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "1805",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-29 20:36:31.845757_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-29 20:36:31.845757_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "What was the name of the battle that occured under Napoleon in Europe, October of 1805?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "The Battle of Trafalgar",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-29 20:37:27.679431_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-29 20:37:27.679431_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "What was the outcome of the Battle of Trafalgar in 1805?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "A British fleet destroyed a larger French and allied Spanish one. forcing Napoleon to abandon his hope of invading Britain.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-29 20:39:11.899335_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-29 20:39:11.899335_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "Prussia, went to war in 1806, but Napoleon defeated the Prussians at the Battle of ______ and then occupied _____.",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Battle of Jena\nBerlin",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-29 20:39:47.513568_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-29 20:39:47.513568_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "How much of the Prussian Army was lost at the Battle of Jena?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Fully 96% of the over 170,000 soldiers",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-29 20:41:30.131617_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-29 20:41:30.131617_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "In 1806, following the victories over the Austrians and Prussians, Napoleon formally dissolved what?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "The Holy Roman Empire (almost exactly 1000 years old at the time), replacing much of its territory with a newly invented puppet state he called the Confederation of the Rhine",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-29 20:42:04.200953_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-29 20:42:04.200953_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "What was the name of the state Napoleon replaced the Holy Roman Empire with?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "The Confederation of the Rhine",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-29 20:42:44.242001_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-29 20:42:44.242001_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "When did Napoleon negotiate an alliance with Tsar Alexander of Russia?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "1807",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-29 20:43:57.697286_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-29 20:43:57.697286_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "Napoleon set up a number of puppet-states in the places he conquered. Who did he put in charge of these puppet states?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "He generally appointed his family members as the puppet rulers",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-29 20:47:01.138661_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-29 20:47:01.138661_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "How many battles did Napoleon fight in the two decades he was in power?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "~60 battles",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-29 20:47:47.794292_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-29 20:47:47.794292_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "How many battles did Napoleon lose during his reign? Out of how many?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "8 lost out of 60 total battles.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-29 20:49:51.501038_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-29 20:49:51.501038_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "When did Napoleon create the Bank of France?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "1800",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-29 20:51:09.034745_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-29 20:51:09.034745_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "How did Napoleon address the chronic problem of inflation?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "1. Improving tax collection and public auditing\n2. Creating the Bank of France in 1800\n3. Substituting silver and gold for the almost worthless paper notes.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-29 20:51:39.206769_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-29 20:51:39.206769_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "When did Napoleon introduce his new Civil Code, called the Code Napoleon?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "1804",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-29 20:53:18.362256_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-29 20:53:18.362256_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "What was Napoleons most noteworthy invention in Education?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "The lyc\u00e9e, a secondary school for the training of an elite of leaders and adminstrators.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-29 20:56:45.321342_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-29 20:56:45.321342_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "Unable to invade Britain after the Battle of Trafalgar, Napoleon reacted how?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "By establishing a European boycott of British goods, creating what he hoped would be a self-sustaining internal European economy: the \"Continental System\"",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-29 20:57:36.836823_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-29 20:57:36.836823_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "The \"Continental System\" established by Napoleon resulted in every nation in Europe closing their ports to Britian, except for which countries?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Denmark, Sweden, and Portugal",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-29 20:59:29.183005_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-29 20:59:29.183005_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "Napoleon had attempted to force Denmark and Portugal to comply with his Continental System. How did Britain respond?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "By bombarding Copenhagen and seizing the Danish fleet.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-29 21:00:22.357697_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-29 21:00:22.357697_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "How did Napoleon respond to Britain bombarding Copenhagen, after failing to get Denmark and Portugal to comply with his Continental System?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "With an invasion of the Iberian peninsula in 1808",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-29 21:01:16.176347_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-29 21:01:16.176347_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "the term \"guerrilla\" in the phrase guerrilla war means what?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "\"little war\"",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-29 21:02:53.816258_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-29 21:02:53.816258_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "What does this image depict?",
+        "question_audio": null,
+        "question_image": "Screenshot from 2025-01-29 21-02-09.png",
+        "question_video": null,
+        "answer_text": "Francisco Goya's \"The Third of May\", commemorating the massacre of Spanish villagers by French troops",
+        "answer_audio": null,
+        "answer_image": "Screenshot from 2025-01-29 21-02-09.png",
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-30 07:50:21.042603_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-30 07:50:21.042603_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "biology"
+        ],
+        "related": null,
+        "question_text": "Who posited cell theory in 1839?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Theodor Schwan",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "computational cognitive neuroscience",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-30 08:39:18.177420_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-30 08:39:18.177420_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "astronomy"
+        ],
+        "related": null,
+        "question_text": "What is the densest planet in our solar system?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Mercury",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "introductory astronomy",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-30 10:15:55.670737_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-30 10:15:55.670737_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "What are three concepts John Locke states as being most important for society?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Life, Liberty, and Property",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-30 10:16:50.604391_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-30 10:16:50.604391_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "According to Montesquieu in the \"Spirit of the Laws\", what is required to preserve \"political liberty\" and the \"abuse of power\"?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "The separation of powers between the legislative, judicial, and executive branches",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-30 10:18:19.395613_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-30 10:18:19.395613_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "The Marquis de Condorcet offered his thoughts on humanity in the uncertainty that followed the French Revolution in 1789, What is his view of humanity's future?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "He is optimistic -- the future of humanity includes the abolition of inequality between nations, progressing equality within nations, and ultimately achieving the perfection of mankind.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-30 12:06:06.162442_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-30 12:06:06.162442_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "Napoleon did not stop after conquering Prussia, what was his goals of expansion?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "His ultimate goal was to conquer not just Russia, but the European part of the Ottoman Empire.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-30 12:06:42.841239_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-30 12:06:42.841239_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "How large was Napoleon's army when he marched into Russia in the summer of 1812?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "600,000 strong",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-30 12:08:40.474311_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-30 12:08:40.474311_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "Napoleon faced problems even before the army left to conquer Russia. Where were most of his best troops? And what was the issue with the \"Grand Army\"?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Most of his best troops were in Spain\nMost of the Grand Army were fresh recruits from non-French territories.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-30 12:10:45.199242_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-30 12:10:45.199242_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "What is this image a depiction of?",
+        "question_audio": null,
+        "question_image": "Screenshot from 2025-01-30 12-09-54.png",
+        "question_video": null,
+        "answer_text": "Napoleon's retreat from Russia, where he lost 560,000 men, returning with only 40,000 to France.",
+        "answer_audio": null,
+        "answer_image": "Screenshot from 2025-01-30 12-09-54.png",
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-30 12:12:01.556281_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-30 12:12:01.556281_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "What did Napoleons enemies do in response to the failed invasion of Russia?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "The anti-french coalition of Austria, Prussia, Britain, and Russia reformed",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-30 12:19:06.954940_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-30 12:19:06.954940_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "Napoleon abdicated after a conflict in April of 1814, where was he sent? and How long did he stay there?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "He was sent to a manor on the small Mediterranean island of Elba, He stayed until March of 1815.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-30 12:20:19.992544_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-30 12:20:19.992544_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "After Napoleon escaped the Island of Elba, he found who had been placed in charge of France",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "The Bourbons had been restored by the anti-french coalition. In the person of the unpopular Louis XVIII",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-30 12:21:10.540843_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-30 12:21:10.540843_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "Napoleon had one final conflict in his career. What was the name of it and when did it occur?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "The Battle of Waterloo in 1815",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-30 12:22:41.023712_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-30 12:22:41.023712_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "Napoleon had lost the Battle of Waterloo, but where was he exiled to after his defeat?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "The island of Saint Helena in the South Atlantic, where he finally died in 1821 after composing his memoirs.",
+        "answer_audio": null,
+        "answer_image": "Screenshot from 2025-01-30 12-22-33.png",
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-30 12:57:19.023847_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-30 12:57:19.023847_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "While controversial, Napoleon held a contradictory role in Europe. But ultimately what was the effect on existing nobility?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "A major weakening of the nobility. These conquests crippled the power of the existing old-regime",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-30 13:09:24.290805_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-30 13:09:24.290805_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history",
+            "computer_science"
+        ],
+        "related": null,
+        "question_text": "In Python, what is the difference between = and ==?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "= is an assignment \n== is an equivalence operator\nx = y assigns y to var x\nx == y compares the values and returns a boolean",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "intermediate computer science with python",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-30 13:11:08.512779_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-30 13:11:08.512779_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "computer_science"
+        ],
+        "related": null,
+        "question_text": "In Python, Expressions that evaluate to zero or the empty string are considered?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "False",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "intermediate computer science with python",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-30 13:12:13.411286_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-30 13:12:13.411286_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "computer_science"
+        ],
+        "related": null,
+        "question_text": "True/False\nYou can use floats as arguments in the range() function.",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "False, range only takes integer arguments",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "intermediate computer science with python",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-30 13:13:41.424713_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-30 13:13:41.424713_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "computer_science"
+        ],
+        "related": null,
+        "question_text": "In Python, what is the result of this code:\nfor i in range(100):\n    stdio.writeln(i)\n    i += 10",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "It will print 0 - 99. the i is reset at the beginning of every iteration of the for loop in this case.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "intermediate computer science with python",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-30 13:16:39.536037_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-30 13:16:39.536037_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "computer_science"
+        ],
+        "related": null,
+        "question_text": "In Python, an array is also called what datatype?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "A list",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "intermediate computer science with python",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-30 13:48:16.177854_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-30 13:48:16.177854_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "computer_science"
+        ],
+        "related": null,
+        "question_text": "In python, you want to represent a grid of items as an object. How should you do this?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "A two-dimensional array\n \n1 2 3 4 4\n1 4 2 4 4\n1 2 3 4 4\n1 8 4 4 4",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "intermediate computer science with python",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-30 13:51:08.736054_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-30 13:51:08.736054_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "computer_science"
+        ],
+        "related": null,
+        "question_text": "In python list[-i] is shorthand for?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "list[len(list)-i]",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "intermediate computer science with python",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-30 13:53:04.812180_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-30 13:53:04.812180_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "computer_science"
+        ],
+        "related": null,
+        "question_text": "In Python, what happens when you compare two arrays a[] and b[] with (a==b)?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "For arrays of numbers it works as you might expect: the arrays are equal if each has the same length and the corresponding elements are equal.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "intermediate computer science with python",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-30 13:55:56.009412_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-30 13:55:56.009412_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "computer_science"
+        ],
+        "related": null,
+        "question_text": "In Python, compose a program that creates a one-dimensional array a containing exactly 1000 integers and then attempts to access a[1000]. What happens when you run the program?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "a = [10] * 1000\nprint(a[1000])\n\nIndexError: list index out of range",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "intermediate computer science with python",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-30 13:58:49.977097_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-30 13:58:49.977097_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "computer_science"
+        ],
+        "related": null,
+        "question_text": "What is a[] after executing the following code fragment?\nn = 10\na = [0, 1]\nfor i in range(2, n):\n    a += [a[i-1]+a[i-2]]",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "It adds 8 new items to the list object:\n[0, 1, 1, 2, 3, 5, 8, ,13, 21, 34]",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "intermediate computer science with python",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-30 14:11:35.227326_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-30 14:11:35.227326_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "computer_science"
+        ],
+        "related": null,
+        "question_text": "Compose a code fragment to create a two-dimension array b[][] that is the transpose of an existing m-by-n array a[][]\n",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "b = []\ncolumns = len(a)\nrows = len(a[0])\nfor i in range(rows):\n    row = []\n    for j in range(columns):\n        row.append(a[j][i])\n    b.append(row)\nstdio.writeln(b)",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "intermediate computer science with python",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-30 18:21:07.829243_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-30 18:21:07.829243_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "calculus"
+        ],
+        "related": null,
+        "question_text": "x^2/3 is also equal to?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "\u00b3\u221ax\u00b2",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "calculus 1",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-31 09:04:48.764990_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-31 09:04:48.764990_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "How is Conservatism defined most succintly?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "A worldview or outlook that values traditional institutions and values",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-31 09:06:42.781546_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-31 09:06:42.781546_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "After the French Revolution and Napoleon's conquests, this \"ism\" served as the reaction to it.",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Conservatism",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-31 09:09:40.302566_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-31 09:09:40.302566_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "Conservatism of the early 19th century emphasized the authority of whom?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "The church and the king",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-31 09:11:46.082256_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-31 09:11:46.082256_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "Who was considered to be the leader and figurehead behind the Conservatism that followed Napoleon's conquests?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Edmund Burke",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-31 09:14:20.032952_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-31 09:14:20.032952_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "Where did Conservatives of the 19th century stand on the idea of Faith in human reason?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "They were skeptical, that people are not rational",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-31 09:15:04.130097_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-31 09:15:04.130097_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "What was the Conservatism stance on Human Nature?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Conservatives believed in the wickedness of human nature.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-31 09:16:17.382084_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-31 09:16:17.382084_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "What was the 19th century Conservatism stance on Progress and Discovery",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "\"Infinite caution\" before any change. preferring history and tradition.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-31 09:17:53.740568_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-31 09:17:53.740568_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "Prince Klemens Von Metternich equated Liberty and Equality with?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "war and terror",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-31 09:18:37.948649_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-31 09:18:37.948649_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "What was the name of the council that was formed following Napoleon's defeat in 1814-1815?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "The Congress of Vienna",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-31 09:19:10.035705_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-31 09:19:10.035705_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "During what years did the first Congress of Vienna take place?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "1814-1815",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-31 09:28:51.590218_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-31 09:28:51.590218_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "Edmund Burke held that without the restraints of established authority, people would revert to what?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Savagery",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-31 09:30:48.520503_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-31 09:30:48.520503_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "For Edmund Burke, these three factors represented civilizing forces that tamed the beast in human nature.",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "monarchy, aristocracy, and Christianity",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-31 09:33:59.565630_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-31 09:33:59.565630_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "Who wrote the following quote:\n\n\"You revolutionaries chose to act as if you had never been moulded into civil society, and had every thing to begin anew. You began ill, because you began by despising everything that belong to you. .. . If the last generations of your country appeared without much lustre in your eyes, you might have passed them by, and derived your claims from a more early race of ancestors\"",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Edmund Burke, Reflections on the Revolution in France",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-31 09:34:53.794919_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-31 09:34:53.794919_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "The Congress of Vienna in 1814-1815, put who in charge of the nations?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Monarchs\nRestoring the \"rightful\" monarchs to power.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-31 09:36:31.789151_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-31 09:36:31.789151_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "What are the birth and death years of Edmund Burke?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "1727-1797",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-31 09:37:02.802173_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-31 09:37:02.802173_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "western history"
+        ],
+        "related": null,
+        "question_text": "What are the birth and death years of Klemens Von Metternich?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "1773-1859",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-31 10:06:30.278031_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-31 10:06:30.278031_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "computer_science"
+        ],
+        "related": null,
+        "question_text": "In Python, using the stddraw library. How do you draw a basic circle?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "import stddraw\nstddraw.setXscale(-1,1)\nstddraw.setYscale(-1,1)\nstddraw.setPenRadius(0.01)\nstddraw.circle(0,0,1)\nstddraw.show()",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "intermediate computer science with python",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-31 10:10:06.498604_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-31 10:10:06.498604_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "computer_science"
+        ],
+        "related": null,
+        "question_text": "The function stddraw.circle() takes what arguments.",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "stddraw.circle(x_cord, y_cord, radius)",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "intermediate computer science with python",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-31 10:19:35.854488_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-31 10:19:35.854488_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "computer_science"
+        ],
+        "related": null,
+        "question_text": "In python, using the stddraw module, how do you draw point?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "stddraw.setXscale(-1,1)\nstddraw.setYscale(-1,1)\nstddraw.point(x, y)\nstddraw.show()\n\nMake sure to set the scale of the image, .point draws a point on that cartesian coordinate",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "intermediate computer science with python",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-31 10:22:04.985899_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-31 10:22:04.985899_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "computer_science"
+        ],
+        "related": null,
+        "question_text": "In Python, you've used the stddraw module to draw a graph. How do you save this as an image?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "stddraw.save(\"filename.ext\")\n\nAssuming you've already written the prerequsite code to generate the image.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "intermediate computer science with python",
         "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
     }
 }
