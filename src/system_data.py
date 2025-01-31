@@ -1205,8 +1205,8 @@ def get_next_question(user_profile_data, amount_of_rs_one_questions):
     # RS 14+ Questions are spaced more than a month apart 
     # So we have 4 weight groups, RS 1 is already covered, so let's calculated three weights each weight is percentile/quartile
     two_six_weight          = 0
-    seven_thirteen_weight   = .50
-    fourteen_plus_weight    = .90
+    seven_thirteen_weight   = .75
+    fourteen_plus_weight    = .95
     # We can generate a random number between 0 and 1 using random.random()
     random_weight = random.random()
     # Now based on the random_weight we will choose a question within the range

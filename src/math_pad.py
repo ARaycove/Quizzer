@@ -116,14 +116,3 @@ for i in range(3):
     a.append(row)
 print(a)
 print("##########################")
-b = []
-# how many columns and row b will have
-columns = len(a)
-rows    = len(a[0])
-print(columns, rows)
-for i in range(rows):
-    row = []
-    for j in range(columns):
-        row.append(a[j][i])
-    b.append(row)
-print(b)

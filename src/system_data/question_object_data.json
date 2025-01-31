@@ -44771,7 +44771,7 @@
             "computer_science"
         ],
         "related": null,
-        "question_text": "In SQL, what are Key Constraints?",
+        "question_text": "In SQL, what does Key Constraint mean?",
         "question_audio": null,
         "question_image": null,
         "question_video": null,
@@ -45152,11 +45152,11 @@
             "computer_science"
         ],
         "related": null,
-        "question_text": "You defined a table in SQL using quotes\nCREATE TABLE table_name (\"Colum One\" INT(255))\n\nHowever when you attempt to insert data into it you get an error\nINSERT INTO table_name (\"Column One) VALUES (10);\n\nWhat's gone wrong?",
+        "question_text": "You defined a table in SQL using quotes\nCREATE TABLE table_name (\"Colum One\" INT(255))\n\nHowever when you attempt to insert data into it you get an error\nINSERT INTO table_name (\"Column One\") VALUES (10);\n\nWhat's gone wrong?",
         "question_audio": null,
         "question_image": null,
         "question_video": null,
-        "answer_text": "The proper syntax when calling INSERT INTO is `backticks` not \"quotations\"",
+        "answer_text": "The proper syntax when calling INSERT INTO with a column that has space characters  is `backticks` not \"quotations\". Alternatively just don't use spaces in your column names opting for an underscore instead",
         "answer_audio": null,
         "answer_image": null,
         "answer_video": null,
@@ -45613,7 +45613,7 @@
             "computer_science"
         ],
         "related": null,
-        "question_text": "Identify the missing keywrod in the following SQL statement:\nINSERT INTO customers\n(ID, name)\n________\n(7, \"Tom\");",
+        "question_text": "Identify the missing keyword in the following SQL statement:\nINSERT INTO customers\n(ID, name)\n________\n(7, \"Tom\");",
         "question_audio": null,
         "question_image": null,
         "question_video": null,
@@ -74999,7 +74999,7 @@
         "question_audio": null,
         "question_image": null,
         "question_video": null,
-        "answer_text": "1701-1713",
+        "answer_text": "1701-1714\n\nThe War of the Spanish Succession was a European great power conflict fought between 1701 and 1714. The immediate cause was the death of the childless Charles II of Spain in November 1700, which led to a struggle for control of the Spanish Empire between supporters of the French Bourbons and the Austrian Habsburgs.",
         "answer_audio": null,
         "answer_image": null,
         "answer_video": null,
@@ -79413,6 +79413,64 @@
         "answer_image": null,
         "answer_video": null,
         "module_name": "intermediate computer science with python",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-31 15:32:35.855900_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-31 15:32:35.855900_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "psychology",
+            "philosophy"
+        ],
+        "related": null,
+        "question_text": "What is the The Semmelweis Reflex?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "The Semmelweis reflex or \"Semmelweis effect\" is a metaphor for the reflex-like tendency to reject new evidence or new knowledge because it contradicts established norms, beliefs, or paradigms.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "logical fallacies",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-31 16:03:23.892776_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-31 16:03:23.892776_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "calculus"
+        ],
+        "related": null,
+        "question_text": "Find K such that the limit exists:\nlim (x -> \u221e) (x\u00b2+3x+5)/(4x + 1 + x^k)",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "k \u2265 2",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "calculus 1",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-01-31 16:04:38.920425_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-31 16:04:38.920425_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous",
+            "calculus"
+        ],
+        "related": null,
+        "question_text": "Find K such that the limit exists:\nlim (x->4) (x\u00b2-k\u00b2)/(x-4)",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "k = 4\n\n(x-k)(x+k) / (x-4)\nset k = 4\nsimplifies now to (x+4)",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "calculus 1",
         "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
     }
 }
