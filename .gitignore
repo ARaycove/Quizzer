@@ -159,12 +159,7 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
-user_profiles/
-backups/
-instance_data/
-modules/
-scratchpad.py
-scratchpad.txt
-system_data/user_profiles/
-math_pad.py/
+src/scratchpad.py
+src/scratchpad.txt
+src/math_pad.py/
 src/quizzer-d70f1-firebase-adminsdk-5qr3n-f4abb1d335.json
