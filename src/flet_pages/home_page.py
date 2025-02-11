@@ -231,19 +231,10 @@ class HomePage(ft.View):
             # Total is 0, the entry is made when the first question is answered
             system_data.update_stats(self.user_profile_data,self.question_object_data)
             self.total_answered_today.value = "0"
-        try:
             # Current question is residing in the is_eligible pile, use this one, otherwise get a new question
-            self.user_profile_data["questions"] = system_data.sort_questions(self.user_profile_data, self.question_object_data)
-            valid_check = self.user_profile_data["questions"]["in_circulation_is_eligible"][self.current_question_id]
-            self.current_question                   = self.question_object_data[self.current_question_id]
+        self.user_profile_data["questions"] = system_data.sort_questions(self.user_profile_data, self.question_object_data)
+        self.get_next_question()
 
-        except KeyError:
-            self.get_next_question()
-            self.user_profile_data["questions"] = system_data.sort_questions(self.user_profile_data, self.question_object_data)
-            # self.user_profile_data = system_data.update_circulating_non_eligible_questions(
-            #     self.user_profile_data,
-            #     self.question_object_data
-            # )        
         if self.questions_available_to_answer == False:
             return None
         # Execute these if there are available questions
@@ -269,13 +260,14 @@ class HomePage(ft.View):
                 self.question_object_data)
             # Go through the non_eligible questions to see if anything is eligible now
             self.user_profile_data["questions"] = system_data.sort_questions(self.user_profile_data, self.question_object_data)
-            # Go through the reserve bank and see if we can put anything into circulation
+            current_eligible_questions = len(self.user_profile_data["questions"]["in_circulation_is_eligible"])
+        if current_eligible_questions <= 0:
             self.user_profile_data = generate_quiz.update_questions_in_circulation(
                 self.user_profile_data,
                 self.question_object_data
             )
             # Call to the server everytime we run out of questions
-            system_data.update_user_profile(self.user_profile_data)
+        system_data.update_user_profile(self.user_profile_data)
         # After these checks we should have new questions available,
         #   If the value is still 0 then we have no new questions to introduce
         current_eligible_questions = len(self.user_profile_data["questions"]["in_circulation_is_eligible"])
@@ -290,15 +282,6 @@ class HomePage(ft.View):
         # print(f"def get_next_question()")
         # If the question list has no questions in it, attempt to fill it again
         self.verify_if_remaining_questions()
-        self.ticker += 1
-        # Push user data to cloud after every 15 questions answered
-        if self.ticker >= 20:
-            try:
-                system_data.update_user_profile(self.user_profile_data)
-                firestore_db.write_user_profile_to_firestore(self.CURRENT_USER)
-            except:
-                system_data.update_user_profile(self.user_profile_data)
-            self.ticker = 0
         
         if self.questions_available_to_answer == True:
             # self.current_question_id = random.choice(list(self.user_profile_data["questions"]["in_circulation_is_eligible"].keys()))
@@ -330,12 +313,6 @@ class HomePage(ft.View):
         self.has_seen = False
         self.skip_button.disabled=False
         system_data.update_user_profile(self.user_profile_data)
-        self.verify_if_remaining_questions()
-        # Refresh stats when a question is answered
-        self.user_profile_data = generate_quiz.update_questions_in_circulation(
-            self.user_profile_data,
-            self.question_object_data
-        )
         self.remaining_questions_counter.value  = str(f"Rem: {len(self.user_profile_data['questions']['in_circulation_is_eligible'])}")
         self.total_answered_today.value         = str(f"TAT:{self.user_profile_data['stats']['questions_answered_by_date'][self.todays_date]}")
         self.average_questions_per_day.value    = str(f"APD: {self.user_profile_data["stats"]["average_questions_per_day"]:.3f}")

@@ -1,5 +1,7 @@
 import math
 from datetime import timedelta, datetime
+import sys
+import stddraw
 
 # Solve Sinusoidal
 def solve_sinusoidal(theta,
@@ -101,18 +103,35 @@ def memory_formula(x):
     number_of_days = fraction+g
     return number_of_days
 
+
 # for x in range(0, 31):
 #     num_days = memory_formula(x)
 #     if num_days != 0 or num_days != 0.0:
 #         avg_shown = 1 / num_days
 #         next_due_date = datetime.now() + timedelta(days=num_days)
 #         print(f"{x:5} reps: {num_days:10.2f}, next_due: {next_due_date}")
+def draw_sin_rose(n = None):
+    d_t = 0.001
+    theta = 0
+    if n == None:
+        n=6
+    stddraw.setXscale(-1,1)
+    stddraw.setYscale(-1,1)
+    while theta <= math.pi*2: #custom range -> range only works with integer values
+        # Polar equation
+        radius = math.sin(n*theta)
+        # Determine cartesian coordinates
+        x = radius * math.cos(theta)
+        y = radius * math.sin(theta)
+        # Plot point
+        stddraw.point(x, y)
+        theta += d_t # increment step
+    stddraw.show()
 
-import random
-a = []
-for i in range(3):
+def natlog(x):
+    print(x, math.log(x))
 
-    row = [(random.randint(1, 5)) for i in range(5)]
-    a.append(row)
-print(a)
-print("##########################")
+x_val = [1, 2, 5, 10]
+
+for i in x_val:
+    natlog(i)

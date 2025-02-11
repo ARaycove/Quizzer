@@ -1197,61 +1197,42 @@ def get_next_question(user_profile_data, amount_of_rs_one_questions):
     determines which question will be shown to the user next based on their profile data and settings
     Currently ensures that presented questions prioritize questions with lower revision streaks over questions with higher streaks
     '''
-    # Calculate Weighting
-    # With goal to weight questions with lower revision more heavily than others
-    # RS 1 questions are always asked first if available
-    # RS 2-6 questions are the initial concrete learning stage
-    # RS 7-13 questions cement these facts into long-term memory beyond a month, but are asked less frequently
-    # RS 14+ Questions are spaced more than a month apart 
-    # So we have 4 weight groups, RS 1 is already covered, so let's calculated three weights each weight is percentile/quartile
-    two_six_weight          = 0
-    seven_thirteen_weight   = .75
-    fourteen_plus_weight    = .95
-    # We can generate a random number between 0 and 1 using random.random()
-    random_weight = random.random()
     # Now based on the random_weight we will choose a question within the range
     user_questions: dict = user_profile_data["questions"]["in_circulation_is_eligible"]
     # To ensure questions are not presented back to back, we will shuffle the order of the keys every time we pick a new question
     user_questions = helper.shuffle_dictionary_keys(user_questions)
     for i in range(1, 101):
-        # In the case no question is available in the range, change random weight to a different range
-        # On first iteration we target RS 1 questions
-        # On second iteration we target question in random range
-        # on third and fourth we target any question available
-        if i == 3:
-            random_weight = seven_thirteen_weight
-        if i == 4:
-            random_weight = fourteen_plus_weight
         for question_id, question_object_user_data in user_questions.items():
             check_var = question_object_user_data["revision_streak"]
             due_date = helper.convert_to_datetime_object(question_object_user_data["next_revision_due"])
             overdue = False
             # Questions that are not close to the due date won't be presented
             # If the question hits this condition it indicates it is overdue for revision, beyond the acceptable margin
-            if helper.within_twenty_four_hours(helper.convert_to_datetime_object(question_object_user_data["next_revision_due"])) == False:
-                overdue = True
-                print(due_date)
+
             # Define which questions get immediate priority
+            # Questions that have just been added go first
             if i == 1:
                 if check_var == 1:
                     print(f"Selected question with RS of {check_var}")
                     return question_id
-                elif overdue == True:
+            # Questions that the user is still actively learning (has not gone to medium-long term memory)
+            elif i == 2:
+                if check_var <= 6:
+                    print(f"Selected question with RS of {check_var}")
+                    return question_id         
+            # Questions the user is overdue for answering (At risk of forgetting that information)           
+            elif i == 3:   
+                if helper.within_twenty_four_hours(helper.convert_to_datetime_object(question_object_user_data["next_revision_due"])) == False:
+                    overdue = True
+                    print(due_date)
+                if overdue == True:
                     print(f"Selected question with RS of {check_var}")
                     print(f"Question is overdue")
-                    return question_id         
-            # Ensure distribution of questions selected based on current revision streak           
-            if i > 1:
-                # Check range in reverse order
-                if (random_weight >= fourteen_plus_weight) and check_var >= 14:
-                    print(f"Selected question with RS of {check_var}")
-                    return question_id    
-                elif (random_weight >= seven_thirteen_weight) and check_var <= 13:
-                    print(f"Selected question with RS of {check_var}")
-                    return question_id                  
-                elif (random_weight >= two_six_weight) and check_var <= 6:
-                    print(f"Selected question with RS of {check_var}")
                     return question_id
+            # All other questions
+            elif i >= 4:
+                print(f"Selected question with RS of {check_var}")
+                return question_id                  
 
 
                 

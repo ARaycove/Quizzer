@@ -3,7 +3,6 @@
 from lib import helper
 import system_data
 
-
 # Common Libraries
 from datetime import datetime
 import random

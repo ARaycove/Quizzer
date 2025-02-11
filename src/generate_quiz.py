@@ -216,12 +216,17 @@ def update_questions_in_circulation(user_profile_data: dict, question_object_dat
     '''
     # print("def quiz_functions.update_questions_in_circulation(user_profile_data: dict) -> dict")
     # Load in user data
+
     settings_data = user_profile_data["settings"]
     stats_data = user_profile_data["stats"]
     
     # assign variables with user data we are working with.
     average_daily_questions = stats_data["average_questions_per_day"]
     desired_daily_questions = settings_data["desired_daily_questions"]
+    user_profile_data = add_questions_into_circulation(1, 2, user_profile_data, question_object_data) # function will now add a single question every time its called
+# print("    Finished updating list of circulating questions")
+    user_profile_data = system_data.update_stats(user_profile_data, question_object_data)
+    return user_profile_data
     # print(f"    Current average daily questions being shown is: {average_daily_questions}")
     # print(f"    Current desired daily questions to be shown is: {desired_daily_questions}")
     if average_daily_questions >= desired_daily_questions * 1.10: # 10% threshold, so if desired is 100, if we exceed 110 the script will reduce the amount of questions in circulation
