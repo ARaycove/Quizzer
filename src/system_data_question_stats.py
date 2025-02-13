@@ -32,7 +32,8 @@ def update_question_history(question_object:dict, status:str) -> dict:
     elif status == "incorrect":
         question_object["incorrect_attempt_history"][todays_date] += 1
     else:
-        print("invalid status provided")
+        # Currently a "repeat" status can be passed, if passed, we will do nothing with it
+        pass
     return question_object
 
 def calculate_next_revision_date(status: str, question_object:dict): #Private Function

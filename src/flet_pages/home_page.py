@@ -2,7 +2,7 @@ import flet as ft
 import random
 import system_data
 import generate_quiz
-import firestore_db
+import system_data_user_stats
 from datetime import datetime, date, timedelta
 
 class HomePage(ft.View):
@@ -49,7 +49,7 @@ class HomePage(ft.View):
         self.menu_icon      = ft.Icon(name=ft.Icons.MENU_SHARP, color=ft.Colors.BLACK)
         self.yes_icon       = ft.Icon(name=ft.Icons.CHECK_CIRCLE, color=ft.Colors.WHITE)
         self.no_icon        = ft.Icon(name=ft.Icons.NOT_INTERESTED, color=ft.Colors.WHITE)
-        self.skip_icon      = ft.Icon(name=ft.Icons.SKIP_NEXT, color=ft.Colors.BLACK)
+        self.skip_icon      = ft.Icon(name=ft.Icons.REPEAT, color=ft.Colors.BLACK)
         self.plus_icon      = ft.Icon(name=ft.Icons.ADD, color=ft.Colors.BLACK)
         self.edit_icon      = ft.Icon(name=ft.Icons.EDIT, color=ft.Colors.BLACK)
         ############################################################
@@ -328,13 +328,19 @@ class HomePage(ft.View):
 
     def skip_to_next_question(self, e: ft.ControlEvent):
         '''
-        Skips to next question, does not update any statistics on the backend
+        Changed semantically to a re-do button, low confidence correct answer
+        Will now increment only number of questions answered, but does not modify the object itself
         '''
-        # print(f"def skip_to_next_question(e: ft.ControlEvent)")
-        # print("    Skipping question")
-        # Disable the button while it processes
         self.skip_button.disabled=True
         self.page.update()
+        self.user_profile_data = system_data_user_stats.increment_questions_answered(self.user_profile_data)
+        status = "repeat"
+        self.user_profile_data = system_data.update_score(
+            status,
+            self.current_question_id,
+            self.user_profile_data,
+            self.question_object_data
+        )
         self.get_next_question()
         if self.questions_available_to_answer == True:
             self.text_object.value          = self.current_question["question_text"]

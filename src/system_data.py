@@ -815,9 +815,8 @@ def update_score(status:str, unique_id:str, user_profile_data: dict, question_ob
     # We will be moving the question anyway so we're going to extract the question object
 
     try:
-        question_object = user_profile_data['questions']["in_circulation_is_eligible"].pop(unique_id) #Removes the question from the in_circulation_is_eligible pile
-        if question_object["time_between_revisions"] >= 1:
-            question_object["time_between_revisions"] = 0.37
+        question_object = user_profile_data['questions']["in_circulation_is_eligible"].pop(unique_id) 
+        #Removes the question from the in_circulation_is_eligible pile
     except KeyError:
         # Attempting to update the score of a question that has already been updated
         return user_profile_data
@@ -1206,6 +1205,8 @@ def get_next_question(user_profile_data, amount_of_rs_one_questions):
             check_var = question_object_user_data["revision_streak"]
             due_date = helper.convert_to_datetime_object(question_object_user_data["next_revision_due"])
             overdue = False
+            print(f"Selected question with RS of {check_var}")
+            return question_id  
             # Questions that are not close to the due date won't be presented
             # If the question hits this condition it indicates it is overdue for revision, beyond the acceptable margin
 
