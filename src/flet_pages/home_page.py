@@ -33,6 +33,10 @@ class HomePage(ft.View):
         self.has_seen                       = has_seen
         self.pages_visited                  = pages_visited
         self.amount_of_rs_one_questions     = 1
+        self.question_presented_time        = datetime.now()
+        self.question_answered_time         = None
+        self.time_taken_to_answer           = None
+        self.has_been_flipped               = False
 
         ############################################################
         # Define General Data
@@ -288,6 +292,8 @@ class HomePage(ft.View):
             self.current_question_id = system_data.get_next_question(self.user_profile_data,
                                                                      amount_of_rs_one_questions=self.amount_of_rs_one_questions)
             self.current_question    = self.question_object_data[self.current_question_id].copy()
+        self.question_presented_time = datetime.now()
+        self.question_answered_time  = datetime.now()
         self.page.update()
 
     def question_answered(self, e: ft.ControlEvent, status):
@@ -297,14 +303,20 @@ class HomePage(ft.View):
         # print(f"def question_answered(e: ft.ControlEvent, status: int) -> None")
         self.correct_button.disabled    = True
         self.incorrect_button.disabled  = True
+        self.has_been_flipped           = False # Since we got a new question, the new question has not been flipped:
         self.page.update()
         # print(f"    Updating question <{self.current_question_id}> with status of <{status}>")
+        self.time_taken_to_answer   = self.question_answered_time -self.question_presented_time
+        if self.time_taken_to_answer.total_seconds() == 0:
+            self.time_taken_to_answer = None
         self.user_profile_data = system_data.update_score(
-            status,
-            self.current_question_id,
-            self.user_profile_data,
-            self.question_object_data
+            status                      = status,
+            unique_id                   = self.current_question_id,
+            user_profile_data           = self.user_profile_data,
+            question_object_data        = self.question_object_data,
+            time_spent                  = self.time_taken_to_answer
         )
+
         self.get_next_question()
         if self.questions_available_to_answer == True:
             self.text_object.value          = self.current_question["question_text"]
@@ -318,6 +330,8 @@ class HomePage(ft.View):
         self.average_questions_per_day.value    = str(f"APD: {self.user_profile_data["stats"]["average_questions_per_day"]:.3f}")
         print("Current Learning Rate Questions per day:", self.user_profile_data["stats"]["average_num_questions_entering_circulation_daily"])
         yesterday = date.today() - timedelta(1)
+        if self.user_profile_data["stats"]["total_in_circulation_questions"].get(str(yesterday)) == None:
+            self.user_profile_data["stats"]["total_in_circulation_questions"][str(yesterday)] = self.user_profile_data["stats"]["total_in_circulation_questions"][str(date.today())]
         print("Yesterday's num questions in circulation:   ", self.user_profile_data["stats"]["total_in_circulation_questions"][str(yesterday)])
         print("Current     num questions in circulation:   ", self.user_profile_data["stats"]["total_in_circulation_questions"][str(date.today())])
         difference = self.user_profile_data["stats"]["total_in_circulation_questions"][str(date.today())] - self.user_profile_data["stats"]["total_in_circulation_questions"][str(yesterday)]
@@ -335,6 +349,7 @@ class HomePage(ft.View):
         self.page.update()
         self.user_profile_data = system_data_user_stats.increment_questions_answered(self.user_profile_data)
         status = "repeat"
+        self.time_taken_to_answer   = self.question_answered_time - self.question_presented_time 
         self.user_profile_data = system_data.update_score(
             status,
             self.current_question_id,
@@ -351,9 +366,11 @@ class HomePage(ft.View):
         self.page.update()
 
     def flip_question_answer(self, e):
-        # print("def flip_question_answer(self, e)")
-        # print("Current Question ID:", self.current_question_id)
-        # self.verify_if_remaining_questions()
+        # After a question is presented, the call of this funciton indicates that the question has been answered. Therefore on the initial answering we will record the time at this point
+        if self.has_been_flipped == False:
+            self.question_answered_time = datetime.now()
+            self.has_been_flipped = True
+        
         if self.questions_available_to_answer == False:
             self.page.update()
             return False

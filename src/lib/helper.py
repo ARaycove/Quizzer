@@ -5,6 +5,7 @@ import os
 import random
 import sys
 import shutil
+import numpy as np
 def dict_size_mb(d: dict): return sys.getsizeof(d) / (1024 * 1024)
 
 def get_user_profiles_directory() -> str:
@@ -131,3 +132,22 @@ def copy_file(file_to_copy, location):
         print(f"    File '{file_to_copy}' copied successfully to '{location}'.")
     except shutil.Error as e:
         print(f"    Error when copying file {e}")
+
+def reject_outliers(data: list, m=1.5):
+    data.sort()
+    length_of_data = len(data)
+    # Get the approximate index of the 1st and 3rd quartiles
+    q1_index = int(length_of_data*0.25)
+    q3_index = int(length_of_data*0.75)
+    # Assign the values of those two points
+    q1 = data[q1_index]
+    q3 = data[q3_index]
+    # Calculate the Range
+    interquartile_range = q3 - q1
+    # Calculate lower and upper bound
+    lower_bound = q1 - (m * interquartile_range)
+    upper_bound = q3 + (m * interquartile_range)
+    # filter out x values that are not within the interquartile_range
+    filtered_data = [x for x in data if lower_bound <= x <= upper_bound]
+    return filtered_data
+

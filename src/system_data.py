@@ -806,20 +806,50 @@ def update_stats(user_profile_data: dict, question_object_data: dict) -> dict:#P
     user_profile_data = system_data_user_stats.determine_total_eligible_questions(user_profile_data)
     return user_profile_data
 
-def update_score(status:str, unique_id:str, user_profile_data: dict, question_object_data: dict) -> dict: #Public Function
-    # print(f"def update_score(status:str, id:str, user_profile_data: dict) -> dict")
-    # print(f"    Updating < {unique_id} > with status of < {status} >")
+def update_score(status:str, unique_id:str, user_profile_data: dict, question_object_data: dict, time_spent = None) -> dict: #Public Function
     # The question just answered will be sitting in the "in_circulation_is_eligible" pile
-    # We need to update the metrics, then place it in the "in_circulation_not_eligible" pile
-    check_variable = "" # Used to aid in print statements, a temporary place to store values
-    # We will be moving the question anyway so we're going to extract the question object
-
+    # We need to update the metrics, then place it in the "in_circulation_not_eligible" pile    
+    # Initial Check, has the question already been updated?
     try:
+        # We will be moving the question anyway so we're going to extract the question object
         question_object = user_profile_data['questions']["in_circulation_is_eligible"].pop(unique_id) 
-        #Removes the question from the in_circulation_is_eligible pile
+        # Removes the question from the in_circulation_is_eligible pile
     except KeyError:
         # Attempting to update the score of a question that has already been updated
         return user_profile_data
+    def calculate_average_time(raw_data_list):
+        # Convert to floats
+        time_data = [float(i) for i in raw_data_list]
+        # Reject outliers
+        filtered_times = helper.reject_outliers(time_data)
+        average_time = sum(filtered_times)/len(filtered_times)
+        return average_time
+
+    
+    #############################################################################
+    # Potential Status Overide based on time required to answer depending on average time to answer
+    # Weighing of average time only is factored based on correct answers
+    if time_spent != None:
+        n = 5 # Hard n second recall, if below n seconds, do not override
+        print(f"Time taken to answer: {time_spent}/{n}")
+        # Need to first add the time_spent to the question_objects array of answer_times:
+        time_spent = str(time_spent.total_seconds())
+        if question_object.get("answer_times") == None:
+            question_object["answer_times"] = [time_spent]
+        else:
+            question_object["answer_times"].append(time_spent)
+        if status != "incorrect":
+            average_time = calculate_average_time(question_object["answer_times"])
+            if average_time < n:
+                average_time = n
+            # Criteria is a bit obnoxious for an absolute comparison. In effect the absolute, you have to beat your average causes even well known questions to constantly be repeated without benefit
+            # Two thoughts
+            # Percentage variance (acceptable range)
+            if float(time_spent) >= (average_time*1.10): # If within 10% of average, do not repeat. This adds a range to the hard-repeat -> if average is 6 seconds and user answers at 6.1 seconds, we don't repeat.
+                time_spent_text = round(float(time_spent), 2)
+                average_time_text = round((average_time*1.10),2)
+                print(f"{time_spent_text} >= {average_time_text}, status overidden to 'repeat'")
+                status = "repeat"
     module_name = question_object_data[unique_id]["module_name"]
     # print(f"    Question is from module < {module_name} >")
     ############# We Have Multiple Values to Update ########################################
@@ -847,23 +877,14 @@ def update_score(status:str, unique_id:str, user_profile_data: dict, question_ob
         if question_object["revision_streak"] < 1:
             question_object["revision_streak"] = 1
     # print(f"Revision streak was {check_variable}, streak is now {question_object['revision_streak']}")
-
-
-
     ###################
     # User stat representing how many questions the user has answered over lifetime
     user_profile_data = system_data_user_stats.increment_questions_answered(user_profile_data)
-    
-
-    
     ###################
     # Change the last_revised property to datetime.now() since we just revised it at time of now
     check_variable = question_object["last_revised"]
     # print(f"This question was last revised on {check_variable}")
     question_object["last_revised"] = helper.stringify_date(datetime.now())
-    
-    
-    
     ###################
     # Calculate the next time the question will be due for revision
     # That is, predict when the user will forget the answer to the question and set the due date to right before that point in time
@@ -872,16 +893,13 @@ def update_score(status:str, unique_id:str, user_profile_data: dict, question_ob
     question_object["next_revision_due"] = helper.stringify_date(question_object["next_revision_due"])
     check_variable = question_object["next_revision_due"]
     # print(f"The next revision is due on {check_variable}")
-
     ###################
     # Update question's history stats
     question_object = system_data_question_stats.update_question_history(question_object, status)
-
     ###################
     # Update all the other stats
     # redetermines eligibility, if the question was given a status of incorrect this will show the question as eligible to answer
     question_object = update_user_question_stats(question_object, unique_id, user_profile_data, question_object_data)
-
     ###################
     # Update data structure
     # We need to move the question we just answered from the "in_circulation_is_eligible" pile to the "in_circulation_not_eligible" pile
@@ -891,7 +909,6 @@ def update_score(status:str, unique_id:str, user_profile_data: dict, question_ob
         user_profile_data["questions"]["in_circulation_not_eligible"].update(write_data)
     else:
         user_profile_data["questions"]["in_circulation_is_eligible"].update(write_data)
-
     # We also need to update any stats directly relating whats in the piles
     # Most of these stats just use O(1) functions
     user_profile_data = update_stats(user_profile_data, question_object_data)
