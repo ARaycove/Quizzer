@@ -60,7 +60,6 @@ def configure_initial_tier_value(actual_composition, master_ratio, questions_rem
         
 ###############################################################
 def should_increment_tier_value(actual_composition, master_ratio, tier_value):
-
     for subject in master_ratio.copy():
         target_ratio = master_ratio[subject] * tier_value
         if actual_composition[subject] < target_ratio:
@@ -121,9 +120,11 @@ def add_questions_into_circulation(average_daily_questions: float, desired_daily
             # Gather the information for that subject
             current_subject_target = working_ratio_targets[subject_value]
             current_amount_circulating = actual_composition[subject_value]
+            # load in question_object
             question_stat_block = user_profile_data["questions"]["reserve_bank"][question_id]
-            if question_stat_block.get("average_times_shown_per_day") == None:
-                question_stat_block = system_data_question_stats.calculate_average_shown(question_stat_block)
+            # Ensure average times per day shown stat is accurate
+            question_stat_block = system_data_question_stats.calculate_average_shown(question_stat_block)
+            # Initialize for easy update
             question_to_move = {question_id: question_stat_block}
             
             if current_amount_circulating < current_subject_target:

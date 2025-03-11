@@ -1,0 +1,786 @@
+{
+    "2024-12-10 12:46:21.575860_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-12-10 12:46:21.575860_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous"
+        ],
+        "related": null,
+        "question_text": "How many basic Logic Gates are there?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Seven\nAND, OR, XOR, NOT, NAND, NOR, and XNOR",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "what are logic gates?",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "index_id": "question_index_1",
+        "updateTime": "2024-12-10T19:46:22.469746Z"
+    },
+    "2025-02-20 19:52:32.571592_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-02-20 19:52:32.571592_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous"
+        ],
+        "related": null,
+        "question_text": "What is the main political belief associated with Socialism?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "The belief that government should be deeply invested in the welfare of the common people.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-02-26 14:41:39.985330_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-02-26 14:41:39.985330_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous"
+        ],
+        "related": null,
+        "question_text": "What are the birth and death years of Karl Marx?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "1818-1883",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "73.110.32.112.121.116.104.111.110.44.32.104.111.119.32.100.111.32.121.111.117.32.99.111.109.98.105.110.101.32.116.104.101.32.102.108.111.97.116.105.110.103.32.112.111.105.110.116.32.112.114.101.99.105.115.105.111.110.32.102.111.114.109.97.116.32.115.112.101.99.105.102.105.99.97.116.105.111.110.32.119.105.116.104.32.116.104.101.32.102.105.101.108.100.32.119.105.100.116.104.32.115.112.101.99.105.102.105.99.97.116.105.111.110.63": {
+        "subject": [
+            "miscellaneous"
+        ],
+        "related": [
+            "Floating-point precision",
+            "field width"
+        ],
+        "question_text": "In python, how do you combine the floating point precision format specification with the field width specification?",
+        "question_image": null,
+        "answer_text": "print(f\"{5:4.1f}\")\n\nThe . in front of the 1f serves to separate the specifications",
+        "answer_image": null,
+        "question_audio": null,
+        "question_video": null,
+        "answer_audio": null,
+        "answer_video": null,
+        "module_name": "introductory computer science with python",
+        "academic_sources": [],
+        "id": "73.110.32.112.121.116.104.111.110.44.32.104.111.119.32.100.111.32.121.111.117.32.99.111.109.98.105.110.101.32.116.104.101.32.102.108.111.97.116.105.110.103.32.112.111.105.110.116.32.112.114.101.99.105.115.105.111.110.32.102.111.114.109.97.116.32.115.112.101.99.105.102.105.99.97.116.105.111.110.32.119.105.116.104.32.116.104.101.32.102.105.101.108.100.32.119.105.100.116.104.32.115.112.101.99.105.102.105.99.97.116.105.111.110.63",
+        "updateTime": "2024-11-24T23:15:15.827444Z",
+        "index_id": "question_index_1"
+    },
+    "2025-03-04 10:37:29.695924_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-03-04 10:37:29.695924_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous"
+        ],
+        "related": null,
+        "question_text": "How did the Victorian bourgeoisie interpret the working class's demands for shortened working days?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "As evidence of laziness and lack of work ethic, not exhaustion and exploitation",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-02-03 12:21:45.635610_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-02-03 12:21:45.635610_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous"
+        ],
+        "related": null,
+        "question_text": "What is the formula of the Rescorla-Wagner Model?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Where\n\u0394Vx is the change in the strength, on a single trial, of the association between CS labeleed \"X\" and the US\n\u03b1 is the salience\n\u03b2 is the rate parameter for the US (bounded by 0 and 1) association value\n\u03bb is the maxmium conditioning possible\nVx is current associative strength\nVtot is the total associative strength",
+        "answer_audio": null,
+        "answer_image": "Screenshot from 2025-02-07 15-41-25.png",
+        "answer_video": null,
+        "module_name": "computational cognitive neuroscience",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-02-02 13:41:57.947900_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-02-02 13:41:57.947900_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous"
+        ],
+        "related": null,
+        "question_text": "Klemens von Metternich cites what as the reason for why the French Revolution broke out?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "The French Philosophers and their ideas, saying they forsook the experience and wisdom of the past, trusting only their own thoughts and inclinations.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "87.104.97.116.32.105.115.32.116.104.101.32.116.105.110.121.32.112.105.101.99.101.32.97.116.32.116.104.101.32.101.110.100.32.111.102.32.97.32.115.104.111.101.108.97.99.101.32.99.97.108.108.101.100.63": {
+        "subject": [
+            "miscellaneous"
+        ],
+        "related": [
+            "shoes",
+            "aglet"
+        ],
+        "question_text": "What is the tiny piece at the end of a shoelace called?",
+        "question_image": null,
+        "answer_text": "An aglet",
+        "answer_image": null,
+        "question_audio": null,
+        "question_video": null,
+        "answer_audio": null,
+        "answer_video": null,
+        "module_name": "random fun facts",
+        "academic_sources": [],
+        "id": "87.104.97.116.32.105.115.32.116.104.101.32.116.105.110.121.32.112.105.101.99.101.32.97.116.32.116.104.101.32.101.110.100.32.111.102.32.97.32.115.104.111.101.108.97.99.101.32.99.97.108.108.101.100.63",
+        "primary_subject": "miscellaneous",
+        "updateTime": "2024-11-24T23:08:58.888825Z",
+        "index_id": "question_index_1"
+    },
+    "2024-11-19 09:56:29.132877_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-11-19 09:56:29.132877_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous"
+        ],
+        "related": [
+            "Woodrow Wilson",
+            "The Sedition Act",
+            "World War One"
+        ],
+        "question_text": "When did the Sedition Act, implemented by the United States, go into effect?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "The bill was signed into law in April of 1917, just a few weeks after Wilson decreed war.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "world war one",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "updateTime": "2024-11-24T23:24:35.787253Z",
+        "index_id": "question_index_1"
+    },
+    "73.110.32.80.121.116.104.111.110.44.32.121.111.117.32.104.97.118.101.32.100.97.116.97.32.115.116.111.114.101.100.32.105.110.32.97.32.100.105.99.116.105.111.110.97.114.121.44.32.121.111.117.32.116.104.101.110.32.103.101.116.32.110.101.119.32.100.97.116.97.32.105.110.32.97.110.111.116.104.101.114.32.100.105.99.116.105.111.110.97.114.121.46.32.72.111.119.32.100.111.32.121.111.117.32.109.101.114.103.101.32.116.104.101.32.110.101.119.32.100.105.99.116.105.111.110.97.114.121.32.105.110.116.111.32.116.104.101.32.111.108.100.32.100.105.99.116.105.111.110.97.114.121.63": {
+        "subject": [
+            "miscellaneous"
+        ],
+        "related": [
+            "miscellaneous"
+        ],
+        "question_text": "In Python, you have data stored in a dictionary, you then get new data in another dictionary. How do you merge the new dictionary into the old dictionary?",
+        "question_image": null,
+        "answer_text": "Using the dict1.update(dict2) method -> .update()",
+        "answer_image": null,
+        "question_audio": null,
+        "question_video": null,
+        "answer_audio": null,
+        "answer_video": null,
+        "module_name": "introductory computer science with python",
+        "academic_sources": [],
+        "id": "73.110.32.80.121.116.104.111.110.44.32.121.111.117.32.104.97.118.101.32.100.97.116.97.32.115.116.111.114.101.100.32.105.110.32.97.32.100.105.99.116.105.111.110.97.114.121.44.32.121.111.117.32.116.104.101.110.32.103.101.116.32.110.101.119.32.100.97.116.97.32.105.110.32.97.110.111.116.104.101.114.32.100.105.99.116.105.111.110.97.114.121.46.32.72.111.119.32.100.111.32.121.111.117.32.109.101.114.103.101.32.116.104.101.32.110.101.119.32.100.105.99.116.105.111.110.97.114.121.32.105.110.116.111.32.116.104.101.32.111.108.100.32.100.105.99.116.105.111.110.97.114.121.63",
+        "updateTime": "2024-11-24T23:12:17.209360Z",
+        "index_id": "question_index_1"
+    },
+    "2024-12-10 12:01:05.157054_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-12-10 12:01:05.157054_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous"
+        ],
+        "related": null,
+        "question_text": "What is the SQL syntax to insert data into a table?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "INSERT INTO table_name (column_one, column_two, column_three)\nVALUES (value1, value2, value3, . . .);",
+        "answer_audio": null,
+        "answer_image": "Screenshot from 2024-12-10 12-00-59.png",
+        "answer_video": null,
+        "module_name": "introduction to databases for back-end development",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "index_id": "question_index_1",
+        "updateTime": "2024-12-10T19:01:06.212657Z"
+    },
+    "2025-03-04 17:58:23.648631_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-03-04 17:58:23.648631_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous"
+        ],
+        "related": null,
+        "question_text": "What was the male literacy rate in France at the time of the French Revolution compared to 1870 and 1900?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Just below 50% during the French Revolution, almost 80% in 1870, and almost 100% by 1900",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-12-23 11:43:35.633375_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-12-23 11:43:35.633375_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous"
+        ],
+        "related": null,
+        "question_text": "What is the name of the element with the symbol Tm?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Thulium",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "periodic table of elements",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "index_id": "question_index_1",
+        "updateTime": "2024-12-23T18:43:35.912733Z"
+    },
+    "2025-01-25 17:54:21.190987_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-25 17:54:21.190987_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous"
+        ],
+        "related": null,
+        "question_text": "What kind of cells are \"lurking around\" the synaptic cleft?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Glial cells",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "computational cognitive neuroscience",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "87.104.101.110.32.100.105.100.32.116.104.101.32.67.111.108.111.115.115.117.115.32.111.102.32.82.104.111.100.101.115.32.98.101.103.105.110.32.99.111.110.115.116.114.117.99.116.105.111.110.32.97.110.100.32.119.104.101.110.32.119.97.115.32.105.116.32.99.111.109.112.108.101.116.101.100.63": {
+        "subject": [
+            "miscellaneous"
+        ],
+        "related": [
+            "Colossus of Rhodes",
+            "Helios",
+            "Rhodes"
+        ],
+        "question_text": "When did the Colossus of Rhodes begin construction and when was it completed?",
+        "question_image": null,
+        "answer_text": "294 BCE - 282 BCE \n\n\"The statue, which took 12 years to build (c. 294\u2013282 bce), was toppled by an earthquake about 225/226 bce. The fallen Colossus was left in place until 654 ce, when Arabian forces raided Rhodes and had the statue broken up and the bronze sold for scrap.\" - Encyclopedia of Britannica",
+        "answer_image": null,
+        "question_audio": null,
+        "question_video": null,
+        "answer_audio": null,
+        "answer_video": null,
+        "module_name": "world history",
+        "academic_sources": [],
+        "id": "87.104.101.110.32.100.105.100.32.116.104.101.32.67.111.108.111.115.115.117.115.32.111.102.32.82.104.111.100.101.115.32.98.101.103.105.110.32.99.111.110.115.116.114.117.99.116.105.111.110.32.97.110.100.32.119.104.101.110.32.119.97.115.32.105.116.32.99.111.109.112.108.101.116.101.100.63",
+        "updateTime": "2024-11-25T22:53:58.356851Z",
+        "index_id": "question_index_1",
+        "primary_subject": "history"
+    },
+    "73.110.32.116.104.101.32.80.104.111.110.101.116.105.99.32.97.108.112.104.97.98.101.116.44.32.104.111.119.32.100.111.32.121.111.117.32.112.114.111.110.111.117.110.99.101.32.67.63": {
+        "subject": [
+            "miscellaneous"
+        ],
+        "related": [
+            "miscellaneous"
+        ],
+        "question_text": "In the Phonetic alphabet, how do you pronounce C?",
+        "question_image": null,
+        "answer_text": "Charlie",
+        "answer_image": null,
+        "question_audio": null,
+        "question_video": null,
+        "answer_audio": null,
+        "answer_video": null,
+        "module_name": "phonetic alphabet",
+        "academic_sources": [],
+        "id": "73.110.32.116.104.101.32.80.104.111.110.101.116.105.99.32.97.108.112.104.97.98.101.116.44.32.104.111.119.32.100.111.32.121.111.117.32.112.114.111.110.111.117.110.99.101.32.67.63",
+        "updateTime": "2024-11-24T23:07:38.803825Z",
+        "index_id": "question_index_1"
+    },
+    "87.104.97.116.32.105.115.32.116.97.110.40.960.41.63": {
+        "subject": [
+            "miscellaneous"
+        ],
+        "related": [
+            "unit circle",
+            "tangent"
+        ],
+        "question_text": "What is tan(\u03c0)?",
+        "answer_text": "0",
+        "question_image": null,
+        "answer_image": null,
+        "question_audio": null,
+        "question_video": null,
+        "answer_audio": null,
+        "answer_video": null,
+        "module_name": "trigonometry",
+        "academic_sources": [],
+        "id": "87.104.97.116.32.105.115.32.116.97.110.40.960.41.63",
+        "primary_subject": "mathematics",
+        "updateTime": "2024-11-24T22:16:21.318895Z",
+        "index_id": "question_index_1"
+    },
+    "87.104.121.32.115.104.111.117.108.100.32.121.111.117.32.114.101.99.111.110.115.116.114.117.99.116.32.97.114.103.117.109.101.110.116.115.63": {
+        "subject": [
+            "miscellaneous"
+        ],
+        "related": [
+            "argument"
+        ],
+        "question_text": "Why should you reconstruct arguments?",
+        "question_image": null,
+        "question_audio": null,
+        "question_video": null,
+        "answer_text": null,
+        "answer_image": null,
+        "answer_audio": null,
+        "answer_video": null,
+        "module_name": "obsidian_default",
+        "academic_sources": [],
+        "id": "87.104.121.32.115.104.111.117.108.100.32.121.111.117.32.114.101.99.111.110.115.116.114.117.99.116.32.97.114.103.117.109.101.110.116.115.63",
+        "updateTime": "2024-11-24T23:16:34.693665Z",
+        "index_id": "question_index_1"
+    },
+    "2025-03-07 12:45:00.600941_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-03-07 12:45:00.600941_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous"
+        ],
+        "related": null,
+        "question_text": "In Machine Learning, what does MSE stand for?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Mean Squared Error",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "computational cognitive neuroscience",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-02-24 09:12:42.175348_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-02-24 09:12:42.175348_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous"
+        ],
+        "related": null,
+        "question_text": "According to Karl Marx, Everything about a society (religion, culture, politics, etc) depends on what?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Whoever controls the means of production",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-02-20 18:48:08.781397_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-02-20 18:48:08.781397_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous"
+        ],
+        "related": null,
+        "question_text": "What was the significance of the \"mule\" introduced in 1803?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "It allowed thread production to be 200 to 300 times faster than hand spinning.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-03-04 18:05:47.382539_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-03-04 18:05:47.382539_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous"
+        ],
+        "related": null,
+        "question_text": "What major international tension was exacerbated by sensationalizing journalism in the late nineteenth century?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "A naval arms race between Britain and Germany that was one of the causes of World War I",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-12-18 12:07:29.523035_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-12-18 12:07:29.523035_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous"
+        ],
+        "related": null,
+        "question_text": "What is the symbol of the element named Aluminum?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Al",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "periodic table of elements",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "index_id": "question_index_1",
+        "updateTime": "2024-12-18T19:07:30.263269Z"
+    },
+    "2025-02-28 10:44:14.518826_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-02-28 10:44:14.518826_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous"
+        ],
+        "related": null,
+        "question_text": "A cell is at rest at -70 mV, and potassium channels open. In which direction does potassium flow and how does this affect the membrane potential?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Out of the cell; Makes potential more negative\n\nSince potassiums equilibrium potential is -80mV, potassium will need to leave the cell, taking out its postive charge, making the membrane potential more negative.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "introductory neuroscience",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-02-11 19:48:16.204391_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-02-11 19:48:16.204391_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous"
+        ],
+        "related": null,
+        "question_text": "Union Ourvriere was written by whom?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Flora Tristan",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "73.110.32.116.104.101.32.80.104.111.110.101.116.105.99.32.97.108.112.104.97.98.101.116.44.32.104.111.119.32.100.111.32.121.111.117.32.112.114.111.110.111.117.110.99.101.32.85.63": {
+        "subject": [
+            "miscellaneous"
+        ],
+        "related": [
+            "miscellaneous"
+        ],
+        "question_text": "In the Phonetic alphabet, how do you pronounce U?",
+        "question_image": null,
+        "answer_text": "Uniform",
+        "answer_image": null,
+        "question_audio": null,
+        "question_video": null,
+        "answer_audio": null,
+        "answer_video": null,
+        "module_name": "phonetic alphabet",
+        "academic_sources": [],
+        "id": "73.110.32.116.104.101.32.80.104.111.110.101.116.105.99.32.97.108.112.104.97.98.101.116.44.32.104.111.119.32.100.111.32.121.111.117.32.112.114.111.110.111.117.110.99.101.32.85.63",
+        "primary_subject": "us_military",
+        "updateTime": "2024-11-24T23:12:59.576203Z",
+        "index_id": "question_index_1"
+    },
+    "2024-12-19 18:35:58.548205_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-12-19 18:35:58.548205_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous"
+        ],
+        "related": null,
+        "question_text": "How does the principle \"form follows function\" apply to cells?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "The principle suggests that the structure of a cell or its components is suited to its function, similar to how streamlined bodies help birds and fish move efficiently in their environments.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "contemporary biology",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "index_id": "question_index_1",
+        "updateTime": "2024-12-20T01:35:59.465571Z"
+    },
+    "2025-02-23 18:10:03.045886_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-02-23 18:10:03.045886_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous"
+        ],
+        "related": null,
+        "question_text": "When did Ivan IV die, thus ending his reign over Russia?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "1584",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "102.116.46.114.111.119.40.41.32.105.115.32.119.104.97.116.32.107.105.110.100.32.111.102.32.99.111.110.116.114.111.108.32.105.110.32.116.104.101.32.102.108.101.116.32.109.111.100.117.108.101.63": {
+        "subject": [
+            "miscellaneous"
+        ],
+        "related": [
+            "ft.row()",
+            "container"
+        ],
+        "module_name": "python - flutter with flet",
+        "question_text": "ft.row() is what kind of control in the flet module?",
+        "question_image": null,
+        "question_audio": null,
+        "question_video": null,
+        "answer_text": "A \"container\" control (like Page) which could contain other controls.",
+        "answer_image": null,
+        "answer_audio": null,
+        "answer_video": null,
+        "academic_sources": "https://flet.dev/docs/getting-started/flet-controls",
+        "id": "102.116.46.114.111.119.40.41.32.105.115.32.119.104.97.116.32.107.105.110.100.32.111.102.32.99.111.110.116.114.111.108.32.105.110.32.116.104.101.32.102.108.101.116.32.109.111.100.117.108.101.63",
+        "updateTime": "2024-11-24T23:21:00.852240Z",
+        "index_id": "question_index_1"
+    },
+    "2025-01-21 14:44:18.326397_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-21 14:44:18.326397_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous"
+        ],
+        "related": null,
+        "question_text": "What was Jean Calvin's stance on free will? What doctrine did this result in?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "That Free will is merely an illusion born of human ignorance, since the fate of person's soul was determined before time itself began. This doctrine is called \"predestination\"",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "73.110.32.112.121.116.104.111.110.44.32.103.105.118.101.110.32.97.32.108.105.115.116.44.32.104.111.119.32.100.111.32.121.111.117.32.102.105.110.100.32.105.102.32.97.32.118.97.108.117.101.32.105.115.32.105.110.32.116.104.101.32.108.105.115.116.63.10.69.120.97.109.112.108.101.58.10.108.105.115.116.32.61.32.91.49.44.32.50.44.32.51.44.32.52.44.32.53.93": {
+        "subject": [
+            "miscellaneous"
+        ],
+        "related": [
+            "membership operator"
+        ],
+        "question_text": "In python, given a list, how do you find if a value is in the list?\nExample:\nlist = [1, 2, 3, 4, 5]",
+        "answer_text": "using the \"in\" membership operator:\n\nif 2 in list:\n   print(\"2 is in the list\")",
+        "question_image": null,
+        "question_audio": null,
+        "question_video": null,
+        "answer_image": null,
+        "answer_audio": null,
+        "answer_video": null,
+        "module_name": "introductory computer science with python",
+        "academic_sources": [],
+        "id": "73.110.32.112.121.116.104.111.110.44.32.103.105.118.101.110.32.97.32.108.105.115.116.44.32.104.111.119.32.100.111.32.121.111.117.32.102.105.110.100.32.105.102.32.97.32.118.97.108.117.101.32.105.115.32.105.110.32.116.104.101.32.108.105.115.116.63.10.69.120.97.109.112.108.101.58.10.108.105.115.116.32.61.32.91.49.44.32.50.44.32.51.44.32.52.44.32.53.93",
+        "updateTime": "2024-11-24T22:21:07.643295Z",
+        "index_id": "question_index_1"
+    },
+    "2024-12-18 11:55:26.201197_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-12-18 11:55:26.201197_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous"
+        ],
+        "related": null,
+        "question_text": "What is the atomic number of the element named Nitrogen?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "7",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "periodic table of elements",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "index_id": "question_index_1",
+        "updateTime": "2024-12-18T18:55:27.086249Z"
+    },
+    "2024-12-18 13:00:10.600577_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-12-18 13:00:10.600577_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous"
+        ],
+        "related": null,
+        "question_text": "What is the atomic number of the element named Arsenic?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "33",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "periodic table of elements",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "index_id": "question_index_1",
+        "updateTime": "2024-12-18T20:00:11.295173Z"
+    },
+    "2025-03-07 10:24:05.798162_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-03-07 10:24:05.798162_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous"
+        ],
+        "related": null,
+        "question_text": "Tangent Line Approximation:\nThe error, E(x), in the approximation is defined by ?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "E(x) = f(x) - f(a) - f'(a)(x-a)",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "calculus 1",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2024-12-18 11:51:01.732309_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-12-18 11:51:01.732309_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous"
+        ],
+        "related": null,
+        "question_text": "What is the atomic number of the element named Boron?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "5",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "periodic table of elements",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "index_id": "question_index_1",
+        "updateTime": "2024-12-18T18:51:02.926964Z"
+    },
+    "2024-12-15 12:40:35.362167_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2024-12-15 12:40:35.362167_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous"
+        ],
+        "related": null,
+        "question_text": "What kind of language is dart? When is type determined?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Static Typed,\nType is determined during code compilation.",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "flutter and dart: developing ios, android, and mobile apps",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "index_id": "question_index_1",
+        "updateTime": "2024-12-15T19:40:36.189349Z"
+    },
+    "2025-01-31 09:37:02.802173_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-01-31 09:37:02.802173_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous"
+        ],
+        "related": null,
+        "question_text": "What are the birth and death years of Klemens Von Metternich?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "1773-1859",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-02-15 13:41:43.414331_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-02-15 13:41:43.414331_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous"
+        ],
+        "related": null,
+        "question_text": "What is this a depiction of?",
+        "question_audio": null,
+        "question_image": "Screenshot from 2025-02-15 13-41-07.png",
+        "question_video": null,
+        "answer_text": "The Decembrist uprising, depicted at the moment troops loyal to the tsar opened fire.",
+        "answer_audio": null,
+        "answer_image": "Screenshot from 2025-02-15 13-41-07.png",
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-02-28 10:33:36.845898_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-02-28 10:33:36.845898_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous"
+        ],
+        "related": null,
+        "question_text": "The equilibrium potential of an ion is calculated using what equation?",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Nernst equation",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "introductory neuroscience",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    },
+    "2025-02-28 09:32:35.422279_47d39d7b-37ff-461b-aeec-ca52e36c101d": {
+        "id": "2025-02-28 09:32:35.422279_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+        "primary_subject": "miscellaneous",
+        "subject": [
+            "miscellaneous"
+        ],
+        "related": null,
+        "question_text": "Who wrote the following quote?\n\n\"History shows me one way, and one way only, in which a high state of civilization has been produced, namely, the struggle of race with race, and the survival of the physically and mentally fitter race.\"",
+        "question_audio": null,
+        "question_image": null,
+        "question_video": null,
+        "answer_text": "Karl Pearson in \"National Life from the Standpoint of Science\" (1900)",
+        "answer_audio": null,
+        "answer_image": null,
+        "answer_video": null,
+        "module_name": "western civilization ii: renaissance to present",
+        "author": "47d39d7b-37ff-461b-aeec-ca52e36c101d"
+    }
+}

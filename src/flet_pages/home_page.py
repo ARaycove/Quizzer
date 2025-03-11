@@ -336,7 +336,6 @@ class HomePage(ft.View):
         print("Current     num questions in circulation:   ", self.user_profile_data["stats"]["total_in_circulation_questions"][str(date.today())])
         difference = self.user_profile_data["stats"]["total_in_circulation_questions"][str(date.today())] - self.user_profile_data["stats"]["total_in_circulation_questions"][str(yesterday)]
         print(f"Amount Learned so far today:                 {difference}")
-        print(f"{self.user_profile_data["stats"]["revision_streak_stats"]}")
         self.amount_of_rs_one_questions = self.user_profile_data["stats"]["revision_streak_stats"].get(1)
         self.page.update()
 

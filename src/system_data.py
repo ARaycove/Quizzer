@@ -817,29 +817,43 @@ def update_score(status:str, unique_id:str, user_profile_data: dict, question_ob
     except KeyError:
         # Attempting to update the score of a question that has already been updated
         return user_profile_data
-    def calculate_average_time(raw_data_list):
+    def _calculate_average_time(raw_data_list):
         # Convert to floats
         time_data = [float(i) for i in raw_data_list]
         # Reject outliers
         filtered_times = helper.reject_outliers(time_data)
         average_time = sum(filtered_times)/len(filtered_times)
         return average_time
-
+    def _increment_total_answer(question_object: dict):
+        if question_object.get("total_answers") == None:
+            question_object["total_answers"] = 1
+        else:
+            question_object["total_answers"] += 1
+        return question_object
     
     #############################################################################
     # Potential Status Overide based on time required to answer depending on average time to answer
     # Weighing of average time only is factored based on correct answers
+    question_object = _increment_total_answer(question_object)
     if time_spent != None:
-        n = 5 # Hard n second recall, if below n seconds, do not override
+        override_mechanism = False # Override mechanism ensures if on revision one, set time to at least 60 seconds, driving the average up, set to override so we do not force repeat the question on the first revision
+        n = 7.25 # Hard n second recall, if below n seconds, do not override. 7.25 is the developers current overall answer average
+        # There is a strange temporal perception going on. What I perceive as 5 seconds has varied from just 2 seconds to 8 seconds. Sometimes answering something quickly and seeing it took 8 seconds, or thinking I spent longer on something, but it only took 3 seconds. There may be something to investigate here.
         print(f"Time taken to answer: {time_spent}/{n}")
         # Need to first add the time_spent to the question_objects array of answer_times:
         time_spent = str(time_spent.total_seconds())
+        # The first revision should be focused more on accuracy than speed,
+        # By forcing at least one 60 second answer time, we drive the average, reducing the number of forced repeats during early revisions
+        if question_object["revision_streak"] == 1 or question_object["revision_streak"] == 2 or question_object["revision_streak"] == 3:
+            if float(time_spent) < 60.0:
+                time_spent = str('60.0')
+                override_mechanism = True
         if question_object.get("answer_times") == None:
             question_object["answer_times"] = [time_spent]
         else:
             question_object["answer_times"].append(time_spent)
-        if status != "incorrect":
-            average_time = calculate_average_time(question_object["answer_times"])
+        if status != "incorrect" and override_mechanism == False:
+            average_time = _calculate_average_time(question_object["answer_times"])
             if average_time < n:
                 average_time = n
             # Criteria is a bit obnoxious for an absolute comparison. In effect the absolute, you have to beat your average causes even well known questions to constantly be repeated without benefit
@@ -850,6 +864,7 @@ def update_score(status:str, unique_id:str, user_profile_data: dict, question_ob
                 average_time_text = round((average_time*1.10),2)
                 print(f"{time_spent_text} >= {average_time_text}, status overidden to 'repeat'")
                 status = "repeat"
+    ######################################
     module_name = question_object_data[unique_id]["module_name"]
     # print(f"    Question is from module < {module_name} >")
     ############# We Have Multiple Values to Update ########################################

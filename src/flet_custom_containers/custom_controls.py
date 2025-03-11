@@ -216,7 +216,7 @@ class PrimarySubjectField(ft.Container):
         self.submission             = new_data
         self.display_field.value    = str(self.submission).lower()
         self.submission             = self.display_field.value
-        print("New Primary subject value:", self.submission)
+        # print("New Primary subject value:", self.submission)
         self.page.update()
 
 class ModuleNameField(ft.Container):
@@ -307,7 +307,7 @@ class ModuleNameField(ft.Container):
     def update_module_name(self, new_data):
         self.submission = new_data
         self.display_field.value = str(self.submission).lower()
-        print(f"New Module Name value: {self.submission}")
+        # print(f"New Module Name value: {self.submission}")
         self.page.update()
     def show_module_name_textfield_option           (self, e: ft.ControlEvent):
         self.content = self.content_box_textfield
@@ -440,7 +440,7 @@ class RelatedSubjectsField(ft.Container):
         self.page.update()
     def update_related_subject(self, new_data):
         self.submission = new_data
-        print(f"New related_subjects field value: {self.submission}")
+        # print(f"New related_subjects field value: {self.submission}")
 
         
 class RelatedConceptsField(ft.Container):
@@ -570,7 +570,7 @@ class RelatedConceptsField(ft.Container):
 
     def update_related_concepts(self, new_data):
         self.submission = new_data
-        print(f"New related concepts value: {self.submission}")
+        # print(f"New related concepts value: {self.submission}")
 
 class QuestionEntryField(ft.Container):
     def __init__(self, page, question_object_data, form_fields_width, current_question_id = None):
@@ -668,21 +668,21 @@ class QuestionEntryField(ft.Container):
     def update_text_field(self, new_data):
         self.text_submission    = new_data
         self.text_field.value   = self.text_submission
-        print(f"New Question Text Value: {self.text_submission}")
+        # print(f"New Question Text Value: {self.text_submission}")
         self.page.update()
 
     def update_question_image(self, new_data):
         self.image_submission   = new_data
         self.preview_image.src  = self.image_submission
-        print(f"New Question Image Value: {self.image_submission}")
+        # print(f"New Question Image Value: {self.image_submission}")
 
     def update_question_audio(self, new_data):
         self.audio_submission   = new_data
-        print(f"New Question Audio Value: {self.audio_submission}")
+        # print(f"New Question Audio Value: {self.audio_submission}")
 
     def update_question_video(self, new_data):
         self.video_submission = new_data
-        print(f"New Question Video Value: {self.video_submission}")
+        # print(f"New Question Video Value: {self.video_submission}")
 
     def upload_file(self, e):
         upload_list = []
@@ -695,7 +695,7 @@ class QuestionEntryField(ft.Container):
 
     def dialog_result(self, e: ft.FilePickerResultEvent):
         # Construct the file path, and put the to-be uploaded file in staging area
-        print(self.file_picker.result.files[0].path)
+        # print(self.file_picker.result.files[0].path)
         if self.file_picker.result.files[0].path != None: # for desktop version
             helper.copy_file(self.file_picker.result.files[0].path, "uploads")
         else: # for web apps
@@ -835,21 +835,21 @@ class AnswerEntryField(ft.Container):
     def update_text_field(self, new_data):
         self.text_submission    = new_data
         self.text_field.value   = self.text_submission
-        print(f"New Answer Text Value: {self.text_submission}")
+        # print(f"New Answer Text Value: {self.text_submission}")
         self.page.update()
 
     def update_image_field(self, new_data):
         self.image_submission   = new_data
         self.preview_image.src  = self.image_submission
-        print(f"New Answer Image Value: {self.image_submission}")
+        # print(f"New Answer Image Value: {self.image_submission}")
 
     def update_audio_field(self, new_data):
         self.audio_submission   = new_data
-        print(f"New Answer Audio Value: {self.audio_submission}")
+        # print(f"New Answer Audio Value: {self.audio_submission}")
 
     def update_video_field(self, new_data):
         self.video_submission = new_data
-        print(f"New Answer Video Value: {self.video_submission}")
+        # print(f"New Answer Video Value: {self.video_submission}")
 
     def upload_file(self, e):
         upload_list = []
@@ -883,7 +883,7 @@ class AnswerEntryField(ft.Container):
         #   Will later be used by the actual upload_question button to move the media into the system_data/media_files dir -> media_file_name may need to be updated when adding to the main database
         #   when exiting this interface, we should clear the uploads folder
         if self.q_or_a == "answer_media":
-            print("Answer being uploaded")
+            # print("Answer being uploaded")
             if media_type == "image":
                 self.update_image_field(self.file_picker.result.files[0].name)
                 self.preview_image.src= f"uploads/{self.image_submission}"

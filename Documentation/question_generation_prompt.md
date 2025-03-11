@@ -15,7 +15,7 @@ The context of the questions should be included in the question itself.
 Do not make references to vague words, such as "the study" or "the paper" or "the person" or "that monkey" or "the monkeys", or "according to the text", etc. 
 ________________________
 If a question relies on knowledge of a specific thing, that specific thing should be mentioned in the context of the question. 
-Do not make vague references to source materials (such as "according to the document","according to the text","mentioned in the text","described in Chapter #")
+Do not make vague references (such as "according to the document","according to the text","mentioned in the text","described in Chapter #", "According to the editorial note", "shown on this page", "according to the XXXXX chapter", "what ______ does the text identify")
 if you are referencing source material in the question, use the exact name of the source material. 
 If you are unable to find the name of the material to reference, make no such reference at all. 
 Always use full names when referencing people, again do not make vague references to people. 

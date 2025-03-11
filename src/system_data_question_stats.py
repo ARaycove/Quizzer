@@ -79,7 +79,7 @@ def calculate_next_revision_date(status: str, question_object:dict): #Private Fu
     # We need to ensure we don't use this value that is in each object
     # So if we have an old value, detected greater than one, we'll set it to 0.37 to match the new initial constant
     if question_object["time_between_revisions"] >= 1:
-        question_object["time_between_revisions"] = 0.37
+        question_object["time_between_revisions"] = 1
     elif question_object["time_between_revisions"] <= 0:
         question_object["time_between_revisions"] = 0.05
         # value has to be above 0, otherwise the function inverts

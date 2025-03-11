@@ -171,7 +171,7 @@ class AddQuestionPage(ft.View):
             self.file_picker.upload(upload_list)
     def dialog_result(self, e: ft.FilePickerResultEvent):
         # Construct the file path, and put the to-be uploaded file in staging area
-        print(self.file_picker.result.files[0].path)
+        # print(self.file_picker.result.files[0].path)
         if self.file_picker.result.files[0].path != None: # for desktop version
             helper.copy_file(self.file_picker.result.files[0].path, "uploads")
         else: # for web apps
@@ -276,18 +276,18 @@ class AddQuestionPage(ft.View):
         self.answer_image_submission        = self.answer_entry_box.image_submission
         self.answer_audio_submission        = self.answer_entry_box.audio_submission
         self.answer_video_submission        = self.answer_entry_box.video_submission
-        print(f"self.primary_subject_submission has value of    : {self.primary_subject_submission} of type {type(self.primary_subject_submission)}")
-        print(f"self.module_name_submission has value of        : {self.module_name_submission} of type {type(self.module_name_submission)}")
-        print(f"self.related_subjects_submission has value of   : {self.related_subjects_submission} of type {type(self.related_subjects_submission)}")
-        print(f"self.related_concepts_submission has value of   : {self.related_concepts_submission} of type {type(self.related_concepts_submission)}")
-        print(f"self.question_text_submission has value of      : {self.question_text_submission} of type {type(self.question_text_submission)}")
-        print(f"self.question_image_submission has value of     : {self.question_image_submission} of type {type(self.question_image_submission)}")
-        print(f"self.question_audio_submission has value of     : {self.question_audio_submission} of type {type(self.question_audio_submission)}")
-        print(f"self.question_video_submission has value of     : {self.question_video_submission} of type {type(self.question_video_submission)}")
-        print(f"self.answer_text_submission has value of        : {self.answer_text_submission} of type {type(self.answer_text_submission)}")
-        print(f"self.answer_image_submission has value of       : {self.answer_image_submission} of type {type(self.answer_image_submission)}")
-        print(f"self.answer_audio_submission has value of       : {self.answer_audio_submission} of type {type(self.answer_audio_submission)}")
-        print(f"self.answer_video_submission has value of       : {self.answer_video_submission} of type {type(self.answer_video_submission)}")
+        # print(f"self.primary_subject_submission has value of    : {self.primary_subject_submission} of type {type(self.primary_subject_submission)}")
+        # print(f"self.module_name_submission has value of        : {self.module_name_submission} of type {type(self.module_name_submission)}")
+        # print(f"self.related_subjects_submission has value of   : {self.related_subjects_submission} of type {type(self.related_subjects_submission)}")
+        # print(f"self.related_concepts_submission has value of   : {self.related_concepts_submission} of type {type(self.related_concepts_submission)}")
+        # print(f"self.question_text_submission has value of      : {self.question_text_submission} of type {type(self.question_text_submission)}")
+        # print(f"self.question_image_submission has value of     : {self.question_image_submission} of type {type(self.question_image_submission)}")
+        # print(f"self.question_audio_submission has value of     : {self.question_audio_submission} of type {type(self.question_audio_submission)}")
+        # print(f"self.question_video_submission has value of     : {self.question_video_submission} of type {type(self.question_video_submission)}")
+        # print(f"self.answer_text_submission has value of        : {self.answer_text_submission} of type {type(self.answer_text_submission)}")
+        # print(f"self.answer_image_submission has value of       : {self.answer_image_submission} of type {type(self.answer_image_submission)}")
+        # print(f"self.answer_audio_submission has value of       : {self.answer_audio_submission} of type {type(self.answer_audio_submission)}")
+        # print(f"self.answer_video_submission has value of       : {self.answer_video_submission} of type {type(self.answer_video_submission)}")
         media_files_input = set([])
         if self.question_image_submission != None:
             media_files_input.add(self.question_image_submission)
@@ -309,7 +309,7 @@ class AddQuestionPage(ft.View):
         
         for filename in media_files_input:
             if filename in current_media_files:
-                print("GOTCHA")
+                # print("GOTCHA")
                 index_val = filename.rfind(".")
                 extension = filename[index_val:]
                 file_no_ext = filename[:index_val]
