@@ -1,0 +1,19 @@
+In this folder will be stored the saved ML models that will be developed specifically for Quizzer
+
+Among the models to be developed are:
+
+1. A QuestionObject subject classifier
+2. A QuestionObject concept/term classifier
+
+There are two options for classifying questions by subject and concept, but I have learned recently and more fully understand, unsupervised learning models.
+
+So my thought process is that if we just feed in every single question object together into a properly setup ML model, it can train itself and teach itself how exactly all of this information connects. Doing so would remove the need entirely for classification by subject and concept, instead allowing the computer to directly determine the relationship amongst QuestionObjects.
+
+I find this to be a much more powerful approach, as even later we can manually go back and assign each group, each of k clusters identified and manually assign our current academic subject taxonomy on top of it. In this way we can tie in our current human understanding to a much more fluid classification of identity.
+
+I believe this would resolve a much larger issue of academic topics becoming needlessly isolated. Economics for example is a separate discipline, but geography also subdivides into an economics branch, as does anthropology and sociology. Linguistics especially has this issue, as nearly every major subdivision has there own branch of Linguistics, when in reality it could be a single field on its own, and much more interconnected and interdisciplinary.
+
+Removing labels entirely from subject and concept classification, divorces us from the human intuition to place this into easily visualizable boxes and categories. I for fear of sounding "woke", would point out that this tendency can be extremely destructive, we need only look back to recent history, an overused example would be Nazi Germany, but other examples include large scale colonialism and imperialism, these categorization of peoples led to the genocide of Jews in germany, the genocide of the Herrero people and many other African peoples, the genocide of the Armenians in Turkey, the Genocide of Native Americans in the US, and the genocide of modern day palestinians today. This tendency has led American politics to become steeped in bigotry and hatred of other peoples who are not white, and who do not fit the category of "all-american, christian evangelical". I venture to say that this same destructive tendency impedes our collective action of advancing human knowledge and it would not be out of left field to say that our current Academic Discipline division of labels is equally destructive and prevents interdisciplinary discourse.
+
+3. Source Material Question Generation Model
+4. A Precise equation for Retention of Human Memory, used to predict exactly when someone will forget something

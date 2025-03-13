@@ -830,22 +830,17 @@ def update_score(status:str, unique_id:str, user_profile_data: dict, question_ob
         else:
             question_object["total_answers"] += 1
         return question_object
-    
-    #############################################################################
-    # Potential Status Overide based on time required to answer depending on average time to answer
-    # Weighing of average time only is factored based on correct answers
-    question_object = _increment_total_answer(question_object)
-    if time_spent != None:
+    def _reinforce_time(question_object: dict, time_spent: datetime, status: str):
         override_mechanism = False # Override mechanism ensures if on revision one, set time to at least 60 seconds, driving the average up, set to override so we do not force repeat the question on the first revision
+
         n = 7.25 # Hard n second recall, if below n seconds, do not override. 7.25 is the developers current overall answer average
-        # There is a strange temporal perception going on. What I perceive as 5 seconds has varied from just 2 seconds to 8 seconds. Sometimes answering something quickly and seeing it took 8 seconds, or thinking I spent longer on something, but it only took 3 seconds. There may be something to investigate here.
-        print(f"Time taken to answer: {time_spent}/{n}")
+        print(f"Time taken to answer: {time_spent}/{n}") # For my own gratification, feel free to remove.
+
         # Need to first add the time_spent to the question_objects array of answer_times:
-        time_spent = str(time_spent.total_seconds())
-        # The first revision should be focused more on accuracy than speed,
-        # By forcing at least one 60 second answer time, we drive the average, reducing the number of forced repeats during early revisions
+        time_spent = str(time_spent.total_seconds()) # get total seconds and stringify
+        
         if question_object["revision_streak"] == 1 or question_object["revision_streak"] == 2 or question_object["revision_streak"] == 3:
-            if float(time_spent) < 60.0:
+            if float(time_spent) < 60.0: # By forcing at least one 60 second answer time, we drive the average up, reducing the number of forced repeats during early revisions, we do strip outliers so eventually the large minute time may get stripped from the calculations.
                 time_spent = str('60.0')
                 override_mechanism = True
         if question_object.get("answer_times") == None:
@@ -864,13 +859,25 @@ def update_score(status:str, unique_id:str, user_profile_data: dict, question_ob
                 average_time_text = round((average_time*1.10),2)
                 print(f"{time_spent_text} >= {average_time_text}, status overidden to 'repeat'")
                 status = "repeat"
+        return [question_object, status]
+        # Function Notes:
+        # There is a strange temporal perception going on. What I perceive as 5 seconds has varied from just 2 seconds to 8 seconds. Sometimes answering something quickly and seeing it took 8 seconds, or thinking I spent longer on something, but it only took 1-3 seconds. There may be something to investigate here.
+
+    #############################################################################
+    # Potential Status Overide based on time required to answer depending on average time to answer
+    # Weighing of average time only is factored based on correct answers
+    question_object = _increment_total_answer(question_object)
+    # If no time is given when updating the score, then GUI does not implement this feature:
+    # This if statement exists to make time reinforcement an optional system
+    if time_spent != None:
+        return_info:        list    = _reinforce_time(question_object, time_spent, status)
+        question_object:    dict    = return_info[0]
+        status:             str     = return_info[1]
     ######################################
     module_name = question_object_data[unique_id]["module_name"]
     # print(f"    Question is from module < {module_name} >")
     ############# We Have Multiple Values to Update ########################################
-    ###################
-    # Increment Revision Streak by 1 if correct, or decrement by 3 if not correct
-    check_variable = question_object["revision_streak"]
+    # Increment Revision Streak by 1 if correct, or decrement by 1 if not correct
     if status == "correct":
         # Sometimes we are able to answer something correctly, even though the projection would say we should have forgotten about it:
         # In such instances we will increment the time_between_revisions so the questions shows less often
@@ -885,9 +892,16 @@ def update_score(status:str, unique_id:str, user_profile_data: dict, question_ob
         # The projection was set, but the user answers it incorrectly despite the fact that the algorithm predicted they should still remember it.
         # In such a case we will decrement the time between revisions so it shows more often
         if helper.within_twenty_four_hours(helper.convert_to_datetime_object(question_object["next_revision_due"])) == True:
-            question_object["time_between_revisions"] -= 0.005 # Decrement by 0.5%
-            print(f"Time Between Revisions Updated -0.5% for id:{unique_id}")
-        question_object["revision_streak"] -= 3 #Less discouraging then completely resetting the streak, if questions aren't getting completely reset we make room for more knowledge faster
+            # memory model is extremely aggressive, therefore if we do not get the answer correct the k constant should be reduced more aggressively (flattening the curve)
+            k_reduction = 0 # the constant k that determines the curve
+            # But two possible conditions exist, either we are in 
+            #   - the initial revision stage (1-5)
+            if question_object["revision_streak"] >= 6:
+                k_reduction = 0.015
+            #   - outside the initial revision stage
+            #   k_reduction remains 0
+            question_object["time_between_revisions"] -= k_reduction # Decrement by k_reduction
+        question_object["revision_streak"] -= 1 #Less discouraging then completely resetting the streak, if questions aren't getting completely reset we make room for more knowledge faster
         # At this point revision streak is no longer representative of a streak of correct replies, but rather a value to help determine spacing
         if question_object["revision_streak"] < 1:
             question_object["revision_streak"] = 1
@@ -897,8 +911,6 @@ def update_score(status:str, unique_id:str, user_profile_data: dict, question_ob
     user_profile_data = system_data_user_stats.increment_questions_answered(user_profile_data)
     ###################
     # Change the last_revised property to datetime.now() since we just revised it at time of now
-    check_variable = question_object["last_revised"]
-    # print(f"This question was last revised on {check_variable}")
     question_object["last_revised"] = helper.stringify_date(datetime.now())
     ###################
     # Calculate the next time the question will be due for revision
@@ -906,8 +918,6 @@ def update_score(status:str, unique_id:str, user_profile_data: dict, question_ob
     question_object["next_revision_due"] = helper.convert_to_datetime_object(question_object["next_revision_due"])
     question_object = system_data_question_stats.calculate_next_revision_date(status, question_object)
     question_object["next_revision_due"] = helper.stringify_date(question_object["next_revision_due"])
-    check_variable = question_object["next_revision_due"]
-    # print(f"The next revision is due on {check_variable}")
     ###################
     # Update question's history stats
     question_object = system_data_question_stats.update_question_history(question_object, status)
