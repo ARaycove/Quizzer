@@ -1,1 +1,2 @@
-test.pickle, is the test file for all unit testing in our objects. I do not feel inclined to change this. Upon running any class Object file, it will run the unit test save the test object to test.pickle then immediately load from test.pickle
+Every test object will be saved with Test<NameOfObject>
+This should allow for easily testing new objects that rely on dependency of previous objects

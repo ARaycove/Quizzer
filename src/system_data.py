@@ -839,10 +839,10 @@ def update_score(status:str, unique_id:str, user_profile_data: dict, question_ob
         # Need to first add the time_spent to the question_objects array of answer_times:
         time_spent = str(time_spent.total_seconds()) # get total seconds and stringify
         
-        if question_object["revision_streak"] == 1 or question_object["revision_streak"] == 2 or question_object["revision_streak"] == 3:
-            if float(time_spent) < 60.0: # By forcing at least one 60 second answer time, we drive the average up, reducing the number of forced repeats during early revisions, we do strip outliers so eventually the large minute time may get stripped from the calculations.
-                time_spent = str('60.0')
-                override_mechanism = True
+        # if question_object["revision_streak"] == 1 or question_object["revision_streak"] == 2 or question_object["revision_streak"] == 3:
+        #     if float(time_spent) < 60.0: # By forcing at least one 60 second answer time, we drive the average up, reducing the number of forced repeats during early revisions, we do strip outliers so eventually the large minute time may get stripped from the calculations.
+        #         time_spent = str('60.0')
+        #         override_mechanism = True
         if question_object.get("answer_times") == None:
             question_object["answer_times"] = [time_spent]
         else:
@@ -854,11 +854,11 @@ def update_score(status:str, unique_id:str, user_profile_data: dict, question_ob
             # Criteria is a bit obnoxious for an absolute comparison. In effect the absolute, you have to beat your average causes even well known questions to constantly be repeated without benefit
             # Two thoughts
             # Percentage variance (acceptable range)
-            if float(time_spent) >= (average_time*1.10): # If within 10% of average, do not repeat. This adds a range to the hard-repeat -> if average is 6 seconds and user answers at 6.1 seconds, we don't repeat.
-                time_spent_text = round(float(time_spent), 2)
-                average_time_text = round((average_time*1.10),2)
-                print(f"{time_spent_text} >= {average_time_text}, status overidden to 'repeat'")
-                status = "repeat"
+            # if float(time_spent) >= (average_time*1.10): # If within 10% of average, do not repeat. This adds a range to the hard-repeat -> if average is 6 seconds and user answers at 6.1 seconds, we don't repeat.
+            #     time_spent_text = round(float(time_spent), 2)
+            #     average_time_text = round((average_time*1.10),2)
+            #     print(f"{time_spent_text} >= {average_time_text}, status overidden to 'repeat'")
+            #     status = "repeat"
         return [question_object, status]
         # Function Notes:
         # There is a strange temporal perception going on. What I perceive as 5 seconds has varied from just 2 seconds to 8 seconds. Sometimes answering something quickly and seeing it took 8 seconds, or thinking I spent longer on something, but it only took 1-3 seconds. There may be something to investigate here.
