@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta, date
 import pickle
+import json
 # Constructor fails if all question fields are None or all answer fields are None
 class QuestionObject():
     '''
@@ -11,6 +12,11 @@ class QuestionObject():
     # Dunder Methods
     def __init__(self,
                  author:            str,
+                 id:                str     = None,
+                 module_name:       str     = None,
+                 primary_subject:   str     = None,
+                 subjects:          list    = None,
+                 related_concepts:  list    = None,
                  question_text:     str     = None,
                  question_audio:    str     = None,
                  question_image:    str     = None,
@@ -19,11 +25,9 @@ class QuestionObject():
                  answer_audio:      str     = None,
                  answer_image:      str     = None,   
                  answer_video:      str     = None,
-                 module_name:       str     = None,
-                 id:                str     = None,
-                 primary_subject:   str     = None,
-                 subjects:          list    = None,
-                 related_concepts:  list    = None
+
+
+
                  ):
         # Some items much be lowercased
         self.id                 = id                
@@ -64,7 +68,7 @@ class QuestionObject():
         return current_time + "_" + self.author
 
     def _verify_question_answer_fields(self):
-        def _verify_question_field_present(self):
+        def _verify_question_field_present(self: QuestionObject):
             total_question_fields = 0
             if self.question_text != None:
                 total_question_fields += 1
@@ -75,7 +79,7 @@ class QuestionObject():
             elif self.question_video != None:
                 total_question_fields += 1
             return total_question_fields
-        def _verify_answer_field_present(self):
+        def _verify_answer_field_present(self: QuestionObject):
             total_answer_fields = 0
             if self.answer_text != None:
                 total_answer_fields += 1
@@ -89,7 +93,8 @@ class QuestionObject():
         answer_field_present    = _verify_answer_field_present(self)
         question_field_present  = _verify_question_field_present(self)
         if answer_field_present == 1 and question_field_present == 1:
-            print("QuestionObject Valid")
+            # print("QuestionObject Valid")
+            pass
         else:
             raise Exception("QuestionObject must have at least 1 answer field and 1 question field to be valid")
 
@@ -129,7 +134,24 @@ class QuestionObject():
         # self._author = value
 
 
-
+def util_QuizzerV4ObjDict_to_QuestionObject(json_dict: dict):
+    return QuestionObject(
+        author              = json_dict.get("author"),
+        id                  = json_dict.get("id"),
+        module_name         = json_dict.get("module_name"),
+        primary_subject     = json_dict.get("primary_subject"),
+        subjects            = json_dict.get("subject"),
+        related_concepts    = json_dict.get("related"),
+        question_text       = json_dict.get("question_text"),
+        question_image      = json_dict.get("question_image"),
+        question_audio      = json_dict.get("question_audio"),
+        question_video      = json_dict.get("question_video"),
+        answer_text         = json_dict.get("answer_text"),
+        answer_image        = json_dict.get("answer_image"),
+        answer_audio        = json_dict.get("answer_audio"),
+        answer_video        = json_dict.get("answer_video")
+        
+    )
 
 
 if __name__ == "__main__":
@@ -154,15 +176,7 @@ if __name__ == "__main__":
         "author": "Original"
     }
 
-    test_data = QuestionObject(
-        author          = json_encode["author"],
-        id              = json_encode['id'],
-        primary_subject = json_encode["primary_subject"],
-        subjects        = json_encode["subject"],
-        question_text   = json_encode["question_text"],
-        answer_text     = json_encode["answer_text"],
-        module_name     = json_encode["module_name"]
-        )
+    test_data = util_QuizzerV4ObjDict_to_QuestionObject(json_encode)
 
     print("str print out of QuestionObject:")
     print(test_data)
@@ -183,3 +197,17 @@ if __name__ == "__main__":
     test_data.__author = "Change_Value"
     test_data._author = "Change_Value"
     print(f"Author Safeguard Works: {test_data.author == "Original"}")
+
+    print(f"Testing Conversion Utility on old json database")
+    with open("../system_data/question_object_data.json", "r") as f:
+        old_data:dict = json.load(f)
+        print(f"Old Data loaded successfully. . .\n Now applying util function to all question objects in old data")
+    i = 0
+    for key, value in old_data.items():
+        try:
+            qo = util_QuizzerV4ObjDict_to_QuestionObject(value)
+            i += 1
+        except:
+            print(f"conversion failed on id: {key:.50}")
+
+    print(f"Successfully converted all objects")

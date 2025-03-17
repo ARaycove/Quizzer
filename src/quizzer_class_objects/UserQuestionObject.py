@@ -6,6 +6,7 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from QuestionObject import QuestionObject
+from QuizzerDB      import QuizzerDB, QuestionObjectDB
 from datetime       import datetime, date, timedelta
 from lib import helper
 import numpy        as np
@@ -61,16 +62,19 @@ class UserQuestionObject:
     
     Old module system is being scrapped as of right now
     '''
+    # FIXME
+    # self.question should be only a reference to a question object inthe QuizzerDB,
+    # we should still be able to access the fields of the question object through the dot notation
     #############
     # Dunder Methods
     t = 36500
     def __init__(self, 
-                 question:                  QuestionObject,
+                 question_id:               str,
                  last_revised:              datetime        = datetime.now(),
                  next_revison_due:          datetime        = datetime.now(),
                  attempt_history:           list[Attempt]   = None,
                  ):
-        self.question: QuestionObject   = question
+        self.question_id: str           = question_id
         self.last_revised               = last_revised
         self.next_revison_due           = next_revison_due
         self.attempt_history            = attempt_history
@@ -85,17 +89,13 @@ class UserQuestionObject:
     def __str__(self):
         full_print = ""
         for key, value in self.__dict__.items():
-            if value == self.question:
-                for key, value in self.question.__dict__.items():
-                    full_print += f"{f"question.{key}":25.25}: {value}\n"
-            else:
-                full_print += f"{key:25}: {value}\n"
+            full_print += f"{key:25}: {value}\n"
         return full_print
     def __eq__(self, other):
         if not isinstance(other, UserQuestionObject):
             return False
         # Compare the internal question objects using their equality method
-        return self.question == other.question
+        return self.__dict__ == other.__dict__
     #############
     # Initialization Code
     def _build_object(self):
@@ -162,7 +162,7 @@ class UserQuestionObject:
         self.average_shown      = average_shown
         self.next_revison_due   = datetime.now() + timedelta(days=number_of_days)
 
-    def _update_user_question_object(self, status):
+    def _update_user_question_object(self, status, quizzer_question_object_DB: QuestionObjectDB):
         # Update the revision score based on the given answer
         if status == "correct":
             if helper.within_twenty_four_hours(self.next_revison_due) == False:
@@ -186,12 +186,20 @@ class UserQuestionObject:
         # Now update revision metrics, due date and last revision
         self.__total_attempts += 1
         self.last_revised = datetime.now()
+        # Tutorial Questions, should be set to a revision_score to very large n (100), forcing the next revision due date to be well over 100 years into the future
+        if quizzer_question_object_DB.get_QuestionObject(self.question_id).module_name == "quizzer_tutorial":
+            self.__revision_score = 100
         self._calculate_next_revision_date()
 
-    def add_attempt(self, status, answer_speed: float):
+    def add_attempt(self, status, answer_speed: float, quizzer_question_object_DB: QuestionObjectDB):
         '''
         Records the current state of the object, each attempt is a record of the user's history with the question at that point in time
         The second function of adding an attempt record is the need to update the state of the object -> replaces the old update_score function
+        Parameters:
+
+        status: "correct", "incorrect", or "repeat"
+        answer_speed: Takes a single floating point value, may also take a string of a flaot point value, the number provided must be of a float or decimal value
+        quizzer_question_object_DB: Must pass the reference to Quizzers Question Object Database
         '''
         # First we will update the status of the object with current revision
         # Validation metric, ensuring status of correct type
@@ -212,7 +220,7 @@ class UserQuestionObject:
         ))
 
         # Update other metrics as necessary
-        self._update_user_question_object(status)
+        self._update_user_question_object(status, quizzer_question_object_DB)
 
     def place_into_circulation(self):
         '''
@@ -225,6 +233,14 @@ class UserQuestionObject:
         Remove the question from the user's active Quizzer
         '''
         self.__in_circulation = False
+
+    def get_pandas_dataframe(self):
+        all_attempts = []
+        for att in self.attempt_history:
+            att_dict = att.__dict__.copy()
+            att_dict['question_object_id'] = self.question_id
+            all_attempts.append(att_dict)
+        return pd.DataFrame(all_attempts)
 
 
 
@@ -293,7 +309,7 @@ if __name__ == "__main__":
         print(f"    Successfully Loaded QuestionObject class: {isinstance(base_question_object, QuestionObject)}")
     print(f"    Attempting to initialize new instance of object UserQuestionObject")
     test_user_question_object = UserQuestionObject(
-        question = base_question_object
+        question_id = base_question_object.id
     )
     print(f"    Success")
     print(f"    Printing Object")
@@ -338,11 +354,11 @@ if __name__ == "__main__":
         valid_statusi = ["correct", "incorrect", "repeat"]
         test_user_question_object.add_attempt(valid_statusi[random_status], "15")
     print()
-
     print(f"Retesting properties with new revisions added")
     print(f"    Number of revisions: {test_user_question_object.total_attempts}")
     print(f"    correct/wrong      : {test_user_question_object.correct_attempts}/{test_user_question_object.wrong_attempts}")
     print(f"    Revision Score     : {test_user_question_object.revision_score}")
+    print(f"    Avg times shown    : {test_user_question_object.average_shown}")
 
     print(f"Testing whether add and remove from circulation is working:")
     print(f"Status Should be False: {test_user_question_object.in_circulation}")
@@ -360,10 +376,7 @@ if __name__ == "__main__":
     print(f"Access results in:        {test_user_question_object.next_revison_due}")
 
     print(f"Now testing pandas collection functionality")
-    data_frame = pd.DataFrame()
-    for attempt_record in test_user_question_object.attempt_history:
-        data_frame = pd.concat([data_frame, attempt_record.return_pandas_table()])
+    data_frame = test_user_question_object.get_pandas_dataframe()
     print(data_frame)
-    
     end_test = datetime.now()
     print(f"Unit Tests took: {end_test-start_test} time")
