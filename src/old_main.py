@@ -1,10 +1,18 @@
+# Big Imports
 import flet as ft
+from system_data.QuizzerDB    import QuizzerDB
+from Quizzer      import Quizzer
+
+
+
 from lib import helper
 from datetime import date
 import os
 import time
 import sys
 import asyncio
+
+
 print(ft.__file__)
 
 # PAGES
@@ -47,6 +55,7 @@ print(f"Globals are currently blank, further assignment is needed")
 current_question        = {}
 current_question_id     = ""
 user_profile_data       = {}
+# FIXME looks like the first step in the rebuild is to ensure we loading the Database -> this directs us to QuizzerDB object
 question_object_data    = system_data.get_question_object_data()
 system_data.update_question_object_data(question_object_data) # Regenerates the all_modules block, subject and concept blocks too
 all_module_data         = system_data.get_all_module_data()
