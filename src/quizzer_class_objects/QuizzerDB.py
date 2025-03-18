@@ -4,8 +4,37 @@ import datetime
 from QuestionObject import QuestionObject, util_QuizzerV4ObjDict_to_QuestionObject
 
 class QuestionObjectDB():
+    # Cool Dunder Methods
     def __init__(self):
         self.__all_question_objects = {} # stored by id: QuestionObject
+        self.__subject_index        = {} # {"subject_class": "question_id"}
+        self.__concept_index        = {} # {"concept_class": "question_id"}
+        self.__module_index         = {} # {"module_name": "question_id"}
+    def __add__(self, other):
+        raise NotImplementedError("In Testing, remove raise statement to test")
+        if isinstance(other, QuestionObject):
+            # If use add operator DB + QuestionObject, should add the question object to the 
+            self.add_new_QuestionObject(other)
+            # FIXME Should also add this to the main QuizzerDB object
+    # Index build functions
+    def _construct_subject_index(self):
+        raise NotImplementedError("I'm not done yet, calm down")
+
+    def _construct_concept_index(self):
+        raise NotImplementedError("I'm not done yet, calm down")
+    
+    # Index access functions
+    def get_list_of_subjects(self):
+        raise NotImplementedError("I'm not done yet, calm down")
+    
+    def get_list_of_concepts(self):
+        raise NotImplementedError("I'm not done yet, calm down")
+    
+    def get_questions_by_subject(self, subject_name: str):
+        raise NotImplementedError("I'm not done yet, calm down")
+    
+    def get_questions_by_concept(self, concept_name: str):
+        raise NotImplementedError("I'm not done yet, calm down")
 
     # Add or Delete QuestionObject's
     def add_new_QuestionObject(self, question_object: QuestionObject):

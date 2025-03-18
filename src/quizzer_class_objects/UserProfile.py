@@ -2,74 +2,10 @@ import pandas as pd
 import pickle
 from UserQuestionObject import UserQuestionObject
 from QuestionObject     import QuestionObject
-# class DotDict(dict):
-#     """
-#     Dictionary subclass that allows attribute-style access (dot notation)
-#     while maintaining all standard dictionary functionality.
-    
-#     Examples:
-#         >>> d = DotDict({'a': 1, 'b': {'c': 2}})
-#         >>> d.a  # Access with dot notation
-#         1
-#         >>> d.b.c  # Works with nested dictionaries
-#         2
-#         >>> d.b['c']  # Standard dictionary access still works
-#         2
-#         >>> d.new_key = 'value'  # Can set new values with dot notation
-#         >>> d
-#         {'a': 1, 'b': {'c': 2}, 'new_key': 'value'}
-#     """
-#     def __init__(self, *args, **kwargs):
-#         super().__init__(*args, **kwargs)
-#         # Convert nested dictionaries to DotDict instances
-#         self._convert_nested_dicts()
-    
-#     def _convert_nested_dicts(self):
-#         """Convert nested dictionaries to DotDict instances."""
-#         for key, value in self.items():
-#             if isinstance(value, dict) and not isinstance(value, DotDict):
-#                 self[key] = DotDict(value)
-    
-#     def __getattr__(self, key):
-#         """Allow attribute access for dictionary keys."""
-#         try:
-#             return self[key]
-#         except KeyError:
-#             raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{key}'")
-    
-#     def __setattr__(self, key, value):
-#         """Allow setting dictionary keys via attributes."""
-#         self[key] = value
-        
-#         # If we've added a dict, convert it to DotDict
-#         if isinstance(value, dict) and not isinstance(value, DotDict):
-#             self[key] = DotDict(value)
-    
-#     def __delattr__(self, key):
-#         """Allow deleting keys via attributes."""
-#         try:
-#             del self[key]
-#         except KeyError:
-#             raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{key}'")
-    
-#     def __dir__(self):
-#         """Enable auto-completion in IDEs and the REPL."""
-#         return list(self.keys()) + dir(dict)
-    
-#     def update(self, *args, **kwargs):
-#         """Override update to handle nested dictionaries."""
-#         super().update(*args, **kwargs)
-#         self._convert_nested_dicts()
-#         return self
-    
-#     def copy(self):
-#         """Return a new DotDict with the same items."""
-#         return DotDict(super().copy())
-    
-#     def __repr__(self):
-#         """Show class name for clearer debugging."""
-#         items = ', '.join(f"{k!r}: {v!r}" for k, v in self.items())
-#         return f"{self.__class__.__name__}({{{items}}})"
+# FIXME Need some sort of mechanism to prevent a question that has just been answered from immediatley appearing again. For example if the user answers something incorrectly, it should not be immediately shown again. If it is selected by the algorithm the algorithm should "try again", If it's the only question left, then it should just get more questions and add them into circulation.
+
+# FIXME Next question selection
+#   What if we gave a mechanism for users to enter questions they have as they use Quizzer? Quizzer could then use this list of questions to determine what comes next, otherwise defaulting to a standard algorithm. This would allow Quizzer to be even more personlized based on exactly what the user is curious about. We would have to match those user questions to the database for likelihood, if no match found, then we'll need to add them
 
 class UserProfileQuestionDB():
     '''
