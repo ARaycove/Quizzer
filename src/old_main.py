@@ -1,7 +1,6 @@
 import flet as ft
 from lib import helper
 from datetime import date
-import system_data
 import os
 import time
 import sys
