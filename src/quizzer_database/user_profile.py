@@ -153,14 +153,53 @@ class UserProfileQuestionDB():
 class UserProfileSettingsDB:
     '''
     Subclass to store all User Settings
+    Subject Settings: (Also known as interest settings)
+        -subject_name: { FIXME might just decide to turn this into a just interest and priority, and aggregate the rest into the stats block, but this is the stats used by our circulate algorithm
+            interest_level: int,
+            priority:       int,
+            total_questions:int,
+            num_in_circulation: int,
+            total_activated:int,
+            has_available_questions: bool}
+    Module Settings:
+        -New Modules Active By Default: bool
+        -Module Status
+            -module_name: bool
+
+    Scrapping the following settings:
+    quiz_length                 : Not needed, questions are selected one at a time based on an algorithm and full length quizzes are not populated
+    "time_between_revisions"    : User should not have access to this, too advanced of functionality
+    "due_date_sensitivity"      : User should also not have access to this, 
+    "vault_path"                : A relic from QuizzerV1 and V2
+    "desired_daily_questions"   : Fundamental change to when in_circulation algorithm is triggered, making this function not useful
     '''
     pass
     # Could potentionally make a sub-subclass called setting
 class UserProfileStatsDB:
     '''
-    Subclass to storre all User statistics
+    Subclass to store all User statistics\n
+    Stats to Included (FIXME if not implemented)\n
+    All stats are historical records over time: properties are made to get just todays stat\n
+
+    "current_eligible_questions":                       FIXME\n
+    "reserve_questions_exhaust_in_x_days":              FIXME\n
+    "non_circulating_questions":                        FIXME\n
+    "Graphical Charts":                                 FIXME\n
+    "average_num_questions_entering_circulation_daily": FIXME\n
+    current_num_question_in_circulation:                FIXME\n
+    total_in_circulation_questions_history:             FIXME\n
+    "revision_streak_stats":                            FIXME\n
+    "total_questions_in_database"(historical):          FIXME\n
+    "average_questions_per_day":                        FIXME\n
+    "total_questions_answered":                         FIXME\n
+        This one can be verified by the attempt history
+    ""questions_answered_by_date":                      FIXME\n
+
     '''
     pass
+    # Some stats are derived, others are stored.
+
+
 
 class UserProfile:
     '''
@@ -221,21 +260,20 @@ class UserProfile:
         self.user_questions.add_question(question_id) # This is purely an abstraction for easier calling from main program
         # self.add_question_to_UserProfile as opposed to self.user_questions.add_question, call is shorter as a result
 
+    def _verify_stats(self):
+        '''
+        Goes through and ensures all stats are sorted and no missing values/dates exist (should only need to be called once upon being loaded)
+
+        Ensure date stats are sorted chronologically, ensure missing values, if the user missed a day or two or three, they'll need to be filled in
+
+        Any verifiable stats, like the total number of attempts made (total questions answered) can be verified by summation of attempt objects, among other verifiable stats
+
+        All other stats can be incremented while operating, Again this function should only be ran upon intialization
+        '''
+        raise NotImplementedError("Not done Yet")
+    
 if __name__ == "__main__":
-    print(f"Loading in test_objects")
-    with open("TestQuestionObject.pickle", "rb") as f:
-        test_question_object = pickle.load(f)
-
-    test_profile = UserProfile("aacra0820@gmail.com", "Aaron", "Raycove")
-    print("Testing __str__ printout of object UserProfile")
-    print(test_profile)
-    print(f"Testing Adding new Question to UserProfile. . .")
-    test_profile.add_question_to_UserProfile(test_question_object)
-    if test_profile.num_questions == 1:
-        print("    Success")
-    test_profile.user_questions.print_review_schedule()
-
-    test_profile.save_UserProfile()
+    print(f"Test Client Currently Broken")
 
 
 

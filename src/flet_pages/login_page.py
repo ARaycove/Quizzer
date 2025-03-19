@@ -125,14 +125,14 @@ class LoginPage(ft.View):
         #     system_data.sync_local_data_with_cloud_data(self.CURRENT_USER)
         # except requests.exceptions.ConnectionError as e:
         #     print("No Internet Connection, can't sync with cloud storage")
-        self.question_object_data = system_data.get_question_object_data()
-        self.user_profile_data    = system_data.get_user_data(self.CURRENT_USER)
+        self.question_object_data = system_data.get_question_object_data() # encapped
+        self.user_profile_data    = system_data.get_user_data(self.CURRENT_USER) # encapped
         self.CURRENT_UUID = self.user_profile_data["uuid"]
 
         print(f"Current User: <{self.CURRENT_USER}> WITH UUID: <{self.CURRENT_UUID}>")
         # Sort any unsorted questions that may be in the user_profile
-        self.user_profile_data["questions"] = system_data.sort_questions(self.user_profile_data, self.question_object_data)
-        system_data.update_user_profile(self.user_profile_data)
+        self.user_profile_data["questions"] = system_data.sort_questions(self.user_profile_data, self.question_object_data) # No longer necessary
+        system_data.update_user_profile(self.user_profile_data) # Function Stub has been made for this update functionality
         print("These Keys:", self.user_profile_data.keys())
         self.go_to_home_screen()
 

@@ -438,16 +438,7 @@ class QuizzerDB:
                 profile = self.UserProfilesDB.load_UserProfile(email)
                 
                 # Create profile data structure
-                profile_data = {
-                    "metadata": {
-                        "timestamp": datetime.datetime.now().isoformat(),
-                        "email": email,
-                        "username": profile.username,
-                        "full_name": profile.full_name,
-                        "uuid": profile.user_uuid
-                    },
-                    "profile": profile.__dict__,
-                }                
+                profile_data = profile.__dict__               
                 # Write to file with a clear naming convention
                 profile_filename = f"user_profile_{email.replace('@', '_at_')}_{timestamp}.json"
                 with open(profile_filename, 'w') as f:

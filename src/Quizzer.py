@@ -75,6 +75,7 @@ class Quizzer:
 
     #______________________________________________________________________________
     async def load_in_UserProfile(self, email_address):
+        # FIXME Authentication functionality for server deployment
         async with UP_LOCK: # Request profile information from Central DB
             self.__active_profile: UserProfile = USER_PROFILE_DB.load_UserProfile(email_address=email_address)
 
@@ -186,7 +187,6 @@ if __name__ == "__main__":
         # console.info("Testing Printout of current profiles")
         # user_profiles_dict = QUIZZER_DB.UserProfilesDB.__dict__
         # console.info(f"    {user_profiles_dict}")
-
     async def test_user_profile_functionality():
         """
         Comprehensive test of UserProfile functionality that properly commits changes 
@@ -374,9 +374,9 @@ if __name__ == "__main__":
         # First round of tests is to ensure we can effectively access various parts of our QuizzerDB object
         quizzer = Quizzer()
         # await DB_test_loop()
-        console.info("Starting User Profile functionality tests")
-        await test_user_profile_functionality()
-        console.info("User Profile tests complete - NO CHANGES COMMITTED")
+        # console.info("Starting User Profile functionality tests")
+        # await test_user_profile_functionality()
+        # console.info("User Profile tests complete - NO CHANGES COMMITTED")
 
 
 

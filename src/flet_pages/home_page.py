@@ -236,7 +236,7 @@ class HomePage(ft.View):
             system_data.update_stats(self.user_profile_data,self.question_object_data)
             self.total_answered_today.value = "0"
             # Current question is residing in the is_eligible pile, use this one, otherwise get a new question
-        self.user_profile_data["questions"] = system_data.sort_questions(self.user_profile_data, self.question_object_data)
+        self.user_profile_data["questions"] = system_data.sort_questions(self.user_profile_data, self.question_object_data) # No longer necessary in API client
         self.get_next_question()
 
         if self.questions_available_to_answer == False:
