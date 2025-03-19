@@ -28,36 +28,38 @@ from flet_pages.feedback_page           import FeedbackPage
 from flet_pages.stats_page              import StatsPage
 import platform
 
-arch = platform.machine()
-if arch in ["arm64", "aarch64"]:
-    arch_path = "arm64-v8a"
-elif arch == "armv7l":
-    arch_path = "armeabi-v7a"
-elif arch == "x86_64":
-    arch_path = "x86_64"
-elif arch == "i686":
-    arch_path = "x86"
-else:
-    raise RuntimeError(f"Unsupported architecture: {arch}")
-print(f"The Architecture of the device is: {arch}")
-# Globals
-print("sys.path:", sys.path)
-os.environ["FLET_SECRET_KEY"] = os.urandom(12).hex()
-CURRENT_USER = ""
-CURRENT_UUID = ""
-# Example code from Google 
-# bucket = storage_client.bucket("your-bucket-name")
-# blob = bucket.blob(f"system_data/user_profiles/{CURRENT_USER}/{CURRENT_USER}_data.json")
-# blob.upload_from_filename(f"data/system_data/user_profiles/{CURRENT_USER}/{CURRENT_USER}_data.json")
-# GLOBAL VARIABLES
-print(f"Initializing Globals Into Memory")
-print(f"Globals are currently blank, further assignment is needed")
-current_question        = {}
-current_question_id     = ""
-user_profile_data       = {}
-# FIXME looks like the first step in the rebuild is to ensure we loading the Database -> this directs us to QuizzerDB object
-question_object_data    = system_data.get_question_object_data()
-system_data.update_question_object_data(question_object_data) # Regenerates the all_modules block, subject and concept blocks too
+# arch = platform.machine()
+# if arch in ["arm64", "aarch64"]:
+#     arch_path = "arm64-v8a"
+# elif arch == "armv7l":
+#     arch_path = "armeabi-v7a"
+# elif arch == "x86_64":
+#     arch_path = "x86_64"
+# elif arch == "i686":
+#     arch_path = "x86"
+# else:
+#     raise RuntimeError(f"Unsupported architecture: {arch}")
+# print(f"The Architecture of the device is: {arch}")
+# # Globals
+# print("sys.path:", sys.path)
+# os.environ["FLET_SECRET_KEY"] = os.urandom(12).hex()
+# CURRENT_USER = ""
+# CURRENT_UUID = ""
+# # Example code from Google 
+# # bucket = storage_client.bucket("your-bucket-name")
+# # blob = bucket.blob(f"system_data/user_profiles/{CURRENT_USER}/{CURRENT_USER}_data.json")
+# # blob.upload_from_filename(f"data/system_data/user_profiles/{CURRENT_USER}/{CURRENT_USER}_data.json")
+# # GLOBAL VARIABLES
+# print(f"Initializing Globals Into Memory")
+# print(f"Globals are currently blank, further assignment is needed")
+# current_question        = {}
+# current_question_id     = ""
+# user_profile_data       = {}
+# # FIXME looks like the first step in the rebuild is to ensure we loading the Database -> this directs us to QuizzerDB object
+# question_object_data    = system_data.get_question_object_data() # Now have a separate instance for this
+# Mechanism exist for this now too
+# system_data.update_question_object_data(question_object_data) # Regenerates the all_modules block, subject and concept blocks too
+# Need to rebuild module data in QuestionObjectDB, module_index, will have information on modules
 all_module_data         = system_data.get_all_module_data()
 current_page_data       = ""
 pages_visited           = [] # When a new route is detected we append the link to this variable

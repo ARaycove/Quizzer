@@ -217,8 +217,8 @@ class UserProfile:
         '''
         return str(uuid.uuid4())
     
-    def add_question_to_UserProfile(self, question_object: QuestionObject):
-        self.user_questions.add_question(question_object) # This is purely an abstraction for easier calling from main program
+    def add_question_to_UserProfile(self, question_id: str):
+        self.user_questions.add_question(question_id) # This is purely an abstraction for easier calling from main program
         # self.add_question_to_UserProfile as opposed to self.user_questions.add_question, call is shorter as a result
 
 if __name__ == "__main__":

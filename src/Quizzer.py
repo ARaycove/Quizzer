@@ -6,14 +6,14 @@ import logging
 import asyncio
 
 # So upon loading the module, the QuizzerDB will also be loaded
-LOCK = asyncio.Lock()
 QUIZZER_DB: QuizzerDB = load_quizzer_db()
 QUIZZER_DB.QuestionObjectDB._construct_sub_indices()
-# Additional references, for great granularity
+# Additional references, for great granularity -> each references get's it's own lock
+Q_LOCK  = asyncio.Lock()
 QUESTION_OBJECT_DB: QuestionObjectDB = QUIZZER_DB.QuestionObjectDB
+
+UP_LOCK = asyncio.Lock()
 USER_PROFILE_DB: UserProfilesDB = QUIZZER_DB.UserProfilesDB
-
-
 
 class Quizzer:
     '''
@@ -26,33 +26,20 @@ class Quizzer:
     ###############################################################################
     def __init__(self, Quizzer_DB = None):  
         self.__active_profile:      UserProfile     = None
+        # Instance level lock, prevents spam from UI clients causing race conditions:
+        self.__PROFILE_LOCK                         = asyncio.Lock()
         self.__current_question:    QuestionObject  = None
 
     ###############################################################################
     # Private Function Calls
-    ###############################################################################
-    async def _place_questions_into_circulation(self):
-        '''
-        When called moves questions from the UserProfile reserve bank into active circulation
-        '''
-        raise NotImplementedError("Not Done Yet Hause")
-    ###############################################################################
-    # Profile Manipulation
-    ###############################################################################
-    async def add_new_profile(self, username: str, email_address: str, full_name:str):
-        async with LOCK:
-            tutorial_questions = QUIZZER_DB.QuestionObjectDB.get_questions_by_module_name('quizzer tutorial')
-            QUIZZER_DB.UserProfilesDB.add_UserProfile(
-            username            =   username,
-            email_address       =   email_address,
-            full_name           =   full_name,
-            tutorial_questions  =   tutorial_questions
-            )
+    ###############################################################################  
 
-    async def load_in_UserProfile(self, email_address):
-        async with LOCK:
-            self.__active_profile: UserProfile = QUIZZER_DB.UserProfilesDB.load_UserProfile(email_address=email_address)
 
+
+
+    ###############################################################################
+    # Core Functionality
+    ###############################################################################
     async def get_next_question(self):
         '''
         Question Selection Algorithm
@@ -68,14 +55,48 @@ class Quizzer:
         '''
         # if no remaining questions -> await place_question_into_circulation()
         raise NotImplementedError("Not Done Yet Hause")
-    
 
+    ###############################################################################
+    # Profile Manipulation
+    ###############################################################################
+    async def add_new_profile(self, username: str, email_address: str, full_name:str):
+        async with Q_LOCK:
+            tutorial_questions = QUESTION_OBJECT_DB.get_questions_by_module_name('quizzer tutorial')
+        async with UP_LOCK: # Allow instance to add new profiles to Central DB
+            USER_PROFILE_DB.add_UserProfile(
+            username            =   username,
+            email_address       =   email_address,
+            full_name           =   full_name,
+            tutorial_questions  =   tutorial_questions
+            )
+
+    async def load_in_UserProfile(self, email_address):
+        async with UP_LOCK: # Request profile information from Central DB
+            self.__active_profile: UserProfile = USER_PROFILE_DB.load_UserProfile(email_address=email_address)
 
     async def add_module_to_user_profile(self, module_name:str):
-        raise NotImplementedError("Not Done Yet Hause")
+        # Get list of module questions
+        async with Q_LOCK: # Operation should finish in a fraction of a second, but as it scaled this will prevent race conditions
+            module_questions = QUESTION_OBJECT_DB.get_questions_by_module_name(module_name)
+        # Loop over list
+        async with self.__PROFILE_LOCK:
+            for question_id in module_questions:
+                # Add each id into user profile using the add_question
+                self.__active_profile.add_question_to_UserProfile(question_id)
     
     async def remove_module_from_user_profile(self, module_name: str):
-        raise NotImplementedError("Not Done Yet Hause")
+        # Get list of module questions
+        async with Q_LOCK: # Operation should finish in a fraction of a second, but as it scaled this will prevent race conditions
+            module_questions = QUESTION_OBJECT_DB.get_questions_by_module_name(module_name)
+        # Loop over list'
+        async with self.__PROFILE_LOCK:
+            for question_id in module_questions:
+                # Deactivate each id in the UserProfile
+                self.__active_profile.user_questions.deactive_question(question_id)
+
+    async def deactive_specific_question(self, question_id: str) -> None:
+        async with self.__PROFILE_LOCK:
+            self.__active_profile.user_questions.deactive_question(question_id)
     ###############################################################################
     # Add, Edit, and Remove Questions
     ###############################################################################
@@ -89,15 +110,23 @@ class Quizzer:
     
     async def delete_question_from_QuestionObjectDB(self):
         raise NotImplementedError("Almost There")
+
+    ###############################################################################
+    # DB Queries, for UI interface
+    ###############################################################################
+
+
+    ###############################################################################
+    # Debug Printouts
+    ###############################################################################
+    async def print_user_review_schedule():
+        raise NotImplementedError("Almost There")
+
 if __name__ == "__main__":
     console = logging.getLogger(__name__)
     logging.basicConfig(filename="Quizzer.log", level=logging.INFO)
-    async def test_event_loop():
+    async def DB_test_loop():
         global QUIZZER_DB
-        console.info('Started')
-        # First round of tests is to ensure we can effectively access various parts of our QuizzerDB object
-        quizzer = Quizzer()
-
         console.info("Now Testing Get and Fetch from QuestionObjectDB")
         console.info("    Commit DB")
         QUIZZER_DB.commit_QuizzerDB()
@@ -125,6 +154,12 @@ if __name__ == "__main__":
         console.info("Testing Printout of current profiles")
         user_profiles_dict = QUIZZER_DB.UserProfilesDB.__dict__
         console.info(f"    {user_profiles_dict}")
+    async def test_event_loop():
+        global QUIZZER_DB
+        console.info('Started')
+        # First round of tests is to ensure we can effectively access various parts of our QuizzerDB object
+        quizzer = Quizzer()
+        await DB_test_loop()
         console.info(f"    Adding test profile")
         await quizzer.add_new_profile("test_man", "test@test.com", "Test McTester")
         user_profiles_dict = QUIZZER_DB.UserProfilesDB.__dict__

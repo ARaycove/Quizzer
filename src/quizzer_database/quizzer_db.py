@@ -42,6 +42,8 @@ class QuestionObjectDB():
             for conc in question.related_concepts:
                 concept_index.update({conc: question.id}) # add each concept under that concept label
             module_index.update({question.module_name: question.id}) # add to module list
+        if isinstance(module_index[question.module_name], str):
+            module_index[question.module_name] = [question.id]
 
         self.__subject_index = subject_index
         self.__concept_index = concept_index
@@ -80,6 +82,11 @@ class QuestionObjectDB():
         '''
         returns a COPY of the list of question_id's belonging to the given module
         '''
+        print(f"DEBUG: {type(self.__module_index[module_name])}")
+        if isinstance(self.__module_index[module_name], str):
+            value = self.__module_index[module_name]
+            value = [value]
+            return value
         return self.__module_index[module_name].copy()
     # End Index Access functionality
     ###############################################################################
@@ -87,6 +94,7 @@ class QuestionObjectDB():
     ###############################################################################
     def add_new_QuestionObject(self, question_object: QuestionObject):
         self.__all_question_objects[question_object.id] = question_object
+        self._construct_sub_indices() # Rebuild the index whenever a question is added
 
     def delete_QuestionObject(self, question_object_id: str):
         del self.__all_question_objects[question_object_id]
