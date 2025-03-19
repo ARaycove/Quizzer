@@ -1,5 +1,8 @@
 # All Tests will be contained from running this modules test_client:
-from quizzer_database.quizzer_db import QuizzerDB, load_quizzer_db, UserProfilesDB, QuestionObjectDB, UserProfile, QuestionObject
+from quizzer_database.quizzer_db import (
+    QuizzerDB,          load_quizzer_db,    UserProfilesDB, 
+    QuestionObjectDB,   UserProfile,        QuestionObject, 
+    QuestionModuleDB,   QuestionModule)
 from datetime import datetime, date, timedelta
 import threading
 import logging
@@ -70,10 +73,20 @@ class Quizzer:
             tutorial_questions  =   tutorial_questions
             )
 
+    #______________________________________________________________________________
     async def load_in_UserProfile(self, email_address):
         async with UP_LOCK: # Request profile information from Central DB
             self.__active_profile: UserProfile = USER_PROFILE_DB.load_UserProfile(email_address=email_address)
 
+    #______________________________________________________________________________
+    async def commit_UserProfile(self):
+        '''
+        Commits the current state of the user's UserProfile to LTS
+        '''
+        async with UP_LOCK:
+            USER_PROFILE_DB.commit_UserProfile(self.__active_profile)
+
+    #______________________________________________________________________________
     async def add_module_to_user_profile(self, module_name:str):
         # Get list of module questions
         async with Q_LOCK: # Operation should finish in a fraction of a second, but as it scaled this will prevent race conditions
@@ -83,7 +96,8 @@ class Quizzer:
             for question_id in module_questions:
                 # Add each id into user profile using the add_question
                 self.__active_profile.add_question_to_UserProfile(question_id)
-    
+
+    #______________________________________________________________________________
     async def remove_module_from_user_profile(self, module_name: str):
         # Get list of module questions
         async with Q_LOCK: # Operation should finish in a fraction of a second, but as it scaled this will prevent race conditions
@@ -94,6 +108,7 @@ class Quizzer:
                 # Deactivate each id in the UserProfile
                 self.__active_profile.user_questions.deactive_question(question_id)
 
+    #______________________________________________________________________________
     async def deactive_specific_question(self, question_id: str) -> None:
         async with self.__PROFILE_LOCK:
             self.__active_profile.user_questions.deactive_question(question_id)
@@ -123,7 +138,22 @@ class Quizzer:
         raise NotImplementedError("Almost There")
 
 if __name__ == "__main__":
-    console = logging.getLogger(__name__)
+    def reset_log_file(log_file="Quizzer.log"):
+        """Clear the log file or create a new empty one"""
+        with open(log_file, 'w') as f:
+            f.write(f"--- New Test Run Started: {datetime.now()} ---\n")
+        
+        # Configure the logger
+        logging.basicConfig(
+            filename=log_file,
+            level=logging.INFO,
+            format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+            filemode='a'  # We've already created/cleared the file, now we can append
+        )
+        
+        # Get the logger
+        return logging.getLogger(__name__)
+    console = reset_log_file()
     logging.basicConfig(filename="Quizzer.log", level=logging.INFO)
     async def DB_test_loop():
         global QUIZZER_DB
@@ -134,6 +164,8 @@ if __name__ == "__main__":
         console.info("    Load DB again")
         QUIZZER_DB = load_quizzer_db()
         console.info("        No Errors")
+        console.info("Writing DB to json for further analysis")
+        QUIZZER_DB.debug_write_db_to_json()
 
         console.info("    Questions by Concept")
         concept_list = QUIZZER_DB.QuestionObjectDB.get_list_of_concepts()
@@ -147,23 +179,207 @@ if __name__ == "__main__":
         module_list  = QUIZZER_DB.QuestionObjectDB.get_list_of_module_names()
         console.info(f"        {module_list}")
 
-        console.info("Testing get by module, tutorial questions only:")
-        tutorial_questions = QUIZZER_DB.QuestionObjectDB.get_questions_by_module_name('quizzer tutorial')
-        console.info(f"    {tutorial_questions}")
+        # console.info("Testing get by module, tutorial questions only:")
+        # tutorial_questions = QUIZZER_DB.QuestionObjectDB.get_questions_by_module_name('quizzer tutorial')
+        # console.info(f"    {tutorial_questions}")
 
-        console.info("Testing Printout of current profiles")
-        user_profiles_dict = QUIZZER_DB.UserProfilesDB.__dict__
-        console.info(f"    {user_profiles_dict}")
+        # console.info("Testing Printout of current profiles")
+        # user_profiles_dict = QUIZZER_DB.UserProfilesDB.__dict__
+        # console.info(f"    {user_profiles_dict}")
+
+    async def test_user_profile_functionality():
+        """
+        Comprehensive test of UserProfile functionality that properly commits changes 
+        at appropriate points before writing to JSON.
+        """
+        import random
+        
+        console.info("==== BEGINNING USER PROFILE FUNCTIONALITY TESTS ====")
+        
+        # Generate unique test email
+        test_email = f"test_user_{datetime.now().strftime('%Y%m%d%H%M%S')}@quizzer.test"
+        
+        #################################################
+        # TEST 1: Create new user profile
+        #################################################
+        console.info("\n[TEST 1] Creating new user profile")
+        quizzer = Quizzer()
+        
+        try:
+            await quizzer.add_new_profile(
+                username="TestUser",
+                email_address=test_email,
+                full_name="Test User Profile"
+            )
+            console.info(f"✓ Successfully created profile: {test_email}")
+            # Note: Profile is already committed in add_UserProfile method
+        except Exception as e:
+            console.error(f"✗ Failed to create profile: {e}")
+            return
+        
+        #################################################
+        # TEST 2: Load user profile
+        #################################################
+        console.info("\n[TEST 2] Loading user profile")
+        
+        try:
+            await quizzer.load_in_UserProfile(test_email)
+            console.info(f"✓ Successfully loaded profile: {test_email}")
+            
+            profile = quizzer._Quizzer__active_profile
+            console.info(f"→ Initial question count: {profile.num_questions}")
+        except Exception as e:
+            console.error(f"✗ Failed to load profile: {e}")
+            return
+        
+        #################################################
+        # TEST 3: Add modules to profile (RANDOMIZED)
+        #################################################
+        console.info("\n[TEST 3] Adding modules to profile (random selection)")
+        
+        # Get available modules
+        all_modules = list(QUIZZER_DB.QuestionObjectDB.get_list_of_module_names())
+        
+        # Filter out tutorial module
+        available_modules = [m for m in all_modules if m != "quizzer tutorial"]
+        
+        # Randomly select between 2 and min(10, available) modules
+        num_modules = random.randint(2, min(10, len(available_modules)))
+        
+        # Randomly select modules without replacement
+        test_modules = random.sample(available_modules, num_modules)
+        
+        console.info(f"Randomly selected {num_modules} modules: {test_modules}")
+        
+        # Add each module
+        for module_name in test_modules:
+            try:
+                profile_before = quizzer._Quizzer__active_profile.num_questions
+                console.info(f"→ Adding module: {module_name}")
+                await quizzer.add_module_to_user_profile(module_name)
+                
+                profile_after = quizzer._Quizzer__active_profile.num_questions
+                questions_added = profile_after - profile_before
+                
+                console.info(f"✓ Added module '{module_name}' - {questions_added} questions added")
+                
+                # Commit after each module addition
+                await quizzer.commit_UserProfile()
+                console.info(f"  ✓ Profile changes committed after adding module")
+            except Exception as e:
+                console.error(f"✗ Failed to add module '{module_name}': {e}")
+        
+        # Log total questions after adding all modules
+        total_questions = quizzer._Quizzer__active_profile.num_questions
+        console.info(f"→ Total questions after adding all modules: {total_questions}")
+        
+        # Commit all module additions
+        await quizzer.commit_UserProfile()
+        console.info(f"  ✓ Profile changes committed after adding all modules")
+        
+        #################################################
+        # TEST 4: Deactivate specific questions
+        #################################################
+        console.info("\n[TEST 4] Deactivating specific questions")
+        
+        # Get sample questions to deactivate
+        try:
+            active_questions = []
+            modules_to_sample = random.sample(test_modules, min(3, len(test_modules)))
+            
+            for module_name in modules_to_sample:
+                module_questions = QUESTION_OBJECT_DB.get_questions_by_module_name(module_name)
+                if module_questions and len(module_questions) > 0:
+                    num_to_sample = random.randint(1, min(3, len(module_questions)))
+                    sample_indices = random.sample(range(len(module_questions)), num_to_sample)
+                    for idx in sample_indices:
+                        active_questions.append(module_questions[idx])
+            
+            console.info(f"Selected {len(active_questions)} questions for deactivation")
+            
+            for i, question_id in enumerate(active_questions):
+                console.info(f"→ Deactivating question {i+1}: {question_id[:30]}...")
+                await quizzer.deactive_specific_question(question_id)
+                console.info(f"✓ Question deactivated")
+            
+            # Commit after deactivating questions
+            await quizzer.commit_UserProfile()
+            console.info(f"  ✓ Profile changes committed after deactivating questions")
+        except Exception as e:
+            console.error(f"✗ Error in question deactivation: {e}")
+        
+        #################################################
+        # TEST 5: Remove modules from profile
+        #################################################
+        console.info("\n[TEST 5] Removing modules from profile")
+        
+        # Randomly select a subset of modules to remove
+        if test_modules:
+            modules_to_remove = random.sample(test_modules, random.randint(1, min(3, len(test_modules))))
+            console.info(f"Selected {len(modules_to_remove)} modules for removal: {modules_to_remove}")
+            
+            for module_to_remove in modules_to_remove:
+                try:
+                    console.info(f"→ Removing module: {module_to_remove}")
+                    await quizzer.remove_module_from_user_profile(module_to_remove)
+                    console.info(f"✓ Module '{module_to_remove}' removed (questions deactivated)")
+                    
+                    # Commit after each module removal
+                    await quizzer.commit_UserProfile()
+                    console.info(f"  ✓ Profile changes committed after removing module")
+                except Exception as e:
+                    console.error(f"✗ Failed to remove module '{module_to_remove}': {e}")
+        
+        # Final commit to ensure all changes are saved
+        console.info("\n[COMMIT] Final commit of all profile changes")
+        await quizzer.commit_UserProfile()
+        console.info("✓ All profile changes committed successfully")
+        
+        #################################################
+        # DEBUG JSON OUTPUT
+        #################################################
+        console.info("\n[DEBUG] Writing current DB state to JSON for inspection")
+        try:
+            # First ensure the changes are reflected in the DB
+            debug_file = QUIZZER_DB.debug_write_db_to_json()
+            console.info(f"✓ DB state written to: {debug_file}")
+            
+            # Now write detailed profile information
+            debug_files = QUIZZER_DB.debug_write_UserProfiles_to_json()
+            console.info(f"✓ User profiles written to JSON files: {len(debug_files)} files")
+        except Exception as e:
+            console.error(f"✗ Failed to write debug JSON: {e}")
+        
+        #################################################
+        # TEST SUMMARY
+        #################################################
+        console.info("\n==== USER PROFILE TESTS COMPLETED ====")
+        console.info(f"Profile tested: {test_email}")
+        console.info(f"Modules added: {len(test_modules)} ({', '.join(test_modules)})")
+        console.info(f"Questions deactivated: {len(active_questions)}")
+        console.info(f"Modules removed: {len(modules_to_remove)} ({', '.join(modules_to_remove)})")
+        console.info("All test operations completed and committed properly")
+    
+        return {
+            "test_email": test_email,
+            "modules_added": test_modules,
+            "questions_deactivated": len(active_questions),
+            "modules_removed": modules_to_remove
+        }
+
+
     async def test_event_loop():
         global QUIZZER_DB
         console.info('Started')
         # First round of tests is to ensure we can effectively access various parts of our QuizzerDB object
         quizzer = Quizzer()
-        await DB_test_loop()
-        console.info(f"    Adding test profile")
-        await quizzer.add_new_profile("test_man", "test@test.com", "Test McTester")
-        user_profiles_dict = QUIZZER_DB.UserProfilesDB.__dict__
-        console.info(f"    {user_profiles_dict}")
+        # await DB_test_loop()
+        console.info("Starting User Profile functionality tests")
+        await test_user_profile_functionality()
+        console.info("User Profile tests complete - NO CHANGES COMMITTED")
+
+
+
 
     start = datetime.now()
     asyncio.run(test_event_loop())
