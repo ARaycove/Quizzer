@@ -8,6 +8,7 @@ import asyncio
 # So upon loading the module, the QuizzerDB will also be loaded
 LOCK = asyncio.Lock()
 QUIZZER_DB: QuizzerDB = load_quizzer_db()
+# Would consider building additional references, so we can lock various locations individually without locking the entire DB
 QUIZZER_DB.QuestionObjectDB._construct_sub_indices()
 
 class Quizzer:
@@ -36,14 +37,28 @@ class Quizzer:
             )
             
 
-    async def load_in_UserProfile(self):
-        pass
+    async def load_in_UserProfile(self, email_address):
+        async with LOCK:
+            self.__active_profile: UserProfile = QUIZZER_DB.UserProfilesDB.load_UserProfile(email_address=email_address)
 
-    async def add_module_to_user_profile(self, module_name:str, email_address):
+    async def add_module_to_user_profile(self, module_name:str):
         raise NotImplementedError("Not Done Yet Hause")
-
-
-
+    
+    async def remove_module_from_user_profile(self, module_name: str):
+        raise NotImplementedError("Not Done Yet Hause")
+    ###############################################################################
+    # Add, Edit, and Remove Questions
+    ###############################################################################
+    # This is where we can implement some user permissions. If we want to restrict some users from manipulating the QuestionObjectDB of the QuizzerDB
+    
+    async def add_new_question(self):
+        raise NotImplementedError("Almost There")
+    
+    async def edit_question(self):
+        raise NotImplementedError("Almost There")
+    
+    async def delete_question(self):
+        raise NotImplementedError("Almost There")
 if __name__ == "__main__":
     console = logging.getLogger(__name__)
     logging.basicConfig(filename="Quizzer.log", level=logging.INFO)
