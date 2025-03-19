@@ -63,21 +63,24 @@ class QuestionObjectDB():
 
         If you don't know what to query, use the get_list_of_subjects function to query all available options
         '''
-        raise NotImplementedError("I'm not done yet, calm down")
+        return self.__subject_index[subject_name].copy()
     #___________________________________
     # Concept specific access
     def get_list_of_concepts(self):
         return self.__concept_index.keys()
     
-    def get_questions_by_concept(self, concept_name: str):
-        raise NotImplementedError("I'm not done yet, calm down")
+    def get_questions_by_concept(self, concept_name: str) -> list:
+        return self.__concept_index[concept_name].copy()
     #___________________________________
     # Module specific access
     def get_list_of_module_names(self):
         return self.__module_index.keys()
     
     def get_questions_by_module_name(self, module_name:str) -> list:
-        return self.__module_index[module_name]
+        '''
+        returns a COPY of the list of question_id's belonging to the given module
+        '''
+        return self.__module_index[module_name].copy()
     # End Index Access functionality
     ###############################################################################
     # Add or Delete QuestionObject's

@@ -1,5 +1,5 @@
 # All Tests will be contained from running this modules test_client:
-from quizzer_database.quizzer_db import QuizzerDB, load_quizzer_db, UserProfilesDB, QuestionObjectDB, UserProfile
+from quizzer_database.quizzer_db import QuizzerDB, load_quizzer_db, UserProfilesDB, QuestionObjectDB, UserProfile, QuestionObject
 from datetime import datetime, date, timedelta
 import threading
 import logging
@@ -8,8 +8,12 @@ import asyncio
 # So upon loading the module, the QuizzerDB will also be loaded
 LOCK = asyncio.Lock()
 QUIZZER_DB: QuizzerDB = load_quizzer_db()
-# Would consider building additional references, so we can lock various locations individually without locking the entire DB
 QUIZZER_DB.QuestionObjectDB._construct_sub_indices()
+# Additional references, for great granularity
+QUESTION_OBJECT_DB: QuestionObjectDB = QUIZZER_DB.QuestionObjectDB
+USER_PROFILE_DB: UserProfilesDB = QUIZZER_DB.UserProfilesDB
+
+
 
 class Quizzer:
     '''
@@ -21,8 +25,17 @@ class Quizzer:
     # Dunder Mefflin's, We all love Pam and Jim
     ###############################################################################
     def __init__(self, Quizzer_DB = None):  
-        self.__active_profile:      UserProfile = None
+        self.__active_profile:      UserProfile     = None
+        self.__current_question:    QuestionObject  = None
 
+    ###############################################################################
+    # Private Function Calls
+    ###############################################################################
+    async def _place_questions_into_circulation(self):
+        '''
+        When called moves questions from the UserProfile reserve bank into active circulation
+        '''
+        raise NotImplementedError("Not Done Yet Hause")
     ###############################################################################
     # Profile Manipulation
     ###############################################################################
@@ -35,11 +48,28 @@ class Quizzer:
             full_name           =   full_name,
             tutorial_questions  =   tutorial_questions
             )
-            
 
     async def load_in_UserProfile(self, email_address):
         async with LOCK:
             self.__active_profile: UserProfile = QUIZZER_DB.UserProfilesDB.load_UserProfile(email_address=email_address)
+
+    async def get_next_question(self):
+        '''
+        Question Selection Algorithm
+        Prompts Quizzer to run the QSA to determine what should be presented to the user next
+        '''
+        # Future plans involve a more robust relational graph of question objects to determine this rather than (largely random selection)
+        raise NotImplementedError("Not Done Yet Hause")
+    
+    async def attempt_question(self, status):
+        '''
+        Provides Quizzer with your answer attempt:
+        status: "correct", "incorrect", or "repeat"
+        '''
+        # if no remaining questions -> await place_question_into_circulation()
+        raise NotImplementedError("Not Done Yet Hause")
+    
+
 
     async def add_module_to_user_profile(self, module_name:str):
         raise NotImplementedError("Not Done Yet Hause")
@@ -51,13 +81,13 @@ class Quizzer:
     ###############################################################################
     # This is where we can implement some user permissions. If we want to restrict some users from manipulating the QuestionObjectDB of the QuizzerDB
     
-    async def add_new_question(self):
+    async def add_new_question_to_QuestionObjectDB(self):
         raise NotImplementedError("Almost There")
     
-    async def edit_question(self):
+    async def edit_question_in_QuestionObjectDB(self):
         raise NotImplementedError("Almost There")
     
-    async def delete_question(self):
+    async def delete_question_from_QuestionObjectDB(self):
         raise NotImplementedError("Almost There")
 if __name__ == "__main__":
     console = logging.getLogger(__name__)

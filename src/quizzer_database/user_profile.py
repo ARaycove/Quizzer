@@ -96,15 +96,16 @@ class UserProfileQuestionDB():
         Internal function that returns the name of the column where the question should be
         '''
         user_question: UserQuestionObject = self.__user_question_index[question_id]
-        if user_question.in_circulation:
+        if not user_question.is_active:
+            return str("deactivated")
+        # If reach here, question is active, now check whether is_circulating now
+        elif user_question.in_circulation: # question is circulating and active, place into appropriately dated column
             # questions marked in circulation will be active
             date_due = user_question.next_revison_due
             date_due = date_due.replace().date()
             return str(date_due)
-        elif user_question.in_circulation == False and user_question.is_active == True:
+        else: # question is active, but not marked to circulate, place into reserve_bank
             return str("reserve_bank")
-        elif user_question.is_active == False:
-            return str("deactivated")
 
     #______________________________________________________________________________
     def place_question_into_circulation(self, question_id):
@@ -130,7 +131,15 @@ class UserProfileQuestionDB():
     def deactive_question(self, question_id):
         user_question: UserQuestionObject = self.__user_question_index[question_id]
         self._util_remove_question_from_column(question_id)
-        user_question.deactivate_question() # flips the boolean, indicating it should go in the deactivated key
+        user_question.deactivate_question()     # flips the boolean, indicating it should go in the deactivated key
+        self._util_add_question_to_column(question_id)
+
+    #______________________________________________________________________________
+    def reactivate_question(self, question_id):
+        user_question: UserQuestionObject = self.__user_question_index[question_id]
+        self._util_remove_question_from_column(question_id)
+        # If the question was circulating at time of deactivation, it will still be in circulation when this is called
+        user_question.activate_question()       # flips the boolean, question is eligible to be placed into circulation
         self._util_add_question_to_column(question_id)
 
     ###############################################################################
