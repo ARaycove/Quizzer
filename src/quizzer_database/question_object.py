@@ -1,7 +1,4 @@
 from datetime import datetime, timedelta, date
-from DB_utils import util_QuizzerV4ObjDict_to_QuestionObject
-import pickle
-import json
 # Constructor fails if all question fields are None or all answer fields are None
 class QuestionObject():
     '''

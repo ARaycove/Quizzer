@@ -79,6 +79,7 @@ class UserQuestionObject:
         self.__time_between_revisions   = 0.38 # k constant in memory equation
         self.__h                        = 4.5368
         self.__in_circulation           = False
+        self.__is_active                = False
         self.__revision_score           = 1
         self.__total_attempts           = 0
         self.__correct_attempts         = 0
@@ -117,11 +118,11 @@ class UserQuestionObject:
         return self.__wrong_attempts
 
     @property
-    def revision_score(self):
+    def revision_score(self) -> int:
         return self.__revision_score
     
     @property
-    def is_eligible(self):
+    def is_eligible(self) -> bool:
         '''
         Default sensitivity set to 1 hours, removing from user_settings
         '''
@@ -131,12 +132,16 @@ class UserQuestionObject:
         return is_eligible
     
     @property
-    def in_circulation(self):
+    def in_circulation(self) -> bool:
         return self.__in_circulation
     
     @in_circulation.setter
     def in_circulation(self, value):
         print("You tried to change the in_circulation property directly, please use the place into or remove from functions for that")
+
+    @property
+    def is_active(self) -> bool:
+        return self.__is_active
     
     ###############################################################################
     # Add new attempt data to object:
@@ -236,6 +241,12 @@ class UserQuestionObject:
         Remove the question from the user's active Quizzer
         '''
         self.__in_circulation = False
+
+    def activate_question(self):
+        self.__is_active = True
+    
+    def deactivate_question(self):
+        self.__is_active = False
 
     def get_pandas_dataframe(self):
         all_attempts = []

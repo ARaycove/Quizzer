@@ -2,10 +2,11 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-import QuestionObject
+from quizzer_database.question_object   import QuestionObject
+from quizzer_database.user_profile      import UserProfile, UserQuestionObject
 
 def util_QuizzerV4ObjDict_to_QuestionObject(json_dict: dict):
-    return QuestionObject.QuestionObject(
+    return QuestionObject(
         author              = json_dict.get("author"),
         id                  = json_dict.get("id"),
         module_name         = json_dict.get("module_name"),
@@ -21,6 +22,9 @@ def util_QuizzerV4ObjDict_to_QuestionObject(json_dict: dict):
         answer_audio        = json_dict.get("answer_audio"),
         answer_video        = json_dict.get("answer_video")
     )
+
+def util_QuizzerV4UserProfileDict_to_UserProfile(json_dict: dict):
+    pass
 
 if __name__ == "__main__":
     print("Nothing Here Yet")
