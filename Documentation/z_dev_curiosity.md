@@ -31,6 +31,11 @@ This is essentially my horizon of ignorance
 - How do you get the cost function in linear regression?
 
 ## Computer Science Stuff
+- Scikit Learn library
+    - How does the PCA function work?
+    - How does the KMeans function work?
+- Python Transformers and Torch
+- More Machine learning stuff
 - Python Console.log, debugging levels
 - Can you put two decorators on a single function?
 - What is a decorator in Python?
@@ -39,6 +44,7 @@ This is essentially my horizon of ignorance
 - What is the temporal difference learning algorithm?
 - When creating simulated datasets, how do you ensure they are similar to real world datasets?
 - Is there any benefit to writing a dataclass asynchronously?
+- More on Thread Safety
 
 ## Neuroscience and Bio
 - What are astrocytes?
@@ -47,6 +53,7 @@ This is essentially my horizon of ignorance
 - What is a Thylakoid?
 - What are PET scans primarily used for?
 - What is the chemical formula for ADP
+- More on the Blood Brain Barrier
 
 # Priority 2 Questions
 (Questions I'll deal with next semester)
@@ -81,6 +88,8 @@ This is essentially my horizon of ignorance
 - What is the first recorded case of small pox?
 - Who was L'Hopital?
 ### All the other history
+- More on Queen Elizabeth the 1st of England RIP 1603
+- More on Marie Antoinette
 - When did the June Days take place in France? (Input a wiki article worth of information on the june days)
 - When did the Mai Lai Massacre occur and under whose command?
 - What was the name of the warrant officer who stopped the Mai Lai Massacre?
