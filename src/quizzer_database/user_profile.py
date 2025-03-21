@@ -1,9 +1,15 @@
 import pandas as pd
-from datetime import datetime, date, timedelta
+from datetime   import datetime, date, timedelta
+from typing     import Dict, Union
 import pickle
+import logging
 import uuid
-from quizzer_database.user_question_object    import UserQuestionObject
-from quizzer_database.question_object        import QuestionObject
+import sys
+import os
+# Add parent directory to path so we can import properly
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from quizzer_database.user_question_object  import UserQuestionObject
+from quizzer_database.question_object       import QuestionObject
 # FIXME Need some sort of mechanism to prevent a question that has just been answered from immediatley appearing again. For example if the user answers something incorrectly, it should not be immediately shown again. If it is selected by the algorithm the algorithm should "try again", If it's the only question left, then it should just get more questions and add them into circulation.
 
 # FIXME Next question selection
@@ -102,8 +108,7 @@ class UserProfileQuestionDB():
         elif user_question.in_circulation: # question is circulating and active, place into appropriately dated column
             # questions marked in circulation will be active
             date_due = user_question.next_revison_due
-            date_due = date_due.replace().date()
-            return str(date_due)
+            return str(date_due.date())
         else: # question is active, but not marked to circulate, place into reserve_bank
             return str("reserve_bank")
 
@@ -114,8 +119,8 @@ class UserProfileQuestionDB():
         # General pattern:
         #   Erase from one column and place into a different one
         self._util_remove_question_from_column(question_id)
-        user_question.place_into_circulation()  # flips the boolean, indicating it is no longer in circulation
-        user_question.activate_question()       # flips the boolean, indicating the question is now active and eligble to be placed into circulation
+        user_question.place_into_circulation()  # flips the boolean, indicating it should actively circulate
+        user_question.activate_question()       # flips the boolean, indicating the question is now active and eligible to be placed into circulation
         self._util_add_question_to_column(question_id)
 
 
@@ -124,7 +129,7 @@ class UserProfileQuestionDB():
         print(f"Removing Question from circulation")
         user_question: UserQuestionObject = self.__user_question_index[question_id]
         self._util_remove_question_from_column(question_id)
-        user_question.remove_from_circulation() # flips the boolean, indicating it is now in circulation
+        user_question.remove_from_circulation() # flips the boolean, indicating it should not be in circulation
         self._util_add_question_to_column(question_id)
 
     #______________________________________________________________________________
@@ -146,9 +151,204 @@ class UserProfileQuestionDB():
     # Debugging Statements
     ###############################################################################
     # Debug Utils
+    #______________________________________________________________________________
     def print_review_schedule(self):
         print(self.__review_schedule)
 
+class UserSetting:
+    """
+    Quizzer class object for individual settings (this designed to be a non-nested single setting)
+    - May be nested within the ComplexUserSetting Class
+    
+    Attributes:
+        name (str):         The name of the setting
+        description (str):  A description of what the setting does
+        value:              The current value of the setting
+        default_value:      The default value of the setting
+        setting_type (str): The type of the setting (e.g., 'int', 'bool', 'string')
+        validation_func:    A function that validates the setting value
+    """
+    ###############################################################################
+    # Dunder Mifflin Methods O_O
+    ###############################################################################
+    def __init__(self, name, value, description="", default_value=None, setting_type=None, validation_func=None):
+        self.name:          str = name
+        self.description:   str = description
+        self.__value            = value
+        self.default_value      = default_value if default_value is not None else value
+        self.setting_type       = setting_type
+        self.validation_func    = validation_func
+
+    def __str__(self):
+        return f"{self.name}: {self.value} ({self.description})"
+
+    def __repr__(self):
+        return f"UserSetting(name='{self.name}', value={self.value}, default_value={self.default_value})"
+    ###############################################################################
+    # Getter, Setter, and Reset Function
+    ###############################################################################
+    @property
+    def value(self):
+        """Get the current value of the setting."""
+        return self.__value
+    #______________________________________________________________________________
+    def set_value(self, new_value):
+        """Set the value of the setting with validation."""
+        # Type validation if setting_type is specified
+        if self.validation_func:
+            new_value = self.validation_func(new_value)
+        if self.setting_type:
+            if self.setting_type == 'int' and not isinstance(new_value, int):
+                try:
+                    new_value = int(new_value)
+                except (ValueError, TypeError):
+                    raise ValueError(f"Setting '{self.name}' requires an integer value")
+            elif self.setting_type == 'float' and not isinstance(new_value, float):
+                try:
+                    new_value = float(new_value)
+                except (ValueError, TypeError):
+                    raise ValueError(f"Setting '{self.name}' requires a float/decimal value")
+            elif self.setting_type == 'bool' and not isinstance(new_value, bool):
+                if isinstance(new_value, str):
+                    if new_value.lower() in ['true', 't', 'yes', 'y', '1']:
+                        new_value = True
+                    elif new_value.lower() in ['false', 'f', 'no', 'n', '0']:
+                        new_value = False
+                    else:
+                        raise ValueError(f"Setting '{self.name}' requires a boolean value")
+                else:
+                    try:
+                        new_value = bool(new_value)
+                    except (ValueError, TypeError):
+                        raise ValueError(f"Setting '{self.name}' requires a boolean value")
+        # All validation passed, set the new value
+        self.__value = new_value
+    #______________________________________________________________________________
+    def reset(self):
+        """Reset the setting to its default value."""
+        if self.default_value != None:
+            self.__value = self.default_value
+    
+
+
+class ComplexUserSetting:
+    """
+    A class representing a complex user setting that contains nested settings.
+    
+    This class provides dictionary-like access to a collection of settings,
+    along with additional functionality for validation and management.
+    """
+    ###############################################################################
+    # Dunder Mifflin Methods O_O
+    ###############################################################################
+    def __init__(self, name="", description=""):
+        self.name:              str                     = name
+        self.description:       str                     = description
+        self.nested_settings:   Dict[str, UserSetting]  = {}.copy()
+        self.metadata:          Dict[str, set]          = {
+            "expected_settings": set(),
+            "required_settings": set()
+        }
+    #______________________________________________________________________________
+    def __str__(self):
+        return f"{self.name} ComplexUserSetting with {len(self.nested_settings)} settings"
+    
+    #______________________________________________________________________________
+    def __repr__(self):
+        return f"ComplexUserSetting(name='{self.name}', {len(self.nested_settings)} settings)"
+
+    ###############################################################################
+    # get_value functions
+    ###############################################################################
+    #______________________________________________________________________________
+    def get_nested_settings(self):
+        """Return all UserSetting names in the nested settings."""
+        return self.nested_settings.keys()
+    #______________________________________________________________________________
+    def get_nested_values(self):
+        """Return all values in the nested settings."""
+        return self.nested_settings.values()
+    
+    #______________________________________________________________________________
+    def get_nested_items(self):
+        """
+        Return all key-value pairs in the nested settings.\n
+        setting.name, setting
+        """
+        return self.nested_settings.items()
+    
+    #______________________________________________________________________________
+    def get_specific_setting(self, setting_name, default=None):
+        """
+        Get a nested setting, with a default if it doesn't exist.
+        Example: setting.get('theme', 'light')
+        """
+        return self.nested_settings.get(setting_name, default)
+    ###############################################################################
+    # Verification functions
+    ###############################################################################
+    #______________________________________________________________________________
+    def set_required_settings(self, setting_names):
+        """
+        Set which UserSettings are required for this complex setting.
+        
+        Args:
+            setting_names (list or set): The UserSettings that are required
+        """
+        self.metadata["required_settings"] = set(setting_names)
+
+    @property
+    def required_settings(self) -> set[str]:
+        '''
+        returns: set of required settings by name
+        '''
+        return self.metadata["required_settings"]
+
+    #______________________________________________________________________________
+    def validate(self):
+        """
+        Validate that the complex setting contains all required keys.
+        
+        Returns:
+            bool: True if valid, False otherwise
+        """
+        # Check that all required keys are present
+        for key in self.metadata["required_settings"]:
+            if key not in self.nested_settings:
+                return False
+        return True
+    ###############################################################################
+    # Manipulate Setting Values
+    ###############################################################################
+    #______________________________________________________________________________
+    def reset_all(self):
+        """
+        Reset all nested settings to their default values.
+        This only works for settings that are UserSetting instances.
+        """
+        for _, setting in self.nested_settings.items():
+            setting.reset()
+    #______________________________________________________________________________
+    def add_setting(self, setting: UserSetting):
+        """
+        Add a new setting to the complex setting.
+        Args:
+            setting (UserSetting): The setting to add
+        """
+        self.nested_settings[setting.name] = setting
+    
+    #______________________________________________________________________________
+    def remove_setting(self, setting_name: str):
+        if setting_name in self.required_settings:
+            print(f"{setting_name} is required and may not be removed")
+            return f"{setting_name} is required and may not be removed"
+        else:
+            del self.nested_settings[setting_name]
+
+    #______________________________________________________________________________
+    def update_setting(self, setting_name: str, setting_value):
+        setting = self.get_specific_setting(setting_name)
+        setting.set_value(setting_value)
 
 class UserProfileSettingsDB:
     '''
@@ -173,8 +373,172 @@ class UserProfileSettingsDB:
     "vault_path"                : A relic from QuizzerV1 and V2
     "desired_daily_questions"   : Fundamental change to when in_circulation algorithm is triggered, making this function not useful
     '''
-    pass
-    # Could potentionally make a sub-subclass called setting
+    ###############################################################################
+    # Dunder Mifflin Methods O_O
+    ###############################################################################
+    def __init__(self, list_of_all_modules, list_of_all_subjects):
+        # List of Complex Settings
+        self.__activation_status_of_modules         = None
+        self.__subject_interest_levels              = None
+        self.__subject_priority_settings            = None
+        self.__user_general_interest_settings       = None
+        # List of Basic Settings
+        self.__modules_default_activation_status    = None
+        self._verify_build(list_of_all_modules, list_of_all_subjects)
+
+    def _verify_build(self, list_of_all_modules, list_of_all_subjects):
+        '''
+        Check if each instance variable exists and of proper type\n
+        If not of proper type or not existing, calls the appropriate build function to initialize it
+        '''
+        # Check Small Settings First
+        if not isinstance(self.__modules_default_activation_status, UserSetting):
+            self._build_initial_modules_default_activation_status_setting()
+
+        # Check Complex Settings Second (Some complex settings might rely on simpler settings)
+        if not isinstance(self.__activation_status_of_modules, ComplexUserSetting):
+            self._build_initial_activation_status_of_modules_setting(list_of_all_modules)
+
+    
+        if not isinstance(self.__subject_interest_levels, ComplexUserSetting):
+            self._build_initial_subject_interest_settings(list_of_all_subjects)
+        
+        if not isinstance(self.__subject_priority_settings, ComplexUserSetting):
+            self._build_initial_subject_priority_settings(list_of_all_subjects)
+
+        if not isinstance(self.__user_general_interest_settings, ComplexUserSetting):
+            # self._build_initial_general_interest_settings()
+            print(f"Are you going to implement the general interest settings?")
+            pass #FIXME Yes fix it, you should add this, but not now. Will construct based on some new Interest Inventory testing.
+    ###############################################################################
+    # Validation Functions - Static Methods for custom validation of UserSettings
+    ###############################################################################
+    @staticmethod
+    def _validation_for_subject_interest_level_setting(value):
+        '''validation function as named, enforces range of 0 to 1000 for subject interest, to be passed into an individual subject_interest UserSetting'''
+        if not isinstance(value, int):
+            try:
+                value = int(value)
+            except (ValueError, TypeError):
+                return 0
+        return max(0, min(value, 1000))
+    ###############################################################################
+    # Initial Build Functions
+    ###############################################################################
+    def _build_initial_modules_default_activation_status_setting(self):
+        self.__modules_default_activation_status = UserSetting(
+            name            =   "modules_default_activation_status",
+            value           =   True,
+            description     =   "Defines whether the UserQuestionObject.is_active values within an added module are set to True or False, this property defines whether a new question will be placed into the 'reserve_bank' or 'deactivated' columns of the UserProfile revision schedule",
+            default_value   = True,
+            setting_type    = 'bool',
+            validation_func = None # No custom validation necessary for default bool status
+        )
+
+    def _build_initial_activation_status_of_modules_setting(self, list_of_all_modules):
+        # Need a full list of all modules in the QuizzerDB (which should be able to grab from the QuestionModuleDB)
+        # Since this call lies further up the call chain, we'll need to pass it down when this is called
+        self.__activation_status_of_modules = ComplexUserSetting(
+            name        = "activation_status_of_modules",
+            description = "Record of which modules are active or inactive in a user's UserProfile"
+        )
+        self.__activation_status_of_modules: ComplexUserSetting
+        for module_name in list_of_all_modules:
+            self.__activation_status_of_modules.add_setting(
+                UserSetting(
+                    name            =   module_name,
+                    value           =   self.__modules_default_activation_status.value,
+                    description     =   f"Is module with name: '{module_name}' currently active?",
+                    default_value   =   self.__modules_default_activation_status.value,
+                    setting_type    =   'bool',
+                    validation_func =   None # No custom validation need for booleans
+                )
+            )
+    
+    def _build_initial_subject_interest_settings(self, list_of_all_subjects):
+        # Need a full list of all settings (which should be able to grab from the QuestionObjectDB subject index that gets built)
+        # Since this call lies further up the call chain, we'll need to pass it down when this is called
+        self.__subject_interest_levels = ComplexUserSetting(
+            name        = "subject_interest_levels",
+            description = "Contains a numeric value that represents a User's Interest level in a given subject\nHigher values indicate more interest"
+        )
+        self.__subject_interest_levels: ComplexUserSetting
+        for subject_name in list_of_all_subjects:
+            self.__subject_interest_levels.add_setting(
+                UserSetting(
+                    name            =   subject_name,
+                    value           =   10,
+                    description     =   f"The amount of interest the user has in subject: {subject_name}",
+                    default_value   =   10, # default interest level of 10, representing low interest level
+                    setting_type    =   'int', # Could be of type of float, but should be easier to understand conceptually as an integer value
+                    validation_func =   self._validation_for_subject_interest_level_setting
+                )
+            )
+    
+    def _build_initial_subject_priority_settings(self, list_of_all_subjects):
+        self.__subject_priority_settings = ComplexUserSetting(
+            name        = "subject_priority_settings",
+            description = "Contains a numeric value to define the which subjects are being prioritized"
+        )
+        self.__subject_priority_settings: ComplexUserSetting
+        for subject_name in list_of_all_subjects:
+            self.__subject_priority_settings.add_setting(
+                UserSetting(
+                    name            = subject_name,
+                    value           = 5,
+                    description     = f"The user defined priority level for subject: {subject_name}",
+                    default_value   = 5,
+                    setting_type    = 'int',
+                    validation_func = None # No custom validation, since not limiting to 1-10, allows priorities to be more flexible, user may manually set a hypothetical 1000 subjects with n+1 priority for ever subject if they so please
+                )
+            )
+
+    def _build_initial_general_interest_settings(self):
+        # This will be additional data, allowing the user to manually tell Quizzer what thier likes and dislikes are, potentially useless data, but you never know what might be relevant
+        raise NotImplementedError("GUFFA!!!")
+    ###############################################################################
+    # Custom Construction Functionality for Complex Settings
+    ###############################################################################
+
+    ###############################################################################
+    # Access Functionality for Settings
+    ###############################################################################
+    #______________________________________________________________________________
+    # Get/Update for default activation status for modules
+    def get_value_of_modules_default_activation_status(self):
+        return self.__modules_default_activation_status
+    
+    def update_value_of_modules_default_activation_status(self, new_value: bool):
+        self.__modules_default_activation_status: UserSetting
+        self.__modules_default_activation_status.set_value(new_value = new_value)
+
+    #______________________________________________________________________________
+    # Get/Update for Subject Interest Settings
+    def get_value_of_subject_interest_level(self, subject_name: str):
+        return self.__subject_interest_levels.get_specific_setting(subject_name)
+    
+    def update_value_of_subject_interest_level(self, subject_name: str, new_value: int):
+        self.__subject_interest_levels.update_setting(subject_name, new_value)
+
+    #______________________________________________________________________________
+    # Get/Update for Subject Priority Settings
+    def get_value_of_subject_priority(self, subject_name:str):
+        return self.__subject_priority_settings.get_specific_setting(subject_name)
+    
+    def update_value_of_subject_priority(self, subject_name:str, new_value: int):
+        self.__subject_priority_settings.update_setting(subject_name, new_value)
+    #______________________________________________________________________________
+    # Get/Update for module_activation statusi
+    def get_module_activation_status(self, module_name:str):
+        return self.__activation_status_of_modules.get_specific_setting(module_name)
+    
+    def update_module_activation_status(self, module_name:str, new_value: bool):
+        self.__activation_status_of_modules.update_setting(module_name, new_value)
+    #______________________________________________________________________________
+    # Get/Update for General Interest Settings
+    #FIXME Once you add in this setting of course
+
+
 class UserProfileStatsDB:
     '''
     Subclass to store all User statistics\n
@@ -196,6 +560,9 @@ class UserProfileStatsDB:
     ""questions_answered_by_date":                      FIXME\n
 
     '''
+    def __init__(self, UserQuestionsDB_REF, UserSettingsDB_REF):
+        self.__UserQuestionsDB_REF: UserProfileQuestionDB   =   UserQuestionsDB_REF
+        self.__UserSettingsDB_REF:  UserProfileSettingsDB   =   UserSettingsDB_REF
     pass
     # Some stats are derived, others are stored.
 
@@ -219,19 +586,24 @@ class UserProfile:
     '''
     # Commentary
     #     Design Pattern: To be saved as individual files, while the main QuizzerDB class will load in these individual files as necessary. Saving each profile as an individual file should allow for more optimal memory management. If Quizzer contains 1000 profiles and only 50-100 users are active at any given time then we only need to load in 50-100 user profiles into memory at any given time
-    ###################################
-    # Core Dunder Methods
+    ###############################################################################
+    # Dun Dun DunderS!
+    ###############################################################################
     def __init__(self,
+                 list_of_all_modules: list[str],
+                 list_of_all_subjects: list[str],
                  username:          str,
                  email_address:     str,
                  full_name:         str,
                  tutorial_questions:str,
-                 user_settings  =   UserProfileSettingsDB(),
-                 user_stats     =   UserProfileStatsDB(),
+                 user_stats     =   None
                  ):
         self.user_uuid                              = self.generate_uuid()
         self.user_questions: UserProfileQuestionDB  = UserProfileQuestionDB(tutorial_questions)
-        self.user_settings: UserProfileSettingsDB   = user_settings
+        self.user_settings: UserProfileSettingsDB   = UserProfileSettingsDB(
+            list_of_all_modules     = list_of_all_modules,
+            list_of_all_subjects    = list_of_all_subjects
+        )
         self.user_stats: UserProfileStatsDB         = user_stats
         self.username                               = username
         self.email_address: str                     = email_address
@@ -242,6 +614,12 @@ class UserProfile:
         for key, value in self.__dict__.items():
             full_print += f"{key:25}: {value}\n"
         return full_print
+    
+    ###############################################################################
+    # Verification and build functionality:
+    ###############################################################################
+    def _build_user_stats_db(self):
+        self.user_stats =   UserProfileStatsDB(self.user_questions, self.user_settings)
     ###################################
     # Properties
     @property
@@ -273,9 +651,329 @@ class UserProfile:
         raise NotImplementedError("Not done Yet")
     
 if __name__ == "__main__":
-    print(f"Test Client Currently Broken")
-
-
-
-
+    import logging
+    import sys
+    import os
+    from datetime import datetime, timedelta
+    import traceback
+    import random
     
+    # Set up logging
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(levelname)s - %(message)s',
+        handlers=[
+            logging.FileHandler("user_profile_test.log"),
+            logging.StreamHandler(sys.stdout)
+        ]
+    )
+    logger = logging.getLogger("UserProfileTests")
+    logger.info("=============== Starting User Profile Test Suite ===============")
+    
+    # Test data
+    mock_modules = ["math", "science", "history", "quizzer tutorial"]
+    mock_subjects = ["algebra", "geometry", "chemistry", "biology", "world history", "us history"]
+    mock_question_ids = [f"question_{i}" for i in range(1, 20)]
+    
+    # Define reusable test function
+    def run_test(name, test_fn, *args, **kwargs):
+        logger.info(f"TEST: {name}")
+        try:
+            result = test_fn(*args, **kwargs)
+            logger.info(f"✓ PASS: {name}")
+            return result
+        except Exception as e:
+            logger.error(f"✗ FAIL: {name}")
+            logger.error(f"Error: {str(e)}")
+            logger.error(traceback.format_exc())
+            return None
+    
+    # ====== TEST USERSETTING ======
+    def test_user_setting():
+        logger.info("===== Testing UserSetting class =====")
+        
+        # Test initialization
+        setting = UserSetting(
+            name="test_setting",
+            value=10,
+            description="A test setting",
+            default_value=5,
+            setting_type="int"
+        )
+        logger.info(f"Created setting: {setting}")
+        assert setting.name == "test_setting"
+        assert setting.value == 10
+        assert setting.default_value == 5
+        
+        # Test value setting
+        setting.set_value(20)
+        logger.info(f"Set value to 20: {setting}")
+        assert setting.value == 20
+        
+        # Test type validation
+        setting.set_value("30")  # Should convert to int
+        logger.info(f"Set value to string '30' (should convert): {setting}")
+        assert setting.value == 30 and isinstance(setting.value, int)
+        
+        # Test reset
+        setting.reset()
+        logger.info(f"Reset to default: {setting}")
+        assert setting.value == 5
+        
+        # Test bool conversion
+        bool_setting = UserSetting("test_bool", True, setting_type="bool")
+        bool_setting.set_value("yes")
+        logger.info(f"Bool setting with 'yes': {bool_setting}")
+        assert bool_setting.value is True
+        bool_setting.set_value("false")
+        logger.info(f"Bool setting with 'false': {bool_setting}")
+        assert bool_setting.value is False
+        
+        # Test validation function
+        def validate_range(val):
+            return max(0, min(val, 100))
+        
+        validated_setting = UserSetting(
+            "range_setting", 
+            50, 
+            setting_type="int", 
+            validation_func=validate_range
+        )
+        validated_setting.set_value(150)
+        logger.info(f"Validated setting with 150 (should cap at 100): {validated_setting}")
+        assert validated_setting.value == 100
+        validated_setting.set_value(-10)
+        logger.info(f"Validated setting with -10 (should cap at 0): {validated_setting}")
+        assert validated_setting.value == 0
+        
+        logger.info("UserSetting tests complete")
+        return True
+    
+    # ====== TEST COMPLEXUSERSETTING ======
+    def test_complex_user_setting():
+        logger.info("===== Testing ComplexUserSetting class =====")
+        
+        complex_setting = ComplexUserSetting(
+            name="test_complex",
+            description="A complex test setting"
+        )
+        logger.info(f"Created complex setting: {complex_setting}")
+        
+        # Test adding settings
+        complex_setting.add_setting(UserSetting("setting1", 10))
+        complex_setting.add_setting(UserSetting("setting2", "value"))
+        complex_setting.add_setting(UserSetting("setting3", True))
+        
+        logger.info(f"Added 3 settings, total now: {len(complex_setting.nested_settings)}")
+        assert len(complex_setting.nested_settings) == 3
+        
+        # Test getting settings
+        s1 = complex_setting.get_specific_setting("setting1")
+        s2 = complex_setting.get_specific_setting("setting2")
+        s3 = complex_setting.get_specific_setting("setting3")
+        logger.info(f"Retrieved settings: {s1}, {s2}, {s3}")
+        assert s1.value == 10
+        assert s2.value == "value"
+        assert s3.value is True
+        
+        # Test required settings
+        complex_setting.set_required_settings(["setting1", "setting3"])
+        logger.info(f"Set required settings: {complex_setting.required_settings}")
+        assert "setting1" in complex_setting.required_settings
+        assert "setting3" in complex_setting.required_settings
+        assert complex_setting.validate() is True
+        
+        # Test updating settings
+        complex_setting.update_setting("setting1", 20)
+        s1 = complex_setting.get_specific_setting("setting1")
+        logger.info(f"Updated setting1 to 20: {s1}")
+        assert s1.value == 20
+        
+        # Test removing settings (non-required)
+        complex_setting.remove_setting("setting2")
+        logger.info(f"Removed setting2, remaining: {complex_setting.get_nested_settings()}")
+        assert "setting2" not in complex_setting.nested_settings
+        
+        # Test attempting to remove required setting
+        result = complex_setting.remove_setting("setting1")
+        logger.info(f"Attempted to remove required setting, result: {result}")
+        logger.info(f"Settings after attempted removal: {complex_setting.get_nested_settings()}")
+        assert "setting1" in complex_setting.nested_settings
+        assert isinstance(result, str) and "required" in result
+        
+        # Test reset all
+        s1 = complex_setting.get_specific_setting("setting1")
+        s1.default_value = 5
+        logger.info(f"Set default_value to 5 for setting1: {s1}")
+        complex_setting.reset_all()
+        logger.info(f"Reset all settings, setting1 now: {complex_setting.get_specific_setting('setting1')}")
+        assert complex_setting.get_specific_setting("setting1").value == 5
+        
+        logger.info("ComplexUserSetting tests complete")
+        return True
+    
+    # ====== TEST USERPROFILESETTINGSDB ======
+    def test_userprofile_settings_db():
+        logger.info("===== Testing UserProfileSettingsDB class =====")
+        
+        # Test initialization
+        settings_db = UserProfileSettingsDB(mock_modules, mock_subjects)
+        logger.info(f"Created UserProfileSettingsDB with {len(mock_modules)} modules and {len(mock_subjects)} subjects")
+        
+        # Test module settings
+        module_setting = settings_db.get_module_activation_status("math")
+        logger.info(f"Retrieved module setting for 'math': {module_setting}")
+        assert module_setting is not None
+        assert module_setting.value is True
+        
+        # Test updating module settings
+        settings_db.update_module_activation_status("math", False)
+        module_setting = settings_db.get_module_activation_status("math")
+        logger.info(f"Updated 'math' activation to False: {module_setting}")
+        assert module_setting.value is False
+        
+        # Test subject interest settings
+        interest_setting = settings_db.get_value_of_subject_interest_level("algebra")
+        logger.info(f"Retrieved interest setting for 'algebra': {interest_setting}")
+        assert interest_setting is not None
+        assert interest_setting.value == 10
+        
+        # Test updating subject interest
+        settings_db.update_value_of_subject_interest_level("algebra", 50)
+        interest_setting = settings_db.get_value_of_subject_interest_level("algebra")
+        logger.info(f"Updated 'algebra' interest to 50: {interest_setting}")
+        assert interest_setting.value == 50
+        
+        # Test validation function (should cap at 1000)
+        settings_db.update_value_of_subject_interest_level("algebra", 1500)
+        interest_setting = settings_db.get_value_of_subject_interest_level("algebra")
+        logger.info(f"Attempted to set 'algebra' interest to 1500 (should cap at 1000): {interest_setting}")
+        assert interest_setting.value == 1000
+        
+        # Test subject priority settings
+        priority_setting = settings_db.get_value_of_subject_priority("algebra")
+        logger.info(f"Retrieved priority setting for 'algebra': {priority_setting}")
+        assert priority_setting is not None
+        assert priority_setting.value == 5
+        
+        # Test updating subject priority
+        settings_db.update_value_of_subject_priority("algebra", 9)
+        priority_setting = settings_db.get_value_of_subject_priority("algebra")
+        logger.info(f"Updated 'algebra' priority to 9: {priority_setting}")
+        assert priority_setting.value == 9
+        
+        logger.info("UserProfileSettingsDB tests complete")
+        return settings_db
+    
+    # ====== TEST USERPROFILEQUESTIONDB ======
+    def test_userprofile_question_db():
+        logger.info("===== Testing UserProfileQuestionDB class =====")
+        
+        # Create a list of real UserQuestionObject instances for testing
+        test_question_ids = ["tutorial_q1", "tutorial_q2"]
+        
+        # Initialize the DB with tutorial questions
+        question_db = UserProfileQuestionDB(test_question_ids)
+        logger.info(f"Created UserProfileQuestionDB with {len(test_question_ids)} tutorial questions")
+        
+        # Verify questions were added
+        num_questions = question_db.get_num_questions()
+        logger.info(f"DB now has {num_questions} questions")
+        assert num_questions == 2
+        
+        # Test adding more questions
+        additional_questions = ["question_1", "question_2", "question_3"]
+        for qid in additional_questions:
+            question_db.add_question(qid)
+            logger.info(f"Added question: {qid}")
+        
+        num_questions = question_db.get_num_questions()
+        logger.info(f"DB now has {num_questions} questions after additions")
+        assert num_questions == 5
+        
+        # Test circulation operations
+        for op in [
+            ("place_question_into_circulation", "question_1"),
+            ("remove_question_from_circulation", "tutorial_q1"),
+            ("deactive_question", "question_2"),
+            ("reactivate_question", "question_2"),
+        ]:
+            operation, qid = op
+            logger.info(f"Performing operation: {operation} on question_id: {qid}")
+            method = getattr(question_db, operation)
+            method(qid)
+            logger.info(f"Operation completed successfully")
+        
+        # Debug: Print the review schedule
+        logger.info("Printing final review schedule:")
+        question_db.print_review_schedule()
+        
+        logger.info("UserProfileQuestionDB tests complete")
+        return question_db
+    
+    # ====== TEST USERPROFILE ======
+    def test_userprofile():
+        logger.info("===== Testing UserProfile class =====")
+        
+        # Test basic initialization
+        tutorial_questions = ["tutorial_q1", "tutorial_q2"]
+        
+        # First create settings DB with minimal test data
+        settings_db = UserProfileSettingsDB(mock_modules, mock_subjects)
+        
+        # Create profile
+        profile = UserProfile(
+            username="test_user",
+            list_of_all_modules=mock_modules,
+            list_of_all_subjects=mock_subjects,
+            email_address="test@example.com",
+            full_name="Test User",
+            tutorial_questions=tutorial_questions,
+            user_stats=UserProfileStatsDB()
+        )
+        
+        logger.info(f"Created UserProfile for {profile.username}")
+        
+        # Test basic properties
+        assert profile.username == "test_user"
+        assert profile.email_address == "test@example.com"
+        assert profile.full_name == "Test User"
+        logger.info(f"Basic profile properties verified")
+        
+        # Test num_questions property
+        initial_questions = profile.num_questions
+        logger.info(f"Initial question count: {initial_questions}")
+        assert initial_questions == 2
+        
+        # Test adding questions
+        test_questions = ["additional_q1", "additional_q2"]
+        for qid in test_questions:
+            profile.add_question_to_UserProfile(qid)
+            logger.info(f"Added question: {qid}")
+        
+        new_count = profile.num_questions
+        logger.info(f"Question count after additions: {new_count}")
+        assert new_count == initial_questions + len(test_questions)
+        
+        # Test UUID generation
+        logger.info(f"Profile UUID: {profile.user_uuid}")
+        assert isinstance(profile.user_uuid, str)
+        assert len(profile.user_uuid) > 30  # UUID should be fairly long
+        
+        logger.info("UserProfile tests complete")
+        return profile
+    
+    # Run all tests in sequence
+    try:
+        run_test("UserSetting Tests", test_user_setting)
+        run_test("ComplexUserSetting Tests", test_complex_user_setting)
+        run_test("UserProfileSettingsDB Tests", test_userprofile_settings_db)
+        run_test("UserProfileQuestionDB Tests", test_userprofile_question_db)
+        run_test("UserProfile Tests", test_userprofile)
+        
+        logger.info("=============== All tests completed successfully ===============")
+    except Exception as e:
+        logger.error(f"Test suite failed: {str(e)}")
+        logger.error(traceback.format_exc())
+    
+    print("Test Client Complete - See user_profile_test.log for details")
