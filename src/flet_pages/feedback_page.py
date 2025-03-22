@@ -1,6 +1,6 @@
 import flet as ft
-import system_data
-import firestore_db
+import OldQuizzer_system_data
+import OldQuizzer_firestore_db
 import time
 
 class FeedbackPage(ft.View):
@@ -100,7 +100,7 @@ class FeedbackPage(ft.View):
         self.submit_button.disabled = False
         category = self.categorize_menu.value
         feedback = self.feedback_box.value
-        firestore_db.submit_feedback_to_firestore(category, feedback)
+        OldQuizzer_firestore_db.submit_feedback_to_firestore(category, feedback)
         self.categorize_menu.value = "Is this a Bug Report, A Feature, or something else?"
         self.feedback_box.value    = "Anything Else?"
         self.page.update()

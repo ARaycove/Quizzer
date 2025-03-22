@@ -1,6 +1,6 @@
 import flet as ft
 from flet_custom_containers import settings_controls
-import system_data
+import OldQuizzer_system_data
 
 class SettingsPage(ft.View):
     def __init__(self, page: ft.Page, questions_available_to_answer, 
@@ -127,9 +127,9 @@ class SettingsPage(ft.View):
     def add_settings_cards                  (self, e: ft.ControlEvent = None):
         pass
     def go_to_home_screen                   (self, e: ft.ControlEvent = None):
-        system_data.update_user_profile(self.user_profile_data)
+        OldQuizzer_system_data.update_user_profile(self.user_profile_data)
         self.page.go("/HomePage")
 
     def go_to_menu_page                     (self, e: ft.ControlEvent = None):
-        system_data.update_user_profile(self.user_profile_data)
+        OldQuizzer_system_data.update_user_profile(self.user_profile_data)
         self.page.go("/Menu")

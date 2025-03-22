@@ -1,6 +1,6 @@
 import flet as ft
-import public_functions
-import system_data
+import OldQuizzer_public_functions
+import OldQuizzer_system_data
 from lib import helper
 class SubjectSettingCard(ft.Row):
     def __init__(self, subject_name, user_profile_data):

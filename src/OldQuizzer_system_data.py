@@ -1,8 +1,8 @@
 # All functions relating to the generation, updates, and fetching of system data goes in this file
 # Dev Modules
 from lib import helper
-import system_data_user_stats
-import system_data_question_stats # Any function that works directly with the user question stats, scoring metrics related to the question object
+import OldQuizzer_system_data_user_stats
+import OldQuizzer_system_data_question_stats # Any function that works directly with the user question stats, scoring metrics related to the question object
 # External Libs
 import json
 import os
@@ -10,7 +10,7 @@ import uuid
 from datetime import datetime, timedelta, date
 import math
 import random
-import firestore_db
+import OldQuizzer_firestore_db
 import matplotlib.pyplot as plt
 # Any Function that does not call another function (besides external libs)
 def build_first_time_stats_data(user_profile_data: dict = None) -> dict:#Private Function
@@ -258,7 +258,7 @@ def get_question_object_data() -> dict:
         # print("Question Object Data exists:")
         return question_object_data
     except FileNotFoundError:
-        firestore_db.get_question_object_data_from_firestore()
+        OldQuizzer_firestore_db.get_question_object_data_from_firestore()
         with open("system_data/question_object_data.json", "r") as f:
             question_object_data = json.load(f)
         # print("Question Object Data exists:")
@@ -742,14 +742,14 @@ def sort_questions(user_profile_data: dict, question_object_data: dict):
 def update_user_question_stats(question_object: dict, unique_id, user_profile_data: dict, question_object_data: dict) -> dict:
     # print("def update_user_question_stats(question_object: dict, unique_id, user_profile_data: dict, question_object_data: dict) -> dict")
     settings_data = user_profile_data["settings"]
-    question_object = system_data_question_stats.initialize_revision_streak_property(question_object)
-    question_object = system_data_question_stats.initialize_last_revised_property(question_object)
-    question_object = system_data_question_stats.initialize_next_revision_due_property(question_object)
-    question_object = system_data_question_stats.initialize_in_circulation_property(question_object, settings_data)
-    question_object = system_data_question_stats.initialize_time_between_revisions_property(question_object, settings_data)
-    question_object = system_data_question_stats.calculate_average_shown(question_object)
-    question_object = system_data_question_stats.determine_eligibility_of_question_object(question_object, settings_data)
-    question_object = system_data_question_stats.update_is_module_active_property(question_object, unique_id, user_profile_data, question_object_data)
+    question_object = OldQuizzer_system_data_question_stats.initialize_revision_streak_property(question_object)
+    question_object = OldQuizzer_system_data_question_stats.initialize_last_revised_property(question_object)
+    question_object = OldQuizzer_system_data_question_stats.initialize_next_revision_due_property(question_object)
+    question_object = OldQuizzer_system_data_question_stats.initialize_in_circulation_property(question_object, settings_data)
+    question_object = OldQuizzer_system_data_question_stats.initialize_time_between_revisions_property(question_object, settings_data)
+    question_object = OldQuizzer_system_data_question_stats.calculate_average_shown(question_object)
+    question_object = OldQuizzer_system_data_question_stats.determine_eligibility_of_question_object(question_object, settings_data)
+    question_object = OldQuizzer_system_data_question_stats.update_is_module_active_property(question_object, unique_id, user_profile_data, question_object_data)
     if type(question_object) != type({}):
         # print(f"Question Object has type {type(question_object)}")
         raise Exception("Question Object is not a dictionary, one of the properties is returning the wrong object")
@@ -778,7 +778,7 @@ def add_new_user(user_name: str, question_object_data) -> dict: #Public Function
             for unique_id, question_object in pile.items():
                 question_object = update_user_question_stats(question_object, unique_id, user_profile_data, question_object_data)
         update_user_profile(user_profile_data)
-    firestore_db.write_user_profile_to_firestore(user_name)
+    OldQuizzer_firestore_db.write_user_profile_to_firestore(user_name)
     return user_profile_data
 
 def get_user_data(user_profile_name: str) -> dict:
@@ -790,20 +790,20 @@ def get_user_data(user_profile_name: str) -> dict:
             user_profile_data = json.load(f)
         return user_profile_data
     except FileNotFoundError as e:
-        user_profile_data = firestore_db.get_user_profile_from_firestore(user_profile_name)
+        user_profile_data = OldQuizzer_firestore_db.get_user_profile_from_firestore(user_profile_name)
         with open(f"system_data/user_profiles/{user_profile_name}/{user_profile_name}_data.json", "r") as f:
             user_profile_data = json.load(f)
         return user_profile_data
 
 def update_stats(user_profile_data: dict, question_object_data: dict) -> dict:#Private Function
-    user_profile_data = system_data_user_stats.update_stat_total_questions_in_database(user_profile_data)
-    user_profile_data = system_data_user_stats.print_and_update_revision_streak_stats(user_profile_data)
+    user_profile_data = OldQuizzer_system_data_user_stats.update_stat_total_questions_in_database(user_profile_data)
+    user_profile_data = OldQuizzer_system_data_user_stats.print_and_update_revision_streak_stats(user_profile_data)
     user_profile_data["settings"]["subject_settings"] = build_subject_settings(user_profile_data, question_object_data)
-    user_profile_data = system_data_user_stats.calculate_average_questions_per_day(user_profile_data)
-    user_profile_data = system_data_user_stats.calculate_total_in_circulation(user_profile_data)
-    user_profile_data = system_data_user_stats.calculate_average_num_questions_entering_circulation(user_profile_data)
-    user_profile_data = system_data_user_stats.initialize_and_update_questions_exhausted_in_x_days_stat(user_profile_data)
-    user_profile_data = system_data_user_stats.determine_total_eligible_questions(user_profile_data)
+    user_profile_data = OldQuizzer_system_data_user_stats.calculate_average_questions_per_day(user_profile_data)
+    user_profile_data = OldQuizzer_system_data_user_stats.calculate_total_in_circulation(user_profile_data)
+    user_profile_data = OldQuizzer_system_data_user_stats.calculate_average_num_questions_entering_circulation(user_profile_data)
+    user_profile_data = OldQuizzer_system_data_user_stats.initialize_and_update_questions_exhausted_in_x_days_stat(user_profile_data)
+    user_profile_data = OldQuizzer_system_data_user_stats.determine_total_eligible_questions(user_profile_data)
     return user_profile_data
 
 def update_score(status:str, unique_id:str, user_profile_data: dict, question_object_data: dict, time_spent = None) -> dict: #Public Function
@@ -908,7 +908,7 @@ def update_score(status:str, unique_id:str, user_profile_data: dict, question_ob
     # print(f"Revision streak was {check_variable}, streak is now {question_object['revision_streak']}")
     ###################
     # User stat representing how many questions the user has answered over lifetime
-    user_profile_data = system_data_user_stats.increment_questions_answered(user_profile_data)
+    user_profile_data = OldQuizzer_system_data_user_stats.increment_questions_answered(user_profile_data)
     ###################
     # Change the last_revised property to datetime.now() since we just revised it at time of now
     question_object["last_revised"] = helper.stringify_date(datetime.now())
@@ -916,11 +916,11 @@ def update_score(status:str, unique_id:str, user_profile_data: dict, question_ob
     # Calculate the next time the question will be due for revision
     # That is, predict when the user will forget the answer to the question and set the due date to right before that point in time
     question_object["next_revision_due"] = helper.convert_to_datetime_object(question_object["next_revision_due"])
-    question_object = system_data_question_stats.calculate_next_revision_date(status, question_object)
+    question_object = OldQuizzer_system_data_question_stats.calculate_next_revision_date(status, question_object)
     question_object["next_revision_due"] = helper.stringify_date(question_object["next_revision_due"])
     ###################
     # Update question's history stats
-    question_object = system_data_question_stats.update_question_history(question_object, status)
+    question_object = OldQuizzer_system_data_question_stats.update_question_history(question_object, status)
     ###################
     # Update all the other stats
     # redetermines eligibility, if the question was given a status of incorrect this will show the question as eligible to answer
@@ -1137,19 +1137,19 @@ def sync_local_data_with_cloud_data(CURRENT_USER):
     Returns None
     '''
     # First Sync the Question Database
-    question_timestamp_log = firestore_db.get_question_object_data_timestamps_from_firestore()
+    question_timestamp_log = OldQuizzer_firestore_db.get_question_object_data_timestamps_from_firestore()
     question_object_data = get_question_object_data()
     for info_block in question_timestamp_log:
         question_id         = info_block["doc_id"]
         cloud_time_stamp    = info_block["updateTime"]
         # If the question exists in the cloud database, but not locally, get the question object from the cloud and write it to the local json
         if question_object_data.get(question_id) == None:
-            question_object = firestore_db.get_specific_question_from_firestore(question_id)
+            question_object = OldQuizzer_firestore_db.get_specific_question_from_firestore(question_id)
             question_object_data[question_id] = question_object
             continue
         local_time_stamp = question_object_data[question_id]["updateTime"]
         if local_time_stamp != cloud_time_stamp: # Update the local object with cloud object
-            question_object_data[question_id] = firestore_db.get_specific_question_from_firestore(question_id)
+            question_object_data[question_id] = OldQuizzer_firestore_db.get_specific_question_from_firestore(question_id)
     update_question_object_data(question_object_data)
     # Second Sync any media files (Was 1 read per image in the server, now no read operations take place at all)
     media_files = []
@@ -1171,20 +1171,20 @@ def sync_local_data_with_cloud_data(CURRENT_USER):
     local_files = list_local_media_files()
     for file_name in media_files:
         if file_name not in local_files:
-            firestore_db.get_media_file_from_firestore(file_name)
+            OldQuizzer_firestore_db.get_media_file_from_firestore(file_name)
     # Third Sync User Data, if User Data in cloud is newer than local User Data
-    last_server_update  = firestore_db.get_user_profile_last_update_property_from_firestore(CURRENT_USER)
+    last_server_update  = OldQuizzer_firestore_db.get_user_profile_last_update_property_from_firestore(CURRENT_USER)
     try:
         # Last update is stored locally, file will not exist, if the user_profile has never been updated on that device
         with open(f"system_data/user_profiles/{CURRENT_USER}/last_user_update.json", "r") as f:
             last_local_update = json.load(f)
         if is_server_update_newer(last_server_update, last_local_update) == True:
-            firestore_db.get_user_profile_from_firestore(CURRENT_USER)
+            OldQuizzer_firestore_db.get_user_profile_from_firestore(CURRENT_USER)
             # Ensure the last_server update property matches when we hit this condition
             user_profile_data = get_user_data(CURRENT_USER)
             update_user_profile(user_profile_data)
     except FileNotFoundError:
-        firestore_db.get_user_profile_from_firestore(CURRENT_USER)
+        OldQuizzer_firestore_db.get_user_profile_from_firestore(CURRENT_USER)
         # Ensure the last_server update property matches when we hit this condition
         user_profile_data = get_user_data(CURRENT_USER)
         update_user_profile(user_profile_data)

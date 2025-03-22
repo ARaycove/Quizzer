@@ -1,5 +1,7 @@
 import pandas as pd
+from lib        import helper
 from datetime   import datetime, date, timedelta
+from typing     import Callable
 from typing     import Dict, Union
 import pickle
 import logging
@@ -23,7 +25,7 @@ class UserProfileQuestionDB():
     # Dunder Mifflin Methods O_O
     ###############################################################################
     def __init__ (self, tutorial_questions):
-        self.__user_question_index = {}.copy()
+        self.__user_question_index: Dict[str, UserQuestionObject] = {}.copy()
         self.__review_schedule = {
             "reserve_bank": [],
             "deactivated": []
@@ -35,11 +37,6 @@ class UserProfileQuestionDB():
         for key, value in self.__user_question_index.items():
             full_print += f"    {key:25}: {value}" 
         return full_print
-    ###############################################################################
-    # Abstracted functionality
-    ###############################################################################
-    def get_num_questions(self):
-        return len(self.__user_question_index)
 
     ###############################################################################
     # Add Remove Questions from Profile
@@ -146,14 +143,25 @@ class UserProfileQuestionDB():
         # If the question was circulating at time of deactivation, it will still be in circulation when this is called
         user_question.activate_question()       # flips the boolean, question is eligible to be placed into circulation
         self._util_add_question_to_column(question_id)
-
+    ###############################################################################
+    # Question Selection
+    ###############################################################################
+    def get_specific_UserQuestionObject(self, question_id) -> UserQuestionObject:
+        return self.__user_question_index.get(question_id)
+        
+    def select_next_question_for_review(self):
+        pass
     ###############################################################################
     # Debugging Statements
     ###############################################################################
     # Debug Utils
     #______________________________________________________________________________
-    def print_review_schedule(self):
-        print(self.__review_schedule)
+    def get_review_schedule(self) -> Dict[str, list]:
+        '''Returns a copy of the review schedule'''
+        return self.__review_schedule.copy()
+    @property
+    def total_questions_in_profile(self):
+        return len(self.__user_question_index)
 
 class UserSetting:
     """
@@ -241,7 +249,7 @@ class ComplexUserSetting:
     ###############################################################################
     # Dunder Mifflin Methods O_O
     ###############################################################################
-    def __init__(self, name="", description=""):
+    def __init__(self, name: str, description: str):
         self.name:              str                     = name
         self.description:       str                     = description
         self.nested_settings:   Dict[str, UserSetting]  = {}.copy()
@@ -539,32 +547,430 @@ class UserProfileSettingsDB:
     #FIXME Once you add in this setting of course
 
 
+class UserStat():
+    '''Individual Stat Block representing some statistical measure'''
+    # Yes, this is just a clone of the UserSetting Class, with setting renamed to stat
+    ###############################################################################
+    # Dunder Methods
+    ###############################################################################
+    def __init__(self, 
+                 name, 
+                 value, 
+                 description:       str, 
+                 default_value                  = None, 
+                 stat_type                      = None, 
+                 validation_func:   Callable    = None, 
+                 date_of_entry:     date        = date.today()):
+        
+        self.name:          str = name
+        self.description:   str = description
+        self.__value            = value
+        self.__date_of_entry    = date_of_entry
+        self.stat_type          = stat_type
+        self.validation_func    = validation_func
+
+    def __str__(self):
+        return f"{self.name}: {self.value} ({self.description})"
+
+    def __repr__(self):
+        return f"UserStat(name='{self.name}', value={self.value}, date_of_entry={self.date_of_entry}"
+    ###############################################################################
+    # Getter, Setter, and Reset Function
+    ###############################################################################
+    @property
+    def value(self):
+        '''Get the current value of the stat'''
+        return self.__value
+    
+    @property
+    def date_of_entry(self):
+        '''Get the date of record for this stat block'''
+        return self.__date_of_entry
+    #______________________________________________________________________________
+    def set_value(self, new_value):
+        """Set the value of the stat with validation."""
+        # Type validation if setting_type is specified
+        if self.validation_func:
+            new_value = self.validation_func(new_value)
+        if self.stat_type:
+            if self.stat_type == 'int' and not isinstance(new_value, int):
+                try:
+                    new_value = int(new_value)
+                except (ValueError, TypeError):
+                    raise ValueError(f"Stat '{self.name}' requires an integer value")
+            elif self.stat_type == 'float' and not isinstance(new_value, float):
+                try:
+                    new_value = float(new_value)
+                except (ValueError, TypeError):
+                    raise ValueError(f"Stat '{self.name}' requires a float/decimal value")
+            elif self.stat_type == 'bool' and not isinstance(new_value, bool):
+                if isinstance(new_value, str):
+                    if new_value.lower() in ['true', 't', 'yes', 'y', '1']:
+                        new_value = True
+                    elif new_value.lower() in ['false', 'f', 'no', 'n', '0']:
+                        new_value = False
+                    else:
+                        raise ValueError(f"Stat '{self.name}' requires a boolean value")
+                else:
+                    try:
+                        new_value = bool(new_value)
+                    except (ValueError, TypeError):
+                        raise ValueError(f"Stat '{self.name}' requires a boolean value")
+        # All validation passed, set the new value
+        self.__value = new_value
+
+
+
+class HistoricalUserStat():
+    '''Is a historical record of Stats\n
+    For example: if we track how many questions a user answered today, it will go here under a key with name {date} and value that corresponds with that day\n
+
+    The values of the HistoricalUserStat are UserStat objects:\n
+    name: Title for Stat Block\n
+    description: description of what hte Stat Block indicates\n
+    default_value_type: If values are missing what should they default to? -> options are ('zero', 'previous', float, int, bool)
+    '''
+    def __init__(self, name:            str,
+                 description:           str,
+                 default_value_type,
+                 ):
+        self.name:                  str = name
+        self.description:           str = description
+        self.default_value_type         = default_value_type
+        self.nested_stats:          Dict[date, UserStat] = {}.copy() 
+        self.metadata:              Dict[str, set]       = {
+            'expected_stats': set(),
+            'required_stats': set() # exists but not going to be used yet
+        }
+    #______________________________________________________________________________
+    def __str__(self):
+        return f"{self.name} HistoricalUserStat with {len(self.nested_stats)} dated stats"
+    #______________________________________________________________________________
+    def __repr__(self):
+        return f"HistoricalUserStat(name='{self.name}', {len(self.nested_stats)} dated stats)"
+    ###############################################################################
+    # get_value functions
+    ###############################################################################
+    @property
+    def value_most_recent(self):
+        self._fill_missing_dates()
+        try:
+            most_recent_date = max(self.nested_stats.keys())
+            return self.nested_stats[most_recent_date].value
+        except:
+            return None
+    #______________________________________________________________________________
+    @property
+    def max_value(self):
+        if not self.nested_stats:
+            return None
+        return max(stat.value for stat in self.nested_stats.values())
+
+    @property
+    def min_value(self):
+        if not self.nested_stats:
+            return None
+        return min(stat.value for stat in self.nested_stats.values())
+    #______________________________________________________________________________
+    @property
+    def average_value(self):
+        if not self.nested_stats:
+            return None
+        return sum([self.nested_stats.values()]) / len(self.nested_stats.values())
+    #______________________________________________________________________________
+    @property
+    def trend(self):
+        '''Return trend line indicator'''
+        # FIXME should be updated with more accurate/complex business logic
+        if len(self.nested_stats) < 2:
+            return None
+        sorted_data = sorted([(d, stat.value) for d, stat in self.nested_stats.items()])
+        midpoint = len(sorted_data) // 2
+        early_values    = [val for _, val in sorted_data[:midpoint]]
+        recent_values   = [val for _, val in sorted_data[midpoint:]]
+        early_avg       = sum(early_values) / len(early_values)
+        recent_avg      = sum(recent_values) / len(recent_values)
+        return recent_avg - early_avg
+    #______________________________________________________________________________
+    def get_stats_by_date_range(self,
+                                start_date: date,
+                                end_date:   date) -> Dict[date, UserStat]:
+        '''
+        Returns all stats that fall within the specified date range (inclusive)\n
+        Parameters:
+        start_date: Beginning of date range
+        end_date:   End of date range
+
+        Returns:
+            Dictionary of {date: UserStat} entries within the range
+        '''
+        return {date_obj: user_stat for date_obj, user_stat in self.nested_stats.items() if start_date <= date_obj <= end_date}
+
+
+
+    #______________________________________________________________________________
+    def get_nested_stat_dates(self):
+        '''returns all the dates with recorded stats'''
+        return self.nested_stats.keys()
+    #______________________________________________________________________________
+    def get_nested_values(self):
+        '''returns just the values in the historical record'''
+        return self.nested_stats.values()
+    #______________________________________________________________________________
+    def get_nested_items(self):
+        '''returns all date: value pairs in this stat_block'''
+        return self.nested_stats.items()
+    #______________________________________________________________________________
+    def get_specific_stat(self, date, default=None):
+        '''Get the value of the stat block for a certain day'''
+        return self.nested_stats.get(date, default)
+    ###############################################################################
+    # Manipulate Setting Values
+    ###############################################################################
+    def add_stat_record(self, stat: UserStat):
+        '''
+        Add or Overwrite Stat record for this HistoricalStat
+        If the passed stat already exists for that date, it will overwrite the value, else it will add the stat into the record by the date of the passed stat.
+        '''
+        self._fill_missing_dates()
+        if self.nested_stats.get(stat.date_of_entry) == None:
+            self.nested_stats[stat.date_of_entry] = stat
+        else:
+            self.nested_stats[stat.date_of_entry].set_value(stat.value)
+    ###############################################################################
+    # Validation Functionality
+    ###############################################################################
+    def _get_dates_with_missing_values(self) -> list:
+        '''returns a list of dates that missing in the record'''
+        if len(self.nested_stats) < 2:
+            return []
+        self.nested_stats   = helper.sort_dictionary_keys(self.nested_stats)
+        dates = list(self.get_nested_stat_dates())
+        start_date = dates[0]
+        end_date   = dates[-1]
+
+        all_dates = [start_date + timedelta(days=i) for i in range((end_date-start_date).days+1)]
+
+        return [date_obj for date_obj in all_dates if date_obj not in self.nested_stats]
+    #______________________________________________________________________________
+    def _fill_missing_dates(self):
+        '''Fills missing dates with default value as defined by instance.default_value_type'''
+        missing_dates = self._get_dates_with_missing_values()
+        if not missing_dates or not self.nested_stats:
+            return None
+        sample_stat = next(iter(self.nested_stats.values()))
+        for missing_date in missing_dates:
+            if self.default_value_type == 'zero':
+                new_value = 0
+            elif self.default_value_type == 'previous':
+                prev_dates = [date_obj for date_obj in self.nested_stats.keys() if date_obj < missing_date]
+                if prev_dates:
+                    prev_date = max(prev_dates)
+                    new_value = self.nested_stats[prev_date].value
+                else:
+                    new_value = 0 # If no previous stat default to 0
+            else:
+                new_value = self.default_value_type
+            self.add_stat_record(
+                UserStat(
+                    name            = sample_stat.name,
+                    value           = new_value,
+                    description     = sample_stat.description,
+                    stat_type       = sample_stat.stat_type,
+                    validation_func = sample_stat.validation_func,
+                    date_of_entry   = missing_date
+                )
+            )
+        self.nested_stats   = helper.sort_dictionary_keys(self.nested_stats)
+        
+
+    # Will not be adding a remove_stat, all stats are permanent record, so I will not be including any method to remove them
+
+    
+
 class UserProfileStatsDB:
     '''
     Subclass to store all User statistics\n
     Stats to Included (FIXME if not implemented)\n
     All stats are historical records over time: properties are made to get just todays stat\n
 
-    "current_eligible_questions":                       FIXME\n
-    "reserve_questions_exhaust_in_x_days":              FIXME\n
-    "non_circulating_questions":                        FIXME\n
+    total_in_circulation_questions_history:             \n
+    "current_eligible_questions":                       \n
+    "reserve_questions_exhaust_in_x_days":              \n
+    "non_circulating_questions":                        \n
     "Graphical Charts":                                 FIXME\n
-    "average_num_questions_entering_circulation_daily": FIXME\n
-    current_num_question_in_circulation:                FIXME\n
-    total_in_circulation_questions_history:             FIXME\n
-    "revision_streak_stats":                            FIXME\n
-    "total_questions_in_database"(historical):          FIXME\n
-    "average_questions_per_day":                        FIXME\n
-    "total_questions_answered":                         FIXME\n
+    "revision_streak_stats":                            \n
+    "total_questions_in_database"(historical):          \n
+    "total_questions_answered":                         \n
         This one can be verified by the attempt history
-    ""questions_answered_by_date":                      FIXME\n
-
+    "questions_answered_by_date":                       \n
     '''
+    # Notes:
+    # "average_per_day" figure is now a property of questions_answered_by_date
+    # "current_num_questions_in_circulation" figure is now a property of total_questions_in_circulation
+    ###############################################################################
+    # Dunder Mifflin Methods O_O
+    ###############################################################################
     def __init__(self, UserQuestionsDB_REF, UserSettingsDB_REF):
         self.__UserQuestionsDB_REF: UserProfileQuestionDB   =   UserQuestionsDB_REF
         self.__UserSettingsDB_REF:  UserProfileSettingsDB   =   UserSettingsDB_REF
-    pass
-    # Some stats are derived, others are stored.
+        self.questions_answered_by_date = None
+        self.total_questions_answered   = None
+
+        self._build_initial_stats_frame()
+    #______________________________________________________________________________
+    def _build_initial_stats_frame(self):
+        # Adding fix me's to every stat needs an actuall get/set method
+        self.questions_answered             = HistoricalUserStat(
+            name                = "Questions Answered By Date",
+            description         = "Full record of how many questions the user has answered every day",
+            default_value_type  = 'zero'
+        )
+
+        self.total_questions_answered       = HistoricalUserStat(
+            name                = "Total Questions Answered",
+            description         = "Running total of questions answered",
+            default_value_type  = 'previous'
+        )
+
+        self.total_questions_in_profile     = HistoricalUserStat(
+            name                = "Total UserQuestionObjects",
+            description         = "Running total of how many UserQuestionObjects are in the user's UserProfileQuestionDB",
+            default_value_type  = 'previous'
+        )
+        
+        self.total_in_circulation_questions = HistoricalUserStat(
+            name                = "Total Circulating Questions",
+            description         = "Running total of how many questions are currently circulating for the user, sum of questions not in reserve_bank or deactivated on the review schedule",
+            default_value_type  = 'previous'
+        )
+        self.total_non_circulating_questions = HistoricalUserStat(
+            name                = "Total Out of Circulation Questions",
+            description         = "Running total of how many questions are not in circulation, (either in reserve_bank or deactivated columns of review schedule)",
+            default_value_type  = 'previous'
+        )
+        self.revision_streak_stats      = UserStat(
+            name                = "Revision Streak Stats",
+            description         = "record of how many questions exist for any given revision score, '1: 10, 2: 50, 3: 49'",
+            date_of_entry       = date.today()
+        )
+    #______________________________________________________________________________
+    @property
+    def current_eligible_questions(self):
+        '''The current amount of questions eligible for review'''
+        review_schedule = self.__UserQuestionsDB_REF.get_review_schedule()
+        # Iterate over schedule to get columns that are within today's date
+        today = date.today()
+        eligible_questions = []
+        for date_obj, question_ids in review_schedule.items():
+            question_ids: list[str]
+            if date_obj == "reserve_bank" or date_obj == "deactivated":
+                pass
+            elif date(date_obj) <= today:
+                eligible_questions.extend(
+                    [i for i in question_ids if self.__UserQuestionsDB_REF.get_specific_UserQuestionObject(i).is_eligible]
+                )
+        return len(eligible_questions)
+    #______________________________________________________________________________
+    @property
+    def average_daily_increase_in_total_circulating_questions(self):
+        # Ensure all dates are filled with appropriate values
+        self.total_in_circulation_questions._fill_missing_dates()
+        stats = self.total_in_circulation_questions.nested_stats.copy()
+        if len(stats) < 2:
+            return 0 # Need at least two data points
+        dates = list(stats.keys())
+        
+        first_date = dates[0]
+        last_date  = dates[-1]
+
+        days_span = (last_date-first_date).days
+        if days_span == 0:
+            return 0 # Same day, can't calculate rate
+        total_change= stats[last_date].value - stats[first_date].value
+        return total_change / days_span
+
+    @property
+    def number_of_days_until_reserve_questions_are_exhausted(self):
+        '''Based on the current average, how many days until you learn all available material'''
+        if self.average_daily_increase_in_total_circulating_questions <= 0:
+            return 9999999
+        return self.total_non_circulating_questions.value_most_recent / self.average_daily_increase_in_total_circulating_questions
+    
+
+        # Will be a series of calls to the Calculate Stats Function
+    ###############################################################################
+    # Individual Update Stat Calls
+    ###############################################################################
+    #______________________________________________________________________________
+    def _update_questions_answered(self):
+        questions_answered = self.questions_answered.value_most_recent
+        if questions_answered == None:
+            questions_answered = 1
+        else:
+            questions_answered += 1
+        self.questions_answered.add_stat_record(
+            UserStat(
+                name    = f"Questions Answered Today {date.today()}",
+                description = "",
+                value       = questions_answered
+            )
+        )
+    def _update_total_questions_answered(self):
+        # Since this is a running total, we need to find the max value, if no max value exists we'll get none
+        total_questions_answered = self.total_questions_answered.max_value
+        if total_questions_answered == None:
+            total_questions_answered = 1
+        self.total_questions_answered.add_stat_record(
+            UserStat(
+                name            = "Total Questions Answered",
+                description     = f"Running Total amount of Questions Answered, all questions all dates",
+                date_of_entry   = date.today()
+            )
+        )
+    def _update_total_questions_in_profile(self):
+        self.total_questions_in_profile.add_stat_record(
+            UserStat(
+                name        = "Total Questions In Profile",
+                description =   "Total Questions in all columns, by date",
+                value       = self.__UserQuestionsDB_REF.total_questions_in_profile
+            )
+        )
+
+    def _update_total_in_circulation_questions(self):
+        total = 0
+        for column_name, question_id_list in self.__UserQuestionsDB_REF.get_review_schedule().items():
+            if column_name != "deactivated" and column_name != "reserve_bank":
+                total += len(question_id_list)
+        self.total_in_circulation_questions.add_stat_record(
+            UserStat(
+                name        = "Total Circulating Questions",
+                description = "The total amount of questions circulating, represents the amount of questions the user has committed to memory",
+                value       = total
+            )
+        )
+    def _update_total_non_circulating_questions(self):
+        review_schedule = self.__UserQuestionsDB_REF.get_review_schedule()
+        total = len(review_schedule["reserve_bank"]) + len(review_schedule["deactivated"])
+        self.total_non_circulating_questions.add_stat_record(
+            UserStat(
+                name        = "Total Non Circulating Questions",
+                description = "The amount of questions in the reserve_bank and deactivated columns of the review schedule",
+                value       = total
+            )
+        )
+    def _update_revision_scores(self):
+        review_schedule = self.__UserQuestionsDB_REF.get_review_schedule()
+        data = {}.copy()
+        for column_name, question_id_list in review_schedule.items():
+            if column_name != "deactivated" and column_name != "reserve_bank":
+                for question_id in question_id_list:
+                    user_question = self.__UserQuestionsDB_REF.get_specific_UserQuestionObject(question_id)
+                    if data.get(str(user_question.revision_score)) == None:
+                        data[str(user_question.revision_score)] = 1
+                    else:
+                        data[str(user_question.revision_score)] += 1
+        self.revision_streak_stats.set_value(data)
 
 
 
@@ -608,7 +1014,8 @@ class UserProfile:
         self.username                               = username
         self.email_address: str                     = email_address
         self.full_name                              = full_name
-
+        self._build_user_stats_db()
+    #______________________________________________________________________________
     def __str__(self):
         full_print = ""
         for key, value in self.__dict__.items():
@@ -621,34 +1028,60 @@ class UserProfile:
     def _build_user_stats_db(self):
         self.user_stats =   UserProfileStatsDB(self.user_questions, self.user_settings)
     ###################################
-    # Properties
-    @property
-    def num_questions(self):
-        return self.user_questions.get_num_questions()
-    
-    ###################################
     # Core Functions (API)
+    ###################################
+    #______________________________________________________________________________
     def generate_uuid(self):
         '''
         Every user will have a Unique Universal ID (UUID) assigned upon profile creation
         '''
         return str(uuid.uuid4())
-    
+    #______________________________________________________________________________
     def add_question_to_UserProfile(self, question_id: str):
         self.user_questions.add_question(question_id) # This is purely an abstraction for easier calling from main program
         # self.add_question_to_UserProfile as opposed to self.user_questions.add_question, call is shorter as a result
 
-    def _verify_stats(self):
-        '''
-        Goes through and ensures all stats are sorted and no missing values/dates exist (should only need to be called once upon being loaded)
 
-        Ensure date stats are sorted chronologically, ensure missing values, if the user missed a day or two or three, they'll need to be filled in
+    #______________________________________________________________________________
+    def add_question_attempt(self,
+                             module_name:   str, 
+                             question_id:   str,
+                             status:        str,
+                             answer_speed:  float
+                             ):
+        user_question = self.user_questions.get_specific_UserQuestionObject(question_id)
+        # Add the attempt with values at time of answer:
+        user_question.add_attempt(
+            status                          = status,
 
-        Any verifiable stats, like the total number of attempts made (total questions answered) can be verified by summation of attempt objects, among other verifiable stats
+            answer_speed                    = answer_speed,
 
-        All other stats can be incremented while operating, Again this function should only be ran upon intialization
-        '''
-        raise NotImplementedError("Not done Yet")
+            module_name                     = module_name,
+
+            questions_answered              = self.user_stats.questions_answered.value_most_recent,
+
+            total_questions_answerd         = self.user_stats.total_questions_answered.max_value,
+
+            current_eligible_questions      = self.user_stats.current_eligible_questions,
+
+            total_questions_in_profile      = self.user_questions.total_questions_in_profile,
+
+            total_in_circulation_questions  = self.user_stats.total_in_circulation_questions.value_most_recent,
+
+            total_non_circulating_questions = self.user_stats.total_non_circulating_questions.value_most_recent,
+
+            avg_daily_increase              = self.user_stats.average_daily_increase_in_total_circulating_questions,
+
+            number_of_days_until_reserve_questions_are_exhausted    = self.user_stats.number_of_days_until_reserve_questions_are_exhausted
+        )
+
+        # After we add the attempt object, Statistics should be updated:
+        self.user_stats._update_questions_answered()
+        self.user_stats._update_total_questions_answered()
+        self.user_stats._update_total_questions_in_profile()
+        self.user_stats._update_total_in_circulation_questions()
+        self.user_stats._update_total_non_circulating_questions()
+        self.user_stats._update_revision_scores()
     
 if __name__ == "__main__":
     import logging

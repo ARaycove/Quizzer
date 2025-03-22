@@ -1,6 +1,6 @@
 import flet as ft
-import system_data
-import firestore_db
+import OldQuizzer_system_data
+import OldQuizzer_firestore_db
 
 class NewProfilePage(ft.View):
     def __init__(self, page: ft.Page, question_object_data) -> None:
@@ -69,14 +69,14 @@ class NewProfilePage(ft.View):
     def generate_user_profile(self, e):
         try:
             print(self.email_submission)
-            system_data.add_new_user(self.email_submission, self.question_object_data)
+            OldQuizzer_system_data.add_new_user(self.email_submission, self.question_object_data)
             self.create_user()
             self.go_to_login_page()
         except Exception as e:
             print("Invalid Entry")
             print(e)
     def create_user(self, e = None):
-        firestore_db.create_user(self.email_submission, self.password_submission)
+        OldQuizzer_firestore_db.create_user(self.email_submission, self.password_submission)
     def update_email_submission(self, e):
         self.email_submission = e.data
         print(self.email_submission)

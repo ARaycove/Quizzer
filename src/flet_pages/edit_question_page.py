@@ -1,10 +1,10 @@
 import flet as ft
-import system_data
+import OldQuizzer_system_data
 import os
 from lib import helper
 from datetime import datetime, date, timedelta
 from flet_custom_containers import custom_controls
-import firestore_db
+import OldQuizzer_firestore_db
 
 class EditQuestionPage(ft.View):
     def __init__(
@@ -199,10 +199,10 @@ class EditQuestionPage(ft.View):
         self.question_object_data[self.current_question_id]["answer_image"]     = self.answer_entry.image_submission
 
         # Ensure we submit the change to firestore db
-        self.question_object_data[self.current_question_id] = firestore_db.update_question_in_firestore(self.current_question_id, self.question_object_data[self.current_question_id])
-        system_data.update_question_object_data(self.question_object_data)
+        self.question_object_data[self.current_question_id] = OldQuizzer_firestore_db.update_question_in_firestore(self.current_question_id, self.question_object_data[self.current_question_id])
+        OldQuizzer_system_data.update_question_object_data(self.question_object_data)
 
-        self.all_module_data = system_data.get_all_module_data()
+        self.all_module_data = OldQuizzer_system_data.get_all_module_data()
 
 
         media_files_input = set([])
@@ -256,7 +256,7 @@ class EditQuestionPage(ft.View):
         for filename in os.listdir("uploads"):
             if filename in files_to_move:
                 helper.copy_file(f"uploads/{filename}", f"system_data/media_files/")
-                firestore_db.write_media_file_to_firestore(filename)
+                OldQuizzer_firestore_db.write_media_file_to_firestore(filename)
                 os.remove(f"uploads/{filename}")
         
         self.go_to_home_screen()

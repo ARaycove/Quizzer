@@ -15,27 +15,40 @@ class Attempt:
     All values of the attempt record are the values at the time of the attempt, not the values after the update is made
     '''
     def __init__(self,
-                 date_of_attempt:   datetime,
-                 status:            str,
-                 answer_speed:      datetime,
-                 revision_score:    int,
-                 total_attempts:    int,
-                 last_revised:      datetime,
-                 next_revision_due: datetime
+                 date_of_attempt:                           datetime,
+                 status:                                    str,
+                 answer_speed:                              datetime,
+                 revision_score:                            int,
+                 total_attempts:                            int,
+                 last_revised:                              datetime,
+                 next_revision_due:                         datetime,
+                 questions_answered:                        int,
+                 total_questions_answered:                   int,
+                 current_eligible_questions:                int,
+                 total_questions_in_profile:                int,
+                 total_in_circulation_questions:            int,
+                 total_non_circulating_questions:           int,
+                 avg_daily_increase:                        float,
+                 number_of_days_until_reserve_questions_are_exhausted: float
                  ):
-        self.date_of_attempt    = date_of_attempt
-        self.status             = status
-        self.answer_speed       = answer_speed
-        self.revision_score     = revision_score
-        self.total_attempts     = total_attempts
-        self.last_revised       = last_revised
-        self.next_revision_due  = next_revision_due
+        self.date_of_attempt            = date_of_attempt
+        self.status                     = status
+        self.answer_speed               = answer_speed
+        self.revision_score             = revision_score
+        self.total_attempts             = total_attempts
+        self.last_revised               = last_revised
+        self.next_revision_due          = next_revision_due
+        self.questions_answered         = questions_answered
+        self.total_questions_answered   = total_questions_answered
+        self.current_eligible_questions = current_eligible_questions
+        self.total_questions_in_profile = total_questions_in_profile
+        self.total_in_circulation_questions = total_in_circulation_questions
+        self.total_non_circulating_questions= total_non_circulating_questions
+        self.avg_daily_increase             = avg_daily_increase
+        self.number_of_days_until_reserve_questions_are_exhausted = number_of_days_until_reserve_questions_are_exhausted
 
     def __str__(self):
         return f"{self.__dict__}"
-    
-    def return_pandas_table(self):
-        return pd.DataFrame([self.__dict__])
 
 class UserQuestionObject:
     '''
@@ -197,15 +210,30 @@ class UserQuestionObject:
             self.__revision_score = 100
         self._calculate_next_revision_date()
 
-    def add_attempt(self, status, answer_speed: float, module_name: str):
+    def add_attempt(self, 
+                    status:                                     str, 
+                    answer_speed:                               float, 
+                    module_name:                                str,
+                    questions_answered:                         int,
+                    total_questions_answered:                   int,
+                    current_eligible_questions:                 int,
+                    total_quesitons_in_profile:                 int,
+                    total_in_circulation_questions:             int,
+                    total_non_circulating_questions:            int,
+                    avg_daily_increase:                         float,
+                    number_of_days_until_reserve_questions_are_exhausted: float
+                    ):
         '''
         Records the current state of the object, each attempt is a record of the user's history with the question at that point in time
         The second function of adding an attempt record is the need to update the state of the object -> replaces the old update_score function
-        Parameters:
+        
+        Attempt is going to be quite lengthy, upon adding an attempt we capture the entire state of your UserProfile at the time of the attempt, this includes all stats, your current state of knowledge, and all other data we might be able to capture at that state in time\n
 
-        status: "correct", "incorrect", or "repeat"
-        answer_speed: Takes a single floating point value, may also take a string of a flaot point value, the number provided must be of a float or decimal value
-        quizzer_question_object_DB: Must pass the reference to Quizzers Question Object Database
+        Parameters:\n
+        status: "correct", "incorrect", or "repeat"\n
+        answer_speed: Takes a single floating point value, may also take a string of a flaot point value, the number provided must be of a float or decimal value\n
+        quizzer_question_object_DB: Must pass the reference to Quizzers Question Object Database\n
+        num_questions_in_UserProfile: This is the total amount of questions circulating in your profile
         '''
         # First we will update the status of the object with current revision
         # Validation metric, ensuring status of correct type
@@ -216,13 +244,21 @@ class UserQuestionObject:
 
         # Record the current state of the UserQuestionObject
         self.attempt_history.append(Attempt(
-            date_of_attempt =   datetime.now(),
-            status =            status,
-            answer_speed =      answer_speed,
-            revision_score =    self.revision_score,
-            total_attempts =    self.total_attempts,
-            last_revised =      self.last_revised,
-            next_revision_due=  self.next_revison_due
+            date_of_attempt                                         =   datetime.now(),
+            status                                                  =   status,
+            answer_speed                                            =   answer_speed,
+            revision_score                                          =   self.revision_score,
+            total_attempts                                          =   self.total_attempts,
+            last_revised                                            =   self.last_revised,
+            next_revision_due                                       =   self.next_revison_due,
+            questions_answered                                      =   questions_answered,
+            total_questions_answered                                =   total_questions_answered,
+            current_eligible_questions                              =   current_eligible_questions,
+            total_quesitons_in_profile                              =   total_quesitons_in_profile,
+            total_in_circulation_questions                          =   total_in_circulation_questions,
+            total_non_circulating_questions                         =   total_non_circulating_questions,
+            avg_daily_increase                                      =   avg_daily_increase,
+            number_of_days_until_reserve_questions_are_exhausted    =   number_of_days_until_reserve_questions_are_exhausted
         ))
         # Update other metrics as necessary
         self._update_user_question_object(status, module_name)
