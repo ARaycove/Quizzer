@@ -5,9 +5,11 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from quizzer_database.user_profile import UserProfile, QuestionObject
 from quizzer_database.DB_utils import util_QuizzerV4ObjDict_to_QuestionObject
+from lib import quizzer_logger as ql
 import pickle
 
 class QuestionModule:
+    @ql.log_function()
     def __init__(self, 
                  module_name:       str, 
                  description:       str,
@@ -26,10 +28,20 @@ class QuestionModule:
         self.total_questions:   int         =   len(questions)
         # Good luck reading that
         self.update_module(author,description=description,subjects_covered=subjects_covered,concepts_covered=concepts_covered,questions=questions)
+        ql.log_general_message(f"Module: {self.module_name} values are now:")
+        ql.log_value("self.author", self.author)
+        ql.log_value("self.description", self.description)
+        ql.log_value("self.primary_subject", self.primary_subject)
+        ql.log_value("self.subjects_covered", self.subjects_covered)
+        ql.log_value("self.concepts_covered", self.concepts_covered)
+        ql.log_value("self.questions", self.questions)
+        ql.log_value("self.total_questions", self.total_questions)
 
+    ql.log_function()
     def __str__(self):
         return str(self.__dict__)
     #______________________________________________________________________________
+    ql.log_function()
     def update_module(
             self,
             author:             str         =   None,
@@ -81,22 +93,32 @@ class QuestionModuleDB():
     ###############################################################################
     # Cool Dunder Methods
     ###############################################################################
+    ql.log_function()
     def __init__(self):
         self.index = {}
+        ql.log_general_message(f"Should be an empty dictionary")
+        ql.log_value(f"self.index", self.index)
+        if not self.index:
+            ql.log_error(f"self.index initialized to a non_empty dictionary")
+            raise TypeError("Something is causing init to fail")
 
     ###############################################################################
     # Abstract complicated dictionary operations behind functions to prevent errors
     ###############################################################################
+    @ql.log_function()
     def module_exists(self, module_name: str) -> bool:
         '''
         returns True    : if module does currently exist in DB\n
         returns False   : if module does not exist in DB
         '''
         if self.index.get(module_name) == None:
+            ql.log_general_message(f"Module {module_name} does not exist in ModuleDB")
             return False
+        ql.log_general_message(f"Module {module_name} exists in ModuleDB")
         return True
     
     #______________________________________________________________________________
+    @ql.log_function()
     def add_new_module(
             self,
             module_name:        str,
@@ -120,21 +142,25 @@ class QuestionModuleDB():
             )
         
     #______________________________________________________________________________
+    @ql.log_function()
     def get_module_names(self):
         '''
         returns a view objects of all the module names that exist in Quizzer's QuestionModuleDB
         '''
         return self.index.keys()
     #______________________________________________________________________________
+    @ql.log_function()
     def get_questions_by_module(self, module_name):
         if self.module_exists(module_name):
             ref = self.index[module_name]
             ref: QuestionModule
             return ref.questions.copy() # return a copy of the list, not a reference to it
         else:
-            return f"Module {module_name} does not exist, considering making it"
+            ql.log_warning(f"Attempted to access module that does not exist, returning an empty list")
+            return []
         
     #______________________________________________________________________________
+    @ql.log_function()
     def update_existing_module(
             self, module_name,
             author:             str         =   None,
@@ -146,19 +172,24 @@ class QuestionModuleDB():
         '''
         Abstracts away some calls, updating the module if it exists
         '''
-        if self.module_exists(module_name):
-            ref = self.index[module_name]
-            ref: QuestionModule
-            ref.update_module(
-                author              = author, 
-                description         = description, 
-                subjects_covered    = subjects_covered,
-                concepts_covered    = concepts_covered,
-                questions           = questions
-                )
-        else:
-            return f"Module {module_name} does not exist, considering making it"
-        
+
+        ref = self.index[module_name]
+        ref: QuestionModule
+        ref.update_module(
+            author              = author, 
+            description         = description, 
+            subjects_covered    = subjects_covered,
+            concepts_covered    = concepts_covered,
+            questions           = questions
+            )
+        ql.log_success_message(f"Updated Module {module_name} with Values:")
+        ql.log_value("self.author", ref.author)
+        ql.log_value("self.description", ref.description)
+        ql.log_value("self.primary_subject", ref.primary_subject)
+        ql.log_value("self.subjects_covered", ref.subjects_covered)
+        ql.log_value("self.concepts_covered", ref.concepts_covered)
+        ql.log_value("self.questions", ref.questions)
+        ql.log_value("self.total_questions", ref.total_questions)
 
 
 ###############################################################################
@@ -167,12 +198,14 @@ class QuestionModuleDB():
 class QuestionObjectDB():
     ###############################################################################
     # Cool Dunder Methods
+    @ql.log_function()
     def __init__(self):
         self.__all_question_objects = {}.copy() # stored by id: QuestionObject
         self.__subject_index        = {}.copy() # {"subject_class": "question_id"}
         self.__concept_index        = {}.copy() # {"concept_class": "question_id"}
         self.__module_index         = QuestionModuleDB # {"module_name": "question_id"}
 
+    @ql.log_function()
     def __add__(self, other):
         if isinstance(other, QuestionObject):
             # If use add operator DB + QuestionObject, should add the question object to the 
@@ -181,6 +214,7 @@ class QuestionObjectDB():
             raise ValueError("May not add type {type(other)} to QuestionObjectDB \n May only add type QuestionObject through addition operator")
     ###############################################################################
     # Index build functions (compile into a single function)
+    @ql.log_function()
     def _construct_sub_indices(self):
         '''
         Iterate over the database in order generate the indices\n
@@ -190,15 +224,16 @@ class QuestionObjectDB():
         if not isinstance(self.__module_index, QuestionModuleDB):
             self.__module_index = QuestionModuleDB()
 
-        print(f"Regenerating QuestionObjectDB indicies")
+        ql.log_general_message(f"Regenerating QuestionObjectDB indicies")
         subject_data = {}.copy()
         concept_data = {}.copy()
         module_data  = {}.copy()
-        # module_index["questions"] = []
-        # module_index["subjects"] = []
-        # module_index["concepts"] = []
+        ql.log_value("subject_data", subject_data)
+        ql.log_value("subject_data", concept_data)
+        ql.log_value("subject_data", module_data)
 
         total_iterations = 0
+        ql.log_value("total_iterations", total_iterations)
         # Single Pass Iteration for all data necessary:
         for question in self.__all_question_objects.values():
             # Error handling, build dictionary object dynamically, If the module hasn't been discovered initialize it in the dictionary with appropriate keys
@@ -236,7 +271,12 @@ class QuestionObjectDB():
         # Module index is a little bit more complicated, extra steps
         # Loop over the module_data we collected:
         for mod_name in module_data.keys():
+            # module_exists function, while it does abstract the check, creates undo performance overhead
             # Check whether the module currently exists in the QuestionModuleDB
+            ql.log_section_header(f"Updating ModuleDB -> Module_Name: {mod_name}")
+            ql.log_value("subject_covered:", module_data[mod_name]["subjects"])
+            ql.log_value("concepts_covered:",module_data[mod_name]["concepts"])
+            ql.log_value("concepts_covered:",module_data[mod_name]["question_ids"])
             if not self.__module_index.module_exists(mod_name):
                 # Initialize new QuestionModule add it directly
                 self.__module_index.add_new_module(mod_name,
@@ -251,52 +291,72 @@ class QuestionObjectDB():
                                                    questions        =   module_data[mod_name]["question_ids"])
 
 
-        print(f"DEBUG:    Total Iterations {total_iterations}")
+        ql.log_value("total_iterations", total_iterations)
     ###############################################################################
     # Index access functions
     ###############################################################################
     # Subject specific access
+    @ql.log_function()
     def get_list_of_subjects(self):
         '''
         returns All subjects currently covered by Quizzer
         '''
+        ql.log_value("all_subjects:", self.__subject_index.keys())
         return self.__subject_index.keys()
     
+    @ql.log_function()
     def get_questions_by_subject(self, subject_name: str):
         '''
         returns all question ID's that correspond with a given subject_name.
 
         If you don't know what to query, use the get_list_of_subjects function to query all available options
         '''
+        ql.log_general_message(f"Attempting to get all questions of subject: {subject_name}")
+        ql.log_value("questions_by_subject", self.__subject_index[subject_name].copy())
         return self.__subject_index[subject_name].copy()
     #___________________________________
     # Concept specific access
+    @ql.log_function()
     def get_list_of_concepts(self):
+        ql.log_general_message(f"Attempting to get all concepts present in QuestionObjectDB")
+        ql.log_value("list_of_concepts", self.__concept_index.keys())
         return self.__concept_index.keys()
     
+    @ql.log_function()
     def get_questions_by_concept(self, concept_name: str) -> list:
+        ql.log_general_message(f"Attempting to get all questions of concept: {concept_name}")
+        ql.log_value("questions_by_concept", self.__subject_index[concept_name].copy())
         return self.__concept_index[concept_name].copy()
     #___________________________________
     # Module specific access
+    @ql.log_function()
     def get_list_of_module_names(self):
+        ql.log_general_message(f"Attempting to get all module names")
+        ql.log_value("questions_by_concept", self.__module_index.get_module_names())
         return self.__module_index.get_module_names()
     
+    @ql.log_function()
     def get_questions_by_module_name(self, module_name:str) -> list:
         '''
         returns a COPY of the list of question_id's belonging to the given module
         '''
+        ql.log_general_message(f"Attempting to get all questions contained in module: {module_name}")
+        ql.log_value("questions_by_module", self.__module_index.get_questions_by_module(module_name))
         return self.__module_index.get_questions_by_module(module_name)
     # End Index Access functionality
     ###############################################################################
     # Add or Delete QuestionObject's
     ###############################################################################
+    @ql.log_function()
     def add_new_QuestionObject(self, question_object: QuestionObject):
         self.__all_question_objects[question_object.id] = question_object
         self._construct_sub_indices() # Rebuild the index whenever a question is added
 
+    @ql.log_function()
     def delete_QuestionObject(self, question_object_id: str):
         del self.__all_question_objects[question_object_id]
 
+    @ql.log_function()
     def get_QuestionObject(self, question_id: str) -> QuestionObject:
         return self.__all_question_objects[question_id]
     
@@ -306,12 +366,14 @@ class UserProfilesDB():
     ###############################################################################
     # Dunder Mifflin Paper Company!
     ###############################################################################
+    @ql.log_function()
     def __init__(self):
         self.__profile_dict = {}.copy() # {email_address: file_name}
     
     ###############################################################################
     # Add, Remove, Load, Save User Profiles
     ###############################################################################
+    @ql.log_function()
     def add_UserProfile(self,
                         username: str,
                         email_address: str,
@@ -325,9 +387,10 @@ class UserProfilesDB():
         email_address is the user's actual email address used for account signup
         full_name is the user's full real name, we take a full name instead of first and last, because some people have many names.
         '''
-        print(f"Adding New Profile {email_address}")
+        ql.log_general_message(f"Adding New Profile {email_address}")
         # Ensure we are not creating a duplicate account
         existing_accounts = self.__profile_dict.keys()
+        ql.log_value("existing_accounts", existing_accounts)
         if email_address in existing_accounts:
             return f"Error: email_address already exists in system"
         # Instantiate new instance of UserProfile
@@ -337,23 +400,28 @@ class UserProfilesDB():
             full_name           =   full_name,
             tutorial_questions  =   tutorial_questions
         )
-        print(f"New Profile Generating, now attempting to commit profile to file LTS")
+        ql.log_general_message(f"New Profile Generating, now attempting to commit profile to file LTS (Long Term Storage)")
         # Immediately save that instance
         self.commit_UserProfile(new_profile)
         # Ensure we write the reference to the internal dictionary
         file_name = f"{email_address}.pickle"
         self.__profile_dict[email_address] = file_name
     #______________________________________________________________________________
+    @ql.log_function()
     def remove_UserProfile(self, email_address):
-        try:
+        existing_accounts = self.__profile_dict.keys()
+        if email_address in existing_accounts:
+            ql.log_success_message(f"{email_address} exists, now being deleted. . .")
             del self.__profile_dict[email_address]
-        except Exception() as e:
-            print(f"Error: {e}")
+        else:
+            ql.log_error(f"{email_address} does not exist in DB")
     
     #______________________________________________________________________________
+    @ql.log_function()
     def get_all_profile_emails(self):
         return list(self.__profile_dict.keys())
     #______________________________________________________________________________
+    @ql.log_function()
     def load_UserProfile(self, email_address) -> UserProfile:
         '''
         Mechanism by which we can LOAD in a user profile
@@ -372,6 +440,7 @@ class UserProfilesDB():
         return user_profile
 
     #______________________________________________________________________________
+    @ql.log_function()
     def commit_UserProfile(self, profile_data: UserProfile):
         '''
         Mechanism by which we can save the current state of the UserProfile passed to it
@@ -389,10 +458,12 @@ class UserProfilesDB():
             print(f"Saved Profile to {full_path}")
 
 class QuizzerDB:
+    @ql.log_function()
     def __init__(self):
         self.QuestionObjectDB = QuestionObjectDB()
         self.UserProfilesDB   = UserProfilesDB()
 
+    @ql.log_function()
     def commit_QuizzerDB(self):
         import os
         import sys
@@ -401,7 +472,7 @@ class QuizzerDB:
         full_path = os.path.join(src_dir, file_name)
         with open(full_path, "wb") as f:
             pickle.dump(self, f, protocol=pickle.HIGHEST_PROTOCOL)
-            print(f"Wrote {file_name} to full_path: {full_path}")
+            ql.log_success_message(f"Wrote {file_name} to full_path: {full_path}")
 
     #FIXME
     # Need to convert the above load and commit to pass through functions, for easier access from the API
@@ -409,6 +480,7 @@ class QuizzerDB:
     # Debug and Test Functions
     # Do not use these outside of test clients
     ###############################################################################
+    @ql.log_function()
     def debug_write_UserProfiles_to_json(self):
         """
         Standalone function that writes detailed information about each UserProfile to separate JSON files.
@@ -453,7 +525,7 @@ class QuizzerDB:
         
         print(f"Completed writing {len(profile_files)} user profiles to JSON files")
         return profile_files
-    
+    @ql.log_function()
     def debug_write_db_to_json(self):
         """
         Write complete database contents to a JSON file for debugging purposes.
@@ -555,50 +627,20 @@ class QuizzerDB:
         print(f"Complete QuizzerDB debug data written to {filename}")
         return filename
     
+@ql.log_function()    
 def load_quizzer_db() -> QuizzerDB:
     '''
     Loads the existing DB into memory and returns its reference
     '''
     import os
     src_dir = os.path.dirname(os.path.abspath(__file__))
+    ql.log_value("src_dir:", src_dir)
     file_name = "QuizzerDB.pickle"
     full_path = os.path.join(src_dir, file_name)
     with open(full_path, "rb") as f:
         db: QuizzerDB = pickle.load(f)
         print(f"Successfully loaded DB from {full_path}")
-        return db
 
-
-
-###############################################################################
-# Begin Test Client
-###############################################################################
-if __name__ == "__main__":
-    regenerate_db_from_old_json = True
-    if regenerate_db_from_old_json == True:
-        import json
-        print("Testing QuizzerDB Implementation")
-        # Create a QuizzerDB instance
-        db = QuizzerDB()
-
-        # Run the following comment to conver the old db to the new db
-        with open("QuestionObjectDB.json", "r") as f:
-            old_data:dict = json.load(f)
-            print(f"Old Data loaded successfully. . .\n Now applying util function to all question objects in old data")
-        i = 0
-        for key, value in old_data.items():
-            try:
-                qo = util_QuizzerV4ObjDict_to_QuestionObject(value)
-                i += 1
-                db.QuestionObjectDB.add_new_QuestionObject(qo)
-            except:
-                pass
-                # print(f"conversion failed on id: {key:.50}")
-
-        db.commit_QuizzerDB()
-        db = load_quizzer_db()
-        # with open("QuizzerDB.pickle", "rb") as f:
-        #     db = pickle.load(f)
-        db: QuizzerDB
-        db.debug_write_db_to_json()
+    db.QuestionObjectDB._construct_sub_indices()
+    return db
 

@@ -1,5 +1,6 @@
 import pandas as pd
 from lib        import helper
+from lib        import quizzer_logger as ql
 from datetime   import datetime, date, timedelta
 from typing     import Callable
 from typing     import Dict, Union
@@ -16,7 +17,6 @@ from quizzer_database.question_object       import QuestionObject
 
 # FIXME Next question selection
 #   What if we gave a mechanism for users to enter questions they have as they use Quizzer? Quizzer could then use this list of questions to determine what comes next, otherwise defaulting to a standard algorithm. This would allow Quizzer to be even more personlized based on exactly what the user is curious about. We would have to match those user questions to the database for likelihood, if no match found, then we'll need to add them
-
 class UserProfileQuestionDB():
     '''
     Subclass to store all UserQuestionObjects
@@ -24,15 +24,52 @@ class UserProfileQuestionDB():
     ###############################################################################
     # Dunder Mifflin Methods O_O
     ###############################################################################
+    @ql.log_function()
     def __init__ (self, tutorial_questions):
+        #---------------
         self.__user_question_index: Dict[str, UserQuestionObject] = {}.copy()
+        # This should be empty upon initializing for the first time:
+        ql.log_general_message("Initial UserProfileQuestionDB should be empty")
+        if not self.__user_question_index:
+            ql.log_success_message(f"Initial Index is: {self.__user_question_index}")
+        else:
+            ql.log_error(f"Initial UserProfile question index is not empty!")
+            ql.log_value("__user_question_index", self.__user_question_index)
+            raise Exception("Crashing Program, question_index should be empty")
+        #---------------
         self.__review_schedule = {
             "reserve_bank": [],
             "deactivated": []
         }.copy()
-        self.add_initial_tutorial_questions(tutorial_questions)
 
+        # Review Schedule should also be empty upon first intialization
+        ql.log_general_message("Initial Review Schedule should be empty")
+        if not self.__review_schedule:
+            ql.log_success_message(f"Initial Review schedule is: {self.__review_schedule}")
+        else:
+            ql.log_error(f"Initial review schedule is not empty, should be empty")
+            ql.log_value('__review_schedule:', self.__review_schedule)
+            raise Exception("Crashing Program, review_schedule should be empty")
+        #---------------
+        # We should be adding the tutorial questions immediately
+        self.add_initial_tutorial_questions(tutorial_questions)
+        # The review schedule should have updated
+        ql.log_general_message("Review Schedule should now have tutorial questions in circulation under date header")
+        if self.__review_schedule and self.__user_question_index:
+            ql.log_success_message("Review Schedule is no longer empty")
+            ql.log_success_message("User Question Index is no longer empty")
+            ql.log_value("__review_schedule", self.__review_schedule)
+            ql.log_value("__user_question_index", self.__user_question_index)
+        elif not self.__review_schedule:
+            ql.log_error(f"review_schedule did not update with tutorial questions")
+            ql.log_value('__review_schedule:', self.__review_schedule)
+            ql.log_value("__user_question_index", self.__user_question_index)
+            raise Exception("Crashing Program, add_initial_tutorial_questions did not function properly")
+        
+
+    @ql.log_function()
     def __str__(self):
+        # No need to log this
         full_print = "\n"
         for key, value in self.__user_question_index.items():
             full_print += f"    {key:25}: {value}" 
@@ -41,20 +78,28 @@ class UserProfileQuestionDB():
     ###############################################################################
     # Add Remove Questions from Profile
     ###############################################################################
+    @ql.log_function()
     def add_initial_tutorial_questions(self, tutorial_questions: list[str]):
         '''
         In order to add our tutorial questions we'll need the list of question_id's that correspond to our tutorial module
         tutorial_questions: list of question.id strings
         '''
+        #---------------
+        ql.log_general_message("Tutorial questions should have been passed as a list of question_id's")
+        ql.log_value("tutorial_questions", tutorial_questions)
+
         if isinstance(tutorial_questions, str):
+            ql.log_general_message("Only a single question_id was passed")
             self.add_question(tutorial_questions)
             self.place_question_into_circulation(tutorial_questions)
         else:
+            ql.log_general_message("Iterating over Tutorial Questions, adding, and placing them into UserProfile circulation")
             for question_id in tutorial_questions:
                 self.add_question(question_id)
                 self.place_question_into_circulation(question_id)
     
     #______________________________________________________________________________
+    @ql.log_function()
     def add_question(self, question_id: str):
         '''
         add a question into the User's QuestionDB
@@ -62,14 +107,19 @@ class UserProfileQuestionDB():
 
         The default column of the review_schedule is the reserve_bank
         '''
+        #---------------
+        # add and update:
+        ql.log_value("question_id:", question_id)
         self.__user_question_index[question_id] = UserQuestionObject(question_id)
         user_question: UserQuestionObject = self.__user_question_index[question_id]
         user_question.activate_question() # ensure is active
         self.__review_schedule["reserve_bank"].append(question_id)
+        ql.log_success_message(f"Added question_id: {question_id} with exceptions")
 
     # Logic for how questions are stored and retrieved, Yes for you the person who has no idea what's going on.
     # Questions are placed into one of three* locations: the reserve_bank key,the deactivated key, or a key with a date as the column, the number of these keys will be quite lengthy once a user gets 'rolling'. This allows us to grab questions by due date, so when evaluating what questions we are going to show the user at any moment in time, we only need to grab questions under todays date, or yesterday and behind if the user is behind
     #______________________________________________________________________________
+    @ql.log_function()
     def _util_remove_question_from_column(self, question_id):
         '''
         Just here to clean up duplicate code, and simplify error handling
@@ -82,6 +132,7 @@ class UserProfileQuestionDB():
             del self.__review_schedule[current_location]
 
     #______________________________________________________________________________
+    @ql.log_function()
     def _util_add_question_to_column(self, question_id):
         '''
         Just here to clean up duplicate code, and simplify error handling
@@ -94,6 +145,7 @@ class UserProfileQuestionDB():
             self.__review_schedule[current_location] = [question_id] # initialize new list column with single id in it
 
     #______________________________________________________________________________
+    @ql.log_function()
     def _question_column_loc(self, question_id):
         '''
         Internal function that returns the name of the column where the question should be
@@ -110,6 +162,7 @@ class UserProfileQuestionDB():
             return str("reserve_bank")
 
     #______________________________________________________________________________
+    @ql.log_function()
     def place_question_into_circulation(self, question_id):
         # print(f"Placing Question Into Circulation")
         user_question: UserQuestionObject = self.__user_question_index[question_id]
@@ -122,6 +175,7 @@ class UserProfileQuestionDB():
 
 
     #______________________________________________________________________________
+    @ql.log_function()
     def remove_question_from_circulation(self, question_id):
         print(f"Removing Question from circulation")
         user_question: UserQuestionObject = self.__user_question_index[question_id]
@@ -130,6 +184,7 @@ class UserProfileQuestionDB():
         self._util_add_question_to_column(question_id)
 
     #______________________________________________________________________________
+    @ql.log_function()
     def deactive_question(self, question_id):
         user_question: UserQuestionObject = self.__user_question_index[question_id]
         self._util_remove_question_from_column(question_id)
@@ -137,6 +192,7 @@ class UserProfileQuestionDB():
         self._util_add_question_to_column(question_id)
 
     #______________________________________________________________________________
+    @ql.log_function()
     def reactivate_question(self, question_id):
         user_question: UserQuestionObject = self.__user_question_index[question_id]
         self._util_remove_question_from_column(question_id)
@@ -146,19 +202,26 @@ class UserProfileQuestionDB():
     ###############################################################################
     # Question Selection
     ###############################################################################
+    #______________________________________________________________________________
+    @ql.log_function()
     def get_specific_UserQuestionObject(self, question_id) -> UserQuestionObject:
         return self.__user_question_index.get(question_id)
-        
+    
+    #______________________________________________________________________________
+    @ql.log_function()
     def select_next_question_for_review(self):
+        ql.log_error("Question Selection Not Implemented")
         pass
     ###############################################################################
     # Debugging Statements
     ###############################################################################
     # Debug Utils
     #______________________________________________________________________________
+    @ql.log_function()
     def get_review_schedule(self) -> Dict[str, list]:
         '''Returns a copy of the review schedule'''
         return self.__review_schedule.copy()
+    
     @property
     def total_questions_in_profile(self):
         return len(self.__user_question_index)
@@ -662,25 +725,29 @@ class HistoricalUserStat():
     #______________________________________________________________________________
     @property
     def max_value(self):
+        self._fill_missing_dates()
         if not self.nested_stats:
             return None
         return max(stat.value for stat in self.nested_stats.values())
 
     @property
     def min_value(self):
+        self._fill_missing_dates()
         if not self.nested_stats:
             return None
         return min(stat.value for stat in self.nested_stats.values())
     #______________________________________________________________________________
     @property
     def average_value(self):
+        self._fill_missing_dates()
         if not self.nested_stats:
             return None
-        return sum([self.nested_stats.values()]) / len(self.nested_stats.values())
+        return sum([stat.value for stat in self.get_nested_values()])/len(self.nested_stats)
     #______________________________________________________________________________
     @property
     def trend(self):
         '''Return trend line indicator'''
+        self._fill_missing_dates()
         # FIXME should be updated with more accurate/complex business logic
         if len(self.nested_stats) < 2:
             return None
@@ -732,7 +799,6 @@ class HistoricalUserStat():
         Add or Overwrite Stat record for this HistoricalStat
         If the passed stat already exists for that date, it will overwrite the value, else it will add the stat into the record by the date of the passed stat.
         '''
-        self._fill_missing_dates()
         if self.nested_stats.get(stat.date_of_entry) == None:
             self.nested_stats[stat.date_of_entry] = stat
         else:
@@ -854,6 +920,11 @@ class UserProfileStatsDB:
             description         = "record of how many questions exist for any given revision score, '1: 10, 2: 50, 3: 49'",
             date_of_entry       = date.today()
         )
+        self.avg_daily_questions_shown  = UserStat(
+            name                = "Average Daily Questions Shown to User",
+            description         = "Represents the amount of questions that the User needs to answer daily in order to maintain retention of their knowledge base",
+            date_of_entry       = date.today()
+        )
     #______________________________________________________________________________
     @property
     def current_eligible_questions(self):
@@ -921,10 +992,13 @@ class UserProfileStatsDB:
         total_questions_answered = self.total_questions_answered.max_value
         if total_questions_answered == None:
             total_questions_answered = 1
+        else:
+            total_questions_answered += 1
         self.total_questions_answered.add_stat_record(
             UserStat(
                 name            = "Total Questions Answered",
                 description     = f"Running Total amount of Questions Answered, all questions all dates",
+                value           = total_questions_answered,
                 date_of_entry   = date.today()
             )
         )
@@ -959,18 +1033,27 @@ class UserProfileStatsDB:
                 value       = total
             )
         )
-    def _update_revision_scores(self):
+    def _update_iterable_derived_stats(self):
+        '''
+        Some Stats require us to iterate over all the UserQuestionObjects and sum up individual values,
+        Because of this, we will ignore the separation of concerns principle, and wrap all of these updates within a single loop instead of n-loops
+        '''
         review_schedule = self.__UserQuestionsDB_REF.get_review_schedule()
-        data = {}.copy()
+        revision_data = {}.copy()
+        avg_daily_questions_shown = 0
         for column_name, question_id_list in review_schedule.items():
             if column_name != "deactivated" and column_name != "reserve_bank":
                 for question_id in question_id_list:
                     user_question = self.__UserQuestionsDB_REF.get_specific_UserQuestionObject(question_id)
-                    if data.get(str(user_question.revision_score)) == None:
-                        data[str(user_question.revision_score)] = 1
+                    # Handle Revision Streak Stat Block
+                    if revision_data.get(str(user_question.revision_score)) == None:
+                        revision_data[str(user_question.revision_score)] = 1
                     else:
-                        data[str(user_question.revision_score)] += 1
-        self.revision_streak_stats.set_value(data)
+                        revision_data[str(user_question.revision_score)] += 1
+                    # Handle avg_daily_questions_shown stat (summation of avg_shown properties)
+                    avg_daily_questions_shown += user_question.average_shown
+        self.revision_streak_stats.set_value(revision_data)
+        self.avg_daily_questions_shown.set_value(avg_daily_questions_shown)
 
 
 
@@ -1081,332 +1164,4 @@ class UserProfile:
         self.user_stats._update_total_questions_in_profile()
         self.user_stats._update_total_in_circulation_questions()
         self.user_stats._update_total_non_circulating_questions()
-        self.user_stats._update_revision_scores()
-    
-if __name__ == "__main__":
-    import logging
-    import sys
-    import os
-    from datetime import datetime, timedelta
-    import traceback
-    import random
-    
-    # Set up logging
-    logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(levelname)s - %(message)s',
-        handlers=[
-            logging.FileHandler("user_profile_test.log"),
-            logging.StreamHandler(sys.stdout)
-        ]
-    )
-    logger = logging.getLogger("UserProfileTests")
-    logger.info("=============== Starting User Profile Test Suite ===============")
-    
-    # Test data
-    mock_modules = ["math", "science", "history", "quizzer tutorial"]
-    mock_subjects = ["algebra", "geometry", "chemistry", "biology", "world history", "us history"]
-    mock_question_ids = [f"question_{i}" for i in range(1, 20)]
-    
-    # Define reusable test function
-    def run_test(name, test_fn, *args, **kwargs):
-        logger.info(f"TEST: {name}")
-        try:
-            result = test_fn(*args, **kwargs)
-            logger.info(f"✓ PASS: {name}")
-            return result
-        except Exception as e:
-            logger.error(f"✗ FAIL: {name}")
-            logger.error(f"Error: {str(e)}")
-            logger.error(traceback.format_exc())
-            return None
-    
-    # ====== TEST USERSETTING ======
-    def test_user_setting():
-        logger.info("===== Testing UserSetting class =====")
-        
-        # Test initialization
-        setting = UserSetting(
-            name="test_setting",
-            value=10,
-            description="A test setting",
-            default_value=5,
-            setting_type="int"
-        )
-        logger.info(f"Created setting: {setting}")
-        assert setting.name == "test_setting"
-        assert setting.value == 10
-        assert setting.default_value == 5
-        
-        # Test value setting
-        setting.set_value(20)
-        logger.info(f"Set value to 20: {setting}")
-        assert setting.value == 20
-        
-        # Test type validation
-        setting.set_value("30")  # Should convert to int
-        logger.info(f"Set value to string '30' (should convert): {setting}")
-        assert setting.value == 30 and isinstance(setting.value, int)
-        
-        # Test reset
-        setting.reset()
-        logger.info(f"Reset to default: {setting}")
-        assert setting.value == 5
-        
-        # Test bool conversion
-        bool_setting = UserSetting("test_bool", True, setting_type="bool")
-        bool_setting.set_value("yes")
-        logger.info(f"Bool setting with 'yes': {bool_setting}")
-        assert bool_setting.value is True
-        bool_setting.set_value("false")
-        logger.info(f"Bool setting with 'false': {bool_setting}")
-        assert bool_setting.value is False
-        
-        # Test validation function
-        def validate_range(val):
-            return max(0, min(val, 100))
-        
-        validated_setting = UserSetting(
-            "range_setting", 
-            50, 
-            setting_type="int", 
-            validation_func=validate_range
-        )
-        validated_setting.set_value(150)
-        logger.info(f"Validated setting with 150 (should cap at 100): {validated_setting}")
-        assert validated_setting.value == 100
-        validated_setting.set_value(-10)
-        logger.info(f"Validated setting with -10 (should cap at 0): {validated_setting}")
-        assert validated_setting.value == 0
-        
-        logger.info("UserSetting tests complete")
-        return True
-    
-    # ====== TEST COMPLEXUSERSETTING ======
-    def test_complex_user_setting():
-        logger.info("===== Testing ComplexUserSetting class =====")
-        
-        complex_setting = ComplexUserSetting(
-            name="test_complex",
-            description="A complex test setting"
-        )
-        logger.info(f"Created complex setting: {complex_setting}")
-        
-        # Test adding settings
-        complex_setting.add_setting(UserSetting("setting1", 10))
-        complex_setting.add_setting(UserSetting("setting2", "value"))
-        complex_setting.add_setting(UserSetting("setting3", True))
-        
-        logger.info(f"Added 3 settings, total now: {len(complex_setting.nested_settings)}")
-        assert len(complex_setting.nested_settings) == 3
-        
-        # Test getting settings
-        s1 = complex_setting.get_specific_setting("setting1")
-        s2 = complex_setting.get_specific_setting("setting2")
-        s3 = complex_setting.get_specific_setting("setting3")
-        logger.info(f"Retrieved settings: {s1}, {s2}, {s3}")
-        assert s1.value == 10
-        assert s2.value == "value"
-        assert s3.value is True
-        
-        # Test required settings
-        complex_setting.set_required_settings(["setting1", "setting3"])
-        logger.info(f"Set required settings: {complex_setting.required_settings}")
-        assert "setting1" in complex_setting.required_settings
-        assert "setting3" in complex_setting.required_settings
-        assert complex_setting.validate() is True
-        
-        # Test updating settings
-        complex_setting.update_setting("setting1", 20)
-        s1 = complex_setting.get_specific_setting("setting1")
-        logger.info(f"Updated setting1 to 20: {s1}")
-        assert s1.value == 20
-        
-        # Test removing settings (non-required)
-        complex_setting.remove_setting("setting2")
-        logger.info(f"Removed setting2, remaining: {complex_setting.get_nested_settings()}")
-        assert "setting2" not in complex_setting.nested_settings
-        
-        # Test attempting to remove required setting
-        result = complex_setting.remove_setting("setting1")
-        logger.info(f"Attempted to remove required setting, result: {result}")
-        logger.info(f"Settings after attempted removal: {complex_setting.get_nested_settings()}")
-        assert "setting1" in complex_setting.nested_settings
-        assert isinstance(result, str) and "required" in result
-        
-        # Test reset all
-        s1 = complex_setting.get_specific_setting("setting1")
-        s1.default_value = 5
-        logger.info(f"Set default_value to 5 for setting1: {s1}")
-        complex_setting.reset_all()
-        logger.info(f"Reset all settings, setting1 now: {complex_setting.get_specific_setting('setting1')}")
-        assert complex_setting.get_specific_setting("setting1").value == 5
-        
-        logger.info("ComplexUserSetting tests complete")
-        return True
-    
-    # ====== TEST USERPROFILESETTINGSDB ======
-    def test_userprofile_settings_db():
-        logger.info("===== Testing UserProfileSettingsDB class =====")
-        
-        # Test initialization
-        settings_db = UserProfileSettingsDB(mock_modules, mock_subjects)
-        logger.info(f"Created UserProfileSettingsDB with {len(mock_modules)} modules and {len(mock_subjects)} subjects")
-        
-        # Test module settings
-        module_setting = settings_db.get_module_activation_status("math")
-        logger.info(f"Retrieved module setting for 'math': {module_setting}")
-        assert module_setting is not None
-        assert module_setting.value is True
-        
-        # Test updating module settings
-        settings_db.update_module_activation_status("math", False)
-        module_setting = settings_db.get_module_activation_status("math")
-        logger.info(f"Updated 'math' activation to False: {module_setting}")
-        assert module_setting.value is False
-        
-        # Test subject interest settings
-        interest_setting = settings_db.get_value_of_subject_interest_level("algebra")
-        logger.info(f"Retrieved interest setting for 'algebra': {interest_setting}")
-        assert interest_setting is not None
-        assert interest_setting.value == 10
-        
-        # Test updating subject interest
-        settings_db.update_value_of_subject_interest_level("algebra", 50)
-        interest_setting = settings_db.get_value_of_subject_interest_level("algebra")
-        logger.info(f"Updated 'algebra' interest to 50: {interest_setting}")
-        assert interest_setting.value == 50
-        
-        # Test validation function (should cap at 1000)
-        settings_db.update_value_of_subject_interest_level("algebra", 1500)
-        interest_setting = settings_db.get_value_of_subject_interest_level("algebra")
-        logger.info(f"Attempted to set 'algebra' interest to 1500 (should cap at 1000): {interest_setting}")
-        assert interest_setting.value == 1000
-        
-        # Test subject priority settings
-        priority_setting = settings_db.get_value_of_subject_priority("algebra")
-        logger.info(f"Retrieved priority setting for 'algebra': {priority_setting}")
-        assert priority_setting is not None
-        assert priority_setting.value == 5
-        
-        # Test updating subject priority
-        settings_db.update_value_of_subject_priority("algebra", 9)
-        priority_setting = settings_db.get_value_of_subject_priority("algebra")
-        logger.info(f"Updated 'algebra' priority to 9: {priority_setting}")
-        assert priority_setting.value == 9
-        
-        logger.info("UserProfileSettingsDB tests complete")
-        return settings_db
-    
-    # ====== TEST USERPROFILEQUESTIONDB ======
-    def test_userprofile_question_db():
-        logger.info("===== Testing UserProfileQuestionDB class =====")
-        
-        # Create a list of real UserQuestionObject instances for testing
-        test_question_ids = ["tutorial_q1", "tutorial_q2"]
-        
-        # Initialize the DB with tutorial questions
-        question_db = UserProfileQuestionDB(test_question_ids)
-        logger.info(f"Created UserProfileQuestionDB with {len(test_question_ids)} tutorial questions")
-        
-        # Verify questions were added
-        num_questions = question_db.get_num_questions()
-        logger.info(f"DB now has {num_questions} questions")
-        assert num_questions == 2
-        
-        # Test adding more questions
-        additional_questions = ["question_1", "question_2", "question_3"]
-        for qid in additional_questions:
-            question_db.add_question(qid)
-            logger.info(f"Added question: {qid}")
-        
-        num_questions = question_db.get_num_questions()
-        logger.info(f"DB now has {num_questions} questions after additions")
-        assert num_questions == 5
-        
-        # Test circulation operations
-        for op in [
-            ("place_question_into_circulation", "question_1"),
-            ("remove_question_from_circulation", "tutorial_q1"),
-            ("deactive_question", "question_2"),
-            ("reactivate_question", "question_2"),
-        ]:
-            operation, qid = op
-            logger.info(f"Performing operation: {operation} on question_id: {qid}")
-            method = getattr(question_db, operation)
-            method(qid)
-            logger.info(f"Operation completed successfully")
-        
-        # Debug: Print the review schedule
-        logger.info("Printing final review schedule:")
-        question_db.print_review_schedule()
-        
-        logger.info("UserProfileQuestionDB tests complete")
-        return question_db
-    
-    # ====== TEST USERPROFILE ======
-    def test_userprofile():
-        logger.info("===== Testing UserProfile class =====")
-        
-        # Test basic initialization
-        tutorial_questions = ["tutorial_q1", "tutorial_q2"]
-        
-        # First create settings DB with minimal test data
-        settings_db = UserProfileSettingsDB(mock_modules, mock_subjects)
-        
-        # Create profile
-        profile = UserProfile(
-            username="test_user",
-            list_of_all_modules=mock_modules,
-            list_of_all_subjects=mock_subjects,
-            email_address="test@example.com",
-            full_name="Test User",
-            tutorial_questions=tutorial_questions,
-            user_stats=UserProfileStatsDB()
-        )
-        
-        logger.info(f"Created UserProfile for {profile.username}")
-        
-        # Test basic properties
-        assert profile.username == "test_user"
-        assert profile.email_address == "test@example.com"
-        assert profile.full_name == "Test User"
-        logger.info(f"Basic profile properties verified")
-        
-        # Test num_questions property
-        initial_questions = profile.num_questions
-        logger.info(f"Initial question count: {initial_questions}")
-        assert initial_questions == 2
-        
-        # Test adding questions
-        test_questions = ["additional_q1", "additional_q2"]
-        for qid in test_questions:
-            profile.add_question_to_UserProfile(qid)
-            logger.info(f"Added question: {qid}")
-        
-        new_count = profile.num_questions
-        logger.info(f"Question count after additions: {new_count}")
-        assert new_count == initial_questions + len(test_questions)
-        
-        # Test UUID generation
-        logger.info(f"Profile UUID: {profile.user_uuid}")
-        assert isinstance(profile.user_uuid, str)
-        assert len(profile.user_uuid) > 30  # UUID should be fairly long
-        
-        logger.info("UserProfile tests complete")
-        return profile
-    
-    # Run all tests in sequence
-    try:
-        run_test("UserSetting Tests", test_user_setting)
-        run_test("ComplexUserSetting Tests", test_complex_user_setting)
-        run_test("UserProfileSettingsDB Tests", test_userprofile_settings_db)
-        run_test("UserProfileQuestionDB Tests", test_userprofile_question_db)
-        run_test("UserProfile Tests", test_userprofile)
-        
-        logger.info("=============== All tests completed successfully ===============")
-    except Exception as e:
-        logger.error(f"Test suite failed: {str(e)}")
-        logger.error(traceback.format_exc())
-    
-    print("Test Client Complete - See user_profile_test.log for details")
+        self.user_stats._update_iterable_derived_stats()
