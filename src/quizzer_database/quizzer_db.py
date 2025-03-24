@@ -147,7 +147,7 @@ class QuestionModuleDB():
         '''
         returns a view objects of all the module names that exist in Quizzer's QuestionModuleDB
         '''
-        return self.index.keys()
+        return list(self.index.keys())
     #______________________________________________________________________________
     @ql.log_function()
     def get_questions_by_module(self, module_name):
@@ -358,7 +358,10 @@ class QuestionObjectDB():
 
     @ql.log_function()
     def get_QuestionObject(self, question_id: str) -> QuestionObject:
-        return self.__all_question_objects[question_id]
+        try:
+            return self.__all_question_objects[question_id]
+        except KeyError as e:
+            ql.log_error("Question does not exist:", e)
     
 # End QuestionObjectDB
 ###############################################################################
@@ -375,10 +378,12 @@ class UserProfilesDB():
     ###############################################################################
     @ql.log_function()
     def add_UserProfile(self,
-                        username: str,
-                        email_address: str,
-                        full_name: str,
-                        tutorial_questions: str | list
+                        username:               str,
+                        email_address:          str,
+                        full_name:              str,
+                        tutorial_questions:     str | list,
+                        list_of_all_modules:    list[str],
+                        list_of_all_subjects:   list[str]
                         ):
         '''
         Mechanism by which we add a fresh UserProfile to QuizzerDB
@@ -398,7 +403,9 @@ class UserProfilesDB():
             username            =   username,
             email_address       =   email_address,
             full_name           =   full_name,
-            tutorial_questions  =   tutorial_questions
+            tutorial_questions  =   tutorial_questions,
+            list_of_all_modules =   list_of_all_modules,
+            list_of_all_subjects=   list_of_all_subjects
         )
         ql.log_general_message(f"New Profile Generating, now attempting to commit profile to file LTS (Long Term Storage)")
         # Immediately save that instance
@@ -419,6 +426,7 @@ class UserProfilesDB():
     #______________________________________________________________________________
     @ql.log_function()
     def get_all_profile_emails(self):
+        ql.log_general_message("return value is a copy")
         return list(self.__profile_dict.keys())
     #______________________________________________________________________________
     @ql.log_function()
@@ -430,6 +438,10 @@ class UserProfilesDB():
         '''
         # To save on memory costs on the API, the __profile_dict should just be a list of references to .pickle files, where the actual data is held. Note that the __profile_dict is of format {"email_address": "file_name.pickle"}
         import os
+        existing_accounts = self.get_all_profile_emails()
+        if email_address not in existing_accounts:
+            ql.log_warning(f"Profile with {email_address} does not exist")
+            return None
         src_dir = os.path.dirname(os.path.abspath(__file__))
         user_profiles_dir = os.path.join(src_dir, "user_profiles")
         file_name = f"{email_address}.pickle"
@@ -445,7 +457,7 @@ class UserProfilesDB():
         '''
         Mechanism by which we can save the current state of the UserProfile passed to it
         '''
-        print(f"Now Committing File:")
+        ql.log_general_message(f"Now Committing File:")
         import os
         src_dir = os.path.dirname(os.path.abspath(__file__))
         user_profiles_dir = os.path.join(src_dir, "user_profiles")
@@ -455,7 +467,7 @@ class UserProfilesDB():
 
         with open(full_path, "wb") as f:
             pickle.dump(profile_data, f, protocol=pickle.HIGHEST_PROTOCOL)
-            print(f"Saved Profile to {full_path}")
+            ql.log_general_message(f"Saved Profile to {full_path}")
 
 class QuizzerDB:
     @ql.log_function()

@@ -44,7 +44,7 @@ class UserProfileQuestionDB():
 
         # Review Schedule should also be empty upon first intialization
         ql.log_general_message("Initial Review Schedule should be empty")
-        if not self.__review_schedule:
+        if self.__review_schedule == {'reserve_bank': [], 'deactivated': []}.copy():
             ql.log_success_message(f"Initial Review schedule is: {self.__review_schedule}")
         else:
             ql.log_error(f"Initial review schedule is not empty, should be empty")
@@ -65,15 +65,6 @@ class UserProfileQuestionDB():
             ql.log_value('__review_schedule:', self.__review_schedule)
             ql.log_value("__user_question_index", self.__user_question_index)
             raise Exception("Crashing Program, add_initial_tutorial_questions did not function properly")
-        
-
-    @ql.log_function()
-    def __str__(self):
-        # No need to log this
-        full_print = "\n"
-        for key, value in self.__user_question_index.items():
-            full_print += f"    {key:25}: {value}" 
-        return full_print
 
     ###############################################################################
     # Add Remove Questions from Profile
@@ -109,12 +100,21 @@ class UserProfileQuestionDB():
         '''
         #---------------
         # add and update:
+        # FIXME This is causing duplication
+
         ql.log_value("question_id:", question_id)
-        self.__user_question_index[question_id] = UserQuestionObject(question_id)
-        user_question: UserQuestionObject = self.__user_question_index[question_id]
-        user_question.activate_question() # ensure is active
-        self.__review_schedule["reserve_bank"].append(question_id)
-        ql.log_success_message(f"Added question_id: {question_id} with exceptions")
+        if question_id in self.__user_question_index.keys():
+            ql.log_warning("Attempted to add a question that already exists in the user's profile")
+            user_question: UserQuestionObject = self.__user_question_index[question_id]
+            return None
+        else:
+            self.__user_question_index[question_id] = UserQuestionObject(question_id)
+            user_question: UserQuestionObject = self.__user_question_index[question_id]
+            user_question.activate_question()
+            user_question.remove_from_circulation()
+            column_loc = self._question_column_loc(question_id)
+            self.__review_schedule[column_loc].append(question_id)
+            ql.log_success_message(f"Added question_id: {question_id} in column {column_loc}")
 
     # Logic for how questions are stored and retrieved, Yes for you the person who has no idea what's going on.
     # Questions are placed into one of three* locations: the reserve_bank key,the deactivated key, or a key with a date as the column, the number of these keys will be quite lengthy once a user gets 'rolling'. This allows us to grab questions by due date, so when evaluating what questions we are going to show the user at any moment in time, we only need to grab questions under todays date, or yesterday and behind if the user is behind
@@ -258,11 +258,13 @@ class UserSetting:
     ###############################################################################
     # Getter, Setter, and Reset Function
     ###############################################################################
+    
     @property
     def value(self):
         """Get the current value of the setting."""
         return self.__value
     #______________________________________________________________________________
+    @ql.log_function()
     def set_value(self, new_value):
         """Set the value of the setting with validation."""
         # Type validation if setting_type is specified
@@ -295,8 +297,11 @@ class UserSetting:
         # All validation passed, set the new value
         self.__value = new_value
     #______________________________________________________________________________
+    @ql.log_function()
     def reset(self):
         """Reset the setting to its default value."""
+        ql.log_value("old_value:", self.__value)
+        ql.log_value("new_value:", self.default_value)
         if self.default_value != None:
             self.__value = self.default_value
     
@@ -425,7 +430,7 @@ class UserProfileSettingsDB:
     '''
     Subclass to store all User Settings
     Subject Settings: (Also known as interest settings)
-        -subject_name: { FIXME might just decide to turn this into a just interest and priority, and aggregate the rest into the stats block, but this is the stats used by our circulate algorithm
+        -subject_name: {might just decide to turn this into a just interest and priority, and aggregate the rest into the stats block, but this is the stats used by our circulate algorithm
             interest_level: int,
             priority:       int,
             total_questions:int,
@@ -457,6 +462,7 @@ class UserProfileSettingsDB:
         self.__modules_default_activation_status    = None
         self._verify_build(list_of_all_modules, list_of_all_subjects)
 
+    @ql.log_function()
     def _verify_build(self, list_of_all_modules, list_of_all_subjects):
         '''
         Check if each instance variable exists and of proper type\n
@@ -496,16 +502,18 @@ class UserProfileSettingsDB:
     ###############################################################################
     # Initial Build Functions
     ###############################################################################
+    @ql.log_function()
     def _build_initial_modules_default_activation_status_setting(self):
         self.__modules_default_activation_status = UserSetting(
             name            =   "modules_default_activation_status",
             value           =   True,
             description     =   "Defines whether the UserQuestionObject.is_active values within an added module are set to True or False, this property defines whether a new question will be placed into the 'reserve_bank' or 'deactivated' columns of the UserProfile revision schedule",
-            default_value   = True,
-            setting_type    = 'bool',
-            validation_func = None # No custom validation necessary for default bool status
+            default_value   =   True,
+            setting_type    =   'bool',
+            validation_func =   None # No custom validation necessary for default bool status
         )
 
+    @ql.log_function()
     def _build_initial_activation_status_of_modules_setting(self, list_of_all_modules):
         # Need a full list of all modules in the QuizzerDB (which should be able to grab from the QuestionModuleDB)
         # Since this call lies further up the call chain, we'll need to pass it down when this is called
@@ -518,14 +526,15 @@ class UserProfileSettingsDB:
             self.__activation_status_of_modules.add_setting(
                 UserSetting(
                     name            =   module_name,
-                    value           =   self.__modules_default_activation_status.value,
+                    value           =   False,
                     description     =   f"Is module with name: '{module_name}' currently active?",
                     default_value   =   self.__modules_default_activation_status.value,
                     setting_type    =   'bool',
                     validation_func =   None # No custom validation need for booleans
                 )
             )
-    
+
+    @ql.log_function()
     def _build_initial_subject_interest_settings(self, list_of_all_subjects):
         # Need a full list of all settings (which should be able to grab from the QuestionObjectDB subject index that gets built)
         # Since this call lies further up the call chain, we'll need to pass it down when this is called
@@ -545,7 +554,8 @@ class UserProfileSettingsDB:
                     validation_func =   self._validation_for_subject_interest_level_setting
                 )
             )
-    
+
+    @ql.log_function()
     def _build_initial_subject_priority_settings(self, list_of_all_subjects):
         self.__subject_priority_settings = ComplexUserSetting(
             name        = "subject_priority_settings",
@@ -564,6 +574,7 @@ class UserProfileSettingsDB:
                 )
             )
 
+    @ql.log_function()
     def _build_initial_general_interest_settings(self):
         # This will be additional data, allowing the user to manually tell Quizzer what thier likes and dislikes are, potentially useless data, but you never know what might be relevant
         raise NotImplementedError("GUFFA!!!")
@@ -576,33 +587,50 @@ class UserProfileSettingsDB:
     ###############################################################################
     #______________________________________________________________________________
     # Get/Update for default activation status for modules
+    @ql.log_function()
     def get_value_of_modules_default_activation_status(self):
         return self.__modules_default_activation_status
     
+    @ql.log_function()
     def update_value_of_modules_default_activation_status(self, new_value: bool):
         self.__modules_default_activation_status: UserSetting
         self.__modules_default_activation_status.set_value(new_value = new_value)
 
     #______________________________________________________________________________
     # Get/Update for Subject Interest Settings
+    @ql.log_function()
     def get_value_of_subject_interest_level(self, subject_name: str):
         return self.__subject_interest_levels.get_specific_setting(subject_name)
     
+    @ql.log_function()
     def update_value_of_subject_interest_level(self, subject_name: str, new_value: int):
         self.__subject_interest_levels.update_setting(subject_name, new_value)
 
     #______________________________________________________________________________
     # Get/Update for Subject Priority Settings
+    @ql.log_function()
     def get_value_of_subject_priority(self, subject_name:str):
         return self.__subject_priority_settings.get_specific_setting(subject_name)
     
+    @ql.log_function()
     def update_value_of_subject_priority(self, subject_name:str, new_value: int):
         self.__subject_priority_settings.update_setting(subject_name, new_value)
     #______________________________________________________________________________
     # Get/Update for module_activation statusi
+    @ql.log_function()
     def get_module_activation_status(self, module_name:str):
-        return self.__activation_status_of_modules.get_specific_setting(module_name)
+        status = self.__activation_status_of_modules.get_specific_setting(module_name).value
+        status: bool
+        ql.log_value("is module {module_name} active:", status)
+        if isinstance(status, bool):
+            ql.log_success_message("Status of module is a boolean")
+        else:
+            ql.log_error("Status is not a boolean value")
+            ql.log_value("Status", status)
+            raise ValueError("module activation status should be a boolean")
+        return status
     
+    @ql.log_function()
     def update_module_activation_status(self, module_name:str, new_value: bool):
         self.__activation_status_of_modules.update_setting(module_name, new_value)
     #______________________________________________________________________________
@@ -857,19 +885,7 @@ class HistoricalUserStat():
 class UserProfileStatsDB:
     '''
     Subclass to store all User statistics\n
-    Stats to Included (FIXME if not implemented)\n
     All stats are historical records over time: properties are made to get just todays stat\n
-
-    total_in_circulation_questions_history:             \n
-    "current_eligible_questions":                       \n
-    "reserve_questions_exhaust_in_x_days":              \n
-    "non_circulating_questions":                        \n
-    "Graphical Charts":                                 FIXME\n
-    "revision_streak_stats":                            \n
-    "total_questions_in_database"(historical):          \n
-    "total_questions_answered":                         \n
-        This one can be verified by the attempt history
-    "questions_answered_by_date":                       \n
     '''
     # Notes:
     # "average_per_day" figure is now a property of questions_answered_by_date
@@ -880,9 +896,6 @@ class UserProfileStatsDB:
     def __init__(self, UserQuestionsDB_REF, UserSettingsDB_REF):
         self.__UserQuestionsDB_REF: UserProfileQuestionDB   =   UserQuestionsDB_REF
         self.__UserSettingsDB_REF:  UserProfileSettingsDB   =   UserSettingsDB_REF
-        self.questions_answered_by_date = None
-        self.total_questions_answered   = None
-
         self._build_initial_stats_frame()
     #______________________________________________________________________________
     def _build_initial_stats_frame(self):
@@ -917,11 +930,13 @@ class UserProfileStatsDB:
         )
         self.revision_streak_stats      = UserStat(
             name                = "Revision Streak Stats",
+            value               = {}.copy(),
             description         = "record of how many questions exist for any given revision score, '1: 10, 2: 50, 3: 49'",
             date_of_entry       = date.today()
         )
         self.avg_daily_questions_shown  = UserStat(
             name                = "Average Daily Questions Shown to User",
+            value               = 0,
             description         = "Represents the amount of questions that the User needs to answer daily in order to maintain retention of their knowledge base",
             date_of_entry       = date.today()
         )
@@ -937,11 +952,12 @@ class UserProfileStatsDB:
             question_ids: list[str]
             if date_obj == "reserve_bank" or date_obj == "deactivated":
                 pass
-            elif date(date_obj) <= today:
+            elif datetime.strptime(date_obj, "%Y-%m-%d").date() <= today:
                 eligible_questions.extend(
                     [i for i in question_ids if self.__UserQuestionsDB_REF.get_specific_UserQuestionObject(i).is_eligible]
                 )
         return len(eligible_questions)
+    
     #______________________________________________________________________________
     @property
     def average_daily_increase_in_total_circulating_questions(self):
@@ -1120,6 +1136,7 @@ class UserProfile:
         '''
         return str(uuid.uuid4())
     #______________________________________________________________________________
+    @ql.log_function()
     def add_question_to_UserProfile(self, question_id: str):
         self.user_questions.add_question(question_id) # This is purely an abstraction for easier calling from main program
         # self.add_question_to_UserProfile as opposed to self.user_questions.add_question, call is shorter as a result
