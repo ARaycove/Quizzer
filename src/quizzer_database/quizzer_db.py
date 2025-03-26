@@ -295,6 +295,9 @@ class QuestionObjectDB():
     ###############################################################################
     # Index access functions
     ###############################################################################
+    def get_reference_to_all_objects(self):
+        return self.__all_question_objects
+    
     # Subject specific access
     @ql.log_function()
     def get_list_of_subjects(self):

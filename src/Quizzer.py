@@ -3,6 +3,7 @@ from quizzer_database.quizzer_db import (
     QuizzerDB,          load_quizzer_db,    UserProfilesDB, 
     QuestionObjectDB,   UserProfile,        QuestionObject, 
     QuestionModuleDB,   QuestionModule)
+from Quizzer_question_selection_algo import select_next_question_for_review
 from lib        import quizzer_logger as ql
 from datetime   import datetime, date, timedelta
 import random
@@ -114,15 +115,29 @@ class Quizzer:
     # Core Functionality
     ###############################################################################
     @ql.log_function()
-    async def get_next_question(self):
+    async def get_next_question(self) -> QuestionObject:
         '''
         Question Selection Algorithm
         Prompts Quizzer to run the QSA to determine what should be presented to the user next
         '''
+        async with self.global_Q_LOCK:
+            question_object_index_ref = self.QuestionObject_DB.get_reference_to_all_objects
         # Future plans involve a more robust relational graph of question objects to determine this rather than (largely random selection)
+        ql.log_value("question_buffer", self.__question_buffer)
+        # Pull up revision schedule
+
+        # Get eligible questions from revision schedule
+        self.__active_profile.get_next_question_for_review(self.__question_buffer, question_object_index_ref) # Function contains logic to enter new questions into circulation
+
+
+        # Replace self.__current_question with new QuestionObject selected
+
+        # Add the new question.id to the buffer at index 0
+
+        # If length of buffer is greater than 5 remove the last index with .pop() method
         raise NotImplementedError("Not Done Yet Hause")
     
-    ql.log_function()
+    @ql.log_function()
     async def attempt_question(self, status):
         '''
         Provides Quizzer with your answer attempt:
@@ -379,7 +394,6 @@ class Quizzer:
         else:
             ql.log_warning("No update arguments were provided")
 
-
     @ql.log_function()
     async def delete_question_from_QuestionObjectDB(self, question_id):
         self.QuestionObject_DB.delete_QuestionObject(question_id)
@@ -397,11 +411,16 @@ class Quizzer:
         async with self.global_Q_LOCK:
             return self.QuestionObject_DB.get_list_of_module_names()
         
-    ql.log_function()
+    @ql.log_function()
     async def get_specific_question(self, question_id):
         async with self.global_Q_LOCK:
             return self.QuestionObject_DB.get_QuestionObject(question_id)
 
+    @ql.log_function()
+    async def get_question_selection_buffer(self):
+        return_value = self.__question_buffer.copy()
+        ql.log_value("Question Buffer", return_value)
+        return return_value
     ###############################################################################
     # Debug Printouts
     ###############################################################################
@@ -422,7 +441,6 @@ if __name__ == "__main__":
         Q_LOCK  = asyncio.Lock()
         UP_LOCK = asyncio.Lock()
     
-
     def log_user_profile_UserQuestionDB_values(quizzer):
         ql.log_section_header("UserProfileQuestionsDB values")
         ql.log_value("UserQuestions", quizzer._Quizzer__active_profile.user_questions.__dict__)
@@ -519,10 +537,6 @@ if __name__ == "__main__":
         log_user_profile_UserProfileSettingsDB_values(quizzer)
         log_user_profile_UserProfileStatsDB_values(quizzer)
 
-
-
-
-
     async def test_user_profile_initialization(quizzer: Quizzer):
         ql.log_main_header("Testing User Profile Creation and Initialization")
         #--------------------------------------------------------
@@ -600,7 +614,6 @@ if __name__ == "__main__":
             await quizzer.add_module_to_user_profile(module)
         # log_user_profile_UserQuestionDB_values(quizzer)
 
-
     async def test_QuizzerDB_add_remove_questions(quizzer: Quizzer):
         ql.log_main_header("Testing the addition of and removal of Questions from Central QuestionObjectDB")
         ql.log_section_header("Test: Adding Questions to QuizzerDB")
@@ -673,20 +686,48 @@ if __name__ == "__main__":
         if result == None:
             ql.log_success_message("Test Question was deleted successfully")
 
-    async def test_question_selection_algorithm(quizzer):
+    async def test_question_selection_algorithm(quizzer: Quizzer):
         ql.log_main_header("Testing Question Selection Algorithm")
+        ql.log_section_header("Only testing get_next_question and put_into_circulation functions")
+        # First Get
+        ql.log_general_message("Question Selection Buffer should be empty")
+        next_question = await quizzer.get_next_question()
+        # In the loop we'll run next_question then call quizzer.attempt_question()
 
-        ql.log_general_message(f"Question Selection Buffer should be at most 5 questions long")
+        # First Get
+        ql.log_general_message(f"Question Selection Buffer should be empty")
+        next_question = await quizzer.get_next_question()
+
+
+        # Second Get
+        ql.log_general_message(f"Question Selection Buffer should now have 1 question_id")
+        next_question = await quizzer.get_next_question()
+
+        
+        # Third Get
+        ql.log_general_message(f"Question Selection Buffer should now have 2 question_id")
+        next_question = await quizzer.get_next_question()
+
+
+        # Fourth Get
+        ql.log_general_message(f"Question Selection Buffer should now have 3 question_id")
+        next_question = await quizzer.get_next_question()
+
+        # Fifth Get
+        ql.log_general_message(f"Question Selection Buffer should now have 4 question_id")
+        next_question = await quizzer.get_next_question()
+
+        # Sixth Get
+        ql.log_general_message(f"Question Selection Buffer should now have 5 question_id")
+        next_question = await quizzer.get_next_question()
+        
+        # Seventh Get
+        ql.log_general_message(f"Question Selection Buffer should now have 6 question_id")
+        next_question = await quizzer.get_next_question()
 
         ql.log_general_message("Test prioritization mechanics based on subject interest")
-
         ql.log_general_message("Test prioritization mechanics based on priority values")
-
         ql.log_general_message("Test algorithm handling of empty reserve bank (with or without deactivated questions)")
-
-        ql.log_general_message("If bank is empty, selection buffer should be over-ridden")
-        # I am considering ensuring that there is always a large amount of questions eligible, this would ensure that questions do extend past there due_date, which would ensure we get more varied data
-        ql.log_general_message("Test when no questions are eligible: should add new questions into circulation whenever there are n (50?) or less questions eligible")
 
     async def test_quizzer_main_loop(quizzer):
         ql.log_main_header("Testing Full system behavior")
@@ -723,15 +764,35 @@ if __name__ == "__main__":
         global QUIZZERDB
         global Q_LOCK
         global UP_LOCK
-        
+        test_1_pass = True
+        test_2_pass = False
+        test_3_pass = False
+        test_4_pass = False
+        test_5_pass = False
+
+
+
         
         await test_QuizzerDB_initialization()
         ql.log_main_header("Testing Quizzer Startup Initialization")
         quizzer = Quizzer(UP_LOCK, Q_LOCK, QUIZZERDB)
 
         await test_user_profile_initialization(quizzer)
+        if test_1_pass == False:
+            await test_QuizzerDB_add_remove_questions(quizzer)
 
-        await test_QuizzerDB_add_remove_questions(quizzer)
+        if test_2_pass == False:
+            await test_question_selection_algorithm(quizzer)
+
+
+        if test_3_pass == False:
+            pass
+
+        if test_4_pass == False:
+            pass
+
+        if test_5_pass == False:
+            pass
 
 
 

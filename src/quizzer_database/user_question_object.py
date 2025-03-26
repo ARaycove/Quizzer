@@ -5,6 +5,7 @@ import time
 import sys
 import os
 from datetime       import datetime, date, timedelta
+from lib            import quizzer_logger as ql
 from lib import helper
 import numpy        as np
 import pandas       as pd
@@ -140,8 +141,11 @@ class UserQuestionObject:
         Default sensitivity set to 1 hours, removing from user_settings
         '''
         is_eligible = False
-        if self.next_revison_due <= (datetime.now()-timedelta(hours=1)):
+        ql.log_value("revision_due_date:", self.next_revison_due)
+        ql.log_value("Check Value:", (datetime.now()+timedelta(hours=1)))
+        if self.next_revison_due <= (datetime.now()+timedelta(hours=1)):
             is_eligible = True
+            ql.log_value("is_eligible:", is_eligible)
         return is_eligible
     
     @property
@@ -164,6 +168,10 @@ class UserQuestionObject:
         Whenever the next_revision is calculated we also update the average_shown, average_shown is an embedded property
         '''
         x = self.__revision_score # number of repititionsmath.pow(
+        # Brand new questions should be immediately available for review
+        if x == 1:
+            self.next_revison_due = datetime.now()
+            return
         h = self.__h # horizontal shift
         k = self.__time_between_revisions # constant, initial value of 0.37
         t = 36500 # days Maximum length of human memory (approximately one human lifespan), yes there is the potential for someone to live to 100, but let's just say 100 years is the max lifespan for a human being

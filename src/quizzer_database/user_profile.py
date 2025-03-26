@@ -200,6 +200,16 @@ class UserProfileQuestionDB():
         user_question.activate_question()       # flips the boolean, question is eligible to be placed into circulation
         self._util_add_question_to_column(question_id)
     ###############################################################################
+    # Add/Remove Questions from Circulation
+    ###############################################################################
+    #______________________________________________________________________________
+    def add_questions_into_circulation(self, question_object_index_ref: dict[QuestionObject]):
+        # Ensure we do read only, no writes to the DB_ref else get race conditions
+
+        pass
+
+
+    ###############################################################################
     # Question Selection
     ###############################################################################
     #______________________________________________________________________________
@@ -209,9 +219,37 @@ class UserProfileQuestionDB():
     
     #______________________________________________________________________________
     @ql.log_function()
-    def select_next_question_for_review(self):
-        ql.log_error("Question Selection Not Implemented")
-        pass
+    def get_eligible_questions(self, question_buffer):
+        # Get Review Schedule
+        review_schedule = self.get_review_schedule()
+        # Initialize empty return list
+        eligible_questions = []
+        # Collect date columns that are equal to or less than today's date
+        for header, question_list in review_schedule.items():
+            question_list: list[UserQuestionObject]
+            ql.log_general_message(f"Checking Header: {header}")
+            try:
+                date = datetime.strptime(header, "%Y-%m-%d").date()
+                ql.log_general_message(f"Date has been transformed {date}")
+                if date <= date.today():
+                    ql.log_general_message(f"Is date ≤ than today {date.today()}, evaluated to True")
+                    ql.log_value("potential questions:", question_list)
+                    ql.log_general_message("Logging eligible results")
+                    # for question_id in question_list:
+                    #     ql.log_value(f"Eligibility status: {question_id}",self.get_specific_UserQuestionObject(question_id).is_eligible)
+                    eligible_questions.extend(
+                        # List comprehension, check for eligibility for each question (should stop at some pre-defined point for computational efficiency)
+                        [question_id for question_id in question_list if self.get_specific_UserQuestionObject(question_id).is_eligible and (question_id not in question_buffer)]
+                        )
+                                    
+            except ValueError as e:
+                ql.log_error("Some exception was thrown when getting eligible questions, expected result is error out on reserve_bank and deactivated columns")
+                ql.log_value("column_name", header)
+
+
+
+        ql.log_value("Eligible Question List",eligible_questions)
+        return eligible_questions
     ###############################################################################
     # Debugging Statements
     ###############################################################################
@@ -1140,8 +1178,21 @@ class UserProfile:
     def add_question_to_UserProfile(self, question_id: str):
         self.user_questions.add_question(question_id) # This is purely an abstraction for easier calling from main program
         # self.add_question_to_UserProfile as opposed to self.user_questions.add_question, call is shorter as a result
+    #______________________________________________________________________________
+    @ql.log_function()
+    def get_next_question_for_review(self, question_buffer, question_object_index_ref) -> list[str]:
+        self.user_questions.select_next_question_for_review(question_buffer, question_object_index_ref)
+        #####################################################
+        # Decision call to put new questions into circulation
+        # If no eligible questions are returned: move new questions into circulation
 
+        # elif all eligible questions are in the __question_buffer: move new questions into circulation
 
+        # Select question using question_selection_algorithm logic
+
+        
+        # If selected question is in the buffer, select a different question (Should handle this within the UserProfile class)
+        #####################################################
     #______________________________________________________________________________
     def add_question_attempt(self,
                              module_name:   str, 
