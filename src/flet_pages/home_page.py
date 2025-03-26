@@ -214,6 +214,7 @@ class HomePage(ft.View):
         ]
         self.vertical_alignment     = ft.MainAxisAlignment.SPACE_BETWEEN
         self.horizontal_alignment   = ft.MainAxisAlignment.SPACE_AROUND
+        self.answer_ticker          = 0
         self.build_initial_state()
 
     # Page Functionality below:
@@ -265,7 +266,16 @@ class HomePage(ft.View):
             # Go through the non_eligible questions to see if anything is eligible now
             self.user_profile_data["questions"] = system_data.sort_questions(self.user_profile_data, self.question_object_data)
             current_eligible_questions = len(self.user_profile_data["questions"]["in_circulation_is_eligible"])
+        # Get new questions to put into circulation if no eligible questions to answer
         if current_eligible_questions <= 0:
+            self.answer_ticker = 0 # reset ticker
+            self.user_profile_data = generate_quiz.update_questions_in_circulation(
+                self.user_profile_data,
+                self.question_object_data
+            )
+        # Get new questions to put into circulation every 25 questions answered
+        elif self.answer_ticker >= 25:
+            self.answer_ticker = 0
             self.user_profile_data = generate_quiz.update_questions_in_circulation(
                 self.user_profile_data,
                 self.question_object_data
@@ -286,7 +296,6 @@ class HomePage(ft.View):
         # print(f"def get_next_question()")
         # If the question list has no questions in it, attempt to fill it again
         self.verify_if_remaining_questions()
-        
         if self.questions_available_to_answer == True:
             # self.current_question_id = random.choice(list(self.user_profile_data["questions"]["in_circulation_is_eligible"].keys()))
             self.current_question_id = system_data.get_next_question(self.user_profile_data,
@@ -316,7 +325,7 @@ class HomePage(ft.View):
             question_object_data        = self.question_object_data,
             time_spent                  = self.time_taken_to_answer
         )
-
+        self.answer_ticker += 1
         self.get_next_question()
         if self.questions_available_to_answer == True:
             self.text_object.value          = self.current_question["question_text"]

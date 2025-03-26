@@ -88,6 +88,8 @@ This is essentially my horizon of ignorance
 - What is the first recorded case of small pox?
 - Who was L'Hopital?
 ### All the other history
+- US Sedition Act, WW1
+- Who is Anthony Benezet, the French Quaker
 - More on Queen Elizabeth the 1st of England RIP 1603
 - More on Marie Antoinette
 - When did the June Days take place in France? (Input a wiki article worth of information on the june days)
@@ -111,3 +113,154 @@ This is essentially my horizon of ignorance
 - More on the War of Spanish Succession?
 - More about Napoleon's Lycee
 - Russian Time of Troubles
+- Who is Herbert Spencer?
+- Ivan IV (the terrible)
+
+
+#############################################
+Active Planning on What to enter (If you see this, feel free to add on material you might want)
+The trick is to do the planning when you're too tired to learn stuff in earnest
+# Active Material to learn and enter
+## Perry's Historical Sources []
+## Western Civ II Concise History []
+## Western Civ III Concise History []
+
+## Hughe Calculus Book []
+-[] 4.2 Optimization
+-[] 4.3 Optimization and Modeling
+-[] 4.4 Families of Functions and Modeling
+-[] 4.5 Applications to Marginality
+-[] 4.6 Rates and Related Rates
+-[] 4.7 L'Hopital's Rule, Growth and Dominance
+-[] 4.8 Parametric Equations
+
+## Intro Machine Learning on Coursera []
+
+## Three Brown One Blue Linear Algebra Course on Youtube []
+https://www.youtube.com/watch?v=kYB8IZa5AuE&list=PLZHQObOWTQDPD3MizzM2xVFitgF8hE_ab&index=8
+
+-[] Chapter 5, Three-dimensional linear transformations
+-[] Chapter 6, The determinant
+-[] Chapter 7, Inverse matrices, column space and null space
+-[] Chapter 8, Nonsquare matrices as transformations between dimensions
+-[] Chapter 9, Dot products and duality
+-[] Chapter 10, Cross products
+-[] Chapter 11, Cross Products in the light of linear transformations
+-[] Chapter 12, Cramer's rule, explained geometrically
+-[] Chapter 13, Change of basis
+-[] Chapter 14, Eigenvectors and eigenvalues
+-[] Chapter 15, A quick trick for computing eigenvalues
+-[] Chapter 16, Abstract vector spaces * This is what I need for solving my Quizzer problem
+
+## Varsity Tutors Calculus Questions (All of them) []
+https://www.varsitytutors.com/calculus_1-practice-tests
+-[] Differential functions practice test
+-[] Midpoint riemann sums practice test
+-[] How to find midpoint riemann sums practice test
+-[] Other differential functions practice test
+-[] How to find differential functions practice test
+-[] Equations practice test
+-[] Differential equations practice test
+-[] Graphing differential equations practice test
+-[] Local maximum practice test
+-[] How to find local maximum by graphing differential equations practice test
+-[] Local minimum practice test
+-[] How to find local minimum by graphing differential equations practice test
+-[] Other graphing differential equations practice test
+-[] How to graph differential equations practice test
+-[] Solutions to differential equations practice test
+-[] How to find solutions to differential equations practice test
+-[] Writing equations practice test
+-[] Integral expressions practice test
+-[] How to find integral expressions practice test
+-[] Other writing equations practice test
+-[] How to write equations practice test
+-[] Graphing functions practice test
+-[] Area practice test
+-[] How to graph functions of area practice test
+-[] Curves practice test
+-[] Local maximum practice test
+-[] How to find local maximum graphing functions of curves practice test
+-[] Local minimum practice test
+-[] How to find local minimum graphing functions of curves practice test
+-[] Other curves practice test
+-[] How to graph functions of curves practice test
+-[] Intervals practice test
+-[] Concave down intervals practice test
+-[] How to find concave down intervals by graphing functions practice test
+-[] Continuous on the interval practice test
+-[] How to find continuous on the interval by graphing functions practice test
+-[] Decreasing intervals practice test
+-[] How to find decreasing intervals by graphing functions practice test
+-[] Increasing intervals practice test
+-[] How to find increasing intervals by graphing functions practice test
+-[] Relative extremum practice test
+-[] Relative maximum practice test
+-[] How to find relative maximum on the interval by graphing functions practice test
+-[] Relative minimum practice test
+-[] How to find relative minimum on the interval by graphing functions practice test
+-[] Trapezoidal approximation practice test
+-[] How to find trapezoidal approximation by graphing functions practice test
+-[] Lines practice test
+-[] Equation of line practice test
+-[] How to find equation of line by graphing functions practice test
+-[] Length of line practice test
+-[] How to find length of line by graphing functions practice test
+-[] Slope practice test
+-[] How to find slope by graphing functions practice test
+-[] Points practice test
+-[] Describing points practice test
+-[] How to describe points by graphing functions practice test
+-[] Other points practice test
+-[] How to graph functions of points practice test
+-[] Points of inflection practice test
+-[] How to graph functions of points of inflection practice test
+-[] Meaning of functions practice test
+-[] How to find the meaning of functions practice test
+-[] Rate practice test
+-[] Approximation of rate practice test
+-[] How to find approximation of rate practice test
+-[] Constant of proportionality practice test
+-[] How to find constant of proportionality of rate practice test
+-[] Differentiable rate practice test
+-[] How to find differentiable of rate practice test
+-[] Prediction models practice
+-[] How to find prediction models practice test
+-[] Rate of change practice test
+-[] How to find rate of change practice test
+-[] Rate of flow practice test
+-[] How to find rate of flow practice test
+-[] Solving for time practice test
+-[] How to solve for time practice test
+-[] Regions pracitce test
+-[] Area practice test
+-[] How to find area of a region practice test
+-[] Volume practice test
+-[] How to find volume of a region practice test
+-[] Spatial calculus practice test
+-[] Acceleration practice test
+-[] How to find acceleration practice test
+-[] Distance practice test
+-[] How to find distance practice test
+-[] Position practice test
+-[] How to find position practice test
+-[] Velocity practice test
+-[] How to find velocity practice test
+
+## Intro Neuroscience Textbook
+- 
+CLEP Exams (Entered verbatim)
+
+Practice Exams (Entered verbatim)
+
+Basic Addition and Subtraction Worksheets
+- Good Arithmetic skills
+Basic Multiplication and Division Worksheets
+- Good Arithmetic skills
+
+
+
+# Moving Stuff entered down here:
+## 03/25/25
+-[x] 4.1 Using First and Second Derivatives
+-[x] Chapter 4, Matrix Multiplication as composition

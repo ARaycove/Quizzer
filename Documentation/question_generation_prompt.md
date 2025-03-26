@@ -44,6 +44,8 @@ Avoid using vague temporal references when referring to time periods or dates.
 Use numbers instead of words when citing century (19th c. as opposed to nineteenth century)
 
 When generating answers to generated questions, you will provide the quote of the source material from which it was derived whenever possible
+- You will provide a list of subjects to which it belongs based on the subject_generator.py
+- You will provide a list of concepts to which it relates based on the context of the question
 ________________________
 I will provide the material one paragraph or one page at a time, you will generate questions for each segment provided, with the intent to be as exhaustive as possible. All questions should be formatted in the following way. for exact_academic_citation you will include a proper academic citation.
 
@@ -52,10 +54,11 @@ Q: this is a question
 A: this is the answer 
 
 exact_academic_citation: this is the citation from the source material
+
+Subjects: list[str]
+Concepts: list[str]
 _____________
 Upon generating questions you will examine each of them and determine whether or not they violate the rules in the prompt, then provide an evaluation. If the question violates the rule in the prompt you will regenerate that question so that it does not violate the rules in the prompt. You will provide a log of this.
-
- Do you understand the task? Or do you need further clarification?
 
  ## Reporting Results
  - AI model ignored instructions by stating "According to the text in one of it's questions
