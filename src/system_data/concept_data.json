@@ -2450,9 +2450,10 @@
             "87.104.97.116.32.101.112.105.115.116.101.109.111.108.111.103.105.99.97.108.32.112.104.105.108.111.115.111.112.104.105.99.97.108.32.116.104.101.111.114.121.32.100.105.100.32.74.111.104.110.32.76.111.99.107.101.32.112.114.111.112.111.115.101.63",
             "73.110.32.112.104.105.108.111.115.111.112.104.121.32.111.102.32.101.109.112.105.114.105.99.105.115.109.32.119.104.97.116.32.97.114.101.32.116.104.101.32.116.119.111.32.102.97.99.117.108.116.105.101.115.32.111.102.32.109.105.110.100.63",
             "72.111.119.32.100.111.101.115.32.72.117.109.101.39.115.32.118.105.101.119.32.111.110.32.99.108.97.114.105.102.121.105.110.103.32.105.100.101.97.32.100.105.102.102.101.114.32.102.114.111.109.32.116.114.97.100.105.116.105.111.110.97.108.32.118.105.101.119.115.63",
-            "68.101.102.105.110.101.32.116.104.101.32.118.105.101.119.32.111.102.32.69.115.115.101.110.116.105.97.108.105.115.109.63"
+            "68.101.102.105.110.101.32.116.104.101.32.118.105.101.119.32.111.102.32.69.115.115.101.110.116.105.97.108.105.115.109.63",
+            "2025-03-26 08:52:03.938775_47d39d7b-37ff-461b-aeec-ca52e36c101d"
         ],
-        "num_questions": 5
+        "num_questions": 6
     },
     "Immanuel Kant": {
         "questions": [
@@ -10335,9 +10336,10 @@
     },
     "social mobility": {
         "questions": [
-            "2025-03-24 08:11:38.483061_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+            "2025-03-24 08:11:38.483061_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+            "2025-03-26 08:59:03.319829_47d39d7b-37ff-461b-aeec-ca52e36c101d"
         ],
-        "num_questions": 1
+        "num_questions": 2
     },
     "religious heterodoxy": {
         "questions": [
@@ -11082,9 +11084,10 @@
     "Modernism": {
         "questions": [
             "2025-03-24 09:25:38.234086_47d39d7b-37ff-461b-aeec-ca52e36c101d",
-            "2025-03-24 09:27:58.938019_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+            "2025-03-24 09:27:58.938019_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+            "2025-03-26 08:46:58.383673_47d39d7b-37ff-461b-aeec-ca52e36c101d"
         ],
-        "num_questions": 2
+        "num_questions": 3
     },
     "art movements": {
         "questions": [
@@ -11371,6 +11374,408 @@
     "critical value": {
         "questions": [
             "2025-03-25 08:34:39.642323_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 1
+    },
+    "modernist thought": {
+        "questions": [
+            "2025-03-26 08:46:58.383673_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 1
+    },
+    "psychological theory": {
+        "questions": [
+            "2025-03-26 08:46:58.383673_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+            "2025-03-26 09:01:02.027099_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+            "2025-03-26 09:02:46.552573_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 3
+    },
+    "intellectual foundations": {
+        "questions": [
+            "2025-03-26 08:46:58.383673_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 1
+    },
+    "psychoanalysis": {
+        "questions": [
+            "2025-03-26 08:46:58.383673_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+            "2025-03-26 09:14:56.280646_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+            "2025-03-26 09:16:51.111952_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 3
+    },
+    "Sigmund Freud": {
+        "questions": [
+            "2025-03-26 08:46:58.383673_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+            "2025-03-26 08:48:23.149879_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+            "2025-03-26 08:50:33.468611_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+            "2025-03-26 08:54:09.631834_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+            "2025-03-26 08:56:24.176346_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+            "2025-03-26 08:59:03.319829_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+            "2025-03-26 09:11:57.243942_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+            "2025-03-26 09:13:27.843093_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 8
+    },
+    "psychology founding": {
+        "questions": [
+            "2025-03-26 08:48:23.149879_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 1
+    },
+    "medical disciplines": {
+        "questions": [
+            "2025-03-26 08:48:23.149879_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 1
+    },
+    "mental health study": {
+        "questions": [
+            "2025-03-26 08:48:23.149879_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 1
+    },
+    "psychotherapy": {
+        "questions": [
+            "2025-03-26 08:50:33.468611_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 1
+    },
+    "talking therapy": {
+        "questions": [
+            "2025-03-26 08:50:33.468611_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+            "2025-03-26 09:14:56.280646_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+            "2025-03-26 09:16:51.111952_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 3
+    },
+    "clinical psychology": {
+        "questions": [
+            "2025-03-26 08:50:33.468611_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 1
+    },
+    "therapeutic practice": {
+        "questions": [
+            "2025-03-26 08:50:33.468611_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 1
+    },
+    "empirical validity": {
+        "questions": [
+            "2025-03-26 08:52:03.938775_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 1
+    },
+    "scientific legacy": {
+        "questions": [
+            "2025-03-26 08:52:03.938775_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 1
+    },
+    "theoretical influence": {
+        "questions": [
+            "2025-03-26 08:52:03.938775_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 1
+    },
+    "philosophy of mind": {
+        "questions": [
+            "2025-03-26 08:54:09.631834_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 1
+    },
+    "scientific aspirations": {
+        "questions": [
+            "2025-03-26 08:54:09.631834_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 1
+    },
+    "intellectual legacy": {
+        "questions": [
+            "2025-03-26 08:54:09.631834_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 1
+    },
+    "Moravia": {
+        "questions": [
+            "2025-03-26 08:56:24.176346_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 1
+    },
+    "Czech Republic": {
+        "questions": [
+            "2025-03-26 08:56:24.176346_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 1
+    },
+    "Vienna": {
+        "questions": [
+            "2025-03-26 08:56:24.176346_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 1
+    },
+    "Austrian Empire": {
+        "questions": [
+            "2025-03-26 08:56:24.176346_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 1
+    },
+    "Moravian origins": {
+        "questions": [
+            "2025-03-26 08:56:24.176346_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 1
+    },
+    "geographic mobility": {
+        "questions": [
+            "2025-03-26 08:56:24.176346_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 1
+    },
+    "Jewish emancipation": {
+        "questions": [
+            "2025-03-26 08:59:03.319829_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 1
+    },
+    "assimilation": {
+        "questions": [
+            "2025-03-26 08:59:03.319829_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 1
+    },
+    "generational change": {
+        "questions": [
+            "2025-03-26 08:59:03.319829_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 1
+    },
+    "anti-Semitism": {
+        "questions": [
+            "2025-03-26 08:59:03.319829_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+            "2025-03-26 09:01:02.027099_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 2
+    },
+    "biographical influence": {
+        "questions": [
+            "2025-03-26 09:01:02.027099_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 1
+    },
+    "irrational behavior": {
+        "questions": [
+            "2025-03-26 09:01:02.027099_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+            "2025-03-26 09:02:46.552573_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 2
+    },
+    "personal experience": {
+        "questions": [
+            "2025-03-26 09:01:02.027099_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 1
+    },
+    "irrationality": {
+        "questions": [
+            "2025-03-26 09:02:46.552573_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 1
+    },
+    "human consciousness": {
+        "questions": [
+            "2025-03-26 09:02:46.552573_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 1
+    },
+    "mental processes": {
+        "questions": [
+            "2025-03-26 09:02:46.552573_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 1
+    },
+    "psychological development": {
+        "questions": [
+            "2025-03-26 09:05:31.873074_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+            "2025-03-26 09:08:08.201534_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 2
+    },
+    "Charles Darwin": {
+        "questions": [
+            "2025-03-26 09:05:31.873074_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+            "2025-03-26 09:10:10.744941_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 2
+    },
+    "literary influence": {
+        "questions": [
+            "2025-03-26 09:05:31.873074_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 1
+    },
+    "mental evolution": {
+        "questions": [
+            "2025-03-26 09:05:31.873074_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 1
+    },
+    "hostile psychic environment": {
+        "questions": [
+            "2025-03-26 09:05:31.873074_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 1
+    },
+    "unconscious desires": {
+        "questions": [
+            "2025-03-26 09:08:08.201534_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 1
+    },
+    "social pressure": {
+        "questions": [
+            "2025-03-26 09:08:08.201534_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 1
+    },
+    "mental development": {
+        "questions": [
+            "2025-03-26 09:08:08.201534_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 1
+    },
+    "psychological drives": {
+        "questions": [
+            "2025-03-26 09:08:08.201534_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 1
+    },
+    "pleasure principle": {
+        "questions": [
+            "2025-03-26 09:08:08.201534_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 1
+    },
+    "psychological disorders": {
+        "questions": [
+            "2025-03-26 09:10:10.744941_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 1
+    },
+    "treatment ambitions": {
+        "questions": [
+            "2025-03-26 09:10:10.744941_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 1
+    },
+    "hysteria": {
+        "questions": [
+            "2025-03-26 09:11:57.243942_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 1
+    },
+    "female patients": {
+        "questions": [
+            "2025-03-26 09:11:57.243942_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 1
+    },
+    "psychological diagnosis": {
+        "questions": [
+            "2025-03-26 09:11:57.243942_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 1
+    },
+    "sexism in medicine": {
+        "questions": [
+            "2025-03-26 09:11:57.243942_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 1
+    },
+    "etymological origins": {
+        "questions": [
+            "2025-03-26 09:11:57.243942_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 1
+    },
+    "psychological trauma": {
+        "questions": [
+            "2025-03-26 09:13:27.843093_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 1
+    },
+    "sexual abuse": {
+        "questions": [
+            "2025-03-26 09:13:27.843093_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 1
+    },
+    "psychosomatic symptoms": {
+        "questions": [
+            "2025-03-26 09:13:27.843093_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 1
+    },
+    "trauma theory": {
+        "questions": [
+            "2025-03-26 09:13:27.843093_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 1
+    },
+    "psychological causation": {
+        "questions": [
+            "2025-03-26 09:13:27.843093_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 1
+    },
+    "talking cure": {
+        "questions": [
+            "2025-03-26 09:14:56.280646_47d39d7b-37ff-461b-aeec-ca52e36c101d",
+            "2025-03-26 09:16:51.111952_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 2
+    },
+    "therapeutic technique": {
+        "questions": [
+            "2025-03-26 09:14:56.280646_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 1
+    },
+    "psychological treatment": {
+        "questions": [
+            "2025-03-26 09:14:56.280646_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 1
+    },
+    "clinical innovation": {
+        "questions": [
+            "2025-03-26 09:14:56.280646_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 1
+    },
+    "psychoanalytic method": {
+        "questions": [
+            "2025-03-26 09:16:51.111952_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 1
+    },
+    "memory recollection": {
+        "questions": [
+            "2025-03-26 09:16:51.111952_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 1
+    },
+    "dream analysis": {
+        "questions": [
+            "2025-03-26 09:16:51.111952_47d39d7b-37ff-461b-aeec-ca52e36c101d"
+        ],
+        "num_questions": 1
+    },
+    "suppressed trauma": {
+        "questions": [
+            "2025-03-26 09:16:51.111952_47d39d7b-37ff-461b-aeec-ca52e36c101d"
         ],
         "num_questions": 1
     }
