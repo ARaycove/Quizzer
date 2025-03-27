@@ -124,6 +124,11 @@ The trick is to do the planning when you're too tired to learn stuff in earnest
 ## Perry's Historical Sources []
 ## Western Civ II Concise History []
 ## Western Civ III Concise History []
+## Neuro Pamphlet
+
+## Intro Neuroscience Textbook
+
+## Science of Memory: Concepts
 
 ## Hughe Calculus Book []
 -[] 4.2 Optimization
@@ -247,7 +252,7 @@ https://www.varsitytutors.com/calculus_1-practice-tests
 -[] Velocity practice test
 -[] How to find velocity practice test
 
-## Intro Neuroscience Textbook
+
 - 
 CLEP Exams (Entered verbatim)
 
