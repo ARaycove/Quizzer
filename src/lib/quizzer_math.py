@@ -33,7 +33,7 @@ def find_optimal_pattern_size(n):
     return optimal_r, max_combinations
 
 # Example usage for your specific case
-n_neurons = 180  # Total neurons in output layer
+n_neurons = 32  # Total neurons in output layer
 
 (optimal_r, max_combinations) = find_optimal_pattern_size(n_neurons)
 
