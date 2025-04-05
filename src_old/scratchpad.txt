@@ -1,0 +1,1019 @@
+SSSSSSSSSSHOW columns FROM table_two;  large = max([np.sqrt(i) for i in x]) SELECT col_1 FROM table_two;  ALTER TABLE table_two ADD (col_1 data(size) NOT NULL); Presbyterians in 1646 April 4th 1687  INSERT INTO table_two (col_1) SELECT col_1 FROM table_other;  SHOW columns FROM table_other;  DELETE FROM table_other WHERE primary_key = key;  ALTER TABLE table_nunnuah ADD (col_1 data(size));  int var_name = -44;  @app.get("/2") async def func():     something here  -- Clear a table TRUNCATE TABLE table_name;  value = 10 lock = asyncio.Lock()  async def process():     global value     async with lock:         value += 1         do_work()     print("released lock on value")  columns = len(a[0]) rows    = len(a) b = [] for i in range(columns)     row = []     for j in range(rows):         row.append(a[i][j])     b.append(row) ½⁺  result_1, result_2 = asyncio.gather(res_1(), res_2()) k(x+3)(x-1)(x-2) results, result, resul = asyncio.gather(func1(), func2(), func3()) my_dict[k] = value 1/2 = e^-0.033x ln(1/2)/-0.033 = x stddraw.point(x,y) stddraw.setXscale(-1, 1) stddraw.setYscale(-1, 1) stddraw.point(x,y)  SELECT * FROM table_name;  r*θ new_string = my_string.replace(old, new, count) SELECT col_1, col_2 FROM table_name; ab^x k(x+3)(x-2)²  TRUNCATE TABLE table_name;  action potentials and local field potentials  UPDATE TABLE table_name SET col_1 = num col_2 = funky_dust WHERE primary_key = value;  INSERT INTO table_name (col_1, col_2) VALUES (val_1, val_2);  CREATE DATABASE college; Apr 4th, 1687  ALTER TABLE table_name RENAME col_1 TO col_2;  math.log(x, b)  CREATE TABLE Student (col_1 int);  2 ~/ 1.5 SHOW columns FROM table_name;  columns = len(a) rows    = len(a[0])  b = [] for i in range(columns):     row = []     for j in range(rows)         row.append(a[j][i])     b.append(row) *  void greet(name) {     print('Hello $name!'); }  ALTER TABLE table ADD (col_1 data(size));  queue = asyncio.Queue() queue.put(i) item = queue.get()  ALTER TABLE MODIFY col_1 decimal(10,2);  DELETE FROM table_name Where primary = key  UPDATE TABLE table_name SET  col_1 = value, col_2 = value, WHERE prim = key; @app.get("/2") async def function():     do_something()     1766-1817 madame de stael   var variable = bar bar bar ᵗ 20² = 25^2 + 18^2 -2*18*25*cos(a) 400 = 625 + 324 - 900(a) 400 - 949 / -900 = cos(a) 549/900 = cos(a) cos⁻¹(549/900) = a 1657-1757  isinstance(object, type)  CREATE TABLE table_two (     col_1 data(size),     col_2 data(size) NOT NULL,     col_3 data(size), ) ₂fΔ /   INSERT INTO table_name (col_1) VALUES (val_1); stddraw.circle(x, y, r)  python3 randomseq.py > data.txt   for i in range(columns)     row = []     for j in range(rows)         row.append(a[j][i])     b.append(row)  UPDATE TABLE table_name SET col_1 = ten WHERE primary_key = ??; 2 ~/  1755 - A Discourse on the Origin of Inequality  double floatfloat = 2.4;  lock = asyncio.Lock() async with lock     Do process inside  my_string = my_string.lower()  my_string = "".join[str(i) for i in my_string if i.isalpha()]  ALTER TABLE table_name RENAME col_1 to col_2;  randomseq.py > data.txt randomseq.py < data.txt  ALTER TABLE table_name ADD col_1 data(size);  int  a list of strings CURRENT_DATE()  CREATE TABLE player (     col_1 data(size) default "value" );  stddraw.line(x0, y0, x1, y1)  CURRENT_DATE()  CREATE TABLE prostitutes;   ALTER TABLE table_name MODIFY col_1 decimal(10, 2);  drop table table_name;   CREATE TABLE fffff (col_1 data(size) default = "value"); tuplesss = (43, 21, 22,) result = principle * math.pow(     (1+int_rate), year ) α [int(i) for i in my_string.split()] 1/2 * (sin(a+b)+sin(a-b))  list.count(metkdjfl) rsin(θ) = 3rcos(t)+2 r(sin(t)-3cos(t)) = 2 sqrt(x^2+y^2) = 2 /(sin(t)-3cos(t)) °ˣ import stdio ti json.dump(data, f)  string.capitalize() √Si Square root of Silicon! But How? my_list.sort(key=max()) my_dict.update(dicttt) CONST_VAR = fffff ⋃ ⁻ show columns from table_name CREATE TABLE table_name (col_1 data(size) default = "something"); * result = asyncio.gather(task(), task()) result[0] result[1] 1758 1689-1755  DELETE FROM table_name WHERE primary_key = key;  stddraw.circle(x, y, r)  CHAR(num) or VARCHAR(num) or tinytext text mediumtext longtext  ALTER TABLE table_name ADD (     col_1 data(size), ); @app.get("/uuu") async def function():     await asyncio.sleep(1)  /  b = []  columns = len(a) rows = len(a[0])  for i in range(columns):     row = []     for j in range(rows):         row.append(a[j][i])     b.append(row) print(b) math.log(x, b) inst.ff = 000 -2(x+3)(x-1)(x-2) [i for i in my_list] Apr 4 1684 CURRENT_DATE()  [int(i) for i in my_list] sin(80)/100 = sin(b)/10 1766-1817 ⁹ bool var_name = true; await asyncio.sleep() radnom.py > data.txt k(x+3)(x-2)² 1469-1527 create database college;  ALTER table table_name ADD col_1 data(size) default = "value";  INSERT INTO table_name SELECT * FROM table_name;  UPDATE TABLE table_name SET col_1 = 4 WHERE condition; π if (year >= 2001) {     print("21st century"); } else if (year >= 1901) {     print("20th century"); }  INSERT INTO table_name (     col_1, ) VALUES (val_1) String? name = null; ~/ a = [dup] * 1000 a[1000]  indexError create table table_nammmm; stddraw.circle()  UPDate table table_name set col_1 = value where condition; 1469-1527  async def function():     await do_something  asyncio.create_task(function())  ALTER TABLE table_name MODIFY col_1 data(size);  ALTER TABLE table_name RENAME col_1 TO c-0;  String name = "bob"  CREATE table table_name( col-1 data(size), col_2 data(size), col_3 data(size), ) .point(x, y)  lock = asyncio.Lock()  async with lock     data = manipulate(data)     print("released")  INSERT INTO table_name(     col_1, col_2, col_3 ) VALUES (data, data, data), (data, data, data); if not os.path.exists(path)     os.makedirs(path)  SELECT col, col_1,col_2,col_3 FROM table_name; 20/12.853 = 1.034ᵗ t = math.log(     (20/12.853), 1.034 ) THalamus and hypothalamus = math.sqrt((1-math.cos())/2)  lim x->∞ f(x) = L ln(a) + ln(b)  yesterday = date.today() - timedelta(1) math.log(7, 2)  x = [0, 1, 2, 3] y = [0, 1, 2, 3] stddraw.polygon(x, y) 113.4 = 99.9*math.exp(k*10)  113.4/99.9 = math.exp(k*10) math.log(113.4/99.9) = k*10 math.log(113.4/99.9)/10 = k function(data: str) ⁺ ±Asin(B(θ-h))+k  python3 average.py < data.txt  yesterday = date.today() - timedelta(1)  -x²+4 324  f(a+h)-f(a) / h stddraw.line(x, y, x1, y1)   b = [] num_cols = len(a) num_rows = len(a[0])  for i in range(num_cols):     row = []     for j in range(num_rows):         row.append(a[j][i])     b.append(row)  python3 script.py > text.txt  ALTER TABLE table_name ADD (col_1 data(size));*  select * from table_name where condition; stddraw.square(x, y, 2) delete from table_name where primary_key = desired;  queue = asyncio.Queue() CP/CT ΔV = (prediction error) x = [0, 0, 0 , 0] y = [1, 2, 3, 4] stddraw.polygon(x, y)  b * lim x->c f(x) =  python3 average.py < data.txt 1689-1755  SELECT data from table_name; stddraw.square(x, y, r) r is radius not width  ALTER TABLE table_name ADD col_1 data(size) default "null"; yesterday = date.today() - timedelta(1)  UPDATE TABLE table_name SET col_1 = value, col_2 = value, WHERE condition;  CREATE table table_name (     col_1 data(size),     col_2 data(size), )  char or VARCHAR  ALTER TABLE ccol_ MODIFY col_1 VARCHAR(100); random.uniform(-1, 1)  create table name (     col_1 data(size) default NULL, );  select * from table_name;  ALTER table cooo MODIFY col_1 decimal(10, 2) Madame du Chatelet, who translated Newton's Principia into French?  INSErt into table_name (col_1) select col_1 from other_table;  What was the "immediate" cause of the War of the Spanish Succession? The death of Charles II of Spain in November 1700 python3 average.py < data.txt  lock = asyncio.Lock data_that_is_locked = "not real data"  async with lock     do_something(data_that_is_locked)      yesterday = date.today() - timedelta(1)   UPDATE table table_name SET col_1 = value col_2 = value where != butt_sex  insert into table_name (     col_1,col2,col_3 ) values  (set_1, set_2, set_3), (set_4, set_5, set_6);  ALTER TABLE table_name MODIFY col_1 varchar(100);  put a blocking action in the function, no awaits  1727-1797  t+h² - t²  h(t+h) /h 2t python3 average.py < data.txt   d_t = 0.001 while theta <= 2pi     r = sin(n*theta)     x = r * cos(theta)     y = r * sin(theta)      stddraw.point(x, y)     theta += d_t  UPDATE TABLE table_name SET col_1 = value, col_2 = value, where something;  Insert into table_name (col_1, col, col) values (2, 3 , 5) (3 , 5, 6); / alter table tableiii add (col_1 data(size)); .line(x0, y0, x1, y2) λ .square(x, y, 2) .circle(x, y, radius)   alter table jjjjj modify col_1 varchar(100); random.uniform(-1, 1) λ date.today() - timedelta(1) λ z < x < y ½ create database college; math.log(x, b) 2sin(θ)cos(θ) y = a(0.y)ˣ Perry - 191-192 (The Man Versus the State) X Perry - 190-191 (Justification for State Intervention) X 197-198 (On the famine in Skibbereen) X 253-255 (An early critique of Imperialism) X λ% 1462-1505 1533-1584  stddraw.square(x, y, 2)  Δposition/Δtime  update table jjjjj set col_1 = value where blank;  200x¹⁹⁹ 1689-1755 1805-1859 13th century mongol invasion Battle of Trafalgar Battle of Jena -> Berlin 1805-1859 - Alexis de Tocqueville ₁ class dildo():     def__init__(self, length, ribbed: bool, color)         self.length = length         self.ribbed = ribbed         self.color  = color ³ INSERT into table_name (col) VALUES (value)  ALTER TABLe table_name MODIFY col_1 VARCHAR(100); λ python3 average.py < data.txt ~/ 18*1.5 1/2 * 109°π/180 * 18² 18*109π/180 18²*1.5*1/2 ˣ Map<String, dynamic> thing_one = {"key": 123} Hemoglobin is diamagnetic when oxygenated Hemoglobin is paramagnetic when deoxygenated while (year < 2016) {     print(year);     year++; } drop table table_name;   poorer subsequent memory for those items, demonstrating a nonmonotonic relationship between competition and subsequent memory.  @app.get("/ff") async def func():     time.sleep(1)     print("10") * UPDATE table table_name  set col_1 = value, col_2 = value, where primar;  time_delta = datetime.now() - date_object time_delta = abs(time_delta) boolean = time_delta.total_seconds() <= 24 * 3600   b = [] columns = len(a) rows    = len(a[0])  for i in range(rows)     row = []     for j in range(columns)         row.append(a[j][i])     b.append(row)  void main() {     String name = "little johnny";     print(name) } double var_name = 544.32;  alter table table_name add col_1 data(size);  int spicy = 69;  θ ≠ kπ stddraw.point(x, y) for (int month = 1; month <= 12; month++) {     print(month); } print(f"{col[0]:+^10}|{col[1]:10}|{array[2]:10}") ⁶  Insert into table_name (col_1 data(size) default null) select col_1 from other_table; 20² = 25²+18²-2*25*18*cos(a) 400 - (625+324)-900cos(a) 400-949 / -900 = cos(a) (Bθ+|c|) vs (b(θ-h)) .square(x, y, 2) docker images  if not os.path.exists(path):     os.makedirs(path) docker rmi <image id>  @app.get("/f") async def function():     await asyncio.sleep(1) 1.00727 alter table table_name add col_1 data(size) 2cos(10θ/2)cos(t) math.log(     (20/12.853), 1.034 ) 2cos²(θ) - cos(θ) - 1 = 0 2cos²(θ)- 2cos(θ) + cos(θ) - 1 = 0 2cos(θ)(cos(θ)-1) + (cos(θ) - 1) (2cos(θ)+1) (cos(θ)-1) +1 , -½ 0, 2π/3, 4π/3  Alter table table_name Add (col_1 data(size));  void greet(name) {print("Hello $name!");}  What was the name of the work Joseph de Maistre wrote in 1808?  In What century(s) did the Habsburg Empire reign? A) x1 -> x3  B) x3 -> x5  λ½λˢ k(x+3)(x-2)² ~/ bool var_name = true; list[len(list)-i] Δ q = asyncio.Queue()  q.put(item) q.get(item) stddraw.square(x, y, 2) -2sin(u-v/2)sin(u+v/2) create database college; ga b^2 = a²+c²-2accos(β) stddraw.circle(x, y, r) x = [x0, x1, x2, x3] y = [y0, y1, y2, y3] stddraw.polygon(x, y) ³ ½ Lajos Kossuth led the movement for Hungarian Nationalism tar -x tar_file.tar.gz python3 average.py < data.txt computed_value = sum([min(i) for i in data_row_list]) ₂¹ 1643-1715  h != j  String? name = "do-do"; λ  1619-1683 alter table jooo add (col_1 data(size)); ᵗ alter table table_name rename col_1 to col_2; 1766-1817 math.log(x, b) ~/  while (year < 2016) {     year++; } nucleus caudate globus pallidum Accumbens Putamen 1469-1527 1304-1374 Herbert Spencer 1820-1903 my_list.reverse()  .setXscale(-1, 1) .setYscale(-1, 1)  theta = 0  while theta <= (2 * math.pi)     radius = math.sin(n*theta)     x = radius * math.cos(theta)  for i in range(1, -5, -1):     print(i) 1713-1784 1715-1774 f'(cf(x)) = c*f'(x) 1653  show columns from table_name; f'(x) + f'(c) = f'(f(x)+g(x))  f'(f(x)) + f'(g(x)) 2 f'(x^n) = n*x^n-1  e^kx vs ab^x  1816-1882 Essay on the inequality of the human races  9-4/2 5/2 = x 72ʰ  drop table table_name; alter table table_name modify col_1 decimal(10, 2);  1/3 * x^-2/3 1/3³√x² 1462-1505 1820-1903 α 1789 1713-1784 1835 my_list.index(value) 1806-1873  c*f'(x) use db_name; delete from table_name where condition; 1804 z < x < y  damage to the prefrontal ventromedial cortex leads recalled memories to become distorted beyond recognition life liberty and property  1619-1683 1814-1815  def euclid(p, q)     if q == 0: return p     return euclid(q, p%q)  The agular height above the ground  def harmonic(n)     if n == 1: return 1     return harmonic(n-1) + 1/n  # Key Terms Industrial Revolution Five British Advantages Enclosure Luddism/Luddites cos(4π/12 + 3π/12) cos(π/3+π/4)  1/2*√2/2 -  f'(x)+g'(x) 1/cos(θ) pi/6 & 5pi/6 2 & 10 ⁺  update table table_name set col_1 = "value" col_2 = "Value_2" where condition; ±AD ±AC  False, Burke was a conservative The kaffir tribe did not produce civilization in the same way that Europeans did, therefore Pearson regarded them as sub-human; [int(i) for i in my_list if i.isdigit()] Lajos Kossuth Edict of Nantes, revoked in 1685 by Louis XIV f'' ≥ 0 paramagnetic when deoxygenated yesterday = date.today() - timedelta(1) range(5, -6, -1) radius = math.sqrt(9+25) radius = math.sqrt(34)  x = √34 * cos(θ-20) y = √34 * sin(θ-20) ⁹°    docker network create <network_name>  b = []  for i in range(len(a[0]))     row = []     for j in range(len(a))         row.append(a[j][i])     b.append(row)  b is now transposed LT Hobhouse 1864-1929   1483-1546 class_object.att = new_value 1713-1784 - Denis Diderot - 1772 completed the encyclopedia 1713 - Treaty of Utrecht was signed 1784 - was 10 years after Louis XV died  1864-1929   def euclid(p, q):     if q == 0: return p     return euclid(q, p % q) {var:u>5} Olympe de Gouges 1745 - 1793 L.T. Hobhouse 1864 - 1929  my_list.insert(index, value) THIS_IS_A_CONSTANT = None Gobineau write his essay on the inequality of the human races in 1853-1855 * -√3 ⋃ min([sum(row) for row in data_row_list]) Arthur de Gobineau 1816-1882   alter table table_name add (col_1 data(size));  c² = b²+a²-2abcos(γ) / 3600 arcseconds Ivan III(r. 1462-1505) excratory and digestive systems  def harmonic(n)     if n == 1: return 1     return harmonic(n-1) + 1/n   def harmonic(n)     if n == 1: return 1     return harmonic(n-1) + 1/n  Proof requires base case and an induction step θ velocity = Δ(direction)/Δ(time) speed = magnitude of velocity  π stddraw.setPenColor(stddraw.YELLOW) stddraw.filledrectangle(x, y, w, h)  Perry(124-125) The Division of Labor X  Perry(121-123) Britain's Industrial Advantages X  Brooks Volume III CH 2 X #############################################3 string.isupper() def harmonic(n)     if n == 1: return 1     return harmonic(n-1) + 1/n  -2x^-3 shorthand operators += -= /= *= r+  f.seek(0) f.write(single_line) f.truncate() 1653 == 1203  base case The induction step - assume n is true , then use that to prove my_list.remove(specific_element) Geneva, Switzerland Ptolemy wrote the Almagest select col_1, col_2 from table_name;  python3 randomseq.py > data.txt lim x->c f(x)/lim x-> c g(x)  1853-1855 create table table_name (     col_1 data(size) not null, ); 1713-1784 list[len(list)-i]  -π/2 , π/2  [abs(i) for i in x]  select * from table_name;  non-monotonic plasticity hypothesis predicts that close competition between memories can weaken the memory that loses the competition leading to subsequent forgetting  select col_1 from data_table; Treaty of Utrecht 1713  1806-1873  def euclid(p, q):     if q == 0: return p     return euclid(q, p % q) 1816-1882 1799, The consulate 1724-1804 8 years old Great Compromise 1653  Address the problems of society 290m f'(x^n) = nx^n-1 -9.8t+5 -9.8 stddraw.point(x, y) Current Clamp Recording is Intracellular  r*θ 1820-1903  The king and the church 7√3x⁶-x⁴ Seaborgium is a Transition Metal  .3x²+2√2x^√2-1 1745-1793 my_list[i] = new_value Cromwell 1599-1658 Computation Why(problem) Algorithm What(rules) Implementation How(physical Implementation) THe Lycee 1864-1929  result = asyncio.gather(task()) Sphinx e = 2.71828 class dooogo():     def __init__(self)         self.lol = "What?" docker rmi <image_name> d = √(Δx)²+Δy²  stddraw.filledRectangle(x, y, w, h) def harmonic(n)     if n == 1: return 1     return harmonic(n-1) + 1/n stddraw.setFontSize(int) >>  stddraw.setFontFamily(font) stddraw.rectangle(x, y, w, h) stddraw.setFontFamily(font) stddraw.text(x, y, string)   periphal nervous systems stddraw.setFontSize(int) math.sqrt(70**2 + 23 ** 2) tan(70/23) = θ  def euclid(p, q):     if q == 0: return p     return euclid(q, p%q)  insert into table_name (col_1, col_2, col_3) VALUES (data, data, data), (data, data, data); 1599-1658  time_delta = datetime.now() - date_object() time_delta = abs(time_delta) return time_delta.total_seconds <= (24 * 3600)   Perry(172-174) Hard Times  Perry(136-137) Factory Rules  Perry(134-135) The Condition of the Working Class in England  Perry(132-133) Moral and Physical Dissipation  Perry(130-132) The Sadler Report  Perry(183-189) Communist Manifesto        Perry(172-174) Hard Times  Perry(136-137) Factory Rules  Perry(134-135) The Condition of the Working Class in England  Perry(132-133) Moral and Physical Dissipation  Perry(130-132) The Sadler Report  Perry(183-189) Communist Manifesto du/dy * v + dv/dy * u  1773-1859 - Klemmens Von Metternich  10x*(x³+1)-5x²*(3x²) / (x³+1)² 10x⁴+10x - 15x⁴ / (x³+1)²  10x - 5x⁴ / (x³+1)²  x^-1/3 - 1 / 3x^4/3  1864-1929  for (int month = 1;month <= 12;month++) {     print(month); } 1856 ab(prediction_error)  >  col_1 decimal(10, 3);   (6x+5)*e^x + (3x²+5x)*e^x e^x(6x+5+3x²+5x) e^x(3x²+11x+5)  python3 average.py < data.txt  select something from somewhere;  stddraw.setFontFamily(stddraw.font) docker stop <container_id>  def harmonic(n):     if n == 1: return 1     return harmonic(n-1) + 1/n   Guiseppi Mazzini 1805-1872??  Δf = f(x+h)-f(x) ² f'(x^n) = nx^n-1  default null 1835 def function(var: str = "this") super() function invokes the methods and attributes of the parent class math.exp(x) => e^x  with open("json.josn", "w+") as f:     json.dump(data, f, indent=4)  stddraw.setFontSize(int)  23*sin(73°)  String name = "Bob"  1469-1527 0*... - e^x*1 / (1+e^x)² alter table table_name modify col_1 varchar(100); >  def euclid(p, q)     if q == 0: return p     return euclid(q, p%q)  update table table_name set col_1 = new_value; λ*αβγδκ Klemens Von Metternich 1773 - 1859  Martin Luther  1483-1546  Herbert Spencer 1820 - 1903  @app.get("/url") async def sequential():     time.sleep(1) # io blocking operation 1556 λ 1853-55 3x²
+
+1773-1859
+my_string.title()
+
+anamnesis is a recalling to mind
+~/
+
+Ivan IV (r. 1533 - 1584)
+
+Guiseppi Mazzini
+1805 - 1872
+
+L.T. Hobhouse
+1864-1929
+[(2*i) for i in x]
+.setFontSize(int)
+.setFontFamily(font)
+date_object.date()
+Louis XIII died in 1643
+
+while theta <= (math.pi * 2):
+    r = sin(n*theta)
+    x = r * math.cos(theta)
+    y = r * math.sin(theta)
+    stddraw.point(x, y)
+
+stddraw.show()
+
+def harmonic(n)
+    if n == 1: return 1
+    return harmonic(n-1) + 1/n
+
+1805-1872
+1806-1873
+1820-1903
+1773-1859
+Tsar Nicholai I of Russia (r. 1825-1855)
+
+# Marxism and European Socialism
+Key Terms:
+
+Absolute threshold
+Minimum stimulation necessary for perception
+
+Difference threshold
+Change in stimulation necessary for perception
+
+Webers Law
+Change 
+
+Weber-Fechner Law
+Change needed to perceive is proportional to original intensity of the stimulus (more intense the stimulation, more is needed to notice difference)
+
+Drift diffusion modeling
+- 
+Perceptual discrimination
+- A Decision is a commitment to a proposition, action, or plan based on evidence (sensory input), prior knowledge(memory), and/or expected outcomes
+
+
+if not os.path.exists(path)
+    os.makedirs(path)
+
+dx/dy(f(x)*g(x)) = df/dy*g + dg/dy*f 
+
+draw.rectangle(x, y, w, h)
+
+f(0) = 6.91
+f'(0) = ln(1.011)*6.91
+r²=6rsin(θ)
+r(r-6sin(θ))
+0, 6sin(θ)
+
+1*(1+e^x)-e^x*1  / (1+e^x)²
+2*ln(2)*3^x + 5e^x
+(data: int)
+for (object in flybyObjects) {
+    print(object);
+}
+1820-1903
+
+How long did Ivan III reign for?
+1505-1462 = 28+5 = 33
+
+How long did King Louis XV reign for?
+1715-1774
+create table student;
+.setFontFamily(font)
+.setPenColor(stddraw.YELLOW)
+.filledRectangle(x, y, w, h)
+
+proton = 1.00727
+Three components of decision is: choice, reaction time, certainty
+
+educational and physical standards
+maintainance of heirachy
+economic competition between nations (up to and including warfare)
+
+-x² + 4
+
+update table table_name
+set col_1 = 10;
+
+b = []
+
+for i in range(len(a[0])):
+    row = []
+    for j in range(len(a)):
+        row.append(a[j][i])
+    b.append(row)
+
+@app.get("/")
+async concurrent():
+    await asyncio.sleep(1)
+
+insert into table_name (col_1)
+select col_1 from other_table;
+
+FROM image_nameˢ
+
+create table table_name(
+    col_1 data(size),
+    col_1 data(size),
+    col_3 data(size)
+);
+
+dx/dy(f(x)/g(x)) = f'(x) ± g'(x)
+λ½λˢ
+
+int var_name = -2;
+
+alter table table_nunnuah
+rename col_1 to col_2;
+
+void main() {print("Hello World);}
+
+sensory-related ion channels
+1799 consulate
+2cos((u+v)/2)cos((u-v)/2)₁
+1.740 x 10⁶
+Rice sugar, pimento, cotton, rum, tobacco
+
+def thing(p, q):
+    if q == 0: return p
+    return thing(q, p%q)
+
+1-cos(2a)
+/ 2
+2*ln(3)*3^x + 5e^x
+
+docker container prune
+f'(c*f(x)) = c*f'(x)
+
+def max3(x, y, z):
+    nums = [x, y, z]
+    max_num = x
+    for i in nums:
+        previous = i
+        if i >= previous:
+            max_num = i
+    return max_num
+
+stddraw.setCanvasSize(w, h)
+stddraw.text(x, y, str)
+stddraw.setFontSize(int)
+
+
+f'(g(x)) * g'(x)
+
+z = (x²+x⁴)
+f'(1/z) * g'(x²+x⁴)
+-1/z² * (2x+4x³)
+-(2x+4x³) / (x²+x⁴)²
+
+2*ln(3)*3ˣ + 5eˣ
+
+
+I am in a CCN 591 class, Computation Cognitive Neuroscience, we have been assigned group project to break down a paper, create a question and hypothesis. We've already given a slideshow presentation for our project pitch. Additionally we were given the following literature review task:
+
+literature review
+Hey all, 
+
+So part of the project pitch is ALSO a literature review.  So as you're preparing your pitch presentation, drop any of your references your using in a separate file and elaborate on them.  This will start building up your background/intro section for your papers. 
+
+ 
+
+L
+_
+This is what we've written so far:
+Our mental lives advance as we shift our focus from one idea to another. However, it is unclear how this thought-juggling affects our ability to remember these thoughts. Here we talk about the competition between the neural representations of recalled memory and working memory under pressure or in general.
+Working Memory has been one of the most studied cognitive constructions. Research on working memory had started way back in 1913 claiming the Thorndike’s Law of Disuse; “When a modifiable connection is not made between a situation and a response during a length of time, that connection’s strength is decreased” (Thorndike, 1913). Working memory has traditionally been thought of as an active memory system in charge of the short-term processing and maintenance of data. It is the ability to hold information in mind and manipulate it for brief periods of time during complex cognitive tasks. Theoretical models of working memory proliferate and differ in their views of nature, structure, and function of working memory (Maricle, Miller, & Mortimer, 2011). It is difficult to define working memory and disentangle it from related cognitive processes such as attention, processing speed or reasoning.  With further research, it was argued that there are significant factors behind forgetting which are “interpolated activities and changed stimulating conditions” rather than only passage of time (McGeoch, 1932).
+The delayed estimation task method requires participants to reproduce a feature in memory on a continuous scale of report, which successfully challenges the current views regarding capacity limits in visual WM (Bays et al., 2009; Bays & Husain, 2008; Wilken & Ma, 2004). It was noticed that forgetting reflects a lower probability of recalling the target, but crucially not in precision. (Zhang and Luck, 2009) and time serves as a retrieval cue for a target event, and when events are overcrowded temporally, they are more difficult to retrieve, which affects the probability of correctly retrieving information from WM, but not its precision (Brown, Neath, & Chater, 2007). This method was known as temporal distinctiveness. Regardless of how it is classified, working memory is a major cognitive process underlying thinking and learning. The “Retro-cuing" method where one item was cued long after the memory array was removed—to examine if forgetting is influenced by directing attention toward a single representation in memory. (Pertzov, Bays, Joseph, & Husain, 2013). The results were consistent with the non-monotonic plasticity hypothesis, which posits a U-shaped relationship between memory activation and learning, such that moderate levels of memory activation led to weakening of the memory, whereas higher levels of activation lead to strengthening. (Lewis-Peacock, 2014). Thus, it was predicted that close competition can trigger weakening of memories that lose the competition between co active thoughts, leading to subsequent forgetting.
+[From Nathan]
+ During the early research portions of this initial project, we came across relevant studies potentially applicable to our primary research focus. The Von Resteroff effect states that “Items that are distinctive with respect to their context tend to be recalled better than nondistinctive items” (Rangel-Gomez, Meeter, 2013). This known finding could potentially lead to supporting data related to our primary study. A study involving the Von Resteroff effects suggests that brain area isolates with associated fronto-central N2 and P3a, and the centroparietal P3b components due to the novelty effect but may not suggest overall advantageous memory encoding. Two other studies related to hippocampal ripples of certain frequencies were observed in our analysis. The first, Ripple-locked coactivity of stimulus-specific neurons and human associative memory (Kunz, Staresina, Reinacher, 2024), observed specific neurons and their coactivity alongside hippocampal ripples suggesting associative object location memory related to the two phenomena. This study could give us guidance on how memories are forgotten or retained in relation to their specific hippocampal frequencies and encoding. Thirdly a correlated study entitled “Widespread ripples synchronize human cortical activity during sleep, waking, and memory recall” suggests that specific synchronized hippocampal ripples support “essential properties necessary to support binding by synchrony during memory retrieval and perhaps generally in cognition.” (Dickey, Verzhbinsky, Jiang, Halgren, 2022). These synchronized ripples influence how memories are encoded during sleep, as well as waking states, ultimately affecting how our participants in our primary study retain memories both in the long term and during the temporal competition of memory studies.
+
+Collection and Processing of Data
+All data collected in this data-set is through fMRI raw data. The experiment was divided into two phases, Phase 1 and Phase 2. During Phase 1, the participant was shown a picture of a house and a face each, individually. This allows raw data to be recorded showing the pattern of firing based on the visual stimulus of that picture. Phase 2 begins the actual experiment. Participant is told to remember the entire scene with both images present, the stimulus time varies from trial to trial. For one third of the images shown a switch-cue is provided telling the participant exactly what they’ll be asked to recall. The recall test shows a series of images and asks whether the participant did or not see the following images in the retro-cuing sequence.
+
+There are multiple ways to process this data, but based on the hypothesis the best method to analyze the dataset will be MVPA. Particularly we will be using Pattern Similarity MVPA analysis, this method comes with the downside of losing locational data of the firing pattern but provides a better understanding of the structure and overall pattern itself. Since we will be analyzing the presence or lack of presence of the pattern in relation to the other, we do not need the locational data of the pattern.
+ λ
+ 
+References:
+1.      Thorndike, E. L. (1913). The psychology of learning. New York, NY: Teachers College, Columbia University.
+2.  	Maricle, D. E., Miller, D. C., & Mortimer, J. (2011). Memory tests in pediatric neuropsychology. In A. S. Davis (Ed.), Handbook of pediatric neuropsychology (pp. 275–291). Springer Publishing Company.
+3.      McGeoch, J. A. (1932). Forgetting and the law of disuse. Psychological Review, 39, 352–370. http://dx.doi.org/10.1037/h0069819
+4.      Bays, P. M., Catalao, R. F., & Husain, M. (2009). The precision of visual working memory is set by allocation of a shared resource. Journal of Vision, 9, 7–11. http://dx.doi.org/10.1167/9.10.7
+5.      Zhang, W., & Luck, S. J. (2009). Sudden death and gradual decay in visual working memory. Psychological Science, 20, 423– 428. http://dx.doi .org/10.1111/j.1467-9280.2009.02322.x
+6.      Brown, G. D., Neath, I., & Chater, N. (2007). A temporal ratio model of memory. Psychological Review, 114, 539 –576. http://dx.doi.org/10 .1037/0033-295X.114.3.539
+7.      Pertzov, Y., Bays, P. M., Joseph, S., & Husain, M. (2013). Rapid forgetting prevented by retrospective attention cues. Journal of Experimental Psychology: Human Perception and Performance, 39, 1224 –1231.
+ http:// dx.doi.org/10.1037/a0030947
+8.      Lewis-Peacock, J., Norman, K. Competition between items in working memory leads to forgetting. Nat Commun 5, 5768 (2014). https://doi.org/10.1038/ncomms6768
+9.      Rangel‐Gomez, M., & Meeter, M. (2013). Electrophysiological analysis of the role of novelty in the von Restorff effect. Brain and Behavior, 3(2), 159–170. https://doi.org/10.1002/brb3.112
+10. Kunz, L., Staresina, B.P., Reinacher, P.C. et al. Ripple-locked coactivity of stimulus-specific neurons and human associative memory. Nat Neurosci 27, 587–599 (2024). https://doi.org/10.1038/s41593-023-01550-x
+11. Widespread ripples synchronize human cortical activity during sleep, waking, and memory recall, Proc. Natl. Acad. Sci. U.S.A. 119 (28) e2107797119, https://doi.org/10.1073/pnas.2107797119 (2022). https://www.pnas.org/doi/abs/10.1073/pnas.2107797119
+
+This is our project slideshow: https://docs.google.com/presentation/d/1S7oR9jUYEvBhJPoedCLtJ4jBEXJwtJYquRzclc8V7ds/edit
+
+This is our primary source: https://compmemweb.princeton.edu/wp/wp-content/uploads/2016/11/competition-between-items-in-working-memory-leads-to-forgetting.pdf
+
+Please compile all of the information we have written, and formulate it into a strong introductory paragraph for our group paper, ensure to follow the prompt given to us by our professor.
+_________________________________________________________________________________________
+
+u = g(x) = x²+x⁴
+f'(1/u)*g'(x)
+-1/u² * (2x+4x³)
+-(2x+4x³)/(x²+x⁴)²
+
+docker volume rm <volume_name>
+Rousseau
+Voltaire
+Montesquie
+
+stddraw.setFontFamily()
+dx/dy(f(x)/g(x)) = (f'(x)*g(x)-g'(x)*f(x)) / g(x)²
+
+
+f'(g(x))*g'(x)
+
+³√x²
+
+(6x+5)*e^x + e^x*(3x²+5x)
+
+e^x(3x²+11x+5)
+
+difference threshold = minimum stimulation necessary for perception
+
+show columns from table_name;
+V'(x) = 10
+Trojan War 13th Century BCE
+
+d = √(Δx)²+(Δy)²
+√2 = 1.414
+Mill 1806-1873
+
+delete from table_name
+where primary_key = ??;
+
+tariffs, reducing the cut of the tax collectors, and colonialism
+
+drop table table_name;
+
+rapid eye movement
+
+def harmonic(n)
+    if n == 1: return 1
+    return harmonic(n-1) + 1/n
+
+
+3e^3x
+
+x = 1+e^dx/dy(3+x²)
+z = √x
+
+void main() {
+    var name = "some";
+    print(name);
+}
+
+np.zeros(x, dtype=int)
+
+tan(1-θ)
+
+date.today() - time_delta(1)
+
+
+f.seek(0)
+f.write(data)
+f.truncate()≤
+np.zeros(x)%
+date_object.date()
+asyncio.create_task(task())
+.
+int var_name = 69;
+
+Dysprosium is 66
+
+def euclid(q, p):
+    if p == 0: return q
+    return euclid(p, q%p)
+for i in range(num_events):
+    events_list.append(input())
+[str(i) for i in my_list]
+
+@app.get("/2")
+async def function()
+    time.sleep()
+
+r+
+
+f.seek(0)
+f.write(data)
+f.truncate()
+>
+
+def harmonic(n)
+    if n == 1: return 1
+    return harmonic(n-1) + 1/n
+
+Map<String, dynamic> user_data = {}
+≠
+y=mx+b
+Accumbens, caudate, globus pallidum, 
+
+randomseq.py > text.txt
+
+result = asyncio.gather(task(), task())
+
+.sort(key=str.upper)
+docker rmi <image>
+
+while (year < 2016) {
+    print(year);
+    year++;
+
+}
+void main() {
+    var name = "jj";
+    print("hello $name!");
+}⁺
+{}
+
+modified_list = [int(i) for i in raw_input.split()]
+∞
+
+
+for i in range(len(a)):
+    row = []
+    for j in range(len(a[0])):
+        row.append(a[j][i])
+    b.append(row)
+
+max(my_dict key=my_dict.get)
+[sum(row) for row in data_table]
+
+18 * 1.5
+18 * (109°)
+
+18²*1/2*1.5
+18°*1/2*(109°)
+Your task is to generate quiz questions with answers with the purpose of testing my knowledge and understanding of the material. 
+
+All answers should be in short answer format, all questions should reflect only what is written in the source material. 
+The context of the questions should be included in the question itself. 
+Do not make references to vague words, such as "the study" or "the paper" or "the person" or "that monkey" or "the monkeys", or "according to the text", etc. 
+
+If a question relies on knowledge of a specific thing, that specific thing should be mentioned in the context of the question. 
+Do not make vague references to source materials (such as according to the document or according to the text), 
+if you are referencing source material in the question, use the exact name of the source material. 
+If you are unable to find the name of the material to reference, make no such reference at all. 
+Always use full names when referencing people, again do not make vague references to people. 
+Avoid using vague temporal references when referring to time periods or dates. 
+
+I will provide the material one paragraph or one page at a time, you will generate questions for each segment provided, with the intent to be as exhaustive as possible. All questions should be formatted in the following way 
+
+Q: this is a question 
+
+A: this is the answer 
+
+_____________
+
+ Do you understand the task? Or do you need further clarification?
+
+def outlier():
+    data.sort()
+    length_of_d = len(data)
+    q1_index = int(length_of_d * 0.25)
+    q3_index = int(length_of_d * 0.75)
+
+    q1 = data[q1_index]
+    q3 = data[q3_index]
+
+    interquartile_range = q3 - q1
+
+    lower_bound = q1 - (interquartile_range*m)
+    upper_bound = q3 + (interquartile_range*m)
+
+    filter = [x for x in data if lower_bound <= x <= upper_bound]
+
+
+
+def outlier():
+    data.sort()
+    q1_index = int(len(data)*0.25)
+    q3_index = int(len(data)*0.75)
+    q1 = data[q1_index]
+    q3 = data[q3_index]
+    int_range = q3-q1
+    lower_bound = q1 - (int_range*m)
+    upper_bound = q3 + (int_range*m)
+
+    filter = [x for x in data if lower_bound <= x <= upper_bound]
+    return filter
+
+
+
+def outlier():
+    data.sort()
+    q1 = data[int(len(data)*0.25)]
+    q3 = data[int(len(data)*0.75)]
+    int_range = q3 - q1
+    upper_bound = q1 - int_range*m
+    lower_bound = q3 + int_range*m
+    filter = [x for x in data if upper_bound <= x <= lower_bound]
+    return filter
+
+
+def outlier()":
+    q1_index = (length_of_d * 0.25)
+    q3_index = (len(data)*0.75)
+
+    q1 = data[q1_index]
+    q3 = data[q3_index]
+    rangee = q3 - q1
+    upper_bound = q1 - (rangee * m)
+    lower_bound = q3 - (rangee * m)
+
+    filter = [x for x in data if upper_bound <= x <= lower_bound]
+
+
+
+def outlier():
+    q1 = data[len(data)*.25]
+    q3 = data[len(data)*.75]
+    rangee = q3 - q1
+    lower_bound = q1 - (rangee*m)
+    upper_bound = q3 + (rangee*m)
+    filter = [x for x in data if lower_bound <= x <= upper_bound]
+    return filter
+
+xhost +local/root
+
+
+Δ(w(ji)) = a(t_j - y_j)*g'*(h_j)*x_i
+
+Δ(w(ji)) = a(t_j - y_j)*g'*(h_j)*x_i
+
+
++60mv NA⁺
+
+Δ(w(ji)) = a(t_j - y_j)*g'*(h_j)*x_i
+
+
+Δ = a(t_j - y_j) * g' * (h_j) * x_i
+
+1. Define model independent measures of key processes
+2. Simulate across parameter ranges
+3. Visualize behavior of different models
+
+1. Model-independet variables
+2. model across parameter ranges
+3. visualize behavior of different models
+
+1. Model independt measures of key processes
+2. simulate across para
+3. visualize behavior of different models
+
+Q-Learning and temporal difference learning algorithms
+1/2m * sum (fwb(xi)-yi)²
+
+the delta rule is a gradient descent method learning rule for updating the weights of the inputs
+
+
+
+
+
+27*110 - 30 * 190
+/
+4*110 - 30²
+
+
+160
+c² = 8²+100 - 2*8*10*cos(160)
+
+
+m = sorted(data, key=str.lower)
+
+if f and g and f(g(x)) is defined on an interval, then f(g(x)) is continous on that interval 
+
+
+
+4*120 - 10*16
+/
+4*60 - 100
+
+6co2 + 6H20 = O6H12C6 + 6O2
+
+4 * 230 - 50 * 44
+/
+4*150 - 50²
+
+a(t_j - h_j)*g'*(h_j)*xi
+
+4*210 - 40 * 32
+/
+4*130 - 40²
+
+
+sin(x)ȡ
+
+
+z < x < y
+
+x² = 10²+12²-2*10*12*cos(30)
+
+
+def outliers()
+    q1 = data[len(data)*.25]
+    q3 = data[len(data)*.75]
+    rangee = q3 - q1
+    lower = q1 - (rangee *m)
+    upper = q3 - (rangee *m)
+    filter = [x for x in data if lower <= x <= upper]
+    return filter
+
+w = w - a*d/dx(J)
+
+cos(ρ)+cos(110π/12)
+
+
+
+
+
+
+
+
+
+
+
+    import os
+    os.environ["OMP_NUM_THREADS"] = "4" # Optimize OpenMP threads
+    os.environ["MKL_NUM_THREADS"] = "4" # Optimize MKL threads
+    # Set torch threads for CPU efficiency
+    import torch
+    torch.set_num_threads(4)
+
+alter table table_name
+add col_1 data(size);
+
+
+λ
+Bθ
+insert into table (col_1)
+select * from table_other
+
+1701-1714.date()
+
+
+def outliers()
+    q1 = data[len(data)*.25]
+    q3 = data[len(data) * .75]
+
+    quartile_range = q3 - q1
+    lower = q1 - (quartile_range*m)
+    upper = q3 - (quartile_range*m)
+    filter = [x for x in data if lower <= x <= upper]
+
+
+
+
+def euclid (p, q):
+    if q == 0: return p
+    return euclid(q, p%q)
+
+
+1. equality under the law
+2. taxation by consent only
+3. power in hands of elected officials
+4. laws for the benefit of the population
+
+
+
+
+
+
+
+
+
+def check(data_object):
+    time_delta = abs(date.today() - data_object)
+    return time_delta.total_seconds <= 24 * 3600
+
+
+
+
+
+
+yesterday = date.today() - timedelta(1)
+
+
+class pyth0():
+    def __init__(self, var):
+        self.var = var
+my_list.sort(key=max))(/=)
+
+
+delete from table_name
+where primary_key;
+
+
+
+
+
+
+for (int month = 1; month < 12; month++) {
+    print(month);
+}
+
+27*110 - 30*190
+/
+4*110 - 30²
+John of Salisbury 1115-1180
+
+
+a = [0]*1000
+a[1000]
+indexError
+
+
+Regularization
+Feature Selection
+Collect more data
+Cross validate data - folds
+
+def outliers(data_row_list):
+    q1 = data[len(data)*.25]
+    q3 = data[len(data)*.75]
+    interquartile_range = q3 - q1
+    lower_bound = q1 - (interquartile_range*m)
+    upper_bound = q3 - (interquartile_range*m)
+    filtered = [x for x in data_row_list if lower_bound <= x <= upper_bound]
+    return filtered
+
+
+y = 10 + 7.5cos(0.507t)
+
+1 / 1+e⁻ˣ
+₂ᵗ
+if (year >= 2001) {
+    print("21st century");
+} else if (year >= 1901) {
+    print("20th century");
+}
+.text(x, y, str)
+
+t*ln(t)+1/t*t²
+t*ln(t)+t
+
+DQL
+decimal
+DCL
+DQL
+DDL
+
+if not os.path.exists(path)
+    os.makedirs(path)
+¹
+
+(3x²)*5x²- 10x*(x³+1)
+/
+(x³+1)²
+
+15x⁴ - 10x⁴+10x
+/
+z
+10x-5x⁴ / (x³+1)²
+
+update table table_name
+set col_1 = value
+where primary = key;
+
+ex*x⁻²+-2x⁻³*e^x
+"".join[i for i in this_string.lower() if not i.isspace()]
+
+alter table table_name
+modify col_name varchar(100);
+
+alter table table_name
+add col_1 data(size);
+void main() {
+    print("hello world");
+}
+
+select * from table_name;
+
+
+
+alter table table_name
+modify col_1 varchar(100)
+
+~/αˢ⁻
+
+⋃⁹π°
+
+insert into table table_name
+(col_1 decimal(10, 2)))
+VALUES
+(CURRENT_DATE)
+
+a = [[1,2],[2]]
+
+b = []
+
+for i in a:
+    row = []
+    for j in range(len(a))
+        row.append(a[i][j])
+    b.append(row)
+u221a √±
+
+
+@app.get("/")
+async def funct():
+    time.sleep()
+
+a²=b²+c² - 2bc*cos(a)
+b = a + c - 2a*c*cos(b)
+c = b + a - 2abcos(c)
+
+fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize(12, 12))
+
+__new__() is the actual constructor
+
+complex = 5j
+
+def exchange(i, j, a)
+    temp = a[i]
+    a[i] = j[i]
+    j[i] = temp
+
+
+def calc_mean(a)
+    total = 0
+    for float(i) in a:
+        total+= i
+
+    return total / len(a)
+
+dataframe = pd.DateFrame(columns=["col_1", "col_2", "col_3"])
+
+def return_frame(my_dict):
+    return pd.DateFrame([my_dict])
+
+def dot(a, b):
+    total = 0
+    for i in range(len(a)):
+        total += (a[i]*b[i])
+    return total
+
+drop table table_name;
+
+def euclid(p, q):
+    if q == 0: return p
+    return euclid(q, p%q)
+
+λ
+df = pd.concat([df, pd.DataFrame([record_dict])])
+
+
+
+void main() {
+    String name = "ten";
+    print(name);
+}
+
+fig, (ax1, ax2, ax3) = plt.subplots(3, 1)
+
+
+pd.DataFrame([my_dict])
+
+pd.DataFrame(columns=["c","f","g"])
+
+
+alter table
+modify col_1 decimal(n);
+1.00826
+1533-1584
+
+while (var <= 2016;) {
+    year++;
+
+}
+³
+create table table_name
+(
+    col_1 data(size) NOT NULL;
+)
+>
+.setFontSize()
+record = {"a": 4, "b": 5, "c": 6}
+df_2 = pd.DataFrame([record])
+pd.concat([df_1, df_2])
+
+alter table table_name modify col_1 varchar(100);
+
+
+
+
+
+    q1 = data[len(data)*.25]
+    q3 = data[len(data)*.75]
+    inter_range = q3 - q1
+    lower_bound = q1 - inter_range
+    upper_bound = q3 + inter_range
+    filter = [x for x in data if lower_bound <= x <= upper_bound]
+    return filter
+    
+insert into table_name (col_1) select col_1 from table_name;
+
+fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(12x12))
+
+yesterday = date.today() - timedelta(1)
+
+void greet(String name) {print("Hello, name!");}
+
+delete from table_name
+where primary_key = condition;
+
+bool var_name = true;
+
+double var_name = 5.9;
+
+def mean(a)
+    return sum(a) / len(a)
+
+for i in range(1, 28, 2):
+    pass
+
+F(n) = f(n-1) + f(n-2) for n > 2
+
+def euclid_algo(p, q)
+    if q == 0: return p
+    return (euclid_algo(q, p%q))
+
+
+λˣ
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
