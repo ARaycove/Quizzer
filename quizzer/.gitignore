@@ -30,6 +30,8 @@ migrate_working_dir/
 .pub-cache/
 .pub/
 /build/
+quizzer/google-chrome-stable_current_amd64.deb
+
 
 # Symbolication related
 app.*.symbols
