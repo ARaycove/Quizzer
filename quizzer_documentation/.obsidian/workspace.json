@@ -27,12 +27,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Core Documentation/Chapter 3 - Research Methodology/03_06_Task_03_Answer_Questions.md",
+                "file": "Core Documentation/Chapter 9 - Algorithms and Background Processes/09_05_Background_Noise_Process.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "03_06_Task_03_Answer_Questions"
+              "title": "09_05_Background_Noise_Process"
             }
           }
         ],
@@ -186,6 +186,9 @@
   },
   "active": "d47008925d227bd1",
   "lastOpenFiles": [
+    "Core Documentation/Chapter 9 - Algorithms and Background Processes/09_06_Geographic_Coordinates_Recording_Background_Process.md",
+    "Core Documentation/Chapter 9 - Algorithms and Background Processes/09_05_Background_Noise_Process.md",
+    "Core Documentation/Chapter 3 - Research Methodology/03_06_Task_03_Answer_Questions.md",
     "Core Documentation/Chapter 4 - Technical Architecture Philosophy, Design Principles, and Ethical Considerations/04_01_Core_Technical_Philosophy.md",
     "Core Documentation/Chapter 4 - Technical Architecture Philosophy, Design Principles, and Ethical Considerations/04_02_UI_UX_Philosophy.md",
     "Core Documentation/Chapter 4 - Technical Architecture Philosophy, Design Principles, and Ethical Considerations/04_03_Software_Design_Philosophy.md",
@@ -194,7 +197,6 @@
     "Core Documentation/Chapter 4 - Technical Architecture Philosophy, Design Principles, and Ethical Considerations/04_05_Content_Moderation.md",
     "Core Documentation/Chapter 4 - Technical Architecture Philosophy, Design Principles, and Ethical Considerations/04_06_OpenSource.md",
     "Core Documentation/Chapter 4 - Technical Architecture Philosophy, Design Principles, and Ethical Considerations/04_07_Research_Implementation_Gap.md",
-    "Core Documentation/Chapter 3 - Research Methodology/03_06_Task_03_Answer_Questions.md",
     "Core Documentation/Chapter 8 - Database/08_10_Question_Answer_Attempts_Table.md",
     "Core Documentation/Chapter 3 - Research Methodology/03_05_Task_02_Question_Answer_Pair_Generation.md",
     "Pasted image 20250407093838.png",
@@ -212,8 +214,6 @@
     "Core Documentation/Chapter 8 - Database/08_06_Citation_and_Source_Material_Table.md",
     "Core Documentation/Chapter 8 - Database/08_05_Login_Attempts_Table.md",
     "Core Documentation/Chapter 8 - Database/08_04_User_Profiles_Table.md",
-    "Core Documentation/Chapter 3 - Research Methodology/03_02_Other_Considerations.md",
-    "Core Documentation/Chapter 3 - Research Methodology/03_01_Methods.md",
     "Diagrams/LoginPage.png",
     "Quizzer_Logo.png",
     "Core Documentation/Chapter 7 - Functions",
