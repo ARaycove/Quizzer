@@ -8,49 +8,35 @@
         "type": "tabs",
         "children": [
           {
-            "id": "e3c5f3ac133e96b9",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Paper Documents/03_02_breakdown_of_behavioral_tasks.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "03_02_breakdown_of_behavioral_tasks"
-            }
-          },
-          {
-            "id": "54a19f885d06d417",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Paper Documents/04_01_UI-UX Design.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "04_01_UI-UX Design"
-            }
-          },
-          {
             "id": "ca42fbfcb41dde85",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Areas for Improvement.md",
+                "file": "Core Documentation/Chapter 3 - Research Methodology/03_05_Task_02_Question_Answer_Pair_Generation.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Areas for Improvement"
+              "title": "03_05_Task_02_Question_Answer_Pair_Generation"
+            }
+          },
+          {
+            "id": "d47008925d227bd1",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Core Documentation/Chapter 3 - Research Methodology/03_06_Task_03_Answer_Questions.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "03_06_Task_03_Answer_Questions"
             }
           }
         ],
-        "currentTab": 2
+        "currentTab": 1
       }
     ],
     "direction": "vertical"
@@ -107,7 +93,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 433.5
   },
   "right": {
     "id": "1361b1d659fdf502",
@@ -198,29 +184,47 @@
       "obsidian-excalidraw-plugin:New drawing": false
     }
   },
-  "active": "ca42fbfcb41dde85",
+  "active": "d47008925d227bd1",
   "lastOpenFiles": [
-    "Paper Documents/04_03_Database.md",
-    "Excalidraw/Quizzer_Flow_Chart.md",
-    "Paper Documents/04_04_Algorithms.md",
-    "Paper Documents/04_01_UI-UX Design.md",
-    "Paper Documents/03_02_breakdown_of_behavioral_tasks.md",
-    "Paper Documents/02_01_Building_a_Model.md",
-    "Paper Documents/04_02_Functions.md",
-    "Paper Documents/01_01Preface.md",
-    "Paper Documents/06_references.md",
-    "Paper Documents/05_01_Backend_Architecture_Tech_Stack.md",
-    "Areas for Improvement.md",
-    "Quizzer.md",
-    "Quizzer_Logo.png",
-    "Pasted image 20250402225334.png",
-    "Pasted image 20250402212253.png",
-    "Paper Documents/03_01_methods.md",
-    "Paper Documents/01_03_Motivations.md",
-    "Paper Documents/01_02_Introduction.md",
+    "Core Documentation/Chapter 4 - Technical Architecture Philosophy, Design Principles, and Ethical Considerations/04_01_Core_Technical_Philosophy.md",
+    "Core Documentation/Chapter 4 - Technical Architecture Philosophy, Design Principles, and Ethical Considerations/04_02_UI_UX_Philosophy.md",
+    "Core Documentation/Chapter 4 - Technical Architecture Philosophy, Design Principles, and Ethical Considerations/04_03_Software_Design_Philosophy.md",
+    "Core Documentation/Chapter 4 - Technical Architecture Philosophy, Design Principles, and Ethical Considerations/04_04_Ethics.md",
+    "Core Documentation/Chapter 4 - Technical Architecture Philosophy, Design Principles, and Ethical Considerations/04_04_Technical_Design_Principles.md",
+    "Core Documentation/Chapter 4 - Technical Architecture Philosophy, Design Principles, and Ethical Considerations/04_05_Content_Moderation.md",
+    "Core Documentation/Chapter 4 - Technical Architecture Philosophy, Design Principles, and Ethical Considerations/04_06_OpenSource.md",
+    "Core Documentation/Chapter 4 - Technical Architecture Philosophy, Design Principles, and Ethical Considerations/04_07_Research_Implementation_Gap.md",
+    "Core Documentation/Chapter 3 - Research Methodology/03_06_Task_03_Answer_Questions.md",
+    "Core Documentation/Chapter 8 - Database/08_10_Question_Answer_Attempts_Table.md",
+    "Core Documentation/Chapter 3 - Research Methodology/03_05_Task_02_Question_Answer_Pair_Generation.md",
+    "Pasted image 20250407093838.png",
+    "Core Documentation/Chapter 8 - Database/08_08_Question_Answer_Pair_Table.md",
+    "Diagrams/Question_Answer_Pair_Generation.md",
     "Excalidraw",
-    "Paper Documents",
-    "Source Documents",
-    "Welcome.md"
+    "Core Documentation/Chapter 8 - Database/08_07_Source_Material_Key_Term_Table.md",
+    "question_generation_prompt.md",
+    "Core Documentation/Chapter 8 - Database/08_09_Subject_Concept_Classification_Results.md",
+    "Core Documentation/Chapter 3 - Research Methodology/03_03_breakdown_of_behavioral_tasks.md",
+    "Core Documentation/Chapter 3 - Research Methodology/03_04_Task_01_Source_Material_Generation_and_Classification.md",
+    "Core Documentation/Chapter 8 - Database/08_01_Hybrid_Database.md",
+    "Core Documentation/Chapter 8 - Database/08_02_Local_Database_Implementation.md",
+    "Core Documentation/Chapter 8 - Database/08_03_Central_Database_Implementation.md",
+    "Core Documentation/Chapter 8 - Database/08_06_Citation_and_Source_Material_Table.md",
+    "Core Documentation/Chapter 8 - Database/08_05_Login_Attempts_Table.md",
+    "Core Documentation/Chapter 8 - Database/08_04_User_Profiles_Table.md",
+    "Core Documentation/Chapter 3 - Research Methodology/03_02_Other_Considerations.md",
+    "Core Documentation/Chapter 3 - Research Methodology/03_01_Methods.md",
+    "Diagrams/LoginPage.png",
+    "Quizzer_Logo.png",
+    "Core Documentation/Chapter 7 - Functions",
+    "Core Documentation/Chapter 9 - Algorithms and Background Processes",
+    "Core Documentation/Chapter 8 - Database",
+    "Core Documentation/Chapter 10 - Testing and Deployment",
+    "Core Documentation/Chapter 11 - Future Development",
+    "Core Documentation/Chapter 8 - Server-Side Implementation",
+    "Core Documentation/Chapter 7 - Client-Side Implementation",
+    "Diagrams/NewUserSignUp-LoginPage.png",
+    "Supplementary Images",
+    "Core Documentation/Chapter 6 - Features"
   ]
 }

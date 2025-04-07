@@ -1,5 +1,4 @@
-# Memory Retention Algorithm
-After a user answers a question and submits a response, how long should it be until it should be presented again in order to maximize memory retention?
+
 # Question Selection Algorithm
 After a user answers a question and submits a response, which question in the database should be presented next?
 

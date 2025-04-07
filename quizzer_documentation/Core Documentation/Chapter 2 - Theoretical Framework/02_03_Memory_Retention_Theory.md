@@ -1,0 +1,1 @@
+A synopsis of Ebbinghaus' work

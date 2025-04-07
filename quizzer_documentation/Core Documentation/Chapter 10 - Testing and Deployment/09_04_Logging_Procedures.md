@@ -1,0 +1,1 @@
+Detailed logging will be implemented through a dedicated quizzer_logger.dart logging module. This module will contain the functions necessary to quickly log success and error messages, functions to log values, log general messages, and to log warnings.

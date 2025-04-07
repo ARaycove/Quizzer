@@ -1,0 +1,1 @@
+Quizzer maintains a "fail-fast" methodology. All code should execute as expected, all data types should be exactly what is intended, and if any errant values ever get passed, the program should be deliberately crashed the mistake exposed.

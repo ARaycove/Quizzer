@@ -1,4 +1,4 @@
-## Areas for Improvement
+General feedback that has been expressed, but not investigated
 
 1. **Task Complexity and Participant Burden**
     - The tasks require significant cognitive effort from participants, potentially leading to fatigue and reduced data quality
@@ -15,3 +15,5 @@
 5. **User Motivation and Engagement**
     - The document focuses heavily on data collection but less on what motivates users to participate
     - Consider incorporating gamification elements or learning benefits to sustain engagement
+
+- Don't code, write all documentation in 100% completion before writing a single line of code

@@ -1,4 +1,4 @@
-![[01_01Preface]]
+![[01_01_Preface]]
 
 ![[01_02_Introduction]]
 
@@ -6,16 +6,16 @@
 
 ![[02_01_Building_a_Model]]
 
-![[03_01_methods]]
+![[03_01_Methods]]
 
-![[03_02_breakdown_of_behavioral_tasks]]
+![[03_03_breakdown_of_behavioral_tasks]]
 
-![[04_01_UI-UX Design]]
+![[04_12_UI_UX Design]]
 
-![[04_03_Database]]
+![[08_02_Local_Database_Implementation]]
 
-![[04_04_Algorithms]]
+![[09_01_Central_Algorithms_Overview]]
 
 ![[05_01_Backend_Architecture_Tech_Stack]]
 
-![[06_references]]
+![[references]]
