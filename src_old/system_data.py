@@ -1248,7 +1248,7 @@ def get_next_question(user_profile_data, amount_of_rs_one_questions):
             due_date = helper.convert_to_datetime_object(question_object_user_data["next_revision_due"])
             overdue = False
             print(f"Selected question with RS of {check_var}")
-            return question_id  
+            return question_id
             # Questions that are not close to the due date won't be presented
             # If the question hits this condition it indicates it is overdue for revision, beyond the acceptable margin
 
