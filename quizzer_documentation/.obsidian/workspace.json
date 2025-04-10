@@ -11,6 +11,24 @@
             "id": "d47008925d227bd1",
             "type": "leaf",
             "state": {
+              "type": "excalidraw",
+              "state": {
+                "file": "Diagrams/Quizzer_Flow_Chart.md"
+              },
+              "icon": "excalidraw-icon",
+              "title": "Quizzer_Flow_Chart"
+            }
+          }
+        ]
+      },
+      {
+        "id": "8c3f9ad67d7581b4",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "53ab7d0849ff1e0b",
+            "type": "leaf",
+            "state": {
               "type": "markdown",
               "state": {
                 "file": "Core Documentation/Chapter 08 - Database/08_04_User_Profiles_Table.md",
@@ -171,7 +189,22 @@
   },
   "active": "d47008925d227bd1",
   "lastOpenFiles": [
-    "Core Documentation/Chapter 07 - Functions/07_02_loadDatabase().md",
+    "Diagrams/Question_Answer_Pair_Generation.md",
+    "Core Documentation/Chapter 05 - User Experience and User Interface Design/05_04_New_User_Sign_Up_Page.md",
+    "Core Documentation/Chapter 07 - Functions/Database Functions/07_01_02_createNewUserProfile(email, username).md",
+    "Core Documentation/Chapter 08 - Database/08_04_User_Profiles_Table.md",
+    "Core Documentation/Chapter 07 - Functions/Database Functions/07_01_03_verifyUserProfileTable().md",
+    "Core Documentation/Chapter 05 - User Experience and User Interface Design/05_03_Login_Page.md",
+    "Core Documentation/Chapter 07 - Functions/Redirect Functions/07_02_01newUserSignUp().md",
+    "Core Documentation/Chapter 07 - Functions/Redirect Functions",
+    "Core Documentation/Chapter 07 - Functions/Database Functions/07_01_04_generateUserUUID().md",
+    "Core Documentation/Chapter 07 - Functions/07_02_01_initializeQuizzer().md",
+    "Core Documentation/Chapter 07 - Functions/Database Functions/07_01_01_loadDatabase().md",
+    "Core Documentation/Chapter 07 - Functions/07_00_Functions.md",
+    "Core Documentation/Chapter 07 - Functions/Redirect Functions.md",
+    "Core Documentation/Chapter 07 - Functions/Database Functions",
+    "Core Documentation/Chapter 05 - User Experience and User Interface Design/05_02_Loading_page.md",
+    "Core Documentation/Chapter 05 - User Experience and User Interface Design/05_05_Home_Page.md",
     "Core Documentation/Chapter 07 - Functions/07_05_geographicLocationBackgroundProcess().md",
     "Core Documentation/Chapter 07 - Functions/07_03_initializeUserProfileTable().md",
     "Core Documentation/Chapter 07 - Functions/07_05_dataSynchronizationBackgroundProcess().md",
@@ -184,19 +217,6 @@
     "Core Documentation/Chapter 08 - Database/08_10_Subject_Concept_Classification_Results.md",
     "Core Documentation/Chapter 08 - Database/08_12_Question_Answer_Attempts_Table.md",
     "Core Documentation/Chapter 08 - Database/08_06_Citation_and_Source_Material_Table.md",
-    "Core Documentation/Chapter 08 - Database/08_05_Modules_Table.md",
-    "Core Documentation/Chapter 08 - Database/08_04_User_Profiles_Table.md",
-    "Core Documentation/Chapter 08 - Database/08_01_Hybrid_Database.md",
-    "Core Documentation/Chapter 08 - Database/08_00_Contents.md",
-    "Core Documentation/Chapter 08 - Database/08_03_Central_Database_Implementation.md",
-    "Core Documentation/Chapter 08 - Database/08_02_Local_Database_Implementation.md",
-    "Core Documentation/Chapter 07 - Functions/07_01_initializeQuizzer().md",
-    "Core Documentation/Chapter 07 - Functions/07_00_Functions.md",
-    "Core Documentation/Chapter 09 - Algorithms and Background Processes/09_12_Geographic_Coordinates_Recording_Background_Process.md",
-    "Core Documentation/Chapter 05 - User Experience and User Interface Design/05_02_Loading_page.md",
-    "Core Documentation/Chapter 05 - User Experience and User Interface Design/05_01_UI_UX_Philosophy_and_Design.md",
-    "Core Documentation/Chapter 05 - User Experience and User Interface Design/05_03_Login_Page.md",
-    "Core Documentation/Chapter 04 - Technical Architecture Philosophy, Design Principles, and Ethical Considerations/04_02_UI_UX_Philosophy.md",
     "Core Documentation/Chapter 10 - Data Protection and Privacy",
     "Pasted image 20250407093838.png",
     "Excalidraw",
@@ -208,8 +228,6 @@
     "Core Documentation/Chapter 11 - Testing and Deployment",
     "Core Documentation/Chapter 12 - Future Development",
     "Core Documentation/Chapter 8 - Server-Side Implementation",
-    "Core Documentation/Chapter 7 - Client-Side Implementation",
-    "Diagrams/NewUserSignUp-LoginPage.png",
-    "Supplementary Images"
+    "Diagrams/NewUserSignUp-LoginPage.png"
   ]
 }

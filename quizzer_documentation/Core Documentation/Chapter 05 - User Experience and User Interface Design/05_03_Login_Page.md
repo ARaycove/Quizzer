@@ -4,6 +4,9 @@ The Login page shall consist of the Quizzer logo, an email entry field, password
 - All UI elements should have uniform height
 - Height of UI elements should be of a maximum of 25px and scale to the height of the screen
 - Width of UI elements should not exceed the width of the logo
+## Images
+- Logo should be displayed prominently at the top of the screen
+- Logo should have no top or side margins applied
 ## Data Fields
 - Email Field
 	- The user's email address they signed up with
@@ -26,6 +29,6 @@ onPressed: Calls associated login function
 - This button is a simple link that redirects the program to the New User Signup Page
 - Width should be half of the email and password fields
 - Width should be of minimum width 100px
-**onPressed**: Calls [[07_20_newUserSignUp()|newUserSignUp()]] function -> 
+**onPressed**: Calls [[07_02_01newUserSignUp()|newUserSignUp()]] function -> 
 
 ![[LoginPage.png]]

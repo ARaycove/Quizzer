@@ -6,4 +6,4 @@ Wireframes of the layout are planned using Obsidian's excalidraw community plugi
 This section will also detail what functionality is to be executed, further details of those functions and what they do will be in the next section 04_03_Functions.
 # Initial Startup
 
-When the Quizzer application is loaded, it should immediately start on the [[05_02_Loading_page]] and call the [[07_01_initializeQuizzer()|initializeQuizzer()]] function. This function will load the database, spin up background processes, a verify the structure of the database.
+When the Quizzer application is loaded, it should immediately start on the [[05_02_Loading_page]] and call the [[07_02_01_initializeQuizzer()|initializeQuizzer()]] function. This function will load the database, spin up background processes, a verify the structure of the database.

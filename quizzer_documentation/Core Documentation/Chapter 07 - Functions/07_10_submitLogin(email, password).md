@@ -4,4 +4,4 @@ Sends these two fields to the [[07_11_authenticateUser(username, credential, ser
 
 Checks the status code
 
-If status code is acceptable: redirects the UI to the [[05_04_Home_Page]]
+If status code is acceptable: redirects the UI to the [[05_05_Home_Page]]
