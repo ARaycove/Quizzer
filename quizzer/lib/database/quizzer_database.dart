@@ -24,33 +24,7 @@ class QuizzerDatabase {
     // Creating all planned tables for quizzer_db
     // user_profiles table
     await db.execute('''
-      CREATE TABLE user_profiles (
-        email                   TINYTEXT,
-        uuid                    TINYTEXT PRIMARY KEY,
-        role                    CHAR(15),
-        username                TINYTEXT,
-        account_status          CHAR(15),
-        account_creation_date   DATETIME,
-        last_login              DATETIME,
-        profile_picture         BLOB,
-        birth_date              DATETIME,
-        street_address          TINYTEXT,
-        city                    TINYTEXT,
-        state_province          TINYTEXT,
-        country                 TINYTEXT,
-        job_title               TINYTEXT,
-        highest_education_level TINYTEXT,
-        specializations         TINYTEXT,
-        teaching_experience     BOOL,
-        primary_language        TINYTEXT,
-        secondary_languages     TEXT,
-
-
-
-
-
-        
-      )
+      CREATE TABLE user_profiles ()
     ''');
     // login_attempts table
     await db.execute('''

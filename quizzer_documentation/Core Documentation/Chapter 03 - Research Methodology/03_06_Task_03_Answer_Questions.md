@@ -22,4 +22,4 @@ Since we know that response time and confidence are tightly correlated and causa
  It should be heavily noted however that we need to understand the relationship between confidence and ability to retain information. It may be that low confidence rankings lead to forgetting sooner than higher confidence ratings. By accurately recording reaction times and confidence metrics we should be able to divulge the relationship between how confident a person is in their answer and how long they can retain that information. I would hypothesize that higher confidence scores lead to more long term remembrance of information.
 
 **Date Structure in sections:**
-[[08_10_Question_Answer_Attempts_Table]]
+[[08_12_Question_Answer_Attempts_Table]]

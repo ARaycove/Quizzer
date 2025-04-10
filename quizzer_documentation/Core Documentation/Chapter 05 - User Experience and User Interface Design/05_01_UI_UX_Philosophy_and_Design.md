@@ -5,4 +5,5 @@ Wireframes of the layout are planned using Obsidian's excalidraw community plugi
 
 This section will also detail what functionality is to be executed, further details of those functions and what they do will be in the next section 04_03_Functions.
 # Initial Startup
-When Quizzer is loaded using the executable the database should initialize. A background process should start that syncs the question-answer pair table with the one stored centrally. In addition any attempt records for various tasks that are not necessary for execution of behavioral tasks (described in 03_02_breakdown_of_behavioral_tasks), should be synced with the central database, once it's been confirmed that records were properly uploaded, those records will get removed from the local instance of the application. Leaving behind only what is necessary for regular operation
+
+When the Quizzer application is loaded, it should immediately start on the [[05_02_Loading_page]] and call the [[07_01_initializeQuizzer()|initializeQuizzer()]] function. This function will load the database, spin up background processes, a verify the structure of the database.
