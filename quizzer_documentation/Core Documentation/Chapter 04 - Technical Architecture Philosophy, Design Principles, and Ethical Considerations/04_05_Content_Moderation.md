@@ -58,7 +58,9 @@ This framework allows for a sophisticated approach to content moderation that re
 - Climate science debates
 - Medical/vaccine controversies
 
-# Challenge Mode: Expanding Intellectual Horizons
+# Challenge Mode
 Challenge Mode is a simple feature designed to encourage intellectual growth by periodically inviting users to reconsider their content filtering choices. When activated, users will occasionally receive a pop-up suggesting they consider disabling a specific content filter that may be limiting their educational experience. The pop-up clearly explains how removing this particular restriction could broaden their understanding of the world, while emphasizing that the choice remains entirely with the user.
 
 The feature is designed with user autonomy as the priority. Each invitation includes straightforward options: "Review Filter Settings," "Not Now," or "Disable These Suggestions." Users can easily dismiss the notification, adjust their settings, or turn off the feature permanently. For adult users, Challenge Mode is enabled by default as an opt-out feature, while it remains disabled for accounts with parental controls active. This balanced approach respects individual preferences while gently encouraging users to expand beyond potential echo chambers in their educational journey.
+
+This feature is experimental and merely a proposal, if you've read this far please provide some feedback on such a feature.

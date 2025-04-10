@@ -11,14 +11,10 @@
             "id": "ca42fbfcb41dde85",
             "type": "leaf",
             "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Core Documentation/Chapter 3 - Research Methodology/03_05_Task_02_Question_Answer_Pair_Generation.md",
-                "mode": "source",
-                "source": false
-              },
+              "type": "empty",
+              "state": {},
               "icon": "lucide-file",
-              "title": "03_05_Task_02_Question_Answer_Pair_Generation"
+              "title": "New tab"
             }
           },
           {
@@ -27,12 +23,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Core Documentation/Chapter 09 - Algorithms and Background Processes/09_04_Question_Selection_Algorithm.md",
+                "file": "Core Documentation/Chapter 06 - Features/06_02_Module_System.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "09_04_Question_Selection_Algorithm"
+              "title": "06_02_Module_System"
             }
           }
         ],
@@ -184,36 +180,36 @@
       "obsidian-excalidraw-plugin:New drawing": false
     }
   },
-  "active": "643aebebb5c58bae",
+  "active": "d47008925d227bd1",
   "lastOpenFiles": [
-    "Core Documentation/Chapter 09 - Algorithms and Background Processes/09_03_Question_Circulation_Selection_Algorithm.md",
-    "Core Documentation/Chapter 09 - Algorithms and Background Processes/09_02_Memory_Retention_Algorithm.md",
-    "Core Documentation/Chapter 10 - Testing and Deployment/10_04_Logging_Procedures.md",
-    "Core Documentation/Chapter 10 - Testing and Deployment/10_03_File_Structure.md",
-    "Core Documentation/Chapter 10 - Testing and Deployment/10_02_Deployment_Pipeline.md",
-    "Core Documentation/Chapter 10 - Testing and Deployment/10_01_Testing_Strategy.md",
-    "Core Documentation/Chapter 09 - Algorithms and Background Processes/09_04_Question_Selection_Algorithm.md",
-    "Core Documentation/Chapter 09 - Algorithms and Background Processes/09_07_Geographic_Coordinates_Recording_Background_Process.md",
-    "Core Documentation/Chapter 09 - Algorithms and Background Processes/09_06_Background_Noise_Process.md",
-    "Core Documentation/Chapter 09 - Algorithms and Background Processes/09_05_Data_Synchronization_Background_Process.md",
-    "Core Documentation/references.md",
-    "Core Documentation/Chapter 03 - Research Methodology/03_06_Task_03_Answer_Questions.md",
-    "Core Documentation/Chapter 04 - Technical Architecture Philosophy, Design Principles, and Ethical Considerations/04_01_Core_Technical_Philosophy.md",
-    "Core Documentation/Chapter 04 - Technical Architecture Philosophy, Design Principles, and Ethical Considerations/04_02_UI_UX_Philosophy.md",
-    "Core Documentation/Chapter 04 - Technical Architecture Philosophy, Design Principles, and Ethical Considerations/04_03_Software_Design_Philosophy.md",
-    "Core Documentation/Chapter 04 - Technical Architecture Philosophy, Design Principles, and Ethical Considerations/04_04_Ethics.md",
-    "Core Documentation/Chapter 04 - Technical Architecture Philosophy, Design Principles, and Ethical Considerations/04_04_Technical_Design_Principles.md",
+    "Core Documentation/Chapter 05 - User Experience and User Interface Design/05_15_Display_Modules_Page.md",
+    "Core Documentation/Chapter 06 - Features/06_02_Module_System.md",
+    "Core Documentation/Chapter 05 - User Experience and User Interface Design/05_14_Feed_&_Bug_Reports_Page.md",
+    "Core Documentation/Chapter 05 - User Experience and User Interface Design/05_13_My_Profile_Page.md",
+    "Core Documentation/Chapter 05 - User Experience and User Interface Design/05_12_Stats_Page.md",
+    "Core Documentation/Chapter 05 - User Experience and User Interface Design/05_11_Settings_and_Preferences_Page.md",
+    "Core Documentation/Chapter 05 - User Experience and User Interface Design/05_10_Enter_Answers_Page.md",
+    "Core Documentation/Chapter 05 - User Experience and User Interface Design/05_09_Enter_Questions_Page.md",
+    "Core Documentation/Chapter 05 - User Experience and User Interface Design/05_08_Enter_Source_Material_Page.md",
+    "Core Documentation/Chapter 05 - User Experience and User Interface Design/05_07_Help_With_Research_Page.md",
+    "Core Documentation/Chapter 05 - User Experience and User Interface Design/05_06_Add_Question_Answer_Pair_Page.md",
+    "Core Documentation/Chapter 05 - User Experience and User Interface Design/05_05_Menu_Page.md",
+    "Core Documentation/Chapter 05 - User Experience and User Interface Design/05_04_Home_Page.md",
+    "Core Documentation/Chapter 05 - User Experience and User Interface Design/05_03_New_User_Sign_Up_Page.md",
+    "Core Documentation/Chapter 05 - User Experience and User Interface Design/05_02_Login_Page.md",
+    "Core Documentation/Chapter 04 - Technical Architecture Philosophy, Design Principles, and Ethical Considerations/04_04_Ethical_Framework.md",
     "Core Documentation/Chapter 04 - Technical Architecture Philosophy, Design Principles, and Ethical Considerations/04_05_Content_Moderation.md",
-    "Core Documentation/Chapter 04 - Technical Architecture Philosophy, Design Principles, and Ethical Considerations/04_06_OpenSource.md",
-    "Core Documentation/Chapter 04 - Technical Architecture Philosophy, Design Principles, and Ethical Considerations/04_07_Research_Implementation_Gap.md",
-    "Core Documentation/Chapter 08 - Database/08_10_Question_Answer_Attempts_Table.md",
-    "Core Documentation/Chapter 03 - Research Methodology/03_05_Task_02_Question_Answer_Pair_Generation.md",
+    "Core Documentation/Chapter 04 - Technical Architecture Philosophy, Design Principles, and Ethical Considerations/04_04_Technical_Design_Principles.md",
+    "Core Documentation/Chapter 04 - Technical Architecture Philosophy, Design Principles, and Ethical Considerations/04_03_Software_Design_Philosophy.md",
+    "Core Documentation/Chapter 02 - Theoretical Framework/02_01_Building_a_Model.md",
+    "Core Documentation/Chapter 01 - Foundations/01_02_Introduction.md",
+    "Core Documentation/Chapter 01 - Foundations/01_03_Motivations.md",
+    "Core Documentation/Chapter 08 - Database/08_02_Local_Database_Implementation.md",
+    "Core Documentation/Chapter 09 - Algorithms and Background Processes/09_05_Data_Synchronization_Background_Process.md",
+    "Core Documentation/Chapter 09 - Algorithms and Background Processes/09_04_Question_Selection_Algorithm.md",
+    "Core Documentation/Chapter 09 - Algorithms and Background Processes/09_03_Question_Circulation_Selection_Algorithm.md",
     "Pasted image 20250407093838.png",
-    "Core Documentation/Chapter 08 - Database/08_08_Question_Answer_Pair_Table.md",
-    "Diagrams/Question_Answer_Pair_Generation.md",
     "Excalidraw",
-    "Core Documentation/Chapter 08 - Database/08_07_Source_Material_Key_Term_Table.md",
-    "question_generation_prompt.md",
     "Diagrams/LoginPage.png",
     "Quizzer_Logo.png",
     "Core Documentation/Chapter 07 - Functions",
