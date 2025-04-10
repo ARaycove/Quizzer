@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 // Function to handle login submission
 void submitLogin(String email, String password) {
   // This will later call the authenticateUser function
+  // FIXME authenticateUser Call
   print("Login attempted with email: $email");
 }
 
 // Function to navigate to new user signup page
 void newUserSignUp(BuildContext context) {
   // This will later navigate to the new user page
+  // FIXME we need to redirect to the user signup, but the user signup isn't built yet
   print("Navigating to new user signup page");
 }
 
