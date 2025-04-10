@@ -6,4 +6,3 @@ This function does not produce fields inside of tables
 
 It will initialize empty tables, when the tables actually come into use a separate function will be called to initialize the fields.
 
-The database will not be loaded as
