@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Core Documentation/Chapter 07 - Functions/Database Functions/07_01_02_createNewUserProfile(email, username).md",
+                "file": "Core Documentation/Chapter 10 - Data Protection and Privacy/10_01_User_Authentication.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "07_01_02_createNewUserProfile(email, username)"
+              "title": "10_01_User_Authentication"
             }
           }
         ]
@@ -191,11 +191,16 @@
   },
   "active": "d47008925d227bd1",
   "lastOpenFiles": [
+    "proposed_features.md",
+    "question_generation_prompt.md",
+    "Pasted image 20250407093838.png",
+    "Core Documentation/Chapter 07 - Functions/07_11_authenticateUser(username, credential, service).md",
+    "Core Documentation/Chapter 10 - Data Protection and Privacy/10_01_User_Authentication.md",
+    "Diagrams/Quizzer_Flow_Chart.md",
+    "Core Documentation/Chapter 07 - Functions/Database Functions/07_01_02_createNewUserProfile(email, username).md",
     "Core Documentation/Chapter 07 - Functions/Database Functions/07_01_04_generateUserUUID().md",
     "Core Documentation/Chapter 07 - Functions/Database Functions/07_01_03_verifyUserProfileTable().md",
-    "Core Documentation/Chapter 07 - Functions/Database Functions/07_01_02_createNewUserProfile(email, username).md",
     "Core Documentation/Chapter 07 - Functions/Redirect Functions/07_02_01newUserSignUp().md",
-    "Diagrams/Quizzer_Flow_Chart.md",
     "Diagrams/Question_Answer_Pair_Generation.md",
     "Core Documentation/Chapter 05 - User Experience and User Interface Design/05_04_New_User_Sign_Up_Page.md",
     "Core Documentation/Chapter 08 - Database/08_04_User_Profiles_Table.md",
@@ -213,14 +218,9 @@
     "Core Documentation/Chapter 07 - Functions/07_05_dataSynchronizationBackgroundProcess().md",
     "Core Documentation/Chapter 07 - Functions/07_05_backgroundNoiseBackgroundProcess().md",
     "Core Documentation/Chapter 07 - Functions/07_10_submitLogin(email, password).md",
-    "Core Documentation/Chapter 07 - Functions/07_11_authenticateUser(username, credential, service).md",
     "Core Documentation/Chapter 08 - Database/08_07_Source_Material_Key_Term_Table.md",
     "Core Documentation/Chapter 08 - Database/08_08_Question_Answer_Pair_Table.md",
-    "Core Documentation/Chapter 08 - Database/08_11_Login_Attempts_Table.md",
-    "Core Documentation/Chapter 08 - Database/08_10_Subject_Concept_Classification_Results.md",
-    "Core Documentation/Chapter 08 - Database/08_12_Question_Answer_Attempts_Table.md",
     "Core Documentation/Chapter 10 - Data Protection and Privacy",
-    "Pasted image 20250407093838.png",
     "Excalidraw",
     "Diagrams/LoginPage.png",
     "Quizzer_Logo.png",

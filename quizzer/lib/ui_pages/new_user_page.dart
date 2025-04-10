@@ -31,10 +31,7 @@ void submitSignup(BuildContext context, String email, String username, String pa
         duration: const Duration(seconds: 3),
       ),
     );return;} 
-  else {createNewUserProfile(email, username);}
-  
-  // This will later call the createNewUserProfile function
-  // FIXME: Call createNewUserProfile(email, username)
+  else {createNewUserProfile(email, username, password);}
   
   // Show success message
   ScaffoldMessenger.of(context).showSnackBar(

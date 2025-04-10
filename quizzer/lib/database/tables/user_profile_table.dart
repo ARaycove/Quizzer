@@ -2,13 +2,16 @@ import 'package:sqflite/sqflite.dart';
 import 'package:uuid/uuid.dart';
 import 'package:quizzer/database/quizzer_database.dart';
 
-Future<bool> createNewUserProfile(String email, String username) async {
+Future<bool> createNewUserProfile(String email, String username, String password) async {
   try {
     // First verify that the User Profile Table exists
     await verifyUserProfileTable();
     
     // Next Verify that the profile doesn't already exist in that Table
     await verifyNonDuplicateProfile(email, username);
+
+    // Send data to authentication service to store password field with auth service
+    await registerUserProfileWithFirebaseAuth();
 
     // Generate a UUID for the new user
     final String userUUID = generateUserUUID();
