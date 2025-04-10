@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:quizzer/ui_pages/login_page.dart';
 import 'package:quizzer/database/quizzer_database.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-
 late Database db;
 
 void main() async{

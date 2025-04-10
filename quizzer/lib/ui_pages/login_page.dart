@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:quizzer/ui_pages/new_user_page.dart';
 
 // Function to handle login submission
 void submitLogin(String email, String password) {
@@ -9,9 +10,11 @@ void submitLogin(String email, String password) {
 
 // Function to navigate to new user signup page
 void newUserSignUp(BuildContext context) {
-  // This will later navigate to the new user page
-  // FIXME we need to redirect to the user signup, but the user signup isn't built yet
-  print("Navigating to new user signup page");
+  // Navigate to the NewUserPage
+  Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => const NewUserPage()),
+  );
 }
 
 class LoginPage extends StatefulWidget {

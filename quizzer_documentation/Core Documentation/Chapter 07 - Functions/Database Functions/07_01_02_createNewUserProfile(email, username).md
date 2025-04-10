@@ -1,5 +1,7 @@
 First calls [[07_01_03_verifyUserProfileTable()]]
 
+Checks if the provided email and username already exists in the database, if it does abort the creation process
+
 Calls [[07_01_04_generateUserUUID()]] and assigns the value in local scope
 
 Collects the email field and username

@@ -11,12 +11,14 @@
             "id": "d47008925d227bd1",
             "type": "leaf",
             "state": {
-              "type": "excalidraw",
+              "type": "markdown",
               "state": {
-                "file": "Diagrams/Quizzer_Flow_Chart.md"
+                "file": "Core Documentation/Chapter 07 - Functions/Database Functions/07_01_02_createNewUserProfile(email, username).md",
+                "mode": "source",
+                "source": false
               },
-              "icon": "excalidraw-icon",
-              "title": "Quizzer_Flow_Chart"
+              "icon": "lucide-file",
+              "title": "07_01_02_createNewUserProfile(email, username)"
             }
           }
         ]
@@ -189,15 +191,16 @@
   },
   "active": "d47008925d227bd1",
   "lastOpenFiles": [
+    "Core Documentation/Chapter 07 - Functions/Database Functions/07_01_04_generateUserUUID().md",
+    "Core Documentation/Chapter 07 - Functions/Database Functions/07_01_03_verifyUserProfileTable().md",
+    "Core Documentation/Chapter 07 - Functions/Database Functions/07_01_02_createNewUserProfile(email, username).md",
+    "Core Documentation/Chapter 07 - Functions/Redirect Functions/07_02_01newUserSignUp().md",
+    "Diagrams/Quizzer_Flow_Chart.md",
     "Diagrams/Question_Answer_Pair_Generation.md",
     "Core Documentation/Chapter 05 - User Experience and User Interface Design/05_04_New_User_Sign_Up_Page.md",
-    "Core Documentation/Chapter 07 - Functions/Database Functions/07_01_02_createNewUserProfile(email, username).md",
     "Core Documentation/Chapter 08 - Database/08_04_User_Profiles_Table.md",
-    "Core Documentation/Chapter 07 - Functions/Database Functions/07_01_03_verifyUserProfileTable().md",
     "Core Documentation/Chapter 05 - User Experience and User Interface Design/05_03_Login_Page.md",
-    "Core Documentation/Chapter 07 - Functions/Redirect Functions/07_02_01newUserSignUp().md",
     "Core Documentation/Chapter 07 - Functions/Redirect Functions",
-    "Core Documentation/Chapter 07 - Functions/Database Functions/07_01_04_generateUserUUID().md",
     "Core Documentation/Chapter 07 - Functions/07_02_01_initializeQuizzer().md",
     "Core Documentation/Chapter 07 - Functions/Database Functions/07_01_01_loadDatabase().md",
     "Core Documentation/Chapter 07 - Functions/07_00_Functions.md",
@@ -216,7 +219,6 @@
     "Core Documentation/Chapter 08 - Database/08_11_Login_Attempts_Table.md",
     "Core Documentation/Chapter 08 - Database/08_10_Subject_Concept_Classification_Results.md",
     "Core Documentation/Chapter 08 - Database/08_12_Question_Answer_Attempts_Table.md",
-    "Core Documentation/Chapter 08 - Database/08_06_Citation_and_Source_Material_Table.md",
     "Core Documentation/Chapter 10 - Data Protection and Privacy",
     "Pasted image 20250407093838.png",
     "Excalidraw",
