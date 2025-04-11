@@ -12,7 +12,7 @@
 
 ![[04_12_UI_UX Design]]
 
-![[08_02_Local_Database_Implementation]]
+![[08_00_02_Local_Database_Implementation]]
 
 ![[09_01_Central_Algorithms_Overview]]
 

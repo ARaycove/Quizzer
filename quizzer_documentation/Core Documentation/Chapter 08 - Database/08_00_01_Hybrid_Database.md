@@ -5,7 +5,7 @@ As the project scales, the database architecture will transition to a distribute
 
 The database is designed to be as interconnected as possible. Each table will have properly detailed primary and foreign keys. There are many tables to discuss, including userProfile_uuid Tables, tables for data collection as detailed in section [[03_03_breakdown_of_behavioral_tasks|3-2]], and tables relating to the internal workings of the software itself.
 
-This design aligns with the "Offline - Online" philosophy described in section [[04_02_UI_UX_Philosophy|4-2 UI UX Philosophy]].
+This design aligns with the "Offline - Online" philosophy described in section [[04_03_UI_UX_Philosophy|4-2 UI UX Philosophy]].
 
 ### Core Database Tables
 The database structure includes several interconnected table categories:

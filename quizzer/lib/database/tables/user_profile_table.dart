@@ -1,17 +1,18 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:uuid/uuid.dart';
 import 'package:quizzer/database/quizzer_database.dart';
-
+import 'package:supabase_flutter/supabase_flutter.dart';
+final supabase = Supabase.instance.client;
 Future<bool> createNewUserProfile(String email, String username, String password) async {
   try {
     // First verify that the User Profile Table exists
     await verifyUserProfileTable();
-    
-    // Next Verify that the profile doesn't already exist in that Table
-    await verifyNonDuplicateProfile(email, username);
 
     // Send data to authentication service to store password field with auth service
-    await registerUserProfileWithFirebaseAuth();
+    await registerUserWithSupabase(email, password);
+
+    // Next Verify that the profile doesn't already exist in that Table
+    await verifyNonDuplicateProfile(email, username);
 
     // Generate a UUID for the new user
     final String userUUID = generateUserUUID();
@@ -143,4 +144,36 @@ Future<Map<String, dynamic>> verifyNonDuplicateProfile(String email, String user
     'isValid': true,
     'message': 'Email and username are available'
   };
+}
+
+
+
+Future<Map<String, dynamic>> registerUserWithSupabase(String email, String password) async {
+  try {
+    // Register user with Supabase Auth
+    final AuthResponse response = await supabase.auth.signUp(
+      email: email,
+      password: password
+    );
+    
+    // Return success with user ID if registration was successful
+    if (response.user != null) {
+      return {
+        'success': true,
+        'user_id': response.user!.id,
+        'session': response.session
+      };
+    } else {
+      return {
+        'success': false,
+        'error': 'Registration failed: No user returned'
+      };
+    }
+  } catch (e) {
+    // Return error information if registration failed
+    return {
+      'success': false,
+      'error': e.toString()
+    };
+  }
 }

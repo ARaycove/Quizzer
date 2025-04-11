@@ -1,20 +1,46 @@
 import 'package:flutter/material.dart';
 import 'package:quizzer/ui_pages/new_user_page.dart';
+import 'package:quizzer/ui_pages/home_page.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-// Function to handle login submission
-void submitLogin(String email, String password) {
-  // This will later call the authenticateUser function
-  // FIXME authenticateUser Call
-  print("Login attempted with email: $email");
-}
+// Access the Supabase client
+final supabase = Supabase.instance.client;
+final _secureStorage = const FlutterSecureStorage();
 
-// Function to navigate to new user signup page
-void newUserSignUp(BuildContext context) {
-  // Navigate to the NewUserPage
-  Navigator.push(
-    context,
-    MaterialPageRoute(builder: (context) => const NewUserPage()),
-  );
+// Function to handle authentication with Supabase
+Future<Map<String, dynamic>> authenticateUser(String email, String password) async {
+  try {
+    // Attempt to sign in with Supabase Auth
+    final AuthResponse response = await supabase.auth.signInWithPassword(
+      email: email,
+      password: password
+    );
+    
+    // If login successful, store authentication tokens for offline use
+    if (response.session != null) {
+      await _secureStorage.write(key: 'access_token', value: response.session!.accessToken);
+      await _secureStorage.write(key: 'refresh_token', value: response.session!.refreshToken);
+      await _secureStorage.write(key: 'user_email', value: email);
+      await _secureStorage.write(key: 'user_id', value: response.user!.id);
+      await _secureStorage.write(key: 'last_login_time', value: DateTime.now().toIso8601String());
+      
+      return {
+        'success': true,
+        'user_id': response.user!.id,
+      };
+    } else {
+      return {
+        'success': false,
+        'error': 'Authentication failed: No session returned'
+      };
+    }
+  } catch (e) {
+    return {
+      'success': false,
+      'error': e.toString()
+    };
+  }
 }
 
 class LoginPage extends StatefulWidget {
@@ -28,6 +54,69 @@ class _LoginPageState extends State<LoginPage> {
   // Controllers for the text fields
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  bool _isLoading = false;
+
+  // Function to handle login submission
+  Future<void> submitLogin() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final result = await authenticateUser(
+        _emailController.text.trim(), 
+        _passwordController.text
+      );
+      
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+      
+      if (result['success']) {
+        // Navigate to home page on successful login
+        if (mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const HomePage()),
+          );
+        }
+      } else {
+        // Show error message for failed login
+        String errorMessage = result['error'] ?? 'Invalid email or password';
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(errorMessage),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      // Handle any unexpected errors
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Login error: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  // Function to navigate to new user signup page
+  void newUserSignUp() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const NewUserPage()),
+    );
+  }
 
   @override
   void dispose() {
@@ -111,14 +200,20 @@ class _LoginPageState extends State<LoginPage> {
                 width: buttonWidth,
                 height: elementHeight25px,
                 child: ElevatedButton(
-                  onPressed: () => submitLogin(
-                    _emailController.text, 
-                    _passwordController.text
-                  ),
+                  onPressed: _isLoading ? null : submitLogin,
                   style: ElevatedButton.styleFrom(
                     minimumSize: Size(100, elementHeight25px),
                   ),
-                  child: const Text("Login"),
+                  child: _isLoading 
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : const Text("Login"),
                 ),
               ),
               
@@ -149,7 +244,7 @@ class _LoginPageState extends State<LoginPage> {
                 width: buttonWidth,
                 height: elementHeight25px,
                 child: ElevatedButton(
-                  onPressed: () => newUserSignUp(context),
+                  onPressed: newUserSignUp,
                   style: ElevatedButton.styleFrom(
                     minimumSize: Size(100, elementHeight25px),
                   ),

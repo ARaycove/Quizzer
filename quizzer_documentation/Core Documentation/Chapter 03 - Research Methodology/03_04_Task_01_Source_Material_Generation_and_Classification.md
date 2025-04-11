@@ -64,5 +64,5 @@ The goal of this task is to read the source material entered and check it agains
 If flagged for removal both the removal_flag becomes true and the has_been_reviewed field becomes True, otherwise only the has_been reviewed field is marked True
 
 Data Structures are mentioned in Chapter 8:
-[[08_06_Citation_and_Source_Material_Table]]
-[[08_07_Source_Material_Key_Term_Table]]
+[[08_03_01_Citation_and_Source_Material_Table]]
+[[08_03_02_Source_Material_Key_Term_Table]]
