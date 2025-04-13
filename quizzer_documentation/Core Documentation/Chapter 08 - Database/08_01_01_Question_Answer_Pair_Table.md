@@ -28,5 +28,6 @@ Foreign_Key = citation (links to Citation and Source Material Table)
 | has_been_reviewed | bool        | Indicates that the qst-ans pair has been reviewed by a human being                                        |
 | flag_for_removal  | bool        | Indicates the reviewer claimed the qst-ans pair should be removed                                         |
 | completed         | bool        | Indicates whether all tasks necessary to produce an entire question-answer pair are completed             |
+|                   |             |                                                                                                           |
 
 Note: Contributors to the concept and subject classification are listed in separate tables, not within the Question-Answer Pair Table itself.

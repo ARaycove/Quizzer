@@ -6,7 +6,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 // Access the Supabase client
 final supabase = Supabase.instance.client;
-final _secureStorage = const FlutterSecureStorage();
+const _secureStorage = FlutterSecureStorage();
 
 // Function to handle authentication with Supabase
 Future<Map<String, dynamic>> authenticateUser(String email, String password) async {

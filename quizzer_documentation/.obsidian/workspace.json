@@ -27,28 +27,30 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Core Documentation/Chapter 05 - User Experience and User Interface Design/05_05_Home_Page.md",
+                "file": "Core Documentation/Chapter 07 - Functions/07_14_getNextQuestionForReview().md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "05_05_Home_Page"
+              "title": "07_14_getNextQuestionForReview()"
             }
           },
           {
             "id": "33be048eca52ca5d",
             "type": "leaf",
             "state": {
-              "type": "excalidraw",
+              "type": "markdown",
               "state": {
-                "file": "Diagrams/Quizzer_Flow_Chart.md"
+                "file": "Core Documentation/Chapter 08 - Database/08_02_02_Login_Attempts_Table.md",
+                "mode": "source",
+                "source": false
               },
-              "icon": "excalidraw-icon",
-              "title": "Quizzer_Flow_Chart"
+              "icon": "lucide-file",
+              "title": "08_02_02_Login_Attempts_Table"
             }
           }
         ],
-        "currentTab": 1
+        "currentTab": 2
       }
     ],
     "direction": "vertical"
@@ -196,20 +198,25 @@
       "obsidian-excalidraw-plugin:New drawing": false
     }
   },
-  "active": "070c46f20d30b3b0",
+  "active": "33be048eca52ca5d",
   "lastOpenFiles": [
+    "Core Documentation/Chapter 08 - Database/08_00_01_Hybrid_Database.md",
+    "Core Documentation/Chapter 08 - Database/08_01_01_Question_Answer_Pair_Table.md",
+    "Core Documentation/Chapter 09 - Algorithms and Background Processes/09_14_Module_Background_Process.md",
+    "Core Documentation/Chapter 08 - Database/08_04_Modules_Table.md",
+    "Core Documentation/Chapter 07 - Functions/07_02_01_initializeQuizzer().md",
+    "Core Documentation/Chapter 08 - Database/08_00_03_Central_Database_Implementation.md",
     "Diagrams/Quizzer_Flow_Chart.md",
-    "Diagrams/Question_Answer_Pair_Generation.md",
+    "Core Documentation/Chapter 07 - Functions/07_14_getNextQuestionForReview().md",
+    "Core Documentation/Chapter 09 - Algorithms and Background Processes/09_13_Question_Selection_Background_Process.md",
     "Core Documentation/Chapter 05 - User Experience and User Interface Design/05_05_Home_Page.md",
+    "Diagrams/Question_Answer_Pair_Generation.md",
     "Core Documentation/Chapter 07 - Functions/07_12_answerQuestionAnswerPair(status, elapsed_time).md",
     "Core Documentation/Chapter 08 - Database/08_01_02_User_Question_Relationship_Table.md",
     "Core Documentation/Chapter 08 - Database/08_02_01_User_Profiles_Table.md",
     "Core Documentation/Chapter 08 - Database/08_02_02_Login_Attempts_Table.md",
     "Core Documentation/Chapter 09 - Algorithms and Background Processes/09_02_Memory_Retention_Algorithm.md",
-    "Core Documentation/Chapter 08 - Database/08_01_01_Question_Answer_Pair_Table.md",
-    "Core Documentation/Chapter 08 - Database/08_00_03Central_Database_Implementation.md",
     "Core Documentation/Chapter 08 - Database/08_00_02_Local_Database_Implementation.md",
-    "Core Documentation/Chapter 07 - Functions/07_02_01_initializeQuizzer().md",
     "Core Documentation/Chapter 07 - Functions/Database Functions/07_01_02_createNewUserProfile(email, username).md",
     "Core Documentation/Chapter 07 - Functions/Database Functions/07_01_03_verifyUserProfileTable().md",
     "Core Documentation/Chapter 07 - Functions/Database Functions/07_01_04_generateUserUUID().md",
@@ -219,11 +226,6 @@
     "Core Documentation/Chapter 04 - Technical Architecture Philosophy, Design Principles, and Ethical Considerations/04_03_Core_Technical_Philosophy.md",
     "Core Documentation/Chapter 04 - Technical Architecture Philosophy, Design Principles, and Ethical Considerations/04_03_Software_Design_Philosophy.md",
     "Core Documentation/Chapter 04 - Technical Architecture Philosophy, Design Principles, and Ethical Considerations/04_03_UI_UX_Philosophy.md",
-    "Core Documentation/Chapter 08 - Database/08_00_01_Hybrid_Database.md",
-    "Core Documentation/Chapter 08 - Database/08_04_Modules_Table.md",
-    "Core Documentation/Chapter 08 - Database/08_01_05_Subject_Concept_Classification_Results.md",
-    "Core Documentation/Chapter 08 - Database/08_03_02_Source_Material_Key_Term_Table.md",
-    "Core Documentation/Chapter 08 - Database/08_03_01_Citation_and_Source_Material_Table.md",
     "Core Documentation/Chapter 08 - Database/Question Answer Related Tables",
     "Pasted image 20250407093838.png",
     "Core Documentation/Chapter 07 - Functions/Redirect Functions",

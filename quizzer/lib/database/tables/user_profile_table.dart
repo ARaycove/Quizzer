@@ -61,7 +61,6 @@ Future<void> verifyUserProfileTable() async {
   );
   
   if (tables.isEmpty) {
-    // Create user_profile table according to the schema in documentation
     await db.execute('''
     CREATE TABLE user_profile(
       uuid TEXT PRIMARY KEY,
