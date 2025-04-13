@@ -1,9 +1,10 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:quizzer/database/tables/user_profile_table.dart';
 
 final supabase = Supabase.instance.client;
 const _secureStorage = FlutterSecureStorage();
-const _offlineLoginThresholdDays = 30;
+const _offlineLoginThresholdDays = 30; //FIXME Should be a user preference
 
 Future<Map<String, dynamic>> authenticateUser(String email, String password) async {
   try {
@@ -15,11 +16,15 @@ Future<Map<String, dynamic>> authenticateUser(String email, String password) asy
 
     if (onlineAuthResponse.session != null) {
       // Online authentication successful, store tokens
+      String timeStamp = DateTime.now().toIso8601String();
       await _secureStorage.write(key: 'access_token', value: onlineAuthResponse.session!.accessToken);
       await _secureStorage.write(key: 'refresh_token', value: onlineAuthResponse.session!.refreshToken);
       await _secureStorage.write(key: 'user_email', value: email);
       await _secureStorage.write(key: 'user_id', value: onlineAuthResponse.user!.id);
-      await _secureStorage.write(key: 'last_login_time', value: DateTime.now().toIso8601String());
+      await _secureStorage.write(key: 'last_login_time', value: timeStamp);
+      await updateLastLogin(
+        timeStamp, email
+        );
 
       return {
         'success': true,

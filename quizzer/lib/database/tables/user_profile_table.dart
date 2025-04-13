@@ -130,12 +130,7 @@ Future<Map<String, dynamic>> verifyNonDuplicateProfile(String email, String user
     whereArgs: [email],
   );
   
-  if (emailCheck.isNotEmpty) {
-    return {
-      'isValid': false,
-      'message': 'This email address is already registered'
-    };
-  }
+  if (emailCheck.isNotEmpty) {return {'isValid': false,'message': 'This email address is already registered'};}
   
   // Check if username already exists
   final List<Map<String, dynamic>> usernameCheck = await db.query(
@@ -189,3 +184,13 @@ Future<Map<String, dynamic>> registerUserWithSupabase(String email, String passw
     };
   }
 }
+
+Future<bool> updateLastLogin(String timestamp, String emailAddress) async {
+  final Database db = await getDatabase();
+  db.update(
+    'user_profile',
+    {'last_login': timestamp}, where: 'email = ?',whereArgs: [emailAddress],);
+  return true;
+}
+
+// TODO: FIXME Add in functionality for loginThreshold preference
