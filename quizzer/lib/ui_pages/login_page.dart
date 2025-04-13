@@ -1,47 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:quizzer/database/tables/user_profile_table.dart';
 import 'package:quizzer/ui_pages/new_user_page.dart';
 import 'package:quizzer/ui_pages/home_page.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-
-// Access the Supabase client
-final supabase = Supabase.instance.client;
-const _secureStorage = FlutterSecureStorage();
-
-// Function to handle authentication with Supabase
-Future<Map<String, dynamic>> authenticateUser(String email, String password) async {
-  try {
-    // Attempt to sign in with Supabase Auth
-    final AuthResponse response = await supabase.auth.signInWithPassword(
-      email: email,
-      password: password
-    );
-    
-    // If login successful, store authentication tokens for offline use
-    if (response.session != null) {
-      await _secureStorage.write(key: 'access_token', value: response.session!.accessToken);
-      await _secureStorage.write(key: 'refresh_token', value: response.session!.refreshToken);
-      await _secureStorage.write(key: 'user_email', value: email);
-      await _secureStorage.write(key: 'user_id', value: response.user!.id);
-      await _secureStorage.write(key: 'last_login_time', value: DateTime.now().toIso8601String());
-      
-      return {
-        'success': true,
-        'user_id': response.user!.id,
-      };
-    } else {
-      return {
-        'success': false,
-        'error': 'Authentication failed: No session returned'
-      };
-    }
-  } catch (e) {
-    return {
-      'success': false,
-      'error': e.toString()
-    };
-  }
-}
+import 'package:quizzer/database/tables/login_attempts.dart';
+import 'package:quizzer/backend/functions/user_auth.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -57,92 +19,45 @@ class _LoginPageState extends State<LoginPage> {
   bool _isLoading = false;
 
   // Function to handle login submission
-  Future<void> submitLogin() async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    try {
-      final result = await authenticateUser(
-        _emailController.text.trim(), 
-        _passwordController.text
-      );
-      
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-      
-      if (result['success']) {
-        // Navigate to home page on successful login
-        if (mounted) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const HomePage()),
-          );
-        }
-      } else {
-        // Show error message for failed login
-        String errorMessage = result['error'] ?? 'Invalid email or password';
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(errorMessage),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-      }
-    } catch (e) {
-      // Handle any unexpected errors
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Login error: ${e.toString()}'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+Future<void> submitLogin() async {
+  setState(() {_isLoading = true;});
+  final result = await authenticateUser(_emailController.text.trim(),_passwordController.text);
+  if (!mounted) return;
+  setState(() {_isLoading = false;});
+  bool shouldGoToHomePage = false;
+  late String status;
+  if (result['success']) {shouldGoToHomePage = true; status=result['response'];}
+  else {
+    String errorMessage = result['error'] ?? 'Invalid email or password';
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(errorMessage),backgroundColor:Colors.red,),);
+    status = errorMessage;
     }
-  }
+  String? userId = await getUserIdByEmail(_emailController.text.trim());
+  if (userId == null) {throw Exception("email address does not exist in table, but authenticated anyway");}
+  addLoginAttemptRecord(userId: userId, email: _emailController.text.trim(), statusCode: status);
+  if (shouldGoToHomePage == true) {Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) => const HomePage()),);}
+}
 
   // Function to navigate to new user signup page
-  void newUserSignUp() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const NewUserPage()),
-    );
-  }
+  void newUserSignUp() {Navigator.push(context,MaterialPageRoute(builder: (context) => const NewUserPage()),);}
 
   @override
-  void dispose() {
-    // Clean up controllers when the widget is disposed
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
-  }
+  void dispose() {_emailController.dispose();_passwordController.dispose();super.dispose();}
 
   @override
   Widget build(BuildContext context) {
     // Calculate responsive dimensions
-    final screenWidth = MediaQuery.of(context).size.width;
-    final logoWidth = screenWidth > 600 ? 460.0 : screenWidth * 0.85;
-    final fieldWidth = logoWidth;
-    final buttonWidth = logoWidth / 2;
-    
+    final screenWidth       = MediaQuery.of(context).size.width;
+    final logoWidth         = screenWidth > 600 ? 460.0 : screenWidth * 0.85;
+    final fieldWidth        = logoWidth;
+    final buttonWidth       = logoWidth / 2;
     // Define uniform height for UI elements (max 25px, scaled to screen)
-    final elementHeight = MediaQuery.of(context).size.height * 0.04;
+    final elementHeight     = MediaQuery.of(context).size.height * 0.04;
     final elementHeight25px = elementHeight > 25.0 ? 25.0 : elementHeight;
     
     return Scaffold(
       backgroundColor: const Color(0xFF0A1929),
-      body: Center(
-        child: SingleChildScrollView(
-          child: Column(
+      body: Center(child: SingleChildScrollView(child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               // Quizzer Logo

@@ -3,37 +3,61 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 final supabase = Supabase.instance.client;
 const _secureStorage = FlutterSecureStorage();
+const _offlineLoginThresholdDays = 30;
 
 Future<Map<String, dynamic>> authenticateUser(String email, String password) async {
   try {
-    // Attempt to sign in with Supabase Auth
-    final AuthResponse response = await supabase.auth.signInWithPassword(
+    // 1. Attempt online authentication
+    final AuthResponse onlineAuthResponse = await supabase.auth.signInWithPassword(
       email: email,
-      password: password
+      password: password,
     );
-    
-    // If login successful, store authentication tokens for offline use
-    if (response.session != null) {
-      await _secureStorage.write(key: 'access_token', value: response.session!.accessToken);
-      await _secureStorage.write(key: 'refresh_token', value: response.session!.refreshToken);
+
+    if (onlineAuthResponse.session != null) {
+      // Online authentication successful, store tokens
+      await _secureStorage.write(key: 'access_token', value: onlineAuthResponse.session!.accessToken);
+      await _secureStorage.write(key: 'refresh_token', value: onlineAuthResponse.session!.refreshToken);
       await _secureStorage.write(key: 'user_email', value: email);
-      await _secureStorage.write(key: 'user_id', value: response.user!.id);
+      await _secureStorage.write(key: 'user_id', value: onlineAuthResponse.user!.id);
       await _secureStorage.write(key: 'last_login_time', value: DateTime.now().toIso8601String());
-      
+
       return {
         'success': true,
-        'user_id': response.user!.id,
+        'user_id': onlineAuthResponse.user!.id,
+        'response': onlineAuthResponse.session.toString(),
       };
     } else {
+      // Online authentication failed (likely invalid credentials)
       return {
         'success': false,
-        'error': 'Authentication failed: No session returned'
+        'error': onlineAuthResponse.session ?? 'Authentication failed',
       };
     }
   } catch (e) {
+    // 2. Online authentication failed with an exception (likely network issue)
+    // Check for offline fallback
+    final storedEmail = await _secureStorage.read(key: 'user_email');
+    final storedAccessToken = await _secureStorage.read(key: 'access_token');
+    final lastLoginTimeStr = await _secureStorage.read(key: 'last_login_time');
+
+    if (storedEmail == email && storedAccessToken != null && lastLoginTimeStr != null) {
+      final lastLoginTime = DateTime.tryParse(lastLoginTimeStr);
+      if (lastLoginTime != null &&
+          DateTime.now().difference(lastLoginTime).inDays <= _offlineLoginThresholdDays) {
+        // Allow login with stored access token
+        return {
+          'success': true,
+          'user_id': await _secureStorage.read(key: 'user_id'),
+          'offline': true, // Indicate it's an offline login
+          'response': "offline_login"
+        };
+      }
+    }
+
+    // 3. No valid offline fallback after the exception
     return {
       'success': false,
-      'error': e.toString()
+      'error': 'Network error during authentication', // Generic error for network issues
     };
   }
 }

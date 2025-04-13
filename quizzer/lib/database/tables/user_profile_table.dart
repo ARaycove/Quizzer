@@ -3,6 +3,19 @@ import 'package:uuid/uuid.dart';
 import 'package:quizzer/database/quizzer_database.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 final supabase = Supabase.instance.client;
+Future<String?> getUserIdByEmail(String emailAddress) async {
+    final Database db = await getDatabase();
+    final List<Map<String, dynamic>> result = await db.query(
+      'user_profile',
+      columns: ['uuid'],
+      where: 'email = ?',
+      whereArgs: [emailAddress],
+    );
+
+    if (result.isNotEmpty) {return result.first['uuid'] as String?;} 
+    else {return null;}
+}
+
 Future<bool> createNewUserProfile(String email, String username, String password) async {
   try {
     // First verify that the User Profile Table exists

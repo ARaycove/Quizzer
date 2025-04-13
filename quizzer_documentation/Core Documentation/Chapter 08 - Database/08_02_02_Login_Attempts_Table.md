@@ -7,12 +7,12 @@ The Login_Attempt Table records user authentication attempts in the system. When
 Primary_Key = login_attempt_id
 Foreign_Key = user_id
 
-| Key              | Data Type | Description                                             |
-| ---------------- | --------- | ------------------------------------------------------- |
-| login_attempt_id |           | Unique identifier for each login attempt                |
-| user_id          |           | Reference to the user making the login attempt          |
-| email            |           | Email address used for the login attempt                |
-| timestamp        |           | The date and time when the login attempt occurred       |
-| success          | bool      | Whether the authentication attempt was successful       |
-| ip_address       |           | IP address from which the login was attempted           |
-| device_info      |           | Information about the device used for the login attempt |
+| Key              | Data Type | Description                                                                             |
+| ---------------- | --------- | --------------------------------------------------------------------------------------- |
+| login_attempt_id |           | Unique identifier for each login attempt                                                |
+| user_id          |           | Reference to the user making the login attempt                                          |
+| email            |           | Email address used for the login attempt                                                |
+| timestamp        |           | The date and time when the login attempt occurred                                       |
+| status_code      | bool      | Whether the authentication attempt was successful, failed, idled, or any other response |
+| ip_address       |           | IP address from which the login was attempted                                           |
+| device_info      |           | Information about the device used for the login attempt                                 |
