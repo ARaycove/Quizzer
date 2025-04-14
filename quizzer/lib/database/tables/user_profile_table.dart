@@ -107,13 +107,39 @@ Future<void> verifyUserProfileTable() async {
       recall_accuracy_trends TEXT,
       content_portfolio TEXT,
       activation_status_of_modules TEXT,
-      completion_status_of_modules TEXT
+      completion_status_of_modules TEXT,
+      tutorial_progress INTEGER DEFAULT 0
     )
     ''');
     
     print('User Profile table created successfully');
   } else {
-    print('User Profile table already exists');
+    // Check if tutorial_progress column exists, add it if not
+    await verifyTutorialProgressColumn();
+  }
+}
+
+/// Verifies that the tutorial_progress column exists in the user_profile table
+/// Adds the column if it doesn't exist
+Future<void> verifyTutorialProgressColumn() async {
+  final Database db = await getDatabase();
+  
+  // Check if the column exists in the table
+  final List<Map<String, dynamic>> columns = await db.rawQuery(
+    "PRAGMA table_info(user_profile)"
+  );
+  
+  bool columnExists = false;
+  for (var column in columns) {
+    if (column['name'] == 'tutorial_progress') {
+      columnExists = true;
+      break;
+    }
+  }
+  
+  if (!columnExists) {
+    await db.execute('ALTER TABLE user_profile ADD COLUMN tutorial_progress INTEGER DEFAULT 0');
+    print('Added tutorial_progress column to user_profile table');
   }
 }
 
@@ -153,8 +179,6 @@ Future<Map<String, dynamic>> verifyNonDuplicateProfile(String email, String user
   };
 }
 
-
-
 Future<Map<String, dynamic>> registerUserWithSupabase(String email, String password) async {
   try {
     // Register user with Supabase Auth
@@ -190,6 +214,44 @@ Future<bool> updateLastLogin(String timestamp, String emailAddress) async {
   db.update(
     'user_profile',
     {'last_login': timestamp}, where: 'email = ?',whereArgs: [emailAddress],);
+  return true;
+}
+
+/// Gets the tutorial progress for a user
+/// Returns the current tutorial question number (0-5)
+Future<int> getTutorialProgress(String userId) async {
+  // First verify the table structure
+  await verifyUserProfileTable();
+  await verifyTutorialProgressColumn();
+  
+  final Database db = await getDatabase();
+  
+  final List<Map<String, dynamic>> result = await db.query(
+    'user_profile',
+    columns: ['tutorial_progress'],
+    where: 'uuid = ?',
+    whereArgs: [userId],
+  );
+  
+  if (result.isEmpty) {
+    return 0;
+  }
+  return result.first['tutorial_progress'] as int;
+}
+
+/// Updates the tutorial progress for a user
+/// Returns true if the update was successful, false otherwise
+Future<bool> updateTutorialProgress(String userId, int progress) async {
+  await verifyUserProfileTable();
+  await verifyTutorialProgressColumn();
+  final Database db = await getDatabase();
+  await db.update(
+      'user_profile',
+      {'tutorial_progress': progress},
+      where: 'uuid = ?',
+      whereArgs: [userId],
+  );
+    
   return true;
 }
 

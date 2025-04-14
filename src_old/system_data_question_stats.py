@@ -46,38 +46,6 @@ def calculate_next_revision_date(status: str, question_object:dict): #Private Fu
     # Needs to consider factors like what other questions and concepts the user knows and are related to question at hand
     
     ################################################################################################################3
-    # I noticed that the same questions would always appear next to each other:
-    # To offset this we will add a random amount of hours to the next_revision_due
-    # Based on the current revision_streak we will select a range:
-    # if question_object["revision_streak"] == 1:
-    #     random_variation = random.randint(1,2)
-    # elif question_object["revision_streak"] <= 5:
-    #     random_variation = random.randint(1,2)
-    # elif question_object["revision_streak"] <= 6:
-    #     random_variation = random.randint(1,8)
-    # elif question_object["revision_streak"] <= 10:
-    #     random_variation = random.randint(1,12)
-    # elif question_object["revision_streak"] <= 15:
-    #     random_variation = random.randint(1,14)
-    # else:
-    #     random_variation = random.randint(6, 24)
-    # if status == "correct":
-    #     # Forgetting Curve study formula
-    #     try:
-    #         question_object["next_revision_due"] = datetime.now() + timedelta(hours=(24 * math.pow(question_object["time_between_revisions"],question_object["revision_streak"]))) + timedelta(hours=random_variation) #principle * (1.nn)^x
-    #     except OverflowError as e:
-    #         print(f"    {e}, settings next_due at 100 years from now")
-    #         question_object["next_revision_due"] = datetime.now() + timedelta(hours=(24*365*100)) #Show again in 100 years, basically never again
-    #     # print(f"adding {random_variation} hours to next_revision_due")
-    #     # print(f"{timedelta(hours=random_variation)}")
-    # else: # if not correct then incorrect, function should error out if status is not fed into properly:
-    #     # Intent is to make an incorrect question due immediately and of top priority
-    #     question_object["next_revision_due"] = datetime.now()
-    # return question_object
-    #
-    # Since the old formula required a value of 1 <= x < 1.5
-    # We need to ensure we don't use this value that is in each object
-    # So if we have an old value, detected greater than one, we'll set it to 0.37 to match the new initial constant
     if question_object["time_between_revisions"] >= 1:
         question_object["time_between_revisions"] = 1
     elif question_object["time_between_revisions"] <= 0:

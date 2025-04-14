@@ -1,0 +1,99 @@
+# Project Guidelines and Instructions
+
+## Core Philosophy
+- Prioritize offline functionality and local development over cloud dependencies
+- Treat education as a social good, not a commodity
+- Maintain user privacy, data protection, and student autonomy as fundamental rights
+- Focus on long-term maintainability and sustainability over short-term convenience
+- Build modular, maintainable systems with minimal external dependencies
+
+## Technical Architecture
+- Design for offline-first operation with proper data synchronization
+- Implement local data storage solutions with encryption
+- Use open-source technologies when possible
+- Avoid vendor lock-in and third-party service dependencies
+- Build modular, maintainable systems
+
+## Code Style and Formatting
+- Follow Flutter's official style guide (https://dart.dev/guides/language/effective-dart/style)
+- Use 4 spaces for indentation
+- Keep lines under 80 characters
+- Use trailing commas in multi-line parameter lists
+- Use `const` constructors and `late` instead of nullable types when appropriate
+- Prefer single quotes for strings
+- Organize files with functions at the top, followed by a full-width separator line, then widgets
+- Use full-width separator comment (e.g., `// ==========================================`) to separate functions from widgets
+- Three full-width separator comments should be used
+- Use shorter separator comment (e.g., `// ------------------------------------------`) between individual functions and widgets
+- Example file structure:
+  ```dart
+  // Functions
+  void functionOne() { ... }
+  // ------------------------------------------
+  void functionTwo() { ... }
+  // ------------------------------------------
+  
+  // ==========================================
+  
+  // Widgets
+  class WidgetOne extends StatelessWidget { ... }
+  // ------------------------------------------
+  class WidgetTwo extends StatelessWidget { ... }
+  ```
+
+## Architecture Guidelines
+- Follow Clean Architecture principles
+- Keep business logic separate from UI
+- Use dependency injection and proper state management
+- Keep widgets small and focused
+- Implement proper error handling and data synchronization
+
+## Testing
+- Write comprehensive tests (unit, widget, integration) with >80% coverage
+- Test offline functionality, data sync, and edge cases
+
+## Security and Privacy
+- Never hardcode sensitive information (use environment variables)
+- Implement proper authentication and data encryption
+- Validate all user input and follow secure coding practices
+- Ensure user consent and clear data usage policies
+- Implement proper data retention and protection measures
+
+## Performance Guidelines
+- Optimize widget rebuilds and use const constructors
+- Implement proper caching and minimize network calls
+- Optimize offline data access and synchronization
+- Profile and optimize critical paths
+- Minimize memory allocations in hot paths
+- Use appropriate data structures for performance-critical operations
+
+## Error Handling
+- Follow fail-fast methodology: crash on error rather than hide it
+- Use asserts and validation to ensure data matches exact expectations
+- Avoid try-catch blocks unless absolutely necessary for external operations (cases where this is necessary is for network calls where there might be no clean way to handle this)
+- Validate all data structures and types before use
+- Throw errors immediately when data doesn't match expected format
+- Example: If a function like `load_tutorial_question` returns null or malformed data, throw an error immediately rather than attempting to handle invalid data
+- Use strong typing and null safety to catch errors at compile time
+- Log errors with sufficient context for debugging
+- Handle offline/online transitions explicitly with clear error states
+
+## Code Review Checklist
+- [ ] Code follows style guide and architecture principles
+- [ ] Tests are present and passing with good coverage
+- [ ] Security and privacy measures are implemented
+- [ ] Performance is optimized and error handling is robust
+- [ ] Offline functionality and data sync are working
+- [ ] User autonomy and data protection are respected
+
+## AI Assistant Guidelines
+- Suggest improvements and point out potential issues
+- Provide clear explanations for suggestions
+- Consider performance, security, and maintainability
+- Respect user privacy and autonomy
+- Focus on long-term sustainability and offline functionality
+- Avoid suggesting third-party dependencies
+- Create TODO comments at the top of files when suggesting improvements, with clear descriptions of the suggested changes
+- Never delete or remove existing features and code unless explicitly instructed or absolutely necessary
+- Focus on writing individual functions and making changes within single files
+- Avoid making sweeping changes across multiple files unless specifically requested 

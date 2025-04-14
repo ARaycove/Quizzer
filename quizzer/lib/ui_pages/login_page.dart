@@ -4,6 +4,7 @@ import 'package:quizzer/ui_pages/new_user_page.dart';
 import 'package:quizzer/ui_pages/home_page.dart';
 import 'package:quizzer/database/tables/login_attempts.dart';
 import 'package:quizzer/backend/functions/user_auth.dart';
+import 'package:quizzer/backend/session_manager.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -21,12 +22,23 @@ class _LoginPageState extends State<LoginPage> {
   // Function to handle login submission
 Future<void> submitLogin() async {
   setState(() {_isLoading = true;});
+
   final result = await authenticateUser(_emailController.text.trim(),_passwordController.text);
+
   if (!mounted) return;
+
   setState(() {_isLoading = false;});
+
   bool shouldGoToHomePage = false;
+
   late String status;
-  if (result['success']) {shouldGoToHomePage = true; status=result['response'];}
+
+  if (result['success']) {
+    shouldGoToHomePage = true; 
+    status=result['response'];
+    final sessionManager = SessionManager();
+    await sessionManager.initializeSession(_emailController.text.trim());
+    }
   else {
     String errorMessage = result['error'] ?? 'Invalid email or password';
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(errorMessage),backgroundColor:Colors.red,),);

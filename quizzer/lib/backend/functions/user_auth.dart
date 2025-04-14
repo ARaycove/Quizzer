@@ -1,18 +1,26 @@
+// TODO: Add proper error handling for network operations
+// TODO: Implement proper logging for authentication failures
+// TODO: Add rate limiting for authentication attempts
+
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:quizzer/database/tables/user_profile_table.dart';
 
 final supabase = Supabase.instance.client;
 const _secureStorage = FlutterSecureStorage();
-const _offlineLoginThresholdDays = 30; //FIXME Should be a user preference
+const _offlineLoginThresholdDays = 30; // FIXME: Should be a user preference
 
+// ==========================================
+// Functions
+// ------------------------------------------
+// Authenticate User with Supabase
 Future<Map<String, dynamic>> authenticateUser(String email, String password) async {
-  try {
-    // 1. Attempt online authentication
-    final AuthResponse onlineAuthResponse = await supabase.auth.signInWithPassword(
-      email: email,
-      password: password,
-    );
+    try {
+        // 1. Attempt online authentication
+        final AuthResponse onlineAuthResponse = await supabase.auth.signInWithPassword(
+            email: email,
+            password: password,
+        );
 
     if (onlineAuthResponse.session != null) {
       // Online authentication successful, store tokens
@@ -25,7 +33,7 @@ Future<Map<String, dynamic>> authenticateUser(String email, String password) asy
       await updateLastLogin(
         timeStamp, email
         );
-
+// 
       return {
         'success': true,
         'user_id': onlineAuthResponse.user!.id,
@@ -63,6 +71,38 @@ Future<Map<String, dynamic>> authenticateUser(String email, String password) asy
     return {
       'success': false,
       'error': 'Network error during authentication', // Generic error for network issues
+    };
+  }
+}
+
+// ------------------------------------------
+// Register User with Supabase
+Future<Map<String, dynamic>> registerUserWithSupabase(String email, String password) async {
+  try {
+    // Register user with Supabase Auth
+    final AuthResponse response = await supabase.auth.signUp(
+      email: email,
+      password: password
+    );
+    
+    // Return success with user ID if registration was successful
+    if (response.user != null) {
+      return {
+        'success': true,
+        'user_id': response.user!.id,
+        'session': response.session
+      };
+    } else {
+      return {
+        'success': false,
+        'error': 'Registration failed: No user returned'
+      };
+    }
+  } catch (e) {
+    // Return error information if registration failed
+    return {
+      'success': false,
+      'error': e.toString()
     };
   }
 }
