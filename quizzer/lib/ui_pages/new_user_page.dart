@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quizzer/database/tables/user_profile_table.dart';
-import 'package:quizzer/backend/functions/user_auth.dart';
+import 'package:quizzer/backend/functions/user_auth.dart' as auth;
 
 // TODO: Fix the following issues:
 // 1. If user is already registered, but not present in the local database, a record should be created in the local database.
@@ -79,7 +79,7 @@ String validatePassword(String password, String confirmPassword) {
 
 Future<bool> checkUserExistsInSupabase(String email) async {
     try {
-        final response = await supabase.auth.signInWithPassword(
+        final response = await auth.supabase.auth.signInWithPassword(
             email: email,
             password: 'dummy_password', // We don't need the actual password for this check
         );
@@ -120,12 +120,12 @@ Future<String> handleSupabaseAuth(
 
     if (!supabaseUser && localUser) {
         // Register with Supabase but skip local profile creation
-        final result = await registerUserWithSupabase(email, password);
+        final result = await auth.registerUserWithSupabase(email, password);
         return result['success'] ? '' : (result['error'] ?? 'Failed to register with Supabase');
     }
 
     // User doesn't exist in either place - register with both
-    final supabaseResult = await registerUserWithSupabase(email, password);
+    final supabaseResult = await auth.registerUserWithSupabase(email, password);
     if (!supabaseResult['success']) {
         return supabaseResult['error'] ?? 'Failed to register with Supabase';
     }
