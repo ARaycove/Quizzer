@@ -6,6 +6,14 @@ import 'package:quizzer/backend/session_manager.dart';
 import 'package:quizzer/database/tables/user_profile_table.dart';
 import 'package:quizzer/database/tables/tutorial_questions.dart';
 
+
+// TODO: Reformat the code to be more readable and modular
+// TODO: Reformat the code such that the functions are grouped and separated from the UI code, matching the .cursor/instructions.md file
+
+// TODO: Reformat error handling to match the fail fast methodology defined in the .cursor/instructions.md file
+
+
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 

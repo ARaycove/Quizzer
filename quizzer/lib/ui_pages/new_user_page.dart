@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quizzer/database/tables/user_profile_table.dart';
+import 'package:quizzer/backend/functions/user_auth.dart';
 
 // TODO: Fix the following issues:
 // 1. If user is already registered, but not present in the local database, a record should be created in the local database.

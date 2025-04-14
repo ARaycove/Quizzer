@@ -77,6 +77,9 @@
 - Use strong typing and null safety to catch errors at compile time
 - Log errors with sufficient context for debugging
 - Handle offline/online transitions explicitly with clear error states
+- Everything should be logged no matter how insignificant, all actions the program takes should be documented through the logger.
+- For logging use the logging functions defined in the backend/quizzer_logging.dart
+
 
 ## Code Review Checklist
 - [ ] Code follows style guide and architecture principles

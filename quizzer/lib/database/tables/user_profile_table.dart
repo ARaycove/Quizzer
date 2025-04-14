@@ -2,6 +2,8 @@ import 'package:sqflite/sqflite.dart';
 import 'package:uuid/uuid.dart';
 import 'package:quizzer/database/quizzer_database.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:quizzer/backend/functions/user_auth.dart';
+
 final supabase = Supabase.instance.client;
 Future<String?> getUserIdByEmail(String emailAddress) async {
     final Database db = await getDatabase();
@@ -179,35 +181,7 @@ Future<Map<String, dynamic>> verifyNonDuplicateProfile(String email, String user
   };
 }
 
-Future<Map<String, dynamic>> registerUserWithSupabase(String email, String password) async {
-  try {
-    // Register user with Supabase Auth
-    final AuthResponse response = await supabase.auth.signUp(
-      email: email,
-      password: password
-    );
-    
-    // Return success with user ID if registration was successful
-    if (response.user != null) {
-      return {
-        'success': true,
-        'user_id': response.user!.id,
-        'session': response.session
-      };
-    } else {
-      return {
-        'success': false,
-        'error': 'Registration failed: No user returned'
-      };
-    }
-  } catch (e) {
-    // Return error information if registration failed
-    return {
-      'success': false,
-      'error': e.toString()
-    };
-  }
-}
+
 
 Future<bool> updateLastLogin(String timestamp, String emailAddress) async {
   final Database db = await getDatabase();
