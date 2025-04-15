@@ -75,6 +75,13 @@ All development should reference and follow the guidelines specified in the core
 - Ensure user consent and clear data usage policies
 - Implement proper data retention and protection measures
 
+## UI Guidelines
+### Color Palette:
+- Ensure you follow the same color scheme for UI elements, it should match across pages.
+- All UI elements should be proportional
+- UI elements should follow good UI/UX design principles
+- 
+
 ## Performance Guidelines
 - Optimize widget rebuilds and use const constructors
 - Implement proper caching and minimize network calls
@@ -116,3 +123,5 @@ All development should reference and follow the guidelines specified in the core
 - Never delete or remove existing features and code unless explicitly instructed or absolutely necessary
 - Focus on writing individual functions and making changes within single files
 - Avoid making sweeping changes across multiple files unless specifically requested 
+- Do not make new files unless specifically asked
+- Do not make sweeping changes across multiple files

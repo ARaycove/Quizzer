@@ -33,109 +33,22 @@ TODO: Future Improvements
 */
 
 import 'package:flutter/material.dart';
-import 'package:quizzer/backend/quizzer_logging.dart';
-import 'package:quizzer/database/tables/question_answer_pairs.dart';
-import 'package:quizzer/backend/session_manager.dart';
-import 'dart:io';
 import 'package:image_picker/image_picker.dart';
-
-// Element model to represent both text and media elements
-class Element {
-  final String type; // 'text' or 'image'
-  final String content; // text content or image filename
-
-  Element({
-    required this.type,
-    required this.content,
-  });
-}
-
-// Widget to display a list of elements with drag and drop functionality
-class ElementList extends StatefulWidget {
-  final List<Element> elements;
-  final Function(List<Element>) onElementsChanged;
-  final Function() onAddText;
-  final Function() onAddMedia;
-
-  const ElementList({
-    super.key,
-    required this.elements,
-    required this.onElementsChanged,
-    required this.onAddText,
-    required this.onAddMedia,
-  });
-
-  @override
-  State<ElementList> createState() => _ElementListState();
-}
-
-class _ElementListState extends State<ElementList> {
-  void _reorderElements(int oldIndex, int newIndex) {
-    if (oldIndex < newIndex) {
-      newIndex -= 1;
-    }
-    final List<Element> newElements = List.from(widget.elements);
-    final Element element = newElements.removeAt(oldIndex);
-    newElements.insert(newIndex, element);
-    widget.onElementsChanged(newElements);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        ReorderableListView(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          onReorder: _reorderElements,
-          children: widget.elements.asMap().entries.map((entry) {
-            final element = entry.value;
-            final index = entry.key;
-            return ListTile(
-              key: Key(element.content),
-              leading: IconButton(
-                icon: const Icon(Icons.delete, color: _textColor),
-                onPressed: () {
-                  setState(() {
-                    widget.elements.removeAt(index);
-                    widget.onElementsChanged(widget.elements);
-                  });
-                },
-              ),
-              title: element.type == 'text'
-                  ? Text(element.content, style: const TextStyle(color: _textColor))
-                  : Image.file(File(element.content), height: 100),
-              trailing: const Icon(Icons.drag_handle, color: Colors.grey),
-            );
-          }).toList(),
-        ),
-        const SizedBox(height: 16),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            IconButton(
-              icon: const Icon(Icons.text_fields, color: _textColor),
-              onPressed: widget.onAddText,
-            ),
-            const SizedBox(width: 16),
-            IconButton(
-              icon: const Icon(Icons.image, color: _textColor),
-              onPressed: widget.onAddMedia,
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-}
+import 'package:quizzer/backend/quizzer_logging.dart';
+import 'package:quizzer/backend/session_manager.dart';
+import 'package:quizzer/backend/utils.dart';
+import 'package:quizzer/database/tables/question_answer_pairs.dart';
+import 'package:quizzer/ui_pages/custom_widgets/module_selection.dart';
+import 'package:quizzer/ui_pages/custom_widgets/question_type_selection.dart';
+import 'package:quizzer/ui_pages/custom_widgets/question_answer_element.dart';
+import 'package:quizzer/ui_pages/custom_widgets/question_entry_options_dialog.dart';
+import 'package:quizzer/ui_pages/custom_widgets/submit_clear_buttons.dart';
 
 // Colors
-const Color _backgroundColor = Color(0xFF0A1929);
-const Color _fieldBackgroundColor = Color(0xFF1E2A3A);
-const Color _accentColor = Color(0xFF4CAF50);
-const Color _textColor = Colors.white;
-const Color _hintColor = Colors.grey;
-const Color _errorColor = Colors.red;
+const Color _backgroundColor = Color(0xFF0A1929); // Primary Background
+const Color _surfaceColor = Color(0xFF1E2A3A); // Secondary Background
+const Color _textColor = Colors.white; // Primary Text
+const double _spacing = 16.0;
 
 // ==========================================
 
@@ -148,723 +61,322 @@ class AddQuestionAnswerPage extends StatefulWidget {
 }
 
 class _AddQuestionAnswerPageState extends State<AddQuestionAnswerPage> {
-  final _formKey = GlobalKey<FormState>();
-  final _optionsController = TextEditingController();
-  final _optionsFocusNode = FocusNode();
-  final _options = <String>[];
-  int _correctOptionIndex = -1;
-  String _selectedQuestionType = 'Multiple Choice';
-  final _moduleController = TextEditingController(); // Module text field controller
-  
-  // New state variables for elements
-  List<Element> _questionElements = [];
-  List<Element> _answerElements = [];
-  final ImagePicker _picker = ImagePicker();
-  final TextEditingController _textEntryController = TextEditingController();
-  bool _isAddingText = false;
-  int? _editingIndex;
-  bool _isEditingQuestion = true;
+  final _moduleController = TextEditingController();
+  final _questionTypeController = TextEditingController();
+  final List<QAContent> _questionElements = [];
+  final List<QAContent> _answerElements = [];
+  final _imagePicker = ImagePicker();
   late final SessionManager _sessionManager;
+  final List<String> _options = [];
+  int _correctOptionIndex = -1;
 
   @override
   void initState() {
     super.initState();
     _sessionManager = SessionManager();
-    _moduleController.text = 'General';
+    _moduleController.text = 'general';
+    _questionTypeController.text = 'multiple_choice';
+    _questionTypeController.addListener(_handleQuestionTypeChange);
   }
 
   @override
   void dispose() {
-    _optionsController.dispose();
-    _optionsFocusNode.dispose();
-    _textEntryController.dispose();
     _moduleController.dispose();
+    _questionTypeController.dispose();
     super.dispose();
   }
 
-  void _editElement(int index, bool isQuestion) {
+  void _handleQuestionTypeChange() {
     setState(() {
-      _isEditingQuestion = isQuestion;
-      _editingIndex = index;
-      final elements = isQuestion ? _questionElements : _answerElements;
-      if (elements[index].type == 'text') {
-        _textEntryController.text = elements[index].content;
-        _isAddingText = true;
-      } else {
-        _handleMediaUpload(context, isQuestion);
-      }
+      // Reset options when question type changes
+      _options.clear();
+      _correctOptionIndex = -1;
     });
   }
 
-  void _reorderQuestionElements(int oldIndex, int newIndex) {
-    if (oldIndex < newIndex) {
-      newIndex -= 1;
-    }
-    final List<Element> newElements = List.from(_questionElements);
-    final Element element = newElements.removeAt(oldIndex);
-    newElements.insert(newIndex, element);
+  void _handleOptionsChanged(List<String> newOptions) {
     setState(() {
-      _questionElements = newElements;
+      _options.clear();
+      _options.addAll(newOptions);
     });
   }
 
-  void _reorderAnswerElements(int oldIndex, int newIndex) {
-    if (oldIndex < newIndex) {
-      newIndex -= 1;
-    }
-    final List<Element> newElements = List.from(_answerElements);
-    final Element element = newElements.removeAt(oldIndex);
-    newElements.insert(newIndex, element);
+  void _handleCorrectOptionChanged(int newIndex) {
     setState(() {
-      _answerElements = newElements;
+      _correctOptionIndex = newIndex;
     });
   }
 
-  void _handleTextSubmitted(String text, bool isQuestion) {
-    if (text.isNotEmpty) {
-      setState(() {
-        final elements = isQuestion ? _questionElements : _answerElements;
-        if (_editingIndex != null) {
-          elements[_editingIndex!] = Element(type: 'text', content: text);
-        } else {
-          elements.add(Element(type: 'text', content: text));
+  String getCurrentModuleSelection() {
+    final currentModule = _moduleController.text;
+    QuizzerLogger.logMessage('Fetching current module selection: $currentModule');
+    return currentModule;
+  }
+
+  void _handleQuestionElementsChanged(List<QAContent> newElements) {
+    setState(() {
+      _questionElements.clear();
+      _questionElements.addAll(newElements);
+    });
+  }
+
+  void _handleAnswerElementsChanged(List<QAContent> newElements) {
+    setState(() {
+      _answerElements.clear();
+      _answerElements.addAll(newElements);
+    });
+  }
+
+  void _handleSubmit() async {
+    if (_validateForm()) {
+      // Convert QAContent to Map format required by database
+      final questionElements = await Future.wait(_questionElements.map((e) async {
+        if (e.type == 'image') {
+          // Move image to final location and get just the filename
+          final filename = await moveImageToFinalLocation(e.content);
+          return {
+            'type': e.type,
+            'content': filename,
+          };
         }
-        _isAddingText = false;
-        _editingIndex = null;
-        _textEntryController.clear();
-      });
-    }
-  }
-
-  Future<void> _handleMediaUpload(BuildContext context, bool isQuestion) async {
-    if (!mounted) return;
-    final scaffoldMessenger = ScaffoldMessenger.of(context);
-    
-    try {
-      final XFile? image = await _picker.pickImage(
-        source: ImageSource.gallery,
-        imageQuality: 85,
-      );
+        return {
+          'type': e.type,
+          'content': e.content,
+        };
+      }).toList());
       
-      if (image == null) {
-        return;
-      }
-
-      // Validate that it's an image file
-      if (!image.path.toLowerCase().endsWith('.jpg') && 
-          !image.path.toLowerCase().endsWith('.jpeg') && 
-          !image.path.toLowerCase().endsWith('.png')) {
-        if (!mounted) return;
-        scaffoldMessenger.showSnackBar(
-          const SnackBar(
-            content: Text('Please select a valid image file (JPG, JPEG, or PNG)'),
-            backgroundColor: _errorColor,
-          ),
-        );
-        return;
-      }
-
-      // Create input_staging directory if it doesn't exist
-      final stagingDir = Directory('images/input_staging');
-      if (!await stagingDir.exists()) {
-        await stagingDir.create(recursive: true);
-      }
-
-      // Generate a unique filename for the staged file
-      final timestamp = DateTime.now().millisecondsSinceEpoch;
-      final originalFilename = image.path.split('/').last;
-      final stagedFilename = '${timestamp}_$originalFilename';
-      final stagedPath = '${stagingDir.path}/$stagedFilename';
-
-      // Copy the file to the staging directory
-      await File(image.path).copy(stagedPath);
-
-      if (!mounted) return;
-      setState(() {
-        if (isQuestion) {
-          _questionElements.add(Element(type: 'image', content: stagedPath));
-        } else {
-          _answerElements.add(Element(type: 'image', content: stagedPath));
+      final answerElements = await Future.wait(_answerElements.map((e) async {
+        if (e.type == 'image') {
+          // Move image to final location and get just the filename
+          final filename = await moveImageToFinalLocation(e.content);
+          return {
+            'type': e.type,
+            'content': filename,
+          };
         }
-      });
-    } catch (e) {
-      QuizzerLogger.logError('Error handling image upload: $e');
-      if (!mounted) return;
-      scaffoldMessenger.showSnackBar(
-        SnackBar(
-          content: Text('Error handling image: ${e.toString()}'),
-          backgroundColor: _errorColor,
-        ),
-      );
-    }
-  }
+        return {
+          'type': e.type,
+          'content': e.content,
+        };
+      }).toList());
 
-  void _addTextElement(BuildContext context, bool isQuestion) {
-    setState(() {
-      _isAddingText = true;
-      _isEditingQuestion = isQuestion;
-      _editingIndex = null;
-      _textEntryController.clear();
-    });
-  }
+      // Get current timestamp
+      final timeStamp = DateTime.now().toIso8601String();
 
-  void _addOption() {
-    if (_options.length < 6 && _optionsController.text.isNotEmpty) {
-      setState(() {
-        _options.add(_optionsController.text);
-        _optionsController.clear();
-        if (_selectedQuestionType == 'Multiple Choice' && _optionsFocusNode.hasFocus) {
-          _optionsFocusNode.requestFocus();
-        }
-      });
-    }
-  }
-
-  void _removeOption(int index) {
-    setState(() {
-      _options.removeAt(index);
-      if (_correctOptionIndex == index) {
-        _correctOptionIndex = -1;
-      } else if (_correctOptionIndex > index) {
-        _correctOptionIndex--;
-      }
-    });
-  }
-
-  void _submitQuestionAnswerPair(BuildContext context) async {
-    if (!mounted) return;
-    final scaffoldMessenger = ScaffoldMessenger.of(context);
-    
-    if (!_formKey.currentState!.validate()) {
-      QuizzerLogger.logError('Form validation failed');
-      return;
-    }
-
-    // Validate module name
-    if (_moduleController.text.trim().isEmpty) {
-      QuizzerLogger.logError('Module name is required');
-      scaffoldMessenger.showSnackBar(
-        const SnackBar(
-          content: Text('Please enter a module name'),
-          backgroundColor: _errorColor,
-        ),
-      );
-      return;
-    }
-
-    // Validate multiple choice options
-    if (_selectedQuestionType == 'Multiple Choice') {
-      if (_options.isEmpty) {
-        QuizzerLogger.logError('No options added for multiple choice question');
-        scaffoldMessenger.showSnackBar(
-          const SnackBar(
-            content: Text('Please add at least one option'),
-            backgroundColor: _errorColor,
-          ),
-        );
-        return;
+      // Get user ID from session manager - crash if null
+      final userId = _sessionManager.userId;
+      if (userId == null) {
+        throw Exception('Security Error: Attempted to add question without valid user session');
       }
 
-      if (_correctOptionIndex == -1) {
-        QuizzerLogger.logError('No correct option selected for multiple choice question');
-        scaffoldMessenger.showSnackBar(
-          const SnackBar(
-            content: Text('Please select the correct option'),
-            backgroundColor: _errorColor,
-          ),
-        );
-        return;
-      }
-    }
-
-    try {
-      // Create question_answer_pair_assets directory if it doesn't exist
-      final assetsDir = Directory('images/question_answer_pair_assets');
-      if (!await assetsDir.exists()) {
-        await assetsDir.create(recursive: true);
-      }
-
-      // Process all image elements
-      for (var element in [..._questionElements, ..._answerElements]) {
-        if (element.type == 'image') {
-          final sourceFile = File(element.content);
-          if (await sourceFile.exists()) {
-            final filename = element.content.split('/').last;
-            final destinationPath = '${assetsDir.path}/$filename';
-            await sourceFile.copy(destinationPath);
-            // Update the content to point to the new location
-            element = Element(type: 'image', content: destinationPath);
-          }
-        }
-      }
-
-      // Log the raw data structure
-      QuizzerLogger.printHeader('Raw Data Structure');
-      QuizzerLogger.logMessage('''
-Raw Data Feed:
-{
-  "questionType": "$_selectedQuestionType",
-  "module": "${_moduleController.text.trim()}",
-  "questionElements": [${_questionElements.map((e) => '{"type":"${e.type}","content":"${e.content}"}').join(',')}],
-  "options": [${_options.map((o) => '"$o"').join(',')}],
-  "correctOptionIndex": $_correctOptionIndex,
-  "answerElements": [${_answerElements.map((e) => '{"type":"${e.type}","content":"${e.content}"}').join(',')}]
-}
-''');
-      QuizzerLogger.printDivider();
-
-      // Convert elements to the format expected by the database
-      final questionElements = _questionElements.map((e) => {
-        'type': e.type,
-        'content': e.content,
-      }).toList();
-
-      final answerElements = _answerElements.map((e) => {
-        'type': e.type,
-        'content': e.content,
-      }).toList();
-
-      // Get current user's UUID from session manager
-      final currentUserUuid = _sessionManager.userId;
-      if (currentUserUuid == null) {
-        throw Exception('No user logged in');
-      }
-
-      // Add the question-answer pair to the database
-      final timestamp = DateTime.now().toIso8601String();
+      // Add to database
       await addQuestionAnswerPair(
-        timeStamp: timestamp,
-        citation: '', // Required parameter but not used
+        timeStamp: timeStamp,
         questionElements: questionElements,
         answerElements: answerElements,
         ansFlagged: false,
-        ansContrib: currentUserUuid,
-        qstContrib: currentUserUuid,
+        ansContrib: userId,
+        qstContrib: userId,
         hasBeenReviewed: false,
         flagForRemoval: false,
-        moduleName: _moduleController.text.trim(),
-        questionType: _selectedQuestionType,
-        options: _selectedQuestionType == 'Multiple Choice' ? _options : null,
-        correctOptionIndex: _selectedQuestionType == 'Multiple Choice' ? _correctOptionIndex : null,
+        moduleName: _moduleController.text,
+        questionType: _questionTypeController.text,
+        options: _questionTypeController.text == 'multiple_choice' ? _options : null,
+        correctOptionIndex: _questionTypeController.text == 'multiple_choice' ? _correctOptionIndex : null,
       );
 
-      QuizzerLogger.logSuccess('Question-Answer pair submitted successfully');
-      if (!mounted) return;
-      scaffoldMessenger.showSnackBar(
-        const SnackBar(
-          content: Text('Question-Answer pair submitted successfully'),
-          backgroundColor: _accentColor,
-        ),
-      );
-
-      // Clear the form after successful submission
-      _clearAllFields();
-    } catch (e) {
-      QuizzerLogger.logError('Error processing files: $e');
-      if (!mounted) return;
-      scaffoldMessenger.showSnackBar(
-        SnackBar(
-          content: Text('Error processing files: ${e.toString()}'),
-          backgroundColor: _errorColor,
-        ),
-      );
+      _showSuccessSnackBar('Question-Answer pair saved successfully!');
+      _handleClear(); // Clear the form after successful submission
     }
   }
 
-  void _clearAllFields() {
+  bool _validateForm() {
+    QuizzerLogger.logMessage('Starting form validation...');
+
+    // Check if module is selected
+    // TODO: Formal validation of module name
+    if (_moduleController.text.isEmpty) {
+      QuizzerLogger.logMessage('Module validation failed: Expected non-empty module, got empty');
+      _showErrorSnackBar('Please select a module');
+      return false;
+    }
+    QuizzerLogger.logMessage('Module validation passed: Selected module is "${_moduleController.text}"');
+
+    // Check if question type is selected
+    if (_questionTypeController.text.isEmpty) {
+      QuizzerLogger.logMessage('Question type validation failed: Expected non-empty type, got empty');
+      _showErrorSnackBar('Please select a question type');
+      return false;
+    }
+    QuizzerLogger.logMessage('Question type validation passed: Selected type is "${_questionTypeController.text}"');
+
+    // Check if question has content
+    if (_questionElements.isEmpty) {
+      QuizzerLogger.logMessage('Question content validation failed: Expected at least one element, got none');
+      _showErrorSnackBar('Please add content to the question');
+      return false;
+    }
+    QuizzerLogger.logMessage('Question content validation passed: Found ${_questionElements.length} elements');
+
+    // Check if answer has content
+    if (_answerElements.isEmpty) {
+      QuizzerLogger.logMessage('Answer content validation failed: Expected at least one element, got none');
+      _showErrorSnackBar('Please add content to the answer');
+      return false;
+    }
+    QuizzerLogger.logMessage('Answer content validation passed: Found ${_answerElements.length} elements');
+
+    // Additional validation for multiple choice questions
+    if (_questionTypeController.text == 'multiple_choice') {
+      if (_options.isEmpty) {
+        QuizzerLogger.logMessage('Multiple choice options validation failed: Expected at least one option, got none');
+        _showErrorSnackBar('Please add options for the multiple choice question');
+        return false;
+      }
+      QuizzerLogger.logMessage('Multiple choice options validation passed: Found ${_options.length} options');
+
+      if (_correctOptionIndex == -1) {
+        QuizzerLogger.logMessage('Correct option validation failed: Expected selected option, got none');
+        _showErrorSnackBar('Please select the correct answer for the multiple choice question');
+        return false;
+      }
+      QuizzerLogger.logMessage('Correct option validation passed: Selected option index is $_correctOptionIndex');
+    }
+
+    // Log final form data
+    QuizzerLogger.logMessage('Form validation completed successfully');
+    QuizzerLogger.logMessage('Final form data:');
+    QuizzerLogger.logMessage('Module: ${_moduleController.text}');
+    QuizzerLogger.logMessage('Question Type: ${_questionTypeController.text}');
+    QuizzerLogger.logMessage('Question Elements: ${_questionElements.map((e) => '{"type":"${e.type}","content":"${e.content}"}').join(',')}');
+    QuizzerLogger.logMessage('Answer Elements: ${_answerElements.map((e) => '{"type":"${e.type}","content":"${e.content}"}').join(',')}');
+    if (_questionTypeController.text == 'multiple_choice') {
+      QuizzerLogger.logMessage('Options: ${_options.join(',')}');
+      QuizzerLogger.logMessage('Correct Option Index: $_correctOptionIndex');
+    }
+
+    return true;
+  }
+
+  void _showErrorSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+        duration: const Duration(seconds: 3),
+      ),
+    );
+  }
+
+  void _showSuccessSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.green,
+        duration: const Duration(seconds: 3),
+      ),
+    );
+  }
+
+  void _handleClear() {
     setState(() {
       _questionElements.clear();
       _answerElements.clear();
       _options.clear();
       _correctOptionIndex = -1;
-      _optionsController.clear();
-      _textEntryController.clear();
-      _isAddingText = false;
-      _editingIndex = null;
+      _moduleController.text = 'general';
+      _questionTypeController.text = 'multiple_choice';
     });
+    QuizzerLogger.logMessage('Cleared all form fields');
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _backgroundColor,
       appBar: AppBar(
-        title: const Text('Add Question-Answer Pair', style: TextStyle(color: _textColor)),
-        backgroundColor: _backgroundColor,
+        title: const Text(
+          'Add Question-Answer Pair',
+          style: TextStyle(color: _textColor),
+        ),
+        backgroundColor: _surfaceColor,
+        elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: _textColor),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () {
+            final previousPage = _sessionManager.getPreviousPage();
+            if (previousPage != null) {
+              Navigator.of(context).pushReplacementNamed(previousPage);
+            } else {
+              Navigator.of(context).pop();
+            }
+          },
         ),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // TODO: Convert to autocomplete/autosuggest field that shows existing modules
-              // This will help users find existing modules and maintain consistency
-              TextField(
-                controller: _moduleController,
-                style: const TextStyle(color: _textColor),
-                decoration: InputDecoration(
-                  labelText: 'Module',
-                  labelStyle: const TextStyle(color: _textColor),
-                  hintText: 'Enter module name',
-                  hintStyle: const TextStyle(color: _hintColor),
-                  filled: true,
-                  fillColor: _fieldBackgroundColor,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: const BorderSide(color: _accentColor),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: const BorderSide(color: _accentColor),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: const BorderSide(color: _accentColor),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-
-              // Question Type Selection
-              DropdownButtonFormField<String>(
-                value: _selectedQuestionType,
-                dropdownColor: _fieldBackgroundColor,
-                style: const TextStyle(color: _textColor),
-                decoration: InputDecoration(
-                  labelText: 'Question Type',
-                  labelStyle: const TextStyle(color: _textColor),
-                  filled: true,
-                  fillColor: _fieldBackgroundColor,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: const BorderSide(color: _accentColor),
-                  ),
-                ),
-                items: const [
-                  DropdownMenuItem(
-                    value: 'Multiple Choice',
-                    child: Text('Multiple Choice', style: TextStyle(color: _textColor)),
-                  ),
-                ],
-                onChanged: (value) {
-                  setState(() {
-                    _correctOptionIndex = -1;
-                    _selectedQuestionType = value!;
-                  });
-                },
-              ),
-              const SizedBox(height: 20),
-
-              // Question Elements
-              Text(
-                'Question',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(color: _textColor),
-              ),
-              const SizedBox(height: 8),
-              Container(
-                decoration: BoxDecoration(
-                  color: _fieldBackgroundColor,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: _accentColor),
-                ),
-                child: Column(
-                  children: [
-                    ReorderableListView(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      onReorder: _reorderQuestionElements,
-                      children: _questionElements.asMap().entries.map((entry) {
-                        final element = entry.value;
-                        final index = entry.key;
-                        return ListTile(
-                          key: Key(element.content),
-                          leading: IconButton(
-                            icon: const Icon(Icons.delete, color: _textColor),
-                            onPressed: () {
-                              setState(() {
-                                _questionElements.removeAt(index);
-                              });
-                            },
-                          ),
-                          title: GestureDetector(
-                            onDoubleTap: () => _editElement(index, true),
-                            child: element.type == 'text'
-                                ? Text(element.content, style: const TextStyle(color: _textColor))
-                                : Image.file(File(element.content), height: 100),
-                          ),
-                          trailing: const Icon(Icons.drag_handle, color: Colors.grey),
-                        );
-                      }).toList(),
-                    ),
-                    if (_isAddingText && _isEditingQuestion)
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: TextField(
-                                controller: _textEntryController,
-                                autofocus: true,
-                                style: const TextStyle(color: _textColor),
-                                maxLines: null,
-                                keyboardType: TextInputType.multiline,
-                                decoration: InputDecoration(
-                                  hintText: 'Enter text',
-                                  hintStyle: const TextStyle(color: _hintColor),
-                                  filled: true,
-                                  fillColor: _fieldBackgroundColor,
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                    borderSide: const BorderSide(color: _accentColor),
-                                  ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                    borderSide: const BorderSide(color: _accentColor),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                    borderSide: const BorderSide(color: _accentColor),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.add, color: _textColor),
-                              onPressed: () {
-                                if (_textEntryController.text.isNotEmpty) {
-                                  _handleTextSubmitted(_textEntryController.text, true);
-                                }
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.text_fields, color: _textColor),
-                          onPressed: () => _addTextElement(context, true),
-                        ),
-                        const SizedBox(width: 16),
-                        IconButton(
-                          icon: const Icon(Icons.image, color: _textColor),
-                          onPressed: () => _handleMediaUpload(context, true),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
-
-              // Multiple Choice Options
-              if (_selectedQuestionType == 'Multiple Choice') ...[
-                Text(
-                  'Options',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(color: _textColor),
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: _optionsController,
-                        focusNode: _optionsFocusNode,
-                        decoration: InputDecoration(
-                          hintText: 'Enter an option',
-                          filled: true,
-                          fillColor: _fieldBackgroundColor,
-                          hintStyle: const TextStyle(color: _hintColor),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: const BorderSide(color: _accentColor),
-                          ),
-                        ),
-                        style: const TextStyle(color: _textColor),
-                        onSubmitted: (value) {
-                          if (value.isNotEmpty) {
-                            _addOption();
-                          }
-                        },
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: _addOption,
-                      icon: const Icon(Icons.add, color: _textColor),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                ..._options.asMap().entries.map((entry) {
-                  final index = entry.key;
-                  final option = entry.value;
-                  return ListTile(
-                    title: Text(option, style: const TextStyle(color: _textColor)),
-                    leading: IconButton(
-                      icon: Icon(
-                        _correctOptionIndex == index ? Icons.check_circle : Icons.cancel,
-                        color: _correctOptionIndex == index ? _accentColor : _errorColor,
-                        size: 28,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          if (_correctOptionIndex == index) {
-                            _correctOptionIndex = -1;
-                          } else {
-                            _correctOptionIndex = index;
-                          }
-                        });
-                      },
-                    ),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.delete, color: _textColor),
-                      onPressed: () => _removeOption(index),
-                    ),
-                  );
-                }),
-              ],
-
-              // Answer Elements
-              Text(
-                'Answer',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(color: _textColor),
-              ),
-              const SizedBox(height: 8),
-              Container(
-                decoration: BoxDecoration(
-                  color: _fieldBackgroundColor,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: _accentColor),
-                ),
-                child: Column(
-                  children: [
-                    ReorderableListView(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      onReorder: _reorderAnswerElements,
-                      children: _answerElements.asMap().entries.map((entry) {
-                        final element = entry.value;
-                        final index = entry.key;
-                        return ListTile(
-                          key: Key(element.content),
-                          leading: IconButton(
-                            icon: const Icon(Icons.delete, color: _textColor),
-                            onPressed: () {
-                              setState(() {
-                                _answerElements.removeAt(index);
-                              });
-                            },
-                          ),
-                          title: GestureDetector(
-                            onDoubleTap: () => _editElement(index, false),
-                            child: element.type == 'text'
-                                ? Text(element.content, style: const TextStyle(color: _textColor))
-                                : Image.file(File(element.content), height: 100),
-                          ),
-                          trailing: const Icon(Icons.drag_handle, color: Colors.grey),
-                        );
-                      }).toList(),
-                    ),
-                    if (_isAddingText && !_isEditingQuestion)
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: TextField(
-                                controller: _textEntryController,
-                                autofocus: true,
-                                style: const TextStyle(color: _textColor),
-                                maxLines: null,
-                                keyboardType: TextInputType.multiline,
-                                decoration: InputDecoration(
-                                  hintText: 'Enter text',
-                                  hintStyle: const TextStyle(color: _hintColor),
-                                  filled: true,
-                                  fillColor: _fieldBackgroundColor,
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                    borderSide: const BorderSide(color: _accentColor),
-                                  ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                    borderSide: const BorderSide(color: _accentColor),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                    borderSide: const BorderSide(color: _accentColor),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.add, color: _textColor),
-                              onPressed: () {
-                                if (_textEntryController.text.isNotEmpty) {
-                                  _handleTextSubmitted(_textEntryController.text, false);
-                                }
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.text_fields, color: _textColor),
-                          onPressed: () => _addTextElement(context, false),
-                        ),
-                        const SizedBox(width: 16),
-                        IconButton(
-                          icon: const Icon(Icons.image, color: _textColor),
-                          onPressed: () => _handleMediaUpload(context, false),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
-
-              // Submit and Clear Buttons
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ElevatedButton(
-                    onPressed: () => _submitQuestionAnswerPair(context),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: _accentColor,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 32,
-                        vertical: 16,
-                      ),
-                    ),
-                    child: const Text('Submit', style: TextStyle(color: _textColor)),
-                  ),
-                  const SizedBox(width: 16),
-                  ElevatedButton(
-                    onPressed: _clearAllFields,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: _errorColor,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 32,
-                        vertical: 16,
-                      ),
-                    ),
-                    child: const Text('Clear All', style: TextStyle(color: _textColor)),
-                  ),
-                ],
-              ),
-            ],
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.home, color: _textColor),
+            onPressed: () {
+              Navigator.of(context).pushReplacementNamed('/home');
+            },
           ),
+        ],
+      ),
+      backgroundColor: _backgroundColor,
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(_spacing),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ModuleSelection(controller: _moduleController),
+            const SizedBox(height: _spacing),
+            QuestionTypeSelection(controller: _questionTypeController),
+            const SizedBox(height: _spacing * 2),
+            const Text(
+              'Question Entry',
+              style: TextStyle(
+                color: _textColor,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: _spacing),
+            QuestionAnswerElement(
+              elements: _questionElements,
+              onElementsChanged: _handleQuestionElementsChanged,
+              isQuestion: true,
+              picker: _imagePicker,
+            ),
+            if (_questionTypeController.text == 'multiple_choice')
+              Padding(
+                padding: const EdgeInsets.only(top: _spacing),
+                child: QuestionEntryOptionsDialog(
+                  options: _options,
+                  onOptionsChanged: _handleOptionsChanged,
+                  correctOptionIndex: _correctOptionIndex,
+                  onCorrectOptionChanged: _handleCorrectOptionChanged,
+                ),
+              ),
+            const SizedBox(height: _spacing * 2),
+            const Text(
+              'Answer Entry',
+              style: TextStyle(
+                color: _textColor,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: _spacing),
+            QuestionAnswerElement(
+              elements: _answerElements,
+              onElementsChanged: _handleAnswerElementsChanged,
+              isQuestion: false,
+              picker: _imagePicker,
+            ),
+            const SizedBox(height: _spacing * 2),
+            SubmitClearButtons(
+              onSubmit: _handleSubmit,
+              onClear: _handleClear,
+            ),
+          ],
         ),
       ),
     );

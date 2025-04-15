@@ -1,0 +1,122 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+## UI Guidelines
+
+### Color Palette
+- Primary Background: `Color(0xFF0A1929)` (Dark blue background)
+- Secondary Background: `Color(0xFF1E2A3A)` (Lighter blue for fields)
+- Accent Color: `Color(0xFF4CAF50)` (Green accent)
+- Text Input Background: `Color.fromARGB(255, 145, 236, 247)` (Light cyan)
+- Text Colors:
+  - Primary Text: `Colors.white`
+  - Secondary Text: `Colors.grey`
+  - Input Text: `Colors.black87`
+  - Input Hint: `Colors.black54`
+- Button Colors:
+  - Primary: `Color.fromARGB(255, 71, 214, 93)` (Success green)
+  - Secondary: `Colors.grey`
+  - Danger: `Color.fromARGB(255, 214, 71, 71)` (Error red)
+  - Warning: `Color.fromARGB(255, 214, 118, 118)` (Light red)
+
+### Typography
+- Default Text: 16px, white color
+- Title Text: 18px, bold weight
+- Input Labels: 14px, black87 color
+- Button Text: 14-16px, white color
+- Small Text/Hints: 12px, grey color
+
+### Layout & Spacing
+- Standard Padding: 16.0 pixels (EdgeInsets.all(16.0))
+- Content Padding: 12.0 pixels for input fields
+- Vertical Spacing:
+  - Between Major Sections: 20.0 pixels
+  - Between Related Elements: 10.0 pixels
+  - Between Form Fields: 8.0 pixels
+- Horizontal Spacing:
+  - Between Buttons: 16.0 pixels
+  - Between Icons: 8.0 pixels
+
+### Component Styling
+
+#### Buttons
+- Border Radius: 8.0-10.0 pixels
+- Minimum Height: Scale with screen (max 25px)
+- Padding: symmetric(horizontal: 32, vertical: 16)
+- Elevation: Flat design (0 elevation)
+- States:
+  - Enabled: Full opacity
+  - Disabled: 0.5 opacity
+  - Loading: Show CircularProgressIndicator(strokeWidth: 2)
+
+#### Text Fields
+- Border Radius: 8.0-10.0 pixels
+- Fill Color: Light cyan (`Color.fromARGB(255, 145, 236, 247)`)
+- Border: OutlineInputBorder
+- Padding: EdgeInsets.all(12)
+- Label Style: black87 color
+- Hint Style: black54 color
+
+#### Cards & Containers
+- Border Radius: 12.0 pixels
+- Border: 2px width when used
+- Background: Primary background color
+- Shadow: Minimal or none (flat design)
+
+#### Dialogs
+- Background: Primary background color
+- Border: 2px width, accent color
+- Border Radius: 12.0 pixels
+- Width: 80% of screen width
+- Padding: 20.0 pixels all around
+
+#### App Bar
+- Background: Primary background color
+- Elevation: 0 (flat design)
+- Icon Color: White
+- Height: Standard `kToolbarHeight`
+
+### Responsive Design
+- Logo Width: 85% of screen width (max 460px)
+- Field Width: Match logo width
+- Button Width: Half of logo width
+- Element Height: 4% of screen height (max 25px)
+- Dialog Width: 80% of screen width
+
+### Icons
+- Size: Default 24.0 pixels
+- Color: White for light backgrounds, matching text color for dark
+- Touch Target: Minimum 48x48 pixels
+
+### Images
+- Logo Placement: Centered
+- Background Images: 0.1 opacity when used as watermark
+- Image Fit: Contain for logos, cover for backgrounds
+
+### Animation
+- Duration: Quick transitions (300ms)
+- Curve: Standard curves.easeInOut
+- Loading Indicators: Circular, 2px stroke width
+
+### Error States
+- Error Color: `Color.fromARGB(255, 214, 71, 71)`
+- Error Text: Red color, 14px
+- Error Icons: Red color, standard size
+
+### Accessibility
+- Minimum Touch Target: 48x48 pixels
+- Color Contrast: Maintain WCAG 2.1 AA standards
+- Text Scaling: Support system font scaling
+- Focus Indicators: Clear visual feedback
+
+### Best Practices
+1. Maintain consistent spacing throughout the app
+2. Use the defined color palette exclusively
+3. Implement responsive sizing for all components
+4. Follow material design principles for component behavior
+5. Ensure all interactive elements have proper hover/focus states
+6. Use loading indicators for async operations
+7. Implement proper error states for all inputs
+8. Maintain consistent typography hierarchy

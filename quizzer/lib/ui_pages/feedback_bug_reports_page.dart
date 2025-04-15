@@ -1,5 +1,5 @@
 /*
-Feed & Bug Reports Page Description:
+Feedback & Bug Reports Page Description:
 This page handles user feedback and bug reporting.
 Key features:
 - Bug report submission

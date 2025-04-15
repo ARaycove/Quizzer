@@ -57,7 +57,7 @@ List<Map<String, dynamic>> _parseElements(String csvString) {
 
 Future<int> addQuestionAnswerPair({
   required String timeStamp,
-  required String citation,
+  String citation = '',
   required List<Map<String, dynamic>> questionElements,
   required List<Map<String, dynamic>> answerElements,
   required bool ansFlagged,

@@ -41,12 +41,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Core Documentation/Chapter 05 - User Experience and User Interface Design/05_06_Menu_Page.md",
+                "file": "Core Documentation/Chapter 05 - User Experience and User Interface Design/05_15_Display_Modules_Page.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "05_06_Menu_Page"
+              "title": "05_15_Display_Modules_Page"
             }
           }
         ],
@@ -200,14 +200,18 @@
   },
   "active": "33be048eca52ca5d",
   "lastOpenFiles": [
-    "Core Documentation/Chapter 00 - Project Overview and Guidelines/00_02_Development_Rules.md",
+    "Core Documentation/Chapter 00 - Project Overview and Guidelines/general-guidelines.mdc",
     "Core Documentation/Chapter 00 - Project Overview and Guidelines",
+    "Core Documentation/Chapter 06 - Features/06_02_Module_System.md",
+    "Core Documentation/Chapter 08 - Database/08_04_Modules_Table.md",
+    "Core Documentation/Chapter 05 - User Experience and User Interface Design/05_15_Display_Modules_Page.md",
+    "Core Documentation/Chapter 05 - User Experience and User Interface Design/05_06_Menu_Page.md",
+    "Core Documentation/Chapter 00 - Project Overview and Guidelines/00_02_Development_Rules.md",
     "Core Documentation/Chapter 05 - User Experience and User Interface Design/05_06_Add_Question_Answer_Pair_Page.md",
     "Core Documentation/Chapter 08 - Database/08_01_01_Question_Answer_Pair_Table.md",
     "Core Documentation/Chapter 05 - User Experience and User Interface Design/05_11_Settings_and_Preferences_Page.md",
     "Core Documentation/Chapter 05 - User Experience and User Interface Design/05_03_Login_Page.md",
     "Core Documentation/Chapter 05 - User Experience and User Interface Design/05_02_Loading_page.md",
-    "Core Documentation/Chapter 08 - Database/08_04_Modules_Table.md",
     "Core Documentation/Chapter 08 - Database/08_02_02_Login_Attempts_Table.md",
     "Core Documentation/Chapter 08 - Database/08_00_01_Hybrid_Database.md",
     "Core Documentation/Chapter 09 - Algorithms and Background Processes/09_14_Module_Background_Process.md",
@@ -223,10 +227,6 @@
     "Core Documentation/Chapter 08 - Database/08_02_01_User_Profiles_Table.md",
     "Core Documentation/Chapter 09 - Algorithms and Background Processes/09_02_Memory_Retention_Algorithm.md",
     "Core Documentation/Chapter 08 - Database/08_00_02_Local_Database_Implementation.md",
-    "Core Documentation/Chapter 07 - Functions/Database Functions/07_01_02_createNewUserProfile(email, username).md",
-    "Core Documentation/Chapter 07 - Functions/Database Functions/07_01_03_verifyUserProfileTable().md",
-    "Core Documentation/Chapter 07 - Functions/Database Functions/07_01_04_generateUserUUID().md",
-    "Core Documentation/Chapter 04 - Technical Architecture Philosophy, Design Principles, and Ethical Considerations/04_02_Ethical_Framework.md",
     "Core Documentation/Chapter 08 - Database/Question Answer Related Tables",
     "Pasted image 20250407093838.png",
     "Core Documentation/Chapter 07 - Functions/Redirect Functions",
