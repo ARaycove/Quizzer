@@ -20,35 +20,50 @@ class _LoginPageState extends State<LoginPage> {
   bool _isLoading = false;
 
   // Function to handle login submission
-Future<void> submitLogin() async {
-  setState(() {_isLoading = true;});
+  Future<void> submitLogin() async {
+    setState(() {_isLoading = true;});
 
-  final result = await authenticateUser(_emailController.text.trim(),_passwordController.text);
+    final result = await authenticateUser(_emailController.text.trim(),_passwordController.text);
 
-  if (!mounted) return;
+    if (!mounted) return;
 
-  setState(() {_isLoading = false;});
+    setState(() {_isLoading = false;});
 
-  bool shouldGoToHomePage = false;
+    bool shouldGoToHomePage = false;
+    late String status;
 
-  late String status;
-
-  if (result['success']) {
-    shouldGoToHomePage = true; 
-    status=result['response'];
-    final sessionManager = SessionManager();
-    await sessionManager.initializeSession(_emailController.text.trim());
+    if (result['success']) {
+      shouldGoToHomePage = true; 
+      status=result['response'];
+      final sessionManager = SessionManager();
+      await sessionManager.initializeSession(_emailController.text.trim());
     }
-  else {
-    String errorMessage = result['error'] ?? 'Invalid email or password';
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(errorMessage),backgroundColor:Colors.red,),);
-    status = errorMessage;
+    else {
+      String errorMessage = result['error'] ?? 'Invalid email or password';
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(errorMessage),backgroundColor:Colors.red,),);
+      }
+      status = errorMessage;
     }
-  String? userId = await getUserIdByEmail(_emailController.text.trim());
-  if (userId == null) {throw Exception("email address does not exist in table, but authenticated anyway");}
-  addLoginAttemptRecord(userId: userId, email: _emailController.text.trim(), statusCode: status);
-  if (shouldGoToHomePage == true) {Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) => const HomePage()),);}
-}
+
+    String? userId = await getUserIdByEmail(_emailController.text.trim());
+    
+    // If user authenticated but doesn't have a profile, create one
+    if (userId == null && result['success']) {
+      // Use email username as default username
+      final username = _emailController.text.trim().split('@')[0];
+      await createNewUserProfile(_emailController.text.trim(), username, _passwordController.text);
+      userId = await getUserIdByEmail(_emailController.text.trim());
+    }
+    
+    if (userId != null) {
+      addLoginAttemptRecord(userId: userId, email: _emailController.text.trim(), statusCode: status);
+    }
+    
+    if (shouldGoToHomePage == true && mounted) {
+      Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) => const HomePage()),);
+    }
+  }
 
   // Function to navigate to new user signup page
   void newUserSignUp() {Navigator.push(context,MaterialPageRoute(builder: (context) => const NewUserPage()),);}

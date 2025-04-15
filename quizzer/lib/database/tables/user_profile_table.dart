@@ -6,6 +6,9 @@ import 'package:quizzer/backend/functions/user_auth.dart';
 
 final supabase = Supabase.instance.client;
 Future<String?> getUserIdByEmail(String emailAddress) async {
+    // First verify the table exists
+    await verifyUserProfileTable();
+    
     final Database db = await getDatabase();
     final List<Map<String, dynamic>> result = await db.query(
       'user_profile',

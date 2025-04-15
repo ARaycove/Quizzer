@@ -1,4 +1,20 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
 # Project Guidelines and Instructions
+
+## Core Documentation
+The project's comprehensive documentation is located in the `quizzer_documentation/Core Documentation/` directory. This documentation includes:
+- Project overview and architecture
+- User interface design guidelines
+- Database schema and data models
+- API documentation
+- Testing procedures
+- Deployment guidelines
+
+All development should reference and follow the guidelines specified in the core documentation. If there are conflicts in the documentation they should be brought to my attention so they can be corrected.
 
 ## Core Philosophy
 - Prioritize offline functionality and local development over cloud dependencies

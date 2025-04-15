@@ -12,3 +12,31 @@
 // The queue will be of length 10 items
 
 
+// The get next question function should work as follows:
+// The longer the current date extends past the due date, the more heavily weighted the question will be
+// We will use a system of weights to determine the priority of the questions
+// each question-answer pair will have a score assigned to it based on the weights,
+// We should then select the question with the highest score from the queue
+// If there is a tie for highest score, then we should select a random question from those eligible.
+// The lower the revision score, the more heavily weighted the question will be
+
+
+// Before we can implement this, we need to implement the following:
+// [x] The menu page // DONE
+// [x] the add-question page
+// [ ] user profile statistics page
+// [ ] module page and build functionality
+// [ ] settings page (where we will store the subject interest settings)
+// [ ] user profile page
+
+
+
+
+
+
+
+
+
+// Save for later: requires further implementation of other data structures
+// The subjec interest settings should be taken into account as well
+

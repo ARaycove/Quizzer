@@ -11,95 +11,120 @@ class SessionManager {
   final _storage = const FlutterSecureStorage();
 
   // Session state variables
-  String? _userId;
-  String? _email;
-  String? _currentQuestionId;
-  bool _hasBeenFlipped = false;
-  bool _isQuestionSideActive = true;
-  bool _buttonsEnabled = true;
-  DateTime? _sessionStartTime;
-  DateTime? _questionPresentedTime;
-  DateTime? _questionAnsweredTime;
-  Duration? _elapsedTime;
+  String? userId;
+  String? email;
+  String? currentQuestionId;
+  bool hasBeenFlipped = false;
+  bool isQuestionSideActive = true;
+  bool buttonsEnabled = true;
+  DateTime? sessionStartTime;
+  DateTime? questionPresentedTime;
+  DateTime? questionAnsweredTime;
+  Duration? elapsedTime;
+  
+  // Page history tracking
+  final List<String> _pageHistory = [];
+  static const int _maxHistoryLength = 12;
 
-  // Getters
-  String? get userId => _userId;
-  String? get email => _email;
-  String? get currentQuestionId => _currentQuestionId;
-  bool get hasBeenFlipped => _hasBeenFlipped;
-  bool get isQuestionSideActive => _isQuestionSideActive;
-  bool get buttonsEnabled => _buttonsEnabled;
-  DateTime? get sessionStartTime => _sessionStartTime;
-  DateTime? get questionPresentedTime => _questionPresentedTime;
-  DateTime? get questionAnsweredTime => _questionAnsweredTime;
-  Duration? get elapsedTime => _elapsedTime;
+  // Add page to history
+  void addPageToHistory(String routeName) {
+    if (_pageHistory.isNotEmpty && _pageHistory.last == routeName) {
+      return; // Don't add duplicate consecutive pages
+    }
+    _pageHistory.add(routeName);
+    if (_pageHistory.length > _maxHistoryLength) {
+      _pageHistory.removeAt(0);
+    }
+  }
 
-  // Setters
-  set buttonsEnabled(bool value) => _buttonsEnabled = value;
+  // Get previous page
+  String? getPreviousPage() {
+    if (_pageHistory.length < 2) return null;
+    return _pageHistory[_pageHistory.length - 2];
+  }
+
+  // Clear page history
+  void clearPageHistory() {
+    _pageHistory.clear();
+  }
+
+  // Question and answer data
+  List<Map<String, dynamic>> questionElements = [];
+  List<Map<String, dynamic>> answerElements = [];
 
   // Initialize session with email
   Future<void> initializeSession(String email) async {
-    _email = email;
-    _userId = await getUserIdByEmail(email);
-    _sessionStartTime = DateTime.now();
+    this.email = email;
+    userId = await getUserIdByEmail(email);
+    sessionStartTime = DateTime.now();
     resetQuestionState();
   }
 
   // Update current question
   void setCurrentQuestionId(String questionId) {
-    _currentQuestionId = questionId;
+    currentQuestionId = questionId;
     resetQuestionState();
+  }
+
+  // Set question and answer elements
+  void setQuestionAndAnswerElements(
+      List<Map<String, dynamic>> questionElements,
+      List<Map<String, dynamic>> answerElements) {
+    this.questionElements = questionElements;
+    this.answerElements = answerElements;
   }
 
   // Toggle card side
   void toggleCardSide() {
-    _isQuestionSideActive = !_isQuestionSideActive;
+    isQuestionSideActive = !isQuestionSideActive;
   }
 
   // Set has been flipped
   void setHasBeenFlipped(bool value) {
-    _hasBeenFlipped = value;
+    hasBeenFlipped = value;
   }
 
   // Set question presented time
   void setQuestionPresentedTime() {
-    _questionPresentedTime = DateTime.now();
+    questionPresentedTime = DateTime.now();
   }
 
   // Set question answered time
   void setQuestionAnsweredTime() {
-    _questionAnsweredTime = DateTime.now();
+    questionAnsweredTime = DateTime.now();
   }
 
   // Get session duration in seconds
   double? getSessionDuration() {
-    if (_sessionStartTime == null) return null;
-    return DateTime.now().difference(_sessionStartTime!).inMilliseconds / 1000.0;
+    if (sessionStartTime == null) return null;
+    return DateTime.now().difference(sessionStartTime!).inMilliseconds / 1000.0;
   }
 
   // Get elapsed time in seconds
   double? getElapsedTime() {
-    if (_questionPresentedTime == null || _questionAnsweredTime == null) return null;
-    return _questionAnsweredTime!.difference(_questionPresentedTime!).inMilliseconds / 1000.0;
+    if (questionPresentedTime == null || questionAnsweredTime == null) return null;
+    return questionAnsweredTime!.difference(questionPresentedTime!).inMilliseconds / 1000.0;
   }
 
   // Reset question-specific state
   void resetQuestionState() {
-    _hasBeenFlipped = false;
-    _isQuestionSideActive = true;
-    _buttonsEnabled = false;
-    _questionPresentedTime = null;
-    _questionAnsweredTime = null;
-    _elapsedTime = null;
+    hasBeenFlipped = false;
+    isQuestionSideActive = true;
+    buttonsEnabled = false;
+    questionPresentedTime = null;
+    questionAnsweredTime = null;
+    elapsedTime = null;
+    questionElements.clear();
+    answerElements.clear();
   }
 
   // Clear session
   Future<void> clearSession() async {
-    _userId = null;
-    _email = null;
-    _currentQuestionId = null;
+    userId = null;
+    email = null;
+    currentQuestionId = null;
     resetQuestionState();
-    _sessionStartTime = null;
+    sessionStartTime = null;
     await _storage.deleteAll();
   }
 }

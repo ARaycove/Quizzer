@@ -1,25 +1,77 @@
 ## Task_03: Answer Question-Answer pairs Task
-At this phase, we have collected academic citations, individual passages, probable question outputs, probable answer outputs for questions, subject classification data, and concept/key-term classification data. Now for users of the Quizzer platform the primary behavioral task will be to answer these questions and record the result. Unlike the subject/concept classification task, the answer here will be a binary Yes or No. However to indicate some level of confidence we will include 6 possible answers. Yes(sure), Yes(not sure), No(sure), No(not sure), did not read question properly before answering, and a final answer to indicate that the user is not ready for this material yet, or has no interest in learning it.
 
-The first four answers should be the most common, either you know you answered it correctly or not, but you might feel a bit hazy on whether you were sure of yourself. For this reason, a sure and not sure option will be provided. However there are cases where you might prematurely answer the question with great confidence only to realize you did not properly read the question, in this case you were neither right or wrong, you answered a question that was not presented. So a middle option for this case will be presented. Two other possible conditions exist. The user is not ready to learn this material as it is out of order and the user understands they do not have the pre-requisite knowledge to properly understand the material provided. An option should be provided for this scenario. Finally it is possible that the question-answer pair just has no value or interest to the user, in which case an option to should be provided to indicate this sheer lack of interest. Given the complexity of possible states. We will have 7 possible answers. In the UI interface of the task 5 buttons will be presented. Two of the left will be Yes(sure), Yes(unsure), A middle ? button, No(unsure), No(sure). Pressing the question mark button will provide a prompt to input one of three edge cases, you did not read the question properly and thus gave a wrong answer, you do not care to see this question-answer pair, or you are not ready to learn this material yet.
+At this phase, we have collected academic citations, individual passages, probable question outputs, probable answer outputs for questions, subject classification data, and concept/key-term classification data. The primary behavioral task for users of the Quizzer platform will be to answer these questions through direct match validation.
 
-All possible states will be recorded, for the lifecycle of Quizzer, providing a do not care response will remove that question from your active pool of questions, providing a is not ready response will place the question into the reserve bank with a lock preventing it from entering circulation for at least n days. n will have to be determined later.
+### Design Rationale
 
-Other data to be recorded during this task
-- qst_ans_reference:    record the reference to which qestion-answer pair was attempted
-- response time:        How long did it take from the time the question was presented for the user to select to view the answer
-- response result:      The result given in the above description
-- user_uuid:            the uuid given to the user of the platform
-- attempt_number:       the nth attempt given by the user to the specific question-answer pair (this can be derived by sorting attempting by timestamp then counting, select time_stamp from table where qst_ans_reference = qst_reference)
-- knowledge-base:       The current state of the user's knowledge (simple way to derive this is to get a summation of every subject and concept by number of times mentioned in this table for this user)
+The Quizzer platform intentionally avoids self-reported correctness through confidence buttons or similar mechanisms. This design decision is based on several key observations:
 
-Using this response data, along with the context of the question-answered and the tracked state of the user's current knowledge at time of answer, we will feed this data into a model that will get the probability the user will be right or wrong in answering a given question given the present_context. When a user provides an answer to a question, the current state of the program will be recorded as an attempt and that record will be fed into the existing model, the model will then calculate "At what time (t) will the user's probability of being correct (p) be n%? For the sake of maximizing length of time between questions and avoiding scenarios where a question was given for review too late, n will be set at 99% probability. This means that approximately every 1 in 100 questions will not be able to be answered correctly. Machine learning techniques will be used to process the entire table of results in order to train and derive the mathematical model for this program. It should be revisited at exactly what the optimal percentage target should be.
+1. **Unreliable Self-Assessment**: Users often struggle to accurately assess their own knowledge and confidence levels. Studies show that self-reported confidence frequently misaligns with actual performance.
 
-A question does remain, do we need to actively record the entire state of the user's progress at the time of answer, or can we write an algorithm that derives the current state of the user's knowledge base at the time of answer. As I understand it, if all data and records have exact time stamps any subsequent statistics can be derived. For example if we want to get the total amount of times the user has seen concept x, we'd first get every question-answer attempt for that user, filtering out other user data. We then for every attempt get whether or not it correlates with concept x. Total those up for every record thats before or at the time_stamp we are working with. Which we can pre-filter out of the data. Filter out all attempts after the specified timestamp. Once the algorithm is developed to join all this data into a record. The record can be fed into the ML model we are training. Thus it stands to reason we do not need to duplicate any data so long as any time anything is done an exact time_stamp is recorded.
+2. **Cognitive Load**: Asking users to make multiple decisions (correctness + confidence) increases cognitive load and may interfere with the learning process.
 
-Since we know that response time and confidence are tightly correlated and causal, we can use answer_times as a measure of confidence as well. However confidence and accuracy are not causal and thus can't be relied upon as an indicator of whether or not the user will be correct or incorrect
+3. **Response Time as a Proxy**: Instead of explicit confidence reporting, we use response time as an implicit measure of confidence, as it naturally correlates with the user's certainty.
 
- It should be heavily noted however that we need to understand the relationship between confidence and ability to retain information. It may be that low confidence rankings lead to forgetting sooner than higher confidence ratings. By accurately recording reaction times and confidence metrics we should be able to divulge the relationship between how confident a person is in their answer and how long they can retain that information. I would hypothesize that higher confidence scores lead to more long term remembrance of information.
+4. **Objective Validation**: Each question type is designed to provide immediate, objective validation of correctness through direct matching or specific interaction patterns.
 
-**Date Structure in sections:**
+5. **Streamlined Experience**: By focusing on quick, direct responses, we maintain user engagement while still gathering valuable data about knowledge retention.
+
+### Question Type Categories
+
+Questions are categorized into three core formats, each with specific validation methods:
+
+#### 1. Selection-Based Questions
+All questions where users choose from provided options:
+
+- **Multiple Choice**: Selecting one or more correct answers from a set
+- **True/False**: The simplest form of multiple choice with only two options
+- **Matching**: Pairing items from two lists (fundamentally selection-based)
+- **Sorting/Ordering**: Arranging items in correct sequence (selection through ordering)
+
+#### 2. Input-Based Questions
+All questions requiring user-generated text or values:
+
+- **Fill-in-the-Blank**: Any question requiring a specific word, phrase, or value
+  - Includes equation completion, terminology recall, unit conversion, etc.
+- **Short Answer**: Slightly longer response with some flexibility in wording
+  - Generally limited to 1-3 words or a simple phrase
+
+#### 3. Interactive Questions
+Questions using spatial interaction beyond simple selection or text entry:
+
+- **Hot Spot**: Clicking/tapping the correct location on an image
+- **Diagram Labeling**: Placing labels in correct positions (drag-and-drop variation)
+
+### Data Collection and Analysis
+
+For each question attempt, we record:
+
+- **qst_ans_reference**: Reference to the question-answer pair being attempted
+- **response_time**: Time taken from question presentation to answer submission
+- **response_result**: Whether the answer was correct or incorrect
+- **user_uuid**: Unique identifier for the platform user
+- **attempt_number**: The nth attempt by the user for this specific question
+- **knowledge_base**: Current state of the user's knowledge (derived from subject and concept mentions)
+
+### Knowledge Retention Modeling
+
+Using the collected response data, along with the question context and the user's current knowledge state, among other possible data the user shares, we feed this information into a model that calculates:
+
+1. The probability of correct response given the present context
+2. The optimal timing for question review based on retention patterns
+
+The model aims to determine: "At what time (t) will the user's probability of being correct (p) reach n%?" 
+
+For maximizing retention while avoiding late reviews, we set n at 99% probability, meaning approximately 1 in 100 questions will be answered incorrectly. Machine learning techniques process the complete dataset to train and refine this mathematical model.
+
+### Implementation Notes
+
+- All interactions are timestamped to enable historical analysis
+- Response times are recorded as they correlate with confidence levels
+- The system maintains a question bank with:
+  - Active pool: Questions currently in circulation
+  - Reserve bank: Questions temporarily locked from circulation
+  - Retired pool: Questions marked as no longer relevant
+
+### Data Structure Reference
 [[08_01_03_Question_Answer_Attempts_Table]]

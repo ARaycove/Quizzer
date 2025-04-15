@@ -26,25 +26,17 @@ Future<void> verifyQuestionAnswerPairTable() async {
         flag_for_removal BOOLEAN,
         completed BOOLEAN,
         module_name TEXT,
+        question_type TEXT,      -- Added for multiple choice support
+        options TEXT,            -- Added for multiple choice options
+        correct_option_index INTEGER,  -- Added for multiple choice correct answer
         PRIMARY KEY (time_stamp, qst_contrib)
       )
     ''');
   }
 }
 
-Future<bool> _checkTableExists() async {
-  final Database db = await getDatabase();
-try {
-    await _db.rawQuery('SELECT 1 FROM $tableName LIMIT 1');
-    return true;
-} catch (e) {
-    await createTable();
-    return false;
-}
-}
-
 bool _checkCompletionStatus(String questionElements, String answerElements) {
-return questionElements.isNotEmpty && answerElements.isNotEmpty;
+  return questionElements.isNotEmpty && answerElements.isNotEmpty;
 }
 
 String _formatElements(List<Map<String, dynamic>> elements) {
@@ -77,6 +69,9 @@ Future<int> addQuestionAnswerPair({
   required bool hasBeenReviewed,
   required bool flagForRemoval,
   required String moduleName,
+  String? questionType,
+  List<String>? options,
+  int? correctOptionIndex,
 }) async {
   // First verify that the table exists
   await verifyQuestionAnswerPairTable();
@@ -90,16 +85,19 @@ Future<int> addQuestionAnswerPair({
     'citation': citation,
     'question_elements': formattedQuestionElements,
     'answer_elements': formattedAnswerElements,
-    'ans_flagged': ansFlagged,
+    'ans_flagged': ansFlagged ? 1 : 0,
     'ans_contrib': ansContrib,
     'concepts': concepts ?? '',
     'subjects': subjects ?? '',
     'qst_contrib': qstContrib,
     'qst_reviewer': qstReviewer,
-    'has_been_reviewed': hasBeenReviewed,
-    'flag_for_removal': flagForRemoval,
-    'completed': _checkCompletionStatus(formattedQuestionElements, formattedAnswerElements),
+    'has_been_reviewed': hasBeenReviewed ? 1 : 0,
+    'flag_for_removal': flagForRemoval ? 1 : 0,
+    'completed': _checkCompletionStatus(formattedQuestionElements, formattedAnswerElements) ? 1 : 0,
     'module_name': moduleName,
+    'question_type': questionType ?? 'text',
+    'options': options?.join(',') ?? '',
+    'correct_option_index': correctOptionIndex ?? -1,
   });
 }
 
@@ -117,6 +115,9 @@ Future<int> editQuestionAnswerPair({
   bool? hasBeenReviewed,
   bool? flagForRemoval,
   String? moduleName,
+  String? questionType,
+  List<String>? options,
+  int? correctOptionIndex,
 }) async {
   // First verify that the table exists
   await verifyQuestionAnswerPairTable();
@@ -135,6 +136,9 @@ Future<int> editQuestionAnswerPair({
   if (hasBeenReviewed != null) values['has_been_reviewed'] = hasBeenReviewed;
   if (flagForRemoval != null) values['flag_for_removal'] = flagForRemoval;
   if (moduleName != null) values['module_name'] = moduleName;
+  if (questionType != null) values['question_type'] = questionType;
+  if (options != null) values['options'] = options.join(',');
+  if (correctOptionIndex != null) values['correct_option_index'] = correctOptionIndex;
 
   // Get current values to check completion status
   final current = await getQuestionAnswerPairById(timeStamp, qstContrib);

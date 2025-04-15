@@ -93,20 +93,41 @@ Future<void> insertTutorialQuestions() async {
 
 Future<Map<String, String>?> getTutorialQuestion(String id) async {
   final Database db = await getDatabase();
+  
+  // First ensure the table exists
   await createTutorialQuestionsTableIfNotExists();
+  
+  // Check if the question exists
   final List<Map<String, dynamic>> maps = await db.query(
     tableTutorialQuestions,
     where: '$columnId = ?',
     whereArgs: [id],
   );
 
-  if (maps.isNotEmpty) {
-    return {
-      'question': maps.first[columnQuestion],
-      'answer': maps.first[columnAnswer],
-    };
+  // If the question doesn't exist, insert all tutorial questions
+  if (maps.isEmpty) {
+    await insertTutorialQuestions();
+    
+    // Try to get the question again after inserting
+    final List<Map<String, dynamic>> newMaps = await db.query(
+      tableTutorialQuestions,
+      where: '$columnId = ?',
+      whereArgs: [id],
+    );
+
+    if (newMaps.isNotEmpty) {
+      return {
+        'question': newMaps.first[columnQuestion],
+        'answer': newMaps.first[columnAnswer],
+      };
+    }
+    return null;
   }
-  return null;
+
+  return {
+    'question': maps.first[columnQuestion],
+    'answer': maps.first[columnAnswer],
+  };
 }
 
 Future<List<Map<String, String>>> getAllTutorialQuestions(Database db) async {
