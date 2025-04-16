@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:quizzer/ui_pages/login_page.dart';
-import 'package:quizzer/ui_pages/home_page.dart';
-import 'package:quizzer/ui_pages/menu.dart';
-import 'package:quizzer/ui_pages/add_question_answer_page.dart';
-import 'package:quizzer/database/quizzer_database.dart';
+import 'package:quizzer/features/user_profile_management/pages/login_page.dart';
+import 'package:quizzer/features/question_management/pages/home_page.dart';
+import 'package:quizzer/global/pages/menu.dart';
+import 'package:quizzer/features/question_management/pages/add_question_answer_page.dart';
+import 'package:quizzer/global/database/quizzer_database.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:quizzer/backend/session_manager.dart';
-import 'package:quizzer/backend/quizzer_logging.dart';
+import 'package:quizzer/global/functionality/session_manager.dart';
+import 'package:quizzer/global/functionality/quizzer_logging.dart';
 
 late Database db;
 

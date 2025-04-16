@@ -57,6 +57,94 @@ All development should reference and follow the guidelines specified in the core
   class WidgetTwo extends StatelessWidget { ... }
   ```
 
+## UI Guidelines
+### General Layout Rules
+- All UI elements should have uniform height
+- Height of UI elements should be of a maximum of 25px and scale to the height of the screen
+- Width of UI elements should not exceed the width of the logo
+- Maintain consistent spacing between elements (8px minimum)
+- Use proper padding around content (16px minimum)
+
+### Color Scheme
+- Primary background color: Color(0xFF0A1929)
+- Secondary background color: Color(0xFF1E2A3A)
+- Accent color: Color(0xFF4CAF50)
+- Text color: Colors.white
+- Hint color: Colors.grey
+- Error color: Colors.red
+
+### Typography
+- Use consistent font sizes across the application
+- Headers: 24px
+- Subheaders: 20px
+- Body text: 16px
+- Small text: 14px
+- Maintain proper contrast ratios for accessibility
+
+### Button Design
+- All buttons should follow a consistent style
+- Primary buttons should use the accent color
+- Secondary buttons should use the secondary background color
+- Buttons should have proper padding (16px horizontal, 8px vertical)
+- Buttons should include proper hover and active states
+- Icon buttons should maintain a 1:1 aspect ratio
+- Maximum icon size should be 25px
+
+### Form Elements
+- All input fields should have consistent styling
+- Use proper validation feedback
+- Show clear error messages
+- Include proper loading states
+- Maintain consistent spacing between form elements
+- Use proper label placement and alignment
+
+### Navigation
+- Navigation elements should be clearly visible
+- Use consistent icons for navigation
+- Maintain proper spacing between navigation items
+- Include proper active state indicators
+- Ensure navigation is accessible on all screen sizes
+
+### Responsive Design
+- Design for mobile-first approach
+- Use proper breakpoints for different screen sizes
+- Ensure content is readable on all devices
+- Maintain proper spacing on different screen sizes
+- Use proper scaling for images and icons
+
+### Animation and Transitions
+- Use smooth animations for state changes
+- Keep animations under 300ms
+- Use proper easing functions
+- Maintain consistent animation patterns
+- Ensure animations don't interfere with usability
+
+### Error Handling
+- Show clear error messages
+- Provide proper feedback for user actions
+- Include proper loading states
+- Maintain consistent error message styling
+- Ensure error messages are accessible
+
+### Accessibility
+- Maintain proper contrast ratios
+- Use proper semantic HTML
+- Include proper ARIA labels
+- Ensure keyboard navigation is possible
+- Support screen readers
+
+### Documentation Requirements
+Each UI page documentation should include:
+1. Clear purpose statement
+2. Rule of thumb section with specific UI guidelines
+3. Detailed interface elements section
+4. Buttons section with specific locations and icons
+5. Functionality description
+6. User experience notes
+7. Implementation notes
+8. Technical dependencies
+9. Proper cross-references to other documentation
+
 ## Architecture Guidelines
 - Follow Clean Architecture principles
 - Keep business logic separate from UI
@@ -74,13 +162,6 @@ All development should reference and follow the guidelines specified in the core
 - Validate all user input and follow secure coding practices
 - Ensure user consent and clear data usage policies
 - Implement proper data retention and protection measures
-
-## UI Guidelines
-### Color Palette:
-- Ensure you follow the same color scheme for UI elements, it should match across pages.
-- All UI elements should be proportional
-- UI elements should follow good UI/UX design principles
-- 
 
 ## Performance Guidelines
 - Optimize widget rebuilds and use const constructors
@@ -123,5 +204,3 @@ All development should reference and follow the guidelines specified in the core
 - Never delete or remove existing features and code unless explicitly instructed or absolutely necessary
 - Focus on writing individual functions and making changes within single files
 - Avoid making sweeping changes across multiple files unless specifically requested 
-- Do not make new files unless specifically asked
-- Do not make sweeping changes across multiple files
