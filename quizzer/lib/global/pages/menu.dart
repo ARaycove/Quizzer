@@ -15,6 +15,7 @@ import 'package:flutter/material.dart';
 import 'dart:developer' as developer;
 import 'package:quizzer/global/functionality/session_manager.dart';
 import 'package:quizzer/global/functionality/quizzer_logging.dart';
+import 'package:quizzer/global/widgets/global_app_bar.dart';
 
 // TODO: Implement proper error handling for all navigation actions
 // TODO: Add proper validation for all user inputs
@@ -35,33 +36,9 @@ class _MenuPageState extends State<MenuPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF0A1929),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF0A1929),
-        title: const Text('Quizzer Menu', style: TextStyle(color: Colors.white)),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () {
-            QuizzerLogger.logMessage('Back button pressed in menu');
-            final previousPage = _sessionManager.getPreviousPage();
-            if (previousPage != null) {
-              Navigator.pushReplacementNamed(context, previousPage);
-              QuizzerLogger.logMessage('Navigated back to $previousPage');
-            } else {
-              Navigator.pop(context);
-              QuizzerLogger.logMessage('No previous page in history, using default back navigation');
-            }
-          },
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.home, color: Colors.white),
-            onPressed: () {
-              QuizzerLogger.logMessage('Home button pressed in menu');
-              Navigator.pushReplacementNamed(context, '/home');
-              QuizzerLogger.logMessage('Navigated to home page');
-            },
-          ),
-        ],
+      appBar: GlobalAppBar(
+        title: 'Quizzer Menu',
+        showHomeButton: true,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -96,7 +73,7 @@ class _MenuPageState extends State<MenuPage> {
               label: 'Display Modules',
               onPressed: () {
                 QuizzerLogger.logMessage('Display Modules button pressed');
-                developer.log('Display Modules page not implemented yet');
+                Navigator.pushNamed(context, '/display_modules');
               },
             ),
             const SizedBox(height: 16),

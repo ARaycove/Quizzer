@@ -3,6 +3,7 @@ import 'package:quizzer/features/user_profile_management/pages/login_page.dart';
 import 'package:quizzer/features/question_management/pages/home_page.dart';
 import 'package:quizzer/global/pages/menu.dart';
 import 'package:quizzer/features/question_management/pages/add_question_answer_page.dart';
+import 'package:quizzer/features/modules/pages/display_modules_page.dart';
 import 'package:quizzer/global/database/quizzer_database.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -52,12 +53,14 @@ class QuizzerApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         useMaterial3: true,
       ),
+      debugShowCheckedModeBanner: false,
       initialRoute: '/login',
       routes: {
         '/login': (context) => const LoginPage(),
         '/home': (context) => const HomePage(),
         '/menu': (context) => const MenuPage(),
         '/add_question': (context) => const AddQuestionAnswerPage(),
+        '/display_modules': (context) => const DisplayModulesPage(),
       },
       navigatorObservers: [QuizzerNavigatorObserver()],
     );

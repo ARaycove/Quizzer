@@ -204,3 +204,11 @@ Each UI page documentation should include:
 - Never delete or remove existing features and code unless explicitly instructed or absolutely necessary
 - Focus on writing individual functions and making changes within single files
 - Avoid making sweeping changes across multiple files unless specifically requested 
+
+
+Global widgets are in the global/ directory
+global database is in the global/ directory
+
+Please use common sense
+
+You will not just randomly create new class objects and devices without properly searching the codebase first
