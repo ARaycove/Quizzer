@@ -1,12 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:quizzer/features/modules/widgets/module_action_buttons.dart';
+import 'package:quizzer/global/functionality/quizzer_logging.dart';
 
 class ModuleCard extends StatelessWidget {
   final Map<String, dynamic> moduleData;
+  final bool isActivated;
+  final VoidCallback onToggleActivation;
 
   const ModuleCard({
     super.key,
     required this.moduleData,
+    required this.isActivated,
+    required this.onToggleActivation,
   });
+
+  Widget _buildMetadataItem(IconData icon, String text) {
+    return Row(
+      children: [
+        Icon(icon, size: 16, color: Colors.grey),
+        const SizedBox(width: 4.0),
+        Text(
+          text,
+          style: const TextStyle(
+            color: Colors.grey,
+            fontSize: 14,
+          ),
+        ),
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,14 +40,29 @@ class ModuleCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Module name
-            Text(
-              moduleData['module_name'] ?? 'Unnamed Module',
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+            // Module name and action buttons row
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    moduleData['module_name'] ?? 'Unnamed Module',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                ModuleActionButtons(
+                  onAddPressed: onToggleActivation,
+                  onEditPressed: () {
+                    QuizzerLogger.logMessage('Edit module button pressed for: ${moduleData['module_name']}');
+                    // TODO: Implement edit module functionality
+                  },
+                  isAdded: isActivated,
+                ),
+              ],
             ),
             const SizedBox(height: 8.0),
             // Description
@@ -56,22 +93,6 @@ class ModuleCard extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildMetadataItem(IconData icon, String text) {
-    return Row(
-      children: [
-        Icon(icon, size: 16, color: Colors.grey),
-        const SizedBox(width: 4.0),
-        Text(
-          text,
-          style: const TextStyle(
-            color: Colors.grey,
-            fontSize: 14,
-          ),
-        ),
-      ],
     );
   }
 } 

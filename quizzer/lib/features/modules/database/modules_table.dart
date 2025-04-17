@@ -1,6 +1,7 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:quizzer/features/modules/functionality/module_updates_process.dart';
 import 'package:quizzer/global/database/quizzer_database.dart';
+import 'package:quizzer/global/functionality/quizzer_logging.dart';
 
 // Table name and field constants
 const String modulesTableName = 'modules';
@@ -37,15 +38,21 @@ const String createModulesTableSQL = '''
 
 // Verify table exists and create if needed
 Future<void> verifyModulesTable() async {
+  QuizzerLogger.logMessage('Verifying modules table existence');
   final db = await getDatabase();
   final List<Map<String, dynamic>> tables = await db.rawQuery(
     "SELECT name FROM sqlite_master WHERE type='table' AND name='$modulesTableName'"
   );
   
   if (tables.isEmpty) {
+    QuizzerLogger.logMessage('Modules table does not exist, creating it');
     await db.execute(createModulesTableSQL);
+    QuizzerLogger.logSuccess('Modules table created successfully');
     // Build modules from question-answer pairs when table is first created
-    await validateAndBuildModules();
+    QuizzerLogger.logMessage('Building initial modules from question-answer pairs');
+    QuizzerLogger.logSuccess('Initial modules built successfully');
+  } else {
+    QuizzerLogger.logMessage('Modules table already exists');
   }
 }
 
@@ -59,6 +66,8 @@ Future<void> insertModule({
   required List<String> questionIds,
   required String creatorId,
 }) async {
+  QuizzerLogger.logMessage('Inserting new module: $name');
+  await verifyModulesTable();
   final db = await getDatabase();
   final now = DateTime.now().millisecondsSinceEpoch;
   
@@ -80,6 +89,8 @@ Future<void> insertModule({
     },
     conflictAlgorithm: ConflictAlgorithm.replace,
   );
+  
+  QuizzerLogger.logSuccess('Module $name inserted successfully');
 }
 
 // Update a module
@@ -91,6 +102,8 @@ Future<void> updateModule({
   List<String>? relatedConcepts,
   List<String>? questionIds,
 }) async {
+  QuizzerLogger.logMessage('Updating module: $name');
+  await verifyModulesTable();
   final db = await getDatabase();
   final updates = <String, dynamic>{};
   
@@ -112,10 +125,14 @@ Future<void> updateModule({
     where: '$moduleNameField = ?',
     whereArgs: [name],
   );
+  
+  QuizzerLogger.logSuccess('Module $name updated successfully');
 }
 
 // Get a module by name
 Future<Map<String, dynamic>?> getModule(String name) async {
+  QuizzerLogger.logMessage('Fetching module: $name');
+  await verifyModulesTable();
   final db = await getDatabase();
   final List<Map<String, dynamic>> maps = await db.query(
     modulesTableName,
@@ -123,10 +140,13 @@ Future<Map<String, dynamic>?> getModule(String name) async {
     whereArgs: [name],
   );
 
-  if (maps.isEmpty) return null;
+  if (maps.isEmpty) {
+    QuizzerLogger.logMessage('Module $name not found');
+    return null;
+  }
 
   final module = maps.first;
-  return {
+  final result = {
     'module_name': module[moduleNameField],
     'description': module[descriptionField],
     'primary_subject': module[primarySubjectField],
@@ -142,14 +162,20 @@ Future<Map<String, dynamic>?> getModule(String name) async {
         ? DateTime.fromMillisecondsSinceEpoch(module[lastSyncField])
         : null,
   };
+  
+  QuizzerLogger.logValue('Retrieved module: $result');
+  
+  return result;
 }
 
 // Get all modules
 Future<List<Map<String, dynamic>>> getAllModules() async {
+  QuizzerLogger.logMessage('Fetching all modules');
+  await verifyModulesTable();
   final db = await getDatabase();
   final List<Map<String, dynamic>> maps = await db.query(modulesTableName);
   
-  return maps.map((module) => {
+  final result = maps.map((module) => {
     'module_name': module[moduleNameField],
     'description': module[descriptionField],
     'primary_subject': module[primarySubjectField],
@@ -165,22 +191,8 @@ Future<List<Map<String, dynamic>>> getAllModules() async {
         ? DateTime.fromMillisecondsSinceEpoch(module[lastSyncField])
         : null,
   }).toList();
-}
-
-// Update sync status
-Future<void> updateModuleSyncStatus({
-  required String name,
-  required bool hasBeenSynced,
-  required DateTime lastSync,
-}) async {
-  final db = await getDatabase();
-  await db.update(
-    modulesTableName,
-    {
-      hasBeenSyncedField: hasBeenSynced ? 1 : 0,
-      lastSyncField: lastSync.millisecondsSinceEpoch,
-    },
-    where: '$moduleNameField = ?',
-    whereArgs: [name],
-  );
+  
+  QuizzerLogger.logValue('Retrieved modules: $result');
+  
+  return result;
 }

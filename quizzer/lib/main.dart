@@ -9,6 +9,7 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:quizzer/global/functionality/session_manager.dart';
 import 'package:quizzer/global/functionality/quizzer_logging.dart';
+import 'package:quizzer/features/modules/functionality/module_updates_process.dart';
 
 late Database db;
 
@@ -25,26 +26,41 @@ class QuizzerNavigatorObserver extends NavigatorObserver {
   }
 }
 
-void main() async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Need to initialize the database
+  // Initialize Supabase
   await Supabase.initialize(
     url: 'https://yruvxuvzztnahuuiqxit.supabase.co',
     anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlydXZ4dXZ6enRuYWh1dWlxeGl0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQzMTY1NDIsImV4cCI6MjA1OTg5MjU0Mn0.hF1oAILlmzCvsJxFk9Bpjqjs3OEisVdoYVZoZMtTLpo',
   );
   
+  // Initialize SQLite
   sqfliteFfiInit();
   databaseFactory = databaseFactoryFfi;
-  await initDb();
   
-  // Once DB is loaded and opened, we can run the main application
-  runApp(const QuizzerApp());
+  // Initialize database and build modules
+  bool modulesBuilt = false;
+  try {
+    QuizzerLogger.logMessage('Starting module build process');
+    modulesBuilt = await buildModuleRecords();
+    if (modulesBuilt) {
+      QuizzerLogger.logSuccess('Module build process completed successfully');
+    } else {
+      QuizzerLogger.logError('Module build process failed');
+    }
+  } catch (e) {
+    QuizzerLogger.logError('Error during initialization: $e');
+  }
+  
+  runApp(QuizzerApp(modulesBuilt: modulesBuilt));
 }
 
 class QuizzerApp extends StatelessWidget {
-  const QuizzerApp({super.key});
-
+  final bool modulesBuilt;
+  
+  const QuizzerApp({super.key, required this.modulesBuilt});
+  
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

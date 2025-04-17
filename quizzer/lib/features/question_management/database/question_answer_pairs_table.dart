@@ -1,5 +1,6 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:quizzer/global/database/quizzer_database.dart';
+import 'package:quizzer/features/modules/functionality/module_updates_process.dart';
 
 Future<void> verifyQuestionAnswerPairTable() async {
   final Database db = await getDatabase();
@@ -29,9 +30,37 @@ Future<void> verifyQuestionAnswerPairTable() async {
         question_type TEXT,      -- Added for multiple choice support
         options TEXT,            -- Added for multiple choice options
         correct_option_index INTEGER,  -- Added for multiple choice correct answer
+        question_id TEXT,        -- Added for unique question identification
         PRIMARY KEY (time_stamp, qst_contrib)
       )
     ''');
+  } else {
+    // Check if question_id column exists
+    final List<Map<String, dynamic>> columns = await db.rawQuery(
+      "PRAGMA table_info(question_answer_pairs)"
+    );
+    
+    final bool hasQuestionId = columns.any((column) => column['name'] == 'question_id');
+    
+    if (!hasQuestionId) {
+      // Add question_id column to existing table
+      await db.execute('ALTER TABLE question_answer_pairs ADD COLUMN question_id TEXT');
+      
+      // Update existing records with question_id
+      final List<Map<String, dynamic>> existingPairs = await db.query('question_answer_pairs');
+      for (var pair in existingPairs) {
+        final timeStamp = pair['time_stamp'] as String;
+        final qstContrib = pair['qst_contrib'] as String;
+        final questionId = '${timeStamp}_$qstContrib';
+        
+        await db.update(
+          'question_answer_pairs',
+          {'question_id': questionId},
+          where: 'time_stamp = ? AND qst_contrib = ?',
+          whereArgs: [timeStamp, qstContrib],
+        );
+      }
+    }
   }
 }
 
@@ -80,7 +109,10 @@ Future<int> addQuestionAnswerPair({
   final formattedQuestionElements = _formatElements(questionElements);
   final formattedAnswerElements = _formatElements(answerElements);
 
-  return await db.insert('question_answer_pairs', {
+  // Generate question_id by concatenating time_stamp and qst_contrib
+  final questionId = '${timeStamp}_$qstContrib';
+
+  final result = await db.insert('question_answer_pairs', {
     'time_stamp': timeStamp,
     'citation': citation,
     'question_elements': formattedQuestionElements,
@@ -98,7 +130,13 @@ Future<int> addQuestionAnswerPair({
     'question_type': questionType ?? 'text',
     'options': options?.join(',') ?? '',
     'correct_option_index': correctOptionIndex ?? -1,
+    'question_id': questionId,
   });
+
+  // After successfully adding the pair, update the module records
+  await buildModuleRecords();
+
+  return result;
 }
 
 Future<int> editQuestionAnswerPair({
@@ -158,8 +196,7 @@ Future<int> editQuestionAnswerPair({
   );
 }
 
-
-Future<Map<String, dynamic>?>       getQuestionAnswerPairById(String timeStamp, String qstContrib) async {
+Future<Map<String, dynamic>?> getQuestionAnswerPairById(String timeStamp, String qstContrib) async {
   // First verify that the table exists
   await verifyQuestionAnswerPairTable();
 
@@ -172,13 +209,14 @@ Future<Map<String, dynamic>?>       getQuestionAnswerPairById(String timeStamp, 
 
   if (maps.isEmpty) return null;
 
-  final pair = maps.first;
+  // Create a new map instead of modifying the read-only query result
+  final Map<String, dynamic> result = Map<String, dynamic>.from(maps.first);
   
   // Parse the CSV strings into arrays of elements
-  pair['question_elements'] = _parseElements(pair['question_elements']);
-  pair['answer_elements'] = _parseElements(pair['answer_elements']);
+  result['question_elements'] = _parseElements(result['question_elements']);
+  result['answer_elements'] = _parseElements(result['answer_elements']);
 
-  return pair;
+  return result;
 }
 
 Future<List<Map<String, dynamic>>>  getQuestionAnswerPairsBySubject(String subject) async {

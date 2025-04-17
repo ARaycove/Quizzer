@@ -1,10 +1,5 @@
 import 'package:flutter/material.dart';
 
-  void _handleFilter() {
-    // TODO: Implement filter functionality
-  }
-
-
 class ModuleFilterButton extends StatelessWidget {
   final VoidCallback? onFilterPressed;
 

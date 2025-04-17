@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
-import 'package:quizzer/global/functionality/quizzer_logging.dart';
+// import 'package:quizzer/global/functionality/quizzer_logging.dart';
 
 class HomePageCenterButton extends StatefulWidget {
   final List<Map<String, dynamic>> questionElements;
@@ -27,8 +27,8 @@ class _HomePageCenterButtonState extends State<HomePageCenterButton> with Single
   @override
   void initState() {
     super.initState();
-    QuizzerLogger.logMessage('HomePageCenterButton initState with question elements: ${widget.questionElements}');
-    QuizzerLogger.logMessage('HomePageCenterButton initState with answer elements: ${widget.answerElements}');
+    // QuizzerLogger.logMessage('HomePageCenterButton initState with question elements: ${widget.questionElements}');
+    // QuizzerLogger.logMessage('HomePageCenterButton initState with answer elements: ${widget.answerElements}');
     _controller = AnimationController(
       duration: const Duration(milliseconds: 350),
       vsync: this,
@@ -45,8 +45,8 @@ class _HomePageCenterButtonState extends State<HomePageCenterButton> with Single
   @override
   void didUpdateWidget(HomePageCenterButton oldWidget) {
     super.didUpdateWidget(oldWidget);
-    QuizzerLogger.logMessage('HomePageCenterButton didUpdateWidget with question elements: ${widget.questionElements}');
-    QuizzerLogger.logMessage('HomePageCenterButton didUpdateWidget with answer elements: ${widget.answerElements}');
+    // QuizzerLogger.logMessage('HomePageCenterButton didUpdateWidget with question elements: ${widget.questionElements}');
+    // QuizzerLogger.logMessage('HomePageCenterButton didUpdateWidget with answer elements: ${widget.answerElements}');
     if (widget.isShowingAnswer != oldWidget.isShowingAnswer) {
       if (widget.isShowingAnswer) {
         _controller.forward();
@@ -58,8 +58,8 @@ class _HomePageCenterButtonState extends State<HomePageCenterButton> with Single
 
   @override
   Widget build(BuildContext context) {
-    QuizzerLogger.logMessage('HomePageCenterButton building with question elements: ${widget.questionElements}');
-    QuizzerLogger.logMessage('HomePageCenterButton building with answer elements: ${widget.answerElements}');
+    // QuizzerLogger.logMessage('HomePageCenterButton building with question elements: ${widget.questionElements}');
+    // QuizzerLogger.logMessage('HomePageCenterButton building with answer elements: ${widget.answerElements}');
     return GestureDetector(
       onTap: widget.onFlip,
       child: AnimatedBuilder(
@@ -127,7 +127,7 @@ class _HomePageCenterButtonState extends State<HomePageCenterButton> with Single
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: elements.map((element) {
-                QuizzerLogger.logMessage('Processing element: $element');
+                // QuizzerLogger.logMessage('Processing element: $element');
                 switch (element['type']) {
                   case 'text':
                     return Text(

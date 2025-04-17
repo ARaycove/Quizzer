@@ -5,6 +5,9 @@ import 'package:quizzer/features/modules/widgets/module_card.dart';
 import 'package:quizzer/features/modules/widgets/scroll_to_top_button.dart';
 import 'package:quizzer/features/modules/widgets/module_filter_button.dart';
 import 'package:quizzer/global/functionality/quizzer_logging.dart';
+import 'package:quizzer/features/user_profile_management/database/user_profile_table.dart';
+import 'package:quizzer/global/functionality/session_manager.dart';
+import 'package:quizzer/features/user_profile_management/functionality/user_question_processes.dart';
 
 class DisplayModulesPage extends StatefulWidget {
   const DisplayModulesPage({super.key});
@@ -15,7 +18,9 @@ class DisplayModulesPage extends StatefulWidget {
 
 class _DisplayModulesPageState extends State<DisplayModulesPage> {
   final ScrollController _scrollController = ScrollController();
+  final SessionManager _sessionManager = SessionManager();
   List<Map<String, dynamic>> _modules = [];
+  Map<String, bool> _moduleActivationStatus = {};
   bool _isLoading = true;
   bool _showScrollToTop = false;
 
@@ -35,11 +40,69 @@ class _DisplayModulesPageState extends State<DisplayModulesPage> {
   }
 
   Future<void> _loadModules() async {
-    // TODO: Implement module loading
-    // Should fetch module records from the database
-    // Should then construct cards for each module in the database
-    // Should start a validation process to ensure that the module data is correct and up to date
-    // Should then display the module cards in the UI
+    try {
+      setState(() {
+        _isLoading = true;
+      });
+
+      // Get current user ID
+      final userId = _sessionManager.userId;
+      if (userId == null) {
+        QuizzerLogger.logError('No user ID found in session');
+        setState(() {
+          _isLoading = false;
+        });
+        return;
+      }
+
+      // Fetch all modules from the database
+      final modules = await getAllModules();
+      QuizzerLogger.logMessage('Retrieved ${modules.length} modules from database');
+
+      // Fetch module activation status for the current user
+      _moduleActivationStatus = await getModuleActivationStatus(userId);
+      QuizzerLogger.logMessage('Retrieved module activation status: $_moduleActivationStatus');
+
+      setState(() {
+        _modules = modules;
+        _isLoading = false;
+      });
+    } catch (e) {
+      QuizzerLogger.logError('Error loading modules: $e');
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _toggleModuleActivation(String moduleName) async {
+    final userId = _sessionManager.userId;
+    if (userId == null) {
+      QuizzerLogger.logError('No user ID found in session');
+      return;
+    }
+
+    // Get current activation status
+    final currentStatus = _moduleActivationStatus[moduleName] ?? false;
+    
+    // Update the status
+    final success = await updateModuleActivationStatus(
+      userId,
+      moduleName,
+      !currentStatus,
+    );
+
+    if (success) {
+      setState(() {
+        _moduleActivationStatus[moduleName] = !currentStatus;
+      });
+      
+      await validateModuleQuestionsInUserProfile(moduleName);
+      
+      QuizzerLogger.logSuccess('Module $moduleName activation status updated to ${!currentStatus}');
+    } else {
+      QuizzerLogger.logError('Failed to update module $moduleName activation status');
+    }
   }
 
   void _scrollListener() {
@@ -76,6 +139,10 @@ class _DisplayModulesPageState extends State<DisplayModulesPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Add space for floating buttons
+                  const SizedBox(
+                    height: 48.0, // Height of a mini FAB (40.0) + some padding
+                  ),
                   if (_isLoading)
                     const Center(
                       child: CircularProgressIndicator(
@@ -90,7 +157,11 @@ class _DisplayModulesPageState extends State<DisplayModulesPage> {
                       ),
                     )
                   else
-                    ..._modules.map((module) => ModuleCard(moduleData: module)).toList(),
+                    ..._modules.map((module) => ModuleCard(
+                          moduleData: module,
+                          isActivated: _moduleActivationStatus[module['module_name']] ?? false,
+                          onToggleActivation: () => _toggleModuleActivation(module['module_name']),
+                        )).toList(),
                 ],
               ),
             ),

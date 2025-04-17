@@ -29,9 +29,9 @@ class _HomePageState extends State<HomePage> {
     int _currentTutorialProgress = 0;
 
     Future<void> _loadTutorialQuestion(int questionNumber) async {
-        QuizzerLogger.logMessage('Loading tutorial question $questionNumber');
+        // QuizzerLogger.logMessage('Loading tutorial question $questionNumber');
         final tutorialId = 'tutorial_${(questionNumber + 1).toString().padLeft(2, '0')}';
-        QuizzerLogger.logMessage('Tutorial ID: $tutorialId');
+        // QuizzerLogger.logMessage('Tutorial ID: $tutorialId');
         
         final tutorialQuestion = await getTutorialQuestion(tutorialId);
         if (tutorialQuestion == null) {
@@ -39,9 +39,9 @@ class _HomePageState extends State<HomePage> {
                 'question not found in database.');
         }
 
-        QuizzerLogger.logMessage('Successfully loaded tutorial question');
-        QuizzerLogger.logMessage('Question content: ${tutorialQuestion['question']}');
-        QuizzerLogger.logMessage('Answer content: ${tutorialQuestion['answer']}');
+        // QuizzerLogger.logMessage('Successfully loaded tutorial question');
+        // QuizzerLogger.logMessage('Question content: ${tutorialQuestion['question']}');
+        // QuizzerLogger.logMessage('Answer content: ${tutorialQuestion['answer']}');
         
         _sessionManager.setCurrentQuestionId(tutorialId);
         _sessionManager.setQuestionPresentedTime();
@@ -53,15 +53,15 @@ class _HomePageState extends State<HomePage> {
             {'type': 'text', 'content': tutorialQuestion['answer']!},
         ];
         
-        QuizzerLogger.logMessage('Setting question elements: $questionElements');
-        QuizzerLogger.logMessage('Setting answer elements: $answerElements');
+        // QuizzerLogger.logMessage('Setting question elements: $questionElements');
+        // QuizzerLogger.logMessage('Setting answer elements: $answerElements');
         
         _sessionManager.setQuestionAndAnswerElements(questionElements, answerElements);
     }
 
     void _loadRegularQuestion() {
         // TODO: Replace with actual database call
-        QuizzerLogger.logMessage('Loading regular question');
+        // QuizzerLogger.logMessage('Loading regular question');
         
         _sessionManager.setCurrentQuestionId("q123");
         _sessionManager.setQuestionPresentedTime();
@@ -78,8 +78,8 @@ class _HomePageState extends State<HomePage> {
                 'confirmed in 2015 by Murre and Dros.'},
         ];
         
-        QuizzerLogger.logMessage('Setting question elements: $questionElements');
-        QuizzerLogger.logMessage('Setting answer elements: $answerElements');
+        // QuizzerLogger.logMessage('Setting question elements: $questionElements');
+        // QuizzerLogger.logMessage('Setting answer elements: $answerElements');
         
         _sessionManager.setQuestionAndAnswerElements(questionElements, answerElements);
     }
@@ -91,28 +91,28 @@ class _HomePageState extends State<HomePage> {
                 'check tutorial status.');
         }
 
-        QuizzerLogger.logMessage('Checking tutorial status for user: $userId');
+        // QuizzerLogger.logMessage('Checking tutorial status for user: $userId');
         final progress = await getTutorialProgress(userId);
-        QuizzerLogger.logMessage('Current tutorial progress: $progress');
+        // QuizzerLogger.logMessage('Current tutorial progress: $progress');
         
         // If the tutorial progress is less than 5, work on the tutorial questions
         if (progress < 5) { 
-            QuizzerLogger.logMessage('Loading tutorial question $progress');
+            // QuizzerLogger.logMessage('Loading tutorial question $progress');
             await _loadTutorialQuestion(progress);
-            QuizzerLogger.logMessage('After _loadTutorialQuestion, question elements: ${_sessionManager.questionElements}');
-            QuizzerLogger.logMessage('After _loadTutorialQuestion, answer elements: ${_sessionManager.answerElements}');
+            // QuizzerLogger.logMessage('After _loadTutorialQuestion, question elements: ${_sessionManager.questionElements}');
+            // QuizzerLogger.logMessage('After _loadTutorialQuestion, answer elements: ${_sessionManager.answerElements}');
         } 
         // Otherwise, we are in the normal question loop
         else {
-            QuizzerLogger.logMessage('Tutorial completed, loading regular question');
+            // QuizzerLogger.logMessage('Tutorial completed, loading regular question');
             _loadRegularQuestion();
-            QuizzerLogger.logMessage('After _loadRegularQuestion, question elements: ${_sessionManager.questionElements}');
-            QuizzerLogger.logMessage('After _loadRegularQuestion, answer elements: ${_sessionManager.answerElements}');
+            // QuizzerLogger.logMessage('After _loadRegularQuestion, question elements: ${_sessionManager.questionElements}');
+            // QuizzerLogger.logMessage('After _loadRegularQuestion, answer elements: ${_sessionManager.answerElements}');
         }
         
         // Log the current state after loading
-        QuizzerLogger.logMessage('After loading, question elements: ${_sessionManager.questionElements}');
-        QuizzerLogger.logMessage('After loading, answer elements: ${_sessionManager.answerElements}');
+        // QuizzerLogger.logMessage('After loading, question elements: ${_sessionManager.questionElements}');
+        // QuizzerLogger.logMessage('After loading, answer elements: ${_sessionManager.answerElements}');
         
         // Trigger a rebuild of the widget to show the new question/answer
         if (mounted) {
@@ -142,7 +142,7 @@ class _HomePageState extends State<HomePage> {
     @override
     void initState() {
         super.initState();
-        QuizzerLogger.logMessage('Initializing HomePage state');
+        // QuizzerLogger.logMessage('Initializing HomePage state');
         _checkTutorialStatus();
     }
 
@@ -165,7 +165,7 @@ class _HomePageState extends State<HomePage> {
     }
 
     void _submitFlag() {
-        QuizzerLogger.logMessage('Flag submitted: ${_flagController.text}');
+        // QuizzerLogger.logMessage('Flag submitted: ${_flagController.text}');
         setState(() {
             _showFlagDialog = false;
             _flagController.clear();
@@ -174,13 +174,13 @@ class _HomePageState extends State<HomePage> {
 
     @override
     Widget build(BuildContext context) {
-        QuizzerLogger.logMessage('Building HomePage with question elements: ${_sessionManager.questionElements}');
-        QuizzerLogger.logMessage('Building HomePage with answer elements: ${_sessionManager.answerElements}');
+        // QuizzerLogger.logMessage('Building HomePage with question elements: ${_sessionManager.questionElements}');
+        // QuizzerLogger.logMessage('Building HomePage with answer elements: ${_sessionManager.answerElements}');
         return Scaffold(
             backgroundColor: const Color(0xFF0A1929),
             appBar: HomePageTopBar(
                 onMenuPressed: () {
-                    QuizzerLogger.logMessage('Menu button pressed');
+                    // QuizzerLogger.logMessage('Menu button pressed');
                     Navigator.pushNamed(context, '/menu');
                 },
                 showFlagDialog: _showFlagDialog,
