@@ -48,9 +48,21 @@
               "icon": "lucide-file",
               "title": "05_15_Display_Modules_Page"
             }
+          },
+          {
+            "id": "d477a20869bd563d",
+            "type": "leaf",
+            "state": {
+              "type": "excalidraw",
+              "state": {
+                "file": "Excalidraw/Drawing 2025-04-17 10.16.39.excalidraw.md"
+              },
+              "icon": "excalidraw-icon",
+              "title": "Drawing 2025-04-17 10.16.39.excalidraw"
+            }
           }
         ],
-        "currentTab": 2
+        "currentTab": 3
       }
     ],
     "direction": "vertical"
@@ -198,13 +210,14 @@
       "obsidian-excalidraw-plugin:New drawing": false
     }
   },
-  "active": "33be048eca52ca5d",
+  "active": "d477a20869bd563d",
   "lastOpenFiles": [
+    "Core Documentation/Chapter 05 - User Experience and User Interface Design/05_15_Display_Modules_Page.md",
+    "Excalidraw/Drawing 2025-04-17 10.16.39.excalidraw.md",
     "Core Documentation/Chapter 00 - Project Overview and Guidelines/general-guidelines.mdc",
     "Core Documentation/Chapter 00 - Project Overview and Guidelines",
     "Core Documentation/Chapter 06 - Features/06_02_Module_System.md",
     "Core Documentation/Chapter 08 - Database/08_04_Modules_Table.md",
-    "Core Documentation/Chapter 05 - User Experience and User Interface Design/05_15_Display_Modules_Page.md",
     "Core Documentation/Chapter 05 - User Experience and User Interface Design/05_06_Menu_Page.md",
     "Core Documentation/Chapter 00 - Project Overview and Guidelines/00_02_Development_Rules.md",
     "Core Documentation/Chapter 05 - User Experience and User Interface Design/05_06_Add_Question_Answer_Pair_Page.md",
@@ -238,7 +251,6 @@
     "Core Documentation/Chapter 07 - Functions",
     "Core Documentation/Chapter 09 - Algorithms and Background Processes",
     "Core Documentation/Chapter 08 - Database",
-    "Core Documentation/Chapter 11 - Testing and Deployment",
     "Diagrams/NewUserSignUp-LoginPage.png"
   ]
 }

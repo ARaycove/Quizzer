@@ -1,8 +1,7 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:quizzer/global/database/quizzer_database.dart';
 
-Future<void> verifyUserQuestionAnswerPairTable() async {
-  final Database db = await getDatabase();
+Future<void> verifyUserQuestionAnswerPairTable(Database db) async {
   
   // Check if the table exists
   final List<Map<String, dynamic>> tables = await db.rawQuery(
@@ -39,10 +38,10 @@ Future<int> addUserQuestionAnswerPair({
   required double averageTimesShownPerDay,
   required bool isEligible,
   required bool inCirculation,
+  required Database db,
 }) async {
-  await verifyUserQuestionAnswerPairTable();
+  await verifyUserQuestionAnswerPairTable(db);
 
-  final Database db = await getDatabase();
   return await db.insert('user_question_answer_pairs', {
     'user_uuid': userUuid,
     'question_id': questionAnswerReference,
@@ -60,6 +59,7 @@ Future<int> addUserQuestionAnswerPair({
 Future<int> editUserQuestionAnswerPair({
   required String userUuid,
   required String questionAnswerReference,
+  required Database db,
   int? revisionStreak,
   String? lastRevised,
   String? predictedRevisionDueHistory,
@@ -69,9 +69,8 @@ Future<int> editUserQuestionAnswerPair({
   bool? isEligible,
   bool? inCirculation,
 }) async {
-  await verifyUserQuestionAnswerPairTable();
+  await verifyUserQuestionAnswerPairTable(db);
 
-  final Database db = await getDatabase();
   Map<String, dynamic> values = {};
   
   if (revisionStreak != null) values['revision_streak'] = revisionStreak;
@@ -91,10 +90,9 @@ Future<int> editUserQuestionAnswerPair({
   );
 }
 
-Future<Map<String, dynamic>?> getUserQuestionAnswerPairById(String userUuid, String questionAnswerReference) async {
-  await verifyUserQuestionAnswerPairTable();
+Future<Map<String, dynamic>?> getUserQuestionAnswerPairById(String userUuid, String questionAnswerReference, Database db) async {
+  await verifyUserQuestionAnswerPairTable(db);
 
-  final Database db = await getDatabase();
   final List<Map<String, dynamic>> maps = await db.query(
     'user_question_answer_pairs',
     where: 'user_uuid = ? AND question_id = ?',
@@ -104,10 +102,8 @@ Future<Map<String, dynamic>?> getUserQuestionAnswerPairById(String userUuid, Str
   return maps.isEmpty ? null : maps.first;
 }
 
-Future<List<Map<String, dynamic>>> getUserQuestionAnswerPairsByUser(String userUuid) async {
-  await verifyUserQuestionAnswerPairTable();
-
-  final Database db = await getDatabase();
+Future<List<Map<String, dynamic>>> getUserQuestionAnswerPairsByUser(String userUuid, Database db) async {
+  await verifyUserQuestionAnswerPairTable(db);
   return await db.query(
     'user_question_answer_pairs',
     where: 'user_uuid = ?',
@@ -115,10 +111,9 @@ Future<List<Map<String, dynamic>>> getUserQuestionAnswerPairsByUser(String userU
   );
 }
 
-Future<List<Map<String, dynamic>>> getEligibleQuestions(String userUuid) async {
-  await verifyUserQuestionAnswerPairTable();
+Future<List<Map<String, dynamic>>> getEligibleQuestions(String userUuid, Database db) async {
+  await verifyUserQuestionAnswerPairTable(db);
 
-  final Database db = await getDatabase();
   return await db.query(
     'user_question_answer_pairs',
     where: 'user_uuid = ? AND is_eligible = ?',
@@ -126,10 +121,9 @@ Future<List<Map<String, dynamic>>> getEligibleQuestions(String userUuid) async {
   );
 }
 
-Future<List<Map<String, dynamic>>> getQuestionsInCirculation(String userUuid) async {
-  await verifyUserQuestionAnswerPairTable();
+Future<List<Map<String, dynamic>>> getQuestionsInCirculation(String userUuid, Database db) async {
+  await verifyUserQuestionAnswerPairTable(db);
 
-  final Database db = await getDatabase();
   return await db.query(
     'user_question_answer_pairs',
     where: 'user_uuid = ? AND in_circulation = ?',
@@ -137,17 +131,15 @@ Future<List<Map<String, dynamic>>> getQuestionsInCirculation(String userUuid) as
   );
 }
 
-Future<List<Map<String, dynamic>>> getAllUserQuestionAnswerPairs() async {
-  await verifyUserQuestionAnswerPairTable();
+Future<List<Map<String, dynamic>>> getAllUserQuestionAnswerPairs(Database db) async {
+  await verifyUserQuestionAnswerPairTable(db);
 
-  final Database db = await getDatabase();
   return await db.query('user_question_answer_pairs');
 }
 
-Future<int> removeUserQuestionAnswerPair(String userUuid, String questionAnswerReference) async {
-  await verifyUserQuestionAnswerPairTable();
+Future<int> removeUserQuestionAnswerPair(String userUuid, String questionAnswerReference, Database db) async {
+  await verifyUserQuestionAnswerPairTable(db);
 
-  final Database db = await getDatabase();
   return await db.delete(
     'user_question_answer_pairs',
     where: 'user_uuid = ? AND question_id = ?',

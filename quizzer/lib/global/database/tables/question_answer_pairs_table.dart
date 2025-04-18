@@ -2,8 +2,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:quizzer/global/database/quizzer_database.dart';
 import 'package:quizzer/features/modules/functionality/module_updates_process.dart';
 
-Future<void> verifyQuestionAnswerPairTable() async {
-  final Database db = await getDatabase();
+Future<void> verifyQuestionAnswerPairTable(Database db) async {
   
   // Check if the table exists
   final List<Map<String, dynamic>> tables = await db.rawQuery(
@@ -101,11 +100,11 @@ Future<int> addQuestionAnswerPair({
   String? questionType,
   List<String>? options,
   int? correctOptionIndex,
+  required Database db,
 }) async {
   // First verify that the table exists
-  await verifyQuestionAnswerPairTable();
+  await verifyQuestionAnswerPairTable(db);
 
-  final Database db = await getDatabase();
   final formattedQuestionElements = _formatElements(questionElements);
   final formattedAnswerElements = _formatElements(answerElements);
 
@@ -142,6 +141,7 @@ Future<int> addQuestionAnswerPair({
 Future<int> editQuestionAnswerPair({
   required String timeStamp,
   required String qstContrib,
+  required Database db,
   String? citation,
   List<Map<String, dynamic>>? questionElements,
   List<Map<String, dynamic>>? answerElements,
@@ -158,9 +158,8 @@ Future<int> editQuestionAnswerPair({
   int? correctOptionIndex,
 }) async {
   // First verify that the table exists
-  await verifyQuestionAnswerPairTable();
+  await verifyQuestionAnswerPairTable(db);
 
-  final Database db = await getDatabase();
   Map<String, dynamic> values = {};
   
   if (citation != null) values['citation'] = citation;
@@ -179,7 +178,7 @@ Future<int> editQuestionAnswerPair({
   if (correctOptionIndex != null) values['correct_option_index'] = correctOptionIndex;
 
   // Get current values to check completion status
-  final current = await getQuestionAnswerPairById(timeStamp, qstContrib);
+  final current = await getQuestionAnswerPairById(timeStamp, qstContrib, db);
   if (current != null) {
     values.addAll(current);
     values['completed'] = _checkCompletionStatus(
@@ -196,11 +195,10 @@ Future<int> editQuestionAnswerPair({
   );
 }
 
-Future<Map<String, dynamic>?> getQuestionAnswerPairById(String timeStamp, String qstContrib) async {
+Future<Map<String, dynamic>?> getQuestionAnswerPairById(String timeStamp, String qstContrib, Database db) async {
   // First verify that the table exists
-  await verifyQuestionAnswerPairTable();
+  await verifyQuestionAnswerPairTable(db);
 
-  final Database db = await getDatabase();
   final List<Map<String, dynamic>> maps = await db.query(
     'question_answer_pairs',
     where: 'time_stamp = ? AND qst_contrib = ?',
@@ -219,11 +217,10 @@ Future<Map<String, dynamic>?> getQuestionAnswerPairById(String timeStamp, String
   return result;
 }
 
-Future<List<Map<String, dynamic>>>  getQuestionAnswerPairsBySubject(String subject) async {
+Future<List<Map<String, dynamic>>>  getQuestionAnswerPairsBySubject(String subject, Database db) async {
   // First verify that the table exists
-  await verifyQuestionAnswerPairTable();
+  await verifyQuestionAnswerPairTable(db);
 
-  final Database db = await getDatabase();
   return await db.query(
     'question_answer_pairs',
     where: 'subjects LIKE ?',
@@ -231,11 +228,10 @@ Future<List<Map<String, dynamic>>>  getQuestionAnswerPairsBySubject(String subje
   );
 }
 
-Future<List<Map<String, dynamic>>>  getQuestionAnswerPairsByConcept(String concept) async {
+Future<List<Map<String, dynamic>>>  getQuestionAnswerPairsByConcept(String concept, Database db) async {
   // First verify that the table exists
-  await verifyQuestionAnswerPairTable();
+  await verifyQuestionAnswerPairTable(db);
 
-  final Database db = await getDatabase();
   return await db.query(
     'question_answer_pairs',
     where: 'concepts LIKE ?',
@@ -243,41 +239,36 @@ Future<List<Map<String, dynamic>>>  getQuestionAnswerPairsByConcept(String conce
   );
 }
 
-Future<List<Map<String, dynamic>>>  getQuestionAnswerPairsBySubjectAndConcept(String subject, String concept) async {
+Future<List<Map<String, dynamic>>>  getQuestionAnswerPairsBySubjectAndConcept(String subject, String concept, Database db) async {
   // First verify that the table exists
-  await verifyQuestionAnswerPairTable();
+  await verifyQuestionAnswerPairTable(db);
 
-  final Database db = await getDatabase();
   return await db.query(
     'question_answer_pairs',
     where: 'subjects LIKE ? AND concepts LIKE ?',
     whereArgs: ['%$subject%', '%$concept%'],
   );
 }
-Future<Map<String, dynamic>?>       getRandomQuestionAnswerPair() async {
+Future<Map<String, dynamic>?>       getRandomQuestionAnswerPair(Database db) async {
   // First verify that the table exists
-  await verifyQuestionAnswerPairTable();
+  await verifyQuestionAnswerPairTable(db);
 
-  final Database db = await getDatabase();
   final List<Map<String, dynamic>> maps = await db.rawQuery(
     'SELECT * FROM question_answer_pairs ORDER BY RANDOM() LIMIT 1'
   );
   return maps.isEmpty ? null : maps.first;
 }
 
-Future<List<Map<String, dynamic>>>  getAllQuestionAnswerPairs() async {
+Future<List<Map<String, dynamic>>>  getAllQuestionAnswerPairs(Database db) async {
   // First verify that the table exists
-  await verifyQuestionAnswerPairTable();
-
-  final Database db = await getDatabase();
+  await verifyQuestionAnswerPairTable(db);
   return await db.query('question_answer_pairs');
 }
 
-Future<int> removeQuestionAnswerPair(String timeStamp, String qstContrib) async {
+Future<int> removeQuestionAnswerPair(String timeStamp, String qstContrib, Database db) async {
   // First verify that the table exists
-  await verifyQuestionAnswerPairTable();
+  await verifyQuestionAnswerPairTable(db);
 
-  final Database db = await getDatabase();
   return await db.delete(
     'question_answer_pairs',
     where: 'time_stamp = ? AND qst_contrib = ?',

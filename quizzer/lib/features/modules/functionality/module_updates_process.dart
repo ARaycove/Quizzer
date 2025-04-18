@@ -6,12 +6,13 @@ Current Implementation:
 - Process runs after each question addition and during app initialization
 TODO: Develop a plan to optimize the module building process
 */
-
-import 'package:quizzer/features/modules/database/modules_table.dart';
-import 'package:quizzer/features/question_management/database/question_answer_pairs_table.dart';
 import 'package:quizzer/global/functionality/quizzer_logging.dart';
-import 'dart:isolate';
+import 'package:quizzer/global/database/tables/question_answer_pairs_table.dart';
+import 'package:quizzer/global/database/tables/modules_table.dart';
+import 'package:quizzer/global/database/database_monitor.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'dart:async';
+import 'dart:isolate';
 
 /// Validates and builds module records based on question-answer pairs
 /// This function:
@@ -159,89 +160,89 @@ Map<String, dynamic> getQuestionIdsForModule(List<Map<String, dynamic>> pairs, S
 /// 3. Checks if each module exists in the modules table
 /// 4. Creates new modules or updates existing ones accordingly
 /// Returns a Future<bool> indicating if the process completed successfully
+/// 
+/// 
 Future<bool> buildModuleRecords() async {
-  QuizzerLogger.logMessage('Starting module build process');
+  QuizzerLogger.logMessage('Starting module build process in isolate');
+  // FIXME This log message was displayed in the console
+  final receivePort = ReceivePort();
+  await Isolate.spawn(_moduleBuildIsolate, receivePort.sendPort);
   
-  try {
-    // Spawn a new isolate to handle the module building process
-    final receivePort = ReceivePort();
-    final isolate = await Isolate.spawn(_buildModuleRecordsInIsolate, receivePort.sendPort);
-    
-    // Wait for the isolate to complete
-    final bool success = await receivePort.first as bool;
-    
-    // Clean up
-    receivePort.close();
-    isolate.kill();
-    
-    QuizzerLogger.logSuccess('Module build process completed successfully');
-    return success;
-  } catch (e) {
-    QuizzerLogger.logError('Error in module build process: $e');
-    return false;
-  }
+  return await receivePort.first;
 }
 
-// This function runs in a separate isolate
-Future<void> _buildModuleRecordsInIsolate(SendPort sendPort) async {
-  try {
-    // Initialize database factory for the isolate
-    sqfliteFfiInit();
-    databaseFactory = databaseFactoryFfi;
-
-    QuizzerLogger.logMessage('Starting to build module records in isolate');
-    
-    // Step 1: Get all question-answer pairs
-    final List<Map<String, dynamic>> pairs = await getAllQuestionAnswerPairs();
-    QuizzerLogger.logMessage('Retrieved ${pairs.length} question-answer pairs');
-    
-    // Step 2: Get unique module names
-    final Set<String> uniqueModuleNames = await getUniqueModuleNames(pairs);
-    QuizzerLogger.logMessage('Found ${uniqueModuleNames.length} unique module names');
-    
-    // Step 3: Process each module
-    for (final moduleName in uniqueModuleNames) {
-      QuizzerLogger.logMessage('Processing module: $moduleName');
-      
-      // Get module data
-      final Map<String, dynamic> subjectsData = getUniqueSubjectsForModule(pairs, moduleName);
-      final Set<String> concepts = getUniqueConceptsForModule(pairs, moduleName);
-      final Map<String, dynamic> questionsData = getQuestionIdsForModule(pairs, moduleName);
-      
-      // Check if module exists
-      final Map<String, dynamic>? existingModule = await getModule(moduleName);
-      
-      if (existingModule == null) {
-        // Create new module
-        QuizzerLogger.logMessage('Creating new module: $moduleName');
-        await insertModule(
-          name: moduleName,
-          description: "no_description",
-          primarySubject: subjectsData['primary_subject'],
-          subjects: subjectsData['subjects'].toList(),
-          relatedConcepts: concepts.toList(),
-          questionIds: questionsData['question_ids'],
-          creatorId: questionsData['module_contributor'],
-        );
-        QuizzerLogger.logSuccess('Successfully created new module: $moduleName');
-      } else {
-        // Update existing module
-        QuizzerLogger.logMessage('Updating existing module: $moduleName');
-        await updateModule(
-          name: moduleName,
-          primarySubject: subjectsData['primary_subject'],
-          subjects: subjectsData['subjects'].toList(),
-          relatedConcepts: concepts.toList(),
-          questionIds: questionsData['question_ids'],
-        );
-        QuizzerLogger.logSuccess('Successfully updated module: $moduleName');
-      }
+void _moduleBuildIsolate(SendPort sendPort) async {
+  bool success = false;
+  
+  // Initialize SQLite in isolate
+  sqfliteFfiInit();
+  databaseFactory = databaseFactoryFfi;
+  
+  // Request database access
+  Database? db;
+  while (db == null) {
+    db = await DatabaseMonitor().requestDatabaseAccess();
+    if (db == null) {
+      QuizzerLogger.logMessage('Database access denied, waiting...');
+      await Future.delayed(const Duration(milliseconds: 250));
     }
-    
-    QuizzerLogger.logSuccess('Successfully processed all modules');
-    sendPort.send(true); // Signal completion
-  } catch (e) {
-    QuizzerLogger.logError('Error in module build isolate: $e');
-    sendPort.send(false); // Signal failure
   }
+
+  // Get all question-answer pairs
+  final List<Map<String, dynamic>> pairs = await getAllQuestionAnswerPairs(db);
+  QuizzerLogger.logMessage('Retrieved ${pairs.length} question-answer pairs');
+  
+  // Get unique module names
+  final Set<String> uniqueModuleNames = await getUniqueModuleNames(pairs);
+  
+  // Process each module
+  for (final moduleName in uniqueModuleNames) {
+    // Get unique subjects and primary subject
+    final Map<String, dynamic> subjectsData = getUniqueSubjectsForModule(pairs, moduleName);
+    final Set<String> uniqueSubjects = subjectsData['subjects'] as Set<String>;
+    final String primarySubject = subjectsData['primary_subject'] as String;
+    
+    // Get unique concepts
+    final Set<String> uniqueConcepts = getUniqueConceptsForModule(pairs, moduleName);
+    
+    // Get question IDs and module contributor
+    final Map<String, dynamic> questionsData = getQuestionIdsForModule(pairs, moduleName);
+    final List<String> questionIds = questionsData['question_ids'] as List<String>;
+    final String moduleContributor = questionsData['module_contributor'] as String;
+    
+    // Check if module exists
+    final existingModule = await getModule(moduleName, db);
+    
+    if (existingModule != null) {
+      // Update existing module
+      await updateModule(
+        name: moduleName,
+        subjects: uniqueSubjects.toList(),
+        relatedConcepts: uniqueConcepts.toList(),
+        questionIds: questionIds,
+        db: db
+      );
+      QuizzerLogger.logMessage('Updated module: $moduleName');
+    } else {
+      // Create new module
+      await insertModule(
+        name: moduleName,
+        description: 'Module for $moduleName',
+        primarySubject: primarySubject,
+        subjects: uniqueSubjects.toList(),
+        relatedConcepts: uniqueConcepts.toList(),
+        questionIds: questionIds,
+        creatorId: moduleContributor,
+        db: db
+      );
+      QuizzerLogger.logMessage('Created new module: $moduleName');
+    }
+  }
+  
+  success = true;
+  QuizzerLogger.logSuccess('Module records built successfully');
+  
+  DatabaseMonitor().releaseDatabaseAccess();
+  sendPort.send(success);
+  Isolate.exit();
 }

@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:quizzer/global/widgets/global_app_bar.dart';
-import 'package:quizzer/features/modules/database/modules_table.dart';
+import 'package:quizzer/global/database/tables/modules_table.dart';
 import 'package:quizzer/features/modules/widgets/module_card.dart';
 import 'package:quizzer/features/modules/widgets/scroll_to_top_button.dart';
 import 'package:quizzer/features/modules/widgets/module_filter_button.dart';
 import 'package:quizzer/global/functionality/quizzer_logging.dart';
-import 'package:quizzer/features/user_profile_management/database/user_profile_table.dart';
+import 'package:quizzer/global/database/tables/user_profile_table.dart';
 import 'package:quizzer/global/functionality/session_manager.dart';
-import 'package:quizzer/features/user_profile_management/functionality/user_question_processes.dart';
+import 'package:quizzer/features/modules/functionality/module_isolates.dart';
+import 'package:quizzer/main.dart';
+import 'dart:isolate';
 
 class DisplayModulesPage extends StatefulWidget {
   const DisplayModulesPage({super.key});
@@ -55,16 +57,17 @@ class _DisplayModulesPageState extends State<DisplayModulesPage> {
         return;
       }
 
-      // Fetch all modules from the database
-      final modules = await getAllModules();
-      QuizzerLogger.logMessage('Retrieved ${modules.length} modules from database');
-
-      // Fetch module activation status for the current user
-      _moduleActivationStatus = await getModuleActivationStatus(userId);
-      QuizzerLogger.logMessage('Retrieved module activation status: $_moduleActivationStatus');
-
+      final receivePort = ReceivePort();
+      await Isolate.spawn(handleLoadModules, {
+        'sendPort': receivePort.sendPort,
+        'userId': userId,
+      });
+      
+      final result = await receivePort.first as Map<String, dynamic>;
+      
       setState(() {
-        _modules = modules;
+        _modules = result['modules'] as List<Map<String, dynamic>>;
+        _moduleActivationStatus = result['activationStatus'] as Map<String, bool>;
         _isLoading = false;
       });
     } catch (e) {
@@ -82,23 +85,22 @@ class _DisplayModulesPageState extends State<DisplayModulesPage> {
       return;
     }
 
-    // Get current activation status
     final currentStatus = _moduleActivationStatus[moduleName] ?? false;
     
-    // Update the status
-    final success = await updateModuleActivationStatus(
-      userId,
-      moduleName,
-      !currentStatus,
-    );
-
+    final receivePort = ReceivePort();
+    await Isolate.spawn(handleModuleActivation, {
+      'sendPort': receivePort.sendPort,
+      'userId': userId,
+      'moduleName': moduleName,
+      'isActive': !currentStatus,
+    });
+    
+    final success = await receivePort.first;
+    
     if (success) {
       setState(() {
         _moduleActivationStatus[moduleName] = !currentStatus;
       });
-      
-      await validateModuleQuestionsInUserProfile(moduleName);
-      
       QuizzerLogger.logSuccess('Module $moduleName activation status updated to ${!currentStatus}');
     } else {
       QuizzerLogger.logError('Failed to update module $moduleName activation status');

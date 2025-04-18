@@ -5,13 +5,12 @@ import 'package:quizzer/global/pages/menu.dart';
 import 'package:quizzer/features/question_management/pages/add_question_answer_page.dart';
 import 'package:quizzer/features/modules/pages/display_modules_page.dart';
 import 'package:quizzer/global/database/quizzer_database.dart';
+import 'package:quizzer/global/database/database_monitor.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:quizzer/global/functionality/session_manager.dart';
 import 'package:quizzer/global/functionality/quizzer_logging.dart';
 import 'package:quizzer/features/modules/functionality/module_updates_process.dart';
-
-late Database db;
 
 // Custom NavigatorObserver to track route changes
 class QuizzerNavigatorObserver extends NavigatorObserver {
@@ -28,18 +27,20 @@ class QuizzerNavigatorObserver extends NavigatorObserver {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
-  // Initialize Supabase
+
+  // Initialize Supabase - will crash if initialization fails
   await Supabase.initialize(
     url: 'https://yruvxuvzztnahuuiqxit.supabase.co',
     anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlydXZ4dXZ6enRuYWh1dWlxeGl0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQzMTY1NDIsImV4cCI6MjA1OTg5MjU0Mn0.hF1oAILlmzCvsJxFk9Bpjqjs3OEisVdoYVZoZMtTLpo',
   );
+  QuizzerLogger.logMessage('Supabase initialized');
   
-  // Initialize SQLite
-  sqfliteFfiInit();
-  databaseFactory = databaseFactoryFfi;
-  
-  // Initialize database and build modules
+  // Initialize database and monitor
+  final monitor = DatabaseMonitor();
+  await monitor.initialize();
+  await Future.delayed(const Duration(milliseconds: 100)); // Ensure initialization is complete
+
+  // build module records first upon loading in
   bool modulesBuilt = false;
   try {
     QuizzerLogger.logMessage('Starting module build process');
@@ -52,7 +53,7 @@ void main() async {
   } catch (e) {
     QuizzerLogger.logError('Error during initialization: $e');
   }
-  
+  // End of Block
   runApp(QuizzerApp(modulesBuilt: modulesBuilt));
 }
 

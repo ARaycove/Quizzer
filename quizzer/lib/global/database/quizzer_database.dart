@@ -1,8 +1,14 @@
 import 'package:path/path.dart';
-import 'package:sqflite/sqflite.dart';
-import 'package:quizzer/features/user_profile_management/database/user_profile_table.dart';
-import 'package:quizzer/features/question_management/database/question_answer_pairs_table.dart';
-import 'package:quizzer/features/modules/database/modules_table.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:quizzer/global/functionality/quizzer_logging.dart';
+import 'package:quizzer/global/database/database_monitor.dart';
+
+// The database
+// Every write operation or complex operation should be ran as an isolated process
+// These processes are a wrapper for functionality
+// This wrapper contains the write operations to be executed like any normal function
+// requests access from the monitor to perform its operations
+// if doesn't get access from the monitor idles for a moment then requests access again
 
 // Global database reference
 Database? _database;
@@ -10,38 +16,40 @@ Database? _database;
 /// Initializes the database if it doesn't exist
 /// Creates all necessary tables during initialization
 Future<Database> initDb() async {
-  if (_database != null) return _database!;
+  // Initialize FFI
+  sqfliteFfiInit();
+  // Change the default factory
+  databaseFactory = databaseFactoryFfi;
   
   String databasesPath = await getDatabasesPath();
   String path = join(databasesPath, 'quizzer.db');
-  print('Database path: $path');
+  QuizzerLogger.logMessage('Database path: $path');
 
   _database = await openDatabase(
     path,
     version: 1,
     onCreate: (Database db, int version) async {
-      // Create tables during database creation
-      await verifyUserProfileTable();
-      await verifyQuestionAnswerPairTable();
-      await verifyModulesTable();
+      // Tables will be created by the worker
     },
     onUpgrade: (Database db, int oldVersion, int newVersion) async {
       // Handle database upgrades if needed
     }
   );
-  
-  // Verify tables exist even if database already exists
-  await verifyUserProfileTable();
-  await verifyQuestionAnswerPairTable();
-  await verifyModulesTable();
-  
+
   return _database!;
 }
 
-/// Gets the database instance
-Future<Database> getDatabase() async {
-  return _database ?? await initDb();
+/// Returns the current database instance
+/// Throws StateError if database hasn't been initialized
+Database getDatabaseForMonitor() {
+  if (_database == null) {
+    throw StateError('Database has not been initialized');
+  }
+  return _database!;
 }
+
+// TODO add function that returns the database instance
+
 
 //------------------------------------------------------------------------------
 // User Profile Table Functions

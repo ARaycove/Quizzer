@@ -37,9 +37,8 @@ const String createModulesTableSQL = '''
 ''';
 
 // Verify table exists and create if needed
-Future<void> verifyModulesTable() async {
+Future<void> verifyModulesTable(Database db) async {
   QuizzerLogger.logMessage('Verifying modules table existence');
-  final db = await getDatabase();
   final List<Map<String, dynamic>> tables = await db.rawQuery(
     "SELECT name FROM sqlite_master WHERE type='table' AND name='$modulesTableName'"
   );
@@ -65,10 +64,10 @@ Future<void> insertModule({
   required List<String> relatedConcepts,
   required List<String> questionIds,
   required String creatorId,
+  required Database db,
 }) async {
   QuizzerLogger.logMessage('Inserting new module: $name');
-  await verifyModulesTable();
-  final db = await getDatabase();
+  await verifyModulesTable(db);
   final now = DateTime.now().millisecondsSinceEpoch;
   
   await db.insert(
@@ -96,6 +95,7 @@ Future<void> insertModule({
 // Update a module
 Future<void> updateModule({
   required String name,
+  required Database db,
   String? description,
   String? primarySubject,
   List<String>? subjects,
@@ -103,8 +103,7 @@ Future<void> updateModule({
   List<String>? questionIds,
 }) async {
   QuizzerLogger.logMessage('Updating module: $name');
-  await verifyModulesTable();
-  final db = await getDatabase();
+  await verifyModulesTable(db);
   final updates = <String, dynamic>{};
   
   if (description != null) updates[descriptionField] = description;
@@ -130,10 +129,9 @@ Future<void> updateModule({
 }
 
 // Get a module by name
-Future<Map<String, dynamic>?> getModule(String name) async {
+Future<Map<String, dynamic>?> getModule(String name, Database db) async {
   QuizzerLogger.logMessage('Fetching module: $name');
-  await verifyModulesTable();
-  final db = await getDatabase();
+  await verifyModulesTable(db);
   final List<Map<String, dynamic>> maps = await db.query(
     modulesTableName,
     where: '$moduleNameField = ?',
@@ -169,10 +167,9 @@ Future<Map<String, dynamic>?> getModule(String name) async {
 }
 
 // Get all modules
-Future<List<Map<String, dynamic>>> getAllModules() async {
+Future<List<Map<String, dynamic>>> getAllModules(Database db) async {
   QuizzerLogger.logMessage('Fetching all modules');
-  await verifyModulesTable();
-  final db = await getDatabase();
+  await verifyModulesTable(db);
   final List<Map<String, dynamic>> maps = await db.query(modulesTableName);
   
   final result = maps.map((module) => {

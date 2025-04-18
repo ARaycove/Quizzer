@@ -1,48 +1,49 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:uuid/uuid.dart';
-import 'package:quizzer/global/database/quizzer_database.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:quizzer/features/user_profile_management/functionality/user_auth.dart';
 import 'package:quizzer/global/functionality/quizzer_logging.dart';
 import 'dart:convert';
 
 final supabase = Supabase.instance.client;
 
-Future<String?> getUserIdByEmail(String emailAddress) async {
+Future<String?> getUserIdByEmail(String emailAddress, Database db) async {
     QuizzerLogger.logMessage('Getting user ID for email: $emailAddress');
-    // First verify the table exists
-    await verifyUserProfileTable();
-    
-    final Database db = await getDatabase();
-    final List<Map<String, dynamic>> result = await db.query(
-      'user_profile',
-      columns: ['uuid'],
-      where: 'email = ?',
-      whereArgs: [emailAddress],
-    );
+    try {
+        // First verify the table exists
+        await verifyUserProfileTable(db);
+        
+        final List<Map<String, dynamic>> result = await db.query(
+            'user_profile',
+            columns: ['uuid'],
+            where: 'email = ?',
+            whereArgs: [emailAddress],
+        );
 
-    if (result.isNotEmpty) {
-        QuizzerLogger.logSuccess('Found user ID: ${result.first['uuid']}');
-        return result.first['uuid'] as String?;
-    } else {
-        QuizzerLogger.logMessage('No user found with email: $emailAddress');
+        if (result.isNotEmpty) {
+            QuizzerLogger.logSuccess('Found user ID: ${result.first['uuid']}');
+            return result.first['uuid'] as String?;
+        } else {
+            QuizzerLogger.logMessage('No user found with email: $emailAddress');
+            return null;
+        }
+    } catch (e) {
+        QuizzerLogger.logError('Error getting user ID: $e');
         return null;
     }
 }
 
-Future<bool> createNewUserProfile(String email, String username, String password) async {
+Future<bool> createNewUserProfile(String email, String username, String password, Database db) async {
   try {
     QuizzerLogger.logMessage('Creating new user profile for email: $email, username: $username');
     
     // First verify that the User Profile Table exists
-    await verifyUserProfileTable();
+    await verifyUserProfileTable(db);
 
     // Send data to authentication service to store password field with auth service
-    await registerUserWithSupabase(email, password);
     QuizzerLogger.logSuccess('User registered with Supabase');
 
     // Next Verify that the profile doesn't already exist in that Table
-    final duplicateCheck = await verifyNonDuplicateProfile(email, username);
+    final duplicateCheck = await verifyNonDuplicateProfile(email, username, db);
     if (!duplicateCheck['isValid']) {
         QuizzerLogger.logError(duplicateCheck['message']);
         return false;
@@ -55,9 +56,6 @@ Future<bool> createNewUserProfile(String email, String username, String password
     // Get current timestamp for account creation date
     final String creationTimestamp = DateTime.now().toIso8601String();
     
-    // Get database instance
-    final Database db = await getDatabase();
-    
     // Insert the new user profile with minimal required fields
     await db.insert('user_profile', {
       'uuid': userUUID,
@@ -66,8 +64,6 @@ Future<bool> createNewUserProfile(String email, String username, String password
       'role': 'base_user',
       'account_status': 'active',
       'account_creation_date': creationTimestamp,
-      // All other fields will be initialized to NULL by default
-      // Fields like settings and notification preferences will be initialized when first used
     });
     
     QuizzerLogger.logSuccess('New user profile created successfully: $userUUID');
@@ -89,67 +85,66 @@ String generateUserUUID() {
 
 /// Verifies that the User Profile Table exists in the database
 /// Creates the table if it doesn't exist based on the schema in documentation
-Future<void> verifyUserProfileTable() async {
+Future<void> verifyUserProfileTable(Database db) async {
   QuizzerLogger.logMessage('Verifying user profile table existence');
-  final Database db = await getDatabase();
   
   // Check if the table exists
   final List<Map<String, dynamic>> tables = await db.rawQuery(
-    "SELECT name FROM sqlite_master WHERE type='table' AND name='user_profile'"
+    "SELECT name FROM sqlite_master WHERE type='table' AND name=?",
+    ['user_profile']
   );
   
   if (tables.isEmpty) {
     QuizzerLogger.logMessage('User profile table does not exist, creating it');
     await db.execute('''
-    CREATE TABLE user_profile(
-      uuid TEXT PRIMARY KEY,
-      email TEXT NOT NULL,
-      username TEXT NOT NULL,
-      role TEXT DEFAULT 'base_user',
-      account_status TEXT DEFAULT 'active',
-      account_creation_date TEXT NOT NULL,
-      last_login TEXT,
-      profile_picture TEXT,
-      birth_date TEXT,
-      address TEXT,
-      job_title TEXT,
-      education_level TEXT,
-      specialization TEXT,
-      teaching_experience INTEGER,
-      primary_language TEXT,
-      secondary_languages TEXT,
-      study_schedule TEXT,
-      social_links TEXT,
-      achievement_sharing INTEGER,
-      interest_data TEXT,
-      settings TEXT,
-      notification_preferences TEXT,
-      learning_streak INTEGER DEFAULT 0,
-      total_study_time REAL DEFAULT 0.0,
-      total_questions_answered INTEGER DEFAULT 0,
-      average_session_length REAL,
-      peak_cognitive_hours TEXT,
-      health_data TEXT,
-      recall_accuracy_trends TEXT,
-      content_portfolio TEXT,
-      activation_status_of_modules TEXT,
-      completion_status_of_modules TEXT,
-      tutorial_progress INTEGER DEFAULT 0
-    )
+      CREATE TABLE user_profile(
+        uuid TEXT PRIMARY KEY,
+        email TEXT NOT NULL,
+        username TEXT NOT NULL,
+        role TEXT DEFAULT 'base_user',
+        account_status TEXT DEFAULT 'active',
+        account_creation_date TEXT NOT NULL,
+        last_login TEXT,
+        profile_picture TEXT,
+        birth_date TEXT,
+        address TEXT,
+        job_title TEXT,
+        education_level TEXT,
+        specialization TEXT,
+        teaching_experience INTEGER,
+        primary_language TEXT,
+        secondary_languages TEXT,
+        study_schedule TEXT,
+        social_links TEXT,
+        achievement_sharing INTEGER,
+        interest_data TEXT,
+        settings TEXT,
+        notification_preferences TEXT,
+        learning_streak INTEGER DEFAULT 0,
+        total_study_time REAL DEFAULT 0.0,
+        total_questions_answered INTEGER DEFAULT 0,
+        average_session_length REAL,
+        peak_cognitive_hours TEXT,
+        health_data TEXT,
+        recall_accuracy_trends TEXT,
+        content_portfolio TEXT,
+        activation_status_of_modules TEXT,
+        completion_status_of_modules TEXT,
+        tutorial_progress INTEGER DEFAULT 0
+      )
     ''');
     
     QuizzerLogger.logSuccess('User Profile table created successfully');
   } else {
     // Check if tutorial_progress column exists, add it if not
-    await verifyTutorialProgressColumn();
+    await verifyTutorialProgressColumn(db);
   }
 }
 
 /// Verifies that the tutorial_progress column exists in the user_profile table
 /// Adds the column if it doesn't exist
-Future<void> verifyTutorialProgressColumn() async {
+Future<void> verifyTutorialProgressColumn(Database db) async {
   QuizzerLogger.logMessage('Verifying tutorial_progress column existence');
-  final Database db = await getDatabase();
   
   // Check if the column exists in the table
   final List<Map<String, dynamic>> columns = await db.rawQuery(
@@ -176,11 +171,9 @@ Future<void> verifyTutorialProgressColumn() async {
 /// Verifies that the email and username don't already exist in the user profile table
 /// Returns a map with 'isValid' (bool) indicating if the profile is non-duplicate
 /// and 'message' (String) containing any error message if there's a duplicate
-Future<Map<String, dynamic>> verifyNonDuplicateProfile(String email, String username) async {
+Future<Map<String, dynamic>> verifyNonDuplicateProfile(String email, String username, Database db) async {
   QuizzerLogger.logMessage('Verifying non-duplicate profile for email: $email, username: $username');
-  await verifyUserProfileTable();
-  final Database db = await getDatabase();
-  
+
   // Check if email already exists
   final List<Map<String, dynamic>> emailCheck = await db.query(
     'user_profile',
@@ -216,10 +209,9 @@ Future<Map<String, dynamic>> verifyNonDuplicateProfile(String email, String user
   };
 }
 
-Future<bool> updateLastLogin(String timestamp, String emailAddress) async {
+Future<bool> updateLastLogin(String timestamp, String emailAddress, Database db) async {
   QuizzerLogger.logMessage('Updating last login for email: $emailAddress');
-  await verifyUserProfileTable();
-  final Database db = await getDatabase();
+  await verifyUserProfileTable(db);
   await db.update(
     'user_profile',
     {'last_login': timestamp},
@@ -232,13 +224,11 @@ Future<bool> updateLastLogin(String timestamp, String emailAddress) async {
 
 /// Gets the tutorial progress for a user
 /// Returns the current tutorial question number (0-5)
-Future<int> getTutorialProgress(String userId) async {
+Future<int> getTutorialProgress(String userId, Database db) async {
   QuizzerLogger.logMessage('Getting tutorial progress for user: $userId');
   // First verify the table structure
-  await verifyUserProfileTable();
-  await verifyTutorialProgressColumn();
-  
-  final Database db = await getDatabase();
+  await verifyUserProfileTable(db);
+  await verifyTutorialProgressColumn(db);
   
   final List<Map<String, dynamic>> result = await db.query(
     'user_profile',
@@ -258,11 +248,10 @@ Future<int> getTutorialProgress(String userId) async {
 
 /// Updates the tutorial progress for a user
 /// Returns true if the update was successful, false otherwise
-Future<bool> updateTutorialProgress(String userId, int progress) async {
+Future<bool> updateTutorialProgress(String userId, int progress, Database db) async {
   QuizzerLogger.logMessage('Updating tutorial progress for user: $userId to $progress');
-  await verifyUserProfileTable();
-  await verifyTutorialProgressColumn();
-  final Database db = await getDatabase();
+  await verifyUserProfileTable(db);
+  await verifyTutorialProgressColumn(db);
   await db.update(
       'user_profile',
       {'tutorial_progress': progress},
@@ -275,10 +264,9 @@ Future<bool> updateTutorialProgress(String userId, int progress) async {
 
 /// Gets the activation status of modules for a user
 /// Returns a Map<String, bool> where keys are module names and values are activation status
-Future<Map<String, bool>> getModuleActivationStatus(String userId) async {
+Future<Map<String, bool>> getModuleActivationStatus(String userId, Database db) async {
   QuizzerLogger.logMessage('Getting module activation status for user: $userId');
-  await verifyUserProfileTable();
-  final Database db = await getDatabase();
+  await verifyUserProfileTable(db);
   
   final List<Map<String, dynamic>> result = await db.query(
     'user_profile',
@@ -308,14 +296,13 @@ Future<Map<String, bool>> getModuleActivationStatus(String userId) async {
 
 /// Updates the activation status of a specific module for a user
 /// Takes a module name and boolean value to set its activation status
-Future<bool> updateModuleActivationStatus(String userId, String moduleName, bool isActive) async {
+Future<bool> updateModuleActivationStatus(String userId, String moduleName, bool isActive, Database db) async {
   QuizzerLogger.logMessage('Updating activation status for module: $moduleName, user: $userId, status: $isActive');
-  await verifyUserProfileTable();
-  final Database db = await getDatabase();
+  await verifyUserProfileTable(db);
   
   try {
     // First get the current activation status
-    final Map<String, bool> currentStatus = await getModuleActivationStatus(userId);
+    final Map<String, bool> currentStatus = await getModuleActivationStatus(userId, db);
     
     // Update the status for the specified module
     currentStatus[moduleName] = isActive;

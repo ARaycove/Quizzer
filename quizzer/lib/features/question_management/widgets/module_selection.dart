@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:quizzer/global/functionality/quizzer_logging.dart';
+import 'package:quizzer/features/modules/functionality/module_isolates.dart';
+import 'dart:isolate';
 
 // Colors
 const Color _surfaceColor = Color(0xFF1E2A3A); // Secondary Background
@@ -11,13 +13,58 @@ const double _borderRadius = 12.0;
 const double _spacing = 16.0;
 const double _fieldSpacing = 8.0; // Spacing between form fields
 
-class ModuleSelection extends StatelessWidget {
+class ModuleSelection extends StatefulWidget {
   final TextEditingController controller;
 
   const ModuleSelection({
     super.key,
     required this.controller,
   });
+
+  @override
+  State<ModuleSelection> createState() => _ModuleSelectionState();
+}
+
+class _ModuleSelectionState extends State<ModuleSelection> {
+  List<String> _suggestions = [];
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadModules();
+  }
+
+  Future<void> _loadModules() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final receivePort = ReceivePort();
+      await Isolate.spawn(handleLoadModules, {
+        'sendPort': receivePort.sendPort,
+      });
+      
+      final modules = await receivePort.first as List<Map<String, dynamic>>;
+      setState(() {
+        _suggestions = modules.map((m) => m['module_name'] as String).toList();
+        _isLoading = false;
+      });
+    } catch (e) {
+      QuizzerLogger.logError('Error loading modules: $e');
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  List<String> _getFilteredSuggestions(String query) {
+    if (query.isEmpty) return [];
+    return _suggestions
+        .where((module) => module.toLowerCase().contains(query.toLowerCase()))
+        .toList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,26 +95,64 @@ class ModuleSelection extends StatelessWidget {
               horizontal: _spacing,
               vertical: 4.0,
             ),
-            child: TextField(
-              controller: controller,
-              style: const TextStyle(color: _textColor),
-              decoration: InputDecoration(
-                hintText: 'Enter module name (default: General)',
-                hintStyle: TextStyle(color: _textColor.withOpacity(0.6)),
-                filled: true,
-                fillColor: _surfaceColor,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(_borderRadius),
-                  borderSide: BorderSide.none,
+            child: Column(
+              children: [
+                TextField(
+                  controller: widget.controller,
+                  style: const TextStyle(color: _textColor),
+                  decoration: InputDecoration(
+                    hintText: 'Enter module name (default: General)',
+                    hintStyle: TextStyle(color: _textColor.withOpacity(0.6)),
+                    filled: true,
+                    fillColor: _surfaceColor,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(_borderRadius),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: _spacing,
+                      vertical: _spacing,
+                    ),
+                  ),
+                  onChanged: (value) {
+                    setState(() {});
+                  },
                 ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: _spacing,
-                  vertical: _spacing,
-                ),
-              ),
-              onChanged: (value) {
-                QuizzerLogger.logMessage('Module name updated: $value');
-              },
+                if (_isLoading)
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 8.0),
+                    child: CircularProgressIndicator(),
+                  )
+                else if (widget.controller.text.isNotEmpty)
+                  Container(
+                    constraints: BoxConstraints(
+                      maxHeight: 200,
+                      maxWidth: width - 2 * _spacing,
+                    ),
+                    decoration: BoxDecoration(
+                      color: _surfaceColor,
+                      borderRadius: BorderRadius.circular(_borderRadius),
+                      border: Border.all(color: _primaryColor.withAlpha(128)),
+                    ),
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: _getFilteredSuggestions(widget.controller.text).length,
+                      itemBuilder: (context, index) {
+                        final suggestion = _getFilteredSuggestions(widget.controller.text)[index];
+                        return ListTile(
+                          title: Text(
+                            suggestion,
+                            style: const TextStyle(color: _textColor),
+                          ),
+                          onTap: () {
+                            widget.controller.text = suggestion;
+                            setState(() {});
+                          },
+                        );
+                      },
+                    ),
+                  ),
+              ],
             ),
           ),
         ),

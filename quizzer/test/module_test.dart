@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:quizzer/features/modules/functionality/module_updates_process.dart';
 import 'package:quizzer/global/functionality/quizzer_logging.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-import 'package:quizzer/features/modules/database/modules_table.dart';
+import 'package:quizzer/global/database/tables/modules_table.dart';
 
 void main() {
   // Initialize FFI

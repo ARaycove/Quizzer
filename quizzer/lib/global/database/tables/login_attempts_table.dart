@@ -1,5 +1,5 @@
 import 'package:sqflite/sqflite.dart';
-import 'package:quizzer/global/database/quizzer_database.dart';
+import 'package:quizzer/global/functionality/quizzer_logging.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:device_info_plus/device_info_plus.dart';
@@ -33,35 +33,48 @@ Future<String> getDeviceInfo() async {
 
 Future<String> getUserIpAddress() async {
   try {
-    // Using a public API service that returns the client's IP address
-    final response = await http.get(
-      Uri.parse('https://api.ipify.org?format=json'),
-      // Add a short timeout to avoid long waits when offline
-      headers: {'Connection': 'keep-alive'},
-    ).timeout(const Duration(seconds: 3));
+    QuizzerLogger.logMessage('Attempting to get IP address');
+    
+    // Create a custom HttpClient that skips certificate verification
+    final httpClient = HttpClient()
+      ..badCertificateCallback = (cert, host, port) => true;
+    
+    final request = await httpClient.getUrl(Uri.parse('https://www.dnsleaktest.com/'));
+    final response = await request.close();
+    final responseBody = await response.transform(utf8.decoder).join();
     
     if (response.statusCode == 200) {
-      final Map<String, dynamic> data = json.decode(response.body);
-      return data['ip'] as String;
+      // Extract IP from the welcome message
+      final ipRegex = RegExp(r'Hello (\d+\.\d+\.\d+\.\d+)');
+      final match = ipRegex.firstMatch(responseBody);
+      
+      if (match != null) {
+        final ip = match.group(1)!;
+        QuizzerLogger.logSuccess('Successfully retrieved IP address: $ip');
+        return ip;
+      } else {
+        QuizzerLogger.logWarning('Could not find IP address in response');
+        return "offline_login";
+      }
     } else {
+      QuizzerLogger.logWarning('Failed to get IP address, status code: ${response.statusCode}');
       return "offline_login";
     }
   } catch (e) {
+    QuizzerLogger.logError('Error getting IP address: $e');
     return "offline_login";
   }
 }
 
 
-Future<bool> doesLoginAttemptsTableExist() async {
-  final Database db = await getDatabase();
+Future<bool> doesLoginAttemptsTableExist(Database db) async {
   final List<Map<String, dynamic>> tables = await db.rawQuery(
     "SELECT name FROM sqlite_master WHERE type='table' AND name='login_attempts'"
   );
   return tables.isNotEmpty;
 }
 
-Future<void> createLoginAttemptsTable() async {
-  final Database db = await getDatabase();
+Future<void> createLoginAttemptsTable(Database db) async {
   await db.execute('''
   CREATE TABLE login_attempts(
     login_attempt_id TEXT PRIMARY KEY,
@@ -80,13 +93,13 @@ Future<bool> addLoginAttemptRecord({
   required String userId,
   required String email,
   required String statusCode,
+  required Database db
 }) async {
-  final Database db = await getDatabase();
   
   // Check if table exists and create if needed
-  bool checkTable = await doesLoginAttemptsTableExist();
+  bool checkTable = await doesLoginAttemptsTableExist(db);
   if (checkTable == false) {
-    await createLoginAttemptsTable();
+    await createLoginAttemptsTable(db);
   }
   
   String ipAddress = await getUserIpAddress();
@@ -109,6 +122,6 @@ Future<bool> addLoginAttemptRecord({
         'device_info': deviceInfo,
       },
     );
-    print('Login attempt recorded successfully: $loginAttemptId');
+    QuizzerLogger.logMessage('Login attempt recorded successfully: $loginAttemptId');
   return true;
 }

@@ -37,13 +37,15 @@ import 'package:image_picker/image_picker.dart';
 import 'package:quizzer/global/functionality/quizzer_logging.dart';
 import 'package:quizzer/global/functionality/session_manager.dart';
 import 'package:quizzer/helper_lib/utils.dart';
-import 'package:quizzer/features/question_management/database/question_answer_pairs_table.dart';
+import 'package:quizzer/global/database/tables/question_answer_pairs_table.dart';
 import 'package:quizzer/features/question_management/widgets/module_selection.dart';
 import 'package:quizzer/features/question_management/widgets/question_type_selection.dart';
 import 'package:quizzer/features/question_management/widgets/question_answer_element.dart';
 import 'package:quizzer/features/question_management/widgets/question_entry_options_dialog.dart';
 import 'package:quizzer/features/question_management/widgets/submit_clear_buttons.dart';
 import 'package:quizzer/global/widgets/global_app_bar.dart';
+import 'package:quizzer/features/question_management/functionality/question_isolates.dart';
+import 'dart:isolate';
 
 // Colors
 const Color _backgroundColor = Color(0xFF0A1929); // Primary Background
@@ -169,24 +171,25 @@ class _AddQuestionAnswerPageState extends State<AddQuestionAnswerPage> {
         throw Exception('Security Error: Attempted to add question without valid user session');
       }
 
-      // Add to database
-      await addQuestionAnswerPair(
-        timeStamp: timeStamp,
-        questionElements: questionElements,
-        answerElements: answerElements,
-        ansFlagged: false,
-        ansContrib: userId,
-        qstContrib: userId,
-        hasBeenReviewed: false,
-        flagForRemoval: false,
-        moduleName: _moduleController.text,
-        questionType: _questionTypeController.text,
-        options: _questionTypeController.text == 'multiple_choice' ? _options : null,
-        correctOptionIndex: _questionTypeController.text == 'multiple_choice' ? _correctOptionIndex : null,
-      );
-
+      final receivePort = ReceivePort();
+      Isolate.spawn(handleAddQuestionAnswerPair, {
+        'sendPort': receivePort.sendPort,
+        'timeStamp': timeStamp,
+        'questionElements': questionElements,
+        'answerElements': answerElements,
+        'ansFlagged': false,
+        'ansContrib': userId,
+        'qstContrib': userId,
+        'hasBeenReviewed': false,
+        'flagForRemoval': false,
+        'moduleName': _moduleController.text,
+        'questionType': _questionTypeController.text,
+        'options': _questionTypeController.text == 'multiple_choice' ? _options : null,
+        'correctOptionIndex': _questionTypeController.text == 'multiple_choice' ? _correctOptionIndex : null,
+      });
+      
       _showSuccessSnackBar('Question-Answer pair saved successfully!');
-      _handleClear(); // Clear the form after successful submission
+      _handleClear();
     }
   }
 

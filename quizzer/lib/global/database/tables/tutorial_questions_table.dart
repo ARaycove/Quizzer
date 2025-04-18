@@ -66,8 +66,7 @@ final Map<String, Map<String, String>> tutorialQuestions = {
 };
 
 // Database helper methods
-Future<void> createTutorialQuestionsTableIfNotExists() async {
-  final Database db = await getDatabase();
+Future<void> createTutorialQuestionsTableIfNotExists(Database db) async {
   try {
     await db.execute(createTutorialQuestionsTable);
   } catch (e) {
@@ -76,8 +75,7 @@ Future<void> createTutorialQuestionsTableIfNotExists() async {
   }
 }
 
-Future<void> insertTutorialQuestions() async {
-  final Database db = await getDatabase();
+Future<void> insertTutorialQuestions(Database db) async {
   for (var entry in tutorialQuestions.entries) {
     await db.insert(
       tableTutorialQuestions,
@@ -91,11 +89,10 @@ Future<void> insertTutorialQuestions() async {
   }
 }
 
-Future<Map<String, String>?> getTutorialQuestion(String id) async {
-  final Database db = await getDatabase();
-  
+Future<Map<String, String>?> getTutorialQuestion(String id, Database db) async {
+
   // First ensure the table exists
-  await createTutorialQuestionsTableIfNotExists();
+  await createTutorialQuestionsTableIfNotExists(db);
   
   // Check if the question exists
   final List<Map<String, dynamic>> maps = await db.query(
@@ -106,7 +103,7 @@ Future<Map<String, String>?> getTutorialQuestion(String id) async {
 
   // If the question doesn't exist, insert all tutorial questions
   if (maps.isEmpty) {
-    await insertTutorialQuestions();
+    await insertTutorialQuestions(db);
     
     // Try to get the question again after inserting
     final List<Map<String, dynamic>> newMaps = await db.query(

@@ -1,17 +1,19 @@
-import 'package:quizzer/features/user_profile_management/database/user_question_answer_pairs_table.dart';
-import 'package:quizzer/features/user_profile_management/database/user_profile_table.dart';
-import 'package:quizzer/features/question_management/database/question_answer_pairs_table.dart';
+import 'package:quizzer/global/database/tables/user_question_answer_pairs_table.dart';
+import 'package:quizzer/global/database/tables/user_profile_table.dart';
+import 'package:quizzer/global/database/tables/question_answer_pairs_table.dart';
 import 'package:quizzer/global/functionality/quizzer_logging.dart';
 import 'package:quizzer/global/functionality/session_manager.dart';
-import 'package:quizzer/features/modules/database/modules_table.dart';
+import 'package:quizzer/global/database/tables/modules_table.dart';
+import 'package:quizzer/main.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 /// Checks if a module is active for a specific user
 /// Returns true if the module is active, false otherwise
-Future<bool> isModuleActiveForUser(String userId, String moduleName) async {
+Future<bool> isModuleActiveForUser(String userId, String moduleName, Database db) async {
   QuizzerLogger.logMessage('Checking if module $moduleName is active for user $userId');
   
   // Get the module activation status from the user profile
-  final moduleActivationStatus = await getModuleActivationStatus(userId);
+  final moduleActivationStatus = await getModuleActivationStatus(userId, db);
   
   // Check if the module exists in the activation status map
   final isActive = moduleActivationStatus[moduleName] ?? false;
@@ -22,7 +24,7 @@ Future<bool> isModuleActiveForUser(String userId, String moduleName) async {
 
 /// Ensures all questions from a module are present in the user's question-answer pairs table
 /// If the module is not active, this function will skip validation
-Future<void> validateModuleQuestionsInUserProfile(String moduleName) async {
+Future<void> validateModuleQuestionsInUserProfile(String moduleName, Database db) async {
   QuizzerLogger.logMessage('Ensuring questions from module $moduleName are in user profile');
   
   // Get the current user's ID from the session manager
@@ -33,14 +35,14 @@ Future<void> validateModuleQuestionsInUserProfile(String moduleName) async {
   }
   
   // Check if the module is active for this user
-  final isActive = await isModuleActiveForUser(userId, moduleName);
+  final isActive = await isModuleActiveForUser(userId, moduleName, db);
   if (!isActive) {
     QuizzerLogger.logMessage('Module $moduleName is not active, skipping question validation');
     return;
   }
   
   // Get the module data from the modules table
-  final module = await getModule(moduleName);
+  final module = await getModule(moduleName, db);
   if (module == null) {
     QuizzerLogger.logError('Module $moduleName not found in modules table');
     return;
@@ -49,7 +51,7 @@ Future<void> validateModuleQuestionsInUserProfile(String moduleName) async {
   final questionIds = module['question_ids'] as List<String>;
   
   // Get all existing user question-answer pairs
-  final existingPairs = await getUserQuestionAnswerPairsByUser(userId);
+  final existingPairs = await getUserQuestionAnswerPairsByUser(userId, db);
   final existingQuestionIds = existingPairs.map((pair) => pair['question_id'] as String).toSet();
   
   // Add any missing questions to the user's profile
@@ -60,7 +62,7 @@ Future<void> validateModuleQuestionsInUserProfile(String moduleName) async {
       // Get the question details from the question-answer pairs table
       final timeStamp = questionId.split('_')[0];
       final qstContrib = questionId.split('_')[1];
-      final question = await getQuestionAnswerPairById(timeStamp, qstContrib);
+      final question = await getQuestionAnswerPairById(timeStamp, qstContrib, db);
       if (question == null) {
         QuizzerLogger.logError('Question $questionId not found in question-answer pairs table');
         continue;
@@ -78,6 +80,7 @@ Future<void> validateModuleQuestionsInUserProfile(String moduleName) async {
         averageTimesShownPerDay: 0.0,
         isEligible: true,
         inCirculation: false,
+        db: db
       );
     }
   }
@@ -87,7 +90,7 @@ Future<void> validateModuleQuestionsInUserProfile(String moduleName) async {
 
 /// Validates questions for all modules in the user profile
 /// This function will check both active and inactive modules
-Future<void> validateAllModuleQuestions() async {
+Future<void> validateAllModuleQuestions(Database db) async {
   QuizzerLogger.logMessage('Starting validation of all module questions');
   
   // Get the current user's ID from the session manager
@@ -98,11 +101,11 @@ Future<void> validateAllModuleQuestions() async {
   }
   
   // Get the module activation status map from the user's profile
-  final moduleActivationStatus = await getModuleActivationStatus(userId);
+  final moduleActivationStatus = await getModuleActivationStatus(userId, db);
   
   // Validate questions for each module in the user's profile
   for (final moduleName in moduleActivationStatus.keys) {
-    await validateModuleQuestionsInUserProfile(moduleName);
+    await validateModuleQuestionsInUserProfile(moduleName, db);
   }
   
   QuizzerLogger.logSuccess('Completed validation of all module questions');

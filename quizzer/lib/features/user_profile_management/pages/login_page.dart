@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:quizzer/features/user_profile_management/database/user_profile_table.dart';
+import 'package:quizzer/global/functionality/quizzer_logging.dart';
 import 'package:quizzer/features/user_profile_management/pages/new_user_page.dart';
-import 'package:quizzer/features/question_management/pages/home_page.dart';
-import 'package:quizzer/features/user_profile_management/database/login_attempts_table.dart';
-import 'package:quizzer/features/user_profile_management/functionality/user_auth.dart';
-import 'package:quizzer/global/functionality/session_manager.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'dart:isolate';
+import 'package:quizzer/features/user_profile_management/functionality/login_isolates.dart';
+import 'package:flutter/services.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -19,57 +19,77 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
 
-  // Function to handle login submission
   Future<void> submitLogin() async {
     setState(() {_isLoading = true;});
-
-    final result = await authenticateUser(_emailController.text.trim(),_passwordController.text);
-
-    if (!mounted) return;
-
-    setState(() {_isLoading = false;});
-
-    bool shouldGoToHomePage = false;
-    late String status;
-
-    if (result['success']) {
-      shouldGoToHomePage = true; 
-      status=result['response'];
-      final sessionManager = SessionManager();
-      await sessionManager.initializeSession(_emailController.text.trim());
-    }
-    else {
-      String errorMessage = result['error'] ?? 'Invalid email or password';
+    // define the email and password submission
+    final email = _emailController.text.trim();
+    final password = _passwordController.text;
+    
+    // Attempt to log in using credentials
+    QuizzerLogger.logMessage('Login attempt for: $email');
+    
+    dynamic response;
+    try {
+      response = await supabase.auth.signInWithPassword(
+        email: email,
+        password: password,
+      );
+    } on AuthException catch (e) {
+      response = e;
+      QuizzerLogger.logError('AuthException: ${e.message}');
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.message),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(errorMessage),backgroundColor:Colors.red,),);
+        setState(() {_isLoading = false;});
       }
-      status = errorMessage;
     }
 
-    String? userId = await getUserIdByEmail(_emailController.text.trim());
-    
-    // If user authenticated but doesn't have a profile, create one
-    if (userId == null && result['success']) {
-      // Use email username as default username
-      final username = _emailController.text.trim().split('@')[0];
-      await createNewUserProfile(_emailController.text.trim(), username, _passwordController.text);
-      userId = await getUserIdByEmail(_emailController.text.trim());
+    // Log the response regardless of outcome
+    QuizzerLogger.logMessage('Supabase response: ${response.toString()}');
+    if (response is AuthResponse) {
+      QuizzerLogger.logMessage('User data: ${response.user?.toJson()}');
+      QuizzerLogger.logMessage('Session data: ${response.session?.toJson()}');
     }
-    
-    if (userId != null) {
-      addLoginAttemptRecord(userId: userId, email: _emailController.text.trim(), statusCode: status);
-    }
-    
-    if (shouldGoToHomePage == true && mounted) {
-      Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) => const HomePage()),);
-    }
+
+    // Log login attempt in isolate
+    final receivePort = ReceivePort();
+    Isolate.spawn(
+      handleLoginAttempt,
+      {
+        'sendPort': receivePort.sendPort,
+        'email': email,
+        'timestamp': DateTime.now().toIso8601String(),
+        'response': response,
+        'rootToken': RootIsolateToken.instance!,
+      },
+    );
+
+    // Route to home page
+    if (!mounted) return;
+    Navigator.pushReplacementNamed(context, '/home');
   }
 
   // Function to navigate to new user signup page
-  void newUserSignUp() {Navigator.push(context,MaterialPageRoute(builder: (context) => const NewUserPage()),);}
+  void newUserSignUp() {
+    QuizzerLogger.logMessage('Navigating to new user page');
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const NewUserPage()),
+    );
+  }
 
   @override
-  void dispose() {_emailController.dispose();_passwordController.dispose();super.dispose();}
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -220,3 +240,5 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 }
+
+// TODO this looks fine put should be placed in the login_isolates.dart file under functionality/ in the user_profile_management feature

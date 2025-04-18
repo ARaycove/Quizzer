@@ -1,5 +1,6 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:quizzer/features/user_profile_management/database/user_profile_table.dart';
+import 'package:quizzer/global/database/tables/user_profile_table.dart';
+import 'package:quizzer/main.dart';
 
 class SessionManager {
   // Singleton instance
@@ -55,7 +56,6 @@ class SessionManager {
   // Initialize session with email
   Future<void> initializeSession(String email) async {
     this.email = email;
-    userId = await getUserIdByEmail(email);
     sessionStartTime = DateTime.now();
     resetQuestionState();
   }
