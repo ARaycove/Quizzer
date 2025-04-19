@@ -1,6 +1,5 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:quizzer/global/database/tables/user_profile_table.dart';
-import 'package:quizzer/main.dart';
+import 'package:quizzer/global/functionality/session_isolates.dart';
 
 class SessionManager {
   // Singleton instance
@@ -55,7 +54,16 @@ class SessionManager {
 
   // Initialize session with email
   Future<void> initializeSession(String email) async {
+    final userId = await handleSessionInitialization({
+      'email': email,
+    });
+    
+    if (userId == null) {
+      throw Exception('Failed to initialize session: No user found');
+    }
+    
     this.email = email;
+    this.userId = userId;
     sessionStartTime = DateTime.now();
     resetQuestionState();
   }

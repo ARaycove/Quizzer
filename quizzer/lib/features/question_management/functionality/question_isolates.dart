@@ -2,10 +2,8 @@ import 'package:quizzer/global/database/tables/question_answer_pairs_table.dart'
 import 'package:quizzer/global/database/database_monitor.dart';
 import 'package:quizzer/global/functionality/quizzer_logging.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-import 'dart:isolate';
 
-void handleAddQuestionAnswerPair(Map<String, dynamic> data) async {
-  final sendPort = data['sendPort'] as SendPort;
+Future<void> handleAddQuestionAnswerPair(Map<String, dynamic> data) async {
   final timeStamp = data['timeStamp'] as String;
   final questionElements = data['questionElements'] as List<Map<String, dynamic>>;
   final answerElements = data['answerElements'] as List<Map<String, dynamic>>;
@@ -23,13 +21,12 @@ void handleAddQuestionAnswerPair(Map<String, dynamic> data) async {
   QuizzerLogger.logMessage('Module: $moduleName, Type: $questionType, Contributor: $qstContrib');
   QuizzerLogger.logMessage('Question elements: ${questionElements.length}, Answer elements: ${answerElements.length}');
   
+  final monitor = getDatabaseMonitor();
   Database? db;
-  bool success = false;
   
   try {
-    QuizzerLogger.logMessage('Requesting database access');
     while (db == null) {
-      db = await DatabaseMonitor().requestDatabaseAccess();
+      db = await monitor.requestDatabaseAccess();
       if (db == null) {
         QuizzerLogger.logMessage('Database access denied, waiting...');
         await Future.delayed(const Duration(milliseconds: 100));
@@ -53,13 +50,12 @@ void handleAddQuestionAnswerPair(Map<String, dynamic> data) async {
       correctOptionIndex: correctOptionIndex,
       db: db
     );
-    success = true;
+    monitor.releaseDatabaseAccess();
     QuizzerLogger.logSuccess('Question-answer pair added successfully');
   } catch (e) {
+    monitor.releaseDatabaseAccess();
     QuizzerLogger.logError('Error adding question-answer pair: $e');
   } finally {
-    QuizzerLogger.logMessage('Sending result and terminating isolate');
-    sendPort.send(success);
-    Isolate.exit();
+    monitor.releaseDatabaseAccess();
   }
 } 

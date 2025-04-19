@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:isolate';
 import 'package:quizzer/global/functionality/quizzer_logging.dart';
 import 'package:quizzer/features/user_profile_management/functionality/new_user_page_field_validation.dart';
 import 'package:quizzer/features/user_profile_management/functionality/new_user_isolates.dart';
@@ -83,23 +82,19 @@ class _NewUserPageState extends State<NewUserPage> {
         }
 
         // Regardless of whether the user is registered with supabase we need to ensure they are stored locally
-        final receivePort = ReceivePort();
-        await Isolate.spawn(
-            handleSignupInIsolate,
-            {
-                'sendPort': receivePort.sendPort,
-                'email': email,
-                'username': username,
-                'password': password,
-            },
-        );
-        
-        final result = await receivePort.first;
-        if (!mounted) return;
-        
-        if (result is String) {
+        final success = await handleSignupInIsolate({
+            'email': email,
+            'username': username,
+            'password': password,
+        });
+
+        if (!success) {
+            if (!mounted) return;
             ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(result), backgroundColor: Colors.red),
+                const SnackBar(
+                    content: Text('User already exists or error occurred'),
+                    backgroundColor: Color.fromARGB(255, 214, 71, 71),
+                ),
             );
             return;
         }

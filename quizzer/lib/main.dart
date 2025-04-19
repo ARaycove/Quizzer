@@ -36,9 +36,28 @@ void main() async {
   QuizzerLogger.logMessage('Supabase initialized');
   
   // Initialize database and monitor
-  final monitor = DatabaseMonitor();
-  await monitor.initialize();
-  await Future.delayed(const Duration(milliseconds: 100)); // Ensure initialization is complete
+  try {
+    QuizzerLogger.logMessage('Initializing database');
+    await initDb();
+    QuizzerLogger.logSuccess('Database initialized successfully');
+  } catch (e) {
+    QuizzerLogger.logError('Error initializing database: $e');
+    rethrow; // Crash the app if database initialization fails
+  }
+
+  // Verify database is accessible
+  try {
+    final monitor = getDatabaseMonitor();
+    final testDb = await monitor.requestDatabaseAccess();
+    if (testDb == null) {
+      throw Exception('Database monitor failed to provide access');
+    }
+    monitor.releaseDatabaseAccess();
+    QuizzerLogger.logSuccess('Database access verified');
+  } catch (e) {
+    QuizzerLogger.logError('Error verifying database access: $e');
+    rethrow;
+  }
 
   // build module records first upon loading in
   bool modulesBuilt = false;

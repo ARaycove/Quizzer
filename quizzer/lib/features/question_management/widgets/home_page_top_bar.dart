@@ -5,6 +5,10 @@ class HomePageTopBar extends StatelessWidget implements PreferredSizeWidget {
   final bool showFlagDialog;
   final TextEditingController flagController;
   final VoidCallback onSubmitFlag;
+  // TODO When OnSubmitFlag is called we need to do the following:
+  // 1. provide error handling for UI, If the field is empty do not proceed, but do not notify the user, if the field is not empty proceed with next steps
+  // 2. Spin up an isolate, the function of the isolate will be as follows: take the data from the field, add it to the submitted flags table. You should read the submit flag table and ensure all fields are filled out
+  // 3. Isolate is an async process not an isolate, just need to incorporate the DB call
   final VoidCallback onCancelFlag;
 
   const HomePageTopBar({

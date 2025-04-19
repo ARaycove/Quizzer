@@ -19,7 +19,7 @@
 
 // Notice that our tutorial question will be displayed in the same way as the rest of the content, thus the wording of the question will need to be crafted to fit the context of the tutorial.
 import 'package:sqflite/sqflite.dart';
-import 'package:quizzer/global/database/quizzer_database.dart';
+import 'package:quizzer/global/functionality/quizzer_logging.dart';
 
 // Table name
 const String tableTutorialQuestions = 'tutorial_questions';
@@ -71,7 +71,7 @@ Future<void> createTutorialQuestionsTableIfNotExists(Database db) async {
     await db.execute(createTutorialQuestionsTable);
   } catch (e) {
     // Table already exists, ignore the error
-    print('DEBUG: Tutorial questions table already exists');
+    QuizzerLogger.logMessage('Tutorial questions table already exists');
   }
 }
 

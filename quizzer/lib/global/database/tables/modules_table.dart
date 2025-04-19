@@ -1,6 +1,4 @@
 import 'package:sqflite/sqflite.dart';
-import 'package:quizzer/features/modules/functionality/module_updates_process.dart';
-import 'package:quizzer/global/database/quizzer_database.dart';
 import 'package:quizzer/global/functionality/quizzer_logging.dart';
 
 // Table name and field constants

@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:quizzer/features/modules/widgets/module_action_buttons.dart';
 import 'package:quizzer/global/functionality/quizzer_logging.dart';
+import 'package:quizzer/features/modules/widgets/edit_module_dialog.dart';
+import 'package:quizzer/features/modules/functionality/module_isolates.dart';
 
 class ModuleCard extends StatelessWidget {
   final Map<String, dynamic> moduleData;
   final bool isActivated;
   final VoidCallback onToggleActivation;
+  final Function(String) onDescriptionUpdated;
 
   const ModuleCard({
     super.key,
     required this.moduleData,
     required this.isActivated,
     required this.onToggleActivation,
+    required this.onDescriptionUpdated,
   });
 
   Widget _buildMetadataItem(IconData icon, String text) {
@@ -27,6 +31,35 @@ class ModuleCard extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  void _showEditDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => EditModuleDialog(
+        moduleData: moduleData,
+        onSave: (String newDescription) async {
+          QuizzerLogger.logMessage('Saving new description for module: ${moduleData['module_name']}');
+          final success = await handleUpdateModuleDescription({
+            'moduleName': moduleData['module_name'],
+            'description': newDescription,
+          });
+          
+          if (success) {
+            onDescriptionUpdated(newDescription);
+          } else {
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Failed to update module description'),
+                  backgroundColor: Color.fromARGB(255, 214, 71, 71),
+                ),
+              );
+            }
+          }
+        },
+      ),
     );
   }
 
@@ -56,10 +89,7 @@ class ModuleCard extends StatelessWidget {
                 ),
                 ModuleActionButtons(
                   onAddPressed: onToggleActivation,
-                  onEditPressed: () {
-                    QuizzerLogger.logMessage('Edit module button pressed for: ${moduleData['module_name']}');
-                    // TODO: Implement edit module functionality
-                  },
+                  onEditPressed: () => _showEditDialog(context),
                   isAdded: isActivated,
                 ),
               ],

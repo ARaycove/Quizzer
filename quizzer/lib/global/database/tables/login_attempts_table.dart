@@ -1,6 +1,5 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:quizzer/global/functionality/quizzer_logging.dart';
-import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'dart:io';

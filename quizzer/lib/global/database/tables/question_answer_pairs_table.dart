@@ -132,9 +132,6 @@ Future<int> addQuestionAnswerPair({
     'question_id': questionId,
   });
 
-  // After successfully adding the pair, update the module records
-  await buildModuleRecords();
-
   return result;
 }
 

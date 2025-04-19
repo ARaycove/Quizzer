@@ -160,28 +160,14 @@ Map<String, dynamic> getQuestionIdsForModule(List<Map<String, dynamic>> pairs, S
 /// 3. Checks if each module exists in the modules table
 /// 4. Creates new modules or updates existing ones accordingly
 /// Returns a Future<bool> indicating if the process completed successfully
-/// 
-/// 
+
 Future<bool> buildModuleRecords() async {
   QuizzerLogger.logMessage('Starting module build process in isolate');
-  // FIXME This log message was displayed in the console
-  final receivePort = ReceivePort();
-  await Isolate.spawn(_moduleBuildIsolate, receivePort.sendPort);
-  
-  return await receivePort.first;
-}
+  final monitor = getDatabaseMonitor();
 
-void _moduleBuildIsolate(SendPort sendPort) async {
-  bool success = false;
-  
-  // Initialize SQLite in isolate
-  sqfliteFfiInit();
-  databaseFactory = databaseFactoryFfi;
-  
-  // Request database access
   Database? db;
   while (db == null) {
-    db = await DatabaseMonitor().requestDatabaseAccess();
+    db = await monitor.requestDatabaseAccess();
     if (db == null) {
       QuizzerLogger.logMessage('Database access denied, waiting...');
       await Future.delayed(const Duration(milliseconds: 250));
@@ -191,7 +177,7 @@ void _moduleBuildIsolate(SendPort sendPort) async {
   // Get all question-answer pairs
   final List<Map<String, dynamic>> pairs = await getAllQuestionAnswerPairs(db);
   QuizzerLogger.logMessage('Retrieved ${pairs.length} question-answer pairs');
-  
+
   // Get unique module names
   final Set<String> uniqueModuleNames = await getUniqueModuleNames(pairs);
   
@@ -201,7 +187,7 @@ void _moduleBuildIsolate(SendPort sendPort) async {
     final Map<String, dynamic> subjectsData = getUniqueSubjectsForModule(pairs, moduleName);
     final Set<String> uniqueSubjects = subjectsData['subjects'] as Set<String>;
     final String primarySubject = subjectsData['primary_subject'] as String;
-    
+
     // Get unique concepts
     final Set<String> uniqueConcepts = getUniqueConceptsForModule(pairs, moduleName);
     
@@ -239,10 +225,9 @@ void _moduleBuildIsolate(SendPort sendPort) async {
     }
   }
   
-  success = true;
+  bool success = true;
   QuizzerLogger.logSuccess('Module records built successfully');
   
-  DatabaseMonitor().releaseDatabaseAccess();
-  sendPort.send(success);
-  Isolate.exit();
+  monitor.releaseDatabaseAccess();
+  return success;
 }

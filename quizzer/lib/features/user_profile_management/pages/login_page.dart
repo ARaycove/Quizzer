@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:quizzer/global/functionality/quizzer_logging.dart';
 import 'package:quizzer/features/user_profile_management/pages/new_user_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'dart:isolate';
 import 'package:quizzer/features/user_profile_management/functionality/login_isolates.dart';
-import 'package:flutter/services.dart';
+import 'package:quizzer/global/functionality/session_manager.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -17,37 +17,80 @@ class _LoginPageState extends State<LoginPage> {
   // Controllers for the text fields
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  bool _isLoading = false;
 
   Future<void> submitLogin() async {
-    setState(() {_isLoading = true;});
     // define the email and password submission
     final email = _emailController.text.trim();
     final password = _passwordController.text;
     
+    // Basic validation
+    if (email.isEmpty && password.isEmpty) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter both email and password'),
+          backgroundColor: Color.fromARGB(255, 214, 71, 71),
+        ),
+      );
+      return;
+    }
+
+    if (email.isEmpty) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter your email address'),
+          backgroundColor: Color.fromARGB(255, 214, 71, 71),
+        ),
+      );
+      return;
+    }
+
     // Attempt to log in using credentials
     QuizzerLogger.logMessage('Login attempt for: $email');
     
+
+    // TODO Update such that if the AuthException is thrown, we check the email against the session in secure storage, the user has logged in recently, then we can safely bypass the online authentication step
+    // DO NOT DELETE THE TODO UNTIL THE TODO IS COMPLETELY DONE
     dynamic response;
     try {
+      // Go for online Sign in first (Must be wrapped in a try catch block)
       response = await supabase.auth.signInWithPassword(
         email: email,
         password: password,
       );
     } on AuthException catch (e) {
-      response = e;
-      QuizzerLogger.logError('AuthException: ${e.message}');
+      // Check for recent session in secure storage
+      const storage = FlutterSecureStorage();
+      final lastLogin = await storage.read(key: email);
+      if (lastLogin != null) {
+        final lastLoginDate = DateTime.parse(lastLogin);
+        final thirtyDaysAgo = DateTime.now().subtract(const Duration(days: 30));
+
+        if (lastLoginDate.isAfter(thirtyDaysAgo)) {
+          QuizzerLogger.logMessage('Last login within 30 days for $email: $lastLogin');
+          response = 'success';
+        } else {
+          QuizzerLogger.logMessage('Last login too old for $email: $lastLogin');
+          response = e;
+        }
+      } else {
+        QuizzerLogger.logMessage('No previous login found for $email');
+        response = e;
+      }
+    }
+    
+    // If we still have an AuthException, show error
+    if (response is AuthException) {
+      QuizzerLogger.logError('AuthException: ${response.message}');
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(e.message),
-          backgroundColor: Colors.red,
+          content: Text(response.message),
+          backgroundColor: const Color.fromARGB(255, 214, 71, 71),
         ),
       );
-    } finally {
-      if (mounted) {
-        setState(() {_isLoading = false;});
-      }
+      return;
     }
 
     // Log the response regardless of outcome
@@ -57,18 +100,28 @@ class _LoginPageState extends State<LoginPage> {
       QuizzerLogger.logMessage('Session data: ${response.session?.toJson()}');
     }
 
-    // Log login attempt in isolate
-    final receivePort = ReceivePort();
-    Isolate.spawn(
-      handleLoginAttempt,
-      {
-        'sendPort': receivePort.sendPort,
-        'email': email,
-        'timestamp': DateTime.now().toIso8601String(),
-        'response': response,
-        'rootToken': RootIsolateToken.instance!,
-      },
-    );
+    // Log login attempt without awaiting
+    handleLoginAttempt({
+      'email': email,
+      'response': response,
+    });
+
+    // Initialize session manager
+    final sessionManager = SessionManager();
+    await sessionManager.initializeSession(email);
+
+    // Save complete Supabase session to secure storage
+    if (response is AuthResponse && response.session != null) {
+      const storage = FlutterSecureStorage();
+      final Map<String, dynamic> sessionJson = response.session!.toJson();
+      final userData = sessionJson['user'] as Map<String, dynamic>;
+      final email = userData['email'] as String;
+      final lastSignIn = userData['last_sign_in_at'] as String;
+      await storage.write(key: email, value: lastSignIn);
+      QuizzerLogger.logMessage('Session stored successfully');
+      QuizzerLogger.logMessage('Saved email: $email');
+      QuizzerLogger.logMessage('Last sign in: $lastSignIn');
+    }
 
     // Route to home page
     if (!mounted) return;
@@ -162,20 +215,22 @@ class _LoginPageState extends State<LoginPage> {
                 width: buttonWidth,
                 height: elementHeight25px,
                 child: ElevatedButton(
-                  onPressed: _isLoading ? null : submitLogin,
+                  onPressed: submitLogin,
                   style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(255, 71, 214, 93),
                     minimumSize: Size(100, elementHeight25px),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
                   ),
-                  child: _isLoading 
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
-                        ),
-                      )
-                    : const Text("Login"),
+                  child: const Text(
+                    "Login",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
               ),
               
@@ -208,9 +263,20 @@ class _LoginPageState extends State<LoginPage> {
                 child: ElevatedButton(
                   onPressed: newUserSignUp,
                   style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(255, 71, 214, 93),
                     minimumSize: Size(100, elementHeight25px),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
                   ),
-                  child: const Text("New User"),
+                  child: const Text(
+                    "New User",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
               ),
             ],
@@ -226,12 +292,16 @@ class _LoginPageState extends State<LoginPage> {
       width: 25,
       height: 25,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: const Color(0xFF1E2A3A),
         borderRadius: BorderRadius.circular(5),
+        border: Border.all(
+          color: const Color.fromARGB(255, 71, 214, 93),
+          width: 1,
+        ),
       ),
       child: IconButton(
         padding: EdgeInsets.zero,
-        icon: Icon(icon, size: 20),
+        icon: Icon(icon, size: 20, color: Colors.white),
         onPressed: () {
           // This would later call the appropriate social login function
           print("Social login with $service");
@@ -242,3 +312,33 @@ class _LoginPageState extends State<LoginPage> {
 }
 
 // TODO this looks fine put should be placed in the login_isolates.dart file under functionality/ in the user_profile_management feature
+
+/*
+{access_token: eyJhbGciOiJIUzI1NiIsImtpZCI6IkR1UEdZT3Z6eFhxbklFT3AiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3lydXZ4dXZ6enRuYWh1dWlxeGl0LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJkNDI1MDY5MC05ZjJiLTQ3NzAtYjgxMy1iMTI0MjFlNWFhZTYiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzQ0OTg5NjIwLCJpYXQiOjE3NDQ5ODYwMjAsImVtYWlsIjoiYWFjcmEwODIwQGdtYWlsLmNvbSIsInBob25lIjoiIiwiYXBwX21ldGFkYXRhIjp7InByb3ZpZGVyIjoiZW1haWwiLCJwcm92aWRlcnMiOlsiZW1haWwiXX0sInVzZXJfbWV0YWRhdGEiOnsiZW1haWwiOiJhYWNyYTA4MjBAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsInBob25lX3ZlcmlmaWVkIjpmYWxzZSwic3ViIjoiZDQyNTA2OTAtOWYyYi00NzcwLWI4MTMtYjEyNDIxZTVhYWU2In0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3NDQ5ODYwMjB9XSwic2Vzc2lvbl9pZCI6IjNkYzNlMzM3LTFiNDUtNDA3YS04NTNhLWY2ZjQ5N2M1N2NkMCIsImlzX2Fub255bW91cyI6ZmFsc2V9.7BYGZ0RFV7aVQnSUJYPk3SRSTU8oc7Mk76YJqol3My8, 
+expires_in: 3600, 
+expires_at: 1744989620, 
+refresh_token: 7XJ4tMyfYLETgXpSrlT7-w, 
+token_type: bearer, 
+provider_token: null, 
+provider_refresh_token: null, 
+user: {id: d4250690-9f2b-4770-b813-b12421e5aae6, app_metadata: {provider: email, providers: [email]}, user_metadata: {email: aacra0820@gmail.com, email_verified: true, phone_verified: false, sub: d4250690-9f2b-4770-b813-b12421e5aae6}, 
+
+aud: authenticated, 
+confirmation_sent_at: 2025-04-10T20:53:23.546196Z, 
+recovery_sent_at: 2025-04-11T03:54:57.716707Z, 
+email_change_sent_at: null, 
+new_email: null, 
+invited_at: null, 
+action_link: null, 
+email: aacra0820@gmail.com, 
+phone: , 
+created_at: 2025-04-10T20:53:23.501392Z, 
+confirmed_at: 2025-04-11T03:48:21.571134Z, 
+email_confirmed_at: 2025-04-11T03:48:21.571134Z, 
+phone_confirmed_at: null, 
+last_sign_in_at: 2025-04-18T14:20:20.367791489Z, 
+role: authenticated, 
+updated_at: 2025-04-18T14:20:20.376848Z, 
+identities: [{id: d4250690-9f2b-4770-b813-b12421e5aae6, user_id: d4250690-9f2b-4770-b813-b12421e5aae6, identity_data: {email: aacra0820@gmail.com, email_verified: false, phone_verified: false, sub: d4250690-9f2b-4770-b813-b12421e5aae6}, identity_id: 089495ed-1d2a-4b4d-9b85-f85012ae355e, provider: email, created_at: 2025-04-10T20:53:23.525002Z, last_sign_in_at: 2025-04-10T20:53:23.524929Z, updated_at: 2025-04-10T20:53:23.525002Z}], 
+factors: null, is_anonymous: false}}
+*/

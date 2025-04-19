@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quizzer/features/question_management/widgets/home_page_top_bar.dart';
-
-// TODO: Implement proper error handling for all database operations
-// TODO: Add comprehensive logging for all user interactions
-// TODO: Add proper validation for all user inputs
-// TODO: Flag
+import 'package:quizzer/global/functionality/session_manager.dart';
 
 // ==========================================
 // Widgets
@@ -16,8 +12,17 @@ class HomePage extends StatefulWidget {
 }
 // ------------------------------------------
 class _HomePageState extends State<HomePage> {
+    final SessionManager _sessionManager = SessionManager();
     bool _showFlagDialog = false;
     final TextEditingController _flagController = TextEditingController();
+
+    @override
+    void initState() {
+        super.initState();
+        if (_sessionManager.userId == null) {
+            throw Exception('Security Error: No user ID found in session');
+        }
+    }
 
     @override
     void dispose() {

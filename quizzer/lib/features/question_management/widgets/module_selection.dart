@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:quizzer/global/functionality/quizzer_logging.dart';
 import 'package:quizzer/features/modules/functionality/module_isolates.dart';
-import 'dart:isolate';
+import 'package:quizzer/global/functionality/session_manager.dart';
 
 // Colors
 const Color _surfaceColor = Color(0xFF1E2A3A); // Secondary Background
@@ -40,23 +39,16 @@ class _ModuleSelectionState extends State<ModuleSelection> {
       _isLoading = true;
     });
 
-    try {
-      final receivePort = ReceivePort();
-      await Isolate.spawn(handleLoadModules, {
-        'sendPort': receivePort.sendPort,
-      });
-      
-      final modules = await receivePort.first as List<Map<String, dynamic>>;
-      setState(() {
-        _suggestions = modules.map((m) => m['module_name'] as String).toList();
-        _isLoading = false;
-      });
-    } catch (e) {
-      QuizzerLogger.logError('Error loading modules: $e');
-      setState(() {
-        _isLoading = false;
-      });
-    }
+    final result = await handleLoadModules({
+      'userId': SessionManager().userId!,
+    });
+    
+    setState(() {
+      _suggestions = (result['modules'] as List<Map<String, dynamic>>)
+          .map((m) => m['module_name'] as String)
+          .toList();
+      _isLoading = false;
+    });
   }
 
   List<String> _getFilteredSuggestions(String query) {
@@ -102,7 +94,7 @@ class _ModuleSelectionState extends State<ModuleSelection> {
                   style: const TextStyle(color: _textColor),
                   decoration: InputDecoration(
                     hintText: 'Enter module name (default: General)',
-                    hintStyle: TextStyle(color: _textColor.withOpacity(0.6)),
+                    hintStyle: TextStyle(color: _textColor.withAlpha(153)),
                     filled: true,
                     fillColor: _surfaceColor,
                     border: OutlineInputBorder(

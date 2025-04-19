@@ -4,7 +4,6 @@ import 'package:quizzer/global/database/tables/question_answer_pairs_table.dart'
 import 'package:quizzer/global/functionality/quizzer_logging.dart';
 import 'package:quizzer/global/functionality/session_manager.dart';
 import 'package:quizzer/global/database/tables/modules_table.dart';
-import 'package:quizzer/main.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 /// Checks if a module is active for a specific user

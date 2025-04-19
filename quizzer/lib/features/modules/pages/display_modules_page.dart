@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:quizzer/global/widgets/global_app_bar.dart';
-import 'package:quizzer/global/database/tables/modules_table.dart';
 import 'package:quizzer/features/modules/widgets/module_card.dart';
 import 'package:quizzer/features/modules/widgets/scroll_to_top_button.dart';
 import 'package:quizzer/features/modules/widgets/module_filter_button.dart';
 import 'package:quizzer/global/functionality/quizzer_logging.dart';
-import 'package:quizzer/global/database/tables/user_profile_table.dart';
 import 'package:quizzer/global/functionality/session_manager.dart';
 import 'package:quizzer/features/modules/functionality/module_isolates.dart';
-import 'package:quizzer/main.dart';
-import 'dart:isolate';
 
 class DisplayModulesPage extends StatefulWidget {
   const DisplayModulesPage({super.key});
@@ -57,13 +53,9 @@ class _DisplayModulesPageState extends State<DisplayModulesPage> {
         return;
       }
 
-      final receivePort = ReceivePort();
-      await Isolate.spawn(handleLoadModules, {
-        'sendPort': receivePort.sendPort,
+      final result = await handleLoadModules({
         'userId': userId,
       });
-      
-      final result = await receivePort.first as Map<String, dynamic>;
       
       setState(() {
         _modules = result['modules'] as List<Map<String, dynamic>>;
@@ -87,15 +79,11 @@ class _DisplayModulesPageState extends State<DisplayModulesPage> {
 
     final currentStatus = _moduleActivationStatus[moduleName] ?? false;
     
-    final receivePort = ReceivePort();
-    await Isolate.spawn(handleModuleActivation, {
-      'sendPort': receivePort.sendPort,
+    final success = await handleModuleActivation({
       'userId': userId,
       'moduleName': moduleName,
       'isActive': !currentStatus,
     });
-    
-    final success = await receivePort.first;
     
     if (success) {
       setState(() {
@@ -163,7 +151,21 @@ class _DisplayModulesPageState extends State<DisplayModulesPage> {
                           moduleData: module,
                           isActivated: _moduleActivationStatus[module['module_name']] ?? false,
                           onToggleActivation: () => _toggleModuleActivation(module['module_name']),
-                        )).toList(),
+                          onDescriptionUpdated: (String newDescription) {
+                            setState(() {
+                              // Update the module in our local state
+                              final index = _modules.indexWhere(
+                                (m) => m['module_name'] == module['module_name']
+                              );
+                              if (index != -1) {
+                                _modules[index] = {
+                                  ..._modules[index],
+                                  'description': newDescription,
+                                };
+                              }
+                            });
+                          },
+                        )),
                 ],
               ),
             ),

@@ -1,24 +1,22 @@
-import 'dart:isolate';
 import 'package:quizzer/global/database/database_monitor.dart';
 import 'package:quizzer/global/functionality/quizzer_logging.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:quizzer/global/database/tables/login_attempts_table.dart';
 import 'package:quizzer/global/database/tables/user_profile_table.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:flutter/services.dart';
 
+// TODO rewrite this isolate using the new paradigm
 void handleLoginAttempt(Map<String, dynamic> message) async {
-    // Initialize platform channels for the isolate
-    BackgroundIsolateBinaryMessenger.ensureInitialized(message['rootToken']);
 
     final email = message['email'] as String;
     final response = message['response'];
 
     QuizzerLogger.logMessage('Logging login attempt for: $email');
     
+    final monitor = getDatabaseMonitor();
     Database? db;
     while (db == null) {
-        db = await DatabaseMonitor().requestDatabaseAccess();
+        db = await monitor.requestDatabaseAccess();
         if (db == null) {
             QuizzerLogger.logMessage('Database access denied, waiting...');
             await Future.delayed(const Duration(milliseconds: 100));
@@ -52,7 +50,6 @@ void handleLoginAttempt(Map<String, dynamic> message) async {
     } catch (e) {
         QuizzerLogger.logError('Error logging login attempt: $e');
     } finally {
-        DatabaseMonitor().releaseDatabaseAccess();
-        Isolate.exit();
+        monitor.releaseDatabaseAccess();
     }
 }

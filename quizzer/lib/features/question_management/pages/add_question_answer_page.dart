@@ -30,14 +30,24 @@ TODO: Future Improvements
      * Text and media element buttons
      * Reordering functionality
      * Double-tap to edit
+
+TODO [Question Bank Upload Feature]
+Implement functionality to upload questions in batches via formatted JSON file:
+- Add a file upload button in the UI
+- Create JSON schema for batch question format
+- Add validation for uploaded file format
+- Create batch processing logic for questions
+- Add progress indicator for batch upload
+- Handle errors and provide feedback
+- Consider adding template download option for users
 */
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:quizzer/features/modules/functionality/module_updates_process.dart';
 import 'package:quizzer/global/functionality/quizzer_logging.dart';
 import 'package:quizzer/global/functionality/session_manager.dart';
 import 'package:quizzer/helper_lib/utils.dart';
-import 'package:quizzer/global/database/tables/question_answer_pairs_table.dart';
 import 'package:quizzer/features/question_management/widgets/module_selection.dart';
 import 'package:quizzer/features/question_management/widgets/question_type_selection.dart';
 import 'package:quizzer/features/question_management/widgets/question_answer_element.dart';
@@ -45,7 +55,6 @@ import 'package:quizzer/features/question_management/widgets/question_entry_opti
 import 'package:quizzer/features/question_management/widgets/submit_clear_buttons.dart';
 import 'package:quizzer/global/widgets/global_app_bar.dart';
 import 'package:quizzer/features/question_management/functionality/question_isolates.dart';
-import 'dart:isolate';
 
 // Colors
 const Color _backgroundColor = Color(0xFF0A1929); // Primary Background
@@ -171,9 +180,7 @@ class _AddQuestionAnswerPageState extends State<AddQuestionAnswerPage> {
         throw Exception('Security Error: Attempted to add question without valid user session');
       }
 
-      final receivePort = ReceivePort();
-      Isolate.spawn(handleAddQuestionAnswerPair, {
-        'sendPort': receivePort.sendPort,
+      handleAddQuestionAnswerPair({
         'timeStamp': timeStamp,
         'questionElements': questionElements,
         'answerElements': answerElements,
@@ -187,7 +194,9 @@ class _AddQuestionAnswerPageState extends State<AddQuestionAnswerPage> {
         'options': _questionTypeController.text == 'multiple_choice' ? _options : null,
         'correctOptionIndex': _questionTypeController.text == 'multiple_choice' ? _correctOptionIndex : null,
       });
-      
+
+      buildModuleRecords();
+
       _showSuccessSnackBar('Question-Answer pair saved successfully!');
       _handleClear();
     }

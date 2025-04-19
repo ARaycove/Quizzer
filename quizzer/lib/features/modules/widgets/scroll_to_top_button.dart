@@ -27,7 +27,7 @@ class ScrollToTopButton extends StatelessWidget {
       onPressed: showScrollToTop ? _scrollToTop : null,
       child: Icon(
         Icons.arrow_upward,
-        color: showScrollToTop ? Colors.white : Colors.white.withOpacity(0.5),
+        color: showScrollToTop ? Colors.white : Colors.white.withAlpha(128),
       ),
     );
   }

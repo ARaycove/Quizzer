@@ -1,7 +1,6 @@
 import 'package:path/path.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:quizzer/global/functionality/quizzer_logging.dart';
-import 'package:quizzer/global/database/database_monitor.dart';
 
 // The database
 // Every write operation or complex operation should be ran as an isolated process
