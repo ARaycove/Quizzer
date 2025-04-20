@@ -1,7 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
-import 'package:supabase/supabase.dart';
 // FIXME add in the quizzer logger
 
 void main() {
@@ -9,6 +8,33 @@ void main() {
   String email = 'test_07@example.com';
   String username = 'testuser7';
   String password = 'testpass123';
+
+  group('Session Manager Singleton Tests', () {
+    test('Session Manager is a singleton', () {
+      // Get multiple instances of the session manager
+      final session1 = getSessionManager();
+      final session2 = getSessionManager();
+      final session3 = getSessionManager();
+      final session4 = getSessionManager();
+      
+      // Verify that all instances are the same object
+      expect(identical(session1, session2), true, 
+          reason: 'First and second instances should be identical');
+      expect(identical(session1, session3), true, 
+          reason: 'First and third instances should be identical');
+      expect(identical(session1, session4), true, 
+          reason: 'First and fourth instances should be identical');
+      
+      // Additional verification that the session variable is also the same instance
+      expect(identical(session, session1), true, 
+          reason: 'Test session variable should be identical to retrieved instances');
+      
+      QuizzerLogger.logSuccess('Session Manager singleton test passed');
+    });
+  });
+
+
+
   test('Create dummy user account', () async {
     // Create dummy account
     final results = await session.createNewUserAccount(
@@ -50,6 +76,7 @@ void main() {
     QuizzerLogger.logMessage('${session.userEmail}');
   });
 
+  // Tests Passed
   test('Load modules for logged in user', () async {
     // Ensure user is logged in before testing module loading
     if (!session.userLoggedIn) {
@@ -161,7 +188,6 @@ void main() {
     } else {
       QuizzerLogger.logMessage('No modules available to test description update');
     }
-
   });
 
 

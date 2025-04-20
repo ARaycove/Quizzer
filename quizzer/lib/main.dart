@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:quizzer/UI_systems/pages/login_page.dart';
-import 'package:quizzer/UI_systems/pages/home_page.dart';
-import 'package:quizzer/UI_systems/pages/menu.dart';
-import 'package:quizzer/UI_systems/pages/add_question_answer_page.dart';
-import 'package:quizzer/UI_systems/pages/display_modules_page.dart';
-import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
+import 'package:quizzer/UI_systems/03_add_question_page/add_question_answer_page.dart';
+import 'package:quizzer/UI_systems/04_display_modules_page/display_modules_page.dart';
+import 'package:quizzer/UI_systems/01_new_user_page/new_user_page.dart';
+import 'package:quizzer/UI_systems/00_login_page/login_page.dart';
+import 'package:quizzer/UI_systems/02_home_page/home_page.dart';
+import 'package:quizzer/UI_systems/05_menu_page/menu_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  Object session = getSessionManager(); // Ensures we load in the session manager and initialize it
   // End of Block
   runApp(const QuizzerApp());
 }
@@ -27,11 +26,12 @@ class QuizzerApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       initialRoute: '/login',
       routes: {
-        '/login': (context) => const LoginPage(),
-        '/home': (context) => const HomePage(),
-        '/menu': (context) => const MenuPage(),
-        '/add_question': (context) => const AddQuestionAnswerPage(),
+        '/login':           (context) => const LoginPage(),
+        '/home':            (context) => const HomePage(),
+        '/menu':            (context) => const MenuPage(),
+        '/add_question':    (context) => const AddQuestionAnswerPage(),
         '/display_modules': (context) => const DisplayModulesPage(),
+        '/signup':          (context) => const NewUserPage(),
       },
     );
   }

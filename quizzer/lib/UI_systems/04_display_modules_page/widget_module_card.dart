@@ -1,0 +1,164 @@
+import 'package:flutter/material.dart';
+import 'package:quizzer/UI_systems/04_display_modules_page/widget_module_action_buttons.dart';
+import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
+import 'package:quizzer/UI_systems/04_display_modules_page/widget_edit_module_dialog.dart';
+import 'package:quizzer/backend_systems/04_module_management/module_isolates.dart';
+import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
+
+class ModuleCard extends StatefulWidget {
+  final Map<String, dynamic> moduleData;
+  final bool isActivated;
+
+  const ModuleCard({
+    super.key,
+    required this.moduleData,
+    required this.isActivated,
+  });
+
+  @override
+  State<ModuleCard> createState() => _ModuleCardState();
+}
+
+class _ModuleCardState extends State<ModuleCard> {
+  late bool _isActivated;
+  late String _description;
+  final SessionManager session = SessionManager();
+
+  @override
+  void initState() {
+    super.initState();
+    _isActivated = widget.isActivated;
+    _description = widget.moduleData['description'] ?? '';
+  }
+
+  Future<void> _toggleActivation() async {
+    final moduleName = widget.moduleData['module_name'];
+    if (moduleName == null) {
+      QuizzerLogger.logError('Module name is null, cannot toggle activation.');
+      return;
+    }
+
+    session.toggleModuleActivation(moduleName, !_isActivated);
+    QuizzerLogger.logMessage('Sent activation toggle request for "$moduleName" to ${!_isActivated}');
+
+    if (mounted) {
+      setState(() {
+        _isActivated = !_isActivated;
+      });
+    }
+  }
+
+  Future<void> _updateDescription(String newDescription) async {
+    final moduleName = widget.moduleData['module_name'];
+    if (moduleName == null) {
+      QuizzerLogger.logError('Module name is null, cannot update description.');
+      return;
+    }
+
+    QuizzerLogger.logMessage('Sending description update for module: $moduleName');
+    handleUpdateModuleDescription({
+      'moduleName': moduleName,
+      'description': newDescription,
+    });
+    QuizzerLogger.logMessage('Sent description update request for module: $moduleName');
+
+    if (mounted) {
+      setState(() {
+        _description = newDescription;
+      });
+    }
+  }
+
+  Widget _buildMetadataItem(IconData icon, String text) {
+    return Row(
+      children: [
+        Icon(icon, size: 16, color: Colors.grey),
+        const SizedBox(width: 4.0),
+        Text(
+          text,
+          style: const TextStyle(
+            color: Colors.grey,
+            fontSize: 14,
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _showEditDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => EditModuleDialog(
+        moduleData: widget.moduleData,
+        initialDescription: _description,
+        onSave: (String newDescription) async {
+          await _updateDescription(newDescription);
+        },
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      color: const Color(0xFF1E2A3A),
+      margin: const EdgeInsets.only(bottom: 16.0),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    widget.moduleData['module_name'] ?? 'Unnamed Module',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                ModuleActionButtons(
+                  onAddPressed: _toggleActivation,
+                  onEditPressed: () => _showEditDialog(context),
+                  isAdded: _isActivated,
+                ),
+              ],
+            ),
+            const SizedBox(height: 8.0),
+            Visibility(
+              visible: _description.isNotEmpty,
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: Text(
+                  _description,
+                  style: const TextStyle(
+                    color: Colors.grey,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+            ),
+            Row(
+              children: [
+                _buildMetadataItem(
+                  Icons.question_answer,
+                  '${widget.moduleData['total_questions']} questions',
+                ),
+                const SizedBox(width: 16.0),
+                if (widget.moduleData['primary_subject'] != null && widget.moduleData['primary_subject'].isNotEmpty)
+                  _buildMetadataItem(
+                    Icons.category,
+                    widget.moduleData['primary_subject'],
+                  ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+} 
