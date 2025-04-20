@@ -1,5 +1,6 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:uuid/uuid.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pairs_table.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'dart:convert';
 
@@ -321,6 +322,88 @@ Future<bool> updateModuleActivationStatus(String userId, String moduleName, bool
     QuizzerLogger.logError('Error updating module activation status: $e');
     return false;
   }
+}
+
+/// Gets the subject interest data for a user
+/// If new subjects are found in the question database that aren't in the user profile,
+/// they will be added with a default interest value of 10
+Future<Map<String, int>> getUserSubjectInterests(String userId, Database db) async {
+  QuizzerLogger.logMessage('Getting subject interests for user: $userId');
+  await verifyUserProfileTable(db);
+  
+  // Query for the user's interest data column
+  final List<Map<String, dynamic>> result = await db.query(
+    'user_profile',
+    columns: ['interest_data'],
+    where: 'uuid = ?',
+    whereArgs: [userId],
+  );
+  // Initialize empty map
+  Map<String, int> interestData = {};
+
+
+  // Get the JSON string from the correct column
+  final String? interestsJson = result.first['interest_data'] as String?;
+
+  // Parse existing interest data if present
+  if (interestsJson != null && interestsJson.isNotEmpty) {
+    try {
+      final Map<String, dynamic> interestsMap = Map<String, dynamic>.from(json.decode(interestsJson));
+      // Ensure values are integers during conversion
+      interestData = interestsMap.map(
+        (key, value) {
+          if (value is int) {
+            return MapEntry(key, value);
+          } else {
+            QuizzerLogger.logWarning('Non-integer value found for key "$key" in interest_data for user $userId. Attempting conversion or defaulting.');
+            return MapEntry(key, int.tryParse(value.toString()) ?? 0);
+          }
+        }
+      );
+      QuizzerLogger.logMessage('Parsed existing interests: $interestData');
+    } catch (e) {
+       QuizzerLogger.logError('Failed to parse interest_data JSON for user $userId: $e');
+       throw FormatException('Failed to parse interest_data JSON for user $userId: $e');
+    }
+  } else {
+     QuizzerLogger.logMessage('No existing interest_data found for user $userId.');
+     interestData = {};
+  }
+
+  // Get all unique subjects from question database
+  final Set<String> allSubjects = await getUniqueSubjects(db);
+  allSubjects.add('misc'); // hidden misc subject for handling questions without subjects
+  QuizzerLogger.logMessage('Unique subjects from questions table: $allSubjects');
+
+  // Check for new subjects and add them with default value
+  bool hasNewSubjects = false;
+  for (final subject in allSubjects) {
+    if (!interestData.containsKey(subject)) {
+      if (subject == 'misc') {interestData[subject] = 1;} 
+      else {interestData[subject] = 10;}
+      hasNewSubjects = true;
+      QuizzerLogger.logMessage('Adding new subject "$subject" with default interest for user $userId.');
+    }
+  }
+
+  // If we found new subjects, update the user profile in the correct column
+  if (hasNewSubjects) {
+    final String updatedInterestsJson = json.encode(interestData);
+    final int rowsAffected = await db.update(
+      'user_profile',
+      {'interest_data': updatedInterestsJson},
+      where: 'uuid = ?',
+      whereArgs: [userId],
+    );
+    if (rowsAffected == 0) {
+       QuizzerLogger.logError('Failed to update interest_data for user $userId - user might no longer exist.');
+    } else {
+      QuizzerLogger.logSuccess('Updated user profile interest_data with new subject interests for user $userId.');
+    }
+  }
+
+  QuizzerLogger.logSuccess('Returning final subject interests for user $userId: $interestData');
+  return interestData;
 }
 
 // TODO: FIXME Add in functionality for loginThreshold preference

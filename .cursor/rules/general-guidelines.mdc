@@ -23,3 +23,14 @@ All code must follow these guidelines and pass review against: style conformity,
 When suggesting improvements, create TODO comments at file tops with clear descriptions. Never delete existing features unless explicitly instructed. Focus on individual functions and files rather than making sweeping changes across multiple files. Use common sense and search the codebase before creating new objects. Ensure that the order in which functions are written follow a logical order. You will not delete my comments, you will not refactor code unnecessarily
 
 
+FAIL FAST METHODOLOGY IS TO BE MAINTAINED AT ALL TIMES, TRY CATCH FINALLY BLOCKS ARE FORBIDDEN.
+
+TRY FINALLY BLOCKS ARE FORBIDDDEN
+YOU WILL NOT USE TRY FINALLY BLOCKS, THEY BREAK AND HIDE THINGS AND MAKE CODE LESS READABLE YOU WILL NOT USE TRY CATCH OR TRY FINALLY DO YOU UNDERSTAND?
+
+YOU WILL AVOID MAKING FUNCTIONS NULLABLE
+YOU WILL AVOID MAKING VARIABLE NULLABLE
+
+ALL THIS DOES IS CAUSE A MASSIVE HEADACHE FOR ME LATER IF I FAIL TO CATCH YOUR BULLSHIT
+
+IN EVERY MESSAGE YOU WILL OPENLY ACKNOWLEDGE THAT YOU UNDERSTAND THAT YOU ARE NOT TO USE TRY CATCH OR TRY FINALLY BLOCKS OR NULLABLE TYPES IN YOUR SOLUTIONS.

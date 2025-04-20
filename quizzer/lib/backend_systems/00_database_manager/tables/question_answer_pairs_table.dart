@@ -1,4 +1,5 @@
 import 'package:sqflite/sqflite.dart';
+import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 
 Future<void> verifyQuestionAnswerPairTable(Database db) async {
   
@@ -134,8 +135,7 @@ Future<int> addQuestionAnswerPair({
 }
 
 Future<int> editQuestionAnswerPair({
-  required String timeStamp,
-  required String qstContrib,
+  required String questionId,
   required Database db,
   String? citation,
   List<Map<String, dynamic>>? questionElements,
@@ -173,7 +173,7 @@ Future<int> editQuestionAnswerPair({
   if (correctOptionIndex != null) values['correct_option_index'] = correctOptionIndex;
 
   // Get current values to check completion status
-  final current = await getQuestionAnswerPairById(timeStamp, qstContrib, db);
+  final current = await getQuestionAnswerPairById(questionId, db);
   if (current != null) {
     values.addAll(current);
     values['completed'] = _checkCompletionStatus(
@@ -185,30 +185,38 @@ Future<int> editQuestionAnswerPair({
   return await db.update(
     'question_answer_pairs',
     values,
-    where: 'time_stamp = ? AND qst_contrib = ?',
-    whereArgs: [timeStamp, qstContrib],
+    where: 'question_id = ?',
+    whereArgs: [questionId],
   );
 }
 
-Future<Map<String, dynamic>?> getQuestionAnswerPairById(String timeStamp, String qstContrib, Database db) async {
+/// Fetches a single question-answer pair by its composite ID.
+/// The questionId format is expected to be 'timestamp_qstContrib'.
+Future<Map<String, dynamic>> getQuestionAnswerPairById(String questionId, Database db) async {
   // First verify that the table exists
   await verifyQuestionAnswerPairTable(db);
 
+  QuizzerLogger.logMessage('Fetching question_answer_pair with ID: $questionId');
+
   final List<Map<String, dynamic>> maps = await db.query(
     'question_answer_pairs',
-    where: 'time_stamp = ? AND qst_contrib = ?',
-    whereArgs: [timeStamp, qstContrib],
+    where: 'question_id = ?', // Query by the composite question_id directly
+    whereArgs: [questionId],   // Use the provided questionId
   );
-
-  if (maps.isEmpty) return null;
-
   // Create a new map instead of modifying the read-only query result
   final Map<String, dynamic> result = Map<String, dynamic>.from(maps.first);
   
-  // Parse the CSV strings into arrays of elements
-  result['question_elements'] = _parseElements(result['question_elements']);
-  result['answer_elements'] = _parseElements(result['answer_elements']);
+  // Parse the element CSV strings if they exist
+  if(result.containsKey('question_elements')){
+      result['question_elements'] = _parseElements(result['question_elements']);
+  }
+  if(result.containsKey('answer_elements')){
+      result['answer_elements'] = _parseElements(result['answer_elements']);
+  }
+  // Ensure subjects is parsed if needed, although it might already be a string
+  // if (result.containsKey('subjects')) { ... parsing logic if needed ... }
 
+  QuizzerLogger.logSuccess('Successfully fetched question $questionId');
   return result;
 }
 
@@ -289,4 +297,60 @@ Future<String> getModuleNameForQuestionId(String questionId, Database db) async 
   }
   // Return the module name from the query result
   return result.first['module_name'] as String;
+}
+
+/// Returns a set of all unique subjects present in the question_answer_pairs table
+/// Subjects are expected to be stored as comma-separated strings in the 'subjects' column.
+/// This is useful for populating subject filters in the UI
+Future<Set<String>> getUniqueSubjects(Database db) async {
+  QuizzerLogger.logMessage('Fetching unique subjects from question_answer_pairs table');
+  // First verify that the table exists
+  await verifyQuestionAnswerPairTable(db);
+  
+  // Query the database for all non-null, non-empty subjects strings
+  final List<Map<String, dynamic>> result = await db.query(
+    'question_answer_pairs',
+    columns: ['subjects'], // Query the correct 'subjects' column
+    where: 'subjects IS NOT NULL AND subjects != ""'
+  );
+  
+  // Process the results to extract unique subjects from CSV strings
+  final Set<String> subjects = {}; // Initialize an empty set
+
+  for (final row in result) {
+    final String? subjectsCsv = row['subjects'] as String?;
+    if (subjectsCsv != null && subjectsCsv.isNotEmpty) {
+       // Split the CSV string, trim whitespace, filter empty, and add to set
+       subjectsCsv.split(',').forEach((subject) {
+         final trimmedSubject = subject.trim();
+         if (trimmedSubject.isNotEmpty) {
+           subjects.add(trimmedSubject);
+         }
+       });
+    }
+  }
+  
+  QuizzerLogger.logSuccess('Retrieved ${subjects.length} unique subjects from CSV data');
+  return subjects;
+}
+
+/// Returns a set of all unique concepts present in the question_answer_pairs table
+/// This is useful for populating concept filters in the UI
+Future<Set<String>> getUniqueConcepts(Database db) async {
+  QuizzerLogger.logMessage('Fetching unique concepts from question_answer_pairs table');
+  // First verify that the table exists
+  await verifyQuestionAnswerPairTable(db);
+  
+  // Query the database for all distinct concept values
+  final List<Map<String, dynamic>> result = await db.rawQuery(
+    'SELECT DISTINCT concept FROM question_answer_pairs WHERE concept IS NOT NULL AND concept != ""'
+  );
+  
+  // Convert the result to a set of strings
+  final Set<String> concepts = result
+      .map((row) => row['concept'] as String)
+      .toSet();
+  
+  QuizzerLogger.logSuccess('Retrieved ${concepts.length} unique concepts');
+  return concepts;
 }

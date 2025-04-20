@@ -20,10 +20,26 @@ Future<void> verifyUserQuestionAnswerPairTable(Database db) async {
         average_times_shown_per_day REAL,
         is_eligible INTEGER,
         in_circulation INTEGER,
+        last_updated TEXT,
         PRIMARY KEY (user_uuid, question_id)
       )
     ''');
+  } else {
+    // Table exists, check if the last_updated column exists
+    final List<Map<String, dynamic>> columns = await db.rawQuery(
+      "PRAGMA table_info(user_question_answer_pairs)"
+    );
+    bool columnExists = columns.any((column) => column['name'] == 'last_updated');
+
+    if (!columnExists) {
+      // Column doesn't exist, add it
+      await db.execute(
+        "ALTER TABLE user_question_answer_pairs ADD COLUMN last_updated TEXT"
+      );
+    }
   }
+
+  // FIXME Add in check specifically for last_updated field, if the field doesn't exist add it to the table
 }
 
 Future<int> addUserQuestionAnswerPair({
@@ -57,7 +73,7 @@ Future<int> addUserQuestionAnswerPair({
 
 Future<int> editUserQuestionAnswerPair({
   required String userUuid,
-  required String questionAnswerReference,
+  required String questionId,
   required Database db,
   int? revisionStreak,
   String? lastRevised,
@@ -67,6 +83,7 @@ Future<int> editUserQuestionAnswerPair({
   double? averageTimesShownPerDay,
   bool? isEligible,
   bool? inCirculation,
+  String? lastUpdated,
 }) async {
   await verifyUserQuestionAnswerPairTable(db);
 
@@ -80,12 +97,13 @@ Future<int> editUserQuestionAnswerPair({
   if (averageTimesShownPerDay != null) values['average_times_shown_per_day'] = averageTimesShownPerDay;
   if (isEligible != null) values['is_eligible'] = isEligible ? 1 : 0;
   if (inCirculation != null) values['in_circulation'] = inCirculation ? 1 : 0;
+  if (lastUpdated != null) values['last_updated'] = lastUpdated;
 
   return await db.update(
     'user_question_answer_pairs',
     values,
     where: 'user_uuid = ? AND question_id = ?',
-    whereArgs: [userUuid, questionAnswerReference],
+    whereArgs: [userUuid, questionId],
   );
 }
 

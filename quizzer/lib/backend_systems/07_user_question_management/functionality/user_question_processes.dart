@@ -52,15 +52,6 @@ Future<void> validateModuleQuestionsInUserProfile(String moduleName, Database db
     if (!existingQuestionIds.contains(questionId)) {
       QuizzerLogger.logMessage('Adding question $questionId to user profile');
       
-      // Get the question details from the question-answer pairs table
-      final timeStamp = questionId.split('_')[0];
-      final qstContrib = questionId.split('_')[1];
-      final question = await getQuestionAnswerPairById(timeStamp, qstContrib, db);
-      if (question == null) {
-        QuizzerLogger.logError('Question $questionId not found in question-answer pairs table');
-        continue;
-      }
-      
       // Add the question to the user's profile
       await addUserQuestionAnswerPair(
         userUuid: userId,

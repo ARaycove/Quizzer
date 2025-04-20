@@ -1,5 +1,7 @@
+import 'package:quizzer/backend_systems/06_question_queue_server/question_queue_maintainer.dart';
 import 'package:quizzer/backend_systems/07_user_question_management/functionality/user_question_processes.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_question_answer_pairs_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pairs_table.dart';
 import 'package:quizzer/backend_systems/03_account_creation/new_user_signup.dart' as account_creation;
 import 'package:quizzer/backend_systems/06_question_queue_server/question_queue_request.dart';
 import 'package:quizzer/backend_systems/04_module_management/module_updates_process.dart';
@@ -13,6 +15,8 @@ import 'package:quizzer/backend_systems/00_helper_utils/utils.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:hive/hive.dart';
 import 'package:supabase/supabase.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile_table.dart' as user_profile_table;
+
 
 /*
 TODO: Implement proper secure storage for the Hive encryption key.
@@ -88,7 +92,7 @@ class SessionManager {
     // Initial process spin up
     buildModuleRecords();
 
-    //TODO Finish the question queue process
+    startQuestionQueueMaintenance();
 
     //TODO Create data sync process, connecting the local DB to the cloud
 
@@ -116,7 +120,85 @@ class SessionManager {
   }
   /// ==================================================================================
   // Private API Calls for testing and internal use (When tests are complete these should all be made private, during testing they will be public so we can use them in our tests)
+  //  ------------------------------------------------
+  // TODO At this line 124, I need a function that takes a questionId as input and adds that question to circulation. (using the update functionality)
 
+  //  ------------------------------------------------
+  /// Updates the user-specific record to mark a question as in circulation.
+  Future<void> addQuestionToCirculation(String questionId) async {
+    assert(userId != null, 'User must be logged in to update circulation status.');
+    QuizzerLogger.logMessage('SessionManager: Adding question $questionId to circulation for user $userId');
+
+    Database? db;
+    // Acquire DB Access using the established loop pattern
+    while (db == null) {
+      db = await _dbMonitor.requestDatabaseAccess();
+      if (db == null) {
+        QuizzerLogger.logMessage('DB access denied for updating circulation, waiting...');
+        await Future.delayed(const Duration(milliseconds: 100));
+      }
+    }
+    QuizzerLogger.logMessage('DB acquired for updating circulation status for $questionId.');
+
+    // Perform the update using the imported function with named parameters
+    final int rowsAffected = await editUserQuestionAnswerPair(
+      userUuid: userId!, 
+      questionId: questionId, 
+      db: db, 
+      inCirculation: true, // Set inCirculation to true (which becomes 1)
+      lastUpdated: DateTime.now().toIso8601String() // Use camelCase: lastUpdated
+      );
+    
+    // Release DB access
+    _dbMonitor.releaseDatabaseAccess();
+    QuizzerLogger.logMessage('DB released after updating circulation status for $questionId.');
+
+    if (rowsAffected == 0) {
+        // Fail fast if the specific record wasn't found for update
+        QuizzerLogger.logWarning('Update circulation status failed: No record found for user $userId and question $questionId');
+        throw Exception('Record not found for user $userId and question $questionId during circulation update.');
+    }
+
+    QuizzerLogger.logMessage('Successfully updated circulation status for question $questionId. Rows affected: $rowsAffected');
+  }
+
+  //  ------------------------------------------------
+  // Get specfic question-answer pair
+  /// Fetches the full question record from the main question_answer_pairs table.
+  /// Takes questionId in the format 'timeStamp_qstContrib'.
+  /// Returns the record map or throws an error if not found or on other issues.
+  Future<Map<String, dynamic>> getQuestionAnswerPair(String questionId) async {
+    // FIXME Should be a private api call, but temporarily public during testing, if testing is done make this private
+    QuizzerLogger.logMessage('SessionManager API: Fetching question pair for ID $questionId');
+
+    Database? db;
+    final dbMonitor = getDatabaseMonitor();
+    Map<String, dynamic>? questionRecord;
+    // Acquire DB Access
+    while (db == null) {
+      db = await dbMonitor.requestDatabaseAccess();
+      if (db == null) {
+        QuizzerLogger.logMessage('DB access denied for fetching question pair, waiting...');
+        await Future.delayed(const Duration(milliseconds: 100));
+      }
+    }
+    QuizzerLogger.logMessage('DB acquired for fetching question pair $questionId.');
+
+    // Call the backend function
+    questionRecord = await getQuestionAnswerPairById(questionId, db);
+      
+    // Fail fast if the record is not found
+    if (questionRecord == null) {
+        QuizzerLogger.logWarning('Question pair not found for $questionId');
+        throw Exception('Question pair not found for ID: $questionId'); 
+    } 
+      
+    QuizzerLogger.logMessage('Successfully fetched question pair for $questionId');
+    
+    dbMonitor.releaseDatabaseAccess();
+    return questionRecord; 
+  }
+  
   //  ------------------------------------------------
   // Check User Question Eligibility
   /// Checks if a specific question is eligible for review for the current user.
@@ -149,7 +231,7 @@ class SessionManager {
     }
     QuizzerLogger.logMessage('DB acquired for fetching user pairs.');
 
-    // Call the backend function
+    // Call the backend function using the prefix
     userPairs = await getUserQuestionAnswerPairsByUser(userId!, db);
     QuizzerLogger.logMessage('Fetched ${userPairs.length} pairs for user $userId');
 
@@ -159,7 +241,40 @@ class SessionManager {
 
     return userPairs;
   }
+  
+  //  ------------------------------------------------
+  // API call to get the user's current subject interest settings
+  /// gets the subject interest map for the current user.
+  /// Asserts that the user is logged in. Lets backend handle DB errors.
+  Future<Map<String, int>> getUserSubjectInterests() async {
+    // FIXME Should be a private api call, but temporarily public during testing, if testing is done make this private
+    assert(userId != null, 'Cannot fetch user subject interests: User not logged in.');
 
+    Database? db;
+    final dbMonitor = getDatabaseMonitor(); 
+    Map<String, int> interests;
+
+    // Acquire DB Access
+    while (db == null) {
+      db = await dbMonitor.requestDatabaseAccess();
+      if (db == null) {
+        QuizzerLogger.logMessage('DB access denied for fetching interests, waiting...');
+        await Future.delayed(const Duration(milliseconds: 100));
+      }
+    }
+
+    QuizzerLogger.logMessage('DB acquired for fetching interests.');
+    // Call the backend function directly. Errors will propagate.
+    // If this call throws, the DB release below will NOT happen.
+    interests = await user_profile_table.getUserSubjectInterests(userId!, db);
+    QuizzerLogger.logMessage('Fetched interests for user $userId');
+
+    // Release DB (Only happens if getUserSubjectInterests succeeds)
+    dbMonitor.releaseDatabaseAccess();
+    QuizzerLogger.logMessage('DB released after fetching interests attempt.');
+       
+    return interests;
+  }
 
   /// ==================================================================================
   // API CALLS

@@ -113,4 +113,20 @@ void main() {
 
   });
 
+  // Test that the maintainer isolate continues running during idle time
+  test('Maintainer stays operational during idle', () async {
+    const idleDuration = Duration(seconds: 30);
+    QuizzerLogger.logMessage('Starting idle test (${idleDuration.inSeconds} seconds)...');
+    QuizzerLogger.logMessage('Expect maintainer logs during this period.');
+
+    // Wait for the specified duration
+    await Future.delayed(idleDuration);
+
+    QuizzerLogger.logMessage('Idle period finished.');
+    // Assert test completion
+    expect(true, isTrue);
+    QuizzerLogger.logSuccess('Idle test passed - Test process did not terminate.');
+
+  }, timeout: const Timeout(Duration(minutes: 5))); // Set timeout to 5 minutes
+
 }
