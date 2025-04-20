@@ -1,9 +1,9 @@
-import 'package:quizzer/global/database/tables/user_question_answer_pairs_table.dart';
-import 'package:quizzer/global/database/tables/user_profile_table.dart';
-import 'package:quizzer/global/database/tables/question_answer_pairs_table.dart';
-import 'package:quizzer/global/functionality/quizzer_logging.dart';
-import 'package:quizzer/global/functionality/session_manager.dart';
-import 'package:quizzer/global/database/tables/modules_table.dart';
+import 'package:quizzer/backend_systems/database_manager/tables/user_question_answer_pairs_table.dart';
+import 'package:quizzer/backend_systems/database_manager/tables/user_profile_table.dart';
+import 'package:quizzer/backend_systems/database_manager/tables/question_answer_pairs_table.dart';
+import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
+import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
+import 'package:quizzer/backend_systems/database_manager/tables/modules_table.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 /// Checks if a module is active for a specific user

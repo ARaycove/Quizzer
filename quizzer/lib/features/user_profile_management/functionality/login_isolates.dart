@@ -1,11 +1,11 @@
-import 'package:quizzer/global/database/database_monitor.dart';
-import 'package:quizzer/global/functionality/quizzer_logging.dart';
+import 'package:quizzer/backend_systems/database_manager/database_monitor.dart';
+import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-import 'package:quizzer/global/database/tables/login_attempts_table.dart';
-import 'package:quizzer/global/database/tables/user_profile_table.dart';
+import 'package:quizzer/backend_systems/database_manager/tables/login_attempts_table.dart';
+import 'package:quizzer/backend_systems/database_manager/tables/user_profile_table.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-// TODO rewrite this isolate using the new paradigm
+
 void handleLoginAttempt(Map<String, dynamic> message) async {
 
     final email = message['email'] as String;

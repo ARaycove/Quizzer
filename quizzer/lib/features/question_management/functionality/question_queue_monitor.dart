@@ -1,8 +1,10 @@
 import 'dart:async';
-import 'package:quizzer/global/functionality/quizzer_logging.dart';
+import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 
 // Global question queue monitor instance
 final QuestionQueueMonitor _globalQuestionQueueMonitor = QuestionQueueMonitor._internal();
+
+
 
 /// Gets the global question queue monitor instance
 QuestionQueueMonitor getQuestionQueueMonitor() => _globalQuestionQueueMonitor;

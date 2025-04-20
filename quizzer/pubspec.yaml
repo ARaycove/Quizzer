@@ -38,14 +38,15 @@ dependencies:
   path: ^1.9.1
   path_provider: ^2.1.5
   uuid: ^4.4.2
-  supabase_flutter: ^2.0.0
-  flutter_secure_storage: ^9.2.4
+  supabase: ^2.6.3
+  encrypted_shared_preferences: ^3.0.1
   http: ^0.13.5
   device_info_plus: ^11.3.3
   synchronized: ^3.3.1
   cached_network_image: ^3.3.1
   image: ^4.1.7
   image_picker: ^1.0.7
+  hive: ^2.2.3
 
 
 dev_dependencies:

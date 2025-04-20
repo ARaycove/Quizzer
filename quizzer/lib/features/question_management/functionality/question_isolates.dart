@@ -1,6 +1,6 @@
-import 'package:quizzer/global/database/tables/question_answer_pairs_table.dart';
-import 'package:quizzer/global/database/database_monitor.dart';
-import 'package:quizzer/global/functionality/quizzer_logging.dart';
+import 'package:quizzer/backend_systems/database_manager/tables/question_answer_pairs_table.dart';
+import 'package:quizzer/backend_systems/database_manager/database_monitor.dart';
+import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 Future<void> handleAddQuestionAnswerPair(Map<String, dynamic> data) async {
