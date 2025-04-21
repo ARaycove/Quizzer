@@ -174,13 +174,12 @@ Future<int> editQuestionAnswerPair({
 
   // Get current values to check completion status
   final current = await getQuestionAnswerPairById(questionId, db);
-  if (current != null) {
-    values.addAll(current);
-    values['completed'] = _checkCompletionStatus(
-      values['question_elements'] ?? '',
-      values['answer_elements'] ?? '',
-    );
-  }
+  values.addAll(current);
+  values['completed'] = _checkCompletionStatus(
+    values['question_elements'] ?? '',
+    values['answer_elements'] ?? '',
+  );
+
 
   return await db.update(
     'question_answer_pairs',

@@ -24,7 +24,7 @@ class QuestionQueueMonitor {
 
   /// Requests access to the question queue
   /// Returns the question queue if available, null if locked
-  Future<List<Map<String, dynamic>>?> requestQueueAccess() async {
+  Future<List<Map<String, dynamic>>> requestQueueAccess() async {
     if (_isLocked) {
       final completer = Completer<List<Map<String, dynamic>>>();
       _accessQueue.add(completer);
@@ -54,6 +54,7 @@ class QuestionQueueMonitor {
       _isLocked = false;
       QuizzerLogger.logMessage('Question queue lock released');
     }
+    QuizzerLogger.logMessage("Queue object $_questionQueue");
   }
 
   /// Gets the current size of the queue

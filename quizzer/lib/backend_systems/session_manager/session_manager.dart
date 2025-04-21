@@ -121,7 +121,32 @@ class SessionManager {
   /// ==================================================================================
   // Private API Calls for testing and internal use (When tests are complete these should all be made private, during testing they will be public so we can use them in our tests)
   //  ------------------------------------------------
-  // TODO At this line 124, I need a function that takes a questionId as input and adds that question to circulation. (using the update functionality)
+  // Get Eligible Questions
+  Future<List<Map<String, dynamic>>> getEligibleQuestions() async{
+    assert(userId != null);
+    Database? db;
+    // Acquire DB Access using the established loop pattern
+    while (db == null) {
+      db = await _dbMonitor.requestDatabaseAccess();
+      if (db == null) {
+        QuizzerLogger.logMessage('DB access denied for updating circulation, waiting...');
+        await Future.delayed(const Duration(milliseconds: 100));
+      }
+    }
+    List<Map<String, dynamic>> userQuestionRecords = await getAllUserQuestionAnswerPairs(db, userId!);
+    _dbMonitor.releaseDatabaseAccess();
+
+    List<Map<String,dynamic>> eligibleQuestionRecords = [];
+
+    for (Map<String, dynamic> userQuestionRecord in userQuestionRecords) {
+      bool isEligible = await checkQuestionEligibility(userQuestionRecord['question_id']);
+      if (isEligible) {
+        eligibleQuestionRecords.add(userQuestionRecord);
+      }
+    }
+
+    return eligibleQuestionRecords;
+  }
 
   //  ------------------------------------------------
   /// Updates the user-specific record to mark a question as in circulation.
@@ -186,12 +211,6 @@ class SessionManager {
 
     // Call the backend function
     questionRecord = await getQuestionAnswerPairById(questionId, db);
-      
-    // Fail fast if the record is not found
-    if (questionRecord == null) {
-        QuizzerLogger.logWarning('Question pair not found for $questionId');
-        throw Exception('Question pair not found for ID: $questionId'); 
-    } 
       
     QuizzerLogger.logMessage('Successfully fetched question pair for $questionId');
     

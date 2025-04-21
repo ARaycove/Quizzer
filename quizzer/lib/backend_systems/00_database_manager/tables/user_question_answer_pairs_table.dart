@@ -136,16 +136,6 @@ Future<List<Map<String, dynamic>>> getUserQuestionAnswerPairsByUser(String userU
   );
 }
 
-Future<List<Map<String, dynamic>>> getEligibleQuestions(String userUuid, Database db) async {
-  await verifyUserQuestionAnswerPairTable(db);
-
-  return await db.query(
-    'user_question_answer_pairs',
-    where: 'user_uuid = ? AND is_eligible = ?',
-    whereArgs: [userUuid, 1],
-  );
-}
-
 Future<List<Map<String, dynamic>>> getQuestionsInCirculation(String userUuid, Database db) async {
   await verifyUserQuestionAnswerPairTable(db);
 
@@ -156,10 +146,14 @@ Future<List<Map<String, dynamic>>> getQuestionsInCirculation(String userUuid, Da
   );
 }
 
-Future<List<Map<String, dynamic>>> getAllUserQuestionAnswerPairs(Database db) async {
+Future<List<Map<String, dynamic>>> getAllUserQuestionAnswerPairs(Database db, String userUuid) async {
   await verifyUserQuestionAnswerPairTable(db);
 
-  return await db.query('user_question_answer_pairs');
+  return await db.query(
+      'user_question_answer_pairs',
+      where: 'user_uuid = ?',
+      whereArgs: [userUuid]
+  );
 }
 
 Future<int> removeUserQuestionAnswerPair(String userUuid, String questionAnswerReference, Database db) async {

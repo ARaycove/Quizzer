@@ -2,7 +2,6 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/user_question
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pairs_table.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
-import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/modules_table.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
@@ -89,6 +88,12 @@ Future<void> validateAllModuleQuestions(Database db, String userId) async {
 }
 
 Future<bool> isUserQuestionEligible(String userId, String questionId) async {
+  // TODO: Refactor eligibility checking.
+  // replace with a multiplicative approach.
+  // Calculate component scores (time past due, subject interest, in circulation value, module active value) If anything hits 0 then the result will be 0, if the result is 0 then not eligible else above 0 will be eligible
+  // where a component is 0 if a condition isn't met. The final eligibility score
+  // would be the product of these components. A question is eligible if the product > 0.
+  // This might be computationally simpler than multiple conditional checks inside the function.
   QuizzerLogger.logMessage(
       'Checking eligibility for question $questionId for user $userId');
   // First we need to read the required data

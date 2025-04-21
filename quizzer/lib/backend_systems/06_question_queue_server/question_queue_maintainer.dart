@@ -12,6 +12,8 @@ Future<void> startQuestionQueueMaintenance() async {
   QuizzerLogger.logMessage('Starting question queue maintenance');
   final queueMonitor = getQuestionQueueMonitor();
   final dbMonitor = getDatabaseMonitor();
+  bool isAvailableQuestions = true;
+  bool shouldImmediatelySelectNewQuestion = false;
   
   while (true) {
     // 1. Check if we need to add questions to circulation
@@ -20,20 +22,29 @@ Future<void> startQuestionQueueMaintenance() async {
       await _addQuestionsToCirculation(dbMonitor);
     }
 
-    // // 2. Check if queue needs new items
-    // if (await _shouldAddToQueue(queueMonitor)) {
-    //   // FIXME Do a very quick read operation to get required data for the _selectNextQuestion function
-    //   // this ensure the dbMonitor is released sooner for other processes to use
-
-    //   // selectNextQuestion won't be modifying the db at all so it should only need to take raw data for processing
-    //   final question = await _selectNextQuestion(dbMonitor);
-    //   if (question != null) {
-    //     await _addToQueue(question, queueMonitor);
-    //   }
-    // }
+    // 2. Check if queue needs new items
+    if (queueMonitor.queueSize < 10) {
+      // queue has less than 10 items in it, we have to select the next question to add it:
+      // selectNextQuestion won't be modifying the db at all so it should only need to take raw data for processing
+      final question = await _selectNextQuestion(dbMonitor);
+      // If we fail to get a question then there aren't any and we should tell the work to take a longer rest,
+      // when the worker wakes back up they can try again
+      if (question.isNotEmpty) {
+        shouldImmediatelySelectNewQuestion = await _addToQueue(question, queueMonitor); //returns false if it failed
+        shouldImmediatelySelectNewQuestion = !shouldImmediatelySelectNewQuestion; // invert response to make sense
+        isAvailableQuestions = true;
+        }
+      else {
+        isAvailableQuestions = false;
+        }
+    }
 
     // Delay ensures we don't gum up the system and CPU
-    await Future.delayed(const Duration(seconds: 3));
+    if (shouldImmediatelySelectNewQuestion) {}
+    else if (isAvailableQuestions) {await Future.delayed(const Duration(seconds: 3));}
+    else {
+      QuizzerLogger.logMessage('No Questions Available to Select, taking long rest. . .');
+      await Future.delayed(const Duration(seconds:60));}
   }
 }
 
@@ -207,32 +218,168 @@ Future<void> _addQuestionsToCirculation(DatabaseMonitor dbMonitor) async {
 }
 
 
+double _selectionAlgorithm(
+  double subInterestWeight, 
+  double revisionStreakWeight,
+  double timeDaysWeight,
+  double revisionStreak, 
+  double timePastDueInDays,
+  double subjectInterestHighest,
+  double bias) {
+    revisionStreak.toDouble();
 
-/// Determines if the queue needs new items
-Future<bool> _shouldAddToQueue(QuestionQueueMonitor queueMonitor) async {
-  return queueMonitor.queueSize < 10;
-}
-
-/// Selects the next question to add to the queue
-Future<Map<String, dynamic>?> _selectNextQuestion(DatabaseMonitor dbMonitor) async {
-  final db = await dbMonitor.requestDatabaseAccess();
-  if (db == null) {
-    QuizzerLogger.logError('Failed to get database access');
-    return null;
+    return (
+    (subInterestWeight * subjectInterestHighest) + 
+    (revisionStreakWeight * revisionStreak) + 
+    (timeDaysWeight * timePastDueInDays) + 
+    bias);
   }
 
-  // TODO: Implement question selection logic
-  // - Consider subject ratios
-  // - Account for question history
-  // - Ensure even distribution
-  dbMonitor.releaseDatabaseAccess();
-  return null;
+/// Selects the next question to add to the queue
+Future<Map<String, dynamic>> _selectNextQuestion(DatabaseMonitor dbMonitor) async {
+  // Should return empty map, if no question can be found. But we need to avoid this at all costs
+  SessionManager session = getSessionManager();
+  // --- Configuration ---
+  const double subInterestWeight    = 0.4; // Importance of subject interest
+  const double revisionStreakWeight = 0.3; // Importance of revision streak
+  const double timeDaysWeight       = 0.3; // Importance of time past due
+  const double bias                 = 0.01; // Small bias to ensure non-zero scores
+  // const double maxRelevantOverdueDays = 30.0; // Removed: Will calculate dynamically
+  // ---------------------
+
+  Map<String, double> scoreMap = {}; //format {question_id: selectionAlgoScore}
+  
+  Map<String, int> userSubjectInterests         = await session.getUserSubjectInterests();
+  List<Map<String, dynamic>> eligibleQuestions  = await session.getEligibleQuestions();
+
+  // --- Preprocessing: Calculate overdue days and find max ---
+  double actualMaxOverdueDays = 0.0;
+  final Map<String, double> overdueDaysMap = {}; // Store calculated days
+  for (final question in eligibleQuestions) {
+      final String questionId = question['question_id'];
+      final String nextRevisionDueStr = question['next_revision_due'];
+      final DateTime nextRevisionDue = DateTime.parse(nextRevisionDueStr);
+      final Duration timeDifference = DateTime.now().difference(nextRevisionDue);
+      final double timePastDueInDays = timeDifference.isNegative ? 0.0 : timeDifference.inDays.toDouble();
+      
+      overdueDaysMap[questionId] = timePastDueInDays;
+      if (timePastDueInDays > actualMaxOverdueDays) {
+          actualMaxOverdueDays = timePastDueInDays;
+      }
+  }
+  // ---------------------------------------------------------
+
+  // Calculate overall max interest - No longer needed for normalization
+  final double overallMaxInterest = userSubjectInterests.values.fold(0.0, (max, current) => current > max ? current.toDouble() : max);
+
+  // Loop over eligible questions to calculate scores
+  double totalScore = 0.0;
+  for (final question in eligibleQuestions) {
+    // Extract necessary data from the question record
+    final String questionId = question['question_id'];
+    final int revisionStreak = question['revision_streak'];
+    // Fetch full pair first, then access subjects
+    final Map<String, dynamic> questionDetails = await session.getQuestionAnswerPair(questionId);
+    final String? subjectsCsv = questionDetails['subjects'] as String?; 
+
+    // --- Calculate Raw Values (Retrieve precalculated time) ---
+    // 1. Absolute Highest Interest (Calculated below)
+    // 2. Time Past Due (Retrieved from map)
+    final double timePastDueInDays = overdueDaysMap[questionId]!; // Non-null assertion okay here
+    // 3. Adjusted Streak (Treat 0 as 1)
+    final int adjustedStreak = (revisionStreak == 0) ? 1 : revisionStreak;
+    // ---------------------------------------------------------
+
+    // --- Calculate Normalized Scores (0-1 range ideally) ---
+    // 1. Normalized Interest Score (S_interest)
+    double subjectInterestHighest = 0.0;
+    if (subjectsCsv != null && subjectsCsv.isNotEmpty) {
+      final List<String> subjects = subjectsCsv.split(',').map((s) => s.trim()).where((s) => s.isNotEmpty).toList();
+      for (final subject in subjects) {
+        final double currentInterest = (userSubjectInterests[subject] ?? 0).toDouble();
+        if (currentInterest > subjectInterestHighest) {
+          subjectInterestHighest = currentInterest;
+        }
+      }
+    } else { 
+        subjectInterestHighest = (userSubjectInterests['misc'] ?? 0).toDouble();
+    }
+    final double normalizedInterest = (overallMaxInterest > 0) ? (subjectInterestHighest / overallMaxInterest) : 0.0;
+
+    // 2. Normalized Streak Score (S_streak)
+    final double normalizedStreak = 1.0 / adjustedStreak; 
+
+    // 3. Normalized Time Score (S_time) - Use dynamic max
+    final double normalizedTime = (actualMaxOverdueDays > 0) ? (timePastDueInDays / actualMaxOverdueDays) : 0.0;
+    // -----------------------------------------------
+
+    // Calculate final score using normalized components + weights + bias
+    final double score = _selectionAlgorithm(subInterestWeight, revisionStreakWeight, timeDaysWeight, normalizedStreak, normalizedTime, normalizedInterest, bias);
+
+    // Ensure score is non-negative 
+    final double finalScore = max(0.0, score); // Safeguard (bias should prevent 0)
+
+    scoreMap[questionId] = finalScore;
+    totalScore += finalScore;
+  }
+
+  // Handle Zero Total Score (Should be rare with bias)
+  if (totalScore <= 0.0) {
+    QuizzerLogger.logWarning("Total score is zero. This should not happen with the current implementation.");
+  }
+
+  // Weighted Random Selection
+  final random = Random();
+  double randomThreshold = random.nextDouble() * totalScore;
+  double cumulativeScore = 0.0;
+
+  for (final question in eligibleQuestions) {
+    final String questionId = question['question_id'];
+    final double score = scoreMap[questionId]!; // Non-null assertion ok due to loop logic
+    cumulativeScore += score;
+    if (cumulativeScore >= randomThreshold) {
+      QuizzerLogger.logMessage("Selected question $questionId with score $score (Cumulative: $cumulativeScore, Threshold: $randomThreshold)");
+      return question; // Return the selected question map
+    }
+  }
+
+  // If all else fails return an empty map
+  return {};
+  
 }
 
 /// Adds a question to the queue
-Future<void> _addToQueue(Map<String, dynamic> question, QuestionQueueMonitor queueMonitor) async {
-  // TODO: Implement queue addition logic
-  // - Get queue access
-  // - Add question
-  // - Release queue access
+Future<bool> _addToQueue(Map<String, dynamic> question, QuestionQueueMonitor queueMonitor) async {
+  final String questionId = question['question_id']; // For logging
+  SessionManager session = getSessionManager();
+  QuizzerLogger.logMessage('Requesting queue access to add question $questionId.');
+  Map<String, dynamic> questionDetails = await session.getQuestionAnswerPair(questionId);
+
+  // 1. Get queue access
+  final List<Map<String, dynamic>> questionQueue = await queueMonitor.requestQueueAccess();
+  QuizzerLogger.logMessage('Queue access granted to add question $questionId.');
+
+  // --- Check for Duplicates ---
+  bool alreadyExists = false;
+  for (final existingQuestion in questionQueue) {
+    if (existingQuestion['question_id'] == questionId) {
+      alreadyExists = true;
+      break;
+    }
+  }
+
+  if (alreadyExists) {
+    QuizzerLogger.logWarning('Attempted to add duplicate question $questionId to queue. Aborting add.');
+    queueMonitor.releaseQueueAccess(); // Release lock before returning
+    return false; // Indicate question was not added
+  }
+  // ---------------------------
+
+  // 2. Add question directly to the list (only if not duplicate)
+  questionQueue.add(questionDetails); 
+  QuizzerLogger.logSuccess('Successfully added question $questionId to the queue. New size: ${queueMonitor.queueSize}');
+
+  // 3. Release queue access
+  queueMonitor.releaseQueueAccess(); 
+  return true; // Indicate question was successfully added
 }
