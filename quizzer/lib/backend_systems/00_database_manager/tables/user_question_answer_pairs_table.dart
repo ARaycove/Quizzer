@@ -1,4 +1,7 @@
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:sqflite/sqflite.dart';
+import 'dart:async';
+import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 
 Future<void> verifyUserQuestionAnswerPairTable(Database db) async {
   
@@ -21,37 +24,43 @@ Future<void> verifyUserQuestionAnswerPairTable(Database db) async {
         is_eligible INTEGER,
         in_circulation INTEGER,
         last_updated TEXT,
+        total_attempts INTEGER NOT NULL DEFAULT 0,
         PRIMARY KEY (user_uuid, question_id)
       )
     ''');
   } else {
-    // Table exists, check if the last_updated column exists
+    // Table exists, check columns
     final List<Map<String, dynamic>> columns = await db.rawQuery(
       "PRAGMA table_info(user_question_answer_pairs)"
     );
-    bool columnExists = columns.any((column) => column['name'] == 'last_updated');
+    final Set<String> columnNames = columns.map((col) => col['name'] as String).toSet();
 
-    if (!columnExists) {
-      // Column doesn't exist, add it
+    // Check for last_updated (existing check)
+    if (!columnNames.contains('last_updated')) {
+      QuizzerLogger.logWarning('Adding missing column: last_updated');
       await db.execute(
         "ALTER TABLE user_question_answer_pairs ADD COLUMN last_updated TEXT"
       );
     }
+    // Check for total_attempts (new check)
+    if (!columnNames.contains('total_attempts')) {
+       QuizzerLogger.logWarning('Adding missing column: total_attempts');
+      // Add with default 0 for existing rows
+      await db.execute("ALTER TABLE user_question_answer_pairs ADD COLUMN total_attempts INTEGER NOT NULL DEFAULT 0");
+    }
   }
-
-  // FIXME Add in check specifically for last_updated field, if the field doesn't exist add it to the table
 }
 
+// FIXME confirm test that lastRevised is now null when first added
 Future<int> addUserQuestionAnswerPair({
   required String userUuid,
   required String questionAnswerReference,
   required int revisionStreak,
-  required String lastRevised,
+  required String? lastRevised,
   required String predictedRevisionDueHistory,
   required String nextRevisionDue,
   required double timeBetweenRevisions,
   required double averageTimesShownPerDay,
-  required bool isEligible,
   required bool inCirculation,
   required Database db,
 }) async {
@@ -66,7 +75,6 @@ Future<int> addUserQuestionAnswerPair({
     'next_revision_due': nextRevisionDue,
     'time_between_revisions': timeBetweenRevisions,
     'average_times_shown_per_day': averageTimesShownPerDay,
-    'is_eligible': isEligible ? 1 : 0,
     'in_circulation': inCirculation ? 1 : 0,
   });
 }
@@ -164,4 +172,26 @@ Future<int> removeUserQuestionAnswerPair(String userUuid, String questionAnswerR
     where: 'user_uuid = ? AND question_id = ?',
     whereArgs: [userUuid, questionAnswerReference],
   );
+}
+
+// --- Helper Functions ---
+
+/// Increments the total_attempts count for a specific user-question pair.
+Future<void> incrementTotalAttempts(String userUuid, String questionId, Database db) async {
+  QuizzerLogger.logMessage('Incrementing total attempts for User: $userUuid, Question: $questionId');
+  
+  // Ensure the table and column exist before attempting update
+  await verifyUserQuestionAnswerPairTable(db);
+
+  final int rowsAffected = await db.rawUpdate(
+    'UPDATE user_question_answer_pairs SET total_attempts = total_attempts + 1 WHERE user_uuid = ? AND question_id = ?',
+    [userUuid, questionId]
+  );
+
+  if (rowsAffected == 0) {
+    QuizzerLogger.logWarning('Failed to increment total attempts: No matching record found for User: $userUuid, Question: $questionId');
+    // Depending on desired behavior, could throw an exception here if the record *should* exist.
+  } else {
+    QuizzerLogger.logSuccess('Successfully incremented total attempts for User: $userUuid, Question: $questionId');
+  }
 }

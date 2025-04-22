@@ -159,6 +159,7 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
+.cursor/rules/general-guidelines.mdc
 src/scratchpad.py
 src/scratchpad.txt
 src/math_pad.py/

@@ -3,7 +3,7 @@ import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 
 /// Requests the next question from the queue
 /// Returns null if no questions are available
-Future<Map<String, dynamic>?> getNextQuestion() async {
+Future<Map<String, dynamic>> getNextQuestion() async {
   // Request access to the shared question queue through the monitor
   QuizzerLogger.logMessage('Requesting next question from queue');
   final queueMonitor    = getQuestionQueueMonitor();
@@ -29,6 +29,12 @@ Future<Map<String, dynamic>?> getNextQuestion() async {
       queueMonitor.releaseQueueAccess();
       // Generate a dummy question when queue is empty to guide user actions
       QuizzerLogger.logMessage('Queue empty, generating dummy question');
+      // Define options as a list first for clarity
+      final List<String> dummyOptionsList = [
+        'Add your own questions',
+        'Activate an existing module',
+        'Check back later'
+      ];
       questionRecord = {
         'question_elements': [
           {'type': 'text', 'content': 'No more eligible questions to present today. You can:'}
@@ -37,11 +43,20 @@ Future<Map<String, dynamic>?> getNextQuestion() async {
           {'type': 'text', 'content': '1. Add your own questions\n2. Activate an existing module\n3. Check back later'}
         ],
         'question_type': 'multiple_choice',
-        'options': ['Add your own questions', 'Activate an existing module', 'Check back later'],
+        // Convert the list to a comma-separated String
+        'options': dummyOptionsList.join(','),
         'correct_option_index': 0,
         'module_name': 'system',
         'time_stamp': DateTime.now().toIso8601String(),
+        'question_id': 'dummy_question_01', // Ensure unique dummy ID
         'qst_contrib': 'system',
+        // Add missing fields expected by the widget/DB schema if necessary,
+        // even if dummy values
+        'ans_flagged': 0,
+        'ans_contrib': 'system',
+        'concepts': '',
+        'subjects': '',
+        'qst_reviewer': null,
         'has_been_reviewed': true,
         'flag_for_removal': false,
         'completed': true

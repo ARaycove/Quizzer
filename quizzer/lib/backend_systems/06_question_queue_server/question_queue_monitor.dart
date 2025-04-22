@@ -63,6 +63,15 @@ class QuestionQueueMonitor {
   /// Checks if the queue is empty
   bool get isEmpty => _questionQueue.isEmpty;
 
+  /// Gets a list of question IDs currently in the queue.
+  /// Note: Callers should ideally hold the queue lock via [requestQueueAccess]
+  /// before calling this to ensure a consistent snapshot.
+  List<String> getQuestionIdsInQueue() {
+    // Assumes 'question_id' exists and is a String in each map.
+    // Add error handling or type checking if this assumption might fail.
+    return _questionQueue.map((q) => q['question_id'] as String).toList();
+  }
+
   /// Clears the entire queue
   /// Should only be called after obtaining queue access
   void clearQueue() {

@@ -406,4 +406,29 @@ Future<Map<String, int>> getUserSubjectInterests(String userId, Database db) asy
   return interestData;
 }
 
+
+
+// --- Helper Functions ---
+
+/// Increments the total_questions_answered count for a specific user.
+Future<void> incrementTotalQuestionsAnswered(String userUuid, Database db) async {
+  QuizzerLogger.logMessage('Incrementing total_questions_answered for User: $userUuid');
+  
+  // Ensure the table and column exist (verification happens elsewhere, but good practice)
+  // We assume verifyUserProfileTable is called prior to DB operations usually.
+
+  final int rowsAffected = await db.rawUpdate(
+    'UPDATE user_profile SET total_questions_answered = total_questions_answered + 1 WHERE uuid = ?',
+    [userUuid]
+  );
+
+  if (rowsAffected == 0) {
+    QuizzerLogger.logWarning('Failed to increment total_questions_answered: No matching record found for User: $userUuid');
+    // Consider if this should throw an error if the user *must* exist at this point.
+  } else {
+    QuizzerLogger.logSuccess('Successfully incremented total_questions_answered for User: $userUuid');
+  }
+}
+
+
 // TODO: FIXME Add in functionality for loginThreshold preference
