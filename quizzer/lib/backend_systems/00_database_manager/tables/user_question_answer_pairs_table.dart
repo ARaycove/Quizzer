@@ -51,7 +51,6 @@ Future<void> verifyUserQuestionAnswerPairTable(Database db) async {
   }
 }
 
-// FIXME confirm test that lastRevised is now null when first added
 Future<int> addUserQuestionAnswerPair({
   required String userUuid,
   required String questionAnswerReference,

@@ -2,6 +2,7 @@ import 'dart:io'; // Import for File access
 import 'package:flutter/material.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart'; // Import SessionManager
+import 'package:quizzer/UI_systems/color_wheel.dart'; // Import ColorWheel
 
 // Placeholder for Question/Answer Element Rendering Widget
 // Now implementing basic type handling
@@ -31,22 +32,20 @@ class ElementRenderer extends StatelessWidget {
   // Helper method to build widget based on element type
   Widget _buildElementWidget(String? type, String? content) {
     if (content == null) {
-      return const Text('[Error: Missing content]', style: TextStyle(color: Colors.redAccent));
+      return const Text('[Error: Missing content]', style: TextStyle(color: ColorWheel.buttonError)); // Use ColorWheel
     }
 
     switch (type) {
       case 'text':
         return Text(
           content,
-          style: const TextStyle(color: Colors.white, fontSize: 16), // Default text style
+          style: ColorWheel.defaultText, // Use ColorWheel
         );
       case 'image':
         try {
           // Construct the full path using the base directory
-          final String basePath = 'images/question_answer_pair_assets'; 
-          // TODO: Consider making basePath configurable or using Flutter asset handling
+          const String basePath = 'images/question_answer_pair_assets'; 
           final String fullPath = '$basePath/$content'; 
-          
           QuizzerLogger.logMessage("Attempting to load image from: $fullPath"); // Log full path
           
           final file = File(fullPath); // Use the full path
@@ -60,27 +59,25 @@ class ElementRenderer extends StatelessWidget {
                  // Add error builder for loading issues
                  errorBuilder: (context, error, stackTrace) {
                     QuizzerLogger.logError("Error loading image $fullPath: $error"); // Log full path
-                    return const Row(children: [ Icon(Icons.broken_image, color: Colors.orangeAccent), SizedBox(width: 8), Text('[Image unavailable]', style: TextStyle(color: Colors.orangeAccent))]);
+                    return const Row(children: [ Icon(Icons.broken_image, color: ColorWheel.warning), SizedBox(width: ColorWheel.iconHorizontalSpacing), Text('[Image unavailable]', style: TextStyle(color: ColorWheel.warning))]); // Use ColorWheel
                  },
-                 // Optional: Add width/height constraints or fit properties
-                 // fit: BoxFit.contain, 
               ),
             );
           } else {
              QuizzerLogger.logWarning("Image file not found: $fullPath"); // Log full path
              // Keep error display Row as is (doesn't need centering typically)
-             return Row(children: [ Icon(Icons.image_not_supported, color: Colors.orangeAccent), SizedBox(width: 8), Text('[Image not found]', style: TextStyle(color: Colors.orangeAccent))]);
+             return const Row(children: [ Icon(Icons.image_not_supported, color: ColorWheel.warning), SizedBox(width: ColorWheel.iconHorizontalSpacing), Text('[Image not found]', style: TextStyle(color: ColorWheel.warning))]); // Use ColorWheel
           }
         } catch (e) {
            QuizzerLogger.logError("Error creating File object for path based on $content: $e"); // Log original content + error
            // Keep error display Row as is
-           return Row(children: [ Icon(Icons.error_outline, color: Colors.redAccent), SizedBox(width: 8), Text('[Error loading image]', style: TextStyle(color: Colors.redAccent))]);
+           return const Row(children: [ Icon(Icons.error_outline, color: ColorWheel.buttonError), SizedBox(width: ColorWheel.iconHorizontalSpacing), Text('[Error loading image]', style: TextStyle(color: ColorWheel.buttonError))]); // Use ColorWheel
         }
       // TODO: Add cases for other types like 'code', 'math', etc.
       default:
         return Text(
           '[Unsupported element type: ${type ?? "null"}]', 
-          style: const TextStyle(color: Colors.orangeAccent),
+          style: const TextStyle(color: ColorWheel.warning), // Use ColorWheel
         );
     }
   }
@@ -153,29 +150,29 @@ class _MultipleChoiceQuestionWidgetState
     // if (parsedOptions.isEmpty) { ... return error ... }
 
     // --- Render UI --- 
-    const Color secondaryBg = Color(0xFF1E2A3A);
-    const Color correctColor = Color(0xFF4CAF50);
-    const Color incorrectColor = Color(0xFFD64747);
-    const Color defaultOptionColor = secondaryBg;
-    const Color selectedOptionColor = Colors.cyan;
+    // Colors moved to ColorWheel, but keep specific logic variables
+    const Color correctColor = ColorWheel.buttonSuccess;
+    const Color incorrectColor = ColorWheel.buttonError;
+    const Color defaultOptionColor = ColorWheel.secondaryBackground;
+    const Color selectedOptionColor = ColorWheel.accent; // Using Accent color for selection highlight
 
     return SingleChildScrollView(
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: ColorWheel.standardPadding, // Use ColorWheel
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // --- Question Elements ---
             Container(
-              padding: const EdgeInsets.all(16.0),
+              padding: ColorWheel.standardPadding, // Use ColorWheel
               decoration: BoxDecoration(
-                color: secondaryBg,
-                borderRadius: BorderRadius.circular(12.0),
+                color: ColorWheel.secondaryBackground, // Use ColorWheel
+                borderRadius: ColorWheel.cardBorderRadius, // Use ColorWheel
               ),
               // Access directly and cast
               child: ElementRenderer(elements: session.currentQuestionData!['question_elements'] as List<Map<String, dynamic>>), 
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: ColorWheel.majorSectionSpacing), // Use ColorWheel
 
             // --- Options ---
             ListView.builder(
@@ -189,10 +186,23 @@ class _MultipleChoiceQuestionWidgetState
                 final bool isCorrect = index == (session.currentQuestionData!['correct_option_index'] as int);
                 final bool showFeedback = session.showingAnswer;
 
-                Color? optionBgColor = defaultOptionColor;
+                Color optionBgColor = defaultOptionColor; // Initialize with const
                 IconData? trailingIcon;
 
-                // Feedback logic
+                // --- Determine Border Color --- 
+                Color borderColor = Colors.transparent; // Default to no border
+                if (isSelected) {
+                  if (showFeedback) {
+                    // Feedback phase: Border color matches correctness
+                    borderColor = isCorrect ? correctColor : incorrectColor;
+                  } else {
+                    // Selection phase (before feedback): Use accent color
+                    borderColor = selectedOptionColor;
+                  }
+                }
+                // --- End Determine Border Color ---
+
+                // Feedback logic using ColorWheel colors (Background and Icon)
                 if (showFeedback) {
                   if (isSelected && isCorrect) {
                     optionBgColor = correctColor.withOpacity(0.3);
@@ -201,10 +211,13 @@ class _MultipleChoiceQuestionWidgetState
                     optionBgColor = incorrectColor.withOpacity(0.3);
                     trailingIcon = Icons.cancel;
                   } else if (isCorrect) {
+                    // Slightly highlight the correct answer even if not selected
                     optionBgColor = correctColor.withOpacity(0.1);
-                    trailingIcon = Icons.check_circle_outline;
+                    // No border change needed for unselected correct answer
+                    trailingIcon = Icons.check_circle_outline; 
                   }
                 } else if (isSelected) {
+                  // Highlight background slightly when selected before feedback
                   optionBgColor = selectedOptionColor.withOpacity(0.2);
                 }
 
@@ -212,14 +225,14 @@ class _MultipleChoiceQuestionWidgetState
                   padding: const EdgeInsets.symmetric(vertical: 4.0),
                   child: InkWell(
                     onTap: () => _handleOptionSelected(index),
-                    borderRadius: BorderRadius.circular(8.0),
+                    borderRadius: ColorWheel.buttonBorderRadius, // Use ColorWheel
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
                       decoration: BoxDecoration(
                         color: optionBgColor,
-                        borderRadius: BorderRadius.circular(8.0),
+                        borderRadius: ColorWheel.buttonBorderRadius, // Use ColorWheel
                         border: Border.all(
-                          color: isSelected ? selectedOptionColor : Colors.transparent,
+                          color: borderColor, // Use calculated border color
                           width: 1.5
                         )
                       ),
@@ -230,24 +243,24 @@ class _MultipleChoiceQuestionWidgetState
                             children: [
                               Icon(
                                 isSelected ? Icons.radio_button_checked : Icons.radio_button_unchecked,
-                                color: showFeedback ? (isCorrect ? correctColor : (isSelected ? incorrectColor : Colors.white54)) : Colors.white,
+                                color: showFeedback ? (isCorrect ? correctColor : (isSelected ? incorrectColor : ColorWheel.secondaryText)) : ColorWheel.primaryText, // Use ColorWheel
                                 size: 20,
                               ),
-                              const SizedBox(width: 12),
+                              const SizedBox(width: ColorWheel.relatedElementSpacing), // Use ColorWheel
                               Expanded(
                                 child: Text(
                                   parsedOptions[index], // Use item from parsed list
-                                  style: const TextStyle(color: Colors.white, fontSize: 16),
+                                  style: ColorWheel.defaultText, // Use ColorWheel
                                 ),
                               ),
                               if (showFeedback && trailingIcon != null)
-                                Icon(trailingIcon, color: isCorrect ? correctColor : (isSelected ? incorrectColor : Colors.grey)),
+                                Icon(trailingIcon, color: isCorrect ? correctColor : (isSelected ? incorrectColor : ColorWheel.secondaryText)), // Use ColorWheel
                             ],
                           ),
                           // --- Display Answer Elements ---
                           if (session.showingAnswer && isCorrect)
                             Padding(
-                              padding: const EdgeInsets.only(top: 10.0, left: 32.0),
+                              padding: const EdgeInsets.only(top: ColorWheel.relatedElementSpacing, left: 32.0), // Use ColorWheel
                                // Access directly and cast
                               child: ElementRenderer(elements: session.currentQuestionData!['answer_elements'] as List<Map<String, dynamic>>), 
                             ),
@@ -258,22 +271,22 @@ class _MultipleChoiceQuestionWidgetState
                 );
               },
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: ColorWheel.majorSectionSpacing), // Use ColorWheel
 
             // --- Next Question Button (Post-Answer) ---
             if (session.showingAnswer)
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: correctColor,
-                  padding: const EdgeInsets.symmetric(vertical: 16.0),
+                  backgroundColor: ColorWheel.buttonSuccess, // Use ColorWheel
+                  padding: const EdgeInsets.symmetric(vertical: ColorWheel.standardPaddingValue), // Use ColorWheel
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.0),
+                    borderRadius: ColorWheel.buttonBorderRadius, // Use ColorWheel
                   ),
                 ),
                 onPressed: _handleNextQuestion,
                 child: const Text(
                   'Next Question',
-                  style: TextStyle(fontSize: 16, color: Colors.white),
+                  style: ColorWheel.buttonText, // Use ColorWheel
                 ),
               ),
           ],

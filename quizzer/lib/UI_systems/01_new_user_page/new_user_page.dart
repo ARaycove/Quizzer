@@ -1,6 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:quizzer/UI_systems/01_new_user_page/new_user_page_field_validation.dart';
+import 'package:flutter/material.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
+import 'package:quizzer/UI_systems/color_wheel.dart';
 // =======================================================================================================
 // Widgets
 class NewUserPage extends StatefulWidget {
@@ -38,7 +39,7 @@ class _NewUserPageState extends State<NewUserPage> {
         if (emailError.isNotEmpty) {
             if (!mounted) return;
             ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(emailError), backgroundColor: Colors.red),
+                SnackBar(content: Text(emailError), backgroundColor: ColorWheel.buttonError),
             );
             return;
         }
@@ -47,7 +48,7 @@ class _NewUserPageState extends State<NewUserPage> {
         if (usernameError.isNotEmpty) {
             if (!mounted) return;
             ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(usernameError), backgroundColor: Colors.red),
+                SnackBar(content: Text(usernameError), backgroundColor: ColorWheel.buttonError),
             );
             return;
         }
@@ -56,7 +57,7 @@ class _NewUserPageState extends State<NewUserPage> {
         if (passwordError.isNotEmpty) {
             if (!mounted) return;
             ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(passwordError), backgroundColor: Colors.red),
+                SnackBar(content: Text(passwordError), backgroundColor: ColorWheel.buttonError),
             );
             return;
         }
@@ -67,7 +68,7 @@ class _NewUserPageState extends State<NewUserPage> {
             ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                     content: Text(results['message']),
-                    backgroundColor: const Color.fromARGB(255, 214, 71, 71),
+                    backgroundColor: ColorWheel.buttonError,
                 ),
             );
             return;
@@ -90,7 +91,7 @@ class _NewUserPageState extends State<NewUserPage> {
         final elementHeight25px = elementHeight > 25.0 ? 25.0 : elementHeight;
         
         return Scaffold(
-            backgroundColor: const Color(0xFF0A1929),
+            backgroundColor: ColorWheel.primaryBackground,
             body: Center(
                 child: SingleChildScrollView(
                     child: Column(
@@ -100,7 +101,7 @@ class _NewUserPageState extends State<NewUserPage> {
                                 'images/quizzer_assets/quizzer_logo.png',
                                 width: logoWidth,
                             ),
-                            const SizedBox(height: 20),
+                            const SizedBox(height: ColorWheel.majorSectionSpacing),
                             
                             SizedBox(
                                 width: fieldWidth,
@@ -109,18 +110,18 @@ class _NewUserPageState extends State<NewUserPage> {
                                     decoration: InputDecoration(
                                         labelText: 'Email Address',
                                         hintText: 'Enter your email address',
-                                        contentPadding: const EdgeInsets.all(12),
+                                        contentPadding: ColorWheel.inputFieldPadding,
                                         filled: true,
-                                        fillColor: const Color.fromARGB(255, 145, 236, 247),
-                                        labelStyle: const TextStyle(color: Colors.black87),
-                                        hintStyle: const TextStyle(color: Colors.black54),
+                                        fillColor: ColorWheel.textInputBackground,
+                                        labelStyle: ColorWheel.inputLabelText,
+                                        hintStyle: ColorWheel.hintTextStyle,
                                         border: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(10.0),
+                                            borderRadius: ColorWheel.textFieldBorderRadius,
                                         ),
                                     ),
                                 ),
                             ),
-                            const SizedBox(height: 10),
+                            const SizedBox(height: ColorWheel.relatedElementSpacing),
                             
                             SizedBox(
                                 width: fieldWidth,
@@ -129,18 +130,18 @@ class _NewUserPageState extends State<NewUserPage> {
                                     decoration: InputDecoration(
                                         labelText: 'Username',
                                         hintText: 'Enter your desired username',
-                                        contentPadding: const EdgeInsets.all(12),
+                                        contentPadding: ColorWheel.inputFieldPadding,
                                         filled: true,
-                                        fillColor: const Color.fromARGB(255, 145, 236, 247),
-                                        labelStyle: const TextStyle(color: Colors.black87),
-                                        hintStyle: const TextStyle(color: Colors.black54),
+                                        fillColor: ColorWheel.textInputBackground,
+                                        labelStyle: ColorWheel.inputLabelText,
+                                        hintStyle: ColorWheel.hintTextStyle,
                                         border: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(10.0),
+                                            borderRadius: ColorWheel.textFieldBorderRadius,
                                         ),
                                     ),
                                 ),
                             ),
-                            const SizedBox(height: 10),
+                            const SizedBox(height: ColorWheel.relatedElementSpacing),
                             
                             SizedBox(
                                 width: fieldWidth,
@@ -150,18 +151,18 @@ class _NewUserPageState extends State<NewUserPage> {
                                     decoration: InputDecoration(
                                         labelText: 'Password',
                                         hintText: 'Create a password',
-                                        contentPadding: const EdgeInsets.all(12),
+                                        contentPadding: ColorWheel.inputFieldPadding,
                                         filled: true,
-                                        fillColor: const Color.fromARGB(255, 145, 236, 247),
-                                        labelStyle: const TextStyle(color: Colors.black87),
-                                        hintStyle: const TextStyle(color: Colors.black54),
+                                        fillColor: ColorWheel.textInputBackground,
+                                        labelStyle: ColorWheel.inputLabelText,
+                                        hintStyle: ColorWheel.hintTextStyle,
                                         border: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(10.0),
+                                            borderRadius: ColorWheel.textFieldBorderRadius,
                                         ),
                                     ),
                                 ),
                             ),
-                            const SizedBox(height: 10),
+                            const SizedBox(height: ColorWheel.relatedElementSpacing),
                             
                             // Confirm Password Field
                             SizedBox(
@@ -172,18 +173,18 @@ class _NewUserPageState extends State<NewUserPage> {
                                     decoration: InputDecoration(
                                         labelText: 'Confirm Password',
                                         hintText: 'Confirm your password',
-                                        contentPadding: const EdgeInsets.all(12),
+                                        contentPadding: ColorWheel.inputFieldPadding,
                                         filled: true,
-                                        fillColor: const Color.fromARGB(255, 145, 236, 247),
-                                        labelStyle: const TextStyle(color: Colors.black87),
-                                        hintStyle: const TextStyle(color: Colors.black54),
+                                        fillColor: ColorWheel.textInputBackground,
+                                        labelStyle: ColorWheel.inputLabelText,
+                                        hintStyle: ColorWheel.hintTextStyle,
                                         border: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(10.0),
+                                            borderRadius: ColorWheel.textFieldBorderRadius,
                                         ),
                                     ),
                                 ),
                             ),
-                            const SizedBox(height: 20),
+                            const SizedBox(height: ColorWheel.majorSectionSpacing),
                             
                             // Button Row with Back and Submit buttons
                             Row(
@@ -191,28 +192,40 @@ class _NewUserPageState extends State<NewUserPage> {
                                 children: [
                                     // Back Button
                                     SizedBox(
-                                        width: buttonWidth,
+                                        width: buttonWidth / 1.1,
                                         height: elementHeight25px,
                                         child: ElevatedButton(
-                                            onPressed: () => Navigator.pop(context),
+                                            onPressed: () {
+                                              session.addPageToHistory('/login');
+                                              Navigator.pushReplacementNamed(context, '/login');
+                                            },
                                             style: ElevatedButton.styleFrom(
+                                                backgroundColor: ColorWheel.buttonSecondary,
                                                 minimumSize: Size(100, elementHeight25px),
+                                                shape: RoundedRectangleBorder(
+                                                    borderRadius: ColorWheel.buttonBorderRadius,
+                                                ),
                                             ),
-                                            child: const Text('Back'),
+                                            child: const Text('Back', style: ColorWheel.buttonText),
                                         ),
                                     ),
                                     
-                                    const SizedBox(width: 20),
+                                    const SizedBox(width: ColorWheel.buttonHorizontalSpacing),
                                     
+                                    // Create Account Button
                                     SizedBox(
-                                        width: buttonWidth,
+                                        width: buttonWidth / 1.1,
                                         height: elementHeight25px,
                                         child: ElevatedButton(
                                             onPressed: _handleSignUpButton,
                                             style: ElevatedButton.styleFrom(
+                                                backgroundColor: ColorWheel.buttonSuccess,
                                                 minimumSize: Size(100, elementHeight25px),
+                                                shape: RoundedRectangleBorder(
+                                                    borderRadius: ColorWheel.buttonBorderRadius,
+                                                ),
                                             ),
-                                            child: const Text('Create Account'),
+                                            child: const Text('Create Account', style: ColorWheel.buttonTextBold),
                                         ),
                                     ),
                                 ],

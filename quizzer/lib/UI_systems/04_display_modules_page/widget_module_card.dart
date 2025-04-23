@@ -4,6 +4,7 @@ import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/UI_systems/04_display_modules_page/widget_edit_module_dialog.dart';
 import 'package:quizzer/backend_systems/04_module_management/module_isolates.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
+import 'package:quizzer/UI_systems/color_wheel.dart';
 
 class ModuleCard extends StatefulWidget {
   final Map<String, dynamic> moduleData;
@@ -72,14 +73,11 @@ class _ModuleCardState extends State<ModuleCard> {
   Widget _buildMetadataItem(IconData icon, String text) {
     return Row(
       children: [
-        Icon(icon, size: 16, color: Colors.grey),
-        const SizedBox(width: 4.0),
+        Icon(icon, size: 16, color: ColorWheel.secondaryText),
+        const SizedBox(width: ColorWheel.iconHorizontalSpacing / 2),
         Text(
           text,
-          style: const TextStyle(
-            color: Colors.grey,
-            fontSize: 14,
-          ),
+          style: ColorWheel.secondaryTextStyle.copyWith(fontSize: 14),
         ),
       ],
     );
@@ -101,10 +99,13 @@ class _ModuleCardState extends State<ModuleCard> {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: const Color(0xFF1E2A3A),
-      margin: const EdgeInsets.only(bottom: 16.0),
+      color: ColorWheel.secondaryBackground,
+      margin: const EdgeInsets.only(bottom: ColorWheel.standardPaddingValue),
+      shape: RoundedRectangleBorder(
+        borderRadius: ColorWheel.cardBorderRadius,
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: ColorWheel.standardPadding,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -114,11 +115,7 @@ class _ModuleCardState extends State<ModuleCard> {
                 Expanded(
                   child: Text(
                     widget.moduleData['module_name'] ?? 'Unnamed Module',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: ColorWheel.titleText,
                   ),
                 ),
                 ModuleActionButtons(
@@ -128,17 +125,14 @@ class _ModuleCardState extends State<ModuleCard> {
                 ),
               ],
             ),
-            const SizedBox(height: 8.0),
+            const SizedBox(height: ColorWheel.formFieldSpacing),
             Visibility(
               visible: _description.isNotEmpty,
               child: Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
+                padding: const EdgeInsets.only(bottom: ColorWheel.formFieldSpacing),
                 child: Text(
                   _description,
-                  style: const TextStyle(
-                    color: Colors.grey,
-                    fontSize: 14,
-                  ),
+                  style: ColorWheel.secondaryTextStyle.copyWith(fontSize: 14),
                 ),
               ),
             ),
@@ -146,9 +140,9 @@ class _ModuleCardState extends State<ModuleCard> {
               children: [
                 _buildMetadataItem(
                   Icons.question_answer,
-                  '${widget.moduleData['total_questions']} questions',
+                  '${widget.moduleData['total_questions'] ?? 0} questions',
                 ),
-                const SizedBox(width: 16.0),
+                const SizedBox(width: ColorWheel.standardPaddingValue),
                 if (widget.moduleData['primary_subject'] != null && widget.moduleData['primary_subject'].isNotEmpty)
                   _buildMetadataItem(
                     Icons.category,

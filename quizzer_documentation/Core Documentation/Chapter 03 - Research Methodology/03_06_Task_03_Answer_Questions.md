@@ -24,7 +24,7 @@ Questions are categorized into three core formats, each with specific validation
 All questions where users choose from provided options:
 
 - **Multiple Choice**: Selecting one or more correct answers from a set
-- **True/False**: The simplest form of multiple choice with only two options
+- **True/False**: The simplest form of multiple choice with only two options (will be a multiple_choice format)
 - **Matching**: Pairing items from two lists (fundamentally selection-based)
 - **Sorting/Ordering**: Arranging items in correct sequence (selection through ordering)
 

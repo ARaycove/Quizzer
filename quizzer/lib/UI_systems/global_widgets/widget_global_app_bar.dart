@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
-
-// Colors
-const Color _surfaceColor = Color(0xFF1E2A3A); // Secondary Background
-const Color _textColor = Colors.white; // Primary Text
+import 'package:quizzer/UI_systems/color_wheel.dart';
 
 class GlobalAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
@@ -26,23 +23,24 @@ class GlobalAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       title: Text(
         title,
-        style: const TextStyle(color: _textColor),
+        style: ColorWheel.titleText,
       ),
-      backgroundColor: _surfaceColor,
+      backgroundColor: ColorWheel.secondaryBackground,
       elevation: 0,
       leading: IconButton(
-        icon: const Icon(Icons.arrow_back, color: _textColor),
+        icon: const Icon(Icons.arrow_back, color: ColorWheel.primaryText),
+        tooltip: 'Back',
         onPressed: () {
           final previousPage = session.getPreviousPage();
           session.addPageToHistory(previousPage);
           Navigator.of(context).pushReplacementNamed(previousPage);
-
         },
       ),
       actions: [
         if (showHomeButton)
           IconButton(
-            icon: const Icon(Icons.home, color: _textColor),
+            icon: const Icon(Icons.home, color: ColorWheel.primaryText),
+            tooltip: 'Home',
             onPressed: () {
               session.addPageToHistory('/home');
               Navigator.of(context).pushReplacementNamed('/home');

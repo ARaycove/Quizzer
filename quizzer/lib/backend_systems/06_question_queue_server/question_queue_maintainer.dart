@@ -9,6 +9,37 @@ import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 /// Starts the question queue maintenance process
 /// This function runs continuously in the background to maintain the queue
 Future<void> startQuestionQueueMaintenance() async {
+  // TODO Update so loop wait time is dynamic
+  // Intention, that dynamic loop wait time would reduce the time the worker is using system resources
+  // Option 1:
+  // 1. get average reaction time out of all items in the queue
+  // 2. set the duration wait time to this value
+  // Option 2:
+  // 1. Run without a timer, until the queue fills (very rapid filling)
+  // 2. If we check and it is 10 items, set sleep time to 75% of sum of average reaction time of items in the queue (Would result in a very long sleep duration, if the avg per item is 3 seconds, we would have a sum of 30 seconds, then tell the program to sleep for .75 * 22.5 seconds)
+  // Option 3:
+  // 1. Add one item per loop iteration
+  // 2. Set sleep time to next item in queue's average reaction time
+
+  // Considerations
+  // If queue is empty and nothing to add, we already have to check to switch to 60 second timeout
+  // We'd only execute the dynamic adjustment if their are presently items in the queue
+
+  // Functions needed to implement
+  // helper function -> getAverage TODO
+  // - takes in list of doubles or ints
+  // - removes outliers of dataset (if anything is way outside standard deviation then don't include it)
+  // - returns the mean value
+  // helper function -> getReactionTimeOfUserQuestionRecord TODO
+  // - takes userQuestionRecord as input
+  // - returns the list of reaction times
+  // helper function -> getAvgReactionTimeOfUserQuestionRecord TODO
+  // - compiles the previous two helper function together
+  // - takes a userQuestionRecord map as input
+  // - calls the getReactionTimeOfUserQuestionRecord
+  // - calls the getAverage 
+  // - returns the result
+
   QuizzerLogger.logMessage('Starting question queue maintenance');
   final queueMonitor = getQuestionQueueMonitor();
   final dbMonitor = getDatabaseMonitor();

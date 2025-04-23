@@ -5,6 +5,7 @@ import 'package:quizzer/UI_systems/04_display_modules_page/widget_scroll_to_top_
 import 'package:quizzer/UI_systems/04_display_modules_page/widget_module_filter_button.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
+import 'package:quizzer/UI_systems/color_wheel.dart';
 
 class DisplayModulesPage extends StatefulWidget {
   const DisplayModulesPage({super.key});
@@ -76,7 +77,7 @@ class _DisplayModulesPageState extends State<DisplayModulesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0A1929),
+      backgroundColor: ColorWheel.primaryBackground,
       appBar: GlobalAppBar(
         title: 'Modules',
         showHomeButton: true,
@@ -87,25 +88,25 @@ class _DisplayModulesPageState extends State<DisplayModulesPage> {
           SingleChildScrollView(
             controller: _scrollController,
             child: Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(ColorWheel.standardPaddingValue),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Add space for floating buttons
                   const SizedBox(
-                    height: 48.0, // Height of a mini FAB (40.0) + some padding
+                    height: 48.0, // Keep fixed for now, could use ColorWheel values later
                   ),
                   if (_isLoading)
                     const Center(
                       child: CircularProgressIndicator(
-                        color: Colors.white,
+                        color: ColorWheel.primaryText,
                       ),
                     )
                   else if (_modules.isEmpty)
                     const Center(
                       child: Text(
                         'No modules found',
-                        style: TextStyle(color: Colors.grey),
+                        style: ColorWheel.secondaryTextStyle,
                       ),
                     )
                   else
@@ -119,8 +120,8 @@ class _DisplayModulesPageState extends State<DisplayModulesPage> {
           ),
           // Top action buttons
           Positioned(
-            top: 16.0,
-            right: 16.0,
+            top: ColorWheel.standardPaddingValue,
+            right: ColorWheel.standardPaddingValue,
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -128,7 +129,7 @@ class _DisplayModulesPageState extends State<DisplayModulesPage> {
                   scrollController: _scrollController,
                   showScrollToTop: _showScrollToTop,
                 ),
-                const SizedBox(width: 8.0),
+                const SizedBox(width: ColorWheel.formFieldSpacing),
                 ModuleFilterButton(
                   onFilterPressed: _handleFilter,
                 ),

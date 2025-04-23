@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:quizzer/UI_systems/color_wheel.dart';
 
 class HomePageTopBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback onMenuPressed;
@@ -25,15 +26,15 @@ class HomePageTopBar extends StatelessWidget implements PreferredSizeWidget {
     return Stack(
       children: [
         AppBar(
-          backgroundColor: const Color(0xFF0A1929),
+          backgroundColor: ColorWheel.primaryBackground,
           elevation: 0,
           leading: IconButton(
-            icon: const Icon(Icons.menu, color: Colors.white),
+            icon: const Icon(Icons.menu, color: ColorWheel.primaryText),
             onPressed: onMenuPressed,
           ),
           actions: [
             IconButton(
-              icon: const Icon(Icons.flag, color: Colors.white),
+              icon: const Icon(Icons.flag, color: ColorWheel.primaryText),
               onPressed: () {
                 // Show flag dialog
                 showDialog(
@@ -56,12 +57,12 @@ class HomePageTopBar extends StatelessWidget implements PreferredSizeWidget {
         color: Colors.transparent,
         child: Container(
           width: MediaQuery.of(context).size.width * 0.8,
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(ColorWheel.majorSectionSpacing),
           decoration: BoxDecoration(
-            color: const Color(0xFF0A1929),
-            borderRadius: BorderRadius.circular(12),
+            color: ColorWheel.primaryBackground,
+            borderRadius: ColorWheel.cardBorderRadius,
             border: Border.all(
-              color: const Color.fromARGB(255, 145, 236, 247),
+              color: ColorWheel.textInputBackground,
               width: 2,
             ),
           ),
@@ -70,26 +71,26 @@ class HomePageTopBar extends StatelessWidget implements PreferredSizeWidget {
             children: [
               const Text(
                 "Flag Question",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: ColorWheel.titleText,
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: ColorWheel.standardPaddingValue),
               TextField(
                 controller: flagController,
                 maxLines: 3,
                 decoration: InputDecoration(
                   hintText: "Please explain the issue with this question...",
+                  hintStyle: ColorWheel.hintTextStyle.copyWith(color: Colors.grey[600]),
                   filled: true,
-                  fillColor: Colors.white,
+                  fillColor: ColorWheel.primaryText,
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: ColorWheel.textFieldBorderRadius,
+                    borderSide: BorderSide.none,
                   ),
+                  contentPadding: ColorWheel.inputFieldPadding,
                 ),
+                style: ColorWheel.defaultText.copyWith(color: Colors.black),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: ColorWheel.standardPaddingValue),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -99,16 +100,22 @@ class HomePageTopBar extends StatelessWidget implements PreferredSizeWidget {
                       Navigator.pop(context);
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey,
+                      backgroundColor: ColorWheel.buttonSecondary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: ColorWheel.buttonBorderRadius,
+                      ),
                     ),
-                    child: const Text("Cancel"),
+                    child: const Text("Cancel", style: ColorWheel.buttonText),
                   ),
                   ElevatedButton(
                     onPressed: onSubmitFlag,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromARGB(255, 71, 214, 93),
+                      backgroundColor: ColorWheel.buttonSuccess,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: ColorWheel.buttonBorderRadius,
+                      ),
                     ),
-                    child: const Text("Submit Flag"),
+                    child: const Text("Submit Flag", style: ColorWheel.buttonTextBold),
                   ),
                 ],
               ),

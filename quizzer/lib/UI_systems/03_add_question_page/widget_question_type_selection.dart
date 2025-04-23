@@ -1,19 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
-
-// Colors
-const Color _surfaceColor = Color(0xFF1E2A3A); // Secondary Background
-const Color _primaryColor = Color(0xFF4CAF50); // Accent Color
-const Color _textColor = Colors.white; // Primary Text
-
-// Spacing and Dimensions
-const double _borderRadius = 12.0;
-const double _spacing = 16.0;
-const double _fieldSpacing = 8.0; // Spacing between form fields
+import 'package:quizzer/UI_systems/color_wheel.dart';
 
 // Question types mapping
 const Map<String, String> _questionTypes = {
   'multiple_choice': 'Multiple Choice',
+  // TODO: Add other question types here as they become available
+  // 'sort_order': 'Sort Order',
+  // 'true_false': 'True/False',
+  // ... and so on
 };
 
 class QuestionTypeSelection extends StatelessWidget {
@@ -33,34 +28,33 @@ class QuestionTypeSelection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        const Text(
           'Question Type',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: _textColor,
-                fontWeight: FontWeight.bold,
-              ),
+          style: ColorWheel.titleText,
         ),
-        const SizedBox(height: _fieldSpacing),
+        const SizedBox(height: ColorWheel.formFieldSpacing),
         Container(
           width: width,
           decoration: BoxDecoration(
-            color: _surfaceColor,
-            borderRadius: BorderRadius.circular(_borderRadius),
-            border: Border.all(color: _primaryColor.withAlpha(128)),
+            color: ColorWheel.secondaryBackground,
+            borderRadius: ColorWheel.cardBorderRadius,
+            border: Border.all(color: ColorWheel.accent.withAlpha(128)),
           ),
           child: Padding(
             padding: const EdgeInsets.symmetric(
-              horizontal: _spacing,
-              vertical: 4.0,
+              horizontal: ColorWheel.standardPaddingValue,
+              vertical: ColorWheel.formFieldSpacing,
             ),
             child: DropdownButton<String>(
-              value: 'multiple_choice',
+              value: controller.text.isNotEmpty && _questionTypes.containsKey(controller.text) 
+                      ? controller.text 
+                      : _questionTypes.keys.first,
               isExpanded: true,
-              dropdownColor: _surfaceColor,
-              style: const TextStyle(color: _textColor),
-              icon: const Icon(Icons.arrow_drop_down, color: _textColor),
+              dropdownColor: ColorWheel.secondaryBackground,
+              style: ColorWheel.defaultText,
+              icon: const Icon(Icons.arrow_drop_down, color: ColorWheel.primaryText),
               underline: const SizedBox(),
-              borderRadius: BorderRadius.circular(_borderRadius),
+              borderRadius: ColorWheel.textFieldBorderRadius,
               items: _questionTypes.entries.map((entry) {
                 return DropdownMenuItem(
                   value: entry.key,
@@ -68,7 +62,7 @@ class QuestionTypeSelection extends StatelessWidget {
                 );
               }).toList(),
               onChanged: (value) {
-                final newValue = value ?? 'multiple_choice';
+                final newValue = value ?? _questionTypes.keys.first;
                 controller.text = newValue;
                 QuizzerLogger.logMessage('Question type changed to: $newValue');
               },

@@ -3,6 +3,7 @@ import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/UI_systems/global_widgets/widget_global_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer' as developer;
+import 'package:quizzer/UI_systems/color_wheel.dart';
 /*
 Menu Page Description:
 The menu serves as the central navigation hub for Quizzer, providing access to various behavioral task interfaces and settings.
@@ -36,13 +37,13 @@ class _MenuPageState extends State<MenuPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0A1929),
+      backgroundColor: ColorWheel.primaryBackground,
       appBar: GlobalAppBar(
         title: 'Quizzer Menu',
         showHomeButton: true,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(ColorWheel.standardPaddingValue),
         child: Column(
           children: [
             // Add Question Button
@@ -54,7 +55,7 @@ class _MenuPageState extends State<MenuPage> {
                 Navigator.pushNamed(context, '/add_question');
               },
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: ColorWheel.standardPaddingValue),
 
             // Add Content Button
             _buildMenuButton(
@@ -65,7 +66,7 @@ class _MenuPageState extends State<MenuPage> {
                 developer.log('Add Content page not implemented yet');
               },
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: ColorWheel.standardPaddingValue),
 
             // Display Modules Button
             _buildMenuButton(
@@ -76,7 +77,7 @@ class _MenuPageState extends State<MenuPage> {
                 Navigator.pushNamed(context, '/display_modules');
               },
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: ColorWheel.standardPaddingValue),
 
             // My Profile Button
             _buildMenuButton(
@@ -87,7 +88,7 @@ class _MenuPageState extends State<MenuPage> {
                 developer.log('My Profile page not implemented yet');
               },
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: ColorWheel.standardPaddingValue),
 
             // Settings Button
             _buildMenuButton(
@@ -98,7 +99,7 @@ class _MenuPageState extends State<MenuPage> {
                 developer.log('Settings page not implemented yet');
               },
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: ColorWheel.standardPaddingValue),
 
             // Stats Button
             _buildMenuButton(
@@ -109,7 +110,7 @@ class _MenuPageState extends State<MenuPage> {
                 developer.log('Stats page not implemented yet');
               },
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: ColorWheel.standardPaddingValue),
 
             // Feedback & Bug Reports Button
             _buildMenuButton(
@@ -120,7 +121,7 @@ class _MenuPageState extends State<MenuPage> {
                 developer.log('Feedback & Bug Reports page not implemented yet');
               },
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: ColorWheel.standardPaddingValue),
 
             // Help with Research Button
             _buildMenuButton(
@@ -131,12 +132,13 @@ class _MenuPageState extends State<MenuPage> {
                 developer.log('Help with Research page not implemented yet');
               },
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: ColorWheel.standardPaddingValue),
 
             // Logout Button
             _buildMenuButton(
               icon: Icons.logout,
               label: 'Logout',
+              isLogoutButton: true,
               onPressed: () async {
                 final navigator = Navigator.of(context);
                 session.clearSessionState();
@@ -157,18 +159,19 @@ class _MenuPageState extends State<MenuPage> {
     required IconData icon,
     required String label,
     required VoidCallback onPressed,
+    bool isLogoutButton = false,
   }) {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton.icon(
         onPressed: onPressed,
-        icon: Icon(icon, color: Colors.white),
-        label: Text(label, style: const TextStyle(color: Colors.white)),
+        icon: Icon(icon, color: ColorWheel.primaryText),
+        label: Text(label, style: ColorWheel.buttonText),
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color.fromARGB(255, 71, 214, 93),
-          padding: const EdgeInsets.symmetric(vertical: 16.0),
+          backgroundColor: isLogoutButton ? ColorWheel.buttonError : ColorWheel.buttonSuccess,
+          padding: const EdgeInsets.symmetric(vertical: ColorWheel.standardPaddingValue),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8.0),
+            borderRadius: ColorWheel.buttonBorderRadius,
           ),
         ),
       ),

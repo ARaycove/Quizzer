@@ -1,16 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
+import 'package:quizzer/UI_systems/color_wheel.dart';
 
-// Colors
-const Color _surfaceColor = Color(0xFF1E2A3A); // Secondary Background
-const Color _primaryColor = Color(0xFF4CAF50); // Accent Color
-const Color _textColor = Colors.white; // Primary Text
-
-// Spacing and Dimensions
-const double _borderRadius = 12.0;
-const double _spacing = 16.0;
-const double _fieldSpacing = 8.0; // Spacing between form fields
-
+// ==========================================
+// Widget
 class ModuleSelection extends StatefulWidget {
   final TextEditingController controller;
 
@@ -66,43 +59,40 @@ class _ModuleSelectionState extends State<ModuleSelection> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        const Text(
           'Module',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: _textColor,
-                fontWeight: FontWeight.bold,
-              ),
+          style: ColorWheel.titleText,
         ),
-        const SizedBox(height: _fieldSpacing),
+        const SizedBox(height: ColorWheel.formFieldSpacing),
         Container(
           width: width,
           decoration: BoxDecoration(
-            color: _surfaceColor,
-            borderRadius: BorderRadius.circular(_borderRadius),
-            border: Border.all(color: _primaryColor.withAlpha(128)),
+            color: ColorWheel.secondaryBackground,
+            borderRadius: ColorWheel.cardBorderRadius,
+            border: Border.all(color: ColorWheel.accent.withAlpha(128)),
           ),
           child: Padding(
             padding: const EdgeInsets.symmetric(
-              horizontal: _spacing,
+              horizontal: ColorWheel.standardPaddingValue,
               vertical: 4.0,
             ),
             child: Column(
               children: [
                 TextField(
                   controller: widget.controller,
-                  style: const TextStyle(color: _textColor),
+                  style: ColorWheel.defaultText,
                   decoration: InputDecoration(
                     hintText: 'Enter module name (default: General)',
-                    hintStyle: TextStyle(color: _textColor.withAlpha(153)),
+                    hintStyle: ColorWheel.defaultText.copyWith(color: ColorWheel.secondaryText),
                     filled: true,
-                    fillColor: _surfaceColor,
+                    fillColor: ColorWheel.secondaryBackground,
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(_borderRadius),
+                      borderRadius: ColorWheel.textFieldBorderRadius,
                       borderSide: BorderSide.none,
                     ),
                     contentPadding: const EdgeInsets.symmetric(
-                      horizontal: _spacing,
-                      vertical: _spacing,
+                      horizontal: ColorWheel.standardPaddingValue,
+                      vertical: ColorWheel.standardPaddingValue,
                     ),
                   ),
                   onChanged: (value) {
@@ -112,18 +102,19 @@ class _ModuleSelectionState extends State<ModuleSelection> {
                 if (_isLoading)
                   const Padding(
                     padding: EdgeInsets.symmetric(vertical: 8.0),
-                    child: CircularProgressIndicator(),
+                    child: CircularProgressIndicator(color: ColorWheel.primaryText),
                   )
                 else if (widget.controller.text.isNotEmpty)
                   Container(
                     constraints: BoxConstraints(
                       maxHeight: 200,
-                      maxWidth: width - 2 * _spacing,
+                      maxWidth: width - 2 * ColorWheel.standardPaddingValue,
                     ),
+                    margin: const EdgeInsets.only(top: ColorWheel.formFieldSpacing),
                     decoration: BoxDecoration(
-                      color: _surfaceColor,
-                      borderRadius: BorderRadius.circular(_borderRadius),
-                      border: Border.all(color: _primaryColor.withAlpha(128)),
+                      color: ColorWheel.secondaryBackground,
+                      borderRadius: ColorWheel.textFieldBorderRadius,
+                      border: Border.all(color: ColorWheel.accent.withAlpha(128)),
                     ),
                     child: ListView.builder(
                       shrinkWrap: true,
@@ -133,7 +124,7 @@ class _ModuleSelectionState extends State<ModuleSelection> {
                         return ListTile(
                           title: Text(
                             suggestion,
-                            style: const TextStyle(color: _textColor),
+                            style: ColorWheel.defaultText,
                           ),
                           onTap: () {
                             widget.controller.text = suggestion;

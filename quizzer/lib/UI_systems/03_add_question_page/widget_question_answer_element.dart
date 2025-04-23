@@ -3,6 +3,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
+import 'package:quizzer/UI_systems/color_wheel.dart';
 
 // Model to represent content in a question or answer
 class QAContent {
@@ -21,16 +22,6 @@ class QAContent {
     };
   }
 }
-
-// Colors
-const Color _backgroundColor = Color(0xFF0A1929); // Primary Background
-const Color _surfaceColor = Color(0xFF1E2A3A); // Secondary Background
-const Color _primaryColor = Color(0xFF4CAF50); // Accent Color
-const Color _errorColor = Color(0xFFD64747); // Error red
-const Color _textColor = Colors.white; // Primary Text
-const Color _hintColor = Colors.grey; // Secondary Text
-const double _borderRadius = 12.0;
-const double _spacing = 16.0;
 
 class QuestionAnswerElement extends StatefulWidget {
   final List<QAContent> elements;
@@ -170,7 +161,7 @@ class _QuestionAnswerElementState extends State<QuestionAnswerElement> {
         scaffoldMessenger.showSnackBar(
           const SnackBar(
             content: Text('Image file size must be less than 5MB'),
-            backgroundColor: _errorColor,
+            backgroundColor: ColorWheel.buttonError,
           ),
         );
         return;
@@ -184,7 +175,7 @@ class _QuestionAnswerElementState extends State<QuestionAnswerElement> {
         scaffoldMessenger.showSnackBar(
           SnackBar(
             content: Text('Please select a valid image file (${validExtensions.join(', ')})'),
-            backgroundColor: _errorColor,
+            backgroundColor: ColorWheel.buttonError,
           ),
         );
         return;
@@ -214,7 +205,7 @@ class _QuestionAnswerElementState extends State<QuestionAnswerElement> {
       scaffoldMessenger.showSnackBar(
         SnackBar(
           content: Text('Error uploading media: ${e.toString()}'),
-          backgroundColor: _errorColor,
+          backgroundColor: ColorWheel.buttonError,
         ),
       );
     }
@@ -233,9 +224,9 @@ class _QuestionAnswerElementState extends State<QuestionAnswerElement> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: _surfaceColor,
-        borderRadius: BorderRadius.circular(_borderRadius),
-        border: Border.all(color: _primaryColor.withAlpha(128)),
+        color: ColorWheel.secondaryBackground,
+        borderRadius: ColorWheel.cardBorderRadius,
+        border: Border.all(color: ColorWheel.accent.withAlpha(128)),
       ),
       child: Column(
         children: [
@@ -249,11 +240,11 @@ class _QuestionAnswerElementState extends State<QuestionAnswerElement> {
               return ListTile(
                 key: Key(element.content),
                 contentPadding: const EdgeInsets.symmetric(
-                  horizontal: _spacing,
-                  vertical: _spacing / 2,
+                  horizontal: ColorWheel.standardPaddingValue,
+                  vertical: ColorWheel.standardPaddingValue / 2,
                 ),
                 leading: IconButton(
-                  icon: const Icon(Icons.delete, color: _errorColor),
+                  icon: const Icon(Icons.delete, color: ColorWheel.buttonError),
                   onPressed: () {
                     setState(() {
                       widget.elements.removeAt(index);
@@ -267,24 +258,27 @@ class _QuestionAnswerElementState extends State<QuestionAnswerElement> {
                   child: element.type == 'text'
                       ? Text(
                           element.content,
-                          style: const TextStyle(color: _textColor),
+                          style: ColorWheel.defaultText,
                         )
                       : Image.file(
                           File(element.content),
                           height: 100,
                           fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                             return const Row(children: [ Icon(Icons.broken_image, color: ColorWheel.warning), SizedBox(width: ColorWheel.iconHorizontalSpacing), Text('[Image unavailable]', style: TextStyle(color: ColorWheel.warning))]);
+                          },
                         ),
                 ),
                 trailing: const Icon(
                   Icons.drag_handle,
-                  color: _hintColor,
+                  color: ColorWheel.secondaryText,
                 ),
               );
             }).toList(),
           ),
           if (_isAddingText)
             Padding(
-              padding: const EdgeInsets.all(_spacing),
+              padding: ColorWheel.standardPadding,
               child: Row(
                 children: [
                   Expanded(
@@ -303,30 +297,38 @@ class _QuestionAnswerElementState extends State<QuestionAnswerElement> {
                         controller: _textEntryController,
                         focusNode: _textFocusNode,
                         autofocus: true,
-                        style: const TextStyle(color: _textColor),
+                        style: ColorWheel.defaultText,
                         maxLines: null,
                         keyboardType: TextInputType.multiline,
                         textInputAction: TextInputAction.newline,
                         decoration: InputDecoration(
                           hintText: 'Enter text (Shift+Enter to submit)',
-                          hintStyle: const TextStyle(color: _hintColor),
+                          hintStyle: ColorWheel.secondaryTextStyle,
                           filled: true,
-                          fillColor: _backgroundColor,
+                          fillColor: ColorWheel.primaryBackground,
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(_borderRadius),
-                            borderSide: const BorderSide(color: _primaryColor),
+                            borderRadius: ColorWheel.textFieldBorderRadius,
+                            borderSide: const BorderSide(color: ColorWheel.accent),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                             borderRadius: ColorWheel.textFieldBorderRadius,
+                             borderSide: const BorderSide(color: ColorWheel.accent),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                             borderRadius: ColorWheel.textFieldBorderRadius,
+                             borderSide: const BorderSide(color: ColorWheel.accent, width: 2.0), 
                           ),
                           contentPadding: const EdgeInsets.symmetric(
-                            horizontal: _spacing,
-                            vertical: _spacing,
+                            horizontal: ColorWheel.standardPaddingValue,
+                            vertical: ColorWheel.standardPaddingValue,
                           ),
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(width: _spacing / 2),
+                  const SizedBox(width: ColorWheel.standardPaddingValue / 2),
                   IconButton(
-                    icon: const Icon(Icons.add, color: _primaryColor),
+                    icon: const Icon(Icons.add, color: ColorWheel.accent),
                     onPressed: () {
                       if (_textEntryController.text.isNotEmpty) {
                         _handleTextSubmitted(_textEntryController.text);
@@ -337,38 +339,38 @@ class _QuestionAnswerElementState extends State<QuestionAnswerElement> {
               ),
             ),
           Padding(
-            padding: const EdgeInsets.all(_spacing),
+            padding: ColorWheel.standardPadding,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ElevatedButton.icon(
                   onPressed: () => _addTextElement(context),
-                  icon: const Icon(Icons.text_fields, color: _textColor),
-                  label: const Text('Add Text', style: TextStyle(color: _textColor)),
+                  icon: const Icon(Icons.text_fields, color: ColorWheel.primaryText),
+                  label: const Text('Add Text', style: ColorWheel.buttonText),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: _primaryColor,
+                    backgroundColor: ColorWheel.accent,
                     padding: const EdgeInsets.symmetric(
-                      horizontal: _spacing,
-                      vertical: _spacing / 2,
+                      horizontal: ColorWheel.standardPaddingValue,
+                      vertical: ColorWheel.standardPaddingValue / 2,
                     ),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(_borderRadius),
+                      borderRadius: ColorWheel.buttonBorderRadius,
                     ),
                   ),
                 ),
-                const SizedBox(width: _spacing),
+                const SizedBox(width: ColorWheel.standardPaddingValue),
                 ElevatedButton.icon(
                   onPressed: () => _handleMediaUpload(context),
-                  icon: const Icon(Icons.image, color: _textColor),
-                  label: const Text('Add Image', style: TextStyle(color: _textColor)),
+                  icon: const Icon(Icons.image, color: ColorWheel.primaryText),
+                  label: const Text('Add Image', style: ColorWheel.buttonText),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: _primaryColor,
+                    backgroundColor: ColorWheel.accent,
                     padding: const EdgeInsets.symmetric(
-                      horizontal: _spacing,
-                      vertical: _spacing / 2,
+                      horizontal: ColorWheel.standardPaddingValue,
+                      vertical: ColorWheel.standardPaddingValue / 2,
                     ),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(_borderRadius),
+                      borderRadius: ColorWheel.buttonBorderRadius,
                     ),
                   ),
                 ),

@@ -32,6 +32,7 @@
 // - Handle question versioning
 
 import 'package:flutter/material.dart';
+import 'package:quizzer/UI_systems/color_wheel.dart';
 
 class EditModuleDialog extends StatefulWidget {
   final Map<String, dynamic> moduleData;
@@ -73,9 +74,9 @@ class _EditModuleDialogState extends State<EditModuleDialog> {
     final questionIds = widget.moduleData['question_ids'] as List<String>;
 
     return Dialog(
-      backgroundColor: const Color(0xFF1E2A3A),
+      backgroundColor: ColorWheel.secondaryBackground,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12.0),
+        borderRadius: ColorWheel.cardBorderRadius,
       ),
       child: SizedBox(
         width: dialogWidth,
@@ -84,98 +85,85 @@ class _EditModuleDialogState extends State<EditModuleDialog> {
           children: [
             // Header
             Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: ColorWheel.standardPadding,
               child: Text(
                 'Edit Module: ${widget.moduleData['module_name']}',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: ColorWheel.titleText,
               ),
             ),
-            const Divider(color: Colors.grey),
+            const Divider(color: ColorWheel.secondaryText),
             // Scrollable content
             Expanded(
               child: SingleChildScrollView(
                 controller: _scrollController,
-                padding: const EdgeInsets.all(16.0),
+                padding: ColorWheel.standardPadding,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Description field
                     const Text(
                       'Description',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: ColorWheel.titleText,
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: ColorWheel.formFieldSpacing),
                     TextField(
                       controller: _descriptionController,
                       maxLines: null,
                       minLines: 3,
-                      style: const TextStyle(color: Colors.grey),
+                      style: ColorWheel.secondaryTextStyle,
                       decoration: InputDecoration(
                         hintText: 'Enter module description',
-                        hintStyle: const TextStyle(color: Colors.grey),
+                        hintStyle: ColorWheel.secondaryTextStyle,
                         filled: true,
-                        fillColor: const Color(0xFF0A1929),
+                        fillColor: ColorWheel.primaryBackground,
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                          borderSide: const BorderSide(color: Colors.grey),
+                          borderRadius: ColorWheel.textFieldBorderRadius,
+                          borderSide: const BorderSide(color: ColorWheel.secondaryText),
                         ),
                         enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                          borderSide: const BorderSide(color: Colors.grey),
+                          borderRadius: ColorWheel.textFieldBorderRadius,
+                          borderSide: const BorderSide(color: ColorWheel.secondaryText),
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                          borderSide: const BorderSide(color: Color.fromARGB(255, 71, 214, 93)),
+                          borderRadius: ColorWheel.textFieldBorderRadius,
+                          borderSide: const BorderSide(color: ColorWheel.accent),
                         ),
-                        contentPadding: const EdgeInsets.all(12.0),
+                        contentPadding: ColorWheel.inputFieldPadding,
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: ColorWheel.majorSectionSpacing),
                     // Questions section
                     const Text(
                       'Questions in Module',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: ColorWheel.titleText,
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: ColorWheel.formFieldSpacing),
                     Container(
                       decoration: BoxDecoration(
-                        color: const Color(0xFF0A1929),
-                        borderRadius: BorderRadius.circular(10.0),
+                        color: ColorWheel.primaryBackground,
+                        borderRadius: ColorWheel.textFieldBorderRadius,
                       ),
-                      padding: const EdgeInsets.all(12.0),
+                      padding: ColorWheel.inputFieldPadding,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             'Total Questions: ${questionIds.length}',
-                            style: const TextStyle(
-                              color: Colors.grey,
-                              fontSize: 14,
-                            ),
+                            style: ColorWheel.secondaryTextStyle,
                           ),
-                          const SizedBox(height: 8),
-                          ...questionIds.map((id) => Padding(
+                          const SizedBox(height: ColorWheel.formFieldSpacing),
+                          ...questionIds.take(10).map((id) => Padding(
                                 padding: const EdgeInsets.only(bottom: 4.0),
                                 child: Text(
                                   id,
-                                  style: const TextStyle(
-                                    color: Colors.grey,
-                                    fontSize: 12,
-                                  ),
+                                  style: ColorWheel.secondaryTextStyle.copyWith(fontSize: 12),
                                 ),
                               )),
+                          if (questionIds.length > 10)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 4.0),
+                              child: Text("... and ${questionIds.length - 10} more", style: ColorWheel.secondaryTextStyle.copyWith(fontStyle: FontStyle.italic)),
+                            ),
                         ],
                       ),
                     ),
@@ -185,12 +173,12 @@ class _EditModuleDialogState extends State<EditModuleDialog> {
             ),
             // Fixed footer with buttons
             Container(
-              padding: const EdgeInsets.all(16.0),
+              padding: ColorWheel.standardPadding,
               decoration: const BoxDecoration(
-                color: Color(0xFF0A1929),
+                color: ColorWheel.primaryBackground,
                 borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(12.0),
-                  bottomRight: Radius.circular(12.0),
+                  bottomLeft: Radius.circular(ColorWheel.cardRadiusValue),
+                  bottomRight: Radius.circular(ColorWheel.cardRadiusValue),
                 ),
               ),
               child: Row(
@@ -202,24 +190,24 @@ class _EditModuleDialogState extends State<EditModuleDialog> {
                     },
                     child: const Text(
                       'Cancel',
-                      style: TextStyle(color: Colors.grey),
+                      style: ColorWheel.secondaryTextStyle,
                     ),
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: ColorWheel.buttonHorizontalSpacing),
                   ElevatedButton(
                     onPressed: () {
                       widget.onSave(_descriptionController.text);
                       Navigator.of(context).pop();
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromARGB(255, 71, 214, 93),
+                      backgroundColor: ColorWheel.buttonSuccess,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
+                        borderRadius: ColorWheel.buttonBorderRadius,
                       ),
                     ),
                     child: const Text(
                       'Save',
-                      style: TextStyle(color: Colors.white),
+                      style: ColorWheel.buttonText,
                     ),
                   ),
                 ],
@@ -230,4 +218,4 @@ class _EditModuleDialogState extends State<EditModuleDialog> {
       ),
     );
   }
-} 
+}

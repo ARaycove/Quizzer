@@ -52,12 +52,7 @@ import 'package:quizzer/UI_systems/03_add_question_page/widget_submit_clear_butt
 import 'package:quizzer/UI_systems/global_widgets/widget_global_app_bar.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
-
-// Colors
-const Color _backgroundColor = Color(0xFF0A1929); // Primary Background
-const Color _textColor = Colors.white; // Primary Text
-const double _spacing = 16.0;
-
+import 'package:quizzer/UI_systems/color_wheel.dart';
 // ==========================================
 
 // Widgets
@@ -240,7 +235,7 @@ class _AddQuestionAnswerPageState extends State<AddQuestionAnswerPage> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: Colors.red,
+        backgroundColor: ColorWheel.buttonError,
         duration: const Duration(seconds: 3),
       ),
     );
@@ -250,7 +245,7 @@ class _AddQuestionAnswerPageState extends State<AddQuestionAnswerPage> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: Colors.green,
+        backgroundColor: ColorWheel.buttonSuccess,
         duration: const Duration(seconds: 3),
       ),
     );
@@ -274,25 +269,21 @@ class _AddQuestionAnswerPageState extends State<AddQuestionAnswerPage> {
       appBar: GlobalAppBar(
         title: 'Add Question-Answer Pair',
       ),
-      backgroundColor: _backgroundColor,
+      backgroundColor: ColorWheel.primaryBackground,
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(_spacing),
+        padding: const EdgeInsets.all(ColorWheel.standardPaddingValue),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ModuleSelection(controller: _moduleController),
-            const SizedBox(height: _spacing),
+            const SizedBox(height: ColorWheel.standardPaddingValue),
             QuestionTypeSelection(controller: _questionTypeController),
-            const SizedBox(height: _spacing * 2),
+            const SizedBox(height: ColorWheel.majorSectionSpacing),
             const Text(
               'Question Entry',
-              style: TextStyle(
-                color: _textColor,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+              style: ColorWheel.titleText,
             ),
-            const SizedBox(height: _spacing),
+            const SizedBox(height: ColorWheel.standardPaddingValue),
             QuestionAnswerElement(
               elements: _questionElements,
               onElementsChanged: _handleQuestionElementsChanged,
@@ -301,7 +292,7 @@ class _AddQuestionAnswerPageState extends State<AddQuestionAnswerPage> {
             ),
             if (_questionTypeController.text == 'multiple_choice')
               Padding(
-                padding: const EdgeInsets.only(top: _spacing),
+                padding: const EdgeInsets.only(top: ColorWheel.standardPaddingValue),
                 child: QuestionEntryOptionsDialog(
                   options: _options,
                   onOptionsChanged: _handleOptionsChanged,
@@ -309,23 +300,19 @@ class _AddQuestionAnswerPageState extends State<AddQuestionAnswerPage> {
                   onCorrectOptionChanged: _handleCorrectOptionChanged,
                 ),
               ),
-            const SizedBox(height: _spacing * 2),
+            const SizedBox(height: ColorWheel.majorSectionSpacing),
             const Text(
               'Answer Entry',
-              style: TextStyle(
-                color: _textColor,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+              style: ColorWheel.titleText,
             ),
-            const SizedBox(height: _spacing),
+            const SizedBox(height: ColorWheel.standardPaddingValue),
             QuestionAnswerElement(
               elements: _answerElements,
               onElementsChanged: _handleAnswerElementsChanged,
               isQuestion: false,
               picker: _imagePicker,
             ),
-            const SizedBox(height: _spacing * 2),
+            const SizedBox(height: ColorWheel.majorSectionSpacing),
             SubmitClearButtons(
               onSubmit: _handleSubmit,
               onClear: _handleClear,

@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Core Documentation/Chapter 08 - Database/08_01_03_Question_Answer_Attempts_Table.md",
+                "file": "Core Documentation/Chapter 03 - Research Methodology/03_06_Task_03_Answer_Questions.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "08_01_03_Question_Answer_Attempts_Table"
+              "title": "03_06_Task_03_Answer_Questions"
             }
           },
           {
@@ -211,7 +211,11 @@
   },
   "active": "d47008925d227bd1",
   "lastOpenFiles": [
+    "Core Documentation/Chapter 03 - Research Methodology/03_05_Task_02_Question_Answer_Pair_Generation.md",
+    "Core Documentation/Chapter 03 - Research Methodology/03_06_Task_03_Answer_Questions.md",
+    "Core Documentation/Chapter 03 - Research Methodology/03_04_Task_01_Source_Material_Generation_and_Classification.md",
     "Core Documentation/Chapter 03 - Research Methodology/03_03_breakdown_of_behavioral_tasks.md",
+    "Core Documentation/Chapter 08 - Database/08_01_03_Question_Answer_Attempts_Table.md",
     "Diagrams/Quizzer_Flow_Chart.md",
     "Diagrams/Question_Answer_Pair_Generation.md",
     "Diagrams/NewUserSignUp-LoginPage.png",
@@ -237,10 +241,6 @@
     "Core Documentation/Chapter 08 - Database/08_00_03_Central_Database_Implementation.md",
     "Core Documentation/Chapter 07 - Functions/07_14_getNextQuestionForReview().md",
     "Core Documentation/Chapter 09 - Algorithms and Background Processes/09_13_Question_Selection_Background_Process.md",
-    "Core Documentation/Chapter 05 - User Experience and User Interface Design/05_05_Home_Page.md",
-    "Core Documentation/Chapter 07 - Functions/07_12_answerQuestionAnswerPair(status, elapsed_time).md",
-    "Core Documentation/Chapter 08 - Database/08_01_02_User_Question_Relationship_Table.md",
-    "Core Documentation/Chapter 08 - Database/08_02_01_User_Profiles_Table.md",
     "Core Documentation/Chapter 08 - Database/Question Answer Related Tables",
     "Pasted image 20250407093838.png",
     "Core Documentation/Chapter 07 - Functions/Redirect Functions",

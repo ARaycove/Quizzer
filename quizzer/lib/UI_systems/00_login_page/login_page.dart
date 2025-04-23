@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
+import 'package:quizzer/UI_systems/color_wheel.dart';
 
 // TODO Let's make plans to implement a very fancy loading indicator.
 // I'm thinking some kind of loading bar
@@ -44,7 +45,7 @@ class _LoginPageState extends State<LoginPage> {
                         : email.isEmpty 
                           ? 'Please enter your email address'
                           : 'Please enter your password'), // More specific messages
-          backgroundColor: const Color.fromARGB(255, 214, 71, 71),
+          backgroundColor: ColorWheel.buttonError,
         ),
       );
       // Reset loading state on validation error
@@ -72,7 +73,7 @@ class _LoginPageState extends State<LoginPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(results['message'] ?? 'Login failed'),
-          backgroundColor: const Color.fromARGB(255, 214, 71, 71),
+          backgroundColor: ColorWheel.buttonError,
         ),
       );
       // Reset loading state on login failure
@@ -120,7 +121,7 @@ class _LoginPageState extends State<LoginPage> {
     final elementHeight25px = elementHeight > 25.0 ? 25.0 : elementHeight;
     
     return Scaffold(
-      backgroundColor: const Color(0xFF0A1929),
+      backgroundColor: ColorWheel.primaryBackground,
       body: Center(child: SingleChildScrollView(child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -129,7 +130,7 @@ class _LoginPageState extends State<LoginPage> {
                 "images/quizzer_assets/quizzer_logo.png",
                 width: logoWidth,
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: ColorWheel.majorSectionSpacing),
               
               // Email Field
               SizedBox(
@@ -140,18 +141,18 @@ class _LoginPageState extends State<LoginPage> {
                   decoration: InputDecoration(
                     labelText: "Email Address",
                     hintText: "Enter your email address to login",
-                    contentPadding: const EdgeInsets.all(12),
+                    contentPadding: ColorWheel.inputFieldPadding,
                     filled: true,
-                    fillColor: const Color.fromARGB(255, 145, 236, 247),
-                    labelStyle: const TextStyle(color: Colors.black87),
-                    hintStyle: const TextStyle(color: Colors.black54),
+                    fillColor: ColorWheel.textInputBackground,
+                    labelStyle: ColorWheel.inputLabelText,
+                    hintStyle: ColorWheel.hintTextStyle,
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
+                      borderRadius: ColorWheel.textFieldBorderRadius,
                     ),
                   ),
                 ),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: ColorWheel.relatedElementSpacing),
               
               // Password Field
               SizedBox(
@@ -163,18 +164,18 @@ class _LoginPageState extends State<LoginPage> {
                   decoration: InputDecoration(
                     labelText: "Password",
                     hintText: "Enter your account password to login",
-                    contentPadding: const EdgeInsets.all(12),
+                    contentPadding: ColorWheel.inputFieldPadding,
                     filled: true,
-                    fillColor: const Color.fromARGB(255, 145, 236, 247),
-                    labelStyle: const TextStyle(color: Colors.black87),
-                    hintStyle: const TextStyle(color: Colors.black54),
+                    fillColor: ColorWheel.textInputBackground,
+                    labelStyle: ColorWheel.inputLabelText,
+                    hintStyle: ColorWheel.hintTextStyle,
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
+                      borderRadius: ColorWheel.textFieldBorderRadius,
                     ),
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: ColorWheel.majorSectionSpacing),
               
               // Submit Button
               SizedBox(
@@ -183,43 +184,39 @@ class _LoginPageState extends State<LoginPage> {
                 child: ElevatedButton(
                   onPressed: _isLoading ? null : submitLogin,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 71, 214, 93),
+                    backgroundColor: ColorWheel.buttonSuccess,
                     minimumSize: Size(100, elementHeight25px),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0),
+                      borderRadius: ColorWheel.buttonBorderRadius,
                     ),
-                    disabledBackgroundColor: Colors.grey[600],
+                    disabledBackgroundColor: ColorWheel.buttonSecondary,
                   ),
                   child: _isLoading 
-                      ? SizedBox(
+                      ? const SizedBox(
                           width: 20,
                           height: 20,
                           child: CircularProgressIndicator(
-                            color: Colors.white,
+                            color: ColorWheel.primaryText,
                             strokeWidth: 3,
                           ),
                         ) 
                       : const Text(
                           "Login",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: ColorWheel.buttonTextBold,
                         ),
                 ),
               ),
               
               // Space for Social Login buttons
-              const SizedBox(height: 30),
+              const SizedBox(height: ColorWheel.majorSectionSpacing + 10),
               
               // Social Login Grid
               SizedBox(
                 width: fieldWidth,
                 child: Wrap(
                   alignment: WrapAlignment.center,
-                  spacing: 10,
-                  runSpacing: 10,
+                  spacing: ColorWheel.relatedElementSpacing,
+                  runSpacing: ColorWheel.relatedElementSpacing,
                   children: [
                     // These would be replaced with actual social login buttons
                     _buildSocialLoginButton(Icons.g_mobiledata, "Google"),
@@ -230,7 +227,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
               
-              const SizedBox(height: 30),
+              const SizedBox(height: ColorWheel.majorSectionSpacing + 10),
               
               // New User Sign Up Button
               SizedBox(
@@ -239,19 +236,15 @@ class _LoginPageState extends State<LoginPage> {
                 child: ElevatedButton(
                   onPressed: _isLoading ? null : newUserSignUp,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 71, 214, 93),
+                    backgroundColor: ColorWheel.buttonSuccess,
                     minimumSize: Size(100, elementHeight25px),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0),
+                      borderRadius: ColorWheel.buttonBorderRadius,
                     ),
                   ),
                   child: const Text(
                     "New User",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: ColorWheel.buttonTextBold,
                   ),
                 ),
               ),
@@ -269,18 +262,19 @@ class _LoginPageState extends State<LoginPage> {
       width: 25,
       height: 25,
       decoration: BoxDecoration(
-        color: const Color(0xFF1E2A3A),
+        color: ColorWheel.secondaryBackground,
         borderRadius: BorderRadius.circular(5),
         border: Border.all(
-          color: const Color.fromARGB(255, 71, 214, 93),
+          color: ColorWheel.buttonSuccess,
           width: 1,
         ),
       ),
       child: IconButton(
         padding: EdgeInsets.zero,
-        icon: Icon(icon, size: 20, color: Colors.white),
+        icon: Icon(icon, size: 20, color: ColorWheel.primaryText),
         onPressed: () {
           // This would later call the appropriate social login function
+          QuizzerLogger.logWarning('Social login ($service) not implemented yet.');
         },
       ),
     );

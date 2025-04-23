@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:quizzer/UI_systems/color_wheel.dart';
 
 /// A custom button for adding a module to user profile
 class AddModuleButton extends StatelessWidget {
@@ -13,15 +14,18 @@ class AddModuleButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final elementHeight = MediaQuery.of(context).size.height * 0.04;
+    final elementHeight25px = elementHeight > 25.0 ? 25.0 : elementHeight;
+    
     return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.04, // Max 25px as per guidelines
+      height: elementHeight25px, // Apply max height
       child: IconButton(
         onPressed: onPressed,
         icon: Icon(
           isAdded ? Icons.check_circle : Icons.add_circle_outline,
           color: isAdded 
-            ? const Color(0xFF4CAF50) // Accent color from guidelines
-            : Colors.white,
+            ? ColorWheel.accent // Use ColorWheel
+            : ColorWheel.primaryText, // Use ColorWheel
         ),
         tooltip: isAdded ? 'Added to Profile' : 'Add to Profile',
         padding: EdgeInsets.zero,
@@ -43,13 +47,16 @@ class EditModuleButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+     final elementHeight = MediaQuery.of(context).size.height * 0.04;
+     final elementHeight25px = elementHeight > 25.0 ? 25.0 : elementHeight;
+
     return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.04, // Max 25px as per guidelines
+      height: elementHeight25px, // Apply max height
       child: IconButton(
         onPressed: onPressed,
         icon: const Icon(
           Icons.edit_outlined,
-          color: Colors.white,
+          color: ColorWheel.primaryText, // Use ColorWheel
         ),
         tooltip: 'Edit Module',
         padding: EdgeInsets.zero,
@@ -82,7 +89,7 @@ class ModuleActionButtons extends StatelessWidget {
           onPressed: onAddPressed,
           isAdded: isAdded,
         ),
-        const SizedBox(width: 8), // Spacing between buttons as per guidelines
+        const SizedBox(width: ColorWheel.iconHorizontalSpacing), // Use ColorWheel
         EditModuleButton(
           onPressed: onEditPressed,
         ),

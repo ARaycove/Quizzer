@@ -1,15 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
-
-// Colors
-const Color _backgroundColor = Color(0xFF0A1929); // Primary Background
-const Color _surfaceColor = Color(0xFF1E2A3A); // Secondary Background
-const Color _primaryColor = Color(0xFF4CAF50); // Accent Color
-const Color _errorColor = Color(0xFFD64747); // Error red
-const Color _textColor = Colors.white; // Primary Text
-const Color _hintColor = Colors.grey; // Secondary Text
-const double _borderRadius = 12.0;
-const double _spacing = 16.0;
+import 'package:quizzer/UI_systems/color_wheel.dart';
 
 class QuestionEntryOptionsDialog extends StatefulWidget {
   final List<String> options;
@@ -93,33 +84,41 @@ optionToRemove.runtimeType: ${optionToRemove.runtimeType}
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: _surfaceColor,
-        borderRadius: BorderRadius.circular(_borderRadius),
-        border: Border.all(color: _primaryColor.withAlpha(128)),
+        color: ColorWheel.secondaryBackground,
+        borderRadius: ColorWheel.cardBorderRadius,
+        border: Border.all(color: ColorWheel.accent.withAlpha(128)),
       ),
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(_spacing),
+            padding: ColorWheel.standardPadding,
             child: Row(
               children: [
                 Expanded(
                   child: TextField(
                     controller: _optionsController,
                     focusNode: _optionsFocusNode,
-                    style: const TextStyle(color: _textColor),
+                    style: ColorWheel.defaultText,
                     decoration: InputDecoration(
                       hintText: 'Enter an option',
-                      hintStyle: const TextStyle(color: _hintColor),
+                      hintStyle: ColorWheel.secondaryTextStyle,
                       filled: true,
-                      fillColor: _backgroundColor,
+                      fillColor: ColorWheel.primaryBackground,
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(_borderRadius),
-                        borderSide: const BorderSide(color: _primaryColor),
+                        borderRadius: ColorWheel.textFieldBorderRadius,
+                        borderSide: const BorderSide(color: ColorWheel.accent),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: ColorWheel.textFieldBorderRadius,
+                        borderSide: const BorderSide(color: ColorWheel.accent), 
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: ColorWheel.textFieldBorderRadius,
+                        borderSide: const BorderSide(color: ColorWheel.accent, width: 2.0), 
                       ),
                       contentPadding: const EdgeInsets.symmetric(
-                        horizontal: _spacing,
-                        vertical: _spacing,
+                        horizontal: ColorWheel.standardPaddingValue,
+                        vertical: ColorWheel.standardPaddingValue,
                       ),
                     ),
                     onSubmitted: (value) {
@@ -129,10 +128,10 @@ optionToRemove.runtimeType: ${optionToRemove.runtimeType}
                     },
                   ),
                 ),
-                const SizedBox(width: _spacing / 2),
+                const SizedBox(width: ColorWheel.standardPaddingValue / 2),
                 IconButton(
                   onPressed: _addOption,
-                  icon: const Icon(Icons.add, color: _primaryColor),
+                  icon: const Icon(Icons.add, color: ColorWheel.accent),
                 ),
               ],
             ),
@@ -142,21 +141,21 @@ optionToRemove.runtimeType: ${optionToRemove.runtimeType}
             final option = entry.value;
             return ListTile(
               contentPadding: const EdgeInsets.symmetric(
-                horizontal: _spacing,
-                vertical: _spacing / 2,
+                horizontal: ColorWheel.standardPaddingValue,
+                vertical: ColorWheel.standardPaddingValue / 2,
               ),
               title: Text(
                 option,
-                style: const TextStyle(color: _textColor),
+                style: ColorWheel.defaultText,
               ),
               leading: IconButton(
                 icon: Icon(
                   widget.correctOptionIndex == index
                       ? Icons.check_circle
-                      : Icons.cancel,
+                      : Icons.cancel_outlined,
                   color: widget.correctOptionIndex == index
-                      ? _primaryColor
-                      : _errorColor,
+                      ? ColorWheel.buttonSuccess
+                      : ColorWheel.buttonError,
                   size: 28,
                 ),
                 onPressed: () {
@@ -169,7 +168,7 @@ optionToRemove.runtimeType: ${optionToRemove.runtimeType}
                 },
               ),
               trailing: IconButton(
-                icon: const Icon(Icons.delete, color: _errorColor),
+                icon: const Icon(Icons.delete, color: ColorWheel.buttonError),
                 onPressed: () => _removeOption(index),
               ),
             );

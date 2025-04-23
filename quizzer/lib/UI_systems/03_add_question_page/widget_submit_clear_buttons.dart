@@ -1,11 +1,5 @@
 import 'package:flutter/material.dart';
-
-// Colors
-const Color _primaryColor = Color(0xFF4CAF50);
-const Color _errorColor = Color(0xFFD64747);
-const Color _textColor = Colors.white;
-const double _borderRadius = 12.0;
-const double _spacing = 16.0;
+import 'package:quizzer/UI_systems/color_wheel.dart';
 
 class SubmitClearButtons extends StatelessWidget {
   final VoidCallback onSubmit;
@@ -25,44 +19,36 @@ class SubmitClearButtons extends StatelessWidget {
         ElevatedButton(
           onPressed: onSubmit,
           style: ElevatedButton.styleFrom(
-            backgroundColor: _primaryColor,
+            backgroundColor: ColorWheel.buttonSuccess,
             padding: const EdgeInsets.symmetric(
-              horizontal: _spacing * 2,
-              vertical: _spacing,
+              horizontal: ColorWheel.standardPaddingValue * 2,
+              vertical: ColorWheel.standardPaddingValue,
             ),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(_borderRadius),
+              borderRadius: ColorWheel.buttonBorderRadius,
             ),
           ),
           child: const Text(
             'Submit',
-            style: TextStyle(
-              color: _textColor,
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
+            style: ColorWheel.buttonTextBold,
           ),
         ),
-        const SizedBox(width: _spacing),
+        const SizedBox(width: ColorWheel.standardPaddingValue),
         ElevatedButton(
           onPressed: onClear,
           style: ElevatedButton.styleFrom(
-            backgroundColor: _errorColor,
+            backgroundColor: ColorWheel.buttonError,
             padding: const EdgeInsets.symmetric(
-              horizontal: _spacing * 2,
-              vertical: _spacing,
+              horizontal: ColorWheel.standardPaddingValue * 2,
+              vertical: ColorWheel.standardPaddingValue,
             ),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(_borderRadius),
+              borderRadius: ColorWheel.buttonBorderRadius,
             ),
           ),
           child: const Text(
             'Clear All',
-            style: TextStyle(
-              color: _textColor,
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
+            style: ColorWheel.buttonTextBold,
           ),
         ),
       ],

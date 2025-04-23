@@ -3,7 +3,7 @@ import 'package:quizzer/UI_systems/02_home_page/widget_home_page_top_bar.dart';
 import 'package:quizzer/UI_systems/02_home_page/widget_multiple_choice_question.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
-
+import 'package:quizzer/UI_systems/color_wheel.dart';
 // ==========================================
 // Widgets
 class HomePage extends StatefulWidget {
@@ -76,11 +76,21 @@ class _HomePageState extends State<HomePage> {
             _flagController.clear();
         });
     }
+  // Question Types (Questions have different potential types)
+  // 1. multiple_choice
+  // 2. sort_order
+  // 3. true_false
+  // 4. matching
+  // 5. fill_in_the_blank
+  // 6. short_answer
+  // 7. hot_spot (click correct location on an image)
+  // 8. label_diagram (drag and drop)
+  // 9. math (complex widget to allow for entering mathematical inputs)
 
     Widget _buildBody() {
         if (_isLoading) {
             return const Center(
-                child: CircularProgressIndicator(color: Colors.white),
+                child: CircularProgressIndicator(color: ColorWheel.primaryText),
             );
         }
 
@@ -100,14 +110,39 @@ class _HomePageState extends State<HomePage> {
                         }
                     },
                 );
+            case 'sort_order':
+                // TODO: Implement SortOrderWidget and replace placeholder
+                return const Center(child: Text('TODO: Sort Order Widget', style: TextStyle(color: ColorWheel.warning)));
+            case 'true_false':
+                 // TODO: Implement TrueFalseWidget and replace placeholder
+                return const Center(child: Text('TODO: True/False Widget', style: TextStyle(color: ColorWheel.warning)));
+            case 'matching':
+                 // TODO: Implement MatchingWidget and replace placeholder
+                return const Center(child: Text('TODO: Matching Widget', style: TextStyle(color: ColorWheel.warning)));
+            case 'fill_in_the_blank':
+                 // TODO: Implement FillInTheBlankWidget and replace placeholder
+                return const Center(child: Text('TODO: Fill In The Blank Widget', style: TextStyle(color: ColorWheel.warning)));
+            case 'short_answer':
+                 // TODO: Implement ShortAnswerWidget and replace placeholder
+                return const Center(child: Text('TODO: Short Answer Widget', style: TextStyle(color: ColorWheel.warning)));
+            case 'hot_spot':
+                 // TODO: Implement HotSpotWidget and replace placeholder
+                return const Center(child: Text('TODO: Hot Spot Widget', style: TextStyle(color: ColorWheel.warning)));
+            case 'label_diagram':
+                 // TODO: Implement LabelDiagramWidget and replace placeholder
+                return const Center(child: Text('TODO: Label Diagram Widget', style: TextStyle(color: ColorWheel.warning)));
+            case 'math':
+                 // TODO: Implement MathInputWidget and replace placeholder
+                return const Center(child: Text('TODO: Math Input Widget', style: TextStyle(color: ColorWheel.warning)));
             // TODO: Add cases for other question types, e.g.:
             // case 'fill_in_the_blank':
             //   return FillInTheBlankWidget(questionData: currentData, onNextQuestion: ...);
             default:
+                QuizzerLogger.logWarning('HomePage encountered unsupported question type: ${session.currentType}');
                 return Center(
                     child: Text(
                         'Unsupported question type: ${session.currentType}',
-                        style: const TextStyle(color: Colors.orangeAccent),
+                        style: const TextStyle(color: ColorWheel.warning),
                     ),
                 );
         }
@@ -116,7 +151,7 @@ class _HomePageState extends State<HomePage> {
     @override
     Widget build(BuildContext context) {
         return Scaffold(
-            backgroundColor: const Color(0xFF0A1929),
+            backgroundColor: ColorWheel.primaryBackground,
             appBar: HomePageTopBar(
                 onMenuPressed: () {
                     Navigator.pushNamed(context, '/menu');
