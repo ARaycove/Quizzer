@@ -22,40 +22,33 @@ import 'package:supabase/supabase.dart';
 Future<bool> createLocalUserProfile(Map<String, dynamic> message, DatabaseMonitor monitor) async {
     final email = message['email'] as String;
     final username = message['username'] as String;
-    final password = message['password'] as String;
 
     QuizzerLogger.logMessage('Starting local user profile creation');
     QuizzerLogger.logMessage('Email: $email, Username: $username');
     
     Database? db;
-    try {
-        while (db == null) {
-            db = await monitor.requestDatabaseAccess();
-            if (db == null) {
-                QuizzerLogger.logMessage('Database access denied, waiting...');
-                await Future.delayed(const Duration(milliseconds: 100));
-            }
+    // Acquire DB access
+    while (db == null) {
+        db = await monitor.requestDatabaseAccess();
+        if (db == null) {
+            QuizzerLogger.logMessage('Database access denied, waiting...');
+            await Future.delayed(const Duration(milliseconds: 100));
         }
-        QuizzerLogger.logMessage('Database access granted');
-        
-        final userExists = await getUserIdByEmail(email, db);
-        if (userExists != null) {
-            QuizzerLogger.logMessage('User already exists in database with ID: $userExists');
-            monitor.releaseDatabaseAccess();
-            return false;
-        }
-
-        QuizzerLogger.logMessage('Creating new user profile in database');
-        await createNewUserProfile(email, username, password, db);
-        QuizzerLogger.logSuccess('User profile created successfully');
-        monitor.releaseDatabaseAccess();
-        return true;
-    } catch (e) {
-        QuizzerLogger.logError('Error in local profile creation: $e');
-        return false;
-    } finally {
-        monitor.releaseDatabaseAccess();
     }
+    QuizzerLogger.logMessage('Database access granted');
+    
+    // Delegate creation logic (including duplicate check) to createNewUserProfile
+    // If it fails unexpectedly, it will throw (Fail Fast)
+    // If user exists, it returns false.
+    // If creation succeeds, it returns true.
+    final bool creationResult = await createNewUserProfile(email, username, db);
+    
+    // Release DB access *after* the operation completes or returns a non-fatal result
+    monitor.releaseDatabaseAccess();
+    QuizzerLogger.logMessage('Database access released');
+
+    // Return the result from the creation attempt
+    return creationResult;
 }
 
 Future<Map<String, dynamic>> handleNewUserProfileCreation(Map<String, dynamic> message, SupabaseClient supabase, DatabaseMonitor monitor) async {
@@ -67,17 +60,17 @@ Future<Map<String, dynamic>> handleNewUserProfileCreation(Map<String, dynamic> m
 
     Map<String, dynamic> results = {};
     
-    // Check for existing user and username
+    // Acquire DB Access
     Database? db;
-
-    try {
-        while (db == null) {
-            db = await monitor.requestDatabaseAccess();
-            if (db == null) {
-                QuizzerLogger.logMessage('Database access denied, waiting...');
-                await Future.delayed(const Duration(milliseconds: 100));
-            }
+    while (db == null) {
+        db = await monitor.requestDatabaseAccess();
+        if (db == null) {
+            QuizzerLogger.logMessage('Database access denied, waiting...');
+            await Future.delayed(const Duration(milliseconds: 100));
         }
+    }
+    // try {
+        // Check for duplicates locally *before* trying Supabase signup
         final duplicateCheck = await verifyNonDuplicateProfile(email, message['username'] as String, db);
         if (!duplicateCheck['isValid']) {
             results = {
@@ -88,24 +81,22 @@ Future<Map<String, dynamic>> handleNewUserProfileCreation(Map<String, dynamic> m
             return results;
         }
         
+        // If no duplicates, release DB for now
         monitor.releaseDatabaseAccess();
-    } catch (e) {
-        QuizzerLogger.logError('Error checking existing users: $e');
-        monitor.releaseDatabaseAccess();
-        results = {
-            'success': false,
-            'message': 'Error checking existing users'
-        };
-        return results;
-    }
     // TODO Integrate with central DB, check record in cloud if it exists before attempting signUp
 
     // Sign up with supabase
+    // NOTE: This try-catch is an ALLOWED EXCEPTION to the no-try-catch rule.
+    // It specifically catches AuthException from the external Supabase service.
+    // This is necessary to handle predictable signup failures (e.g., email already exists)
+    // reported by the external service, allowing the app to return a meaningful
+    // error message to the user instead of crashing.
     try {
         final response = await supabase.auth.signUp(
             email: email,
             password: password,
         );
+        // If signup is successful, store success results
         results = {
             'success': true,
             'message': 'User registered successfully with Supabase',
@@ -113,14 +104,17 @@ Future<Map<String, dynamic>> handleNewUserProfileCreation(Map<String, dynamic> m
             'session': response.session?.toJson(),
         };
     } on AuthException catch (e) {
+        // If Supabase returns an authentication error, capture it.
+        QuizzerLogger.logError('Supabase AuthException during signup: ${e.message}');
         results = {
             'success': false,
-            'message': e.message
+            'message': e.message // Return the specific error from Supabase
         };
+        // Return immediately as signup failed.
         return results;
-    }
+    } // End of allowed try-catch block
 
-    // Create the local profile
+    // Create the local profile ONLY if Supabase signup succeeded
     final resultTwo = await createLocalUserProfile(message, monitor);
     if (!resultTwo) {
         results = {

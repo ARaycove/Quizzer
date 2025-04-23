@@ -20,9 +20,7 @@ Future<String?> initializeSession(Map<String, dynamic> data) async {
     QuizzerLogger.logMessage('Database access granted');
 
     final userId = await getUserIdByEmail(email, db);
-    if (userId == null) {
-      throw Exception('No user found with email: $email');
-    }
+
     QuizzerLogger.logSuccess('Session initialized with userId: $userId');
     monitor.releaseDatabaseAccess();
     return userId;

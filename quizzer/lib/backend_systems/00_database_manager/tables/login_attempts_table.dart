@@ -101,13 +101,6 @@ Future<bool> addLoginAttemptRecord({
   // First get the userId by email
   String? userId = await getUserIdByEmail(email, db);
   
-  // Ensure the userId is not null before proceeding
-  if (userId == null) {
-    QuizzerLogger.logWarning('Cannot record login attempt: No user found with email $email');
-    return false;
-  }
-
-  
   // Check if table exists and create if needed
   bool checkTable = await doesLoginAttemptsTableExist(db);
   if (checkTable == false) {

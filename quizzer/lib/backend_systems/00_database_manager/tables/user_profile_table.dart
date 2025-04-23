@@ -4,72 +4,71 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/question_answ
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'dart:convert';
 
-Future<String?> getUserIdByEmail(String emailAddress, Database db) async {
+/// Gets the user ID for a given email address.
+/// Throws a StateError if no user is found.
+Future<String> getUserIdByEmail(String emailAddress, Database db) async {
     QuizzerLogger.logMessage('Getting user ID for email: $emailAddress');
-    try {
-        // First verify the table exists
-        await verifyUserProfileTable(db);
-        
-        final List<Map<String, dynamic>> result = await db.query(
-            'user_profile',
-            columns: ['uuid'],
-            where: 'email = ?',
-            whereArgs: [emailAddress],
-        );
-
-        if (result.isNotEmpty) {
-            QuizzerLogger.logSuccess('Found user ID: ${result.first['uuid']}');
-            return result.first['uuid'] as String?;
-        } else {
-            QuizzerLogger.logMessage('No user found with email: $emailAddress');
-            return null;
-        }
-    } catch (e) {
-        QuizzerLogger.logError('Error getting user ID: $e');
-        return null;
+    // First verify the table exists
+    await verifyUserProfileTable(db);
+    
+    // Query might fail if table doesn't exist yet, let it crash (Fail Fast)
+    final List<Map<String, dynamic>> result = await db.query(
+        'user_profile',
+        columns: ['uuid'],
+        where: 'email = ?',
+        whereArgs: [emailAddress],
+    );
+    if (result.isNotEmpty) {
+        QuizzerLogger.logSuccess('Found user ID: ${result.first['uuid']}');
+        // Cast should be safe due to query structure, but assert for paranoia
+        final String? userId = result.first['uuid'] as String?;
+        assert(userId != null, 'Database returned null UUID for user $emailAddress');
+        return userId!;
+    } else {
+        QuizzerLogger.logError('No user found with email: $emailAddress. Throwing StateError.');
+        // Throw an exception instead of returning null
+        throw StateError('No user found with email: $emailAddress');
     }
 }
 
-Future<bool> createNewUserProfile(String email, String username, String password, Database db) async {
-  try {
-    QuizzerLogger.logMessage('Creating new user profile for email: $email, username: $username');
-    
-    // First verify that the User Profile Table exists
-    await verifyUserProfileTable(db);
+Future<bool> createNewUserProfile(String email, String username, Database db) async {
+  QuizzerLogger.logMessage('Creating new user profile for email: $email, username: $username');
+  
+  // First verify that the User Profile Table exists
+  await verifyUserProfileTable(db);
 
-    // Send data to authentication service to store password field with auth service
-    QuizzerLogger.logSuccess('User registered with Supabase');
+  // Send data to authentication service to store password field with auth service
+  QuizzerLogger.logSuccess('User registered with Supabase');
 
-    // Next Verify that the profile doesn't already exist in that Table
-    final duplicateCheck = await verifyNonDuplicateProfile(email, username, db);
-    if (!duplicateCheck['isValid']) {
-        QuizzerLogger.logError(duplicateCheck['message']);
-        return false;
-    }
-
-    // Generate a UUID for the new user
-    final String userUUID = generateUserUUID();
-    QuizzerLogger.logMessage('Generated UUID for new user: $userUUID');
-    
-    // Get current timestamp for account creation date
-    final String creationTimestamp = DateTime.now().toIso8601String();
-    
-    // Insert the new user profile with minimal required fields
-    await db.insert('user_profile', {
-      'uuid': userUUID,
-      'email': email,
-      'username': username,
-      'role': 'base_user',
-      'account_status': 'active',
-      'account_creation_date': creationTimestamp,
-    });
-    
-    QuizzerLogger.logSuccess('New user profile created successfully: $userUUID');
-    return true;
-  } catch (e) {
-    QuizzerLogger.logError('Error creating new user profile: $e');
-    return false;
+  // Next Verify that the profile doesn't already exist in that Table
+  final duplicateCheck = await verifyNonDuplicateProfile(email, username, db);
+  if (!duplicateCheck['isValid']) {
+      QuizzerLogger.logError(duplicateCheck['message']);
+      // If validation fails, returning false is acceptable as it's a known flow,
+      // not an unexpected error like a DB failure.
+      return false;
   }
+
+  // Generate a UUID for the new user
+  final String userUUID = generateUserUUID();
+  QuizzerLogger.logMessage('Generated UUID for new user: $userUUID');
+  
+  // Get current timestamp for account creation date
+  final String creationTimestamp = DateTime.now().toIso8601String();
+  
+  // Insert the new user profile with minimal required fields
+  // If db.insert fails, it should throw an exception (Fail Fast)
+  await db.insert('user_profile', {
+    'uuid': userUUID,
+    'email': email,
+    'username': username,
+    'role': 'base_user',
+    'account_status': 'active',
+    'account_creation_date': creationTimestamp,
+  });
+  
+  QuizzerLogger.logSuccess('New user profile created successfully: $userUUID');
+  return true;
 }
 
 /// Generates a unique UUID for a new user
@@ -171,7 +170,7 @@ Future<void> verifyTutorialProgressColumn(Database db) async {
 /// and 'message' (String) containing any error message if there's a duplicate
 Future<Map<String, dynamic>> verifyNonDuplicateProfile(String email, String username, Database db) async {
   QuizzerLogger.logMessage('Verifying non-duplicate profile for email: $email, username: $username');
-
+  verifyUserProfileTable(db);
   // Check if email already exists
   final List<Map<String, dynamic>> emailCheck = await db.query(
     'user_profile',
@@ -430,5 +429,29 @@ Future<void> incrementTotalQuestionsAnswered(String userUuid, Database db) async
   }
 }
 
+/// Retrieves a list of all email addresses from the user_profile table.
+Future<List<String>> getAllUserEmails(Database db) async {
+  QuizzerLogger.logMessage('Fetching all emails from user_profile table.');
+  // Ensure table exists (Fail Fast if verifyUserProfileTable fails)
+  await verifyUserProfileTable(db);
+
+  // Query the database for the email column
+  // If query fails (e.g., table structure wrong), let it crash (Fail Fast)
+  final List<Map<String, dynamic>> results = await db.query(
+    'user_profile',
+    columns: ['email'],
+  );
+
+  // Extract emails into a list of strings
+  final List<String> emails = results.map((row) {
+    final String? email = row['email'] as String?;
+    // Assert non-null as email is NOT NULL in schema
+    assert(email != null, 'Database returned null email from user_profile table.'); 
+    return email!;
+  }).toList();
+
+  QuizzerLogger.logSuccess('Successfully fetched ${emails.length} emails.');
+  return emails;
+}
 
 // TODO: FIXME Add in functionality for loginThreshold preference

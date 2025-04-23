@@ -11,13 +11,6 @@ Future<Map<String, dynamic>> getNextQuestion() async {
   // Keep trying until we get access to the queue
   while (true) {
     final questionBuffer = await queueMonitor.requestQueueAccess();
-    
-    // If access denied, wait and try again
-    if (questionBuffer == null) {
-      QuizzerLogger.logMessage('Queue access denied, retrying in 1 second');
-      await Future.delayed(const Duration(seconds: 1));
-      continue;
-    }
 
     Map<String, dynamic> questionRecord;
     if (questionBuffer.isNotEmpty) {
@@ -62,7 +55,6 @@ Future<Map<String, dynamic>> getNextQuestion() async {
         'completed': true
       };
     }
-    
     return questionRecord;
   }
 }

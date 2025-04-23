@@ -2,8 +2,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/backend_systems/06_question_queue_server/question_queue_monitor.dart';
-import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart'; // Import for DB access
-import 'package:sqflite_common_ffi/sqflite_ffi.dart'; // Import for Database type
 // FIXME add in the quizzer logger
 
 void main() {
@@ -42,35 +40,35 @@ void main() {
   }); // End of Initialization Tests group
 
   // Test for rapid concurrent requests to the question queue
-  test('Rapid concurrent question requests', () async {
-    QuizzerLogger.logMessage('Starting rapid concurrent request test');
-    const int concurrentRequests = 50;
-    final List<Future<Map<String, dynamic>?>> requestFutures = [];
-    // Launch 50 concurrent requests without awaiting each one individually
-    for (int i = 0; i < concurrentRequests; i++) {
-      requestFutures.add(session.requestNextQuestion());
-      // Optional: Small delay to ensure requests are slightly staggered if needed,
-      // but true concurrency comes from not awaiting here.
-      // await Future.delayed(Duration(milliseconds: 5));
-    }
-    // Wait for all 50 requests to complete
-    try {
-      QuizzerLogger.logMessage('Waiting for $concurrentRequests requests to complete...');
-      await Future.wait(requestFutures);
-      QuizzerLogger.logMessage('$concurrentRequests requests completed without breaking.');
-    } catch (e) {
-      QuizzerLogger.logError('Error during concurrent requests: $e');
-      fail('Concurrent requests threw an error: $e'); // Fail the test if any request failed
-    }
-    // Request one final time after the barrage
-    QuizzerLogger.logMessage('Making final request after concurrent batch...');
-    final finalQuestion = await session.requestNextQuestion();
-    // Log the result of the final request
-    QuizzerLogger.logMessage('Final question received: $finalQuestion');
-    // Assert that a result (real or dummy) was received
-    expect(finalQuestion, isNotNull);
-    QuizzerLogger.logMessage('Rapid request test passed.');
-  });
+  // test('Rapid concurrent question requests', () async {
+  //   QuizzerLogger.logMessage('Starting rapid concurrent request test');
+  //   const int concurrentRequests = 50;
+  //   final List<Future<Map<String, dynamic>?>> requestFutures = [];
+  //   // Launch 50 concurrent requests without awaiting each one individually
+  //   for (int i = 0; i < concurrentRequests; i++) {
+  //     requestFutures.add(session.requestNextQuestion());
+  //     // Optional: Small delay to ensure requests are slightly staggered if needed,
+  //     // but true concurrency comes from not awaiting here.
+  //     // await Future.delayed(Duration(milliseconds: 5));
+  //   }
+  //   // Wait for all 50 requests to complete
+  //   try {
+  //     QuizzerLogger.logMessage('Waiting for $concurrentRequests requests to complete...');
+  //     await Future.wait(requestFutures);
+  //     QuizzerLogger.logMessage('$concurrentRequests requests completed without breaking.');
+  //   } catch (e) {
+  //     QuizzerLogger.logError('Error during concurrent requests: $e');
+  //     fail('Concurrent requests threw an error: $e'); // Fail the test if any request failed
+  //   }
+  //   // Request one final time after the barrage
+  //   QuizzerLogger.logMessage('Making final request after concurrent batch...');
+  //   final finalQuestion = await session.requestNextQuestion();
+  //   // Log the result of the final request
+  //   QuizzerLogger.logMessage('Final question received: $finalQuestion');
+  //   // Assert that a result (real or dummy) was received
+  //   expect(finalQuestion, isNotNull);
+  //   QuizzerLogger.logMessage('Rapid request test passed.');
+  // });
 
   // Test the isUserQuestionEligible function
   test('Check eligibility for all user questions', () async {

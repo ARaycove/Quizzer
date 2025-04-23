@@ -1,6 +1,4 @@
-import 'package:quizzer/UI_systems/02_home_page/widget_multiple_choice_question.dart';
 import 'package:quizzer/backend_systems/06_question_queue_server/question_queue_maintainer.dart';
-import 'package:quizzer/backend_systems/06_question_queue_server/question_queue_monitor.dart';
 import 'package:quizzer/backend_systems/07_user_question_management/functionality/user_question_processes.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_question_answer_pairs_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pairs_table.dart';
@@ -42,7 +40,8 @@ class SessionManager {
   
   // Initialize Hive storage without encryption
   Future<void> _initializeStorage() async {
-    _storage = await Hive.openBox('async_prefs', path: 'test');
+    // Let hive_flutter determine the correct path automatically
+    _storage = await Hive.openBox('async_prefs');
   }
   
   // Supabase client instance

@@ -1,5 +1,7 @@
 import 'package:path/path.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart' as ffi;
+import 'package:sqflite/sqflite.dart';
+import 'dart:io' show Platform, Directory;
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 
 // The database
@@ -15,26 +17,53 @@ Database? _database;
 /// Initializes the database if it doesn't exist
 /// Creates all necessary tables during initialization
 Future<Database> initDb() async {
-  // Initialize FFI
-  sqfliteFfiInit();
-  // Change the default factory
-  databaseFactory = databaseFactoryFfi;
   
-  String databasesPath = await getDatabasesPath();
-  String path = join(databasesPath, 'quizzer.db');
-  QuizzerLogger.logMessage('Database path: $path');
+  DatabaseFactory factory;
+  String path;
 
-  _database = await openDatabase(
+  // Select the factory and path based on the platform
+  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+    // --- Desktop --- 
+    ffi.sqfliteFfiInit(); // Initialize FFI *only* for desktop
+    factory = ffi.databaseFactoryFfi;
+    QuizzerLogger.logMessage("Using sqflite FFI factory (Desktop)");
+    
+    // Define path within runtime_cache for desktop
+    String dbDirectoryPath = join(Directory.current.path, 'runtime_cache', 'sqlite');
+    path = join(dbDirectoryPath, 'quizzer.db');
+    
+    // Ensure the database directory exists
+    // If this fails, the app should crash (Fail Fast)
+    Directory(dbDirectoryPath).createSync(recursive: true);
+    QuizzerLogger.logMessage('Desktop SQLite directory ensured: $dbDirectoryPath');
+
+  } else {
+    // --- Mobile --- 
+    factory = databaseFactory; // Default factory from sqflite package
+    QuizzerLogger.logMessage("Using standard sqflite factory (Mobile)");
+    
+    // Use the standard path provided by sqflite for mobile
+    String databasesPath = await factory.getDatabasesPath();
+    path = join(databasesPath, 'quizzer.db');
+  }
+  
+  QuizzerLogger.logMessage('Final Database path: $path');
+
+  // Open the database using the selected factory and path
+  // If this fails, the app should crash (Fail Fast)
+  _database = await factory.openDatabase(
     path,
-    version: 1,
-    onCreate: (Database db, int version) async {
-      // Tables will be created by the worker
-    },
-    onUpgrade: (Database db, int oldVersion, int newVersion) async {
-      // Handle database upgrades if needed
-    }
+    options: OpenDatabaseOptions(
+      version: 1,
+      onCreate: (Database db, int version) async {
+        QuizzerLogger.logMessage('Database onCreate called.');
+      },
+      onUpgrade: (Database db, int oldVersion, int newVersion) async {
+         QuizzerLogger.logWarning('Database onUpgrade called from $oldVersion to $newVersion.');
+      }
+    )
   );
-
+  QuizzerLogger.logSuccess('Database initialized successfully at: $path');
   return _database!;
 }
 

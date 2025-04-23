@@ -1,0 +1,1 @@
+/home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/build/app/intermediates/cxx/Debug/6a6t1k73/obj/arm64-v8a
