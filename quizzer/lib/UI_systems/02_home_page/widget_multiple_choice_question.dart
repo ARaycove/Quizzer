@@ -2,7 +2,8 @@ import 'dart:io'; // Import for File access
 import 'package:flutter/material.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart'; // Import SessionManager
-import 'package:quizzer/UI_systems/color_wheel.dart'; // Import ColorWheel
+import 'package:quizzer/UI_systems/color_wheel.dart';                          // Import ColorWheel
+// Conditionally import dart:io
 
 // Placeholder for Question/Answer Element Rendering Widget
 // Now implementing basic type handling
@@ -205,20 +206,20 @@ class _MultipleChoiceQuestionWidgetState
                 // Feedback logic using ColorWheel colors (Background and Icon)
                 if (showFeedback) {
                   if (isSelected && isCorrect) {
-                    optionBgColor = correctColor.withOpacity(0.3);
+                    optionBgColor = correctColor.withAlpha(25); // 0.1 * 255 = 25.5, rounded to 25
                     trailingIcon = Icons.check_circle;
                   } else if (isSelected && !isCorrect) {
-                    optionBgColor = incorrectColor.withOpacity(0.3);
+                    optionBgColor = incorrectColor.withAlpha(25);
                     trailingIcon = Icons.cancel;
                   } else if (isCorrect) {
                     // Slightly highlight the correct answer even if not selected
-                    optionBgColor = correctColor.withOpacity(0.1);
+                    optionBgColor = correctColor.withAlpha(25);
                     // No border change needed for unselected correct answer
                     trailingIcon = Icons.check_circle_outline; 
                   }
                 } else if (isSelected) {
                   // Highlight background slightly when selected before feedback
-                  optionBgColor = selectedOptionColor.withOpacity(0.2);
+                  optionBgColor = selectedOptionColor.withAlpha(25);
                 }
 
                 return Padding(

@@ -9,6 +9,7 @@ import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dar
 import 'package:quizzer/backend_systems/08_memory_retention_algo/memory_retention_algorithm.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:sqflite/sqflite.dart';
 
 
 /// Checks if a module is active for a specific user
@@ -100,27 +101,27 @@ Future<bool> isUserQuestionEligible(String userId, String questionId) async {
   // This might be computationally simpler than multiple conditional checks inside the function.
   QuizzerLogger.logMessage(
       'Checking eligibility for question $questionId for user $userId');
-  
-  // --- Check if question is already in the QUEUE --- 
-  final queueMonitor = getQuestionQueueMonitor();
-  // Note: Ideally, lock should be held for consistency, but for a quick check,
-  // reading the current list might be acceptable depending on tolerance for race conditions.
-  final List<String> idsInQueue = queueMonitor.getQuestionIdsInQueue();
-  if (idsInQueue.contains(questionId)) {
-    QuizzerLogger.logMessage('Question $questionId is already in the queue, marking as ineligible.');
+
+  // Get Monitors
+  final queueMonitor    = getQuestionQueueMonitor();
+  final historyMonitor  = getAnsweredHistoryMonitor();
+
+  // --- Check if question is already in the QUEUE (using monitor's internal lock) ---
+  bool alreadyInQueue = await queueMonitor.containsQuestion(questionId);
+  if (alreadyInQueue) {
+    QuizzerLogger.logMessage('Question $questionId is currently in the queue (checked via monitor), marking as ineligible.');
     return false; // Not eligible if already queued
   }
-  // --------------------------------------------------
-
-  // --- Check if question is in RECENTLY ANSWERED history (last 5) ---
-  final historyMonitor = getAnsweredHistoryMonitor();
-  if (historyMonitor.isInRecentHistory(questionId)) {
-      QuizzerLogger.logMessage('Question $questionId is in recent answered history (last 5), marking as ineligible.');
-      return false; // Not eligible if recently answered
+  // --------------------------------------------------------------------------------
+  // --- Check if question is in RECENTLY ANSWERED history (using monitor's internal lock) ---
+  bool inRecentHistory = await historyMonitor.isInRecentHistory(questionId);
+  if (inRecentHistory) {
+    QuizzerLogger.logMessage('Question $questionId is in recent answered history (last 5), marking as ineligible.');
+    return false; // Not eligible if recently answered
   }
-  // -------------------------------------------------------------
+  // ---------------------------------------------------------------------
 
-  // First we need to read the required data from DB
+  // --- Proceed with Database checks only if not queued/recent ---
   Database? db;
   DatabaseMonitor monitor = getDatabaseMonitor();
   while (db == null) {

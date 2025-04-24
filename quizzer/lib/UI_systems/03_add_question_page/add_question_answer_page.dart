@@ -49,6 +49,7 @@ import 'package:quizzer/UI_systems/03_add_question_page/widget_question_type_sel
 import 'package:quizzer/UI_systems/03_add_question_page/widget_question_answer_element.dart';
 import 'package:quizzer/UI_systems/03_add_question_page/widget_question_entry_options_dialog.dart';
 import 'package:quizzer/UI_systems/03_add_question_page/widget_submit_clear_buttons.dart';
+import 'package:quizzer/UI_systems/03_add_question_page/widget_bulk_add_button.dart';
 import 'package:quizzer/UI_systems/global_widgets/widget_global_app_bar.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
@@ -165,7 +166,6 @@ class _AddQuestionAnswerPageState extends State<AddQuestionAnswerPage> {
 
   bool _validateForm() {
     QuizzerLogger.logMessage('Starting form validation...');
-
     // Check if module is selected
     // TODO: Formal validation of module name
     if (_moduleController.text.isEmpty) {
@@ -317,6 +317,10 @@ class _AddQuestionAnswerPageState extends State<AddQuestionAnswerPage> {
               onSubmit: _handleSubmit,
               onClear: _handleClear,
             ),
+            const SizedBox(height: 20.0),
+            const Divider(thickness: 1.0),
+            const SizedBox(height: 10.0),
+            Center(child: BulkAddButton()),
           ],
         ),
       ),

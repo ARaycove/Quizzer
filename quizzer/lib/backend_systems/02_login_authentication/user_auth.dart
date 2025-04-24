@@ -132,23 +132,37 @@ Future<Map<String, dynamic>> userAuth({
   QuizzerLogger.logMessage("User authentication requested for $email");
   // 1. Attempt Supabase authentication
   Map<String, dynamic> results = await _attemptSupabaseLogin(email, password, supabase);
+
+  // Flag to track if login succeeded (online or offline)
+  bool loginSuccess = results['success'] == true;
+
   // 2. Handle successful Supabase login (Store data)
-  if (results['success'] == true) {
-    // 2a. Ensure local profile exists:
-    await _ensureLocalProfileExists(email);
-    // 2b. Store the data for future login
+  if (loginSuccess) {
+    // Store the data for future login (only if online success)
     await _handleSuccessfulSupabaseLogin(email, storage, results);
   }
   // 3. Handle failed Supabase login (Check offline)
   else {
     results = _checkOfflineLogin(email, storage, results);
+    // Update success flag based on offline check
+    loginSuccess = results['success'] == true;
   }
-  // 4. Record the login attempt regardless of outcome
-  recordLoginAttempt(
+
+  // 4. Ensure local profile exists *after* any successful login attempt
+  if (loginSuccess) {
+    await _ensureLocalProfileExists(email);
+  }
+
+
+  await recordLoginAttempt(
     email: email,
     statusCode: results['message'],
   );
+  // 5. Record the login attempt regardless of outcome
+  // Note: This might still fail if loginSuccess is false and the profile *never* existed locally.
+  // Consider if recording attempts for completely unknown users is desired.
 
-  // 5. Return final results
+
+  // 6. Return final results
   return results;
 }

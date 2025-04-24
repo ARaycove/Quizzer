@@ -17,6 +17,8 @@
 // 8. Logging a divider (should be a horizontal line)
 
 import 'dart:io';
+import 'package:logging/logging.dart';
+import 'package:path/path.dart' as p; // Import path package for basename
 
 // Log levels enum for type safety
 enum LogLevel {
@@ -27,12 +29,41 @@ enum LogLevel {
   error,
 }
 
-// Logger class following functional programming principles
+// Logger class using the standard logging package
 class QuizzerLogger {
   // Private constructor to prevent instantiation
   QuizzerLogger._();
 
-  // ANSI color codes for terminal output
+  // Create a logger instance
+  static final _logger = Logger('QuizzerApp');
+
+  // --- Source Filtering --- 
+  static List<String> _excludedSources = [
+    "user_question_processes.dart",
+    "user_profile_table.dart",
+    "database_monitor.dart",
+    "question_answer_pairs_table.dart",
+    "login_attempts_table.dart",
+    "login_attempts_record.dart",
+    "session_manager.dart",
+    "question_queue_monitor.dart",
+    "module_updates_process.dart",
+    "modules_table.dart",
+    "answered_history_monitor.dart"
+  ]; // List of source filenames to exclude
+
+  /// Sets the list of source filenames (e.g., 'my_table.dart') to exclude from logging.
+  static void setExcludedSources(List<String> sources) {
+    _excludedSources = sources;
+    // Optional: Log the change (but respect exclusion potentially)
+    final source = _getCallerInfo();
+    if (!_excludedSources.contains(source)) {
+      _logger.info('[$source] Logger exclusion list updated: $_excludedSources');
+    }
+  }
+  // ----------------------
+
+  // ANSI color codes for terminal output (can be used in listener)
   static const String _reset = '\x1B[0m';
   static const String _red = '\x1B[31m';
   static const String _green = '\x1B[32m';
@@ -41,51 +72,120 @@ class QuizzerLogger {
   static const String _magenta = '\x1B[35m';
   static const String _cyan = '\x1B[36m';
 
-  // Pure function to format timestamp
-  static String _getTimestamp() {
-    final now = DateTime.now();
-    return '[${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}:${now.second.toString().padLeft(2, '0')}]';
+  // Helper to format timestamp (can be used in listener)
+  static String _getTimestamp(DateTime time) {
+    return '[${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}:${time.second.toString().padLeft(2, '0')}]';
   }
 
-  // Pure function to format log message
-  static String _formatMessage(LogLevel level, String message) {
-    final timestamp = _getTimestamp();
-    switch (level) {
-      case LogLevel.debug:
-        return '$timestamp $_cyan[DEBUG]$_reset $message';
-      case LogLevel.info:
-        return '$timestamp $_blue[INFO]$_reset $message';
-      case LogLevel.success:
-        return '$timestamp $_green[SUCCESS]$_reset $message';
-      case LogLevel.warning:
-        return '$timestamp $_yellow[WARNING]$_reset $message';
-      case LogLevel.error:
-        return '$timestamp $_red[ERROR]$_reset $message';
+  // --- New Helper to Get Caller Info --- 
+  static String _getCallerInfo() {
+    // Removed try-catch to adhere to Fail Fast principle.
+    // Errors during stack trace parsing will now propagate.
+    final traceString = StackTrace.current.toString();
+    final lines = traceString.split('\n');
+    // Find the first frame outside the logger itself
+    // Start search from index 2 to skip StackTrace.current and _getCallerInfo frames
+    for (int i = 2; i < lines.length; i++) {
+      final line = lines[i];
+      if (!line.contains('quizzer_logging.dart')) {
+        // Attempt to extract the file path/name from the frame
+        // This parsing is brittle and might need adjustment
+        final match = RegExp(r'\(([^\)]+\.dart):\d+:\d+\)').firstMatch(line);
+        if (match != null && match.groupCount >= 1) {
+          // Use basename to get just the file name
+          return p.basename(match.group(1)!);
+        } else {
+           // Fallback parsing for different formats if needed
+           // Or just return the line if parsing fails
+           return line.trim(); // Return the raw line as fallback
+        }
+      }
     }
+    // If no suitable frame is found outside the logger, return default.
+    // This scenario might indicate an issue or unexpected stack structure.
+    return 'UnknownSource'; 
+  }
+  // -------------------------------------
+
+  // Configure the root logger (call this from main.dart)
+  static void setupLogging({Level level = Level.INFO}) {
+    Logger.root.level = level; // Set desired log level
+    Logger.root.onRecord.listen((record) {
+      // Custom formatting matching the old style
+      String levelColor;
+      String levelName = record.level.name;
+      switch (record.level) {
+        case Level.FINE:
+        case Level.FINER:
+        case Level.FINEST:
+          levelColor = _cyan; 
+          levelName = 'DEBUG'; // Map FINE levels to DEBUG
+          break;
+        case Level.INFO:
+          levelColor = _blue;
+          break;
+        case Level.CONFIG: // Treat config like info for color
+           levelColor = _blue;
+           levelName = 'INFO';
+           break;
+        case Level.WARNING:
+          levelColor = _yellow;
+          break;
+        case Level.SEVERE:
+          levelColor = _red;
+          levelName = 'ERROR'; // Map SEVERE to ERROR
+          break;
+        case Level.SHOUT: // Treat shout like severe/error
+           levelColor = _red;
+           levelName = 'ERROR';
+           break;
+        default:
+          levelColor = _reset; // Default to no color
+      }
+      
+      final timestamp = _getTimestamp(record.time);
+      // Create the core formatted message (timestamp, level, message)
+      final coreFormattedMessage = '$timestamp $levelColor[$levelName]$_reset ${record.message}';
+
+      // Prepend "Quizzer:" before printing
+      print("Quizzer: $coreFormattedMessage"); // print allows logs to be shown when testing on Android
+    });
+    // Use the logger itself for the initialization message now
+    logMessage('QuizzerLogger initialized with level: ${level.name}'); 
   }
 
-  // Logging functions
+  // Logging functions using the standard logger
   static void logValue(String message) {
-    stdout.writeln(_formatMessage(LogLevel.debug, message));
+    final source = _getCallerInfo();
+    if (_excludedSources.contains(source)) return; // Check exclusion
+    _logger.fine('[$source] $message'); // Map logValue to FINE level (like DEBUG)
   }
 
   static void logMessage(String message) {
-    stdout.writeln(_formatMessage(LogLevel.info, message));
+    final source = _getCallerInfo();
+    if (_excludedSources.contains(source)) return; // Check exclusion
+    _logger.info('[$source] $message');
   }
 
   static void logError(String message) {
-    stderr.writeln(_formatMessage(LogLevel.error, message));
+    final source = _getCallerInfo();
+    if (_excludedSources.contains(source)) return; // Check exclusion
+    _logger.severe('[$source] $message'); // Map logError to SEVERE level
   }
 
   static void logWarning(String message) {
-    stderr.writeln(_formatMessage(LogLevel.warning, message));
+    final source = _getCallerInfo();
+    if (_excludedSources.contains(source)) return; // Check exclusion
+    _logger.warning('[$source] $message');
   }
 
   static void logSuccess(String message) {
-    stdout.writeln(_formatMessage(LogLevel.success, message));
+    final source = _getCallerInfo();
+    if (_excludedSources.contains(source)) return; // Check exclusion
+    _logger.info('[$source] SUCCESS: $message'); // Use INFO level for success
   }
 
-  // Formatting functions
+  // Formatting functions (kept separate, still using stdout)
   static void printHeader(String message) {
     stdout.writeln('\n$_magenta$message$_reset\n');
   }

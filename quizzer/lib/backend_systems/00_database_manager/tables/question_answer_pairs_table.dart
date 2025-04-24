@@ -29,6 +29,7 @@ Future<void> verifyQuestionAnswerPairTable(Database db) async {
         options TEXT,            -- Added for multiple choice options
         correct_option_index INTEGER,  -- Added for multiple choice correct answer
         question_id TEXT,        -- Added for unique question identification
+        correct_order TEXT,      -- Added for sort_order
         PRIMARY KEY (time_stamp, qst_contrib)
       )
     ''');
@@ -59,6 +60,17 @@ Future<void> verifyQuestionAnswerPairTable(Database db) async {
         );
       }
     }
+
+    // Check for correct_order (for sort_order type)
+    final bool hasCorrectOrder = columns.any((column) => column['name'] == 'correct_order');
+    if (!hasCorrectOrder) {
+      QuizzerLogger.logMessage('Adding correct_order column to question_answer_pairs table.');
+      // Add correct_order column as TEXT to store JSON list
+      await db.execute('ALTER TABLE question_answer_pairs ADD COLUMN correct_order TEXT'); 
+    }
+
+    // TODO: Add checks for columns needed by other future question types here
+
   }
 }
 
@@ -87,6 +99,7 @@ Future<int> addQuestionAnswerPair({
   String citation = '',
   required List<Map<String, dynamic>> questionElements,
   required List<Map<String, dynamic>> answerElements,
+  List<Map<String, dynamic>>? correctOrderElements,
   required bool ansFlagged,
   required String ansContrib,
   String? concepts,
@@ -105,12 +118,14 @@ Future<int> addQuestionAnswerPair({
   await verifyQuestionAnswerPairTable(db);
 
   final formattedQuestionElements = _formatElements(questionElements);
-  final formattedAnswerElements = _formatElements(answerElements);
+  final formattedAnswerElements   = _formatElements(answerElements);
+  final formattedCorrectOrder     = _formatElements(correctOrderElements!);
 
-  // Generate question_id by concatenating time_stamp and qst_contrib
+  // Generate question_id
   final questionId = '${timeStamp}_$qstContrib';
 
-  final result = await db.insert('question_answer_pairs', {
+  // Prepare data map
+  Map<String, dynamic> data = {
     'time_stamp': timeStamp,
     'citation': citation,
     'question_elements': formattedQuestionElements,
@@ -129,8 +144,13 @@ Future<int> addQuestionAnswerPair({
     'options': options?.join(',') ?? '',
     'correct_option_index': correctOptionIndex ?? -1,
     'question_id': questionId,
-  });
+    'correct_order': formattedCorrectOrder, 
+  };
 
+  // Remove null value keys before insert
+  data.removeWhere((key, value) => value == null);
+
+  final result = await db.insert('question_answer_pairs', data);
   return result;
 }
 
@@ -140,6 +160,7 @@ Future<int> editQuestionAnswerPair({
   String? citation,
   List<Map<String, dynamic>>? questionElements,
   List<Map<String, dynamic>>? answerElements,
+  List<Map<String, dynamic>>? correctOrderElements,
   bool? ansFlagged,
   String? ansContrib,
   String? concepts,
@@ -151,6 +172,7 @@ Future<int> editQuestionAnswerPair({
   String? questionType,
   List<String>? options,
   int? correctOptionIndex,
+  
 }) async {
   // First verify that the table exists
   await verifyQuestionAnswerPairTable(db);
@@ -171,6 +193,7 @@ Future<int> editQuestionAnswerPair({
   if (questionType != null) values['question_type'] = questionType;
   if (options != null) values['options'] = options.join(',');
   if (correctOptionIndex != null) values['correct_option_index'] = correctOptionIndex;
+  if (correctOrderElements != null) {values['correct_order'] = _formatElements(correctOrderElements);}
 
   // Get current values to check completion status
   final current = await getQuestionAnswerPairById(questionId, db);
@@ -179,7 +202,6 @@ Future<int> editQuestionAnswerPair({
     values['question_elements'] ?? '',
     values['answer_elements'] ?? '',
   );
-
 
   return await db.update(
     'question_answer_pairs',

@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:math'; // For random selection
+import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pairs_table.dart';
 import 'package:quizzer/backend_systems/06_question_queue_server/question_queue_monitor.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
+import 'package:sqflite/sqflite.dart'; // Add this import
 
 
 /// Starts the question queue maintenance process
@@ -40,43 +42,99 @@ Future<void> startQuestionQueueMaintenance() async {
   // - calls the getAverage 
   // - returns the result
 
-  QuizzerLogger.logMessage('Starting question queue maintenance');
-  final queueMonitor = getQuestionQueueMonitor();
-  final dbMonitor = getDatabaseMonitor();
-  bool isAvailableQuestions = true;
-  bool shouldImmediatelySelectNewQuestion = false;
+  QuizzerLogger.logMessage('Queue Maintainer: Starting question queue maintenance');
+  final queueMonitor      = getQuestionQueueMonitor();
+  final dbMonitor         = getDatabaseMonitor();
+  SessionManager session  = getSessionManager();
+
   
   while (true) {
+    QuizzerLogger.logMessage('Queue Maintainer: Checking. . .');
+    bool? questionsAvailableToPutIntoCirculation = false;
+    int queueSize = queueMonitor.queueSize; // Get current queue size
+
     // 1. Check if we need to add questions to circulation
     if (await _shouldAddToCirculation(dbMonitor)) {
-      QuizzerLogger.logMessage("Should add questions to circulation");
-      await _addQuestionsToCirculation(dbMonitor);
+      questionsAvailableToPutIntoCirculation = await _addQuestionsToCirculation(dbMonitor);
     }
 
     // 2. Check if queue needs new items
-    if (queueMonitor.queueSize < 10) {
-      // queue has less than 10 items in it, we have to select the next question to add it:
-      // selectNextQuestion won't be modifying the db at all so it should only need to take raw data for processing
-      final question = await _selectNextQuestion(dbMonitor);
-      // If we fail to get a question then there aren't any and we should tell the work to take a longer rest,
-      // when the worker wakes back up they can try again
-      if (question.isNotEmpty) {
-        shouldImmediatelySelectNewQuestion = await _addToQueue(question, queueMonitor); //returns false if it failed
-        shouldImmediatelySelectNewQuestion = !shouldImmediatelySelectNewQuestion; // invert response to make sense
-        isAvailableQuestions = true;
-        }
-      else {
-        isAvailableQuestions = false;
-        }
+    if (queueSize < 10) { // Check against current size
+      // _selectNextQuestion returns the selected question map directly
+      Map<String, dynamic> selectedQuestion = await _selectNextQuestion(dbMonitor);
+      
+
+
+
+      // Check if a valid question was selected (not an empty map)
+      if (selectedQuestion.isNotEmpty) {
+          // Make sure we get the actual question answer pair not the userRecord
+          String questionId = selectedQuestion['question_id'];
+          Database? db;
+          // Acquire DB Access
+          while (db == null) {
+            db = await dbMonitor.requestDatabaseAccess();
+            if (db == null) {
+              QuizzerLogger.logMessage('DB access denied for fetching user pairs, waiting...');
+              await Future.delayed(const Duration(milliseconds: 100));
+            }
+          }
+          selectedQuestion = await getQuestionAnswerPairById(questionId, db);
+          dbMonitor.releaseDatabaseAccess();
+
+         // Call the monitor's addQuestion method directly
+         bool added = await queueMonitor.addQuestion(selectedQuestion); 
+         if (added) {
+            QuizzerLogger.logMessage('Queue Maintainer: Successfully added question ${selectedQuestion['question_id']} via monitor.addQuestion.');
+            // Update queue size ONLY if successfully added
+            queueSize = queueMonitor.queueSize; 
+         } else {
+            QuizzerLogger.logWarning('Queue Maintainer: Monitor refused to add selected question ${selectedQuestion['question_id']} (duplicate/recent).');
+         }
+      } else {
+          QuizzerLogger.logMessage('Queue Maintainer: _selectNextQuestion returned no eligible question this cycle.');
+      }
     }
 
-    // Delay ensures we don't gum up the system and CPU
-    if (shouldImmediatelySelectNewQuestion) {}
-    else if (isAvailableQuestions) {await Future.delayed(const Duration(seconds: 3));}
+    // Get number of eligible questions *after* potential queue addition attempts
+    int numEligibleQuestions = (await session.getEligibleQuestions()).length;
+    // 3. Check return statuses to determine how long worker should sleep
+    // 3a. determine if NoRest
+    // if queue is less than 10 and there are eligible questions
+    if (numEligibleQuestions != 0 && queueSize != 10) {
+      bool shouldNotRest = true;
+    } 
+    // 3b. determine if ShortRest
+    // there are questions still to put in circulation, but queue is full
+    else if (questionsAvailableToPutIntoCirculation!) {
+      bool shouldShortRest = true;
+      QuizzerLogger.logMessage('Queue Maintainer: Queue is full, but questions available to circulate. Short rest.');
+      await Future.delayed(const Duration(seconds: 3));
+    }
+    // 3c. determine if LongRest
+    // No eligible questions and nothing to put into circulation
+    else if (numEligibleQuestions == 0 && !questionsAvailableToPutIntoCirculation) {
+      bool shouldLongRest = true;
+      QuizzerLogger.logMessage('Queue Maintainer: Queue full or no eligible questions/circulation needed. Long rest.');
+      await Future.delayed(const Duration(seconds: 60));
+    }
     else {
-      QuizzerLogger.logMessage('No Questions Available to Select, taking long rest. . .');
-      await Future.delayed(const Duration(seconds:60));}
+      QuizzerLogger.logError('Queue Maintainer: NO CASE DECIDED - short rest');
+      await Future.delayed(const Duration(seconds: 3));
+    }
   }
+
+  // Commented out old logic:
+  //   // Delay ensures we don't gum up the system and CPU
+  //   if (shouldImmediatelySelectNewQuestion) {}
+  //   else if (isAvailableQuestions) {
+  //   await Future.delayed(const Duration(seconds: 3));
+  //     QuizzerLogger.logMessage('Queue Maintainer: There are still available questions. short rest');
+  //   }
+  //   else {
+  //     QuizzerLogger.logMessage('Queue Maintainer: No Questions Available to Select, taking long rest. . .');
+  //     await Future.delayed(const Duration(seconds:60));}
+  // }
 }
 
 /// Determines if new questions should be added to circulation
@@ -85,26 +143,26 @@ Future<bool> _shouldAddToCirculation(DatabaseMonitor dbMonitor) async {
   SessionManager session = getSessionManager();
   // Criteria
   // First get the userQuestionAnswerPairs so we can loop over them:
-  List<Map<String, dynamic>> userQuestionRecords = await session.getAllUserQuestionPairs();
-  int numEligibleQuestions = 0;
+  List<Map<String, dynamic>>  eligibleQuestions     = await session.getEligibleQuestions();
   int numEarlyReviewQuestions = 0;
-  // When we loop over we are counting for two things, the number of early review questions and the number of eligible questions
-  for (final userRecord in userQuestionRecords) {
-    String questionId = userRecord['question_id'];
-    int revisionStreak = userRecord['revision_streak'];
-    if (await session.checkQuestionEligibility(questionId)) {numEligibleQuestions++;}
-    if (revisionStreak <= 5) {numEarlyReviewQuestions++;}
-    if (numEligibleQuestions >= 100) {break;}
+  int numEligibleQuestions = eligibleQuestions.length;
+
+  for (final questionRecord in eligibleQuestions) {
+    if (questionRecord['revision_streak'] <= 3) {
+      numEarlyReviewQuestions++;
+    }
   }
+  QuizzerLogger.logMessage('numEarlyReviewQuestions: $numEarlyReviewQuestions');
+  QuizzerLogger.logMessage('numEligibleQuestion    : $numEligibleQuestions');
   // If below 100 eligible questions then shouldAdd = true;
-  if (numEligibleQuestions >= 100) {shouldAdd = true;}
+  if (numEligibleQuestions <= 100) {shouldAdd = true;}
   // If below 20 early review questions when done counting shouldAdd = true;
   else if (numEarlyReviewQuestions < 20) {shouldAdd = true;}
   // If neither we shouldn't add anything
   else {shouldAdd = false;}
 
-  
-
+  if (shouldAdd) {QuizzerLogger.logMessage("Queue Maintainer: Should add questions to circulation");}
+  else {QuizzerLogger.logMessage("Queue Maintainer: No need to add questions to circulation right now");}
   return shouldAdd;
 }
 
@@ -218,7 +276,7 @@ Map<String, dynamic> _selectPrioritizedQuestion(
 }
 
 /// Adds new questions to circulation based on subject ratios
-Future<void> _addQuestionsToCirculation(DatabaseMonitor dbMonitor) async {
+Future<bool?> _addQuestionsToCirculation(DatabaseMonitor dbMonitor) async {
   // Should take raw data and the monitor
   SessionManager session = getSessionManager();
   // We're going to need a separate list of records for just those records that aren't in circulation
@@ -232,8 +290,8 @@ Future<void> _addQuestionsToCirculation(DatabaseMonitor dbMonitor) async {
 
   // If there are no available questions to put into circulation we just return at this point in the function
   if (totalQuestionsAvailableToBePutInCirculation == 0) {
-    QuizzerLogger.logMessage('No non-circulating questions available to add.');
-    return;
+    QuizzerLogger.logMessage('Queue Maintainer: No non-circulating questions available to add.');
+    return false;
   }
 
   // Select the next question to add based on priorities
@@ -245,7 +303,8 @@ Future<void> _addQuestionsToCirculation(DatabaseMonitor dbMonitor) async {
 
   final String questionId = selectedRecord['question_id'];
   await session.addQuestionToCirculation(questionId); // while we don't need to await this operation, it will force the maintainer to slow down by a small amount
-  QuizzerLogger.logMessage("Selected Question Answer pair to be added: $selectedRecord");
+  QuizzerLogger.logMessage("Queue Maintainer: Selected QA pair to add to circulation: $selectedRecord");
+  return true;
 }
 
 
@@ -280,8 +339,10 @@ Future<Map<String, dynamic>> _selectNextQuestion(DatabaseMonitor dbMonitor) asyn
 
   Map<String, double> scoreMap = {}; //format {question_id: selectionAlgoScore}
   
-  Map<String, int> userSubjectInterests         = await session.getUserSubjectInterests();
-  List<Map<String, dynamic>> eligibleQuestions  = await session.getEligibleQuestions();
+  Map<String, int>            userSubjectInterests  = await session.getUserSubjectInterests();
+  List<Map<String, dynamic>>  eligibleQuestions     = await session.getEligibleQuestions();
+  QuizzerLogger.logMessage("$eligibleQuestions");
+  QuizzerLogger.logMessage("Total eligible questions: ${eligibleQuestions.length}");
 
   // --- Preprocessing: Calculate overdue days and find max ---
   double actualMaxOverdueDays = 0.0;
@@ -299,7 +360,6 @@ Future<Map<String, dynamic>> _selectNextQuestion(DatabaseMonitor dbMonitor) asyn
       }
   }
   // ---------------------------------------------------------
-
   // Calculate overall max interest - No longer needed for normalization
   final double overallMaxInterest = userSubjectInterests.values.fold(0.0, (max, current) => current > max ? current.toDouble() : max);
 
@@ -335,6 +395,7 @@ Future<Map<String, dynamic>> _selectNextQuestion(DatabaseMonitor dbMonitor) asyn
     } else { 
         subjectInterestHighest = (userSubjectInterests['misc'] ?? 0).toDouble();
     }
+    
     final double normalizedInterest = (overallMaxInterest > 0) ? (subjectInterestHighest / overallMaxInterest) : 0.0;
 
     // 2. Normalized Streak Score (S_streak)
@@ -355,9 +416,9 @@ Future<Map<String, dynamic>> _selectNextQuestion(DatabaseMonitor dbMonitor) asyn
   }
 
   // Handle Zero Total Score (Should be rare with bias)
-  if (totalScore <= 0.0) {
-    QuizzerLogger.logWarning("Total score is zero. This should not happen with the current implementation.");
-  }
+  // if (totalScore <= 0.0) {
+  //   QuizzerLogger.logWarning("Total score is zero. This should not happen with the current implementation.");
+  // }
 
   // Weighted Random Selection
   final random = Random();
@@ -369,7 +430,7 @@ Future<Map<String, dynamic>> _selectNextQuestion(DatabaseMonitor dbMonitor) asyn
     final double score = scoreMap[questionId]!; // Non-null assertion ok due to loop logic
     cumulativeScore += score;
     if (cumulativeScore >= randomThreshold) {
-      QuizzerLogger.logMessage("Selected question $questionId with score $score (Cumulative: $cumulativeScore, Threshold: $randomThreshold)");
+      QuizzerLogger.logMessage("Queue Maintainer: Selected question $questionId with score $score (Cumulative: $cumulativeScore, Threshold: $randomThreshold)");
       return question; // Return the selected question map
     }
   }
@@ -377,40 +438,4 @@ Future<Map<String, dynamic>> _selectNextQuestion(DatabaseMonitor dbMonitor) asyn
   // If all else fails return an empty map
   return {};
   
-}
-
-/// Adds a question to the queue
-Future<bool> _addToQueue(Map<String, dynamic> question, QuestionQueueMonitor queueMonitor) async {
-  final String questionId = question['question_id']; // For logging
-  SessionManager session = getSessionManager();
-  QuizzerLogger.logMessage('Requesting queue access to add question $questionId.');
-  Map<String, dynamic> questionDetails = await session.getQuestionAnswerPair(questionId);
-
-  // 1. Get queue access
-  final List<Map<String, dynamic>> questionQueue = await queueMonitor.requestQueueAccess();
-  QuizzerLogger.logMessage('Queue access granted to add question $questionId.');
-
-  // --- Check for Duplicates ---
-  bool alreadyExists = false;
-  for (final existingQuestion in questionQueue) {
-    if (existingQuestion['question_id'] == questionId) {
-      alreadyExists = true;
-      break;
-    }
-  }
-
-  if (alreadyExists) {
-    QuizzerLogger.logWarning('Attempted to add duplicate question $questionId to queue. Aborting add.');
-    queueMonitor.releaseQueueAccess(); // Release lock before returning
-    return false; // Indicate question was not added
-  }
-  // ---------------------------
-
-  // 2. Add question directly to the list (only if not duplicate)
-  questionQueue.add(questionDetails); 
-  QuizzerLogger.logSuccess('Successfully added question $questionId to the queue. New size: ${queueMonitor.queueSize}');
-
-  // 3. Release queue access
-  queueMonitor.releaseQueueAccess(); 
-  return true; // Indicate question was successfully added
 }

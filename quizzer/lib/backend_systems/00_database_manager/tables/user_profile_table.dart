@@ -25,9 +25,8 @@ Future<String> getUserIdByEmail(String emailAddress, Database db) async {
         assert(userId != null, 'Database returned null UUID for user $emailAddress');
         return userId!;
     } else {
-        QuizzerLogger.logError('No user found with email: $emailAddress. Throwing StateError.');
-        // Throw an exception instead of returning null
-        throw StateError('No user found with email: $emailAddress');
+        QuizzerLogger.logError('No user found with email:');
+        return "invalid_email_user";
     }
 }
 
@@ -207,7 +206,7 @@ Future<Map<String, dynamic>> verifyNonDuplicateProfile(String email, String user
 }
 
 Future<bool> updateLastLogin(String timestamp, String emailAddress, Database db) async {
-  QuizzerLogger.logMessage('Updating last login for email: $emailAddress');
+  // QuizzerLogger.logMessage('Updating last login for email: $emailAddress');
   await verifyUserProfileTable(db);
   await db.update(
     'user_profile',
@@ -283,10 +282,10 @@ Future<Map<String, bool>> getModuleActivationStatus(String userId, Database db) 
     final Map<String, bool> activationStatus = statusMap.map(
       (key, value) => MapEntry(key, value as bool)
     );
-    QuizzerLogger.logSuccess('Retrieved module activation status: $activationStatus');
+    // QuizzerLogger.logSuccess('Retrieved module activation status: $activationStatus');
     return activationStatus;
   } catch (e) {
-    QuizzerLogger.logError('Error parsing module activation status: $e');
+    // QuizzerLogger.logError('Error parsing module activation status: $e');
     return {};
   }
 }
@@ -327,7 +326,7 @@ Future<bool> updateModuleActivationStatus(String userId, String moduleName, bool
 /// If new subjects are found in the question database that aren't in the user profile,
 /// they will be added with a default interest value of 10
 Future<Map<String, int>> getUserSubjectInterests(String userId, Database db) async {
-  QuizzerLogger.logMessage('Getting subject interests for user: $userId');
+  // QuizzerLogger.logMessage('Getting subject interests for user: $userId');
   await verifyUserProfileTable(db);
   
   // Query for the user's interest data column

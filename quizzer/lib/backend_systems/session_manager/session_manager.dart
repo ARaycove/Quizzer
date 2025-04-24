@@ -336,20 +336,16 @@ class SessionManager {
     while (db == null) {
       db = await dbMonitor.requestDatabaseAccess();
       if (db == null) {
-        QuizzerLogger.logMessage('DB access denied for fetching interests, waiting...');
         await Future.delayed(const Duration(milliseconds: 100));
       }
     }
 
-    QuizzerLogger.logMessage('DB acquired for fetching interests.');
     // Call the backend function directly. Errors will propagate.
     // If this call throws, the DB release below will NOT happen.
     interests = await user_profile_table.getUserSubjectInterests(userId!, db);
-    QuizzerLogger.logMessage('Fetched interests for user $userId');
 
     // Release DB (Only happens if getUserSubjectInterests succeeds)
     dbMonitor.releaseDatabaseAccess();
-    QuizzerLogger.logMessage('DB released after fetching interests attempt.');
        
     return interests;
   }
@@ -415,10 +411,6 @@ class SessionManager {
         answerStatus = "correct";
     }
     QuizzerLogger.logMessage("Determined answerStatus: $answerStatus");
-    
-    // --- Add to Answered History ---
-    final historyMonitor = getAnsweredHistoryMonitor();
-    await historyMonitor.addAnsweredQuestion(questionId); 
 
     recordQuestionAttempt(questionId, userId!, timeToAnswer, answerStatus);
 
@@ -477,6 +469,9 @@ class SessionManager {
       return; // Don't add duplicate consecutive pages
     }
     _pageHistory.add(routeName);
+    if (routeName == "/home") {
+      buildModuleRecords();
+      }
     if (_pageHistory.length > _maxHistoryLength) {
       QuizzerLogger.logMessage('Removing oldest page: ${_pageHistory[0]}');
       _pageHistory.removeAt(0);
@@ -484,20 +479,20 @@ class SessionManager {
     QuizzerLogger.logMessage('Updated page history: $_pageHistory');
   }
 
-  // Get previous page, skipping '/menu'
+  // Get previous page, now including /menu if it was the actual previous page
   String getPreviousPage() {
     QuizzerLogger.logMessage('Attempting to get previous page. Current history: $_pageHistory');
-    // Iterate backwards from the second-to-last entry
-    for (int i = _pageHistory.length - 2; i >= 0; i--) {
-      final page = _pageHistory[i];
-      if (page != '/menu') {
-        QuizzerLogger.logMessage('Found valid previous page: $page');
-        return page; // Return the first non-menu page found
-      }
+    // Check if there are at least two pages in history
+    if (_pageHistory.length >= 2) {
+      // Return the second-to-last entry
+      final previousPage = _pageHistory[_pageHistory.length - 2];
+      QuizzerLogger.logMessage('Returning previous page: $previousPage');
+      return previousPage;
+    } else {
+      // If history has 0 or 1 entries, default to /home
+      QuizzerLogger.logMessage('History has less than 2 entries. Defaulting to /home.');
+      return '/home';
     }
-    // If no suitable page is found (or history is too short) return that home is the previous page
-    QuizzerLogger.logMessage('No suitable previous page found (excluding /menu).');
-    return '/home';
   }
 
   // Clear page history
@@ -621,8 +616,6 @@ class SessionManager {
       }
     }
 
-    // Rebuild the module records locally
-    buildModuleRecords();
     // Validate the user profile questions (that way if the added question belongs to a module they've added to it will get shown to them)
     Database? db;
     while (db == null) {
@@ -632,9 +625,7 @@ class SessionManager {
         await Future.delayed(const Duration(milliseconds: 250));
       }
     }
-    await validateAllModuleQuestions(db, userId!);
     dbMonitor.releaseDatabaseAccess();
-
     // End of function  
   }
 

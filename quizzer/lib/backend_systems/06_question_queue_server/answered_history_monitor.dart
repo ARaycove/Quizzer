@@ -76,33 +76,43 @@ class AnsweredHistoryMonitor {
   }
 
   /// Checks if a question ID is present in the *most recent* answered history (last 5).
-  /// This method does not require a lock as reads on Lists are generally safe,
-  /// but be aware of potential race conditions if checking during a concurrent write.
-  bool isInRecentHistory(String questionId) {
-    // Reading the list directly without a lock.
+  /// Acquires lock for consistency.
+  Future<bool> isInRecentHistory(String questionId) async { // Make async
+    await _requestAnswerHistoryAccess(); // Acquire lock
+    QuizzerLogger.logMessage('isInRecentHistory: Acquired lock for $questionId check.');
+    // Reading the list directly.
     // Determine the range to check (last 5 or fewer)
     final int historyLength = _answeredHistory.length;
     final int checkDepth = historyLength < 5 ? historyLength : 5;
     
-    if (checkDepth == 0) return false; // History is empty
-
-    // Get the sublist representing the last 'checkDepth' items
-    // Note: index 0 is the *most* recent, so we take the first 'checkDepth' elements
-    final List<String> recentSublist = _answeredHistory.sublist(0, checkDepth);
-    
-    final bool found = recentSublist.contains(questionId);
+    bool found = false; // Default to false
+    if (checkDepth > 0) { // Only check if history is not empty
+      // Get the sublist representing the last 'checkDepth' items
+      final List<String> recentSublist = _answeredHistory.sublist(0, checkDepth);
+      found = recentSublist.contains(questionId);
+    }
     
     if (found) {
         QuizzerLogger.logMessage('Checked last $checkDepth answered: $questionId IS present.');
     } else {
-       // QuizzerLogger.logMessage('Checked last $checkDepth answered: $questionId is NOT present.'); // Reduce log noise
+       QuizzerLogger.logMessage('Checked last $checkDepth answered: $questionId is NOT present.'); // Reduce log noise
     }
+    
+    _releaseAnswerHistoryAccess(); // Release lock (will not run if error occurs before this)
+    QuizzerLogger.logMessage('isInRecentHistory: Released lock for $questionId check.');
     return found;
   }
 
   /// Gets a copy of the current answered history list (read-only).
-  List<String> getRecentHistoryCopy() {
+  /// Acquires lock for consistency.
+  Future<List<String>> getRecentHistoryCopy() async { // Make async
+     await _requestAnswerHistoryAccess(); // Acquire lock
+     QuizzerLogger.logMessage('getRecentHistoryCopy: Acquired lock.');
+     // Remove try/finally block
      // Return a copy to prevent external modification
-     return List<String>.from(_answeredHistory);
+     final List<String> historyCopy = List<String>.from(_answeredHistory);
+     _releaseAnswerHistoryAccess(); // Release lock (will not run if error occurs before this)
+     QuizzerLogger.logMessage('getRecentHistoryCopy: Released lock.');
+     return historyCopy;
   }
 } 

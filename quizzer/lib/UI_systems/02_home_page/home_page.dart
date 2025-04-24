@@ -76,16 +76,7 @@ class _HomePageState extends State<HomePage> {
             _flagController.clear();
         });
     }
-  // Question Types (Questions have different potential types)
-  // 1. multiple_choice
-  // 2. sort_order
-  // 3. true_false
-  // 4. matching
-  // 5. fill_in_the_blank
-  // 6. short_answer
-  // 7. hot_spot (click correct location on an image)
-  // 8. label_diagram (drag and drop)
-  // 9. math (complex widget to allow for entering mathematical inputs)
+
 
     Widget _buildBody() {
         if (_isLoading) {
@@ -154,6 +145,8 @@ class _HomePageState extends State<HomePage> {
             backgroundColor: ColorWheel.primaryBackground,
             appBar: HomePageTopBar(
                 onMenuPressed: () {
+                    // Add menu to history BEFORE navigating
+                    session.addPageToHistory('/menu'); 
                     Navigator.pushNamed(context, '/menu');
                 },
                 showFlagDialog: _showFlagDialog,
