@@ -49,6 +49,7 @@ class QuizzerLogger {
     "question_queue_monitor.dart",
     "module_updates_process.dart",
     "modules_table.dart",
+    "module_isolates",
     "answered_history_monitor.dart"
   ]; // List of source filenames to exclude
 
@@ -66,7 +67,7 @@ class QuizzerLogger {
   // ANSI color codes for terminal output (can be used in listener)
   static const String _reset = '\x1B[0m';
   static const String _red = '\x1B[31m';
-  static const String _green = '\x1B[32m';
+  // static const String _green = '\x1B[32m';
   static const String _yellow = '\x1B[33m';
   static const String _blue = '\x1B[34m';
   static const String _magenta = '\x1B[35m';

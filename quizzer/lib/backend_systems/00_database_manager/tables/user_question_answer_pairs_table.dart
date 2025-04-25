@@ -194,3 +194,41 @@ Future<void> incrementTotalAttempts(String userUuid, String questionId, Database
     QuizzerLogger.logSuccess('Successfully incremented total attempts for User: $userUuid, Question: $questionId');
   }
 }
+
+// --- Set Circulation Status --- 
+
+/// Updates the user-specific record for a question's circulation status.
+/// Takes a boolean [isInCirculation] to set the status accordingly.
+/// Throws an Exception if the record is not found, adhering to fail-fast.
+Future<void> setCirculationStatus(
+    String userUuid, String questionId, bool isInCirculation, Database db) async {
+  final String statusString = isInCirculation ? 'IN' : 'OUT OF';
+  QuizzerLogger.logMessage(
+      'DB Table: Setting question $questionId $statusString circulation for user $userUuid');
+
+  // Ensure table exists before update
+  await verifyUserQuestionAnswerPairTable(db);
+
+  // Perform the update using the existing edit function
+  final int rowsAffected = await editUserQuestionAnswerPair(
+      userUuid: userUuid,
+      questionId: questionId,
+      db: db,
+      inCirculation: isInCirculation, // Use the provided boolean value
+      lastUpdated: DateTime.now().toIso8601String());
+
+  if (rowsAffected == 0) {
+    // Fail fast if the specific record wasn't found for update
+    QuizzerLogger.logWarning(
+        'Update circulation status failed: No record found for user $userUuid and question $questionId');
+    // NOTE: Throwing here because if this is called, the record SHOULD exist.
+    throw Exception(
+        'Record not found for user $userUuid and question $questionId during circulation update.');
+  }
+
+  QuizzerLogger.logSuccess(
+      'Successfully set circulation status ($statusString) for question $questionId. Rows affected: $rowsAffected');
+}
+
+// Optional: Add a similar function to set inCirculation to false if needed later.
+// Future<void> removeQuestionFromCirculation(...) async { ... inCirculation: false ... } // This comment is now redundant

@@ -276,18 +276,12 @@ Future<Map<String, bool>> getModuleActivationStatus(String userId, Database db) 
     return {};
   }
   
-  try {
-    final String statusJson = result.first['activation_status_of_modules'] as String;
-    final Map<String, dynamic> statusMap = Map<String, dynamic>.from(json.decode(statusJson));
-    final Map<String, bool> activationStatus = statusMap.map(
-      (key, value) => MapEntry(key, value as bool)
-    );
-    // QuizzerLogger.logSuccess('Retrieved module activation status: $activationStatus');
-    return activationStatus;
-  } catch (e) {
-    // QuizzerLogger.logError('Error parsing module activation status: $e');
-    return {};
-  }
+  final String statusJson = result.first['activation_status_of_modules'] as String;
+  final Map<String, dynamic> statusMap = Map<String, dynamic>.from(json.decode(statusJson));
+  final Map<String, bool> activationStatus = statusMap.map(
+    (key, value) => MapEntry(key, value as bool)
+  );
+  return activationStatus;
 }
 
 /// Updates the activation status of a specific module for a user
@@ -296,30 +290,24 @@ Future<bool> updateModuleActivationStatus(String userId, String moduleName, bool
   QuizzerLogger.logMessage('Updating activation status for module: $moduleName, user: $userId, status: $isActive');
   await verifyUserProfileTable(db);
   
-  try {
-    // First get the current activation status
-    final Map<String, bool> currentStatus = await getModuleActivationStatus(userId, db);
-    
-    // Update the status for the specified module
-    currentStatus[moduleName] = isActive;
-    
-    // Convert the map to a JSON string
-    final String statusJson = json.encode(currentStatus);
-    
-    // Update the database
-    await db.update(
-      'user_profile',
-      {'activation_status_of_modules': statusJson},
-      where: 'uuid = ?',
-      whereArgs: [userId],
-    );
-    
-    QuizzerLogger.logSuccess('Successfully updated module activation status');
-    return true;
-  } catch (e) {
-    QuizzerLogger.logError('Error updating module activation status: $e');
-    return false;
-  }
+  // First get the current activation status
+  final Map<String, bool> currentStatus = await getModuleActivationStatus(userId, db);
+  
+  // Update the status for the specified module
+  currentStatus[moduleName] = isActive;
+  
+  // Convert the map to a JSON string
+  final String statusJson = json.encode(currentStatus);
+  
+  // Update the database
+  await db.update(
+    'user_profile',
+    {'activation_status_of_modules': statusJson},
+    where: 'uuid = ?',
+    whereArgs: [userId],
+  );
+  
+  return true;
 }
 
 /// Gets the subject interest data for a user

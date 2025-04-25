@@ -1,9 +1,4 @@
-import 'package:quizzer/backend_systems/06_question_queue_server/question_queue_maintainer.dart';
-import 'package:quizzer/backend_systems/07_user_question_management/functionality/user_question_processes.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_question_answer_pairs_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pairs_table.dart';
 import 'package:quizzer/backend_systems/03_account_creation/new_user_signup.dart' as account_creation;
-import 'package:quizzer/backend_systems/06_question_queue_server/question_queue_request.dart';
 import 'package:quizzer/backend_systems/04_module_management/module_updates_process.dart';
 import 'package:quizzer/backend_systems/05_question_answer_pairs/question_isolates.dart';
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
@@ -15,8 +10,21 @@ import 'package:quizzer/backend_systems/00_helper_utils/utils.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:hive/hive.dart';
 import 'package:supabase/supabase.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile_table.dart' as user_profile_table;
-import 'package:quizzer/backend_systems/06_question_queue_server/answered_history_monitor.dart';
+import 'package:quizzer/backend_systems/06_question_queue_server/pre_process_worker.dart';
+import 'package:path/path.dart' as p; // Use alias to avoid conflicts
+import 'dart:io'; // For Directory
+import 'dart:async'; // For Completer
+import 'package:path_provider/path_provider.dart'; // For mobile path
+import 'package:quizzer/backend_systems/07_user_question_management/functionality/user_question_processes.dart' show validateAllModuleQuestions;
+import 'package:quizzer/backend_systems/09_data_caches/module_inactive_cache.dart';
+import 'package:quizzer/backend_systems/09_data_caches/unprocessed_cache.dart';
+import 'package:quizzer/backend_systems/09_data_caches/non_circulating_questions_cache.dart';
+import 'package:quizzer/backend_systems/09_data_caches/circulating_questions_cache.dart';
+import 'package:quizzer/backend_systems/09_data_caches/due_date_beyond_24hrs_cache.dart';
+import 'package:quizzer/backend_systems/09_data_caches/due_date_within_24hrs_cache.dart';
+import 'package:quizzer/backend_systems/09_data_caches/eligible_questions_cache.dart';
+import 'package:quizzer/backend_systems/09_data_caches/question_queue_cache.dart';
+import 'package:quizzer/backend_systems/09_data_caches/answer_history_cache.dart';
 
 
 /*
@@ -33,34 +41,32 @@ class SessionManager {
   // Singleton instance
   static final SessionManager _instance = SessionManager._internal();
   factory SessionManager() => _instance;
-
   // Secure Storage
   // Hive storage for offline persistence
   late Box _storage;
-  
-  // Initialize Hive storage without encryption
-  Future<void> _initializeStorage() async {
-    // Let hive_flutter determine the correct path automatically
-    _storage = await Hive.openBox('async_prefs');
-  }
-  
+  // Completer to signal when async initialization (like storage) is done
+  final Completer<void> _initializationCompleter = Completer<void>();
+  /// Future that completes when asynchronous initialization is finished.
+  /// Await this before accessing components that depend on async init (e.g., _storage).
+  Future<void> get initializationComplete => _initializationCompleter.future;
   // Supabase client instance
   late final SupabaseClient supabase;
-
   // Database monitor instance
   final DatabaseMonitor _dbMonitor = getDatabaseMonitor();
-
-  // Session state variables
-
-  // The active user information (These don't get initialized until we first login with a user)
-  // FIXME Security assertions and validation of user authentication all throughout session
-  // Once we attempt login and the session is set, these variables will be assigned. At that point a lock of sorts should be placed upon them. A security check would then determine if the values have been changed, or altered at any point.
-  // If and Only If the user logs out should the state allowed to be changed.
+  // Cache Instances (as instance variables)
+  final UnprocessedCache                _unprocessedCache;
+  final NonCirculatingQuestionsCache _nonCirculatingCache;
+  final ModuleInactiveCache _moduleInactiveCache;
+  final CirculatingQuestionsCache _circulatingCache;
+  final DueDateBeyond24hrsCache _dueDateBeyondCache;
+  final DueDateWithin24hrsCache _dueDateWithinCache;
+  final EligibleQuestionsCache _eligibleCache;
+  final QuestionQueueCache _queueCache;
+  final AnswerHistoryCache _historyCache;
   bool      userLoggedIn = false;
   String?   userId;
   String?   userEmail;
   String?   userRole;
-
   // Current Question information and booleans
   Map<String, dynamic>? _currentQuestionRecord;
   String?               _currentQuestionType;
@@ -68,7 +74,6 @@ class SessionManager {
   int?                  _multipleChoiceOptionSelected; // would be null if no option is presently selected
   DateTime?             _timeDisplayed;
   DateTime?             _timeAnswerGiven;
-
   // --- Public Getters for UI State ---
   Map<String, dynamic>? get currentQuestionData   => _currentQuestionRecord;
   String?               get currentType           => _currentQuestionType;
@@ -76,18 +81,49 @@ class SessionManager {
   int?                  get optionSelected        => _multipleChoiceOptionSelected;
   DateTime?             get timeAnswerGiven       => _timeAnswerGiven;
   DateTime?             get timeQuestionDisplayed => _timeDisplayed;
-
-
   // MetaData
   DateTime? sessionStartTime;
-  
   // Page history tracking
   final List<String> _pageHistory = [];
   static const int _maxHistoryLength = 12;
 
+  // Initialize Hive storage (private)
+  Future<void> _initializeStorage() async {
+    String hivePath;
+    // Determine path based on platform (like original main_native)
+    if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+      // Desktop / Test environment: Use runtime_cache/hive
+      hivePath = p.join(Directory.current.path, 'runtime_cache', 'hive');
+      QuizzerLogger.logMessage("Platform: Desktop/Test. Setting Hive path to: $hivePath");
+    } else {
+      // Mobile: Use standard application documents directory
+      // Assert that path_provider is available if this branch is hit
+      final appDocumentsDir = await getApplicationDocumentsDirectory();
+      hivePath = appDocumentsDir.path;
+      QuizzerLogger.logMessage("Platform: Mobile. Setting Hive path to: $hivePath");
+    }
+    // Ensure the directory exists
+    Directory(hivePath).createSync(recursive: true);
+    Hive.init(hivePath);
+    QuizzerLogger.logMessage('SessionManager: Hive initialized at $hivePath.');
 
-  // SessionManager Constructor
-  SessionManager._internal() {
+    QuizzerLogger.logMessage("SessionManager: Opening Hive box 'async_prefs'...");
+    _storage = await Hive.openBox('async_prefs');
+    QuizzerLogger.logMessage("SessionManager: Hive box 'async_prefs' opened.");
+  }
+
+  // SessionManager Constructor (Initializes Supabase and starts async init)
+  SessionManager._internal()
+      // Initialize cache instance variables
+      : _unprocessedCache = UnprocessedCache(),
+        _nonCirculatingCache = NonCirculatingQuestionsCache(),
+        _moduleInactiveCache = ModuleInactiveCache(),
+        _circulatingCache = CirculatingQuestionsCache(),
+        _dueDateBeyondCache = DueDateBeyond24hrsCache(),
+        _dueDateWithinCache = DueDateWithin24hrsCache(),
+        _eligibleCache = EligibleQuestionsCache(),
+        _queueCache = QuestionQueueCache(),
+        _historyCache = AnswerHistoryCache() {
     supabase = SupabaseClient(
       'https://yruvxuvzztnahuuiqxit.supabase.co',
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlydXZ4dXZ6enRuYWh1dWlxeGl0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQzMTY1NDIsImV4cCI6MjA1OTg5MjU0Mn0.hF1oAILlmzCvsJxFk9Bpjqjs3OEisVdoYVZoZMtTLpo',
@@ -95,7 +131,18 @@ class SessionManager {
         authFlowType: AuthFlowType.implicit,
       ),
     );
-    _initializeStorage();
+    QuizzerLogger.logMessage('SessionManager instance created. Starting async initialization...');
+    // Start async initialization but don't wait for it here.
+    // Complete the completer when done or if an error occurs.
+    _initializeStorage().then((_) {
+      QuizzerLogger.logMessage('SessionManager async initialization successful.');
+      _initializationCompleter.complete();
+    }).catchError((error, stackTrace) {
+      QuizzerLogger.logError('SessionManager async initialization failed: $error\n$stackTrace');
+      _initializationCompleter.completeError(error, stackTrace);
+      // Decide how to handle critical init failure - maybe rethrow?
+      // For now, just completing with error lets awaiters handle it.
+    });
   }
 
   /// Initialize the SessionManager and its dependencies
@@ -104,37 +151,29 @@ class SessionManager {
     userLoggedIn = true;
     userEmail = email;
     userId = await initializeSession({'email': email});
+    assert(userId != null, "Failed to retrieve userId during login initialization.");
     sessionStartTime = DateTime.now();
-    // Initial process spin up
-    buildModuleRecords();
 
-    startQuestionQueueMaintenance();
+    // --- Start new background processing pipeline --- 
+    QuizzerLogger.logMessage('SessionManager: Starting PreProcessWorker...');
+    final PreProcessWorker preProcessWorker = PreProcessWorker();
+    preProcessWorker.start(); // Worker now fetches userId internally
+    QuizzerLogger.logMessage('SessionManager: PreProcessWorker started.');
+    // -------------------------------------------------
 
-    //TODO Create data sync process, connecting the local DB to the cloud
-    Database? db;
-    while (db == null) {
-      db = await _dbMonitor.requestDatabaseAccess();
-      if (db == null) {
-        QuizzerLogger.logMessage('DB access denied for updating circulation, waiting...');
-        await Future.delayed(const Duration(milliseconds: 100));
-      }
-    }
-    await validateAllModuleQuestions(db, userId!);
-    _dbMonitor.releaseDatabaseAccess();
+    // TODO: Implement separate data sync process initialization if needed
 
-    // QuestionQueueMonitor questionQueueMonitor = getQuestionQueueMonitor();
-    // while(questionQueueMonitor.isEmpty) {}
-    
-    // Wait for 3 seconds before completing initialization
+    // Optional: Keep a delay if needed for UI/other reasons, or remove.
+    // TODO: create a mechanism to detect when the question maintainer worker has started and picked an initial question
     await Future.delayed(const Duration(seconds: 3));
-    QuizzerLogger.logMessage('SessionManager initialization complete');
+    QuizzerLogger.logMessage('SessionManager post-worker-start initialization complete');
   }
 
   // Reset Complete Session State
   void clearSessionState() {
     // Reset user information
-    userLoggedIn = false;       userId = null;                  userEmail = null;
-    userRole = null;            _currentQuestionRecord = null;   _isAnswerDisplayed = false;
+    userLoggedIn = false;       userId = null;                    userEmail = null;
+    userRole = null;            _currentQuestionRecord = null;    _isAnswerDisplayed = false;
     sessionStartTime = null;    _multipleChoiceOptionSelected = null;
     _timeAnswerGiven = null;    _timeDisplayed = null;
     _pageHistory.clear();
@@ -175,205 +214,10 @@ class SessionManager {
     _timeAnswerGiven = null; // Reset answer time when new question is displayed
     QuizzerLogger.logMessage('UI set timeDisplayed to: $_timeDisplayed');
   }
-  // ---------------------------------------------
-
-  /// ==================================================================================
-  // Private API Calls for testing and internal use (When tests are complete these should all be made private, during testing they will be public so we can use them in our tests)
-  //  ------------------------------------------------
-  // Get Eligible Questions
-  Future<List<Map<String, dynamic>>> getEligibleQuestions() async{
-    assert(userId != null);
-    Database? db;
-    // Acquire DB Access using the established loop pattern
-    while (db == null) {
-      db = await _dbMonitor.requestDatabaseAccess();
-      if (db == null) {
-        QuizzerLogger.logMessage('DB access denied for updating circulation, waiting...');
-        await Future.delayed(const Duration(milliseconds: 100));
-      }
-    }
-    List<Map<String, dynamic>> userQuestionRecords = await getAllUserQuestionAnswerPairs(db, userId!);
-    _dbMonitor.releaseDatabaseAccess();
-
-    List<Map<String,dynamic>> eligibleQuestionRecords = [];
-
-    for (Map<String, dynamic> userQuestionRecord in userQuestionRecords) {
-      bool isEligible = await checkQuestionEligibility(userQuestionRecord['question_id']);
-      if (isEligible) {
-        eligibleQuestionRecords.add(userQuestionRecord);
-      }
-    }
-
-    return eligibleQuestionRecords;
-  }
-
-  //  ------------------------------------------------
-  /// Updates the user-specific record to mark a question as in circulation.
-  Future<void> addQuestionToCirculation(String questionId) async {
-    assert(userId != null, 'User must be logged in to update circulation status.');
-    QuizzerLogger.logMessage('SessionManager: Adding question $questionId to circulation for user $userId');
-
-    Database? db;
-    // Acquire DB Access using the established loop pattern
-    while (db == null) {
-      db = await _dbMonitor.requestDatabaseAccess();
-      if (db == null) {
-        QuizzerLogger.logMessage('DB access denied for updating circulation, waiting...');
-        await Future.delayed(const Duration(milliseconds: 100));
-      }
-    }
-    QuizzerLogger.logMessage('DB acquired for updating circulation status for $questionId.');
-
-    // Perform the update using the imported function with named parameters
-    final int rowsAffected = await editUserQuestionAnswerPair(
-      userUuid: userId!, 
-      questionId: questionId, 
-      db: db, 
-      inCirculation: true, // Set inCirculation to true (which becomes 1)
-      lastUpdated: DateTime.now().toIso8601String() // Use camelCase: lastUpdated
-      );
-    
-    // Release DB access
-    _dbMonitor.releaseDatabaseAccess();
-    QuizzerLogger.logMessage('DB released after updating circulation status for $questionId.');
-
-    if (rowsAffected == 0) {
-        // Fail fast if the specific record wasn't found for update
-        QuizzerLogger.logWarning('Update circulation status failed: No record found for user $userId and question $questionId');
-        throw Exception('Record not found for user $userId and question $questionId during circulation update.');
-    }
-
-    QuizzerLogger.logMessage('Successfully updated circulation status for question $questionId. Rows affected: $rowsAffected');
-  }
-
-  //  ------------------------------------------------
-  // Get specfic question-answer pair
-  /// Fetches the full question record from the main question_answer_pairs table.
-  /// Takes questionId in the format 'timeStamp_qstContrib'.
-  /// Returns the record map or throws an error if not found or on other issues.
-  Future<Map<String, dynamic>> getQuestionAnswerPair(String questionId) async {
-    assert(userId != null);
-    QuizzerLogger.logMessage('SessionManager API: Fetching question pair for ID $questionId');
-
-    Database? db;
-    final dbMonitor = getDatabaseMonitor();
-    Map<String, dynamic>? questionRecord;
-    // Acquire DB Access
-    while (db == null) {
-      db = await dbMonitor.requestDatabaseAccess();
-      if (db == null) {
-        QuizzerLogger.logMessage('DB access denied for fetching question pair, waiting...');
-        await Future.delayed(const Duration(milliseconds: 100));
-      }
-    }
-    QuizzerLogger.logMessage('DB acquired for fetching question pair $questionId.');
-
-    // Call the backend function
-    questionRecord = await getQuestionAnswerPairById(questionId, db);
-      
-    QuizzerLogger.logMessage('Successfully fetched question pair for $questionId');
-    
-    dbMonitor.releaseDatabaseAccess();
-    return questionRecord; 
-  }
-  
-  //  ------------------------------------------------
-  // Check User Question Eligibility
-  /// Checks if a specific question is eligible for review for the current user.
-  /// Returns true if eligible, false otherwise (including if user not logged in).
-  Future<bool> checkQuestionEligibility(String questionId) async {
-    // FIXME Should be a private api call, but temporarily public during testing, if testing is done make this private
-    QuizzerLogger.logMessage('SessionManager API: Checking eligibility for question $questionId');
-    assert(userId != null);
-    // Call the function from user_question_processes.dart
-    return await isUserQuestionEligible(userId!, questionId);
-  }
-  //  ------------------------------------------------
-  // Get All User Question Answer Pairs
-  Future<List<Map<String, dynamic>>> getAllUserQuestionPairs() async {
-    // FIXME Should be a private api call, but temporarily public during testing, if testing is done make this private
-    QuizzerLogger.logMessage('SessionManager API: Fetching all question pairs for user');
-    assert(userId != null, 'Cannot fetch user question pairs: User not logged in.');
-
-    Database? db;
-    final dbMonitor = getDatabaseMonitor();
-    List<Map<String, dynamic>> userPairs;
-
-    // Acquire DB Access
-    while (db == null) {
-      db = await dbMonitor.requestDatabaseAccess();
-      if (db == null) {
-        QuizzerLogger.logMessage('DB access denied for fetching user pairs, waiting...');
-        await Future.delayed(const Duration(milliseconds: 100));
-      }
-    }
-    QuizzerLogger.logMessage('DB acquired for fetching user pairs.');
-
-    // Call the backend function using the prefix
-    userPairs = await getUserQuestionAnswerPairsByUser(userId!, db);
-    QuizzerLogger.logMessage('Fetched ${userPairs.length} pairs for user $userId');
-
-    // Release DB
-    dbMonitor.releaseDatabaseAccess();
-    QuizzerLogger.logMessage('DB released after fetching user pairs.');
-
-    return userPairs;
-  }
-  
-  //  ------------------------------------------------
-  // API call to get the user's current subject interest settings
-  /// gets the subject interest map for the current user.
-  /// Asserts that the user is logged in. Lets backend handle DB errors.
-  Future<Map<String, int>> getUserSubjectInterests() async {
-    // FIXME Should be a private api call, but temporarily public during testing, if testing is done make this private
-    assert(userId != null, 'Cannot fetch user subject interests: User not logged in.');
-
-    Database? db;
-    final dbMonitor = getDatabaseMonitor(); 
-    Map<String, int> interests;
-
-    // Acquire DB Access
-    while (db == null) {
-      db = await dbMonitor.requestDatabaseAccess();
-      if (db == null) {
-        await Future.delayed(const Duration(milliseconds: 100));
-      }
-    }
-
-    // Call the backend function directly. Errors will propagate.
-    // If this call throws, the DB release below will NOT happen.
-    interests = await user_profile_table.getUserSubjectInterests(userId!, db);
-
-    // Release DB (Only happens if getUserSubjectInterests succeeds)
-    dbMonitor.releaseDatabaseAccess();
-       
-    return interests;
-  }
-
   /// ==================================================================================
   // API CALLS
   //  ------------------------------------------------
-  // Request Question from Queue
-  /// Provides an API endpoint within SessionManager to call the external getNextQuestion function.
-  /// When using requestNextQuestion, ensure to set the display time in the UI when the question is actually displayed
-  Future<bool> requestNextQuestion() async {
-    assert(userId != null);
-    QuizzerLogger.logMessage('SessionManager API: Requesting next question');
-    // Since we're getting the next question to be presented clear the question state
-    clearQuestionState();
-
-    Map<String, dynamic> questionObject = await getNextQuestion(); 
-    // Before we return we need to:
-    // Store the questionObject as the current record
-    _currentQuestionRecord = questionObject;
-    // Extract the question type:
-    _currentQuestionType   = questionObject['question_type'];
-
-    // Display time will be set by UI
-
-    return true;
-  }
-
+  /// Called when answer is given by the user to a particular question
   Future<bool> submitAnswer() async {
     QuizzerLogger.logMessage("submitAnswer called.");
     
@@ -412,7 +256,8 @@ class SessionManager {
     }
     QuizzerLogger.logMessage("Determined answerStatus: $answerStatus");
 
-    recordQuestionAttempt(questionId, userId!, timeToAnswer, answerStatus);
+    // TODO Should call backend functions for this
+    // recordQuestionAttempt(questionId, userId!, timeToAnswer, answerStatus);
 
     
     return true; // Indicate submission process completed 
@@ -436,13 +281,15 @@ class SessionManager {
       'password': password,
     }, supabase, _dbMonitor);
   }
-  
   //  ------------------------------------------------
   // Login User
   // This initializing spins up sub-system processes that rely on the user profile information
-
   Future<Map<String, dynamic>> attemptLogin(String email, String password) async {
-    QuizzerLogger.logMessage('Session Manager: Attempting login for $email');
+    // Ensure async initialization is complete before proceeding
+    await initializationComplete;
+    QuizzerLogger.logMessage('Session Manager: Initialization complete. Attempting login for $email');
+
+    // Now it's safe to access _storage
     final response = await userAuth(
       email: email,
       password: password,
@@ -453,12 +300,8 @@ class SessionManager {
     if (response['success'] == true) {
       await _initializeLogin(email); // initialize function spins up necessary background processes
     }
-
-
-    
     return response; // Response information is for front-end UI, not necessary for backend
   }
-
   //  ------------------------------------------------
   // Manage Page History
   // Add page to history
@@ -507,7 +350,6 @@ class SessionManager {
   // API for loading module names and their activation status
   Future<Map<String, dynamic>> loadModules() async {
     assert(userId != null);
-    
     QuizzerLogger.logMessage('Loading modules for user: $userId');
     return await handleLoadModules({
       'userId': userId,
@@ -516,13 +358,9 @@ class SessionManager {
 
   // API for activating or deactivating a module
   Future<void> toggleModuleActivation(String moduleName, bool activate) async {
-    /*
-    does not need to be awaited, UI will have to accomodate
-    */
     assert(userId != null);
-    // Toggle the activation Status
-    QuizzerLogger.logMessage('Toggling module activation for user: $userId, module: $moduleName, activate: $activate');
-    handleModuleActivation({
+    QuizzerLogger.logMessage('Toggling module activation for user: $userId, module: $moduleName, activate: $activate'); 
+    await handleModuleActivation({
       'userId': userId,
       'moduleName': moduleName,
       'isActive': activate,
@@ -531,14 +369,20 @@ class SessionManager {
     // When activation status is updated we also need to validate the profile questions
     Database? db;
     while (db == null) {
-      db = await dbMonitor.requestDatabaseAccess();
+      db = await _dbMonitor.requestDatabaseAccess();
       if (db == null) {
-        QuizzerLogger.logMessage('Database access denied, waiting...');
+        QuizzerLogger.logMessage('SessionManager: Database access denied, waiting...');
         await Future.delayed(const Duration(milliseconds: 250));
       }
     }
-    validateAllModuleQuestions(db, userId!);
-    dbMonitor.releaseDatabaseAccess();
+
+    final currentUserId = userId!;
+    await validateAllModuleQuestions(db, currentUserId);
+    
+    // Now use the instance variable instead of creating a new instance
+    await _moduleInactiveCache.flushToUnprocessedCache(); 
+
+    _dbMonitor.releaseDatabaseAccess();
   }
 
   // API for updating a module's description
@@ -666,9 +510,7 @@ class SessionManager {
     // All essential checks passed
     return true;
   }
-  
   // ------------------------------
-
 }
 
 // Global instance

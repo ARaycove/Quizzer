@@ -11,14 +11,12 @@
             "id": "d47008925d227bd1",
             "type": "leaf",
             "state": {
-              "type": "markdown",
+              "type": "excalidraw",
               "state": {
-                "file": "Core Documentation/Chapter 03 - Research Methodology/03_06_Task_03_Answer_Questions.md",
-                "mode": "source",
-                "source": false
+                "file": "Diagrams/Quizzer_Flow_Chart.md"
               },
-              "icon": "lucide-file",
-              "title": "03_06_Task_03_Answer_Questions"
+              "icon": "excalidraw-icon",
+              "title": "Quizzer_Flow_Chart"
             }
           },
           {
@@ -209,14 +207,14 @@
       "obsidian-excalidraw-plugin:New drawing": false
     }
   },
-  "active": "d47008925d227bd1",
+  "active": "90de1109fbc27f8e",
   "lastOpenFiles": [
-    "Core Documentation/Chapter 03 - Research Methodology/03_05_Task_02_Question_Answer_Pair_Generation.md",
+    "Diagrams/Quizzer_Flow_Chart.md",
     "Core Documentation/Chapter 03 - Research Methodology/03_06_Task_03_Answer_Questions.md",
+    "Core Documentation/Chapter 03 - Research Methodology/03_05_Task_02_Question_Answer_Pair_Generation.md",
     "Core Documentation/Chapter 03 - Research Methodology/03_04_Task_01_Source_Material_Generation_and_Classification.md",
     "Core Documentation/Chapter 03 - Research Methodology/03_03_breakdown_of_behavioral_tasks.md",
     "Core Documentation/Chapter 08 - Database/08_01_03_Question_Answer_Attempts_Table.md",
-    "Diagrams/Quizzer_Flow_Chart.md",
     "Diagrams/Question_Answer_Pair_Generation.md",
     "Diagrams/NewUserSignUp-LoginPage.png",
     "Diagrams/LoginPage.png",

@@ -198,7 +198,7 @@ class QuizzerApp extends StatelessWidget {
       initialRoute: '/login',
       routes: {
         '/login':           (context) => const LoginPage(),
-        '/home':            (context) => const HomePage(),
+        // '/home':            (context) => const HomePage(), //FIXME need to add in HomePage fix
         '/menu':            (context) => const MenuPage(),
         '/add_question':    (context) => const AddQuestionAnswerPage(),
         '/display_modules': (context) => const DisplayModulesPage(),

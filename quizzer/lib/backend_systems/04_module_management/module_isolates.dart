@@ -13,25 +13,18 @@ Future<Map<String, dynamic>> handleLoadModules(Map<String, dynamic> data) async 
     'activationStatus': {},
   };
   
-  try {
-    while (db == null) {
-      db = await monitor.requestDatabaseAccess();
-      if (db == null) {
-        await Future.delayed(const Duration(milliseconds: 100));
-      }
+  while (db == null) {
+    db = await monitor.requestDatabaseAccess();
+    if (db == null) {
+      await Future.delayed(const Duration(milliseconds: 100));
     }
-    
-    result['modules'] = await getAllModules(db);
-    result['activationStatus'] = await getModuleActivationStatus(userId, db);
-    monitor.releaseDatabaseAccess();
-    return result;
-  } catch (e) {
-    QuizzerLogger.logError('Error loading modules: $e');
-    monitor.releaseDatabaseAccess();
-    return result;
-  } finally {
-    monitor.releaseDatabaseAccess();
   }
+  
+  result['modules']           = await getAllModules(db);
+  result['activationStatus']  = await getModuleActivationStatus(userId, db);
+  
+  monitor.releaseDatabaseAccess();
+  return result;
 }
 
 Future<bool> handleModuleActivation(Map<String, dynamic> data) async {
@@ -91,15 +84,10 @@ Future<bool> handleUpdateModuleDescription(Map<String, dynamic> data) async {
     }
     QuizzerLogger.logMessage('Database access granted');
     
-    QuizzerLogger.logMessage('Updating module description');
-    await db.update(
-      'modules',
-      {'description': newDescription, 'last_modified': DateTime.now().millisecondsSinceEpoch},
-      where: 'module_name = ?',
-      whereArgs: [moduleName],
-    );
+    QuizzerLogger.logMessage('Updating module description in database');
+    await updateModule(name: moduleName, description: newDescription, db: db);
+    QuizzerLogger.logMessage('Module description update successful');
     success = true;
-    QuizzerLogger.logSuccess('Module description updated successfully');
     monitor.releaseDatabaseAccess();
     return success;
   } catch (e) {

@@ -300,24 +300,29 @@ Future<int> removeQuestionAnswerPair(String timeStamp, String qstContrib, Databa
   );
 }
 
-/// Returns the module name for a given question ID
+/// Fetches the module name for a specific question ID.
+/// Throws an error if the question ID is not found (Fail Fast).
 Future<String> getModuleNameForQuestionId(String questionId, Database db) async {
-  // First verify that the table exists
-  await verifyQuestionAnswerPairTable(db);
-  
-  // Query the database for the question
+  await verifyQuestionAnswerPairTable(db); // Ensure table/columns exist
+
+  QuizzerLogger.logMessage('Fetching module_name for question ID: $questionId');
+
   final List<Map<String, dynamic>> result = await db.query(
     'question_answer_pairs',
-    columns: ['module_name'],
+    columns: ['module_name'], // Select only the module_name column
     where: 'question_id = ?',
     whereArgs: [questionId],
+    limit: 1, // We expect only one result
   );
-  // If no result is found, throw an exception since this indicates an invalid questionId
-  if (result.isEmpty) {
-    throw Exception('No question found with ID: $questionId');
-  }
-  // Return the module name from the query result
-  return result.first['module_name'] as String;
+
+  // Fail fast if no record is found
+  assert(result.isNotEmpty, 'No question found with ID: $questionId');
+  // Fail fast if module_name is somehow null in the DB (shouldn't happen if added correctly)
+  assert(result.first['module_name'] != null, 'Module name is null for question ID: $questionId');
+
+  final moduleName = result.first['module_name'] as String;
+  QuizzerLogger.logValue('Found module_name: $moduleName for question ID: $questionId');
+  return moduleName;
 }
 
 /// Returns a set of all unique subjects present in the question_answer_pairs table

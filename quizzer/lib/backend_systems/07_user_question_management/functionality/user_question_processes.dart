@@ -1,8 +1,6 @@
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_question_answer_pairs_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_attempts_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pairs_table.dart';
-import 'package:quizzer/backend_systems/06_question_queue_server/answered_history_monitor.dart';
-import 'package:quizzer/backend_systems/06_question_queue_server/question_queue_monitor.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile_table.dart' as user_profile;
 import 'package:quizzer/backend_systems/00_database_manager/tables/modules_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
@@ -10,7 +8,7 @@ import 'package:quizzer/backend_systems/08_memory_retention_algo/memory_retentio
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:sqflite/sqflite.dart';
-
+import 'package:quizzer/backend_systems/09_data_caches/unprocessed_cache.dart';
 
 /// Checks if a module is active for a specific user
 /// Returns true if the module is active, false otherwise
@@ -70,6 +68,13 @@ Future<void> validateModuleQuestionsInUserProfile(String moduleName, Database db
         inCirculation: false,
         db: db
       );
+      
+      // Fetch the newly added record from the DB
+      final newUserRecord = await getUserQuestionAnswerPairById(userId, questionId, db);
+      
+      // Add the new record to the UnprocessedCache
+      final unprocessedCache = UnprocessedCache(); 
+      await unprocessedCache.addRecord(newUserRecord);
     }
   }
   
@@ -92,93 +97,93 @@ Future<void> validateAllModuleQuestions(Database db, String userId) async {
   QuizzerLogger.logSuccess('Completed validation of all module questions');
 }
 
-Future<bool> isUserQuestionEligible(String userId, String questionId) async {
-  // TODO: Refactor eligibility checking.
-  // replace with a multiplicative approach.
-  // Calculate component scores (time past due, subject interest, in circulation value, module active value) If anything hits 0 then the result will be 0, if the result is 0 then not eligible else above 0 will be eligible
-  // where a component is 0 if a condition isn't met. The final eligibility score
-  // would be the product of these components. A question is eligible if the product > 0.
-  // This might be computationally simpler than multiple conditional checks inside the function.
-  QuizzerLogger.logMessage(
-      'Checking eligibility for question $questionId for user $userId');
+// Future<bool> isUserQuestionEligible(String userId, String questionId) async {
+//   // TODO: Refactor eligibility checking.
+//   // replace with a multiplicative approach.
+//   // Calculate component scores (time past due, subject interest, in circulation value, module active value) If anything hits 0 then the result will be 0, if the result is 0 then not eligible else above 0 will be eligible
+//   // where a component is 0 if a condition isn't met. The final eligibility score
+//   // would be the product of these components. A question is eligible if the product > 0.
+//   // This might be computationally simpler than multiple conditional checks inside the function.
+//   QuizzerLogger.logMessage(
+//       'Checking eligibility for question $questionId for user $userId');
 
-  // Get Monitors
-  final queueMonitor    = getQuestionQueueMonitor();
-  final historyMonitor  = getAnsweredHistoryMonitor();
+//   // Get Monitors
+//   final queueMonitor    = getQuestionQueueMonitor();
+//   final historyMonitor  = getAnsweredHistoryMonitor();
 
-  // --- Check if question is already in the QUEUE (using monitor's internal lock) ---
-  bool alreadyInQueue = await queueMonitor.containsQuestion(questionId);
-  if (alreadyInQueue) {
-    QuizzerLogger.logMessage('Question $questionId is currently in the queue (checked via monitor), marking as ineligible.');
-    return false; // Not eligible if already queued
-  }
-  // --------------------------------------------------------------------------------
-  // --- Check if question is in RECENTLY ANSWERED history (using monitor's internal lock) ---
-  bool inRecentHistory = await historyMonitor.isInRecentHistory(questionId);
-  if (inRecentHistory) {
-    QuizzerLogger.logMessage('Question $questionId is in recent answered history (last 5), marking as ineligible.');
-    return false; // Not eligible if recently answered
-  }
-  // ---------------------------------------------------------------------
+//   // --- Check if question is already in the QUEUE (using monitor's internal lock) ---
+//   bool alreadyInQueue = await queueMonitor.containsQuestion(questionId);
+//   if (alreadyInQueue) {
+//     QuizzerLogger.logMessage('Question $questionId is currently in the queue (checked via monitor), marking as ineligible.');
+//     return false; // Not eligible if already queued
+//   }
+//   // --------------------------------------------------------------------------------
+//   // --- Check if question is in RECENTLY ANSWERED history (using monitor's internal lock) ---
+//   bool inRecentHistory = await historyMonitor.isInRecentHistory(questionId);
+//   if (inRecentHistory) {
+//     QuizzerLogger.logMessage('Question $questionId is in recent answered history (last 5), marking as ineligible.');
+//     return false; // Not eligible if recently answered
+//   }
+//   // ---------------------------------------------------------------------
 
-  // --- Proceed with Database checks only if not queued/recent ---
-  Database? db;
-  DatabaseMonitor monitor = getDatabaseMonitor();
-  while (db == null) {
-    db = await monitor.requestDatabaseAccess();
-    if (db == null) {
-      QuizzerLogger.logMessage('Database access denied, waiting...');
-      await Future.delayed(const Duration(milliseconds: 100));
-    }
-  }
-  // We need the userQuestionAnswerPairRecord
-  Map<String, dynamic>? userQuestionAnswerPair = await getUserQuestionAnswerPairById(userId, questionId, db);
-  // We need the modulename of that the user QuestionAnswerPairRecord, which we can get from the question_answer_pair_table
-  String moduleName = await getModuleNameForQuestionId(questionId, db);
+//   // --- Proceed with Database checks only if not queued/recent ---
+//   Database? db;
+//   DatabaseMonitor monitor = getDatabaseMonitor();
+//   while (db == null) {
+//     db = await monitor.requestDatabaseAccess();
+//     if (db == null) {
+//       QuizzerLogger.logMessage('Database access denied, waiting...');
+//       await Future.delayed(const Duration(milliseconds: 100));
+//     }
+//   }
+//   // We need the userQuestionAnswerPairRecord
+//   Map<String, dynamic>? userQuestionAnswerPair = await getUserQuestionAnswerPairById(userId, questionId, db);
+//   // We need the modulename of that the user QuestionAnswerPairRecord, which we can get from the question_answer_pair_table
+//   String moduleName = await getModuleNameForQuestionId(questionId, db);
 
-  // We need the module activation status of the given module
-  Map<String, dynamic> activationStatusField = await user_profile.getModuleActivationStatus(userId, db);
+//   // We need the module activation status of the given module
+//   Map<String, dynamic> activationStatusField = await user_profile.getModuleActivationStatus(userId, db);
 
-  // Once we're done reading we can return
-  monitor.releaseDatabaseAccess();
-  late bool isEligible;
+//   // Once we're done reading we can return
+//   monitor.releaseDatabaseAccess();
+//   late bool isEligible;
 
-  // Now that we have required data, we need to use it make our decision
+//   // Now that we have required data, we need to use it make our decision
 
-  // Is due date in the past?
-  // Parse the next revision due date from the user question record
-  final nextRevisionDueString = userQuestionAnswerPair['next_revision_due'] as String;
-  final nextRevisionDue = DateTime.parse(nextRevisionDueString);
+//   // Is due date in the past?
+//   // Parse the next revision due date from the user question record
+//   final nextRevisionDueString = userQuestionAnswerPair['next_revision_due'] as String;
+//   final nextRevisionDue = DateTime.parse(nextRevisionDueString);
   
-  // Compare with current time to see if it's due (in the past)
-  final now = DateTime.now();
-  final isDueForRevision = nextRevisionDue.isBefore(now);
+//   // Compare with current time to see if it's due (in the past)
+//   final now = DateTime.now();
+//   final isDueForRevision = nextRevisionDue.isBefore(now);
   
-  QuizzerLogger.logMessage('Question $questionId next revision due: $nextRevisionDueString');
-  QuizzerLogger.logMessage('Question $questionId is ${isDueForRevision ? 'due' : 'not due'} for revision');
-  // Is the userQuestion in circulation?
-  // Check if the question is in circulation
-  final inCirculationValue = userQuestionAnswerPair['in_circulation'] as int;
-  final isInCirculation = inCirculationValue == 1;
+//   QuizzerLogger.logMessage('Question $questionId next revision due: $nextRevisionDueString');
+//   QuizzerLogger.logMessage('Question $questionId is ${isDueForRevision ? 'due' : 'not due'} for revision');
+//   // Is the userQuestion in circulation?
+//   // Check if the question is in circulation
+//   final inCirculationValue = userQuestionAnswerPair['in_circulation'] as int;
+//   final isInCirculation = inCirculationValue == 1;
   
-  QuizzerLogger.logMessage('Question $questionId is ${isInCirculation ? 'in' : 'not in'} circulation');
-  // is the userQuestion's module active?
-  // Check if the module is active in the user's activation status
-  final moduleActivationStatus = activationStatusField[moduleName];
-  final isModuleActive = moduleActivationStatus != null && moduleActivationStatus == true;
+//   QuizzerLogger.logMessage('Question $questionId is ${isInCirculation ? 'in' : 'not in'} circulation');
+//   // is the userQuestion's module active?
+//   // Check if the module is active in the user's activation status
+//   final moduleActivationStatus = activationStatusField[moduleName];
+//   final isModuleActive = moduleActivationStatus != null && moduleActivationStatus == true;
   
-  QuizzerLogger.logMessage('Module $moduleName is ${isModuleActive ? 'active' : 'inactive'} for user $userId');
+//   QuizzerLogger.logMessage('Module $moduleName is ${isModuleActive ? 'active' : 'inactive'} for user $userId');
   
-  // A question is eligible if:
-  // 1. It's due for revision
-  // 2. It's in circulation
-  // 3. Its module is active
-  isEligible = isDueForRevision && isInCirculation && isModuleActive;
+//   // A question is eligible if:
+//   // 1. It's due for revision
+//   // 2. It's in circulation
+//   // 3. Its module is active
+//   isEligible = isDueForRevision && isInCirculation && isModuleActive;
   
-  QuizzerLogger.logMessage('Question $questionId eligibility result: $isEligible');
+//   QuizzerLogger.logMessage('Question $questionId eligibility result: $isEligible');
 
-  return isEligible;
-}
+//   return isEligible;
+// }
 
 /// answerStatus should be ("correct", "incorrect")
 /// timeToAnswer should be in seconds
