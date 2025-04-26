@@ -13,6 +13,8 @@ import 'package:quizzer/backend_systems/09_data_caches/circulating_questions_cac
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_question_answer_pairs_table.dart' as uq_pairs_table;
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pairs_table.dart' as q_pairs_table;
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile_table.dart' as user_profile_table;
+// Workers
+import 'package:quizzer/backend_systems/06_question_queue_server/question_selection_worker.dart';
 
 
 // ==========================================
@@ -28,6 +30,7 @@ class CirculationWorker {
   // --- Worker State ---
   bool _isRunning = false;
   Completer<void>? _stopCompleter;
+  bool _isInitialLoop = true;
   // --------------------
 
   // --- Dependencies ---
@@ -41,10 +44,12 @@ class CirculationWorker {
   // --- Control Methods ---
   /// Starts the worker loop.
   void start() {
+    QuizzerLogger.logMessage('Entering CirculationWorker start()...');
     if (_isRunning) {
       return; // Already running
     }
     _isRunning = true;
+    _isInitialLoop = true;
     _stopCompleter = Completer<void>();
     _runLoop(); // Start the loop asynchronously
     // QuizzerLogger.logMessage('CirculationWorker started.');
@@ -52,6 +57,7 @@ class CirculationWorker {
 
   /// Stops the worker loop.
   Future<void> stop() async {
+    QuizzerLogger.logMessage('Entering CirculationWorker stop()...');
     if (!_isRunning) {
       return; // Already stopped
     }
@@ -63,6 +69,7 @@ class CirculationWorker {
 
   // --- Main Loop ---
   Future<void> _runLoop() async {
+    QuizzerLogger.logMessage('Entering CirculationWorker _runLoop()...');
     while (_isRunning) {
       // QuizzerLogger.logMessage('CirculationWorker: Starting cycle...');
       
@@ -75,22 +82,37 @@ class CirculationWorker {
       final bool shouldAdd = await _shouldAddNewQuestion();
 
       if (shouldAdd) {
-        // 2. Add a question if needed
-        // QuizzerLogger.logMessage('CirculationWorker: Conditions met, adding a question...');
         await _selectAndAddQuestionToCirculation(userId);
         
-        // 3. Sleep for 1 second after adding
         if (!_isRunning) break; // Check again before sleep
         // QuizzerLogger.logMessage('CirculationWorker: Sleeping for 1 second after adding...');
       }
       // 3. Conditions not met. Check if it's due to empty NonCirculatingCache.
       final bool nonCirculatingIsEmpty = await _nonCirculatingCache.isEmpty();
+      // --- Start PresentationSelectionWorker after first cycle --- 
       if (nonCirculatingIsEmpty) {
           // If conditions not met AND NonCirculatingCache is empty, wait for notification.
           // QuizzerLogger.logMessage('CirculationWorker: Conditions not met & NonCirculating empty, waiting...');
+          if (_isRunning && _isInitialLoop) {
+            QuizzerLogger.logMessage('CirculationWorker: Starting Presentation Selection Worker (first cycle complete)...');
+            final selectionWorker = PresentationSelectionWorker();
+            selectionWorker.start();
+            _isInitialLoop = false; // Set flag so it doesn't start again
+            QuizzerLogger.logSuccess('CirculationWorker: Presentation Selection Worker started.');
+          }
           await _nonCirculatingCache.onRecordAdded.first; // Fail Fast on stream error
           // QuizzerLogger.logMessage('CirculationWorker: Woke up by NonCirculatingCache notification.');
       }
+      else if (_isRunning && _isInitialLoop) {
+        QuizzerLogger.logMessage('CirculationWorker: Starting Presentation Selection Worker (first cycle complete)...');
+        final selectionWorker = PresentationSelectionWorker();
+        selectionWorker.start();
+        _isInitialLoop = false; // Set flag so it doesn't start again
+        QuizzerLogger.logSuccess('CirculationWorker: Presentation Selection Worker started.');
+      }
+
+
+      // ---------------------------------------------------------
     }
     _stopCompleter?.complete(); // Signal loop completion
     // QuizzerLogger.logMessage('CirculationWorker loop finished.');
@@ -99,6 +121,7 @@ class CirculationWorker {
 
   /// Checks if conditions are met to add a new question to circulation.
   Future<bool> _shouldAddNewQuestion() async {
+    QuizzerLogger.logMessage('Entering CirculationWorker _shouldAddNewQuestion()...');
     final eligibleRecords = await _eligibleCache.peekAllRecords();
 
     // Condition 1: Less than 20 eligible questions with streak < 3
@@ -114,6 +137,7 @@ class CirculationWorker {
 
   /// Selects the best non-circulating question and adds it to circulation.
   Future<void> _selectAndAddQuestionToCirculation(String userId) async {
+    QuizzerLogger.logMessage('Entering CirculationWorker _selectAndAddQuestionToCirculation()...');
     final nonCirculatingRecords = await _nonCirculatingCache.peekAllRecords();
     if (nonCirculatingRecords.isEmpty) { return; }
 
@@ -151,6 +175,7 @@ class CirculationWorker {
   /// Calculates the subject distribution ratio of currently circulating questions
   /// using the CirculatingQuestionsCache.
   Future<Map<String, int>> _calculateCurrentRatio() async {
+    QuizzerLogger.logMessage('Entering CirculationWorker _calculateCurrentRatio()...');
     Map<String, int> ratio = {};
     final circulatingQuestionIds = await _circulatingCache.peekAllQuestionIds();
 
@@ -198,6 +223,7 @@ class CirculationWorker {
     Map<String, int> currentRatio,
     List<Map<String, dynamic>> nonCirculatingRecords
   ) {
+    QuizzerLogger.logMessage('Entering CirculationWorker _selectPrioritizedQuestion()...');
     // Calculate deficit scores
     final Map<String, double> deficits = {};
     final int totalInterestWeight =
@@ -266,6 +292,7 @@ class CirculationWorker {
 
   /// Updates the DB status and moves the record from NonCirculating to Unprocessed cache.
   Future<void> _addQuestionToCirculation(String userId, Map<String, dynamic> recordToAdd) async {
+     QuizzerLogger.logMessage('Entering CirculationWorker _addQuestionToCirculation()...');
      final questionId = recordToAdd['question_id'] as String;
      Database? db;
      
@@ -296,6 +323,7 @@ class CirculationWorker {
 
    // Helper to get DB access (copied from EligibilityCheckWorker, could be utility)
    Future<Database?> _getDbAccess() async {
+      QuizzerLogger.logMessage('Entering CirculationWorker _getDbAccess()...');
       Database? db;
       int retries       = 0;
       const maxRetries  = 5;

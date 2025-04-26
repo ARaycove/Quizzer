@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:synchronized/synchronized.dart';
+import 'package:quizzer/backend_systems/logger/quizzer_logging.dart'; // Import for logging
 // import 'package:quizzer/backend_systems/logger/quizzer_logging.dart'; // Optional: if logging needed
 
 // ==========================================
@@ -15,6 +16,13 @@ class QuestionQueueCache {
 
   final Lock _lock = Lock();
   final List<Map<String, dynamic>> _cache = [];
+  static const int queueThreshold = 10; // Threshold for signalling removal
+
+  // --- Notification Stream (for removal) ---
+  final StreamController<void> _removeController = StreamController<void>.broadcast();
+  /// A stream that emits an event when a record is removed, potentially making space.
+  Stream<void> get onRecordRemoved => _removeController.stream;
+  // -----------------------------------------
 
   // --- Add Record ---
 
@@ -39,7 +47,16 @@ class QuestionQueueCache {
   Future<Map<String, dynamic>> getAndRemoveRecord() async {
      return await _lock.synchronized(() {
        if (_cache.isNotEmpty) {
-         return _cache.removeAt(0); // Efficiently removes and returns the first element
+         final int lengthBeforeRemove = _cache.length;
+         final record = _cache.removeAt(0);
+         final int lengthAfterRemove = _cache.length;
+
+         // Notify if length dropped below the threshold
+         if (lengthBeforeRemove >= queueThreshold && lengthAfterRemove < queueThreshold) {
+            // QuizzerLogger.logMessage('QuestionQueueCache: Notifying record removed, length now $lengthAfterRemove.');
+            _removeController.add(null);
+         }
+         return record;
        } else {
          // Return an empty map if the cache is empty
          return <String, dynamic>{};
@@ -65,5 +82,10 @@ class QuestionQueueCache {
       // Return a copy to prevent external modification
       return List<Map<String, dynamic>>.from(_cache);
     });
+  }
+
+  // --- Dispose Stream Controller ---
+  void dispose() {
+    _removeController.close();
   }
 }

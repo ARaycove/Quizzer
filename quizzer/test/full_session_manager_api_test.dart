@@ -189,4 +189,48 @@ void main() {
     // Call the extracted monitoring function again
     await monitorCaches();
   }, timeout: Timeout(const Duration(seconds: 15))); // Timeout just > monitor duration
+
+
+  test('simulate activating all modules', () async {
+    final sessionManager = getSessionManager();
+    assert(sessionManager.userLoggedIn, "User must be logged in for this test");
+
+    QuizzerLogger.printHeader('Loading module data...');
+    final moduleData = await sessionManager.loadModules();
+    final List<Map<String, dynamic>> modules = moduleData['modules'] as List<Map<String, dynamic>>? ?? [];
+    final Map<String, bool> initialActivationStatus = moduleData['activationStatus'] as Map<String, bool>? ?? {};
+    
+    QuizzerLogger.logSuccess('Loaded ${modules.length} modules. Initial status: $initialActivationStatus');
+    expect(modules, isNotEmpty, reason: "No modules found in the database to test activation.");
+
+    // Activate each module
+    QuizzerLogger.printHeader('Activating all modules...');
+    for (final module in modules) {
+      final moduleName = module['module_name'] as String;
+      // Only activate if not already active (optional optimization)
+      if (!(initialActivationStatus[moduleName] ?? false)) {
+           QuizzerLogger.logMessage('Activating module: $moduleName');
+           sessionManager.toggleModuleActivation(moduleName, true);
+      } else {
+           QuizzerLogger.logMessage('Module $moduleName already active, skipping.');
+      }
+    }
+    QuizzerLogger.logSuccess('Finished activating all modules.');
+
+    // Pause slightly after triggering activations before test block finishes
+    await Future.delayed(const Duration(seconds: 2)); 
+
+    // REMOVED Cache Monitoring Loop from here
+
+  }, timeout: Timeout(Duration(minutes: 1))); // Reduced timeout slightly
+
+  // New test block to monitor caches
+  test('monitor caches after activation', () async {
+    // Call the extracted monitoring function
+    await monitorCaches();
+  }, timeout: Timeout(const Duration(seconds: 15))); // Timeout just > monitor duration
+
+
+
 }
+

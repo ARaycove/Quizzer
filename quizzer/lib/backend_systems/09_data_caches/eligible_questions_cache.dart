@@ -19,6 +19,11 @@ class EligibleQuestionsCache {
   List<Map<String, dynamic>> _cache = [];
   final UnprocessedCache _unprocessedCache = UnprocessedCache(); // Get singleton instance
 
+  // --- Notification Stream ---
+  final StreamController<void> _addController = StreamController<void>.broadcast();
+  Stream<void> get onRecordAdded => _addController.stream;
+  // -------------------------
+
   // --- Add Record ---
 
   /// Adds a single eligible question record to the cache.
@@ -28,8 +33,12 @@ class EligibleQuestionsCache {
     assert(record.containsKey('question_id'), 'Record added to EligibleQuestionsCache must contain question_id');
 
     await _lock.synchronized(() {
-       // Optional: Check if record with same question_id already exists?
+      final bool wasEmpty = _cache.isEmpty;
       _cache.add(record);
+       if (wasEmpty && _cache.isNotEmpty) {
+        // QuizzerLogger.logMessage('EligibleQuestionsCache: Notifying record added.'); // Optional log
+        _addController.add(null);
+      }
     });
   }
 
@@ -105,5 +114,10 @@ class EligibleQuestionsCache {
      return await _lock.synchronized(() {
          return _cache.length;
      });
+  }
+
+  // --- Dispose Stream Controller ---
+  void dispose() {
+    _addController.close();
   }
 }
