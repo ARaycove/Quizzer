@@ -15,7 +15,7 @@ import 'package:path/path.dart' as p; // Use alias to avoid conflicts
 import 'dart:io'; // For Directory
 import 'dart:async'; // For Completer
 import 'package:path_provider/path_provider.dart'; // For mobile path
-import 'package:quizzer/backend_systems/07_user_question_management/functionality/user_question_processes.dart' show validateAllModuleQuestions;
+import 'package:quizzer/backend_systems/07_user_question_management/user_question_processes.dart' show validateAllModuleQuestions;
 import 'package:quizzer/backend_systems/09_data_caches/module_inactive_cache.dart';
 import 'package:quizzer/backend_systems/09_data_caches/unprocessed_cache.dart';
 import 'package:quizzer/backend_systems/09_data_caches/non_circulating_questions_cache.dart';
@@ -380,7 +380,9 @@ class SessionManager {
     await validateAllModuleQuestions(db, currentUserId);
     
     // Now use the instance variable instead of creating a new instance
-    await _moduleInactiveCache.flushToUnprocessedCache(); 
+    if (activate)   {await _moduleInactiveCache.flushToUnprocessedCache();}
+    if (!activate)  {await _eligibleCache.flushToUnprocessedCache();}
+    
 
     _dbMonitor.releaseDatabaseAccess();
   }

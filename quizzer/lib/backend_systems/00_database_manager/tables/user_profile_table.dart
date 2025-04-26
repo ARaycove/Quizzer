@@ -392,8 +392,6 @@ Future<Map<String, int>> getUserSubjectInterests(String userId, Database db) asy
   return interestData;
 }
 
-
-
 // --- Helper Functions ---
 
 /// Increments the total_questions_answered count for a specific user.

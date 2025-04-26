@@ -13,18 +13,18 @@ Future<Map<String, dynamic>> handleLoadModules(Map<String, dynamic> data) async 
     'activationStatus': {},
   };
   
-  while (db == null) {
-    db = await monitor.requestDatabaseAccess();
-    if (db == null) {
-      await Future.delayed(const Duration(milliseconds: 100));
+    while (db == null) {
+      db = await monitor.requestDatabaseAccess();
+      if (db == null) {
+        await Future.delayed(const Duration(milliseconds: 100));
+      }
     }
-  }
-  
+    
   result['modules']           = await getAllModules(db);
   result['activationStatus']  = await getModuleActivationStatus(userId, db);
   
-  monitor.releaseDatabaseAccess();
-  return result;
+    monitor.releaseDatabaseAccess();
+    return result;
 }
 
 Future<bool> handleModuleActivation(Map<String, dynamic> data) async {

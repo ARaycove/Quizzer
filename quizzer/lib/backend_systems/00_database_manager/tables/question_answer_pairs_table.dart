@@ -306,7 +306,7 @@ Future<String> getModuleNameForQuestionId(String questionId, Database db) async 
   await verifyQuestionAnswerPairTable(db); // Ensure table/columns exist
 
   QuizzerLogger.logMessage('Fetching module_name for question ID: $questionId');
-
+  
   final List<Map<String, dynamic>> result = await db.query(
     'question_answer_pairs',
     columns: ['module_name'], // Select only the module_name column

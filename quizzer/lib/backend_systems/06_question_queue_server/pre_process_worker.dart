@@ -1,19 +1,20 @@
-import 'dart:async';
-import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
-import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pairs_table.dart' show getModuleNameForQuestionId;
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_question_answer_pairs_table.dart' as user_q_pairs_table;
+import 'package:quizzer/backend_systems/07_user_question_management/user_question_processes.dart' as user_question_processor;
+import 'package:quizzer/backend_systems/06_question_queue_server/eligibility_check_worker.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile_table.dart' as user_profile_table;
 import 'package:quizzer/backend_systems/04_module_management/module_updates_process.dart' as module_processor;
-import 'package:quizzer/backend_systems/07_user_question_management/functionality/user_question_processes.dart' as user_question_processor;
-import 'package:quizzer/backend_systems/09_data_caches/unprocessed_cache.dart';
 import 'package:quizzer/backend_systems/09_data_caches/non_circulating_questions_cache.dart';
-import 'package:quizzer/backend_systems/09_data_caches/module_inactive_cache.dart';
 import 'package:quizzer/backend_systems/09_data_caches/due_date_beyond_24hrs_cache.dart';
 import 'package:quizzer/backend_systems/09_data_caches/due_date_within_24hrs_cache.dart';
 import 'package:quizzer/backend_systems/09_data_caches/circulating_questions_cache.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:quizzer/backend_systems/09_data_caches/module_inactive_cache.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pairs_table.dart' show getModuleNameForQuestionId;
+import 'package:quizzer/backend_systems/09_data_caches/unprocessed_cache.dart';
+import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
+import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'dart:async';
 
 // ==========================================
 /// Worker responsible for pre-processing user question records.
@@ -139,11 +140,12 @@ class PreProcessWorker {
     } while (recordToProcess.isNotEmpty);
     QuizzerLogger.logSuccess('Initial Loop: Finished processing initial records.');
 
-    // --- Start Eligibility Worker (Placeholder) ---
-    QuizzerLogger.logMessage('PreProcessWorker: Triggering Eligibility Worker start (Placeholder)...');
-    // TODO: Implement Eligibility Worker start call here
+    // --- Start Eligibility Worker --- 
+    QuizzerLogger.logMessage('PreProcessWorker: Starting Eligibility Check Worker...');
+    final eligibilityWorker = EligibilityCheckWorker(); // Get singleton instance
+    eligibilityWorker.start(); // Start the next worker
 
-    QuizzerLogger.logSuccess('PreProcessWorker: Initial loop completed.');
+    QuizzerLogger.logSuccess('PreProcessWorker: Initial loop completed and Eligibility Worker started.');
   }
 
   // --- Subsequent Loop Logic ---
@@ -151,15 +153,26 @@ class PreProcessWorker {
     // QuizzerLogger.logMessage('PreProcessWorker: Checking UnprocessedCache...');
     if (!_isRunning) return;
 
-    final Map<String, dynamic> record = await _unprocessedCache.getAndRemoveOldestRecord();
-
-    if (record.isNotEmpty) {
-      QuizzerLogger.logMessage('PreProcessWorker: Found record in UnprocessedCache, processing...');
-      await _processRecord(record);
+    // Check if the cache is empty
+    if (await _unprocessedCache.isEmpty()) {
+      // If empty, wait for a notification that a record was added
+      // QuizzerLogger.logMessage('PreProcessWorker: UnprocessedCache empty, waiting for new records...');
+      
+      await _unprocessedCache.onRecordAdded.first;
+      
+      // QuizzerLogger.logMessage('PreProcessWorker: Woke up by UnprocessedCache notification.');
+      // After waking up, the loop will continue and re-check the cache.
+      
     } else {
-      QuizzerLogger.logMessage('PreProcessWorker: UnprocessedCache empty, sleeping...');
-      // Sleep only if the cache is empty
-      await Future.delayed(const Duration(seconds: 30));
+      // If not empty, get and process the oldest record
+      final Map<String, dynamic> record = await _unprocessedCache.getAndRemoveOldestRecord();
+      if (record.isNotEmpty) {
+        // QuizzerLogger.logMessage('PreProcessWorker: Found record in UnprocessedCache, processing...');
+        await _processRecord(record);
+      } 
+      // else { // Should theoretically not happen if isEmpty() was false, but good practice
+      //   QuizzerLogger.logWarning('PreProcessWorker: Cache was not empty but getOldest failed?');
+      // }
     }
   }
 
@@ -206,22 +219,22 @@ class PreProcessWorker {
 
     // Route based on isModuleActive and other fields in the original record
     if (!isModuleActive) {
-      QuizzerLogger.logMessage('Routing $questionId to ModuleInactiveCache.');
+      // QuizzerLogger.logMessage('Routing $questionId to ModuleInactiveCache.');
       await _moduleInactiveCache.addRecord(record);
     } else if (!inCirculation) {
-      QuizzerLogger.logMessage('Routing $questionId to NonCirculatingQuestionsCache.');
+      // QuizzerLogger.logMessage('Routing $questionId to NonCirculatingQuestionsCache.');
       await _nonCirculatingCache.addRecord(record);
     } else {
       // Module is active AND question is in circulation
-      QuizzerLogger.logMessage('Adding $questionId to CirculatingQuestionsCache.');
+      // QuizzerLogger.logMessage('Adding $questionId to CirculatingQuestionsCache.');
       await _circulatingCache.addQuestionId(questionId);
 
       // Now route based on due date
       if (parsedDueDate.isAfter(twentyFourHoursFromNow)) {
-        QuizzerLogger.logMessage('Routing $questionId to DueDateBeyond24hrsCache.');
+        // QuizzerLogger.logMessage('Routing $questionId to DueDateBeyond24hrsCache.');
         await _dueDateBeyondCache.addRecord(record);
       } else {
-        QuizzerLogger.logMessage('Routing $questionId to DueDateWithin24hrsCache.');
+        // QuizzerLogger.logMessage('Routing $questionId to DueDateWithin24hrsCache.');
         await _dueDateWithinCache.addRecord(record);
       }
     }

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:synchronized/synchronized.dart';
+import 'package:quizzer/backend_systems/logger/quizzer_logging.dart'; // For logging
 
 // ==========================================
 
@@ -12,14 +13,27 @@ class UnprocessedCache {
   final Lock _lock = Lock();
   List<Map<String, dynamic>> _cache = [];
 
+  // --- Notification Stream ---
+  // Used to notify listeners (like PreProcessWorker) when a record is added to an empty cache.
+  final StreamController<void> _addController = StreamController<void>.broadcast();
+
+  /// A stream that emits an event when a record is added to a previously empty cache.
+  Stream<void> get onRecordAdded => _addController.stream;
+  // -------------------------
+
   // --- Add Record ---
 
   /// Adds a single user question record to the cache.
   /// Ensures thread safety using a lock.
+  /// Notifies listeners via [onRecordAdded] if the cache was empty.
   Future<void> addRecord(Map<String, dynamic> record) async {
-    // Input validation could be added here if needed
     await _lock.synchronized(() {
+      final bool wasEmpty = _cache.isEmpty;
       _cache.add(record);
+      if (wasEmpty && _cache.isNotEmpty) {
+        // QuizzerLogger.logMessage('UnprocessedCache: Notifying record added.'); // Optional log
+        _addController.add(null);
+      }
     });
   }
 
@@ -27,10 +41,16 @@ class UnprocessedCache {
 
   /// Adds a list of user question records to the cache.
   /// Ensures thread safety using a lock.
+  /// Notifies listeners via [onRecordAdded] if the cache was empty before adding.
   Future<void> addRecords(List<Map<String, dynamic>> records) async {
-    // Input validation could be added here if needed
+    if (records.isEmpty) return; // Avoid processing empty lists
     await _lock.synchronized(() {
+      final bool wasEmpty = _cache.isEmpty;
       _cache.addAll(records);
+      if (wasEmpty && _cache.isNotEmpty) {
+        // QuizzerLogger.logMessage('UnprocessedCache: Notifying records added.'); // Optional log
+        _addController.add(null);
+      }
     });
   }
 
@@ -76,6 +96,14 @@ class UnprocessedCache {
      });
   }
 
+  // --- Check if Empty ---
+  /// Checks if the cache is currently empty.
+  Future<bool> isEmpty() async {
+    return await _lock.synchronized(() {
+      return _cache.isEmpty;
+    });
+  }
+
   // --- Peek All Records (Read-Only) ---
   /// Returns a read-only copy of all records currently in the cache.
   /// Ensures thread safety using a lock.
@@ -84,5 +112,11 @@ class UnprocessedCache {
       // Return a copy to prevent external modification
       return List<Map<String, dynamic>>.from(_cache);
     });
+  }
+
+  // --- Close Stream Controller ---
+  /// Closes the stream controller. Should be called when the cache is no longer needed.
+  void dispose() {
+    _addController.close();
   }
 }

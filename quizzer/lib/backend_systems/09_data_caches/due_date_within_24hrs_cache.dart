@@ -18,11 +18,20 @@ class DueDateWithin24hrsCache {
   List<Map<String, dynamic>> _cache = [];
   final UnprocessedCache _unprocessedCache = UnprocessedCache(); // Get singleton instance
 
+  // --- Notification Stream ---
+  // Used to notify listeners (like EligibilityCheckWorker) when a record is added to an empty cache.
+  final StreamController<void> _addController = StreamController<void>.broadcast();
+
+  /// A stream that emits an event when a record is added to a previously empty cache.
+  Stream<void> get onRecordAdded => _addController.stream;
+  // -------------------------
+
   // --- Add Record ---
 
   /// Adds a single question record if its due date is within 24 hours.
   /// Asserts that the due date condition is met.
   /// Ensures thread safety using a lock.
+  /// Notifies listeners via [onRecordAdded] if the cache was empty.
   Future<void> addRecord(Map<String, dynamic> record) async {
     // Basic validation: Ensure record has required keys
     if (!record.containsKey('question_id') || !record.containsKey('next_revision_due')) {
@@ -55,8 +64,12 @@ class DueDateWithin24hrsCache {
     }
 
     await _lock.synchronized(() {
-      // Optional: Check if record already exists by question_id before adding?
+      final bool wasEmpty = _cache.isEmpty;
       _cache.add(record);
+      if (wasEmpty && _cache.isNotEmpty) {
+        // QuizzerLogger.logMessage('DueDateWithin24hrsCache: Notifying record added.'); // Optional log
+        _addController.add(null);
+      }
     });
   }
 
@@ -105,5 +118,25 @@ class DueDateWithin24hrsCache {
     } else {
        QuizzerLogger.logMessage('DueDateWithin24hrsCache is empty, nothing to flush.');
     }
+  }
+
+  /// Checks if the cache is currently empty.
+  Future<bool> isEmpty() async {
+    return await _lock.synchronized(() {
+      return _cache.isEmpty;
+    });
+  }
+
+  /// Returns the current number of records in the cache.
+  Future<int> getLength() async {
+     return await _lock.synchronized(() {
+         return _cache.length;
+     });
+  }
+
+  // --- Close Stream Controller ---
+  /// Closes the stream controller. Should be called when the cache is no longer needed.
+  void dispose() {
+    _addController.close();
   }
 }

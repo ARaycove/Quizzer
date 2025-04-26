@@ -1,0 +1,316 @@
+import 'dart:async';
+import 'dart:math';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
+import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
+import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
+// Caches
+import 'package:quizzer/backend_systems/09_data_caches/eligible_questions_cache.dart';
+import 'package:quizzer/backend_systems/09_data_caches/non_circulating_questions_cache.dart';
+import 'package:quizzer/backend_systems/09_data_caches/unprocessed_cache.dart';
+import 'package:quizzer/backend_systems/09_data_caches/circulating_questions_cache.dart';
+// Table Access
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_question_answer_pairs_table.dart' as uq_pairs_table;
+import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pairs_table.dart' as q_pairs_table;
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile_table.dart' as user_profile_table;
+
+
+// ==========================================
+// Circulation Worker
+// ==========================================
+/// Determines when and which questions should be moved into active circulation.
+class CirculationWorker {
+  // --- Singleton Setup ---
+  static final CirculationWorker _instance = CirculationWorker._internal();
+  factory CirculationWorker() => _instance;
+  CirculationWorker._internal();
+
+  // --- Worker State ---
+  bool _isRunning = false;
+  Completer<void>? _stopCompleter;
+  // --------------------
+
+  // --- Dependencies ---
+  final EligibleQuestionsCache    _eligibleCache = EligibleQuestionsCache();
+  final NonCirculatingQuestionsCache _nonCirculatingCache = NonCirculatingQuestionsCache();
+  final UnprocessedCache _unprocessedCache = UnprocessedCache();
+  final CirculatingQuestionsCache _circulatingCache = CirculatingQuestionsCache();
+  final DatabaseMonitor _dbMonitor = getDatabaseMonitor();
+  final SessionManager _sessionManager = SessionManager();
+
+  // --- Control Methods ---
+  /// Starts the worker loop.
+  void start() {
+    if (_isRunning) {
+      return; // Already running
+    }
+    _isRunning = true;
+    _stopCompleter = Completer<void>();
+    _runLoop(); // Start the loop asynchronously
+    // QuizzerLogger.logMessage('CirculationWorker started.');
+  }
+
+  /// Stops the worker loop.
+  Future<void> stop() async {
+    if (!_isRunning) {
+      return; // Already stopped
+    }
+    _isRunning = false;
+    await _stopCompleter?.future; // Wait for loop completion
+    // QuizzerLogger.logMessage('CirculationWorker stopped.');
+  }
+  // ----------------------
+
+  // --- Main Loop ---
+  Future<void> _runLoop() async {
+    while (_isRunning) {
+      // QuizzerLogger.logMessage('CirculationWorker: Starting cycle...');
+      
+      if (!_isRunning) break; // Check if stopped before starting the cycle
+      
+      assert(_sessionManager.userId != null, 'Circulation check requires logged-in user.');
+      final userId = _sessionManager.userId!;
+
+      // 1. Check if we should add a question
+      final bool shouldAdd = await _shouldAddNewQuestion();
+
+      if (shouldAdd) {
+        // 2. Add a question if needed
+        // QuizzerLogger.logMessage('CirculationWorker: Conditions met, adding a question...');
+        await _selectAndAddQuestionToCirculation(userId);
+        
+        // 3. Sleep for 1 second after adding
+        if (!_isRunning) break; // Check again before sleep
+        // QuizzerLogger.logMessage('CirculationWorker: Sleeping for 1 second after adding...');
+      }
+      // 3. Conditions not met. Check if it's due to empty NonCirculatingCache.
+      final bool nonCirculatingIsEmpty = await _nonCirculatingCache.isEmpty();
+      if (nonCirculatingIsEmpty) {
+          // If conditions not met AND NonCirculatingCache is empty, wait for notification.
+          // QuizzerLogger.logMessage('CirculationWorker: Conditions not met & NonCirculating empty, waiting...');
+          await _nonCirculatingCache.onRecordAdded.first; // Fail Fast on stream error
+          // QuizzerLogger.logMessage('CirculationWorker: Woke up by NonCirculatingCache notification.');
+      }
+    }
+    _stopCompleter?.complete(); // Signal loop completion
+    // QuizzerLogger.logMessage('CirculationWorker loop finished.');
+  }
+  // -----------------
+
+  /// Checks if conditions are met to add a new question to circulation.
+  Future<bool> _shouldAddNewQuestion() async {
+    final eligibleRecords = await _eligibleCache.peekAllRecords();
+
+    // Condition 1: Less than 20 eligible questions with streak < 3
+    final lowStreakCount = eligibleRecords.where((r) => (r['revision_streak'] as int? ?? 0) < 3).length;
+    final bool lowStreakCondition = lowStreakCount < 20;
+
+    // Condition 2: Less than 100 total eligible questions
+    final totalEligibleCount = eligibleRecords.length;
+    final bool lowTotalCondition = totalEligibleCount < 100;
+
+    return lowStreakCondition || lowTotalCondition;
+  }
+
+  /// Selects the best non-circulating question and adds it to circulation.
+  Future<void> _selectAndAddQuestionToCirculation(String userId) async {
+    final nonCirculatingRecords = await _nonCirculatingCache.peekAllRecords();
+    if (nonCirculatingRecords.isEmpty) { return; }
+
+    // --- Database Operations Required for Selection ---
+    Map<String, int> currentRatio = {};
+    Map<String, int> interestData = {};
+    Database? db;
+
+    // Calculate ratio using the cache first
+    currentRatio = await _calculateCurrentRatio(); // No longer needs db or userId
+
+    // Fetch interest data (still needs DB)
+    db = await _getDbAccess();
+    if(db == null) return; // Failed to get DB
+
+    interestData = await user_profile_table.getUserSubjectInterests(userId, db);
+    
+    // Release DB AFTER successful reads
+    _dbMonitor.releaseDatabaseAccess();
+    db = null; // Ensure db isn't reused accidentally
+    // --- End DB Operations ---
+
+    // Select the prioritized question
+    Map<String, dynamic> selectedRecord = _selectPrioritizedQuestion(
+      interestData,
+      currentRatio,
+      nonCirculatingRecords
+    );
+
+    if (selectedRecord != null) {
+       await _addQuestionToCirculation(userId, selectedRecord);
+    } 
+  }
+
+  /// Calculates the subject distribution ratio of currently circulating questions
+  /// using the CirculatingQuestionsCache.
+  Future<Map<String, int>> _calculateCurrentRatio() async {
+    Map<String, int> ratio = {};
+    final circulatingQuestionIds = await _circulatingCache.peekAllQuestionIds();
+
+    if (circulatingQuestionIds.isEmpty) {
+      // QuizzerLogger.logMessage('CirculationWorker: No questions currently circulating.');
+      return ratio; // Return empty ratio
+    }
+
+    // QuizzerLogger.logMessage('CirculationWorker: Calculating ratio for ${circulatingQuestionIds.length} circulating questions...');
+    
+    Database? db;
+    db = await _getDbAccess();
+    if (db == null) {
+      // Enforce Fail Fast if DB cannot be acquired
+      throw StateError('CirculationWorker: Failed to acquire DB lock to calculate ratio after retries.');
+    }
+
+    // Loop will proceed. If getQuestionAnswerPairById fails, it will throw (Fail Fast).
+    for (var questionId in circulatingQuestionIds) {
+      final questionDetails = await q_pairs_table.getQuestionAnswerPairById(questionId, db);
+      // Handle case where question might be in cache but removed from DB? Unlikely but possible.
+      if (questionDetails.isNotEmpty) {
+        final subjects = (questionDetails['subjects'] as String? ?? '').split(',');
+        for (var subject in subjects) {
+          if (subject.isNotEmpty) {
+            ratio[subject] = (ratio[subject] ?? 0) + 1;
+          }
+        }
+      } else {
+        QuizzerLogger.logWarning('CirculationWorker: Circulating QID $questionId not found in DB during ratio calc.');
+      }
+    }
+    
+    // Release DB lock ONLY AFTER the loop completes successfully.
+    _dbMonitor.releaseDatabaseAccess(); 
+
+    // QuizzerLogger.logValue('CirculationWorker: Calculated Current Ratio: $ratio');
+    return ratio;
+  }
+
+  /// Selects the best question to add based on interest, ratio, and availability.
+  /// Replaces placeholder with logic from question_queue_maintainer.
+  Map<String, dynamic> _selectPrioritizedQuestion(
+    Map<String, int> interestData,
+    Map<String, int> currentRatio,
+    List<Map<String, dynamic>> nonCirculatingRecords
+  ) {
+    // Calculate deficit scores
+    final Map<String, double> deficits = {};
+    final int totalInterestWeight =
+        interestData.values.fold(0, (sum, item) => sum + item);
+    final int totalCurrentCount =
+        currentRatio.values.fold(0, (sum, item) => sum + item);
+
+    if (totalInterestWeight > 0) { // Only calculate if interests are set
+      interestData.forEach((subject, desiredWeight) {
+        final double desiredProportion = desiredWeight / totalInterestWeight;
+        final double currentProportion = (totalCurrentCount == 0)
+            ? 0.0
+            : (currentRatio[subject] ?? 0) / totalCurrentCount;
+        deficits[subject] = desiredProportion - currentProportion;
+      });
+    } 
+
+    // Create a sorted list of subjects with positive deficits (most needed first)
+    final List<MapEntry<String, double>> sortedNeededSubjects = deficits.entries
+        .where((entry) => entry.value > 0) // Only consider needed subjects
+        .toList()
+      ..sort((a, b) => b.value.compareTo(a.value)); // Sort descending by deficit
+
+    Map<String, dynamic>? selectedRecord; // Keep nullable for iteration logic
+
+    // Iterate through needed subjects in order of priority
+    if (sortedNeededSubjects.isNotEmpty) {
+      for (final entry in sortedNeededSubjects) {
+          final neededSubject = entry.key;
+
+          // Filter non-circulating questions for the current needed subject
+          final List<Map<String, dynamic>> potentialMatches =
+              nonCirculatingRecords.where((record) {
+            final String? subjectsCsv = record['subjects'] as String?;
+            if (subjectsCsv != null && subjectsCsv.isNotEmpty) {
+              return subjectsCsv
+                  .split(',')
+                  .map((s) => s.trim())
+                  .contains(neededSubject);
+            }
+            // Handle 'misc' case
+            else if (neededSubject == 'misc' && (subjectsCsv == null || subjectsCsv.isEmpty)) {
+                return true;
+            }
+            return false;
+          }).toList();
+
+          if (potentialMatches.isNotEmpty) {
+            final random = Random();
+            selectedRecord = potentialMatches[random.nextInt(potentialMatches.length)];
+            break; // Found a match based on priority, break the loop
+          } 
+      }
+    } 
+
+    // Fallback to random selection ONLY if no prioritized selection was made
+    if (selectedRecord == null) {
+      final random = Random();
+      // Assumes nonCirculatingRecords is not empty (checked by caller)
+      selectedRecord = nonCirculatingRecords[random.nextInt(nonCirculatingRecords.length)];
+    }
+
+    // selectedRecord is guaranteed to be non-null here due to fallback
+    return selectedRecord;
+  }
+
+  /// Updates the DB status and moves the record from NonCirculating to Unprocessed cache.
+  Future<void> _addQuestionToCirculation(String userId, Map<String, dynamic> recordToAdd) async {
+     final questionId = recordToAdd['question_id'] as String;
+     Database? db;
+     
+     // Remove from NonCirculating Cache first
+     final removedRecord = await _nonCirculatingCache.getAndRemoveRecordByQuestionId(questionId);
+     if (removedRecord.isEmpty) {
+       QuizzerLogger.logWarning('CirculationWorker: Selected record $questionId not found in NonCirculatingCache during add.');
+       return;
+     }
+     
+     // REMOVED try-finally
+     db = await _getDbAccess();
+     if (db == null) {
+          QuizzerLogger.logError('CirculationWorker: Failed to get DB lock to set QID $questionId in circulation.');
+          await _unprocessedCache.addRecord(removedRecord);
+          return;
+     }
+
+     // Set 'inCirculation' to true in the database
+     await uq_pairs_table.setCirculationStatus(userId, questionId, true, db);
+     
+     // Release DB lock AFTER successful write
+     _dbMonitor.releaseDatabaseAccess();
+
+     // Add the record back to the UnprocessedCache
+     await _unprocessedCache.addRecord(recordToAdd); 
+  }
+
+   // Helper to get DB access (copied from EligibilityCheckWorker, could be utility)
+   Future<Database?> _getDbAccess() async {
+      Database? db;
+      int retries       = 0;
+      const maxRetries  = 5;
+      // Cannot use _isRunning here if this worker isn't looping
+      // Assume if called, it should try to get DB
+      while (db == null && retries < maxRetries) {
+        db = await _dbMonitor.requestDatabaseAccess();
+        if (db == null) {
+          await Future.delayed(const Duration(milliseconds: 100));
+          retries++;
+        }
+      }
+      if (db == null) {
+         QuizzerLogger.logError('CirculationWorker: Failed to acquire DB access after $maxRetries retries.');
+      }
+      return db;
+   }
+}

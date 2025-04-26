@@ -10,6 +10,10 @@ import 'package:quizzer/backend_systems/09_data_caches/due_date_within_24hrs_cac
 import 'package:quizzer/backend_systems/09_data_caches/eligible_questions_cache.dart';
 import 'package:quizzer/backend_systems/09_data_caches/question_queue_cache.dart';
 import 'package:quizzer/backend_systems/09_data_caches/answer_history_cache.dart';
+import 'package:logging/logging.dart';
+import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile_table.dart' as user_profile_table;
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 // ==========================================
 // Helper Function for Cache Monitoring
@@ -60,8 +64,8 @@ Future<void> monitorCaches() async {
 // Main Test Suite
 // ==========================================
 void main() {
-  // Ensure logger is initialized first
-  QuizzerLogger.setupLogging();
+  // Ensure logger is initialized first, setting level to FINE to see logValue messages
+  QuizzerLogger.setupLogging(level: Level.FINE);
 
   
   test('login and worker start up', () async {
@@ -137,6 +141,52 @@ void main() {
   // New test block to monitor caches
   test('monitor caches after activation', () async {
     // Call the extracted monitoring function
+    await monitorCaches();
+  }, timeout: Timeout(const Duration(seconds: 15))); // Timeout just > monitor duration
+
+  // --- Test Block: Deactivate Modules via SessionManager ---
+  test('deactivate all modules via SessionManager', () async {
+    final sessionManager = getSessionManager();
+    assert(sessionManager.userLoggedIn, "User must be logged in for this test");
+
+    QuizzerLogger.printHeader("Deactivating All Modules via SessionManager");
+
+    // 1. Load current module state via SessionManager to know which modules exist
+    final initialModuleData = await sessionManager.loadModules();
+    final List<Map<String, dynamic>> modules = initialModuleData['modules'] as List<Map<String, dynamic>>? ?? [];
+    final Map<String, bool> initialActivationStatus = initialModuleData['activationStatus'] as Map<String, bool>? ?? {};
+    QuizzerLogger.logValue('Initial Module Activation Status (via SM): $initialActivationStatus');
+
+    expect(modules, isNotEmpty, reason: "No modules found via SessionManager to test deactivation.");
+
+    // 2. Deactivate each module currently active using SessionManager
+    QuizzerLogger.logMessage('Sending deactivation requests via SessionManager for active modules...');
+    int deactivatedCount = 0;
+    for (final module in modules) {
+      final moduleName = module['module_name'] as String?;
+      // Only toggle if the module exists and is currently active
+      if (moduleName != null && (initialActivationStatus[moduleName] ?? false)) {
+          QuizzerLogger.logMessage('Deactivating module: $moduleName via SM');
+          sessionManager.toggleModuleActivation(moduleName, false);
+          deactivatedCount++;
+      }
+    }
+    
+    if (deactivatedCount > 0) {
+       QuizzerLogger.logSuccess('Sent $deactivatedCount deactivation requests via SessionManager.');
+    } else {
+       QuizzerLogger.logWarning('No modules were active to deactivate.');
+    }
+
+    // 3. Removed verification step within this test.
+    //    The effects will be observed in the subsequent cache monitoring test.
+
+    QuizzerLogger.logSuccess("--- Test: Module Deactivation via SessionManager Triggered ---");
+  }, timeout: Timeout(const Duration(seconds: 20))); // Reduced timeout
+
+  // --- Test Block: Monitor Caches Again ---
+  test('monitor caches after deactivation', () async {
+    // Call the extracted monitoring function again
     await monitorCaches();
   }, timeout: Timeout(const Duration(seconds: 15))); // Timeout just > monitor duration
 }

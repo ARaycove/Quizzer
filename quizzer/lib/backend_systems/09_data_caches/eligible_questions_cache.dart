@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:synchronized/synchronized.dart';
+import 'package:quizzer/backend_systems/logger/quizzer_logging.dart'; // Uncomment if logging needed
+import 'unprocessed_cache.dart'; // Import UnprocessedCache
 // import 'package:quizzer/backend_systems/logger/quizzer_logging.dart'; // Optional: if logging needed
 
 // ==========================================
@@ -15,6 +17,7 @@ class EligibleQuestionsCache {
 
   final Lock _lock = Lock();
   List<Map<String, dynamic>> _cache = [];
+  final UnprocessedCache _unprocessedCache = UnprocessedCache(); // Get singleton instance
 
   // --- Add Record ---
 
@@ -66,5 +69,41 @@ class EligibleQuestionsCache {
       // Return a copy to prevent external modification
       return List<Map<String, dynamic>>.from(_cache);
     });
+  }
+
+  // --- Flush Cache to Unprocessed ---
+  /// Removes all records from this cache and adds them to the UnprocessedCache.
+  /// Ensures thread safety using locks on both caches implicitly via their methods.
+  Future<void> flushToUnprocessedCache() async {
+    List<Map<String, dynamic>> recordsToMove = []; // Initialize
+    // Atomically get and clear records from this cache
+    await _lock.synchronized(() {
+      recordsToMove = List.from(_cache);
+      _cache.clear();
+    });
+
+    // Add the retrieved records to the unprocessed cache
+    if (recordsToMove.isNotEmpty) {
+       QuizzerLogger.logMessage('Flushing ${recordsToMove.length} records from EligibleQuestionsCache to UnprocessedCache.');
+       await _unprocessedCache.addRecords(recordsToMove);
+    } else {
+       // QuizzerLogger.logMessage('EligibleQuestionsCache is empty, nothing to flush.'); // Optional log
+    }
+  }
+
+  // --- Check if Empty ---
+  /// Checks if the cache is currently empty.
+  Future<bool> isEmpty() async {
+    return await _lock.synchronized(() {
+      return _cache.isEmpty;
+    });
+  }
+
+  // --- Get Length ---
+  /// Returns the current number of records in the cache.
+  Future<int> getLength() async {
+     return await _lock.synchronized(() {
+         return _cache.length;
+     });
   }
 }
