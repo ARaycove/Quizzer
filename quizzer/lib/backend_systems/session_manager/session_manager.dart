@@ -27,7 +27,8 @@ import 'package:quizzer/backend_systems/09_data_caches/question_queue_cache.dart
 import 'package:quizzer/backend_systems/09_data_caches/answer_history_cache.dart';
 import 'package:quizzer/backend_systems/06_question_queue_server/question_selection_worker.dart';
 import 'session_toggle_scheduler.dart'; // Import the new scheduler
-
+import 'package:quizzer/backend_systems/06_question_queue_server/switch_board.dart'; // Import SwitchBoard
+import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pairs_table.dart' as q_pairs_table; // Import for question details
 
 /*
 TODO: Implement proper secure storage for the Hive encryption key.
@@ -45,50 +46,116 @@ class SessionManager {
   factory SessionManager() => _instance;
   // Secure Storage
   // Hive storage for offline persistence
-  late Box _storage;
+  late Box                                    _storage;
   // Completer to signal when async initialization (like storage) is done
-  final Completer<void> _initializationCompleter = Completer<void>();
+  final       Completer<void>                 _initializationCompleter = Completer<void>();
   /// Future that completes when asynchronous initialization is finished.
   /// Await this before accessing components that depend on async init (e.g., _storage).
-  Future<void> get initializationComplete => _initializationCompleter.future;
+              Future<void> get                initializationComplete => _initializationCompleter.future;
   // Supabase client instance
-  late final SupabaseClient supabase;
+  late final  SupabaseClient                  supabase;
   // Database monitor instance
-  final DatabaseMonitor _dbMonitor = getDatabaseMonitor();
+  final       DatabaseMonitor                 _dbMonitor = getDatabaseMonitor();
   // Cache Instances (as instance variables)
-  final UnprocessedCache                _unprocessedCache;
-  final NonCirculatingQuestionsCache    _nonCirculatingCache;
-  final ModuleInactiveCache             _moduleInactiveCache;
-  final CirculatingQuestionsCache       _circulatingCache;
-  final DueDateBeyond24hrsCache         _dueDateBeyondCache;
-  final DueDateWithin24hrsCache         _dueDateWithinCache;
-  final EligibleQuestionsCache          _eligibleCache;
-  final QuestionQueueCache              _queueCache;
-  final AnswerHistoryCache              _historyCache;
-  bool      userLoggedIn = false;
-  String?   userId;
-  String?   userEmail;
-  String?   userRole;
+  final       UnprocessedCache                _unprocessedCache;
+  final       NonCirculatingQuestionsCache    _nonCirculatingCache;
+  final       ModuleInactiveCache             _moduleInactiveCache;
+  final       CirculatingQuestionsCache       _circulatingCache;
+  final       DueDateBeyond24hrsCache         _dueDateBeyondCache;
+  final       DueDateWithin24hrsCache         _dueDateWithinCache;
+  final       EligibleQuestionsCache          _eligibleCache;
+  final       QuestionQueueCache              _queueCache;
+  final       AnswerHistoryCache              _historyCache;
+  final       SwitchBoard                     _switchBoard; // Add SwitchBoard instance
+
+  // user State
+              bool                            userLoggedIn = false;
+              String?                         userId;
+              String?                         userEmail;
+              String?                         userRole;
   // Current Question information and booleans
-  Map<String, dynamic>? _currentQuestionRecord;
-  String?               _currentQuestionType;
-  bool                  _isAnswerDisplayed = false;
-  int?                  _multipleChoiceOptionSelected; // would be null if no option is presently selected
-  DateTime?             _timeDisplayed;
-  DateTime?             _timeAnswerGiven;
-  // --- Public Getters for UI State ---
-  Map<String, dynamic>? get currentQuestionData   => _currentQuestionRecord;
-  String?               get currentType           => _currentQuestionType;
-  bool                  get showingAnswer         => _isAnswerDisplayed;
-  int?                  get optionSelected        => _multipleChoiceOptionSelected;
-  DateTime?             get timeAnswerGiven       => _timeAnswerGiven;
-  DateTime?             get timeQuestionDisplayed => _timeDisplayed;
+              Map<String, dynamic>?           _currentQuestionRecord;         // userQuestionRecord
+              Map<String, dynamic>?           _currentQuestionDetails;        // questionAnswerPairRecord
+              String?                         _currentQuestionType;
+              bool                            _isAnswerDisplayed = false;
+              int?                            _multipleChoiceOptionSelected;  // would be null if no option is presently selected
+              DateTime?                       _timeDisplayed;
+              DateTime?                       _timeAnswerGiven;
   // MetaData
-  DateTime? sessionStartTime;
+              DateTime?                       sessionStartTime;
   // Page history tracking
-  final List<String> _pageHistory = [];
-  static const int _maxHistoryLength = 12;
-  final ToggleScheduler _toggleScheduler = getToggleScheduler(); // Get scheduler instance
+  final       List<String>                    _pageHistory = [];
+  static const  int                           _maxHistoryLength = 12;
+  final       ToggleScheduler                 _toggleScheduler = getToggleScheduler(); // Get scheduler instance      
+  
+          
+  // --- Public Getters for UI State ---
+  Map<String, dynamic>? get currentQuestionUserRecord => _currentQuestionRecord;
+  Map<String, dynamic>? get currentQuestionStaticData => _currentQuestionDetails;
+  String?               get currentQuestionType       => _currentQuestionType;
+  bool                  get showingAnswer             => _isAnswerDisplayed;
+  int?                  get optionSelected            => _multipleChoiceOptionSelected;
+  DateTime?             get timeQuestionDisplayed     => _timeDisplayed;
+  DateTime?             get timeAnswerGiven           => _timeAnswerGiven;
+
+  // --- State Reset Functions ---
+  
+  /// Reset only the state related to the currently displayed question.
+  void _clearQuestionState() {
+    _currentQuestionRecord        = null;  // User-specific data
+    _currentQuestionDetails       = null;  // Static data (QPair)
+    _currentQuestionType          = null;
+    _isAnswerDisplayed            = false;
+    _multipleChoiceOptionSelected = null;
+    _timeDisplayed                = null;
+    _timeAnswerGiven              = null;
+    
+    QuizzerLogger.logMessage('Current Question state has been reset');
+  }
+  // --------------------------
+
+  /// Builds placeholder records for display when the question queue is empty.
+  Map<String, Map<String, dynamic>> _buildDummyNoQuestionsRecord() {
+    const String dummyId = "dummy_no_questions";
+    
+    // Mimics the structure of a user-question record (UQPair)
+    final Map<String, dynamic> dummyUserRecord = {
+      'question_id': dummyId,
+      // Add other UQPair fields with default/placeholder values if needed by UI
+      'revision_streak': 0, 
+      'next_revision_due': DateTime.now().toIso8601String(), 
+      // etc. - keeping minimal for now
+    };
+
+    // Mimics the structure of a static question details record (QPair)
+    final Map<String, dynamic> dummyStaticDetails = {
+      'question_id': dummyId,
+      'question_type': 'multiple_choice', // Use multiple choice as requested
+      // Format follows the parsed structure from getQuestionAnswerPairById
+      'question_elements': [{'type': 'text', 'content': 'No new questions available right now. Check back later!'}], 
+      'answer_elements': [{'type': 'text', 'content': ''}], // Empty answer
+      'options': ['Okay', 'Add new modules', 'Check Back Later!'], 
+      'correct_option_index': 0, // Index of the 'Okay' option (or -1 if no default correct)
+      'module_name': 'System', // Placeholder module
+      'subjects': '', // Placeholder subjects
+      'concepts': '', // Placeholder concepts
+      // Add other QPair fields with default/placeholder values if required by UI
+      'time_stamp': DateTime.now().millisecondsSinceEpoch.toString(),
+      'qst_contrib': 'system',
+      'ans_contrib': 'system',
+      'citation': '',
+      'ans_flagged': false,
+      'has_been_reviewed': true,
+      'flag_for_removal': false,
+      'completed': true, 
+      'correct_order': '', // Empty for non-sort_order
+    };
+
+    return {
+      'userRecord': dummyUserRecord,
+      'staticDetails': dummyStaticDetails,
+    };
+  }
 
   // Initialize Hive storage (private)
   Future<void> _initializeStorage() async {
@@ -126,7 +193,9 @@ class SessionManager {
         _dueDateWithinCache = DueDateWithin24hrsCache(),
         _eligibleCache = EligibleQuestionsCache(),
         _queueCache = QuestionQueueCache(),
-        _historyCache = AnswerHistoryCache() {
+        _historyCache = AnswerHistoryCache(),
+        _switchBoard = SwitchBoard() // Initialize SwitchBoard
+         {
     supabase = SupabaseClient(
       'https://yruvxuvzztnahuuiqxit.supabase.co',
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlydXZ4dXZ6enRuYWh1dWlxeGl0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQzMTY1NDIsImV4cCI6MjA1OTg5MjU0Mn0.hF1oAILlmzCvsJxFk9Bpjqjs3OEisVdoYVZoZMtTLpo',
@@ -175,101 +244,8 @@ class SessionManager {
 
     QuizzerLogger.logMessage('SessionManager post-worker-start initialization complete');
   }
-
-  // Reset Complete Session State
-  void clearSessionState() {
-    // Reset user information
-    userLoggedIn = false;       userId = null;                    userEmail = null;
-    userRole = null;            _currentQuestionRecord = null;    _isAnswerDisplayed = false;
-    sessionStartTime = null;    _multipleChoiceOptionSelected = null;
-    _timeAnswerGiven = null;    _timeDisplayed = null;
-    _pageHistory.clear();
-    
-    QuizzerLogger.logMessage('Session state has been reset');
-  }
-
-  // Reset Question State
-  void clearQuestionState() {
-    _currentQuestionRecord        = null;  _isAnswerDisplayed   = false;
-    _multipleChoiceOptionSelected = null;  _currentQuestionType = null;
-    _timeAnswerGiven              = null;  _timeDisplayed       = null;
-    
-    QuizzerLogger.logMessage('Question state has been reset');
-  }
-  
-  // --- Public Setters for UI Interaction State ---
-  void setMultipleChoiceSelection(int? index) {
-    // Add any validation if needed
-    _multipleChoiceOptionSelected = index;
-    QuizzerLogger.logMessage('UI set multiple choice selection to: $index');
-  }
-
-  void setAnswerDisplayed(bool isDisplayed) {
-    // Add any validation if needed
-    _isAnswerDisplayed = isDisplayed;
-    // Also set timeAnswerGiven when answer is displayed
-    if (isDisplayed) {
-        _timeAnswerGiven = DateTime.now();
-         QuizzerLogger.logMessage('UI set timeAnswerGiven to: $_timeAnswerGiven');
-    }
-     QuizzerLogger.logMessage('UI set answer displayed state to: $isDisplayed');
-  }
-
-  // New Setter for display time
-  void setQuestionDisplayTime() {
-    _timeDisplayed = DateTime.now();
-    _timeAnswerGiven = null; // Reset answer time when new question is displayed
-    QuizzerLogger.logMessage('UI set timeDisplayed to: $_timeDisplayed');
-  }
   /// ==================================================================================
   // API CALLS
-  //  ------------------------------------------------
-  /// Called when answer is given by the user to a particular question
-  Future<bool> submitAnswer() async {
-    QuizzerLogger.logMessage("submitAnswer called.");
-    
-    // --- Use validation helper function --- 
-    // Stop if state is invalid
-    
-    assert(_isCurrentQuestionStateValidForSubmission());
-    // -------------------------------------
-    final questionId = _currentQuestionRecord!['question_id'] as String;
-    
-    // --- Skip processing for dummy question --- 
-    if (questionId == 'dummy_question_01') {
-      QuizzerLogger.logMessage('Skipping answer submission for dummy question.');
-      return true; // Indicate handled (by skipping)
-    }
-    // ------------------------------------------
-    
-    // --- Calculate Time to Answer ---
-    final Duration timeDifference = _timeAnswerGiven!.difference(_timeDisplayed!); 
-    // Assert that time difference is not negative (Fail Fast)
-    assert(!timeDifference.isNegative, "Time difference cannot be negative! _timeAnswerGiven ($_timeAnswerGiven) should be after _timeDisplayed ($_timeDisplayed)");
-    // Calculate time in seconds with microsecond precision
-    final double timeToAnswer = timeDifference.inMicroseconds / 1000000;
-    QuizzerLogger.logMessage("Calculated timeToAnswer: $timeToAnswer seconds.");
-    
-    // --- Determine Answer Status ---
-    String answerStatus = "incorrect"; // Default to incorrect
-    final correctIndex = _currentQuestionRecord!['correct_option_index'] as int?; // Still check for null from DB
-    
-    if (correctIndex == null) {
-        QuizzerLogger.logError("Cannot determine answer status: correct_option_index is missing or null in record for $questionId.");
-        // Keep status as incorrect
-    } else if (_multipleChoiceOptionSelected == correctIndex) {
-        // _multipleChoiceOptionSelected might be null, but comparison handles it
-        answerStatus = "correct";
-    }
-    QuizzerLogger.logMessage("Determined answerStatus: $answerStatus");
-
-    // TODO Should call backend functions for this
-    // recordQuestionAttempt(questionId, userId!, timeToAnswer, answerStatus);
-
-    
-    return true; // Indicate submission process completed 
-  }
-
   //  ------------------------------------------------
   // Create New User Account
   // INSERT ONLY HERE
@@ -368,8 +344,13 @@ class SessionManager {
     assert(userId != null);
     QuizzerLogger.logMessage('Toggling module activation for user: $userId, module: $moduleName, activate: $activate');
     
-    // 1. Update DB activation status FIRST (Assumes handleModuleActivation handles its own DB access/release)
+    // 1. Request slot from scheduler, passing module/state
     await _toggleScheduler.requestToggleSlot();
+    QuizzerLogger.logMessage('Toggle slot acquired for $moduleName -> $activate');
+
+    // --- START of actual toggle work (after acquiring slot) --- 
+    
+    // 2. Update DB activation status FIRST 
     await handleModuleActivation({
       'userId': userId,
       'moduleName': moduleName,
@@ -395,11 +376,18 @@ class SessionManager {
     db = null; // Prevent accidental reuse
     // ----------------------------------------------------
 
-    // 3. Flush caches (Does not need DB lock)
-    await _moduleInactiveCache.flushToUnprocessedCache();
-    await _eligibleCache.flushToUnprocessedCache();
-    await _queueCache.flushToUnprocessedCache();  
+    // 3. Signal deactivation if needed, then flush other caches
+    if (!activate) {
+       QuizzerLogger.logMessage('SessionManager: Signaling SwitchBoard for deactivated module: $moduleName');
+       _eligibleCache.flushToDueDateWithin24hrsCache();
+       
+    } else {
+      _switchBoard.signalModuleActivated(moduleName);
+    }
+    
+    // 4. Release slot AFTER all work is done
     await _toggleScheduler.releaseToggleSlot();
+    QuizzerLogger.logMessage('Toggle slot released for $moduleName -> $activate');
     // --- End Direct Execution Logic ---
   }
 
@@ -447,6 +435,83 @@ class SessionManager {
     return true;
   }
   // ------------------------------
+
+  // ==========================================
+  // Public Question Flow API
+  // ==========================================
+
+  /// Retrieves the next question, updates state, and makes it available via getters.
+  Future<void> requestNextQuestion() async {
+    QuizzerLogger.logMessage('SessionManager: requestNextQuestion called.');
+    if (userId == null) {
+       QuizzerLogger.logError('requestNextQuestion called without a logged-in user.');
+       throw StateError('User must be logged in to request a question.');
+    }
+
+    // 1. Flush current question record (if exists) to UnprocessedCache
+    if (_currentQuestionRecord != null) {
+        QuizzerLogger.logMessage('Flushing current question (${_currentQuestionRecord!['question_id']}) to UnprocessedCache.');
+        await _unprocessedCache.addRecord(_currentQuestionRecord!); 
+    }
+
+    // 2. Clear existing question state
+    _clearQuestionState();
+
+    // 3. Get next user record from QuestionQueueCache
+    QuizzerLogger.logMessage('Fetching next question from QuestionQueueCache...');
+    final Map<String, dynamic> newUserRecord = await _queueCache.getAndRemoveRecord();
+
+    if (newUserRecord.isEmpty) {
+        QuizzerLogger.logWarning('QuestionQueueCache is empty. Displaying dummy record.');
+        // --- Build and set dummy question state ---
+        final dummyRecords = _buildDummyNoQuestionsRecord();
+        _currentQuestionRecord = null;
+        _currentQuestionDetails = dummyRecords['staticDetails'];
+        _currentQuestionType = _currentQuestionDetails!['question_type'] as String; // Should be 'multiple_choice'
+        _timeDisplayed = DateTime.now();
+        QuizzerLogger.logMessage('Set dummy \'no questions\' state.');
+        // --- Dummy state set, stop processing ---
+        return; 
+    }
+    
+    // --- If queue was NOT empty, proceed as before ---
+    _currentQuestionRecord = newUserRecord;
+    final String questionId = _currentQuestionRecord!['question_id'] as String;
+    QuizzerLogger.logMessage('Retrieved user record for question ID: $questionId from queue.');
+
+    // 4. Get static question details from DB (Fail Fast)
+    Database? db;
+    Map<String, dynamic> staticDetails = {};
+
+    // --- Acquire DB Lock (Fail Fast - throw if unavailable) ---
+    QuizzerLogger.logMessage('Acquiring DB lock to fetch static details for $questionId...');
+    db = await _dbMonitor.requestDatabaseAccess();
+    if (db == null) {
+        QuizzerLogger.logError('SessionManager (requestNextQuestion): Failed to acquire DB lock immediately.');
+        throw StateError('Database lock unavailable while fetching question details.');
+    }
+    QuizzerLogger.logMessage('DB lock acquired.');
+    // ---------------------------------------------------------
+
+    // Fetch details - Let exceptions propagate (Fail Fast)
+    staticDetails = await q_pairs_table.getQuestionAnswerPairById(questionId, db);
+    QuizzerLogger.logMessage('Fetched static details for $questionId.');
+
+    // --- Release DB Lock (After successful operation) ---
+    _dbMonitor.releaseDatabaseAccess();
+    QuizzerLogger.logMessage('DB lock released after fetching static details.');
+    // ----------------------
+
+    // 5. Update state with new details
+    _currentQuestionDetails = staticDetails;
+    // Assert that the key exists and is not null before casting
+    assert(_currentQuestionDetails!.containsKey('question_type') && _currentQuestionDetails!['question_type'] != null, 
+           "Question details missing 'question_type'");
+    // Directly cast to non-nullable String - will throw if not a String
+    _currentQuestionType = _currentQuestionDetails!['question_type'] as String; 
+    _timeDisplayed = DateTime.now();
+    QuizzerLogger.logSuccess('Successfully set next question state for ID: $questionId (Type: $_currentQuestionType)');
+  }
 }
 
 // Global instance

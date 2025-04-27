@@ -3,16 +3,80 @@ import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/09_data_caches/due_date_within_24hrs_cache.dart';
 import 'package:quizzer/backend_systems/09_data_caches/eligible_questions_cache.dart';
 import 'package:quizzer/backend_systems/09_data_caches/unprocessed_cache.dart';
-import 'package:quizzer/backend_systems/09_data_caches/question_queue_cache.dart'; // Needed for check
 import 'package:quizzer/backend_systems/09_data_caches/answer_history_cache.dart'; // Needed for check
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';     // Needed for userId
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart'; // Needed for DB access
 import 'package:quizzer/backend_systems/06_question_queue_server/circulation_worker.dart'; // Import CirculationWorker
+import 'package:quizzer/backend_systems/06_question_queue_server/switch_board.dart'; // Import SwitchBoard
 import 'package:sqflite_common_ffi/sqflite_ffi.dart'; // Needed for Database type
 // Table function imports
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_question_answer_pairs_table.dart' show getUserQuestionAnswerPairById;
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pairs_table.dart' show getModuleNameForQuestionId;
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile_table.dart' as user_profile_table;
+
+/// Checks if a given user question record is eligible to be shown.
+Future<bool> isUserRecordEligible(Map<String, dynamic> record) async {
+        SessionManager          sessionManager  = getSessionManager();
+  final AnswerHistoryCache      historyCache   = AnswerHistoryCache();
+  final DatabaseMonitor         dbMonitor = getDatabaseMonitor(); 
+  // Fail fast if userId isn't available in session (shouldn't happen if worker runs after login)
+  assert(sessionManager.userId != null, 'Eligibility check requires a logged-in user ID.');
+  final userId = sessionManager.userId!;
+  final questionId = record['question_id'] as String;
+
+    // 1. Check if in recent answer history
+  bool inRecentHistory = await historyCache.isInRecentHistory(questionId);
+  if (inRecentHistory) {
+    // QuizzerLogger.logMessage('$questionId ineligible: In recent history.'); // Optional log
+    return false;
+  }
+  // --- End Cache Checks ---
+
+
+  // --- Proceed with Database Checks (Only for data NOT in the record) ---
+  Database? db;
+  String moduleName;
+  bool isModuleActive;
+
+  // Acquire DB lock
+  int retries = 0;
+  const maxRetries = 5;
+  while (db == null && retries < maxRetries) {
+    db = await dbMonitor.requestDatabaseAccess();
+    if (db == null) {
+      await Future.delayed(const Duration(milliseconds: 100));
+      retries++;
+    }
+  }
+  if (db == null) {
+      QuizzerLogger.logError('EligibilityWorker: Failed to acquire DB lock for eligibility check of $questionId.');
+      throw StateError('Failed to acquire DB lock in EligibilityWorker'); // Fail Fast
+  }
+
+
+  // Fetch module name and activation status from DB
+  // final userQuestionAnswerPair = await getUserQuestionAnswerPairById(userId, questionId, db!); // REMOVED - Data is in `record`
+  moduleName = await getModuleNameForQuestionId(questionId, db);
+  final Map<String, bool> activationStatusField = await user_profile_table.getModuleActivationStatus(userId, db);
+  isModuleActive = activationStatusField[moduleName] ?? false;
+
+  // Release DB lock AFTER DB operations are done
+  dbMonitor.releaseDatabaseAccess();
+  // --- End Database Checks ---
+
+  // --- Use data from the input record ---
+  // 3. Check if due date is in the past (using input record)
+  final nextRevisionDueString = record['next_revision_due'] as String;
+  final nextRevisionDue = DateTime.parse(nextRevisionDueString);
+  final bool isDueForRevision = nextRevisionDue.isBefore(DateTime.now());
+
+  // 4. Check if in circulation (using input record)
+  final inCirculationValue = record['in_circulation'] as int? ?? 0;
+  final bool isInCirculation = inCirculationValue == 1;
+  // -------------------------------------
+
+  // Final eligibility check: All conditions must be true
+  return isDueForRevision && isInCirculation && isModuleActive;
+}
 
 // ==========================================
 // Eligibility Check Worker
@@ -31,11 +95,12 @@ class EligibilityCheckWorker {
 
   // Cache instances & Managers/Monitors needed
   final DueDateWithin24hrsCache _dueDateWithinCache = DueDateWithin24hrsCache();
-  final EligibleQuestionsCache _eligibleCache = EligibleQuestionsCache();
-  final UnprocessedCache _unprocessedCache = UnprocessedCache();
-  final AnswerHistoryCache _historyCache = AnswerHistoryCache(); // For check #1
-  final DatabaseMonitor _dbMonitor = getDatabaseMonitor();       // For DB access
-  final SessionManager _sessionManager = SessionManager();       // For userId
+  final EligibleQuestionsCache  _eligibleCache = EligibleQuestionsCache();
+  final UnprocessedCache        _unprocessedCache = UnprocessedCache();
+  final AnswerHistoryCache      _historyCache = AnswerHistoryCache(); // For check #1
+  final DatabaseMonitor         _dbMonitor = getDatabaseMonitor();       // For DB access
+  final SessionManager          _sessionManager = SessionManager();       // For userId
+  final SwitchBoard             _switchBoard = SwitchBoard();             // Get SwitchBoard instance
 
   /// Starts the worker loop.
   /// Does nothing if the worker is already running.
@@ -118,7 +183,7 @@ class EligibilityCheckWorker {
       // QuizzerLogger.logMessage('EligibilityCheckWorker: DueDateWithin24hrsCache empty, waiting for new records...');
       
       // Await the stream notification. This will Fail Fast on any stream error.
-      await _dueDateWithinCache.onRecordAdded.first;
+      await _switchBoard.onDueDateWithin24hrsAdded.first;
       
       // QuizzerLogger.logMessage('EligibilityCheckWorker: Woke up by DueDateWithin24hrsCache notification.');
       // Loop will continue and re-evaluate isEmpty()
@@ -129,8 +194,14 @@ class EligibilityCheckWorker {
       if (record.isNotEmpty) {
         // QuizzerLogger.logMessage('EligibilityCheckWorker: Found record in DueDateWithin24hrsCache, processing...');
         await _processSingleRecord(record, {}); // Pass empty set for cycle tracking
+
+        // Add a check AFTER processing attempt: if worker was stopped DURING processing, put record back.
+        if (!_isRunning) {
+           QuizzerLogger.logWarning('EligibilityCheckWorker: Stopped during processing record ${record['question_id']}. Putting back in UnprocessedCache.');
+           await _unprocessedCache.addRecord(record); // Add it back to Unprocessed
+        }
       } 
-      // else { // Should not happen if isEmpty() was false, but good practice
+      // else { // Record was empty, likely race condition
       //   QuizzerLogger.logWarning('EligibilityCheckWorker: DueDateWithin24hrsCache not empty but getRecord failed?');
       // }
     }
@@ -142,11 +213,7 @@ class EligibilityCheckWorker {
 
     // Extract question ID (assuming it exists)
     final questionId = record['question_id'] as String?;
-    if (questionId == null) {
-       QuizzerLogger.logError('EligibilityCheckWorker: Record missing question_id: $record. Adding to unprocessed.');
-       await _unprocessedCache.addRecord(record);
-       return;
-    }
+    assert(questionId != null);
 
     // --- Duplicate Check (Optional for subsequent loops, important for initial) ---
     if (processedInCycle.contains(questionId)) {
@@ -154,11 +221,11 @@ class EligibilityCheckWorker {
        await _unprocessedCache.addRecord(record); // Add back to unprocessed to avoid loss
        return; // Skip further processing of this duplicate in this cycle
     }
-    processedInCycle.add(questionId); // Mark as processed for this cycle/initial run
+    processedInCycle.add(questionId!); // Mark as processed for this cycle/initial run
     // ----------------------
 
     // Perform the actual eligibility check
-    bool isEligible = await _isEligible(record);
+    bool isEligible = await isUserRecordEligible(record);
 
     if (isEligible) {
        // QuizzerLogger.logMessage('Eligibility Check: $questionId is eligible.');
@@ -167,68 +234,5 @@ class EligibilityCheckWorker {
        // QuizzerLogger.logMessage('Eligibility Check: $questionId is NOT eligible, adding to unprocessed.');
        await _unprocessedCache.addRecord(record);
     }
-  }
-
-
-  /// Checks if a given user question record is eligible to be shown.
-  Future<bool> _isEligible(Map<String, dynamic> record) async {
-    // Fail fast if userId isn't available in session (shouldn't happen if worker runs after login)
-    assert(_sessionManager.userId != null, 'Eligibility check requires a logged-in user ID.');
-    final userId = _sessionManager.userId!;
-    final questionId = record['question_id'] as String;
-
-     // 1. Check if in recent answer history
-    bool inRecentHistory = await _historyCache.isInRecentHistory(questionId);
-    if (inRecentHistory) {
-      // QuizzerLogger.logMessage('$questionId ineligible: In recent history.'); // Optional log
-      return false;
-    }
-    // --- End Cache Checks ---
-
-
-    // --- Proceed with Database Checks (Only for data NOT in the record) ---
-    Database? db;
-    String moduleName;
-    bool isModuleActive;
-
-    // Acquire DB lock
-    int retries = 0;
-    const maxRetries = 5;
-    while (db == null && _isRunning && retries < maxRetries) {
-      db = await _dbMonitor.requestDatabaseAccess();
-      if (db == null) {
-        await Future.delayed(const Duration(milliseconds: 100));
-        retries++;
-      }
-    }
-    if (db == null) {
-       QuizzerLogger.logError('EligibilityWorker: Failed to acquire DB lock for eligibility check of $questionId.');
-       throw StateError('Failed to acquire DB lock in EligibilityWorker'); // Fail Fast
-    }
-
-
-    // Fetch module name and activation status from DB
-    // final userQuestionAnswerPair = await getUserQuestionAnswerPairById(userId, questionId, db!); // REMOVED - Data is in `record`
-    moduleName = await getModuleNameForQuestionId(questionId, db);
-    final Map<String, bool> activationStatusField = await user_profile_table.getModuleActivationStatus(userId, db);
-    isModuleActive = activationStatusField[moduleName] ?? false;
-
-    // Release DB lock AFTER DB operations are done
-    _dbMonitor.releaseDatabaseAccess();
-    // --- End Database Checks ---
-
-    // --- Use data from the input record ---
-    // 3. Check if due date is in the past (using input record)
-    final nextRevisionDueString = record['next_revision_due'] as String;
-    final nextRevisionDue = DateTime.parse(nextRevisionDueString);
-    final bool isDueForRevision = nextRevisionDue.isBefore(DateTime.now());
-
-    // 4. Check if in circulation (using input record)
-    final inCirculationValue = record['in_circulation'] as int? ?? 0;
-    final bool isInCirculation = inCirculationValue == 1;
-    // -------------------------------------
-
-    // Final eligibility check: All conditions must be true
-    return isDueForRevision && isInCirculation && isModuleActive;
   }
 }

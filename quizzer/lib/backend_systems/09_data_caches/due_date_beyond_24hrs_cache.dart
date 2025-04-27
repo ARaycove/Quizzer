@@ -51,21 +51,14 @@ class DueDateBeyond24hrsCache {
     );
 
     // Check again just in case asserts are disabled in production
+    // FIXME potential deletion point
     if (!parsedDueDate.isAfter(twentyFourHoursFromNow)) {
         QuizzerLogger.logWarning('Record failed >24hr check (asserts might be off): $parsedDueDate');
         return; // Don't add if condition isn't met
     }
 
     await _lock.synchronized(() {
-      // Check if record with the same question_id already exists
-      final bool alreadyExists = _cache.any((existing) => existing['question_id'] == questionId);
-
-      if (!alreadyExists) {
         _cache.add(record);
-        // QuizzerLogger.logMessage('DueDateBeyond24hrsCache: Added $questionId.'); // Optional Log
-      } else {
-         QuizzerLogger.logMessage('DueDateBeyond24hrsCache: Duplicate record skipped (QID: $questionId)'); // Optional Log
-      }
     });
   }
 

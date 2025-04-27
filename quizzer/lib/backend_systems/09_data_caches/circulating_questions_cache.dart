@@ -27,9 +27,12 @@ class CirculatingQuestionsCache {
        return;
     }
     await _lock.synchronized(() {
-      // Add only if not already present to avoid duplicates
+      // Re-added check: Add only if not already present to avoid duplicates
       if (!_questionIds.contains(questionId)) {
         _questionIds.add(questionId);
+        // QuizzerLogger.logValue('CirculatingCache: Added $questionId');
+      } else {
+        // QuizzerLogger.logMessage('CirculatingCache: Duplicate ID skipped: $questionId');
       }
     });
   }

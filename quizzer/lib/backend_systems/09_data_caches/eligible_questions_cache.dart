@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:synchronized/synchronized.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart'; // Uncomment if logging needed
 import 'unprocessed_cache.dart'; // Import UnprocessedCache
+import 'due_date_within_24hrs_cache.dart'; // Import target cache
 // import 'package:quizzer/backend_systems/logger/quizzer_logging.dart'; // Optional: if logging needed
 
 // ==========================================
@@ -35,19 +36,10 @@ class EligibleQuestionsCache {
     final String questionId = record['question_id'] as String; // Assume assertion passes
 
     await _lock.synchronized(() {
-      // Check if record with the same question_id already exists
-      final bool alreadyExists = _cache.any((existing) => existing['question_id'] == questionId);
-
-      if (!alreadyExists) {
         final bool wasEmpty = _cache.isEmpty;
         _cache.add(record);
         if (wasEmpty && _cache.isNotEmpty) {
-          // QuizzerLogger.logMessage('EligibleQuestionsCache: Notifying record added.'); // Optional log
           _addController.add(null);
-        }
-        // QuizzerLogger.logMessage('EligibleQuestionsCache: Added $questionId.'); // Optional Log
-      } else {
-        QuizzerLogger.logMessage('EligibleQuestionsCache: Duplicate record skipped (QID: $questionId)'); // Optional Log
       }
     });
   }
@@ -133,6 +125,41 @@ class EligibleQuestionsCache {
      return await _lock.synchronized(() {
          return _cache.length;
      });
+  }
+
+  // --- Flush Cache to DueDateWithin24hrsCache ---
+  /// Removes all records from this cache and adds them to the DueDateWithin24hrsCache.
+  /// Intended to be called upon events like module deactivation to force re-evaluation.
+  /// Ensures thread safety using locks on both caches implicitly via their methods.
+  Future<void> flushToDueDateWithin24hrsCache() async {
+    List<Map<String, dynamic>> recordsToMove = []; // Initialize
+    bool wasNotEmpty = false; // Track if cache had items before flush
+    final DueDateWithin24hrsCache dueDateCache = DueDateWithin24hrsCache(); // Get instance of target cache
+
+    // Atomically get and clear records from this cache
+    await _lock.synchronized(() {
+      recordsToMove = List.from(_cache);
+      wasNotEmpty = _cache.isNotEmpty; // Check *before* clearing
+      _cache.clear();
+      // If it was not empty before clearing, signal that removals happened.
+      // This might wake up listeners waiting for eligible records (like PSW), 
+      // which is okay as they will just find the cache empty again.
+      if (wasNotEmpty) {
+         QuizzerLogger.logMessage('EligibleQuestionsCache: Flushed non-empty cache. Signaling removal.');
+         _addController.add(null); // Signal using the existing add/remove stream
+      }
+    });
+
+    // Add the retrieved records to the target cache
+    if (recordsToMove.isNotEmpty) {
+       QuizzerLogger.logMessage('Flushing ${recordsToMove.length} records from EligibleQuestionsCache to DueDateWithin24hrsCache.');
+       // Add records one by one to the target cache to ensure its logic (like signaling) runs correctly
+       for (final record in recordsToMove) {
+          await dueDateCache.addRecord(record);
+       }
+    } else {
+       QuizzerLogger.logWarning('EligibleQuestionsCache was empty, nothing to flush.'); // Optional log
+    }
   }
 
   // --- Dispose Stream Controller ---

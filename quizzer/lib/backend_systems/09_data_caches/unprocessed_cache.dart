@@ -29,24 +29,21 @@ class UnprocessedCache {
   Future<void> addRecord(Map<String, dynamic> record) async {
     final String? questionId = record['question_id'] as String?;
     if (questionId == null) {
-       QuizzerLogger.logWarning('UnprocessedCache: Attempted to add record missing question_id.');
-       return; // Cannot check for duplicates without ID
+       QuizzerLogger.logError('UnprocessedCache: Attempted to add record missing question_id.');
+       throw StateError("Can't do that");
     }
 
     bool recordAdded = false;
     await _lock.synchronized(() {
-      final bool alreadyExists = _cache.any((existing) => existing['question_id'] == questionId);
-      if (!alreadyExists) {
+        QuizzerLogger.logValue('[UnprocessedCache.addRecord START] QID: $questionId, Cache Size Before: ${_cache.length}');
         final bool wasEmpty = _cache.isEmpty;
         _cache.add(record);
         recordAdded = true;
         if (wasEmpty) {
-          // QuizzerLogger.logMessage('UnprocessedCache: Notifying record added.'); // Optional log
+          QuizzerLogger.logMessage('[UnprocessedCache.addRecord] Added to empty cache, signaling addController.');
           _addController.add(null);
         }
-      } else {
-         QuizzerLogger.logMessage('UnprocessedCache: Duplicate record skipped (QID: $questionId)'); // Optional log
-      }
+        QuizzerLogger.logValue('[UnprocessedCache.addRecord END] QID: $questionId, Added: true, Cache Size After: ${_cache.length}');
     });
   }
 
@@ -60,6 +57,8 @@ class UnprocessedCache {
 
     List<Map<String, dynamic>> recordsToAdd = [];
     await _lock.synchronized(() {
+      final int sizeBefore = _cache.length;
+      QuizzerLogger.logValue('[UnprocessedCache.addRecords START] Input Count: ${records.length}, Cache Size Before: $sizeBefore');
       final bool wasEmpty = _cache.isEmpty;
       // Create a set of existing IDs for efficient lookup
       final Set<String> existingIds = _cache.map((r) => r['question_id'] as String).toSet();
@@ -80,12 +79,14 @@ class UnprocessedCache {
       }
 
       if (recordsToAdd.isNotEmpty) {
+        QuizzerLogger.logValue('[UnprocessedCache.addRecords] Adding ${recordsToAdd.length} new records.');
         _cache.addAll(recordsToAdd);
         if (wasEmpty) {
-          // QuizzerLogger.logMessage('UnprocessedCache: Notifying records added.'); // Optional log
+          QuizzerLogger.logMessage('[UnprocessedCache.addRecords] Added to empty cache, signaling addController.');
           _addController.add(null);
         }
       }
+      QuizzerLogger.logValue('[UnprocessedCache.addRecords END] Added: ${recordsToAdd.length}, Cache Size After: ${_cache.length}');
     });
   }
 
@@ -95,6 +96,8 @@ class UnprocessedCache {
   /// Returns the found record, or an empty Map `{}` if no matching record is found.
   Future<Map<String, dynamic>> getAndRemoveRecord(String userUuid, String questionId) async {
      return await _lock.synchronized(() {
+       final int sizeBefore = _cache.length;
+       QuizzerLogger.logValue('[UnprocessedCache.getAndRemoveRecord START] User: $userUuid, QID: $questionId, Cache Size Before: $sizeBefore');
        int foundIndex = -1;
        for (int i = 0; i < _cache.length; i++) {
          final record = _cache[i];
@@ -105,10 +108,11 @@ class UnprocessedCache {
        }
 
        if (foundIndex != -1) {
-         // Remove the record at the found index and return it
-         return _cache.removeAt(foundIndex);
+         final removedRecord = _cache.removeAt(foundIndex);
+         QuizzerLogger.logValue('[UnprocessedCache.getAndRemoveRecord END] Found & Removed QID: $questionId, Cache Size After: ${_cache.length}');
+         return removedRecord;
        } else {
-         // Return an empty map if no record was found
+         QuizzerLogger.logValue('[UnprocessedCache.getAndRemoveRecord END] QID: $questionId Not Found, Cache Size After: ${_cache.length}');
          return <String, dynamic>{};
        }
      });
@@ -122,10 +126,15 @@ class UnprocessedCache {
   /// Returns an empty Map `{}` if the cache is empty.
   Future<Map<String, dynamic>> getAndRemoveOldestRecord() async {
      return await _lock.synchronized(() {
+       final int sizeBefore = _cache.length;
+       QuizzerLogger.logValue('[UnprocessedCache.getAndRemoveOldestRecord START] Cache Size Before: $sizeBefore');
        if (_cache.isNotEmpty) {
-         return _cache.removeAt(0); // Removes and returns the first element (oldest)
+         final removedRecord = _cache.removeAt(0);
+         final String removedQid = removedRecord['question_id'] ?? 'UNKNOWN_ID';
+         QuizzerLogger.logValue('[UnprocessedCache.getAndRemoveOldestRecord END] Removed QID: $removedQid, Cache Size After: ${_cache.length}');
+         return removedRecord; 
        } else {
-         // Return an empty map if the cache is empty
+         QuizzerLogger.logValue('[UnprocessedCache.getAndRemoveOldestRecord END] Cache Empty, Cache Size After: ${_cache.length}');
          return <String, dynamic>{};
        }
      });

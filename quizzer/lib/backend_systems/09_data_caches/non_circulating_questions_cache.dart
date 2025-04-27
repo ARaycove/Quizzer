@@ -42,19 +42,10 @@ class NonCirculatingQuestionsCache {
     assert(record['in_circulation'] == 0, 'Record added to NonCirculatingCache must have in_circulation == 0');
 
     await _lock.synchronized(() {
-      // Check if record with the same question_id already exists
-      final bool alreadyExists = _cache.any((existing) => existing['question_id'] == questionId);
-
-      if (!alreadyExists) {
         final bool wasEmpty = _cache.isEmpty;
         _cache.add(record);
         if (wasEmpty && _cache.isNotEmpty) {
-          // QuizzerLogger.logMessage('NonCirculatingCache: Notifying record added.'); // Optional log
           _addController.add(null);
-        }
-        // QuizzerLogger.logMessage('NonCirculatingCache: Added $questionId.'); // Optional Log
-      } else {
-         QuizzerLogger.logMessage('NonCirculatingCache: Duplicate record skipped (QID: $questionId)'); // Optional Log
       }
     });
   }

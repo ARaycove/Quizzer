@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:synchronized/synchronized.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'unprocessed_cache.dart'; // Import for flushing
+import 'package:quizzer/backend_systems/06_question_queue_server/switch_board.dart'; // Corrected Import
 
 // ==========================================
 
@@ -17,14 +18,8 @@ class DueDateWithin24hrsCache {
   final Lock _lock = Lock();
   List<Map<String, dynamic>> _cache = [];
   final UnprocessedCache _unprocessedCache = UnprocessedCache(); // Get singleton instance
+  final SwitchBoard _switchBoard = SwitchBoard(); // Get SwitchBoard instance
 
-  // --- Notification Stream ---
-  // Used to notify listeners (like EligibilityCheckWorker) when a record is added to an empty cache.
-  final StreamController<void> _addController = StreamController<void>.broadcast();
-
-  /// A stream that emits an event when a record is added to a previously empty cache.
-  Stream<void> get onRecordAdded => _addController.stream;
-  // -------------------------
 
   // --- Add Record (with duplicate check) ---
 
@@ -32,12 +27,12 @@ class DueDateWithin24hrsCache {
   /// no record with the same question_id already exists.
   /// Asserts that the due date condition is met.
   /// Ensures thread safety using a lock.
-  /// Notifies listeners via [onRecordAdded] if the cache was empty and a record was added.
+  /// Notifies listeners via [SwitchBoard] if the cache was empty and a record was added.
   Future<void> addRecord(Map<String, dynamic> record) async {
     // Basic validation: Ensure record has required keys
     if (!record.containsKey('question_id') || !record.containsKey('next_revision_due')) {
       QuizzerLogger.logWarning('Attempted to add invalid record (missing keys) to DueDateWithin24hrsCache');
-      return; // Or throw ArgumentError
+      throw ArgumentError("processed question record is invalid, internal issue needs to be addressed");
     }
     final String questionId = record['question_id'] as String; // Assume key exists
 
@@ -66,19 +61,11 @@ class DueDateWithin24hrsCache {
     }
 
     await _lock.synchronized(() {
-      // Check if record with the same question_id already exists
-      final bool alreadyExists = _cache.any((existing) => existing['question_id'] == questionId);
-
-      if (!alreadyExists) {
-        final bool wasEmpty = _cache.isEmpty;
-        _cache.add(record);
-        if (wasEmpty && _cache.isNotEmpty) {
-          // QuizzerLogger.logMessage('DueDateWithin24hrsCache: Notifying record added.'); // Optional log
-          _addController.add(null);
-        }
-        // QuizzerLogger.logMessage('DueDateWithin24hrsCache: Added $questionId.'); // Optional Log
-      } else {
-         QuizzerLogger.logMessage('DueDateWithin24hrsCache: Duplicate record skipped (QID: $questionId)'); // Optional Log
+      final bool wasEmpty = _cache.isEmpty;
+      _cache.add(record);
+      if (wasEmpty && _cache.isNotEmpty) {
+        // QuizzerLogger.logMessage('DueDateWithin24hrsCache: Signaling SwitchBoard.'); // Optional log
+        _switchBoard.signalDueDateWithin24hrsAdded(); // Use SwitchBoard
       }
     });
   }
@@ -142,11 +129,5 @@ class DueDateWithin24hrsCache {
      return await _lock.synchronized(() {
          return _cache.length;
      });
-  }
-
-  // --- Close Stream Controller ---
-  /// Closes the stream controller. Should be called when the cache is no longer needed.
-  void dispose() {
-    _addController.close();
   }
 }

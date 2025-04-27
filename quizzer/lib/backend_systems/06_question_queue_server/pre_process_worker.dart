@@ -15,6 +15,8 @@ import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'dart:async';
+import 'inactive_module_worker.dart'; // Import the new worker
+
 
 // ==========================================
 /// Worker responsible for pre-processing user question records.
@@ -140,6 +142,18 @@ class PreProcessWorker {
     } while (recordToProcess.isNotEmpty);
     QuizzerLogger.logSuccess('Initial Loop: Finished processing initial records.');
 
+    // --- Start Inactive Module Worker ---
+    QuizzerLogger.logMessage('PreProcessWorker: Starting Inactive Module Worker...');
+    final inactiveWorker = InactiveModuleWorker(); // Get singleton instance
+    inactiveWorker.start();
+
+    // --- Start Queue Cache Removal Worker (REMOVED) ---
+    /*
+    QuizzerLogger.logMessage('PreProcessWorker: Starting Queue Cache Removal Worker...');
+    final queueRemovalWorker = QueueCacheRemovalWorker(); // Get singleton instance
+    queueRemovalWorker.start();
+    */
+
     // --- Start Eligibility Worker --- 
     QuizzerLogger.logMessage('PreProcessWorker: Starting Eligibility Check Worker...');
     final eligibilityWorker = EligibilityCheckWorker(); // Get singleton instance
@@ -153,91 +167,125 @@ class PreProcessWorker {
     // QuizzerLogger.logMessage('PreProcessWorker: Checking UnprocessedCache...');
     if (!_isRunning) return;
 
-    // Check if the cache is empty
+    // Check if the cache is empty BEFORE attempting to get a record
     if (await _unprocessedCache.isEmpty()) {
       // If empty, wait for a notification that a record was added
       // QuizzerLogger.logMessage('PreProcessWorker: UnprocessedCache empty, waiting for new records...');
-      
       await _unprocessedCache.onRecordAdded.first;
-      
       // QuizzerLogger.logMessage('PreProcessWorker: Woke up by UnprocessedCache notification.');
       // After waking up, the loop will continue and re-check the cache.
-      
     } else {
-      // If not empty, get and process the oldest record
+      // Cache is not empty, attempt to get and process the oldest record
       final Map<String, dynamic> record = await _unprocessedCache.getAndRemoveOldestRecord();
+      
+      // Check if a record was actually retrieved (could be empty due to race condition)
       if (record.isNotEmpty) {
-        // QuizzerLogger.logMessage('PreProcessWorker: Found record in UnprocessedCache, processing...');
-        await _processRecord(record);
+        await _processRecord(record); 
+        
+        // Add a check AFTER processing attempt: if worker was stopped DURING processing, put record back.
+        if (!_isRunning) {
+           QuizzerLogger.logWarning('PreProcessWorker: Stopped during processing record ${record['question_id']}. Putting back in UnprocessedCache.');
+           await _unprocessedCache.addRecord(record); // Add it back
+        }
       } 
-      // else { // Should theoretically not happen if isEmpty() was false, but good practice
-      //   QuizzerLogger.logWarning('PreProcessWorker: Cache was not empty but getOldest failed?');
-      // }
+      // else: Record was empty, likely due to race condition. Log or ignore.
+      // QuizzerLogger.logWarning('PreProcessWorker: Cache was not empty but getOldest returned empty? Possible race condition.');
     }
   }
 
   // --- Record Processing Logic ---
   Future<void> _processRecord(Map<String, dynamic> record) async {
+    // Check if stopped right at the beginning
+    if (!_isRunning) {
+      await _unprocessedCache.addRecord(record);
+      return;
+    }
+
     assert(_sessionManager.userId != null, "Current User ID cannot be null for processing.");
     String questionId = record['question_id'];
 
-    // --- Assertions for critical fields (REMOVED module_name check) ---
-    assert(record.containsKey('question_id'),       'Record missing question_id: $record');
+    // Critical field assertions
     assert(record.containsKey('in_circulation'),    'Record missing in_circulation: $record');
     assert(record.containsKey('next_revision_due'), 'Record missing next_revision_due: $record');
 
-    // --- Get Dependencies (Module Name and Status) ---
-    String? moduleName; // Declared here, fetched later
+    // --- Get Dependencies (DB Access & Checks) ---
+    String? moduleName;
     bool isModuleActive = false;
     Database? db;
 
     db = await _getDbAccess();
+    assert(db != null); // DO NOT REMOVE THIS ASSERT
+
+    // Check if stopped during DB access OR if DB access failed
     if (!_isRunning || db == null) {
-        if (db != null) _dbMonitor.releaseDatabaseAccess();
-        return;
+      // Log removed
+      _dbMonitor.releaseDatabaseAccess(); 
+      await _unprocessedCache.addRecord(record);
+      return;
     }
 
-    // Fetch module_name using the question_id
-    moduleName = await getModuleNameForQuestionId(questionId, db);
-    
-    // Fetch module activation status using the fetched moduleName
-    final Map<String, bool> activationStatus =
-        await user_profile_table.getModuleActivationStatus(_sessionManager.userId!, db);
-    isModuleActive = activationStatus[moduleName] ?? false; // Default to false if not found
+    // Perform DB checks within try/finally to ensure release
+    try {
+      moduleName = await getModuleNameForQuestionId(questionId, db);
+      final Map<String, bool> activationStatus =
+          await user_profile_table.getModuleActivationStatus(_sessionManager.userId!, db);
+      isModuleActive = activationStatus[moduleName] ?? false;
+    } finally {
+      _dbMonitor.releaseDatabaseAccess();
+    }
 
-    // --- Release DB lock ---
-    _dbMonitor.releaseDatabaseAccess();
-    // QuizzerLogger.logMessage('Record Processing: DB access released for $questionId.');
-    db = null;
-    if (!_isRunning) return;
+    // Check if stopped AFTER DB operations but BEFORE routing
+    if (!_isRunning) {
+      await _unprocessedCache.addRecord(record);
+      return;
+    }
 
-    // --- Routing Logic (Uses fetched moduleName and isModuleActive) ---
+    // --- Routing Logic ---
     final bool     inCirculation          = (record['in_circulation'] as int? ?? 0) == 1;
     final String   dueDateString          = record['next_revision_due'] as String;
+    // Let potential FormatException propagate (Fail Fast)
     final DateTime parsedDueDate          = DateTime.parse(dueDateString);
     final DateTime twentyFourHoursFromNow = DateTime.now().add(const Duration(hours: 24));
 
-    // Route based on isModuleActive and other fields in the original record
-    if (!isModuleActive) {
-      // QuizzerLogger.logMessage('Routing $questionId to ModuleInactiveCache.');
-      await _moduleInactiveCache.addRecord(record);
-    } else if (!inCirculation) {
-      // QuizzerLogger.logMessage('Routing $questionId to NonCirculatingQuestionsCache.');
-      await _nonCirculatingCache.addRecord(record);
-    } else {
-      // Module is active AND question is in circulation
-      // QuizzerLogger.logMessage('Adding $questionId to CirculatingQuestionsCache.');
-      await _circulatingCache.addQuestionId(questionId);
+    // Determine destination and add, checking for stop signal BEFORE the await
+    Future<void> routeToAdd;
+    String destinationCacheName = "Unknown"; // For logging
 
-      // Now route based on due date
+    if (!isModuleActive) {
+      destinationCacheName = "ModuleInactiveCache";
+      routeToAdd = _moduleInactiveCache.addRecord(record);
+    } else if (!inCirculation) {
+      destinationCacheName = "NonCirculatingQuestionsCache";
+      routeToAdd = _nonCirculatingCache.addRecord(record);
+    } else {
+      // Add ID first 
+      await _circulatingCache.addQuestionId(questionId); 
+      // Check stop signal again *after* adding ID but *before* adding full record
+      if (!_isRunning) {
+          await _unprocessedCache.addRecord(record);
+          return;
+      }
+      // Now determine final destination
       if (parsedDueDate.isAfter(twentyFourHoursFromNow)) {
-        // QuizzerLogger.logMessage('Routing $questionId to DueDateBeyond24hrsCache.');
-        await _dueDateBeyondCache.addRecord(record);
+        destinationCacheName = "DueDateBeyond24hrsCache";
+        routeToAdd = _dueDateBeyondCache.addRecord(record);
       } else {
-        // QuizzerLogger.logMessage('Routing $questionId to DueDateWithin24hrsCache.');
-        await _dueDateWithinCache.addRecord(record);
+        destinationCacheName = "DueDateWithin24hrsCache";
+        routeToAdd = _dueDateWithinCache.addRecord(record);
       }
     }
+
+    // Check if stopped right before the final add operation
+    if (!_isRunning) {
+        await _unprocessedCache.addRecord(record);
+        return;
+    }
+
+    // Log the routing decision just before the operation
+    QuizzerLogger.logMessage('[PreProcessWorker] Routing $questionId to $destinationCacheName.');
+    
+    // Perform the actual add to the destination cache
+    await routeToAdd; 
   }
 
   // --- Helper for DB Access ---

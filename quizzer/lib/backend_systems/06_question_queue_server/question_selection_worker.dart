@@ -5,6 +5,7 @@ import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/backend_systems/09_data_caches/eligible_questions_cache.dart';
 import 'package:quizzer/backend_systems/09_data_caches/question_queue_cache.dart';
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
+import 'package:quizzer/backend_systems/09_data_caches/unprocessed_cache.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 // Table Imports
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile_table.dart' as user_profile_table;
@@ -32,6 +33,7 @@ class PresentationSelectionWorker {
   final EligibleQuestionsCache  _eligibleCache = EligibleQuestionsCache();
   final QuestionQueueCache      _queueCache = QuestionQueueCache();
   final DatabaseMonitor         _dbMonitor = getDatabaseMonitor();
+  final UnprocessedCache        _unprocessedCache = UnprocessedCache();
 
   // --- Notification Stream (for Initial Loop Completion) ---
   final StreamController<void> _initialLoopCompleteController = StreamController<void>.broadcast();
@@ -175,32 +177,26 @@ class PresentationSelectionWorker {
 
     // Call the adapted selection logic
     final Map<String, dynamic> selectedQuestion = await _selectNextQuestionFromList(eligibleQuestions);
+    String questionId = selectedQuestion['question_id'];
 
-    if (selectedQuestion.isNotEmpty) {
-      final questionId = selectedQuestion['question_id'] as String;
-      // QuizzerLogger.logMessage('PSW Select: Selection algorithm chose $questionId.');
+    // 1. Grab the selected question by its id from the eligible cache
+    // QuizzerLogger.logMessage('PSW Select: Attempting to get and remove $questionId from EligibleCache...');
+    final Map<String, dynamic> recordToQueue = await _eligibleCache.getAndRemoveRecordByQuestionId(questionId);
 
-      // 1. Add to Queue Cache
-      // QuizzerLogger.logMessage('PSW Select: Adding $questionId to QueueCache...');
-      await _queueCache.addRecord(selectedQuestion);
-      // QuizzerLogger.logSuccess('PSW Select: Added $questionId to QuestionQueueCache.');
-
-      // 2. Remove from Eligible Cache
-      // QuizzerLogger.logMessage('PSW Select: Removing $questionId from EligibleCache...');
-      final removedRecord = await _eligibleCache.getAndRemoveRecordByQuestionId(questionId);
-      if (removedRecord.isEmpty) {
-         // This is unexpected but can happen due to race conditions (e.g., concurrent flush).
-         // Instead of failing fast, log a warning and abort this selection cycle.
-        //  QuizzerLogger.logWarning('PSW Select: Failed to remove selected question $questionId from EligibleCache (likely flushed). Aborting cycle.');
-         return; // Abort the operation for this cycle
-      } else {
-        //  QuizzerLogger.logMessage('PSW Select: Removed $questionId from EligibleQuestionsCache.');
-      }
-    } else {
-      // QuizzerLogger.logWarning('PSW Select: Selection algorithm did not return a question from non-empty eligible list.');
-      // This case might indicate an issue with the selection algorithm or edge case handling
+    // 1a. handle case where that selected question is no longer in there (I believe this is handled by the cache??)
+    if (recordToQueue.isEmpty) {
+      // This means the record was removed from EligibleCache between selection and this fetch.
+      // Could be due to module deactivation flush, concurrent processing, etc.
+      QuizzerLogger.logWarning('PSW Select: Record $questionId was not found in EligibleCache during get/remove (likely removed concurrently).');
+      return; // Cannot queue a record we couldn't fetch.
     }
-    // QuizzerLogger.logMessage('PSW: Exiting _selectAndQueueQuestion.');
+    // QuizzerLogger.logSuccess('PSW Select: Successfully got and removed $questionId from EligibleCache.');
+
+    // 2. Place it in queue
+    // QuizzerLogger.logMessage('PSW Select: Adding fetched record $questionId to QueueCache...');
+    await _queueCache.addRecord(recordToQueue);
+    // QuizzerLogger.logSuccess('PSW Select: Successfully added $questionId to QueueCache.');
+
   }
 
   // --- Adapted Selection Logic (Database Access) ---
@@ -354,5 +350,17 @@ class PresentationSelectionWorker {
        throw StateError('PresentationSelectionWorker: Failed to acquire database access after retries.');
      }
      return db;
+  }
+
+  // --- Helper to Check Eligibility and Queue/Revert ---
+  /// Checks if a selected question is still eligible (primarily module active) before queueing.
+  /// If eligible: Adds to QueueCache, removes from EligibleCache.
+  /// If ineligible: Removes from EligibleCache, adds back to UnprocessedCache.
+  /// Returns true if queued, false if reverted.
+  Future<void> _checkAndQueueOrRevert(Map<String, dynamic> selectedQuestion) async {
+    assert(selectedQuestion.isNotEmpty, "_checkAndQueueOrRevert called with empty record.");
+    final questionId = selectedQuestion['question_id'] as String?;
+    assert(questionId != null, "Selected question missing question_id: $selectedQuestion");
+    
   }
 }

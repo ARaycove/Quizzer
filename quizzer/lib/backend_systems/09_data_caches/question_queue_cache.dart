@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:synchronized/synchronized.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart'; // Import for logging
 import 'unprocessed_cache.dart'; // Import for flushing
+import 'package:quizzer/backend_systems/06_question_queue_server/eligibility_check_worker.dart';
 // import 'package:quizzer/backend_systems/logger/quizzer_logging.dart'; // Optional: if logging needed
 
 // ==========================================
@@ -35,16 +36,16 @@ class QuestionQueueCache {
   Future<void> addRecord(Map<String, dynamic> record) async {
     // Assert required key exists
     assert(record.containsKey('question_id'), 'Record added to QuestionQueueCache must contain question_id');
-    final String questionId = record['question_id'] as String; // Assume assertion passes
 
-    await _lock.synchronized(() { // Lambda is no longer async
-      // Check only if it already exists in this QuestionQueueCache
-      final bool alreadyExists = _cache.any((existing) => existing['question_id'] == questionId);
-      if (!alreadyExists) {
-        _cache.add(record);
-        // QuizzerLogger.logMessage('QuestionQueueCache: Added $questionId.'); // Optional Log
-      } else {
-         QuizzerLogger.logMessage('QuestionQueueCache: Duplicate record skipped (QID: $questionId already in queue).'); // Optional Log
+    await _lock.synchronized(() async {
+      
+      final bool wasEmpty = _cache.isEmpty;
+      _cache.add(record); // Directly add the record
+      
+      // Signal only when adding to an empty queue.
+      if (wasEmpty && _cache.isNotEmpty) { 
+         QuizzerLogger.logMessage("QuestionQueueCache: Added record ${record['question_id']} to empty queue.");
+         _removeController.add(null); 
       }
     });
   }
@@ -130,6 +131,13 @@ class QuestionQueueCache {
   Future<bool> containsQuestionId(String questionId) async {
     return await _lock.synchronized(() {
       return _cache.any((record) => record['question_id'] == questionId);
+    });
+  }
+  // --- Check if Empty ---
+  /// Checks if the cache is currently empty.
+  Future<bool> isEmpty() async {
+    return await _lock.synchronized(() {
+      return _cache.isEmpty;
     });
   }
 

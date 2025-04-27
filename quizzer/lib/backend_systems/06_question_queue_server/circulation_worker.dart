@@ -15,7 +15,7 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/question_answ
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile_table.dart' as user_profile_table;
 // Workers
 import 'package:quizzer/backend_systems/06_question_queue_server/question_selection_worker.dart';
-
+import 'switch_board.dart'; // Import SwitchBoard
 
 // ==========================================
 // Circulation Worker
@@ -28,18 +28,21 @@ class CirculationWorker {
   CirculationWorker._internal();
 
   // --- Worker State ---
-  bool _isRunning = false;
-  Completer<void>? _stopCompleter;
-  bool _isInitialLoop = true;
+  bool                _isRunning = false;
+  Completer<void>?    _stopCompleter;
+  bool                _isInitialLoop = true;
+  DateTime?           _lastActivationSignalTime; // Timestamp of the last signal
+  StreamSubscription? _activationSubscription; // Subscription to the SwitchBoard stream
   // --------------------
 
   // --- Dependencies ---
-  final EligibleQuestionsCache    _eligibleCache = EligibleQuestionsCache();
-  final NonCirculatingQuestionsCache _nonCirculatingCache = NonCirculatingQuestionsCache();
-  final UnprocessedCache _unprocessedCache = UnprocessedCache();
-  final CirculatingQuestionsCache _circulatingCache = CirculatingQuestionsCache();
-  final DatabaseMonitor _dbMonitor = getDatabaseMonitor();
-  final SessionManager _sessionManager = SessionManager();
+  final EligibleQuestionsCache        _eligibleCache        = EligibleQuestionsCache();
+  final NonCirculatingQuestionsCache  _nonCirculatingCache  = NonCirculatingQuestionsCache();
+  final UnprocessedCache              _unprocessedCache     = UnprocessedCache();
+  final CirculatingQuestionsCache     _circulatingCache     = CirculatingQuestionsCache();
+  final DatabaseMonitor               _dbMonitor            = getDatabaseMonitor();
+  final SessionManager                _sessionManager       = SessionManager();
+  final SwitchBoard                   _switchBoard          = SwitchBoard(); // Get SwitchBoard instance
 
   // --- Control Methods ---
   /// Starts the worker loop.
@@ -51,6 +54,14 @@ class CirculationWorker {
     _isRunning = true;
     _isInitialLoop = true;
     _stopCompleter = Completer<void>();
+
+    // Subscribe to the module activation stream - Uses the activation time from the signal
+    _activationSubscription = _switchBoard.onModuleRecentlyActivated.listen((DateTime activationTime) { // Correct parameter type
+      QuizzerLogger.logMessage('CirculationWorker: Received recent activation signal with time: $activationTime.');
+      _lastActivationSignalTime = activationTime; // Use the time from the signal
+    });
+    QuizzerLogger.logMessage('CirculationWorker: Subscribed to onModuleRecentlyActivated stream.');
+
     _runLoop(); // Start the loop asynchronously
     // QuizzerLogger.logMessage('CirculationWorker started.');
   }
@@ -62,6 +73,9 @@ class CirculationWorker {
       return; // Already stopped
     }
     _isRunning = false;
+    await _activationSubscription?.cancel(); // Cancel stream subscription
+    _activationSubscription = null;
+    QuizzerLogger.logMessage('CirculationWorker: Unsubscribed from onModuleRecentlyActivated stream.');
     await _stopCompleter?.future; // Wait for loop completion
     // QuizzerLogger.logMessage('CirculationWorker stopped.');
   }
@@ -120,8 +134,30 @@ class CirculationWorker {
   // -----------------
 
   /// Checks if conditions are met to add a new question to circulation.
+  /// Includes logic to delay check if a module activation signal was recently received.
   Future<bool> _shouldAddNewQuestion() async {
     QuizzerLogger.logMessage('Entering CirculationWorker _shouldAddNewQuestion()...');
+    // 1. Check if the timestamp indicates a recent activation
+    DateTime? activationTimeToProcess = _lastActivationSignalTime; // Capture timestamp locally
+    if (activationTimeToProcess != null) {
+        // Consume the signal timestamp immediately so it's only processed once
+        _lastActivationSignalTime = null; 
+
+        final now = DateTime.now();
+        final timeSinceSignal = now.difference(activationTimeToProcess);
+        // User wants 1 second check
+        const requiredDelay = Duration(seconds: 1); 
+
+        if (timeSinceSignal < requiredDelay) {
+            // Calculate remaining delay needed to reach 1 second total
+            final delayNeeded = requiredDelay - timeSinceSignal; 
+            QuizzerLogger.logMessage('CirculationWorker: Recent activation detected. Delaying check by ${delayNeeded.inMilliseconds}ms...');
+            await Future.delayed(delayNeeded);
+            if (!_isRunning) return false; // Check if stopped during delay
+        }
+        QuizzerLogger.logMessage('CirculationWorker: Resuming check after handling recent activation signal.');
+    }
+    // 2. Now do the rest
     final eligibleRecords = await _eligibleCache.peekAllRecords();
 
     // Condition 1: Less than 20 eligible questions with streak < 3
@@ -132,7 +168,12 @@ class CirculationWorker {
     final totalEligibleCount = eligibleRecords.length;
     final bool lowTotalCondition = totalEligibleCount < 100;
 
-    return lowStreakCondition || lowTotalCondition;
+    // Condition 3: Non-circulating cache must NOT be empty
+    final bool nonCirculatingNotEmpty = !(await _nonCirculatingCache.isEmpty());
+
+    final bool shouldAdd = (lowStreakCondition || lowTotalCondition) && nonCirculatingNotEmpty;
+    // QuizzerLogger.logValue('CirculationWorker: shouldAdd Conditions -> lowStreak (<20): $lowStreakCount ($lowStreakCondition), lowTotal (<100): $totalEligibleCount ($lowTotalCondition), nonCircNotEmpty: $nonCirculatingNotEmpty -> Result: $shouldAdd');
+    return shouldAdd;
   }
 
   /// Selects the best non-circulating question and adds it to circulation.
