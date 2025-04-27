@@ -24,20 +24,30 @@ class EligibleQuestionsCache {
   Stream<void> get onRecordAdded => _addController.stream;
   // -------------------------
 
-  // --- Add Record ---
+  // --- Add Record (with duplicate check) ---
 
-  /// Adds a single eligible question record to the cache.
+  /// Adds a single eligible question record to the cache, only if a record
+  /// with the same question_id does not already exist.
   /// Ensures thread safety using a lock.
   Future<void> addRecord(Map<String, dynamic> record) async {
     // Assert required key exists
     assert(record.containsKey('question_id'), 'Record added to EligibleQuestionsCache must contain question_id');
+    final String questionId = record['question_id'] as String; // Assume assertion passes
 
     await _lock.synchronized(() {
-      final bool wasEmpty = _cache.isEmpty;
-      _cache.add(record);
-       if (wasEmpty && _cache.isNotEmpty) {
-        // QuizzerLogger.logMessage('EligibleQuestionsCache: Notifying record added.'); // Optional log
-        _addController.add(null);
+      // Check if record with the same question_id already exists
+      final bool alreadyExists = _cache.any((existing) => existing['question_id'] == questionId);
+
+      if (!alreadyExists) {
+        final bool wasEmpty = _cache.isEmpty;
+        _cache.add(record);
+        if (wasEmpty && _cache.isNotEmpty) {
+          // QuizzerLogger.logMessage('EligibleQuestionsCache: Notifying record added.'); // Optional log
+          _addController.add(null);
+        }
+        // QuizzerLogger.logMessage('EligibleQuestionsCache: Added $questionId.'); // Optional Log
+      } else {
+        QuizzerLogger.logMessage('EligibleQuestionsCache: Duplicate record skipped (QID: $questionId)'); // Optional Log
       }
     });
   }
@@ -98,6 +108,15 @@ class EligibleQuestionsCache {
     } else {
        // QuizzerLogger.logMessage('EligibleQuestionsCache is empty, nothing to flush.'); // Optional log
     }
+  }
+
+  // --- Check if Contains Question ID ---
+  /// Checks if a record with the specified questionId exists in the cache.
+  /// Ensures thread safety using a lock.
+  Future<bool> containsQuestionId(String questionId) async {
+    return await _lock.synchronized(() {
+      return _cache.any((record) => record['question_id'] == questionId);
+    });
   }
 
   // --- Check if Empty ---

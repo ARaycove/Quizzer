@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:synchronized/synchronized.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart'; // Import for logging
+import 'unprocessed_cache.dart'; // Import for flushing
 // import 'package:quizzer/backend_systems/logger/quizzer_logging.dart'; // Optional: if logging needed
 
 // ==========================================
@@ -17,6 +18,7 @@ class QuestionQueueCache {
   final Lock _lock = Lock();
   final List<Map<String, dynamic>> _cache = [];
   static const int queueThreshold = 10; // Threshold for signalling removal
+  final UnprocessedCache _unprocessedCache = UnprocessedCache(); // Added
 
   // --- Notification Stream (for removal) ---
   final StreamController<void> _removeController = StreamController<void>.broadcast();
@@ -24,17 +26,26 @@ class QuestionQueueCache {
   Stream<void> get onRecordRemoved => _removeController.stream;
   // -----------------------------------------
 
-  // --- Add Record ---
+  // --- Add Record (with duplicate check within this cache only) ---
 
-  /// Adds a single question record to the end of the queue.
+  /// Adds a single question record to the end of the queue, only if a record
+  /// with the same question_id does not already exist in this cache.
   /// Asserts that the record contains a 'question_id'.
   /// Ensures thread safety using a lock.
   Future<void> addRecord(Map<String, dynamic> record) async {
     // Assert required key exists
     assert(record.containsKey('question_id'), 'Record added to QuestionQueueCache must contain question_id');
+    final String questionId = record['question_id'] as String; // Assume assertion passes
 
-    await _lock.synchronized(() {
-      _cache.add(record);
+    await _lock.synchronized(() { // Lambda is no longer async
+      // Check only if it already exists in this QuestionQueueCache
+      final bool alreadyExists = _cache.any((existing) => existing['question_id'] == questionId);
+      if (!alreadyExists) {
+        _cache.add(record);
+        // QuizzerLogger.logMessage('QuestionQueueCache: Added $questionId.'); // Optional Log
+      } else {
+         QuizzerLogger.logMessage('QuestionQueueCache: Duplicate record skipped (QID: $questionId already in queue).'); // Optional Log
+      }
     });
   }
 
@@ -81,6 +92,44 @@ class QuestionQueueCache {
     return await _lock.synchronized(() {
       // Return a copy to prevent external modification
       return List<Map<String, dynamic>>.from(_cache);
+    });
+  }
+
+  // --- Flush Cache to Unprocessed ---
+  /// Removes all records from this cache and adds them to the UnprocessedCache.
+  /// Ensures thread safety using locks on both caches implicitly via their methods.
+  /// Sends a signal on [onRecordRemoved] if the cache was not empty before clearing.
+  Future<void> flushToUnprocessedCache() async {
+    List<Map<String, dynamic>> recordsToMove = []; // Initialize
+    bool wasNotEmpty = false; // Track if cache had items before flush
+    // Atomically get and clear records from this cache
+    await _lock.synchronized(() {
+      recordsToMove = List.from(_cache);
+      wasNotEmpty = _cache.isNotEmpty; // Check *before* clearing
+      _cache.clear();
+      // If it was not empty before clearing, signal that removals happened.
+      // This wakes up listeners waiting for space (like PresentationSelectionWorker).
+      if (wasNotEmpty) {
+         QuizzerLogger.logMessage('QuestionQueueCache: Flushed non-empty queue. Signaling removal.');
+         _removeController.add(null);
+      }
+    });
+
+    // Add the retrieved records to the unprocessed cache
+    if (recordsToMove.isNotEmpty) {
+       QuizzerLogger.logMessage('Flushing ${recordsToMove.length} records from QuestionQueueCache to UnprocessedCache.');
+       await _unprocessedCache.addRecords(recordsToMove);
+    } else {
+       // QuizzerLogger.logMessage('QuestionQueueCache was empty, nothing to flush.'); // Optional log
+    }
+  }
+
+  // --- Check if Contains Question ID ---
+  /// Checks if a record with the specified questionId exists in the cache.
+  /// Ensures thread safety using a lock.
+  Future<bool> containsQuestionId(String questionId) async {
+    return await _lock.synchronized(() {
+      return _cache.any((record) => record['question_id'] == questionId);
     });
   }
 

@@ -25,6 +25,8 @@ import 'package:quizzer/backend_systems/09_data_caches/due_date_within_24hrs_cac
 import 'package:quizzer/backend_systems/09_data_caches/eligible_questions_cache.dart';
 import 'package:quizzer/backend_systems/09_data_caches/question_queue_cache.dart';
 import 'package:quizzer/backend_systems/09_data_caches/answer_history_cache.dart';
+import 'package:quizzer/backend_systems/06_question_queue_server/question_selection_worker.dart';
+import 'session_toggle_scheduler.dart'; // Import the new scheduler
 
 
 /*
@@ -55,14 +57,14 @@ class SessionManager {
   final DatabaseMonitor _dbMonitor = getDatabaseMonitor();
   // Cache Instances (as instance variables)
   final UnprocessedCache                _unprocessedCache;
-  final NonCirculatingQuestionsCache _nonCirculatingCache;
-  final ModuleInactiveCache _moduleInactiveCache;
-  final CirculatingQuestionsCache _circulatingCache;
-  final DueDateBeyond24hrsCache _dueDateBeyondCache;
-  final DueDateWithin24hrsCache _dueDateWithinCache;
-  final EligibleQuestionsCache _eligibleCache;
-  final QuestionQueueCache _queueCache;
-  final AnswerHistoryCache _historyCache;
+  final NonCirculatingQuestionsCache    _nonCirculatingCache;
+  final ModuleInactiveCache             _moduleInactiveCache;
+  final CirculatingQuestionsCache       _circulatingCache;
+  final DueDateBeyond24hrsCache         _dueDateBeyondCache;
+  final DueDateWithin24hrsCache         _dueDateWithinCache;
+  final EligibleQuestionsCache          _eligibleCache;
+  final QuestionQueueCache              _queueCache;
+  final AnswerHistoryCache              _historyCache;
   bool      userLoggedIn = false;
   String?   userId;
   String?   userEmail;
@@ -86,6 +88,7 @@ class SessionManager {
   // Page history tracking
   final List<String> _pageHistory = [];
   static const int _maxHistoryLength = 12;
+  final ToggleScheduler _toggleScheduler = getToggleScheduler(); // Get scheduler instance
 
   // Initialize Hive storage (private)
   Future<void> _initializeStorage() async {
@@ -161,11 +164,15 @@ class SessionManager {
     QuizzerLogger.logMessage('SessionManager: PreProcessWorker started.');
     // -------------------------------------------------
 
+    // --- Wait for Presentation Selection Worker initial loop completion --- 
+    final psw = PresentationSelectionWorker();
+    QuizzerLogger.logMessage('SessionManager: Waiting for PresentationSelectionWorker initial loop completion signal...');
+    await psw.onInitialLoopComplete.first; // Waits for the signal
+    QuizzerLogger.logSuccess('SessionManager: PresentationSelectionWorker initial loop completed signal received.');
+    // ----------------------------------------------------------------------
+
     // TODO: Implement separate data sync process initialization if needed
 
-    // Optional: Keep a delay if needed for UI/other reasons, or remove.
-    // TODO: create a mechanism to detect when the question maintainer worker has started and picked an initial question
-    await Future.delayed(const Duration(seconds: 3));
     QuizzerLogger.logMessage('SessionManager post-worker-start initialization complete');
   }
 
@@ -356,35 +363,44 @@ class SessionManager {
     });
   }
 
-  // API for activating or deactivating a module
+  // API for activating or deactivating a module (Reverted to direct execution - Attempt 3)
   Future<void> toggleModuleActivation(String moduleName, bool activate) async {
     assert(userId != null);
-    QuizzerLogger.logMessage('Toggling module activation for user: $userId, module: $moduleName, activate: $activate'); 
+    QuizzerLogger.logMessage('Toggling module activation for user: $userId, module: $moduleName, activate: $activate');
+    
+    // 1. Update DB activation status FIRST (Assumes handleModuleActivation handles its own DB access/release)
+    await _toggleScheduler.requestToggleSlot();
     await handleModuleActivation({
       'userId': userId,
       'moduleName': moduleName,
       'isActive': activate,
     });
 
-    // When activation status is updated we also need to validate the profile questions
+    // --- Acquire DB Lock ONLY for validation ---
     Database? db;
     while (db == null) {
-      db = await _dbMonitor.requestDatabaseAccess();
+      db = await _dbMonitor.requestDatabaseAccess(); 
       if (db == null) {
-        QuizzerLogger.logMessage('SessionManager: Database access denied, waiting...');
+        QuizzerLogger.logMessage('SessionManager (toggle - validation): Database access denied, waiting...');
         await Future.delayed(const Duration(milliseconds: 250));
       }
     }
 
-    final currentUserId = userId!;
-    await validateAllModuleQuestions(db, currentUserId);
-    
-    // Now use the instance variable instead of creating a new instance
-    if (activate)   {await _moduleInactiveCache.flushToUnprocessedCache();}
-    if (!activate)  {await _eligibleCache.flushToUnprocessedCache();}
-    
+    // 2. Validate profile questions (needs DB)
+    await validateAllModuleQuestions(db, userId!); 
 
-    _dbMonitor.releaseDatabaseAccess();
+    // --- Release DB lock immediately after validation ---
+    _dbMonitor.releaseDatabaseAccess(); 
+    QuizzerLogger.logMessage('SessionManager (toggle - validation): DB released for $moduleName toggle.');
+    db = null; // Prevent accidental reuse
+    // ----------------------------------------------------
+
+    // 3. Flush caches (Does not need DB lock)
+    await _moduleInactiveCache.flushToUnprocessedCache();
+    await _eligibleCache.flushToUnprocessedCache();
+    await _queueCache.flushToUnprocessedCache();  
+    await _toggleScheduler.releaseToggleSlot();
+    // --- End Direct Execution Logic ---
   }
 
   // API for updating a module's description
@@ -398,88 +414,6 @@ class SessionManager {
     });
   }
   
-  //  ------------------------------------------------
-  // Add & Edit Question_Answer Pairs
-  // API for adding a question-answer pair to the database
-  Future<void> addQuestionAnswerPair({
-    required String timeStamp,
-    required List<Map<String, dynamic>> questionElements,
-    required List<Map<String, dynamic>> answerElements,
-    required String moduleName,
-    required String questionType,
-    required List<String>? sourcePaths, // If there are media to be uploaded they need to be passed
-    List<String>? options,
-    int? correctOptionIndex,
-  }) async {
-    // Validation
-    assert(userId != null);
-    // Need to construct the map before passing 
-    // Create a map with required fields
-    final Map<String, dynamic> questionData = {
-      'timeStamp':        timeStamp,
-      'questionElements': questionElements,
-      'answerElements':   answerElements,
-      'ansFlagged':       false,
-      'ansContrib':       userId,
-      'qstContrib':       userId,
-      'hasBeenReviewed':  false,
-      'flagForRemoval':   false,
-      'moduleName':       moduleName,
-      'questionType':     questionType,
-    };
-    // Add optional fields only if they're not null
-    if (options != null) {questionData['options'] = options;}
-    if (correctOptionIndex != null) {questionData['correctOptionIndex'] = correctOptionIndex;}
-    
-
-    // Add the Question Answer Pair to the database
-    QuizzerLogger.logMessage('Adding question-answer pair for module: $moduleName');
-    await handleAddQuestionAnswerPair({
-      'timeStamp':          timeStamp,
-      'questionElements':   questionElements,
-      'answerElements':     answerElements,
-      'ansFlagged':         false,
-      'ansContrib':         userId,
-      'qstContrib':         userId,
-      'hasBeenReviewed':    false,
-      'flagForRemoval':     false,
-      'moduleName':         moduleName,
-      'questionType':       questionType,
-      'options':            options,
-      'correctOptionIndex': correctOptionIndex,
-      });
-    // If there was an image related to the question answer pair submitted, move it to the correct location
-    // Move any image files to their final location if sourcePaths are provided
-    if (sourcePaths != null && sourcePaths.isNotEmpty) {
-      for (final path in sourcePaths) {
-        try {
-          await moveImageToFinalLocation(path);
-          QuizzerLogger.logMessage('Moved image file: $path');
-        } catch (e) {
-          QuizzerLogger.logError('Failed to move image file: $path - Error: $e');
-          // Continue with other files even if one fails
-        }
-      }
-    }
-
-    // Validate the user profile questions (that way if the added question belongs to a module they've added to it will get shown to them)
-    Database? db;
-    while (db == null) {
-      db = await dbMonitor.requestDatabaseAccess();
-      if (db == null) {
-        QuizzerLogger.logMessage('Database access denied, waiting...');
-        await Future.delayed(const Duration(milliseconds: 250));
-      }
-    }
-    dbMonitor.releaseDatabaseAccess();
-    // End of function  
-  }
-
-
-
-  /// Get the database monitor instance
-  DatabaseMonitor get dbMonitor => _dbMonitor;
-
   // --- Private Helper Functions ---
   
   /// Checks if the necessary session state is valid before submitting an answer.

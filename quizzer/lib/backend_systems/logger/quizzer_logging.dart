@@ -49,9 +49,10 @@ class QuizzerLogger {
     "question_queue_monitor.dart",
     "module_updates_process.dart",
     "modules_table.dart",
-    "module_isolates",
+    "module_isolates.dart",
     "answered_history_monitor.dart",
-    "user_question_answer_pairs_table.dart"
+    "user_question_answer_pairs_table.dart",
+    "module_inactive_cache.dart"
   ]; // List of source filenames to exclude
 
   /// Sets the list of source filenames (e.g., 'my_table.dart') to exclude from logging.

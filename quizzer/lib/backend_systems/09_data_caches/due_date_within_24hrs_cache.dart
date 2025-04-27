@@ -26,18 +26,20 @@ class DueDateWithin24hrsCache {
   Stream<void> get onRecordAdded => _addController.stream;
   // -------------------------
 
-  // --- Add Record ---
+  // --- Add Record (with duplicate check) ---
 
-  /// Adds a single question record if its due date is within 24 hours.
+  /// Adds a single question record if its due date is within 24 hours and
+  /// no record with the same question_id already exists.
   /// Asserts that the due date condition is met.
   /// Ensures thread safety using a lock.
-  /// Notifies listeners via [onRecordAdded] if the cache was empty.
+  /// Notifies listeners via [onRecordAdded] if the cache was empty and a record was added.
   Future<void> addRecord(Map<String, dynamic> record) async {
     // Basic validation: Ensure record has required keys
     if (!record.containsKey('question_id') || !record.containsKey('next_revision_due')) {
       QuizzerLogger.logWarning('Attempted to add invalid record (missing keys) to DueDateWithin24hrsCache');
       return; // Or throw ArgumentError
     }
+    final String questionId = record['question_id'] as String; // Assume key exists
 
     final dueDateString = record['next_revision_due'];
     if (dueDateString == null || dueDateString is! String) {
@@ -64,11 +66,19 @@ class DueDateWithin24hrsCache {
     }
 
     await _lock.synchronized(() {
-      final bool wasEmpty = _cache.isEmpty;
-      _cache.add(record);
-      if (wasEmpty && _cache.isNotEmpty) {
-        // QuizzerLogger.logMessage('DueDateWithin24hrsCache: Notifying record added.'); // Optional log
-        _addController.add(null);
+      // Check if record with the same question_id already exists
+      final bool alreadyExists = _cache.any((existing) => existing['question_id'] == questionId);
+
+      if (!alreadyExists) {
+        final bool wasEmpty = _cache.isEmpty;
+        _cache.add(record);
+        if (wasEmpty && _cache.isNotEmpty) {
+          // QuizzerLogger.logMessage('DueDateWithin24hrsCache: Notifying record added.'); // Optional log
+          _addController.add(null);
+        }
+        // QuizzerLogger.logMessage('DueDateWithin24hrsCache: Added $questionId.'); // Optional Log
+      } else {
+         QuizzerLogger.logMessage('DueDateWithin24hrsCache: Duplicate record skipped (QID: $questionId)'); // Optional Log
       }
     });
   }

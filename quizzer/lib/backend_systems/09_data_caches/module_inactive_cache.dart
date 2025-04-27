@@ -17,9 +17,10 @@ class ModuleInactiveCache {
   List<Map<String, dynamic>> _cache = [];
   final UnprocessedCache _unprocessedCache = UnprocessedCache(); // Get singleton instance
 
-  // --- Add Record ---
+  // --- Add Record (with duplicate check) ---
 
-  /// Adds a single module-inactive question record to the cache.
+  /// Adds a single module-inactive question record to the cache, only if a record
+  /// with the same question_id does not already exist.
   /// Ensures thread safety using a lock.
   Future<void> addRecord(Map<String, dynamic> record) async {
     // Basic validation: Ensure record has required key
@@ -27,8 +28,18 @@ class ModuleInactiveCache {
       QuizzerLogger.logWarning('Attempted to add invalid record (missing question_id) to ModuleInactiveCache');
       return; // Or throw ArgumentError
     }
+    final String questionId = record['question_id'] as String; // Assume key exists
+
     await _lock.synchronized(() {
-      _cache.add(record);
+      // Check if record with the same question_id already exists
+      final bool alreadyExists = _cache.any((existing) => existing['question_id'] == questionId);
+
+      if (!alreadyExists) {
+        _cache.add(record);
+        // QuizzerLogger.logMessage('ModuleInactiveCache: Added $questionId.'); // Optional Log
+      } else {
+         QuizzerLogger.logMessage('ModuleInactiveCache: Duplicate record skipped (QID: $questionId)'); // Optional Log
+      }
     });
   }
 

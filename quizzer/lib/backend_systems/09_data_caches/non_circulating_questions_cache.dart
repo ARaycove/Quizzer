@@ -23,11 +23,12 @@ class NonCirculatingQuestionsCache {
   Stream<void> get onRecordAdded => _addController.stream;
   // -------------------------
 
-  // --- Add Record ---
+  // --- Add Record (with duplicate check) ---
 
-  /// Adds a single non-circulating question record to the cache.
+  /// Adds a single non-circulating question record to the cache, only if a record
+  /// with the same question_id does not already exist.
   /// Ensures thread safety using a lock.
-  /// Notifies listeners via [onRecordAdded] if the cache was empty.
+  /// Notifies listeners via [onRecordAdded] if the cache was empty and a record was added.
   Future<void> addRecord(Map<String, dynamic> record) async {
     // Basic validation: Ensure record has required keys and correct state
     if (!record.containsKey('question_id') || !record.containsKey('in_circulation')) {
@@ -35,15 +36,25 @@ class NonCirculatingQuestionsCache {
       QuizzerLogger.logWarning('Attempted to add invalid record (missing keys) to NonCirculatingCache');
       return; // Or throw ArgumentError
     }
+    final String questionId = record['question_id'] as String; // Assume key exists
+
     // Assert that the record is indeed non-circulating
     assert(record['in_circulation'] == 0, 'Record added to NonCirculatingCache must have in_circulation == 0');
 
     await _lock.synchronized(() {
-      final bool wasEmpty = _cache.isEmpty;
-      _cache.add(record);
-      if (wasEmpty && _cache.isNotEmpty) {
-        // QuizzerLogger.logMessage('NonCirculatingCache: Notifying record added.'); // Optional log
-        _addController.add(null);
+      // Check if record with the same question_id already exists
+      final bool alreadyExists = _cache.any((existing) => existing['question_id'] == questionId);
+
+      if (!alreadyExists) {
+        final bool wasEmpty = _cache.isEmpty;
+        _cache.add(record);
+        if (wasEmpty && _cache.isNotEmpty) {
+          // QuizzerLogger.logMessage('NonCirculatingCache: Notifying record added.'); // Optional log
+          _addController.add(null);
+        }
+        // QuizzerLogger.logMessage('NonCirculatingCache: Added $questionId.'); // Optional Log
+      } else {
+         QuizzerLogger.logMessage('NonCirculatingCache: Duplicate record skipped (QID: $questionId)'); // Optional Log
       }
     });
   }

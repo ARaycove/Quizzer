@@ -18,9 +18,10 @@ class DueDateBeyond24hrsCache {
   List<Map<String, dynamic>> _cache = [];
   final UnprocessedCache _unprocessedCache = UnprocessedCache(); // Get singleton instance
 
-  // --- Add Record ---
+  // --- Add Record (with duplicate check) ---
 
-  /// Adds a single question record if its due date is beyond 24 hours.
+  /// Adds a single question record if its due date is beyond 24 hours and
+  /// no record with the same question_id already exists.
   /// Asserts that the due date condition is met.
   /// Ensures thread safety using a lock.
   Future<void> addRecord(Map<String, dynamic> record) async {
@@ -29,6 +30,7 @@ class DueDateBeyond24hrsCache {
       QuizzerLogger.logWarning('Attempted to add invalid record (missing keys) to DueDateBeyond24hrsCache');
       return; // Or throw ArgumentError
     }
+    final String questionId = record['question_id'] as String; // Assume key exists
 
     final dueDateString = record['next_revision_due'];
     if (dueDateString == null || dueDateString is! String) {
@@ -36,14 +38,8 @@ class DueDateBeyond24hrsCache {
        return;
     }
 
-    DateTime? parsedDueDate;
-    try {
-        parsedDueDate = DateTime.parse(dueDateString);
-    } catch (e) { // Catch parsing errors specifically
-        QuizzerLogger.logError('Failed to parse next_revision_due string: $dueDateString - Error: $e');
-        // Fail fast: Throw an error if parsing fails, as the date is critical
-        throw FormatException('Invalid date format for next_revision_due: $dueDateString');
-    }
+    // REMOVED try-catch block - DateTime.parse will now Fail Fast on invalid format
+    final DateTime parsedDueDate = DateTime.parse(dueDateString);
 
     final now = DateTime.now();
     final twentyFourHoursFromNow = now.add(const Duration(hours: 24));
@@ -61,7 +57,15 @@ class DueDateBeyond24hrsCache {
     }
 
     await _lock.synchronized(() {
-      _cache.add(record);
+      // Check if record with the same question_id already exists
+      final bool alreadyExists = _cache.any((existing) => existing['question_id'] == questionId);
+
+      if (!alreadyExists) {
+        _cache.add(record);
+        // QuizzerLogger.logMessage('DueDateBeyond24hrsCache: Added $questionId.'); // Optional Log
+      } else {
+         QuizzerLogger.logMessage('DueDateBeyond24hrsCache: Duplicate record skipped (QID: $questionId)'); // Optional Log
+      }
     });
   }
 
