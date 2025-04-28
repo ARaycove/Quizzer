@@ -75,7 +75,4 @@ Map<String, dynamic> calculateNextRevisionDate(String status, int revisionStreak
   };
 }
 
-// Removed calculateAverageShown as its result is included in calculateNextRevisionDate's return map.
-// Removed _calculateMemoryRetentionMetrics helper function as its logic is inlined above.
-
 

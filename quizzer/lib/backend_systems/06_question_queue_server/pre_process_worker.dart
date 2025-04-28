@@ -9,6 +9,7 @@ import 'package:quizzer/backend_systems/09_data_caches/due_date_beyond_24hrs_cac
 import 'package:quizzer/backend_systems/09_data_caches/due_date_within_24hrs_cache.dart';
 import 'package:quizzer/backend_systems/09_data_caches/circulating_questions_cache.dart';
 import 'package:quizzer/backend_systems/09_data_caches/module_inactive_cache.dart';
+import 'package:quizzer/backend_systems/09_data_caches/past_due_cache.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/backend_systems/09_data_caches/unprocessed_cache.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
@@ -38,6 +39,7 @@ class PreProcessWorker {
   final ModuleInactiveCache           _moduleInactiveCache  = ModuleInactiveCache();
   final DueDateBeyond24hrsCache       _dueDateBeyondCache   = DueDateBeyond24hrsCache();
   final DueDateWithin24hrsCache       _dueDateWithinCache   = DueDateWithin24hrsCache();
+  final PastDueCache                  _pastDueCache         = PastDueCache();
   final CirculatingQuestionsCache     _circulatingCache     = CirculatingQuestionsCache();
   final DatabaseMonitor               _dbMonitor            = getDatabaseMonitor();
   final SessionManager                _sessionManager       = getSessionManager(); // Get SessionManager instance
@@ -258,20 +260,24 @@ class PreProcessWorker {
       destinationCacheName = "NonCirculatingQuestionsCache";
       routeToAdd = _nonCirculatingCache.addRecord(record);
     } else {
-      // Add ID first 
-      await _circulatingCache.addQuestionId(questionId); 
+      // Add ID first
+      await _circulatingCache.addQuestionId(questionId);
       // Check stop signal again *after* adding ID but *before* adding full record
       if (!_isRunning) {
           await _unprocessedCache.addRecord(record);
           return;
       }
-      // Now determine final destination
-      if (parsedDueDate.isAfter(twentyFourHoursFromNow)) {
-        destinationCacheName = "DueDateBeyond24hrsCache";
-        routeToAdd = _dueDateBeyondCache.addRecord(record);
-      } else {
+      // Now determine final destination (updated logic)
+      final now = DateTime.now(); // Need current time for past due check
+      if (parsedDueDate.isBefore(now)) { // Check if past due first
+        destinationCacheName = "PastDueCache";
+        routeToAdd = _pastDueCache.addRecord(record);
+      } else if (parsedDueDate.isBefore(twentyFourHoursFromNow)) { // Then check if within 24hrs
         destinationCacheName = "DueDateWithin24hrsCache";
         routeToAdd = _dueDateWithinCache.addRecord(record);
+      } else { // Otherwise, it must be beyond 24hrs
+        destinationCacheName = "DueDateBeyond24hrsCache";
+        routeToAdd = _dueDateBeyondCache.addRecord(record);
       }
     }
 

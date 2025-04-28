@@ -234,6 +234,25 @@ Future<Map<String, dynamic>> getQuestionAnswerPairById(String questionId, Databa
   if(result.containsKey('answer_elements')){
       result['answer_elements'] = _parseElements(result['answer_elements']);
   }
+  // Parse options CSV string into List<String>
+  if (result.containsKey('options')) {
+    final optionsCsv = result['options'] as String?;
+    if (optionsCsv != null && optionsCsv.isNotEmpty) {
+      result['options'] = optionsCsv.split(',');
+    } else {
+      result['options'] = <String>[]; // Empty list if null or empty CSV
+    }
+  }
+
+  // Parse correct_order CSV string into List<Map<String, dynamic>>
+  if (result.containsKey('correct_order')) {
+    final correctOrderCsv = result['correct_order'] as String?;
+    if (correctOrderCsv != null && correctOrderCsv.isNotEmpty) {
+      result['correct_order'] = _parseElements(correctOrderCsv);
+    } else {
+      result['correct_order'] = <Map<String, dynamic>>[]; // Empty list if null or empty CSV
+    }
+  }
   // Ensure subjects is parsed if needed, although it might already be a string
   // if (result.containsKey('subjects')) { ... parsing logic if needed ... }
 
@@ -380,3 +399,5 @@ Future<Set<String>> getUniqueConcepts(Database db) async {
   QuizzerLogger.logSuccess('Retrieved ${concepts.length} unique concepts');
   return concepts;
 }
+
+// TODO We should have a dedicated function to add a question answer pair, for each question type

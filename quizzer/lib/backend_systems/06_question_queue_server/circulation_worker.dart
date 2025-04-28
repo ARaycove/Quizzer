@@ -207,10 +207,7 @@ class CirculationWorker {
       currentRatio,
       nonCirculatingRecords
     );
-
-    if (selectedRecord != null) {
-       await _addQuestionToCirculation(userId, selectedRecord);
-    } 
+    await _addQuestionToCirculation(userId, selectedRecord);
   }
 
   /// Calculates the subject distribution ratio of currently circulating questions

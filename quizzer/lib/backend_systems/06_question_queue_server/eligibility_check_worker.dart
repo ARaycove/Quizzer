@@ -9,9 +9,11 @@ import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dar
 import 'package:quizzer/backend_systems/06_question_queue_server/circulation_worker.dart'; // Import CirculationWorker
 import 'package:quizzer/backend_systems/06_question_queue_server/switch_board.dart'; // Import SwitchBoard
 import 'package:sqflite_common_ffi/sqflite_ffi.dart'; // Needed for Database type
+import 'due_date_worker.dart'; // ADDED: Import DueDateWorker
 // Table function imports
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pairs_table.dart' show getModuleNameForQuestionId;
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile_table.dart' as user_profile_table;
+import 'package:quizzer/backend_systems/09_data_caches/past_due_cache.dart'; // Added
 
 /// Checks if a given user question record is eligible to be shown.
 Future<bool> isUserRecordEligible(Map<String, dynamic> record) async {
@@ -94,7 +96,7 @@ class EligibilityCheckWorker {
   bool _isInitialLoop = true; // Flag for initial loop
 
   // Cache instances & Managers/Monitors needed
-  final DueDateWithin24hrsCache _dueDateWithinCache = DueDateWithin24hrsCache();
+  final PastDueCache            _pastDueCache = PastDueCache(); // ADDED
   final EligibleQuestionsCache  _eligibleCache = EligibleQuestionsCache();
   final UnprocessedCache        _unprocessedCache = UnprocessedCache();
   final AnswerHistoryCache      _historyCache = AnswerHistoryCache(); // For check #1
@@ -150,18 +152,18 @@ class EligibilityCheckWorker {
      QuizzerLogger.logMessage('EligibilityCheckWorker: Starting initial loop...');
      final Set<String> processedInCycle = {}; // Track IDs processed during initial loop
 
-     // Exhaust DueDateWithin24hrsCache
-     QuizzerLogger.logMessage('Initial Loop: Processing DueDateWithin24hrsCache...');
+     // Exhaust PastDueCache (CHANGED)
+     QuizzerLogger.logMessage('Initial Loop: Processing PastDueCache...');
      Map<String, dynamic> record;
      do {
        if (!_isRunning) break;
-       record = await _dueDateWithinCache.getAndRemoveRecord();
+       record = await _pastDueCache.getAndRemoveOldestRecord();
        if (record.isNotEmpty) {
          await _processSingleRecord(record, processedInCycle);
        }
      } while (record.isNotEmpty && _isRunning);
 
-     QuizzerLogger.logSuccess('Initial Loop: Finished processing initial records.');
+     QuizzerLogger.logSuccess('Initial Loop: Finished processing initial records from PastDueCache.');
 
      if (!_isRunning) return; // Check if stopped during initial processing
 
@@ -170,29 +172,35 @@ class EligibilityCheckWorker {
      final circulationWorker = CirculationWorker(); // Get singleton instance
      circulationWorker.start(); // Start the next worker
 
-     QuizzerLogger.logSuccess('EligibilityCheckWorker: Initial loop completed and Circulation Worker started.');
+     // --- Start Due Date Worker (ADDED) ---
+     QuizzerLogger.logMessage('EligibilityCheckWorker: Starting Due Date Worker...');
+     final dueDateWorker = DueDateWorker(); // Get singleton instance
+     dueDateWorker.start();
+     // --------------------------------
+
+     QuizzerLogger.logSuccess('EligibilityCheckWorker: Initial loop completed and Circulation/DueDate Workers started.'); // Updated log
   }
 
   /// Processes records from input caches sequentially, sleeping if caches are empty.
   Future<void> _performSubsequentLoop() async {
     if (!_isRunning) return;
 
-    // Check if the primary input cache is empty
-    if (await _dueDateWithinCache.isEmpty()) {
-      // If empty, wait for a notification that a record was added
-      // QuizzerLogger.logMessage('EligibilityCheckWorker: DueDateWithin24hrsCache empty, waiting for new records...');
+    // Check if the primary input cache is empty (CHANGED)
+    if (await _pastDueCache.isEmpty()) {
+      // If empty, wait for a notification that a record was added (CHANGED)
+      QuizzerLogger.logMessage('EligibilityCheckWorker: PastDueCache empty, waiting for new records...');
       
-      // Await the stream notification. This will Fail Fast on any stream error.
-      await _switchBoard.onDueDateWithin24hrsAdded.first;
+      // Await the stream notification. This will Fail Fast on any stream error. (CHANGED)
+      await _switchBoard.onPastDueCacheAdded.first;
       
-      // QuizzerLogger.logMessage('EligibilityCheckWorker: Woke up by DueDateWithin24hrsCache notification.');
+      QuizzerLogger.logMessage('EligibilityCheckWorker: Woke up by PastDueCache notification.');
       // Loop will continue and re-evaluate isEmpty()
 
     } else {
-      // If not empty, get and process one record from DueDateWithin24hrsCache
-      final record = await _dueDateWithinCache.getAndRemoveRecord();
+      // If not empty, get and process one record from PastDueCache (CHANGED)
+      final record = await _pastDueCache.getAndRemoveOldestRecord();
       if (record.isNotEmpty) {
-        // QuizzerLogger.logMessage('EligibilityCheckWorker: Found record in DueDateWithin24hrsCache, processing...');
+        QuizzerLogger.logMessage('EligibilityCheckWorker: Found record in PastDueCache, processing...');
         await _processSingleRecord(record, {}); // Pass empty set for cycle tracking
 
         // Add a check AFTER processing attempt: if worker was stopped DURING processing, put record back.
@@ -202,7 +210,7 @@ class EligibilityCheckWorker {
         }
       } 
       // else { // Record was empty, likely race condition
-      //   QuizzerLogger.logWarning('EligibilityCheckWorker: DueDateWithin24hrsCache not empty but getRecord failed?');
+      //   QuizzerLogger.logWarning('EligibilityCheckWorker: PastDueCache not empty but getRecord failed?');
       // }
     }
   }

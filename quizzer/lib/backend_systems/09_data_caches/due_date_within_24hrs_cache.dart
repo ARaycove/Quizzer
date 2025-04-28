@@ -87,6 +87,33 @@ class DueDateWithin24hrsCache {
      });
   }
 
+  // --- Get and Remove Record by Question ID (ADDED) ---
+  /// Retrieves and removes the first record matching the given questionId.
+  /// Ensures thread safety using a lock.
+  /// Returns the found record, or an empty Map `{}` if no matching record is found.
+  Future<Map<String, dynamic>> getAndRemoveRecordByQuestionId(String questionId) async {
+     return await _lock.synchronized(() {
+       int foundIndex = -1;
+       for (int i = 0; i < _cache.length; i++) {
+         final record = _cache[i];
+         // Check key exists and matches
+         if (record.containsKey('question_id') && record['question_id'] == questionId) {
+           foundIndex = i;
+           break;
+         }
+       }
+
+       if (foundIndex != -1) {
+         // Remove the record at the found index and return it
+         return _cache.removeAt(foundIndex);
+       } else {
+         // Return an empty map if no record was found
+         QuizzerLogger.logWarning('DueDateWithin24hrsCache: Record not found for removal (QID: $questionId)');
+         return <String, dynamic>{};
+       }
+     });
+  }
+
   // --- Peek All Records (Read-Only) ---
   /// Returns a read-only copy of all records currently in the cache.
   /// Ensures thread safety using a lock.

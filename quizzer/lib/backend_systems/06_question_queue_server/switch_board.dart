@@ -72,6 +72,23 @@ class SwitchBoard {
   }
   // -------------------------------------
 
+  // --- Past Due Cache Stream (New) ---
+  final StreamController<void> _pastDueCacheController = StreamController<void>.broadcast();
+
+  /// Stream that fires when a record is added to a previously empty PastDueCache.
+  Stream<void> get onPastDueCacheAdded => _pastDueCacheController.stream;
+
+  /// Signals that a record has been added to the PastDueCache when it was empty.
+  void signalPastDueCacheAdded() {
+    if (!_pastDueCacheController.isClosed) {
+       QuizzerLogger.logMessage('SwitchBoard: Signaling PastDueCache added.');
+      _pastDueCacheController.add(null);
+    } else {
+       QuizzerLogger.logWarning('SwitchBoard: Attempted to signal on closed PastDueCache stream.');
+    }
+  }
+  // -------------------------------------
+
   // --- Dispose Method ---
   /// Closes all stream controllers. Should be called on application shutdown.
   void dispose() {
@@ -79,6 +96,7 @@ class SwitchBoard {
     _dueDateWithin24hrsController.close();
     _moduleActivatedController.close(); // Close original controller
     _moduleRecentlyActivatedController.close(); // Close new controller
+    _pastDueCacheController.close(); // Close new PastDue stream
     QuizzerLogger.logMessage('SwitchBoard disposed.');
   }
   // --------------------

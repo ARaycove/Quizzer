@@ -46,6 +46,7 @@ class QuizzerLogger {
     "login_attempts_table.dart",
     "login_attempts_record.dart",
     "session_manager.dart",
+    "circulation_worker.dart",
     "question_queue_monitor.dart",
     "module_updates_process.dart",
     "modules_table.dart",
@@ -54,7 +55,8 @@ class QuizzerLogger {
     "user_question_answer_pairs_table.dart",
     "module_inactive_cache.dart",
     "session_toggle_scheduler.dart",
-    "unprocessed_cache.dart"
+    "unprocessed_cache.dart",
+    "past_due_cache.dart"
   ]; // List of source filenames to exclude
 
   /// Sets the list of source filenames (e.g., 'my_table.dart') to exclude from logging.
