@@ -1,13 +1,14 @@
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile_table.dart';
+import 'package:quizzer/backend_systems/06_question_queue_server/inactive_module_worker.dart';
 import 'package:quizzer/backend_systems/07_user_question_management/user_question_processes.dart' show validateAllModuleQuestions;
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pairs_table.dart' as q_pairs_table;
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_question_answer_pairs_table.dart' as uqap_table;
-import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_attempts_table.dart' as attempt_table;
 import 'package:quizzer/backend_systems/03_account_creation/new_user_signup.dart' as account_creation;
 import 'package:quizzer/backend_systems/04_module_management/module_updates_process.dart';
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
 import 'package:quizzer/backend_systems/04_module_management/module_isolates.dart';
 import 'package:quizzer/backend_systems/02_login_authentication/user_auth.dart';
+import 'package:quizzer/backend_systems/09_data_caches/past_due_cache.dart';
 import 'package:quizzer/backend_systems/session_manager/session_isolates.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
@@ -17,7 +18,6 @@ import 'package:quizzer/backend_systems/06_question_queue_server/pre_process_wor
 import 'package:path/path.dart' as p; // Use alias to avoid conflicts
 import 'dart:async'; // For Completer
 import 'dart:io'; // For Directory
-import 'dart:convert'; // For jsonEncode
 
 import 'package:path_provider/path_provider.dart'; // For mobile path
 // Data Caches for Backend management
@@ -35,6 +35,9 @@ import 'session_toggle_scheduler.dart'; // Import the new scheduler
 import 'package:quizzer/backend_systems/06_question_queue_server/switch_board.dart'; // Import SwitchBoard
 import 'package:quizzer/backend_systems/session_manager/session_helper.dart';
 import 'package:quizzer/backend_systems/session_manager/session_answer_validation.dart' as answer_validator;
+import 'package:quizzer/backend_systems/06_question_queue_server/circulation_worker.dart';
+import 'package:quizzer/backend_systems/06_question_queue_server/due_date_worker.dart';
+import 'package:quizzer/backend_systems/06_question_queue_server/eligibility_check_worker.dart';
 
 
 
@@ -75,6 +78,7 @@ class SessionManager {
   final       QuestionQueueCache              _queueCache;
   final       AnswerHistoryCache              _historyCache;
   final       SwitchBoard                     _switchBoard; // Add SwitchBoard instance
+  final       PastDueCache                    _pastDueCache = PastDueCache();
 
   // user State
               bool                            userLoggedIn = false;
@@ -235,7 +239,20 @@ class SessionManager {
     _isAnswerSubmitted            = false; // Reset the flag
     
   }
-  /// TODO clear sessionState function (to be called when logout is called)
+
+  /// Clears all session-specific user state.
+  void _clearSessionState() {
+    QuizzerLogger.logMessage("Clearing session state...");
+    userLoggedIn = false;
+    userId = null;
+    userEmail = null;
+    userRole = null;
+    sessionStartTime = null;
+    _clearQuestionState(); // Clear current question state
+    clearPageHistory(); // Clear navigation history
+    // Note: Does not stop workers or clear persistent storage, assumes logout function handles that.
+    QuizzerLogger.logSuccess("Session state cleared.");
+  }
 
   // =================================================================================
   // =================================================================================
@@ -282,9 +299,81 @@ class SessionManager {
   }
 
   //  --------------------------------------------------------------------------------
-  /// TODO Logout function that will call the clearSessionState function (also not written)
-  /// 
-  /// 
+  /// Logs out the current user, stops workers, clears caches, and resets state.
+  Future<void> logoutUser() async {
+    QuizzerLogger.printHeader("Starting User Logout Process...");
+
+    if (!userLoggedIn) {
+      QuizzerLogger.logWarning("Logout called, but no user was logged in.");
+      return;
+    }
+
+    // 1. Stop Workers (Order might matter depending on dependencies, stop consumers first?)
+    QuizzerLogger.logMessage("Stopping background workers...");
+    // Get worker instances (assuming they are singletons accessed via factory)
+    final psw                   = PresentationSelectionWorker();
+    final dueDateWorker         = DueDateWorker();
+    final circulationWorker     = CirculationWorker();
+    final eligibilityWorker     = EligibilityCheckWorker();
+    final preProcessWorker      = PreProcessWorker(); 
+    final inactiveModuleWorker  = InactiveModuleWorker();
+    
+    // Stop them (await completion)
+    await psw.stop();
+    await dueDateWorker.stop();
+    await circulationWorker.stop();
+    await eligibilityWorker.stop();
+    await preProcessWorker.stop(); 
+    await inactiveModuleWorker.stop();
+    QuizzerLogger.logSuccess("Background workers stopped.");
+
+    // 2. Clear Caches (TODO: Implement clear methods in caches)
+    QuizzerLogger.logMessage("Clearing data caches...");
+    _queueCache.          clear();
+    _eligibleCache.       clear();
+    _dueDateWithinCache.  clear();
+    _dueDateBeyondCache.  clear();
+    _pastDueCache.        clear();
+    _circulatingCache.    clear();
+    _nonCirculatingCache. clear();
+    _moduleInactiveCache. clear(); 
+    _unprocessedCache.    clear();
+    _historyCache.        clear();
+    QuizzerLogger.logSuccess("Data caches cleared (Placeholder - Clear methods TBD).");
+
+    // Update total study time
+    if (sessionStartTime != null && userId != null) {
+      final Duration elapsedDuration = DateTime.now().difference(sessionStartTime!); // Use non-null assertion
+      final double hoursToAdd = elapsedDuration.inMilliseconds / (1000.0 * 60 * 60);
+      Database? db;
+      db = await _dbMonitor.requestDatabaseAccess();
+      QuizzerLogger.logMessage("Updating total study time for user $userId...");
+      await updateTotalStudyTime(userId!, hoursToAdd, db!); // Let it throw if it fails
+      QuizzerLogger.logSuccess("Total study time updated.");
+      _dbMonitor.releaseDatabaseAccess(); // Release lock AFTER successful update
+    }
+
+    // 3. Sign out from Supabase
+    QuizzerLogger.logMessage("Signing out from Supabase...");
+    try {
+       await supabase.auth.signOut();
+       QuizzerLogger.logSuccess("Supabase sign out successful.");
+    } catch (e) {
+       // Log error but continue logout process
+       QuizzerLogger.logError("Error during Supabase sign out: $e"); 
+    }
+
+    // 4. Clear local session token (ensure key matches auth logic)
+    QuizzerLogger.logMessage("Clearing local session token...");
+    await _storage.delete('supabase.auth.token'); // Assume returns Future<void>
+    QuizzerLogger.logSuccess("Local session token cleared.");
+
+    // 5. Reset SessionManager state
+    _clearSessionState(); // Already logs internally
+
+    QuizzerLogger.printHeader("User Logout Process Completed.");
+  }
+
   //  --------------------------------------------------------------------------------
   // Manage Page History
   // Add page to history
@@ -406,6 +495,7 @@ class SessionManager {
     // 1. Flush current question record (if exists) to UnprocessedCache
     if (_currentQuestionRecord != null) {
         await _unprocessedCache.addRecord(_currentQuestionRecord!); 
+        await _historyCache.addRecord(_currentQuestionRecord!['question_id']);
     }
 
     // 2. Clear existing question state
@@ -492,11 +582,10 @@ class SessionManager {
 
     // --- 3. Determine Correctness ---
            bool    isCorrect;
-     final String  questionType  = currentQuestionType; // Use getter
      final String  questionId    = currentQuestionId;     // Use getter
   
       // TODO: Implement correctness logic for all question types
-      switch (questionType) {
+      switch (_currentQuestionType) {
         case 'multiple_choice':
           final int? correctIndex = currentCorrectOptionIndex;
           isCorrect = answer_validator.validateMultipleChoiceAnswer(
@@ -520,7 +609,7 @@ class SessionManager {
         //   isCorrect = /* ... comparison logic ... */ ;
         //   break;
         default:
-           throw UnimplementedError('Correctness check not implemented for question type: $questionType');
+           throw UnimplementedError('Correctness check not implemented for question type: $_currentQuestionType');
       }
 
     // --- 4. Calculate Updated User Record ---

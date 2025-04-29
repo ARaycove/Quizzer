@@ -2,19 +2,16 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:logging/logging.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
-import 'dart:math';
 import 'test_helpers.dart';
-import 'dart:convert';
-import 'dart:io';
 
 void main() {
   // Ensure logger is initialized first, setting level to FINE to see logValue messages
   QuizzerLogger.setupLogging(level: Level.FINE);
   test('login and worker start up', () async {
     final sessionManager = getSessionManager();
-    final email     = 'example_01@example.com';
-    final password  = 'password1';
-    final username  = 'example 01';
+    const email     = 'example_01@example.com';
+    const password  = 'password1';
+    const username  = 'example 01';
 
     QuizzerLogger.printHeader('Attempting initial login for $email...');
     Map<String, dynamic> loginResult = await sessionManager.attemptLogin(email, password);
@@ -75,83 +72,77 @@ void main() {
 
     // REMOVED Cache Monitoring Loop from here
 
-  }, timeout: Timeout(Duration(minutes: 1))); // Reduced timeout slightly
+  }, timeout: const Timeout(Duration(minutes: 1))); // Reduced timeout slightly
 
-  test('add all number_properties questions', () async {
+
+
+  test('Question loop test', () async {
     final sessionManager = getSessionManager();
     assert(sessionManager.userLoggedIn, "User must be logged in for this test");
 
-    QuizzerLogger.printHeader('Starting Add All Number Properties Questions Test...');
+    QuizzerLogger.printHeader('Starting requestNextQuestion loop test (3 iterations)...');
 
-    // 1. Read the JSON file
-    final filePath = 'runtime_cache/number_properties_questions.json';
-    QuizzerLogger.logMessage('Reading questions from: $filePath');
-    final file = File(filePath);
-    assert(await file.exists(), "JSON file not found: $filePath. Run the generation script first.");
-    final jsonString = await file.readAsString();
-
-    // 2. Decode JSON (Removed try-catch for Fail Fast)
-    List<dynamic> questionsJson = jsonDecode(jsonString) as List<dynamic>;
-    QuizzerLogger.logSuccess('Successfully decoded ${questionsJson.length} questions from JSON.');
-
-    // 3. Loop and add each question
-    int addedCount = 0;
-    for (final questionData in questionsJson) {
-      // Cast to Map<String, dynamic> for easier access
-      final questionMap = questionData as Map<String, dynamic>; 
-
-      // Extract parameters (with type casting)
-      final String moduleName = questionMap['moduleName'] as String;
-      final String questionType = questionMap['questionType'] as String;
-      // Cast inner list elements too
-      final List<Map<String, dynamic>> questionElements = (questionMap['questionElements'] as List<dynamic>)
-          .map((e) => Map<String, dynamic>.from(e as Map)).toList();
-      final List<Map<String, dynamic>> answerElements = (questionMap['answerElements'] as List<dynamic>)
-          .map((e) => Map<String, dynamic>.from(e as Map)).toList();
-      final List<Map<String, dynamic>> options = (questionMap['options'] as List<dynamic>)
-          .map((e) => Map<String, dynamic>.from(e as Map)).toList();
-      // Specifically cast indexOptionsThatApply to List<int>
-      final List<int> indexOptionsThatApply = (questionMap['indexOptionsThatApply'] as List<dynamic>)
-          .map((e) => e as int).toList(); 
-
-      // Assert the type is correct before calling addNewQuestion
-      assert(questionType == 'select_all_that_apply', 
-             "Unexpected question type found in JSON: $questionType");
-
-      // Call addNewQuestion
-      final response = await sessionManager.addNewQuestion(
-        questionType: questionType,
-        moduleName: moduleName,
-        questionElements: questionElements,
-        answerElements: answerElements,
-        options: options,
-        indexOptionsThatApply: indexOptionsThatApply,
-        // Set other common fields to defaults or null as needed
-        citation: null,
-        concepts: null,
-        subjects: null,
-        // Correct option index is not used for this type
-        correctOptionIndex: null, 
-        correctOrderElements: null,
-      );
-
-      // Assert success
-      expect(response['success'], isTrue,
-             reason: 'Failed to add question ${questionMap['questionElements']}: ${response['message']}');
-      addedCount++;
-      
-      // Log current state (Note: Won't show the *just added* question details)
+    for (int i = 1; i <= 10; i++) {
+    QuizzerLogger.printDivider();
+      QuizzerLogger.logMessage('--- Iteration $i ---');
+      QuizzerLogger.logMessage('--- State BEFORE requestNextQuestion Call ---');
+      // Call the new helper function
       await logCurrentQuestionDetails(sessionManager);
-      // Wait 250ms between adds
-      await waitTime(250); 
+      await logCurrentUserQuestionRecordDetails(sessionManager);
+      await logCurrentUserRecordFromDB(sessionManager);
+      await waitTime(250);
+
+
+
+      QuizzerLogger.logMessage('Calling requestNextQuestion...');
+      await sessionManager.requestNextQuestion();
+      QuizzerLogger.logMessage('--- State AFTER requestNextQuestion Call ---');
+      // Call the new helper function again
+      await logCurrentQuestionDetails(sessionManager);
+      await waitTime(250);
+
+      QuizzerLogger.logMessage('Submitting random answer');
+      if (sessionManager.currentQuestionType == "multiple_choice") {
+        await sessionManager.submitAnswer(userAnswer: getRandomMultipleChoiceAnswer(sessionManager));
+      } else if (sessionManager.currentQuestionType == "select_all_that_apply") {
+        await sessionManager.submitAnswer(userAnswer: getRandomSelectAllAnswer(sessionManager));
+      }
+      
+      await waitTime(250);
+      await logCurrentUserQuestionRecordDetails(sessionManager);
+      await logCurrentUserRecordFromDB(sessionManager);
+      await waitTime(250);
+
+      // Monitor caches to observe changes
+      await monitorCaches(monitoringSeconds: 1);
     }
 
-    QuizzerLogger.logSuccess('Successfully attempted to add $addedCount questions.');
-    QuizzerLogger.printHeader('Finished Add All Number Properties Questions Test.');
+    QuizzerLogger.printHeader('Finished requestNextQuestion loop test.');
+  }, timeout: const Timeout(Duration(minutes: 300))); // Allow more time for loops + monitoring
 
-    // Monitor caches to see if questions were processed
-    await monitorCaches(monitoringSeconds: 60);
-  
-  }, timeout: Timeout(Duration(minutes: 3))); // Increased timeout for monitoring
+
+  test('logoutUser test', () async {
+    final sessionManager = getSessionManager();
+    QuizzerLogger.printHeader('Starting logoutUser test...');
+
+    // Ensure user is logged in before attempting logout
+    assert(sessionManager.userLoggedIn, "User must be logged in before testing logout.");
+    QuizzerLogger.logMessage('User confirmed logged in. Attempting logout...');
+
+    // Call the logout function
+    await sessionManager.logoutUser();
+
+    QuizzerLogger.logSuccess('logoutUser() called. Verifying logged-out state...');
+
+    // Assertions: Verify user is logged out
+    expect(sessionManager.userLoggedIn, isFalse, reason: "userLoggedIn should be false after logout.");
+    expect(sessionManager.userId, isNull, reason: "userId should be null after logout.");
+
+    // Optional: Add checks for cleared caches if logout is expected to clear them
+    // Example: expect(await AnswerHistoryCache().peekHistory(), isEmpty, reason: "AnswerHistoryCache should be empty after logout.");
+
+    QuizzerLogger.logSuccess('logoutUser test completed successfully.');
+  });
+
 
 }

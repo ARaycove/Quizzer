@@ -11,7 +11,7 @@ class UnprocessedCache {
   UnprocessedCache._internal(); // Private constructor
 
   final Lock _lock = Lock();
-  List<Map<String, dynamic>> _cache = [];
+  final List<Map<String, dynamic>> _cache = [];
 
   // --- Notification Stream ---
   // Used to notify listeners (like PreProcessWorker) when a record is added to an empty cache.
@@ -32,13 +32,10 @@ class UnprocessedCache {
        QuizzerLogger.logError('UnprocessedCache: Attempted to add record missing question_id.');
        throw StateError("Can't do that");
     }
-
-    bool recordAdded = false;
     await _lock.synchronized(() {
         QuizzerLogger.logValue('[UnprocessedCache.addRecord START] QID: $questionId, Cache Size Before: ${_cache.length}');
         final bool wasEmpty = _cache.isEmpty;
         _cache.add(record);
-        recordAdded = true;
         if (wasEmpty) {
           QuizzerLogger.logMessage('[UnprocessedCache.addRecord] Added to empty cache, signaling addController.');
           _addController.add(null);
@@ -155,6 +152,15 @@ class UnprocessedCache {
     return await _lock.synchronized(() {
       // Return a copy to prevent external modification
       return List<Map<String, dynamic>>.from(_cache);
+    });
+  }
+
+  Future<void> clear() async {
+    await _lock.synchronized(() {
+      if (_cache.isNotEmpty) {
+        _cache.clear();
+        // QuizzerLogger.logMessage('AnswerHistoryCache cleared.'); // Optional log
+      }
     });
   }
 

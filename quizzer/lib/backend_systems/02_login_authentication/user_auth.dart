@@ -121,8 +121,6 @@ Future<void> _ensureLocalProfileExists(String email) async {
 
 // --- Main Authentication Function ---
 
-// TODO Need more extensive logging
-
 Future<Map<String, dynamic>> userAuth({
   required String email,
   required String password,

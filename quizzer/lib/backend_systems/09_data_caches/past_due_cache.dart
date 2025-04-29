@@ -3,6 +3,7 @@ import 'package:synchronized/synchronized.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'unprocessed_cache.dart'; // Import for flushing
 import 'package:quizzer/backend_systems/06_question_queue_server/switch_board.dart'; // Import SwitchBoard
+import 'dart:math';
 
 // ==========================================
 
@@ -16,7 +17,7 @@ class PastDueCache {
   PastDueCache._internal(); // Private constructor
 
   final Lock                  _lock = Lock();
-  List<Map<String, dynamic>>  _cache = [];
+  final List<Map<String, dynamic>>  _cache = [];
   final UnprocessedCache      _unprocessedCache = UnprocessedCache(); // Get singleton instance
   final SwitchBoard           _switchBoard = SwitchBoard(); // Get SwitchBoard instance
 
@@ -80,22 +81,19 @@ class PastDueCache {
   }
 
 
-  // --- Get and Remove Oldest Record (FIFO) ---
-  /// Removes and returns the oldest record added to the cache (FIFO).
-  /// Used by workers processing records in the order they arrived (like EligibilityCheckWorker).
+  /// Retrieves and removes a RANDOM record from the cache.
   /// Ensures thread safety using a lock.
-  /// Returns an empty Map `{}` if the cache is empty.
-  Future<Map<String, dynamic>> getAndRemoveOldestRecord() async {
-     return await _lock.synchronized(() {
-       if (_cache.isNotEmpty) {
-         final removedRecord = _cache.removeAt(0);
-         final String removedQid = removedRecord['question_id'] ?? 'UNKNOWN_ID';
-         QuizzerLogger.logValue('[PastDueCache.getAndRemoveOldestRecord] Removed QID: $removedQid, Cache Size After: ${_cache.length}');
-         return removedRecord;
-       } else {
-         return <String, dynamic>{};
-       }
-     });
+  /// Returns the removed record, or an empty Map `{}` if the cache is empty.
+  Future<Map<String, dynamic>> getAndRemoveRandomRecord() async {
+    return await _lock.synchronized(() {
+      if (_cache.isEmpty) {
+        return <String, dynamic>{}; // Return empty map if cache is empty
+      }
+      // Select a random index
+      final randomIndex = Random().nextInt(_cache.length);
+      // Remove the record at the random index and return it
+      return _cache.removeAt(randomIndex);
+    });
   }
 
   // --- Peek All Records (Read-Only) ---
@@ -140,6 +138,15 @@ class PastDueCache {
      });
   }
 
+  Future<void> clear() async {
+    await _lock.synchronized(() {
+      if (_cache.isNotEmpty) {
+        _cache.clear();
+        // QuizzerLogger.logMessage('AnswerHistoryCache cleared.'); // Optional log
+      }
+    });
+  }
+  
    // --- Close Stream Controller ---
   /// Closes the stream controller. Should be called when the cache is no longer needed.
   void dispose() {

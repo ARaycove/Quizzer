@@ -1,5 +1,3 @@
-import 'dart:math'; // Keep math import if needed for other functions later
-
 /// Validates a user's answer for a multiple-choice question.
 /// 
 /// Args:

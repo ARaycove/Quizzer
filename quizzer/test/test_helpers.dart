@@ -11,14 +11,13 @@ import 'package:quizzer/backend_systems/09_data_caches/due_date_within_24hrs_cac
 import 'package:quizzer/backend_systems/09_data_caches/eligible_questions_cache.dart';
 import 'package:quizzer/backend_systems/09_data_caches/question_queue_cache.dart';
 import 'package:quizzer/backend_systems/09_data_caches/answer_history_cache.dart';
-import 'package:logging/logging.dart';
+// import 'package:logging/logging.dart';
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_question_answer_pairs_table.dart' as uqap_table;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:quizzer/backend_systems/09_data_caches/past_due_cache.dart';
-import 'dart:convert'; // ADDED for jsonDecode
-import 'dart:io'; // ADDED for File operations
-import 'test_helpers.dart'; // Import helper functions
+// import 'dart:convert'; // ADDED for jsonDecode
+// import 'dart:io'; // ADDED for File operations
 
 // ==========================================
 // Helper Function to Log Current Question Details
@@ -119,6 +118,57 @@ int? getRandomMultipleChoiceAnswer(SessionManager manager) {
 }
 
 // ==========================================
+// Helper Function to Generate Random Select-All Answer
+// ==========================================
+/// Generates a random answer (List<int>) for a select_all_that_apply question.
+/// Randomly selects a number of options and returns their indices.
+List<int>? getRandomSelectAllAnswer(SessionManager manager) {
+  QuizzerLogger.logMessage("--- Generating Random Select-All-That-Apply Answer ---");
+  final details = manager.currentQuestionStaticData;
+
+  if (details == null) {
+    QuizzerLogger.logWarning("Cannot generate answer: currentQuestionStaticData is null.");
+    QuizzerLogger.printDivider();
+    return null;
+  }
+
+  if (manager.currentQuestionType != 'select_all_that_apply') {
+    QuizzerLogger.logWarning(
+        "Cannot generate Select-All answer: Current question type is '${manager.currentQuestionType}'.");
+    QuizzerLogger.printDivider();
+    return null;
+  }
+
+  final options = manager.currentQuestionOptions; // This is List<Map<String, dynamic>>
+  final optionCount = options.length;
+
+  if (optionCount == 0) {
+    QuizzerLogger.logError(
+        "Cannot generate Select-All answer: Options list is empty.");
+    QuizzerLogger.printDivider();
+    return []; // Return empty list if no options exist
+  }
+
+  final random = Random();
+  // Determine how many options to select (at least 1, up to total options)
+  final int numSelections = random.nextInt(optionCount) + 1; 
+  
+  final Set<int> selectedIndicesSet = {};
+  // Randomly pick unique indices
+  while (selectedIndicesSet.length < numSelections) {
+    selectedIndicesSet.add(random.nextInt(optionCount)); // Indices 0 to optionCount-1
+  }
+
+  final List<int> selectedIndicesList = selectedIndicesSet.toList();
+  // Optionally sort for consistency, though validation doesn't require it
+  selectedIndicesList.sort(); 
+
+  QuizzerLogger.logValue("Selected random indices: $selectedIndicesList");
+  QuizzerLogger.printDivider();
+  return selectedIndicesList;
+}
+
+// ==========================================
 // Helper Function for Waiting
 // ==========================================
 Future<void> waitTime(int milliseconds) async {
@@ -155,7 +205,7 @@ Future<void> logCurrentUserRecordFromDB(SessionManager manager) async {
     throw StateError('Database access unavailable during test logging.');
   }
 
-  final Map<String, dynamic>? record = await uqap_table.getUserQuestionAnswerPairById(
+  final Map<String, dynamic> record = await uqap_table.getUserQuestionAnswerPairById(
     userId,      // Positional argument 1
     questionId,  // Positional argument 2
     db,          // Positional argument 3
@@ -166,16 +216,12 @@ Future<void> logCurrentUserRecordFromDB(SessionManager manager) async {
   QuizzerLogger.logMessage("DB access released.");
   db = null; // Prevent reuse after release
 
-  if (record == null) {
-      // This case should ideally not be hit if the function throws as documented
-      QuizzerLogger.logError("getUserQuestionAnswerPairById returned null unexpectedly for User: $userId, Question: $questionId");
-  } else {
-    // Log the record
-    QuizzerLogger.logMessage("DB Record for User: $userId, Question: $questionId");
-    record.forEach((key, value) {
-      QuizzerLogger.logValue("  $key: $value");
-    });
-  }
+
+  // Log the record
+  QuizzerLogger.logMessage("DB Record for User: $userId, Question: $questionId");
+  record.forEach((key, value) {
+    QuizzerLogger.logValue("  $key: $value");
+  });
     
   QuizzerLogger.printDivider();
 }

@@ -26,7 +26,7 @@ Future<void> recordQuestionAnswerAttempt({
       throw StateError('Database unavailable during answer submission.');
     }
      final double    responseTimeSeconds   = 
-     timeAnswerGiven!.difference(timeDisplayed!).inMicroseconds / Duration.microsecondsPerSecond;
+     timeAnswerGiven.difference(timeDisplayed).inMicroseconds / Duration.microsecondsPerSecond;
  
      final String?   lastRevisedBeforeStr  = 
      recordBeforeUpdate['last_revised'] as String?;
@@ -37,7 +37,7 @@ Future<void> recordQuestionAnswerAttempt({
      double?         daysSinceLastRevision;
  
       if (lastRevisedBefore != null) {
-        daysSinceLastRevision = timeAnswerGiven!.difference(lastRevisedBefore).inMicroseconds / Duration.microsecondsPerDay;
+        daysSinceLastRevision = timeAnswerGiven.difference(lastRevisedBefore).inMicroseconds / Duration.microsecondsPerDay;
       }
     // Format context as JSON
     final List<String> subjectsList = (currentSubjects ?? '').split(',').map((s) => s.trim()).where((s) => s.isNotEmpty).toList();
@@ -48,9 +48,9 @@ Future<void> recordQuestionAnswerAttempt({
     });
 
     await attempt_table.addQuestionAnswerAttempt(
-      timeStamp: timeAnswerGiven!.toIso8601String(),
+      timeStamp: timeAnswerGiven.toIso8601String(),
       questionId: questionId,
-      participantId: userId!,
+      participantId: userId,
       responseTime: responseTimeSeconds,
       responseResult: isCorrect ? 1 : 0,
       questionContextCsv: contextJson, // Pass the JSON string 
@@ -58,7 +58,6 @@ Future<void> recordQuestionAnswerAttempt({
       revisionStreak: recordBeforeUpdate['revision_streak'] as int,     // Value *before* update
       lastRevisedDate: recordBeforeUpdate['last_revised'] as String?,   // Value *before* update
       daysSinceLastRevision: daysSinceLastRevision,                       // Calculated based on *before* update
-      knowledgeBase: null, // TODO: Determine source/calculation for knowledgeBase (not implemented)
       db: db,
     );
     // Release lock AFTER successful operation

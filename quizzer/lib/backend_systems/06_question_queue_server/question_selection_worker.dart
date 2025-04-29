@@ -5,7 +5,6 @@ import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/backend_systems/09_data_caches/eligible_questions_cache.dart';
 import 'package:quizzer/backend_systems/09_data_caches/question_queue_cache.dart';
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
-import 'package:quizzer/backend_systems/09_data_caches/unprocessed_cache.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 // Table Imports
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile_table.dart' as user_profile_table;
@@ -33,7 +32,7 @@ class PresentationSelectionWorker {
   final EligibleQuestionsCache  _eligibleCache = EligibleQuestionsCache();
   final QuestionQueueCache      _queueCache = QuestionQueueCache();
   final DatabaseMonitor         _dbMonitor = getDatabaseMonitor();
-  final UnprocessedCache        _unprocessedCache = UnprocessedCache();
+  // final UnprocessedCache        _unprocessedCache = UnprocessedCache();
 
   // --- Notification Stream (for Initial Loop Completion) ---
   final StreamController<void> _initialLoopCompleteController = StreamController<void>.broadcast();
@@ -350,17 +349,5 @@ class PresentationSelectionWorker {
        throw StateError('PresentationSelectionWorker: Failed to acquire database access after retries.');
      }
      return db;
-  }
-
-  // --- Helper to Check Eligibility and Queue/Revert ---
-  /// Checks if a selected question is still eligible (primarily module active) before queueing.
-  /// If eligible: Adds to QueueCache, removes from EligibleCache.
-  /// If ineligible: Removes from EligibleCache, adds back to UnprocessedCache.
-  /// Returns true if queued, false if reverted.
-  Future<void> _checkAndQueueOrRevert(Map<String, dynamic> selectedQuestion) async {
-    assert(selectedQuestion.isNotEmpty, "_checkAndQueueOrRevert called with empty record.");
-    final questionId = selectedQuestion['question_id'] as String?;
-    assert(questionId != null, "Selected question missing question_id: $selectedQuestion");
-    
   }
 }

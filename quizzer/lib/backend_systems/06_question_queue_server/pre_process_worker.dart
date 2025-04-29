@@ -17,15 +17,6 @@ import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dar
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'dart:async';
 import 'inactive_module_worker.dart'; // Import the new worker
-
-// TODO: Handle edge case where a record exists in user_question_answer_pairs
-//       but its corresponding question_id does not exist in question_answer_pairs
-//       (e.g., due to incomplete data deletion or sync issue). Currently, this
-//       will cause an assertion failure in _processRecord when getModuleNameForQuestionId
-//       cannot find the question. Consider adding error handling or data validation
-//       either here or in the initial data loading phase to gracefully handle or
-//       remove such orphaned user records.
-
 // ==========================================
 /// Worker responsible for pre-processing user question records.
 /// Fetches records from the database (on initial run) or UnprocessedCache,
@@ -69,7 +60,7 @@ class PreProcessWorker {
   }
 
   /// Stops the worker loop.
-  void stop() {
+  Future<void> stop() async{
     if (!_isRunning) {
       QuizzerLogger.logWarning('PreProcessWorker already stopped.');
       return;

@@ -1,0 +1,1460 @@
+Quizzer: [12:41:53] [34m[INFO][0m [switch_board.dart] SwitchBoard initialized.
+Quizzer: [12:41:53] [34m[INFO][0m Initialize GoTrueClient v2.11.1 with url: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, autoRefreshToken: true, flowType: AuthFlowType.implicit, tickDuration: 0:00:10.000000, tickThreshold: 3
+Quizzer: [12:41:53] [36m[DEBUG][0m Stopping auto refresh
+Quizzer: [12:41:53] [36m[DEBUG][0m Starting auto refresh
+Quizzer: [12:41:53] [34m[INFO][0m Initialize PostgrestClient with url: https://yruvxuvzztnahuuiqxit.supabase.co/rest/v1, schema: public
+Quizzer: [12:41:53] [34m[INFO][0m Initialize FunctionsClient v2.4.1 with url: https://yruvxuvzztnahuuiqxit.supabase.co/functions/v1
+Quizzer: [12:41:53] [34m[INFO][0m Initialize SupabaseStorageClient v2.3.1 with url: https://yruvxuvzztnahuuiqxit.supabase.co/storage/v1, retryAttempts: 0
+Quizzer: [12:41:53] [34m[INFO][0m Initialize RealtimeClient with endpoint: wss://yruvxuvzztnahuuiqxit.supabase.co/realtime/v1, timeout: 0:00:10.000000, heartbeatIntervalMs: 25000, longpollerTimeout: 20000, logLevel: null
+Quizzer: [12:41:53] [34m[INFO][0m Initialize SupabaseClient v2.6.3 with no custom access token
+Quizzer: [12:41:53] [34m[INFO][0m [user_auth.dart] User authentication requested for example_01@example.com
+Quizzer: [12:41:53] [34m[INFO][0m [user_auth.dart] Attempting Supabase authentication for example_01@example.com
+Quizzer: [12:41:53] [34m[INFO][0m [user_auth.dart] Attempting Supabase authentication
+Quizzer: [12:41:53] [36m[DEBUG][0m Saving session
+Quizzer: [12:41:53] [34m[INFO][0m [user_auth.dart] SUCCESS: Supabase authentication successful for example_01@example.com
+Quizzer: [12:41:53] [34m[INFO][0m [user_auth.dart] Handling successful Supabase login for example_01@example.com
+Quizzer: [12:41:53] [34m[INFO][0m [user_auth.dart] Stored last login (2025-04-29T18:41:53.655577317Z) and token for example_01@example.com
+Quizzer: [12:41:53] [34m[INFO][0m [user_auth.dart] Ensuring local profile exists for example_01@example.com
+Quizzer: [12:41:53] [34m[INFO][0m [database_native.dart] Using sqflite FFI factory (Desktop)
+Quizzer: [12:41:53] [34m[INFO][0m [database_native.dart] Desktop SQLite directory ensured: /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/runtime_cache/sqlite
+Quizzer: [12:41:53] [34m[INFO][0m [database_native.dart] Target Database path: /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/runtime_cache/sqlite/quizzer.db
+Quizzer: [12:41:53] [34m[INFO][0m [database_native.dart] Existing database found at /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/runtime_cache/sqlite/quizzer.db. Using it.
+Quizzer: [12:41:53] [34m[INFO][0m [database_native.dart] SUCCESS: Database initialized successfully at: /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/runtime_cache/sqlite/quizzer.db
+Quizzer: [12:41:54] [34m[INFO][0m [session_isolates.dart] Database access granted
+Quizzer: [12:41:54] [34m[INFO][0m [session_isolates.dart] SUCCESS: Session initialized with userId: e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] Starting PreProcessWorker for user: e737b728-1ae2-41d4-bae0-77ff5a222a0a...
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] PreProcessWorker: Starting initial loop...
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] Initial Loop: Building/Validating Module Records...
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] Initial Loop: Fetching all user records from DB...
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] SUCCESS: Initial Loop: Fetched 181 records from DB.
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] Initial Loop: Validating User Questions vs Modules...
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] Initial Loop: DB access released BEFORE cache processing.
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] Initial Loop: Added 181 records to UnprocessedCache.
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] Initial Loop: Processing records from UnprocessedCache...
+Quizzer: [12:41:54] [34m[INFO][0m [switch_board.dart] SwitchBoard: Signaling PastDueCache added.
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:24.043141_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:24.317742_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:24.586007_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:24.856677_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:25.129845_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:25.410942_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:25.689242_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:25.964130_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:26.238595_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:26.513081_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:26.780746_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:27.050130_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:27.318839_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:27.584848_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:27.851260_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:28.126923_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:28.406450_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:28.688657_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:28.962025_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:29.232999_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:29.513308_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:29.798889_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:30.067411_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:30.334033_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:30.601081_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:30.869385_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:31.146596_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:31.424693_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:31.699518_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:31.969565_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:32.250342_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:32.532154_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:32.805723_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:33.070416_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:33.337792_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:33.615258_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:33.892956_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:34.160413_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:34.436018_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:34.704511_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:34.982404_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:35.261611_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:35.540407_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:35.813606_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:36.079528_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:36.345608_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:36.613783_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:36.885524_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:37.163636_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:37.444110_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:37.725642_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:38.005917_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:38.284718_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:38.557745_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:38.823893_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:54] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:39.091657_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:39.366396_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:39.642458_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:39.912270_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:40.191215_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:40.463052_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:40.731790_e737b728-1ae2-41d4-bae0-77ff5a222a0a to DueDateWithin24hrsCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:41.005515_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:41.270698_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:41.537011_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:41.809237_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:42.073444_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:42.337448_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:42.604339_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:42.868795_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:43.135456_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:43.395354_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:43.653284_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:43.914726_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:44.188256_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:44.452479_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:44.717610_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:44.982426_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:45.249624_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:45.516502_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:45.781962_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:05.351312_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:06.754981_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:07.122309_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:07.614963_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:07.988538_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:08.342787_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:08.727987_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:09.118352_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:09.514903_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:09.891199_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:10.496732_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:10.998102_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:11.380194_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:11.885297_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:12.342237_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:12.762617_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:13.202007_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:13.682006_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:14.053192_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:14.437253_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:14.855941_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:15.351271_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:15.745968_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:16.164683_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:16.658591_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:17.077041_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:17.468799_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:17.793862_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:18.231404_e737b728-1ae2-41d4-bae0-77ff5a222a0a to NonCirculatingQuestionsCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:18.737005_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:19.085301_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:19.460379_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:19.946701_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:20.407939_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:20.776821_e737b728-1ae2-41d4-bae0-77ff5a222a0a to NonCirculatingQuestionsCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:21.110521_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:21.476945_e737b728-1ae2-41d4-bae0-77ff5a222a0a to NonCirculatingQuestionsCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:21.844897_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:22.208461_e737b728-1ae2-41d4-bae0-77ff5a222a0a to NonCirculatingQuestionsCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:22.599914_e737b728-1ae2-41d4-bae0-77ff5a222a0a to NonCirculatingQuestionsCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:22.969306_e737b728-1ae2-41d4-bae0-77ff5a222a0a to NonCirculatingQuestionsCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:23.346189_e737b728-1ae2-41d4-bae0-77ff5a222a0a to NonCirculatingQuestionsCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:23.724502_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:24.093962_e737b728-1ae2-41d4-bae0-77ff5a222a0a to NonCirculatingQuestionsCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:24.470993_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:24.848281_e737b728-1ae2-41d4-bae0-77ff5a222a0a to NonCirculatingQuestionsCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:25.230602_e737b728-1ae2-41d4-bae0-77ff5a222a0a to NonCirculatingQuestionsCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:25.622114_e737b728-1ae2-41d4-bae0-77ff5a222a0a to NonCirculatingQuestionsCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:26.002346_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:26.394059_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:26.779705_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:27.147131_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:27.519788_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:27.888052_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:28.258981_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:28.633706_e737b728-1ae2-41d4-bae0-77ff5a222a0a to NonCirculatingQuestionsCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:29.018490_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:29.407410_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:29.803187_e737b728-1ae2-41d4-bae0-77ff5a222a0a to NonCirculatingQuestionsCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:30.171135_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:30.549017_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:30.923071_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:31.317012_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:31.704241_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:32.092048_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:32.403895_e737b728-1ae2-41d4-bae0-77ff5a222a0a to NonCirculatingQuestionsCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:32.784843_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:33.150208_e737b728-1ae2-41d4-bae0-77ff5a222a0a to NonCirculatingQuestionsCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:33.527049_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:33.917288_e737b728-1ae2-41d4-bae0-77ff5a222a0a to NonCirculatingQuestionsCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:34.281087_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:34.663453_e737b728-1ae2-41d4-bae0-77ff5a222a0a to NonCirculatingQuestionsCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:35.037082_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:35.519483_e737b728-1ae2-41d4-bae0-77ff5a222a0a to NonCirculatingQuestionsCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:35.896944_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:36.284293_e737b728-1ae2-41d4-bae0-77ff5a222a0a to NonCirculatingQuestionsCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:36.673117_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:37.059519_e737b728-1ae2-41d4-bae0-77ff5a222a0a to NonCirculatingQuestionsCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:37.446985_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:37.760072_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:38.138379_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:38.531882_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:38.868121_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:39.260366_e737b728-1ae2-41d4-bae0-77ff5a222a0a to NonCirculatingQuestionsCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:39.634382_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:40.041877_e737b728-1ae2-41d4-bae0-77ff5a222a0a to NonCirculatingQuestionsCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:40.431301_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:40.815373_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:41.193024_e737b728-1ae2-41d4-bae0-77ff5a222a0a to NonCirculatingQuestionsCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:41.575068_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:41.977932_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:42.354021_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:42.729451_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:43.117210_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:43.513991_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:43.894077_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:44.292147_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:44.667642_e737b728-1ae2-41d4-bae0-77ff5a222a0a to NonCirculatingQuestionsCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:45.061101_e737b728-1ae2-41d4-bae0-77ff5a222a0a to NonCirculatingQuestionsCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:45.442648_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] SUCCESS: Initial Loop: Finished processing initial records.
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] PreProcessWorker: Starting Inactive Module Worker...
+Quizzer: [12:41:55] [34m[INFO][0m [inactive_module_worker.dart] Starting InactiveModuleWorker...
+Quizzer: [12:41:55] [34m[INFO][0m [inactive_module_worker.dart] InactiveModuleWorker: Waiting for module deactivation signal...
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] PreProcessWorker: Starting Eligibility Check Worker...
+Quizzer: [12:41:55] [34m[INFO][0m [eligibility_check_worker.dart] EligibilityCheckWorker: Starting initial loop...
+Quizzer: [12:41:55] [34m[INFO][0m [eligibility_check_worker.dart] Initial Loop: Processing PastDueCache...
+Quizzer: [12:41:55] [34m[INFO][0m [pre_process_worker.dart] SUCCESS: PreProcessWorker: Initial loop completed and Eligibility Worker started.
+Quizzer: [12:41:56] [34m[INFO][0m [eligibility_check_worker.dart] SUCCESS: Initial Loop: Finished processing initial records from PastDueCache.
+Quizzer: [12:41:56] [34m[INFO][0m [eligibility_check_worker.dart] EligibilityCheckWorker: Starting Circulation Worker...
+Quizzer: [12:41:56] [34m[INFO][0m [eligibility_check_worker.dart] EligibilityCheckWorker: Starting Due Date Worker...
+Quizzer: [12:41:56] [34m[INFO][0m [due_date_worker.dart] Starting DueDateWorker...
+Quizzer: [12:41:56] [34m[INFO][0m [due_date_worker.dart] DueDateWorker loop started.
+Quizzer: [12:41:56] [34m[INFO][0m [eligibility_check_worker.dart] SUCCESS: EligibilityCheckWorker: Initial loop completed and Circulation/DueDate Workers started.
+Quizzer: [12:41:56] [34m[INFO][0m [eligibility_check_worker.dart] EligibilityCheckWorker: PastDueCache empty, waiting for new records...
+Quizzer: [12:41:56] [34m[INFO][0m [question_selection_worker.dart] PresentationSelectionWorker started.
+Quizzer: [12:41:56] [34m[INFO][0m [question_selection_worker.dart] PSW: Starting initial loop...
+Quizzer: [12:41:56] [34m[INFO][0m [question_queue_cache.dart] QuestionQueueCache: Added record 2025-04-28T16:33:41.809237_e737b728-1ae2-41d4-bae0-77ff5a222a0a to empty queue.
+Quizzer: [12:41:56] [34m[INFO][0m [individual_api_tests.dart] Workers initialized as intended???
+Quizzer: [12:41:56] [34m[INFO][0m [individual_api_tests.dart] SUCCESS: Loaded 2 modules. Initial status: {elementary_addition: true, general: true, Is Even Or Odd: true}
+Quizzer: [12:41:56] [34m[INFO][0m [individual_api_tests.dart] Module elementary_addition already active, skipping.
+Quizzer: [12:41:56] [34m[INFO][0m [individual_api_tests.dart] Module Is Even Or Odd already active, skipping.
+Quizzer: [12:41:56] [34m[INFO][0m [individual_api_tests.dart] SUCCESS: Finished activating all modules.
+Quizzer: [12:41:58] [34m[INFO][0m [individual_api_tests.dart] --- Iteration 1 ---
+Quizzer: [12:41:58] [34m[INFO][0m [individual_api_tests.dart] --- State BEFORE requestNextQuestion Call ---
+Quizzer: [12:41:58] [34m[INFO][0m [test_helpers.dart] --- Logging Current Question Details ---
+Quizzer: [12:41:58] [36m[DEBUG][0m [test_helpers.dart] currentQuestionStaticData: null
+Quizzer: [12:41:58] [34m[INFO][0m [test_helpers.dart] --- Logging Current User Question Record Details ---
+Quizzer: [12:41:58] [36m[DEBUG][0m [test_helpers.dart] currentQuestionUserRecord: null
+Quizzer: [12:41:58] [34m[INFO][0m [test_helpers.dart] --- Logging Current User Question Record from DB ---
+Quizzer: [12:41:58] [33m[WARNING][0m [test_helpers.dart] Cannot log from DB: No current question loaded (questionId is null).
+Quizzer: [12:41:58] [34m[INFO][0m [test_helpers.dart] Waiting for 0.3 seconds...
+Quizzer: [12:41:58] [34m[INFO][0m [test_helpers.dart] Wait complete.
+Quizzer: [12:41:58] [34m[INFO][0m [individual_api_tests.dart] Calling requestNextQuestion...
+Quizzer: [12:41:58] [34m[INFO][0m [individual_api_tests.dart] --- State AFTER requestNextQuestion Call ---
+Quizzer: [12:41:58] [34m[INFO][0m [test_helpers.dart] --- Logging Current Question Details ---
+Quizzer: [12:41:58] [36m[DEBUG][0m [test_helpers.dart]   Question ID: 2025-04-28T16:33:41.809237_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:41:58] [36m[DEBUG][0m [test_helpers.dart]   Question Type: multiple_choice
+Quizzer: [12:41:58] [36m[DEBUG][0m [test_helpers.dart]   Module Name: elementary_addition
+Quizzer: [12:41:58] [36m[DEBUG][0m [test_helpers.dart]   Question Elements: [{type: text, content: 8 + 3 = ?}]
+Quizzer: [12:41:58] [36m[DEBUG][0m [test_helpers.dart]   Answer Elements: [{type: text, content: 11}]
+Quizzer: [12:41:58] [36m[DEBUG][0m [test_helpers.dart]   Options: [16, 10, 83, 12, 5, 11]
+Quizzer: [12:41:58] [36m[DEBUG][0m [test_helpers.dart]   Correct Index: 5
+Quizzer: [12:41:58] [36m[DEBUG][0m [test_helpers.dart]   Citation: 
+Quizzer: [12:41:58] [36m[DEBUG][0m [test_helpers.dart]   Concepts: 
+Quizzer: [12:41:58] [36m[DEBUG][0m [test_helpers.dart]   Subjects: 
+Quizzer: [12:41:58] [34m[INFO][0m [test_helpers.dart] Waiting for 0.3 seconds...
+Quizzer: [12:41:59] [34m[INFO][0m [test_helpers.dart] Wait complete.
+Quizzer: [12:41:59] [34m[INFO][0m [individual_api_tests.dart] Submitting random answer
+Quizzer: [12:41:59] [34m[INFO][0m [test_helpers.dart] --- Generating Random Multiple Choice Answer ---
+Quizzer: [12:41:59] [36m[DEBUG][0m [test_helpers.dart] Selected random option index: 2
+Quizzer: [12:41:59] [34m[INFO][0m [question_answer_attempts_table.dart] Verifying question_answer_attempts table...
+Quizzer: [12:41:59] [34m[INFO][0m [question_answer_attempts_table.dart] question_answer_attempts table already exists. Checking columns...
+Quizzer: [12:41:59] [34m[INFO][0m [question_answer_attempts_table.dart] Column check complete.
+Quizzer: [12:41:59] [34m[INFO][0m [question_answer_attempts_table.dart] Checking if first attempt for Q: 2025-04-28T16:33:41.809237_e737b728-1ae2-41d4-bae0-77ff5a222a0a, User: e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:41:59] [34m[INFO][0m [question_answer_attempts_table.dart] Is first attempt? false
+Quizzer: [12:41:59] [34m[INFO][0m [question_answer_attempts_table.dart] Adding question attempt for Q: 2025-04-28T16:33:41.809237_e737b728-1ae2-41d4-bae0-77ff5a222a0a, User: e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:41:59] [34m[INFO][0m [question_answer_attempts_table.dart] SUCCESS: Successfully added question attempt record with result ID: 450. Data: {time_stamp: 2025-04-29T12:41:59.060819, question_id: 2025-04-28T16:33:41.809237_e737b728-1ae2-41d4-bae0-77ff5a222a0a, participant_id: e737b728-1ae2-41d4-bae0-77ff5a222a0a, response_time: 0.273133, response_result: 0, was_first_attempt: 0, knowledge_base: null, question_context_csv: {"subjects":[],"concepts":[]}, last_revised_date: 2025-04-28T21:02:27.708441, days_since_last_revision: 0.6524462080787037, total_attempts: 3, revision_streak: 0}
+Quizzer: [12:41:59] [34m[INFO][0m [test_helpers.dart] Waiting for 0.3 seconds...
+Quizzer: [12:41:59] [34m[INFO][0m [test_helpers.dart] Wait complete.
+Quizzer: [12:41:59] [34m[INFO][0m [test_helpers.dart] --- Logging Current User Question Record Details ---
+Quizzer: [12:41:59] [36m[DEBUG][0m [test_helpers.dart]   user_uuid: e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:41:59] [36m[DEBUG][0m [test_helpers.dart]   question_id: 2025-04-28T16:33:41.809237_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:41:59] [36m[DEBUG][0m [test_helpers.dart]   revision_streak: 0
+Quizzer: [12:41:59] [36m[DEBUG][0m [test_helpers.dart]   last_revised: 2025-04-29T12:41:59.062438
+Quizzer: [12:41:59] [36m[DEBUG][0m [test_helpers.dart]   predicted_revision_due_history: []
+Quizzer: [12:41:59] [36m[DEBUG][0m [test_helpers.dart]   next_revision_due: 2025-04-29T12:41:59.067098
+Quizzer: [12:41:59] [36m[DEBUG][0m [test_helpers.dart]   time_between_revisions: 0.30999999999999994
+Quizzer: [12:41:59] [36m[DEBUG][0m [test_helpers.dart]   average_times_shown_per_day: Infinity
+Quizzer: [12:41:59] [36m[DEBUG][0m [test_helpers.dart]   is_eligible: null
+Quizzer: [12:41:59] [36m[DEBUG][0m [test_helpers.dart]   in_circulation: 1
+Quizzer: [12:41:59] [36m[DEBUG][0m [test_helpers.dart]   last_updated: 2025-04-29T12:41:59.062438
+Quizzer: [12:41:59] [36m[DEBUG][0m [test_helpers.dart]   total_attempts: 4
+Quizzer: [12:41:59] [34m[INFO][0m [test_helpers.dart] --- Logging Current User Question Record from DB ---
+Quizzer: [12:41:59] [34m[INFO][0m [test_helpers.dart] DB access released.
+Quizzer: [12:41:59] [34m[INFO][0m [test_helpers.dart] DB Record for User: e737b728-1ae2-41d4-bae0-77ff5a222a0a, Question: 2025-04-28T16:33:41.809237_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:41:59] [36m[DEBUG][0m [test_helpers.dart]   user_uuid: e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:41:59] [36m[DEBUG][0m [test_helpers.dart]   question_id: 2025-04-28T16:33:41.809237_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:41:59] [36m[DEBUG][0m [test_helpers.dart]   revision_streak: 0
+Quizzer: [12:41:59] [36m[DEBUG][0m [test_helpers.dart]   last_revised: 2025-04-29T12:41:59.062438
+Quizzer: [12:41:59] [36m[DEBUG][0m [test_helpers.dart]   predicted_revision_due_history: []
+Quizzer: [12:41:59] [36m[DEBUG][0m [test_helpers.dart]   next_revision_due: 2025-04-29T12:41:59.067098
+Quizzer: [12:41:59] [36m[DEBUG][0m [test_helpers.dart]   time_between_revisions: 0.30999999999999994
+Quizzer: [12:41:59] [36m[DEBUG][0m [test_helpers.dart]   average_times_shown_per_day: Infinity
+Quizzer: [12:41:59] [36m[DEBUG][0m [test_helpers.dart]   is_eligible: null
+Quizzer: [12:41:59] [36m[DEBUG][0m [test_helpers.dart]   in_circulation: 1
+Quizzer: [12:41:59] [36m[DEBUG][0m [test_helpers.dart]   last_updated: 2025-04-29T12:41:59.062438
+Quizzer: [12:41:59] [36m[DEBUG][0m [test_helpers.dart]   total_attempts: 4
+Quizzer: [12:41:59] [34m[INFO][0m [test_helpers.dart] Waiting for 0.3 seconds...
+Quizzer: [12:41:59] [34m[INFO][0m [test_helpers.dart] Wait complete.
+Quizzer: [12:41:59] [34m[INFO][0m [test_helpers.dart] --- Cache State Check 1 at 0:00:00.000691 (Target: 1s) ---
+Quizzer: [12:41:59] [36m[DEBUG][0m [test_helpers.dart] UnprocessedCache length: 0
+Quizzer: [12:41:59] [36m[DEBUG][0m [test_helpers.dart] NonCirculatingCache length: 25
+Quizzer: [12:41:59] [36m[DEBUG][0m [test_helpers.dart] ModuleInactiveCache length: 0
+Quizzer: [12:41:59] [36m[DEBUG][0m [test_helpers.dart] CirculatingCache length: 156
+Quizzer: [12:41:59] [36m[DEBUG][0m [test_helpers.dart] DueDateBeyond24hrsCache length: 0
+Quizzer: [12:41:59] [36m[DEBUG][0m [test_helpers.dart] DueDateWithin24hrsCache length: 1
+Quizzer: [12:41:59] [36m[DEBUG][0m [test_helpers.dart] PastDueCache length: 0
+Quizzer: [12:41:59] [36m[DEBUG][0m [test_helpers.dart] EligibleQuestionsCache length: 144
+Quizzer: [12:41:59] [36m[DEBUG][0m [test_helpers.dart] QuestionQueueCache length: 10
+Quizzer: [12:41:59] [36m[DEBUG][0m [test_helpers.dart] AnswerHistoryCache length: 0
+Quizzer: [12:42:02] [34m[INFO][0m [test_helpers.dart] SUCCESS: Cache monitoring loop finished after 0:00:03.024051.
+Quizzer: [12:42:02] [34m[INFO][0m [individual_api_tests.dart] --- Iteration 2 ---
+Quizzer: [12:42:02] [34m[INFO][0m [individual_api_tests.dart] --- State BEFORE requestNextQuestion Call ---
+Quizzer: [12:42:02] [34m[INFO][0m [test_helpers.dart] --- Logging Current Question Details ---
+Quizzer: [12:42:02] [36m[DEBUG][0m [test_helpers.dart]   Question ID: 2025-04-28T16:33:41.809237_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:02] [36m[DEBUG][0m [test_helpers.dart]   Question Type: multiple_choice
+Quizzer: [12:42:02] [36m[DEBUG][0m [test_helpers.dart]   Module Name: elementary_addition
+Quizzer: [12:42:02] [36m[DEBUG][0m [test_helpers.dart]   Question Elements: [{type: text, content: 8 + 3 = ?}]
+Quizzer: [12:42:02] [36m[DEBUG][0m [test_helpers.dart]   Answer Elements: [{type: text, content: 11}]
+Quizzer: [12:42:02] [36m[DEBUG][0m [test_helpers.dart]   Options: [16, 10, 83, 12, 5, 11]
+Quizzer: [12:42:02] [36m[DEBUG][0m [test_helpers.dart]   Correct Index: 5
+Quizzer: [12:42:02] [36m[DEBUG][0m [test_helpers.dart]   Citation: 
+Quizzer: [12:42:02] [36m[DEBUG][0m [test_helpers.dart]   Concepts: 
+Quizzer: [12:42:02] [36m[DEBUG][0m [test_helpers.dart]   Subjects: 
+Quizzer: [12:42:02] [34m[INFO][0m [test_helpers.dart] --- Logging Current User Question Record Details ---
+Quizzer: [12:42:02] [36m[DEBUG][0m [test_helpers.dart]   user_uuid: e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:02] [36m[DEBUG][0m [test_helpers.dart]   question_id: 2025-04-28T16:33:41.809237_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:02] [36m[DEBUG][0m [test_helpers.dart]   revision_streak: 0
+Quizzer: [12:42:02] [36m[DEBUG][0m [test_helpers.dart]   last_revised: 2025-04-29T12:41:59.062438
+Quizzer: [12:42:02] [36m[DEBUG][0m [test_helpers.dart]   predicted_revision_due_history: []
+Quizzer: [12:42:02] [36m[DEBUG][0m [test_helpers.dart]   next_revision_due: 2025-04-29T12:41:59.067098
+Quizzer: [12:42:02] [36m[DEBUG][0m [test_helpers.dart]   time_between_revisions: 0.30999999999999994
+Quizzer: [12:42:02] [36m[DEBUG][0m [test_helpers.dart]   average_times_shown_per_day: Infinity
+Quizzer: [12:42:02] [36m[DEBUG][0m [test_helpers.dart]   is_eligible: null
+Quizzer: [12:42:02] [36m[DEBUG][0m [test_helpers.dart]   in_circulation: 1
+Quizzer: [12:42:02] [36m[DEBUG][0m [test_helpers.dart]   last_updated: 2025-04-29T12:41:59.062438
+Quizzer: [12:42:02] [36m[DEBUG][0m [test_helpers.dart]   total_attempts: 4
+Quizzer: [12:42:02] [34m[INFO][0m [test_helpers.dart] --- Logging Current User Question Record from DB ---
+Quizzer: [12:42:02] [34m[INFO][0m [test_helpers.dart] DB access released.
+Quizzer: [12:42:02] [34m[INFO][0m [test_helpers.dart] DB Record for User: e737b728-1ae2-41d4-bae0-77ff5a222a0a, Question: 2025-04-28T16:33:41.809237_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:02] [36m[DEBUG][0m [test_helpers.dart]   user_uuid: e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:02] [36m[DEBUG][0m [test_helpers.dart]   question_id: 2025-04-28T16:33:41.809237_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:02] [36m[DEBUG][0m [test_helpers.dart]   revision_streak: 0
+Quizzer: [12:42:02] [36m[DEBUG][0m [test_helpers.dart]   last_revised: 2025-04-29T12:41:59.062438
+Quizzer: [12:42:02] [36m[DEBUG][0m [test_helpers.dart]   predicted_revision_due_history: []
+Quizzer: [12:42:02] [36m[DEBUG][0m [test_helpers.dart]   next_revision_due: 2025-04-29T12:41:59.067098
+Quizzer: [12:42:02] [36m[DEBUG][0m [test_helpers.dart]   time_between_revisions: 0.30999999999999994
+Quizzer: [12:42:02] [36m[DEBUG][0m [test_helpers.dart]   average_times_shown_per_day: Infinity
+Quizzer: [12:42:02] [36m[DEBUG][0m [test_helpers.dart]   is_eligible: null
+Quizzer: [12:42:02] [36m[DEBUG][0m [test_helpers.dart]   in_circulation: 1
+Quizzer: [12:42:02] [36m[DEBUG][0m [test_helpers.dart]   last_updated: 2025-04-29T12:41:59.062438
+Quizzer: [12:42:02] [36m[DEBUG][0m [test_helpers.dart]   total_attempts: 4
+Quizzer: [12:42:02] [34m[INFO][0m [test_helpers.dart] Waiting for 0.3 seconds...
+Quizzer: [12:42:02] [34m[INFO][0m [test_helpers.dart] Wait complete.
+Quizzer: [12:42:02] [34m[INFO][0m [individual_api_tests.dart] Calling requestNextQuestion...
+Quizzer: [12:42:02] [34m[INFO][0m [switch_board.dart] SwitchBoard: Signaling PastDueCache added.
+Quizzer: [12:42:02] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:41.809237_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:42:02] [34m[INFO][0m [eligibility_check_worker.dart] EligibilityCheckWorker: Woke up by PastDueCache notification.
+Quizzer: [12:42:02] [34m[INFO][0m [eligibility_check_worker.dart] EligibilityCheckWorker: Found record in PastDueCache, processing...
+Quizzer: [12:42:02] [34m[INFO][0m [eligibility_check_worker.dart] Eligibility Check: 2025-04-28T16:33:41.809237_e737b728-1ae2-41d4-bae0-77ff5a222a0a is NOT eligible (in recent history). Waiting 1s before reprocessing.
+Quizzer: [12:42:02] [34m[INFO][0m [individual_api_tests.dart] --- State AFTER requestNextQuestion Call ---
+Quizzer: [12:42:02] [34m[INFO][0m [test_helpers.dart] --- Logging Current Question Details ---
+Quizzer: [12:42:02] [36m[DEBUG][0m [test_helpers.dart]   Question ID: 2025-04-28T20:11:08.342787_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:02] [36m[DEBUG][0m [test_helpers.dart]   Question Type: select_all_that_apply
+Quizzer: [12:42:02] [36m[DEBUG][0m [test_helpers.dart]   Module Name: Is Even Or Odd
+Quizzer: [12:42:02] [36m[DEBUG][0m [test_helpers.dart]   Question Elements: [{type: text, content: Select all the ODD numbers.}]
+Quizzer: [12:42:02] [36m[DEBUG][0m [test_helpers.dart]   Answer Elements: [{type: text, content: Odd numbers are not divisible by 2.}]
+Quizzer: [12:42:02] [36m[DEBUG][0m [test_helpers.dart]   Citation: 
+Quizzer: [12:42:02] [36m[DEBUG][0m [test_helpers.dart]   Concepts: 
+Quizzer: [12:42:02] [36m[DEBUG][0m [test_helpers.dart]   Subjects: 
+Quizzer: [12:42:02] [34m[INFO][0m [test_helpers.dart] Waiting for 0.3 seconds...
+Quizzer: [12:42:03] [34m[INFO][0m [test_helpers.dart] Wait complete.
+Quizzer: [12:42:03] [34m[INFO][0m [individual_api_tests.dart] Submitting random answer
+Quizzer: [12:42:03] [34m[INFO][0m [test_helpers.dart] --- Generating Random Select-All-That-Apply Answer ---
+Quizzer: [12:42:03] [36m[DEBUG][0m [test_helpers.dart] Selected random indices: [0, 3, 4, 5]
+Quizzer: [12:42:03] [34m[INFO][0m [question_answer_attempts_table.dart] Verifying question_answer_attempts table...
+Quizzer: [12:42:03] [34m[INFO][0m [question_answer_attempts_table.dart] question_answer_attempts table already exists. Checking columns...
+Quizzer: [12:42:03] [34m[INFO][0m [question_answer_attempts_table.dart] Column check complete.
+Quizzer: [12:42:03] [34m[INFO][0m [question_answer_attempts_table.dart] Checking if first attempt for Q: 2025-04-28T20:11:08.342787_e737b728-1ae2-41d4-bae0-77ff5a222a0a, User: e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:03] [34m[INFO][0m [question_answer_attempts_table.dart] Is first attempt? false
+Quizzer: [12:42:03] [34m[INFO][0m [question_answer_attempts_table.dart] Adding question attempt for Q: 2025-04-28T20:11:08.342787_e737b728-1ae2-41d4-bae0-77ff5a222a0a, User: e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:03] [34m[INFO][0m [question_answer_attempts_table.dart] SUCCESS: Successfully added question attempt record with result ID: 451. Data: {time_stamp: 2025-04-29T12:42:03.266975, question_id: 2025-04-28T20:11:08.342787_e737b728-1ae2-41d4-bae0-77ff5a222a0a, participant_id: e737b728-1ae2-41d4-bae0-77ff5a222a0a, response_time: 0.280237, response_result: 0, was_first_attempt: 0, knowledge_base: null, question_context_csv: {"subjects":[],"concepts":[]}, last_revised_date: 2025-04-28T20:39:48.048972, days_since_last_revision: 0.6682316898495371, total_attempts: 1, revision_streak: 0}
+Quizzer: [12:42:03] [34m[INFO][0m [test_helpers.dart] Waiting for 0.3 seconds...
+Quizzer: [12:42:03] [34m[INFO][0m [test_helpers.dart] Wait complete.
+Quizzer: [12:42:03] [34m[INFO][0m [test_helpers.dart] --- Logging Current User Question Record Details ---
+Quizzer: [12:42:03] [36m[DEBUG][0m [test_helpers.dart]   user_uuid: e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:03] [36m[DEBUG][0m [test_helpers.dart]   question_id: 2025-04-28T20:11:08.342787_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:03] [36m[DEBUG][0m [test_helpers.dart]   revision_streak: 0
+Quizzer: [12:42:03] [36m[DEBUG][0m [test_helpers.dart]   last_revised: 2025-04-29T12:42:03.268846
+Quizzer: [12:42:03] [36m[DEBUG][0m [test_helpers.dart]   predicted_revision_due_history: []
+Quizzer: [12:42:03] [36m[DEBUG][0m [test_helpers.dart]   next_revision_due: 2025-04-29T12:42:03.269079
+Quizzer: [12:42:03] [36m[DEBUG][0m [test_helpers.dart]   time_between_revisions: 0.33999999999999997
+Quizzer: [12:42:03] [36m[DEBUG][0m [test_helpers.dart]   average_times_shown_per_day: Infinity
+Quizzer: [12:42:03] [36m[DEBUG][0m [test_helpers.dart]   is_eligible: null
+Quizzer: [12:42:03] [36m[DEBUG][0m [test_helpers.dart]   in_circulation: 1
+Quizzer: [12:42:03] [36m[DEBUG][0m [test_helpers.dart]   last_updated: 2025-04-29T12:42:03.268846
+Quizzer: [12:42:03] [36m[DEBUG][0m [test_helpers.dart]   total_attempts: 2
+Quizzer: [12:42:03] [34m[INFO][0m [test_helpers.dart] --- Logging Current User Question Record from DB ---
+Quizzer: [12:42:03] [34m[INFO][0m [test_helpers.dart] DB access released.
+Quizzer: [12:42:03] [34m[INFO][0m [test_helpers.dart] DB Record for User: e737b728-1ae2-41d4-bae0-77ff5a222a0a, Question: 2025-04-28T20:11:08.342787_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:03] [36m[DEBUG][0m [test_helpers.dart]   user_uuid: e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:03] [36m[DEBUG][0m [test_helpers.dart]   question_id: 2025-04-28T20:11:08.342787_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:03] [36m[DEBUG][0m [test_helpers.dart]   revision_streak: 0
+Quizzer: [12:42:03] [36m[DEBUG][0m [test_helpers.dart]   last_revised: 2025-04-29T12:42:03.268846
+Quizzer: [12:42:03] [36m[DEBUG][0m [test_helpers.dart]   predicted_revision_due_history: []
+Quizzer: [12:42:03] [36m[DEBUG][0m [test_helpers.dart]   next_revision_due: 2025-04-29T12:42:03.269079
+Quizzer: [12:42:03] [36m[DEBUG][0m [test_helpers.dart]   time_between_revisions: 0.33999999999999997
+Quizzer: [12:42:03] [36m[DEBUG][0m [test_helpers.dart]   average_times_shown_per_day: Infinity
+Quizzer: [12:42:03] [36m[DEBUG][0m [test_helpers.dart]   is_eligible: null
+Quizzer: [12:42:03] [36m[DEBUG][0m [test_helpers.dart]   in_circulation: 1
+Quizzer: [12:42:03] [36m[DEBUG][0m [test_helpers.dart]   last_updated: 2025-04-29T12:42:03.268846
+Quizzer: [12:42:03] [36m[DEBUG][0m [test_helpers.dart]   total_attempts: 2
+Quizzer: [12:42:03] [34m[INFO][0m [test_helpers.dart] Waiting for 0.3 seconds...
+Quizzer: [12:42:03] [34m[INFO][0m [test_helpers.dart] Wait complete.
+Quizzer: [12:42:03] [34m[INFO][0m [test_helpers.dart] --- Cache State Check 1 at 0:00:00.000004 (Target: 1s) ---
+Quizzer: [12:42:03] [36m[DEBUG][0m [test_helpers.dart] UnprocessedCache length: 0
+Quizzer: [12:42:03] [36m[DEBUG][0m [test_helpers.dart] NonCirculatingCache length: 25
+Quizzer: [12:42:03] [36m[DEBUG][0m [test_helpers.dart] ModuleInactiveCache length: 0
+Quizzer: [12:42:03] [36m[DEBUG][0m [test_helpers.dart] CirculatingCache length: 156
+Quizzer: [12:42:03] [36m[DEBUG][0m [test_helpers.dart] DueDateBeyond24hrsCache length: 0
+Quizzer: [12:42:03] [36m[DEBUG][0m [test_helpers.dart] DueDateWithin24hrsCache length: 1
+Quizzer: [12:42:03] [36m[DEBUG][0m [test_helpers.dart] PastDueCache length: 0
+Quizzer: [12:42:03] [36m[DEBUG][0m [test_helpers.dart] EligibleQuestionsCache length: 143
+Quizzer: [12:42:03] [36m[DEBUG][0m [test_helpers.dart] QuestionQueueCache length: 10
+Quizzer: [12:42:03] [36m[DEBUG][0m [test_helpers.dart] AnswerHistoryCache length: 1
+Quizzer: [12:42:03] [34m[INFO][0m [eligibility_check_worker.dart] EligibilityCheckWorker: PastDueCache empty, waiting for new records...
+Quizzer: [12:42:03] [34m[INFO][0m [switch_board.dart] SwitchBoard: Signaling PastDueCache added.
+Quizzer: [12:42:03] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:41.809237_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:42:03] [34m[INFO][0m [eligibility_check_worker.dart] EligibilityCheckWorker: Woke up by PastDueCache notification.
+Quizzer: [12:42:03] [34m[INFO][0m [eligibility_check_worker.dart] EligibilityCheckWorker: Found record in PastDueCache, processing...
+Quizzer: [12:42:03] [34m[INFO][0m [eligibility_check_worker.dart] Eligibility Check: 2025-04-28T16:33:41.809237_e737b728-1ae2-41d4-bae0-77ff5a222a0a is NOT eligible (in recent history). Waiting 1s before reprocessing.
+Quizzer: [12:42:04] [34m[INFO][0m [eligibility_check_worker.dart] EligibilityCheckWorker: PastDueCache empty, waiting for new records...
+Quizzer: [12:42:04] [34m[INFO][0m [switch_board.dart] SwitchBoard: Signaling PastDueCache added.
+Quizzer: [12:42:04] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:41.809237_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:42:04] [34m[INFO][0m [eligibility_check_worker.dart] EligibilityCheckWorker: Woke up by PastDueCache notification.
+Quizzer: [12:42:04] [34m[INFO][0m [eligibility_check_worker.dart] EligibilityCheckWorker: Found record in PastDueCache, processing...
+Quizzer: [12:42:04] [34m[INFO][0m [eligibility_check_worker.dart] Eligibility Check: 2025-04-28T16:33:41.809237_e737b728-1ae2-41d4-bae0-77ff5a222a0a is NOT eligible (in recent history). Waiting 1s before reprocessing.
+Quizzer: [12:42:05] [34m[INFO][0m [eligibility_check_worker.dart] EligibilityCheckWorker: PastDueCache empty, waiting for new records...
+Quizzer: [12:42:05] [34m[INFO][0m [switch_board.dart] SwitchBoard: Signaling PastDueCache added.
+Quizzer: [12:42:05] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:41.809237_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:42:05] [34m[INFO][0m [eligibility_check_worker.dart] EligibilityCheckWorker: Woke up by PastDueCache notification.
+Quizzer: [12:42:06] [34m[INFO][0m [eligibility_check_worker.dart] EligibilityCheckWorker: Found record in PastDueCache, processing...
+Quizzer: [12:42:06] [34m[INFO][0m [eligibility_check_worker.dart] Eligibility Check: 2025-04-28T16:33:41.809237_e737b728-1ae2-41d4-bae0-77ff5a222a0a is NOT eligible (in recent history). Waiting 1s before reprocessing.
+Quizzer: [12:42:06] [34m[INFO][0m [test_helpers.dart] SUCCESS: Cache monitoring loop finished after 0:00:03.003921.
+Quizzer: [12:42:06] [34m[INFO][0m [individual_api_tests.dart] --- Iteration 3 ---
+Quizzer: [12:42:06] [34m[INFO][0m [individual_api_tests.dart] --- State BEFORE requestNextQuestion Call ---
+Quizzer: [12:42:06] [34m[INFO][0m [test_helpers.dart] --- Logging Current Question Details ---
+Quizzer: [12:42:06] [36m[DEBUG][0m [test_helpers.dart]   Question ID: 2025-04-28T20:11:08.342787_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:06] [36m[DEBUG][0m [test_helpers.dart]   Question Type: select_all_that_apply
+Quizzer: [12:42:06] [36m[DEBUG][0m [test_helpers.dart]   Module Name: Is Even Or Odd
+Quizzer: [12:42:06] [36m[DEBUG][0m [test_helpers.dart]   Question Elements: [{type: text, content: Select all the ODD numbers.}]
+Quizzer: [12:42:06] [36m[DEBUG][0m [test_helpers.dart]   Answer Elements: [{type: text, content: Odd numbers are not divisible by 2.}]
+Quizzer: [12:42:06] [36m[DEBUG][0m [test_helpers.dart]   Citation: 
+Quizzer: [12:42:06] [36m[DEBUG][0m [test_helpers.dart]   Concepts: 
+Quizzer: [12:42:06] [36m[DEBUG][0m [test_helpers.dart]   Subjects: 
+Quizzer: [12:42:06] [34m[INFO][0m [test_helpers.dart] --- Logging Current User Question Record Details ---
+Quizzer: [12:42:06] [36m[DEBUG][0m [test_helpers.dart]   user_uuid: e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:06] [36m[DEBUG][0m [test_helpers.dart]   question_id: 2025-04-28T20:11:08.342787_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:06] [36m[DEBUG][0m [test_helpers.dart]   revision_streak: 0
+Quizzer: [12:42:06] [36m[DEBUG][0m [test_helpers.dart]   last_revised: 2025-04-29T12:42:03.268846
+Quizzer: [12:42:06] [36m[DEBUG][0m [test_helpers.dart]   predicted_revision_due_history: []
+Quizzer: [12:42:06] [36m[DEBUG][0m [test_helpers.dart]   next_revision_due: 2025-04-29T12:42:03.269079
+Quizzer: [12:42:06] [36m[DEBUG][0m [test_helpers.dart]   time_between_revisions: 0.33999999999999997
+Quizzer: [12:42:06] [36m[DEBUG][0m [test_helpers.dart]   average_times_shown_per_day: Infinity
+Quizzer: [12:42:06] [36m[DEBUG][0m [test_helpers.dart]   is_eligible: null
+Quizzer: [12:42:06] [36m[DEBUG][0m [test_helpers.dart]   in_circulation: 1
+Quizzer: [12:42:06] [36m[DEBUG][0m [test_helpers.dart]   last_updated: 2025-04-29T12:42:03.268846
+Quizzer: [12:42:06] [36m[DEBUG][0m [test_helpers.dart]   total_attempts: 2
+Quizzer: [12:42:06] [34m[INFO][0m [test_helpers.dart] --- Logging Current User Question Record from DB ---
+Quizzer: [12:42:06] [34m[INFO][0m [test_helpers.dart] DB access released.
+Quizzer: [12:42:06] [34m[INFO][0m [test_helpers.dart] DB Record for User: e737b728-1ae2-41d4-bae0-77ff5a222a0a, Question: 2025-04-28T20:11:08.342787_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:06] [36m[DEBUG][0m [test_helpers.dart]   user_uuid: e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:06] [36m[DEBUG][0m [test_helpers.dart]   question_id: 2025-04-28T20:11:08.342787_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:06] [36m[DEBUG][0m [test_helpers.dart]   revision_streak: 0
+Quizzer: [12:42:06] [36m[DEBUG][0m [test_helpers.dart]   last_revised: 2025-04-29T12:42:03.268846
+Quizzer: [12:42:06] [36m[DEBUG][0m [test_helpers.dart]   predicted_revision_due_history: []
+Quizzer: [12:42:06] [36m[DEBUG][0m [test_helpers.dart]   next_revision_due: 2025-04-29T12:42:03.269079
+Quizzer: [12:42:06] [36m[DEBUG][0m [test_helpers.dart]   time_between_revisions: 0.33999999999999997
+Quizzer: [12:42:06] [36m[DEBUG][0m [test_helpers.dart]   average_times_shown_per_day: Infinity
+Quizzer: [12:42:06] [36m[DEBUG][0m [test_helpers.dart]   is_eligible: null
+Quizzer: [12:42:06] [36m[DEBUG][0m [test_helpers.dart]   in_circulation: 1
+Quizzer: [12:42:06] [36m[DEBUG][0m [test_helpers.dart]   last_updated: 2025-04-29T12:42:03.268846
+Quizzer: [12:42:06] [36m[DEBUG][0m [test_helpers.dart]   total_attempts: 2
+Quizzer: [12:42:06] [34m[INFO][0m [test_helpers.dart] Waiting for 0.3 seconds...
+Quizzer: [12:42:07] [34m[INFO][0m [eligibility_check_worker.dart] EligibilityCheckWorker: PastDueCache empty, waiting for new records...
+Quizzer: [12:42:07] [34m[INFO][0m [switch_board.dart] SwitchBoard: Signaling PastDueCache added.
+Quizzer: [12:42:07] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:41.809237_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:42:07] [34m[INFO][0m [eligibility_check_worker.dart] EligibilityCheckWorker: Woke up by PastDueCache notification.
+Quizzer: [12:42:07] [34m[INFO][0m [eligibility_check_worker.dart] EligibilityCheckWorker: Found record in PastDueCache, processing...
+Quizzer: [12:42:07] [34m[INFO][0m [eligibility_check_worker.dart] Eligibility Check: 2025-04-28T16:33:41.809237_e737b728-1ae2-41d4-bae0-77ff5a222a0a is NOT eligible (in recent history). Waiting 1s before reprocessing.
+Quizzer: [12:42:07] [34m[INFO][0m [test_helpers.dart] Wait complete.
+Quizzer: [12:42:07] [34m[INFO][0m [individual_api_tests.dart] Calling requestNextQuestion...
+Quizzer: [12:42:07] [34m[INFO][0m [switch_board.dart] SwitchBoard: Signaling PastDueCache added.
+Quizzer: [12:42:07] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:08.342787_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:42:07] [34m[INFO][0m [individual_api_tests.dart] --- State AFTER requestNextQuestion Call ---
+Quizzer: [12:42:07] [34m[INFO][0m [test_helpers.dart] --- Logging Current Question Details ---
+Quizzer: [12:42:07] [36m[DEBUG][0m [test_helpers.dart]   Question ID: 2025-04-28T20:11:13.682006_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:07] [36m[DEBUG][0m [test_helpers.dart]   Question Type: select_all_that_apply
+Quizzer: [12:42:07] [36m[DEBUG][0m [test_helpers.dart]   Module Name: Is Even Or Odd
+Quizzer: [12:42:07] [36m[DEBUG][0m [test_helpers.dart]   Question Elements: [{type: text, content: Select all the ODD numbers.}]
+Quizzer: [12:42:07] [36m[DEBUG][0m [test_helpers.dart]   Answer Elements: [{type: text, content: Odd numbers are not divisible by 2.}]
+Quizzer: [12:42:07] [36m[DEBUG][0m [test_helpers.dart]   Citation: 
+Quizzer: [12:42:07] [36m[DEBUG][0m [test_helpers.dart]   Concepts: 
+Quizzer: [12:42:07] [36m[DEBUG][0m [test_helpers.dart]   Subjects: 
+Quizzer: [12:42:07] [34m[INFO][0m [test_helpers.dart] Waiting for 0.3 seconds...
+Quizzer: [12:42:07] [34m[INFO][0m [test_helpers.dart] Wait complete.
+Quizzer: [12:42:07] [34m[INFO][0m [individual_api_tests.dart] Submitting random answer
+Quizzer: [12:42:07] [34m[INFO][0m [test_helpers.dart] --- Generating Random Select-All-That-Apply Answer ---
+Quizzer: [12:42:07] [36m[DEBUG][0m [test_helpers.dart] Selected random indices: [1]
+Quizzer: [12:42:07] [34m[INFO][0m [question_answer_attempts_table.dart] Verifying question_answer_attempts table...
+Quizzer: [12:42:07] [34m[INFO][0m [question_answer_attempts_table.dart] question_answer_attempts table already exists. Checking columns...
+Quizzer: [12:42:07] [34m[INFO][0m [question_answer_attempts_table.dart] Column check complete.
+Quizzer: [12:42:07] [34m[INFO][0m [question_answer_attempts_table.dart] Checking if first attempt for Q: 2025-04-28T20:11:13.682006_e737b728-1ae2-41d4-bae0-77ff5a222a0a, User: e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:07] [34m[INFO][0m [question_answer_attempts_table.dart] Is first attempt? false
+Quizzer: [12:42:07] [34m[INFO][0m [question_answer_attempts_table.dart] Adding question attempt for Q: 2025-04-28T20:11:13.682006_e737b728-1ae2-41d4-bae0-77ff5a222a0a, User: e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:07] [34m[INFO][0m [question_answer_attempts_table.dart] SUCCESS: Successfully added question attempt record with result ID: 452. Data: {time_stamp: 2025-04-29T12:42:07.391962, question_id: 2025-04-28T20:11:13.682006_e737b728-1ae2-41d4-bae0-77ff5a222a0a, participant_id: e737b728-1ae2-41d4-bae0-77ff5a222a0a, response_time: 0.262932, response_result: 0, was_first_attempt: 0, knowledge_base: null, question_context_csv: {"subjects":[],"concepts":[]}, last_revised_date: 2025-04-28T21:07:35.501824, days_since_last_revision: 0.6489802099305556, total_attempts: 3, revision_streak: 0}
+Quizzer: [12:42:07] [34m[INFO][0m [test_helpers.dart] Waiting for 0.3 seconds...
+Quizzer: [12:42:07] [34m[INFO][0m [test_helpers.dart] Wait complete.
+Quizzer: [12:42:07] [34m[INFO][0m [test_helpers.dart] --- Logging Current User Question Record Details ---
+Quizzer: [12:42:07] [36m[DEBUG][0m [test_helpers.dart]   user_uuid: e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:07] [36m[DEBUG][0m [test_helpers.dart]   question_id: 2025-04-28T20:11:13.682006_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:07] [36m[DEBUG][0m [test_helpers.dart]   revision_streak: 0
+Quizzer: [12:42:07] [36m[DEBUG][0m [test_helpers.dart]   last_revised: 2025-04-29T12:42:07.392042
+Quizzer: [12:42:07] [36m[DEBUG][0m [test_helpers.dart]   predicted_revision_due_history: []
+Quizzer: [12:42:07] [36m[DEBUG][0m [test_helpers.dart]   next_revision_due: 2025-04-29T12:42:07.392203
+Quizzer: [12:42:07] [36m[DEBUG][0m [test_helpers.dart]   time_between_revisions: 0.30999999999999994
+Quizzer: [12:42:07] [36m[DEBUG][0m [test_helpers.dart]   average_times_shown_per_day: Infinity
+Quizzer: [12:42:07] [36m[DEBUG][0m [test_helpers.dart]   is_eligible: null
+Quizzer: [12:42:07] [36m[DEBUG][0m [test_helpers.dart]   in_circulation: 1
+Quizzer: [12:42:07] [36m[DEBUG][0m [test_helpers.dart]   last_updated: 2025-04-29T12:42:07.392042
+Quizzer: [12:42:07] [36m[DEBUG][0m [test_helpers.dart]   total_attempts: 4
+Quizzer: [12:42:07] [34m[INFO][0m [test_helpers.dart] --- Logging Current User Question Record from DB ---
+Quizzer: [12:42:07] [34m[INFO][0m [test_helpers.dart] DB access released.
+Quizzer: [12:42:07] [34m[INFO][0m [test_helpers.dart] DB Record for User: e737b728-1ae2-41d4-bae0-77ff5a222a0a, Question: 2025-04-28T20:11:13.682006_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:07] [36m[DEBUG][0m [test_helpers.dart]   user_uuid: e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:07] [36m[DEBUG][0m [test_helpers.dart]   question_id: 2025-04-28T20:11:13.682006_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:07] [36m[DEBUG][0m [test_helpers.dart]   revision_streak: 0
+Quizzer: [12:42:07] [36m[DEBUG][0m [test_helpers.dart]   last_revised: 2025-04-29T12:42:07.392042
+Quizzer: [12:42:07] [36m[DEBUG][0m [test_helpers.dart]   predicted_revision_due_history: []
+Quizzer: [12:42:07] [36m[DEBUG][0m [test_helpers.dart]   next_revision_due: 2025-04-29T12:42:07.392203
+Quizzer: [12:42:07] [36m[DEBUG][0m [test_helpers.dart]   time_between_revisions: 0.30999999999999994
+Quizzer: [12:42:07] [36m[DEBUG][0m [test_helpers.dart]   average_times_shown_per_day: Infinity
+Quizzer: [12:42:07] [36m[DEBUG][0m [test_helpers.dart]   is_eligible: null
+Quizzer: [12:42:07] [36m[DEBUG][0m [test_helpers.dart]   in_circulation: 1
+Quizzer: [12:42:07] [36m[DEBUG][0m [test_helpers.dart]   last_updated: 2025-04-29T12:42:07.392042
+Quizzer: [12:42:07] [36m[DEBUG][0m [test_helpers.dart]   total_attempts: 4
+Quizzer: [12:42:07] [34m[INFO][0m [test_helpers.dart] Waiting for 0.3 seconds...
+Quizzer: [12:42:07] [34m[INFO][0m [test_helpers.dart] Wait complete.
+Quizzer: [12:42:07] [34m[INFO][0m [test_helpers.dart] --- Cache State Check 1 at 0:00:00.000011 (Target: 1s) ---
+Quizzer: [12:42:07] [36m[DEBUG][0m [test_helpers.dart] UnprocessedCache length: 0
+Quizzer: [12:42:07] [36m[DEBUG][0m [test_helpers.dart] NonCirculatingCache length: 25
+Quizzer: [12:42:07] [36m[DEBUG][0m [test_helpers.dart] ModuleInactiveCache length: 0
+Quizzer: [12:42:07] [36m[DEBUG][0m [test_helpers.dart] CirculatingCache length: 156
+Quizzer: [12:42:07] [36m[DEBUG][0m [test_helpers.dart] DueDateBeyond24hrsCache length: 0
+Quizzer: [12:42:07] [36m[DEBUG][0m [test_helpers.dart] DueDateWithin24hrsCache length: 1
+Quizzer: [12:42:07] [36m[DEBUG][0m [test_helpers.dart] PastDueCache length: 1
+Quizzer: [12:42:07] [36m[DEBUG][0m [test_helpers.dart] EligibleQuestionsCache length: 142
+Quizzer: [12:42:07] [36m[DEBUG][0m [test_helpers.dart] QuestionQueueCache length: 10
+Quizzer: [12:42:07] [36m[DEBUG][0m [test_helpers.dart] AnswerHistoryCache length: 2
+Quizzer: [12:42:08] [34m[INFO][0m [eligibility_check_worker.dart] EligibilityCheckWorker: Found record in PastDueCache, processing...
+Quizzer: [12:42:08] [34m[INFO][0m [eligibility_check_worker.dart] Eligibility Check: 2025-04-28T20:11:08.342787_e737b728-1ae2-41d4-bae0-77ff5a222a0a is NOT eligible (in recent history). Waiting 1s before reprocessing.
+Quizzer: [12:42:08] [34m[INFO][0m [switch_board.dart] SwitchBoard: Signaling PastDueCache added.
+Quizzer: [12:42:08] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:41.809237_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:42:09] [34m[INFO][0m [eligibility_check_worker.dart] EligibilityCheckWorker: Found record in PastDueCache, processing...
+Quizzer: [12:42:09] [34m[INFO][0m [eligibility_check_worker.dart] Eligibility Check: 2025-04-28T16:33:41.809237_e737b728-1ae2-41d4-bae0-77ff5a222a0a is NOT eligible (in recent history). Waiting 1s before reprocessing.
+Quizzer: [12:42:09] [34m[INFO][0m [switch_board.dart] SwitchBoard: Signaling PastDueCache added.
+Quizzer: [12:42:09] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:08.342787_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:42:10] [34m[INFO][0m [eligibility_check_worker.dart] EligibilityCheckWorker: Found record in PastDueCache, processing...
+Quizzer: [12:42:10] [34m[INFO][0m [eligibility_check_worker.dart] Eligibility Check: 2025-04-28T20:11:08.342787_e737b728-1ae2-41d4-bae0-77ff5a222a0a is NOT eligible (in recent history). Waiting 1s before reprocessing.
+Quizzer: [12:42:10] [34m[INFO][0m [switch_board.dart] SwitchBoard: Signaling PastDueCache added.
+Quizzer: [12:42:10] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:41.809237_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:42:10] [34m[INFO][0m [test_helpers.dart] SUCCESS: Cache monitoring loop finished after 0:00:03.014277.
+Quizzer: [12:42:10] [34m[INFO][0m [individual_api_tests.dart] --- Iteration 4 ---
+Quizzer: [12:42:10] [34m[INFO][0m [individual_api_tests.dart] --- State BEFORE requestNextQuestion Call ---
+Quizzer: [12:42:10] [34m[INFO][0m [test_helpers.dart] --- Logging Current Question Details ---
+Quizzer: [12:42:10] [36m[DEBUG][0m [test_helpers.dart]   Question ID: 2025-04-28T20:11:13.682006_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:10] [36m[DEBUG][0m [test_helpers.dart]   Question Type: select_all_that_apply
+Quizzer: [12:42:10] [36m[DEBUG][0m [test_helpers.dart]   Module Name: Is Even Or Odd
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   Question Elements: [{type: text, content: Select all the ODD numbers.}]
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   Answer Elements: [{type: text, content: Odd numbers are not divisible by 2.}]
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   Citation: 
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   Concepts: 
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   Subjects: 
+Quizzer: [12:42:11] [34m[INFO][0m [test_helpers.dart] --- Logging Current User Question Record Details ---
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   user_uuid: e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   question_id: 2025-04-28T20:11:13.682006_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   revision_streak: 0
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   last_revised: 2025-04-29T12:42:07.392042
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   predicted_revision_due_history: []
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   next_revision_due: 2025-04-29T12:42:07.392203
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   time_between_revisions: 0.30999999999999994
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   average_times_shown_per_day: Infinity
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   is_eligible: null
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   in_circulation: 1
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   last_updated: 2025-04-29T12:42:07.392042
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   total_attempts: 4
+Quizzer: [12:42:11] [34m[INFO][0m [test_helpers.dart] --- Logging Current User Question Record from DB ---
+Quizzer: [12:42:11] [34m[INFO][0m [test_helpers.dart] DB access released.
+Quizzer: [12:42:11] [34m[INFO][0m [test_helpers.dart] DB Record for User: e737b728-1ae2-41d4-bae0-77ff5a222a0a, Question: 2025-04-28T20:11:13.682006_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   user_uuid: e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   question_id: 2025-04-28T20:11:13.682006_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   revision_streak: 0
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   last_revised: 2025-04-29T12:42:07.392042
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   predicted_revision_due_history: []
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   next_revision_due: 2025-04-29T12:42:07.392203
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   time_between_revisions: 0.30999999999999994
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   average_times_shown_per_day: Infinity
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   is_eligible: null
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   in_circulation: 1
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   last_updated: 2025-04-29T12:42:07.392042
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   total_attempts: 4
+Quizzer: [12:42:11] [34m[INFO][0m [test_helpers.dart] Waiting for 0.3 seconds...
+Quizzer: [12:42:11] [34m[INFO][0m [eligibility_check_worker.dart] EligibilityCheckWorker: Found record in PastDueCache, processing...
+Quizzer: [12:42:11] [34m[INFO][0m [eligibility_check_worker.dart] Eligibility Check: 2025-04-28T16:33:41.809237_e737b728-1ae2-41d4-bae0-77ff5a222a0a is NOT eligible (in recent history). Waiting 1s before reprocessing.
+Quizzer: [12:42:11] [34m[INFO][0m [switch_board.dart] SwitchBoard: Signaling PastDueCache added.
+Quizzer: [12:42:11] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:08.342787_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:42:11] [34m[INFO][0m [test_helpers.dart] Wait complete.
+Quizzer: [12:42:11] [34m[INFO][0m [individual_api_tests.dart] Calling requestNextQuestion...
+Quizzer: [12:42:11] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:13.682006_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:42:11] [34m[INFO][0m [individual_api_tests.dart] --- State AFTER requestNextQuestion Call ---
+Quizzer: [12:42:11] [34m[INFO][0m [test_helpers.dart] --- Logging Current Question Details ---
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   Question ID: 2025-04-28T16:33:44.982426_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   Question Type: multiple_choice
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   Module Name: elementary_addition
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   Question Elements: [{type: text, content: 9 + 6 = ?}]
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   Answer Elements: [{type: text, content: 15}]
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   Options: [16, 13, 8, 14, 96, 15]
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   Correct Index: 5
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   Citation: 
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   Concepts: 
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   Subjects: 
+Quizzer: [12:42:11] [34m[INFO][0m [test_helpers.dart] Waiting for 0.3 seconds...
+Quizzer: [12:42:11] [34m[INFO][0m [test_helpers.dart] Wait complete.
+Quizzer: [12:42:11] [34m[INFO][0m [individual_api_tests.dart] Submitting random answer
+Quizzer: [12:42:11] [34m[INFO][0m [test_helpers.dart] --- Generating Random Multiple Choice Answer ---
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart] Selected random option index: 4
+Quizzer: [12:42:11] [34m[INFO][0m [question_answer_attempts_table.dart] Verifying question_answer_attempts table...
+Quizzer: [12:42:11] [34m[INFO][0m [question_answer_attempts_table.dart] question_answer_attempts table already exists. Checking columns...
+Quizzer: [12:42:11] [34m[INFO][0m [question_answer_attempts_table.dart] Column check complete.
+Quizzer: [12:42:11] [34m[INFO][0m [question_answer_attempts_table.dart] Checking if first attempt for Q: 2025-04-28T16:33:44.982426_e737b728-1ae2-41d4-bae0-77ff5a222a0a, User: e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:11] [34m[INFO][0m [question_answer_attempts_table.dart] Is first attempt? false
+Quizzer: [12:42:11] [34m[INFO][0m [question_answer_attempts_table.dart] Adding question attempt for Q: 2025-04-28T16:33:44.982426_e737b728-1ae2-41d4-bae0-77ff5a222a0a, User: e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:11] [34m[INFO][0m [question_answer_attempts_table.dart] SUCCESS: Successfully added question attempt record with result ID: 453. Data: {time_stamp: 2025-04-29T12:42:11.550934, question_id: 2025-04-28T16:33:44.982426_e737b728-1ae2-41d4-bae0-77ff5a222a0a, participant_id: e737b728-1ae2-41d4-bae0-77ff5a222a0a, response_time: 0.264218, response_result: 0, was_first_attempt: 0, knowledge_base: null, question_context_csv: {"subjects":[],"concepts":[]}, last_revised_date: 2025-04-28T20:32:31.106702, days_since_last_revision: 0.6733847712037037, total_attempts: 1, revision_streak: 1}
+Quizzer: [12:42:11] [34m[INFO][0m [test_helpers.dart] Waiting for 0.3 seconds...
+Quizzer: [12:42:11] [34m[INFO][0m [test_helpers.dart] Wait complete.
+Quizzer: [12:42:11] [34m[INFO][0m [test_helpers.dart] --- Logging Current User Question Record Details ---
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   user_uuid: e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   question_id: 2025-04-28T16:33:44.982426_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   revision_streak: 0
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   last_revised: 2025-04-29T12:42:11.550989
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   predicted_revision_due_history: []
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   next_revision_due: 2025-04-29T12:42:11.551601
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   time_between_revisions: 0.355
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   average_times_shown_per_day: Infinity
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   is_eligible: null
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   in_circulation: 1
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   last_updated: 2025-04-29T12:42:11.550989
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   total_attempts: 2
+Quizzer: [12:42:11] [34m[INFO][0m [test_helpers.dart] --- Logging Current User Question Record from DB ---
+Quizzer: [12:42:11] [34m[INFO][0m [test_helpers.dart] DB access released.
+Quizzer: [12:42:11] [34m[INFO][0m [test_helpers.dart] DB Record for User: e737b728-1ae2-41d4-bae0-77ff5a222a0a, Question: 2025-04-28T16:33:44.982426_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   user_uuid: e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   question_id: 2025-04-28T16:33:44.982426_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   revision_streak: 0
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   last_revised: 2025-04-29T12:42:11.550989
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   predicted_revision_due_history: []
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   next_revision_due: 2025-04-29T12:42:11.551601
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   time_between_revisions: 0.355
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   average_times_shown_per_day: Infinity
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   is_eligible: null
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   in_circulation: 1
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   last_updated: 2025-04-29T12:42:11.550989
+Quizzer: [12:42:11] [36m[DEBUG][0m [test_helpers.dart]   total_attempts: 2
+Quizzer: [12:42:11] [34m[INFO][0m [test_helpers.dart] Waiting for 0.3 seconds...
+Quizzer: [12:42:12] [34m[INFO][0m [eligibility_check_worker.dart] EligibilityCheckWorker: Found record in PastDueCache, processing...
+Quizzer: [12:42:12] [34m[INFO][0m [eligibility_check_worker.dart] Eligibility Check: 2025-04-28T20:11:13.682006_e737b728-1ae2-41d4-bae0-77ff5a222a0a is NOT eligible (in recent history). Waiting 1s before reprocessing.
+Quizzer: [12:42:12] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:41.809237_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:42:12] [34m[INFO][0m [test_helpers.dart] Wait complete.
+Quizzer: [12:42:12] [34m[INFO][0m [test_helpers.dart] --- Cache State Check 1 at 0:00:00.000005 (Target: 1s) ---
+Quizzer: [12:42:12] [36m[DEBUG][0m [test_helpers.dart] UnprocessedCache length: 0
+Quizzer: [12:42:12] [36m[DEBUG][0m [test_helpers.dart] NonCirculatingCache length: 25
+Quizzer: [12:42:12] [36m[DEBUG][0m [test_helpers.dart] ModuleInactiveCache length: 0
+Quizzer: [12:42:12] [36m[DEBUG][0m [test_helpers.dart] CirculatingCache length: 156
+Quizzer: [12:42:12] [36m[DEBUG][0m [test_helpers.dart] DueDateBeyond24hrsCache length: 0
+Quizzer: [12:42:12] [36m[DEBUG][0m [test_helpers.dart] DueDateWithin24hrsCache length: 1
+Quizzer: [12:42:12] [36m[DEBUG][0m [test_helpers.dart] PastDueCache length: 2
+Quizzer: [12:42:12] [36m[DEBUG][0m [test_helpers.dart] EligibleQuestionsCache length: 141
+Quizzer: [12:42:12] [36m[DEBUG][0m [test_helpers.dart] QuestionQueueCache length: 10
+Quizzer: [12:42:12] [36m[DEBUG][0m [test_helpers.dart] AnswerHistoryCache length: 3
+Quizzer: [12:42:13] [34m[INFO][0m [eligibility_check_worker.dart] EligibilityCheckWorker: Found record in PastDueCache, processing...
+Quizzer: [12:42:13] [34m[INFO][0m [eligibility_check_worker.dart] Eligibility Check: 2025-04-28T20:11:08.342787_e737b728-1ae2-41d4-bae0-77ff5a222a0a is NOT eligible (in recent history). Waiting 1s before reprocessing.
+Quizzer: [12:42:13] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:13.682006_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:42:14] [34m[INFO][0m [eligibility_check_worker.dart] EligibilityCheckWorker: Found record in PastDueCache, processing...
+Quizzer: [12:42:14] [34m[INFO][0m [eligibility_check_worker.dart] Eligibility Check: 2025-04-28T20:11:13.682006_e737b728-1ae2-41d4-bae0-77ff5a222a0a is NOT eligible (in recent history). Waiting 1s before reprocessing.
+Quizzer: [12:42:14] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:08.342787_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:42:15] [34m[INFO][0m [eligibility_check_worker.dart] EligibilityCheckWorker: Found record in PastDueCache, processing...
+Quizzer: [12:42:15] [34m[INFO][0m [eligibility_check_worker.dart] Eligibility Check: 2025-04-28T20:11:08.342787_e737b728-1ae2-41d4-bae0-77ff5a222a0a is NOT eligible (in recent history). Waiting 1s before reprocessing.
+Quizzer: [12:42:15] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:13.682006_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:42:15] [34m[INFO][0m [test_helpers.dart] SUCCESS: Cache monitoring loop finished after 0:00:03.007286.
+Quizzer: [12:42:15] [34m[INFO][0m [individual_api_tests.dart] --- Iteration 5 ---
+Quizzer: [12:42:15] [34m[INFO][0m [individual_api_tests.dart] --- State BEFORE requestNextQuestion Call ---
+Quizzer: [12:42:15] [34m[INFO][0m [test_helpers.dart] --- Logging Current Question Details ---
+Quizzer: [12:42:15] [36m[DEBUG][0m [test_helpers.dart]   Question ID: 2025-04-28T16:33:44.982426_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:15] [36m[DEBUG][0m [test_helpers.dart]   Question Type: multiple_choice
+Quizzer: [12:42:15] [36m[DEBUG][0m [test_helpers.dart]   Module Name: elementary_addition
+Quizzer: [12:42:15] [36m[DEBUG][0m [test_helpers.dart]   Question Elements: [{type: text, content: 9 + 6 = ?}]
+Quizzer: [12:42:15] [36m[DEBUG][0m [test_helpers.dart]   Answer Elements: [{type: text, content: 15}]
+Quizzer: [12:42:15] [36m[DEBUG][0m [test_helpers.dart]   Options: [16, 13, 8, 14, 96, 15]
+Quizzer: [12:42:15] [36m[DEBUG][0m [test_helpers.dart]   Correct Index: 5
+Quizzer: [12:42:15] [36m[DEBUG][0m [test_helpers.dart]   Citation: 
+Quizzer: [12:42:15] [36m[DEBUG][0m [test_helpers.dart]   Concepts: 
+Quizzer: [12:42:15] [36m[DEBUG][0m [test_helpers.dart]   Subjects: 
+Quizzer: [12:42:15] [34m[INFO][0m [test_helpers.dart] --- Logging Current User Question Record Details ---
+Quizzer: [12:42:15] [36m[DEBUG][0m [test_helpers.dart]   user_uuid: e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:15] [36m[DEBUG][0m [test_helpers.dart]   question_id: 2025-04-28T16:33:44.982426_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:15] [36m[DEBUG][0m [test_helpers.dart]   revision_streak: 0
+Quizzer: [12:42:15] [36m[DEBUG][0m [test_helpers.dart]   last_revised: 2025-04-29T12:42:11.550989
+Quizzer: [12:42:15] [36m[DEBUG][0m [test_helpers.dart]   predicted_revision_due_history: []
+Quizzer: [12:42:15] [36m[DEBUG][0m [test_helpers.dart]   next_revision_due: 2025-04-29T12:42:11.551601
+Quizzer: [12:42:15] [36m[DEBUG][0m [test_helpers.dart]   time_between_revisions: 0.355
+Quizzer: [12:42:15] [36m[DEBUG][0m [test_helpers.dart]   average_times_shown_per_day: Infinity
+Quizzer: [12:42:15] [36m[DEBUG][0m [test_helpers.dart]   is_eligible: null
+Quizzer: [12:42:15] [36m[DEBUG][0m [test_helpers.dart]   in_circulation: 1
+Quizzer: [12:42:15] [36m[DEBUG][0m [test_helpers.dart]   last_updated: 2025-04-29T12:42:11.550989
+Quizzer: [12:42:15] [36m[DEBUG][0m [test_helpers.dart]   total_attempts: 2
+Quizzer: [12:42:15] [34m[INFO][0m [test_helpers.dart] --- Logging Current User Question Record from DB ---
+Quizzer: [12:42:15] [34m[INFO][0m [test_helpers.dart] DB access released.
+Quizzer: [12:42:15] [34m[INFO][0m [test_helpers.dart] DB Record for User: e737b728-1ae2-41d4-bae0-77ff5a222a0a, Question: 2025-04-28T16:33:44.982426_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:15] [36m[DEBUG][0m [test_helpers.dart]   user_uuid: e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:15] [36m[DEBUG][0m [test_helpers.dart]   question_id: 2025-04-28T16:33:44.982426_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:15] [36m[DEBUG][0m [test_helpers.dart]   revision_streak: 0
+Quizzer: [12:42:15] [36m[DEBUG][0m [test_helpers.dart]   last_revised: 2025-04-29T12:42:11.550989
+Quizzer: [12:42:15] [36m[DEBUG][0m [test_helpers.dart]   predicted_revision_due_history: []
+Quizzer: [12:42:15] [36m[DEBUG][0m [test_helpers.dart]   next_revision_due: 2025-04-29T12:42:11.551601
+Quizzer: [12:42:15] [36m[DEBUG][0m [test_helpers.dart]   time_between_revisions: 0.355
+Quizzer: [12:42:15] [36m[DEBUG][0m [test_helpers.dart]   average_times_shown_per_day: Infinity
+Quizzer: [12:42:15] [36m[DEBUG][0m [test_helpers.dart]   is_eligible: null
+Quizzer: [12:42:15] [36m[DEBUG][0m [test_helpers.dart]   in_circulation: 1
+Quizzer: [12:42:15] [36m[DEBUG][0m [test_helpers.dart]   last_updated: 2025-04-29T12:42:11.550989
+Quizzer: [12:42:15] [36m[DEBUG][0m [test_helpers.dart]   total_attempts: 2
+Quizzer: [12:42:15] [34m[INFO][0m [test_helpers.dart] Waiting for 0.3 seconds...
+Quizzer: [12:42:15] [34m[INFO][0m [test_helpers.dart] Wait complete.
+Quizzer: [12:42:15] [34m[INFO][0m [individual_api_tests.dart] Calling requestNextQuestion...
+Quizzer: [12:42:15] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:44.982426_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:42:15] [34m[INFO][0m [individual_api_tests.dart] --- State AFTER requestNextQuestion Call ---
+Quizzer: [12:42:15] [34m[INFO][0m [test_helpers.dart] --- Logging Current Question Details ---
+Quizzer: [12:42:15] [36m[DEBUG][0m [test_helpers.dart]   Question ID: 2025-04-28T20:11:19.085301_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:15] [36m[DEBUG][0m [test_helpers.dart]   Question Type: select_all_that_apply
+Quizzer: [12:42:15] [36m[DEBUG][0m [test_helpers.dart]   Module Name: Is Even Or Odd
+Quizzer: [12:42:15] [36m[DEBUG][0m [test_helpers.dart]   Question Elements: [{type: text, content: Select all the EVEN numbers.}]
+Quizzer: [12:42:15] [36m[DEBUG][0m [test_helpers.dart]   Answer Elements: [{type: text, content: Even numbers are divisible by 2.}]
+Quizzer: [12:42:15] [36m[DEBUG][0m [test_helpers.dart]   Citation: 
+Quizzer: [12:42:15] [36m[DEBUG][0m [test_helpers.dart]   Concepts: 
+Quizzer: [12:42:15] [36m[DEBUG][0m [test_helpers.dart]   Subjects: 
+Quizzer: [12:42:15] [34m[INFO][0m [test_helpers.dart] Waiting for 0.3 seconds...
+Quizzer: [12:42:15] [34m[INFO][0m [test_helpers.dart] Wait complete.
+Quizzer: [12:42:15] [34m[INFO][0m [individual_api_tests.dart] Submitting random answer
+Quizzer: [12:42:15] [34m[INFO][0m [test_helpers.dart] --- Generating Random Select-All-That-Apply Answer ---
+Quizzer: [12:42:15] [36m[DEBUG][0m [test_helpers.dart] Selected random indices: [2, 3, 5]
+Quizzer: [12:42:15] [34m[INFO][0m [question_answer_attempts_table.dart] Verifying question_answer_attempts table...
+Quizzer: [12:42:15] [34m[INFO][0m [question_answer_attempts_table.dart] question_answer_attempts table already exists. Checking columns...
+Quizzer: [12:42:15] [34m[INFO][0m [question_answer_attempts_table.dart] Column check complete.
+Quizzer: [12:42:15] [34m[INFO][0m [question_answer_attempts_table.dart] Checking if first attempt for Q: 2025-04-28T20:11:19.085301_e737b728-1ae2-41d4-bae0-77ff5a222a0a, User: e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:15] [34m[INFO][0m [question_answer_attempts_table.dart] Is first attempt? false
+Quizzer: [12:42:15] [34m[INFO][0m [question_answer_attempts_table.dart] Adding question attempt for Q: 2025-04-28T20:11:19.085301_e737b728-1ae2-41d4-bae0-77ff5a222a0a, User: e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:15] [34m[INFO][0m [question_answer_attempts_table.dart] SUCCESS: Successfully added question attempt record with result ID: 454. Data: {time_stamp: 2025-04-29T12:42:15.680732, question_id: 2025-04-28T20:11:19.085301_e737b728-1ae2-41d4-bae0-77ff5a222a0a, participant_id: e737b728-1ae2-41d4-bae0-77ff5a222a0a, response_time: 0.269454, response_result: 0, was_first_attempt: 0, knowledge_base: null, question_context_csv: {"subjects":[],"concepts":[]}, last_revised_date: 2025-04-28T21:16:00.462935, days_since_last_revision: 0.6432316874652778, total_attempts: 3, revision_streak: 0}
+Quizzer: [12:42:15] [34m[INFO][0m [test_helpers.dart] Waiting for 0.3 seconds...
+Quizzer: [12:42:15] [34m[INFO][0m [test_helpers.dart] Wait complete.
+Quizzer: [12:42:15] [34m[INFO][0m [test_helpers.dart] --- Logging Current User Question Record Details ---
+Quizzer: [12:42:15] [36m[DEBUG][0m [test_helpers.dart]   user_uuid: e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:15] [36m[DEBUG][0m [test_helpers.dart]   question_id: 2025-04-28T20:11:19.085301_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:15] [36m[DEBUG][0m [test_helpers.dart]   revision_streak: 0
+Quizzer: [12:42:15] [36m[DEBUG][0m [test_helpers.dart]   last_revised: 2025-04-29T12:42:15.680848
+Quizzer: [12:42:15] [36m[DEBUG][0m [test_helpers.dart]   predicted_revision_due_history: []
+Quizzer: [12:42:15] [36m[DEBUG][0m [test_helpers.dart]   next_revision_due: 2025-04-29T12:42:15.681092
+Quizzer: [12:42:15] [36m[DEBUG][0m [test_helpers.dart]   time_between_revisions: 0.30999999999999994
+Quizzer: [12:42:15] [36m[DEBUG][0m [test_helpers.dart]   average_times_shown_per_day: Infinity
+Quizzer: [12:42:15] [36m[DEBUG][0m [test_helpers.dart]   is_eligible: null
+Quizzer: [12:42:15] [36m[DEBUG][0m [test_helpers.dart]   in_circulation: 1
+Quizzer: [12:42:15] [36m[DEBUG][0m [test_helpers.dart]   last_updated: 2025-04-29T12:42:15.680848
+Quizzer: [12:42:15] [36m[DEBUG][0m [test_helpers.dart]   total_attempts: 4
+Quizzer: [12:42:15] [34m[INFO][0m [test_helpers.dart] --- Logging Current User Question Record from DB ---
+Quizzer: [12:42:16] [34m[INFO][0m [test_helpers.dart] DB access released.
+Quizzer: [12:42:16] [34m[INFO][0m [test_helpers.dart] DB Record for User: e737b728-1ae2-41d4-bae0-77ff5a222a0a, Question: 2025-04-28T20:11:19.085301_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:16] [36m[DEBUG][0m [test_helpers.dart]   user_uuid: e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:16] [36m[DEBUG][0m [test_helpers.dart]   question_id: 2025-04-28T20:11:19.085301_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:16] [36m[DEBUG][0m [test_helpers.dart]   revision_streak: 0
+Quizzer: [12:42:16] [36m[DEBUG][0m [test_helpers.dart]   last_revised: 2025-04-29T12:42:15.680848
+Quizzer: [12:42:16] [36m[DEBUG][0m [test_helpers.dart]   predicted_revision_due_history: []
+Quizzer: [12:42:16] [36m[DEBUG][0m [test_helpers.dart]   next_revision_due: 2025-04-29T12:42:15.681092
+Quizzer: [12:42:16] [36m[DEBUG][0m [test_helpers.dart]   time_between_revisions: 0.30999999999999994
+Quizzer: [12:42:16] [36m[DEBUG][0m [test_helpers.dart]   average_times_shown_per_day: Infinity
+Quizzer: [12:42:16] [36m[DEBUG][0m [test_helpers.dart]   is_eligible: null
+Quizzer: [12:42:16] [36m[DEBUG][0m [test_helpers.dart]   in_circulation: 1
+Quizzer: [12:42:16] [36m[DEBUG][0m [test_helpers.dart]   last_updated: 2025-04-29T12:42:15.680848
+Quizzer: [12:42:16] [36m[DEBUG][0m [test_helpers.dart]   total_attempts: 4
+Quizzer: [12:42:16] [34m[INFO][0m [test_helpers.dart] Waiting for 0.3 seconds...
+Quizzer: [12:42:16] [34m[INFO][0m [eligibility_check_worker.dart] EligibilityCheckWorker: Found record in PastDueCache, processing...
+Quizzer: [12:42:16] [34m[INFO][0m [eligibility_check_worker.dart] Eligibility Check: 2025-04-28T16:33:44.982426_e737b728-1ae2-41d4-bae0-77ff5a222a0a is NOT eligible (in recent history). Waiting 1s before reprocessing.
+Quizzer: [12:42:16] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:08.342787_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:42:16] [34m[INFO][0m [test_helpers.dart] Wait complete.
+Quizzer: [12:42:16] [34m[INFO][0m [test_helpers.dart] --- Cache State Check 1 at 0:00:00.000016 (Target: 1s) ---
+Quizzer: [12:42:16] [36m[DEBUG][0m [test_helpers.dart] UnprocessedCache length: 0
+Quizzer: [12:42:16] [36m[DEBUG][0m [test_helpers.dart] NonCirculatingCache length: 25
+Quizzer: [12:42:16] [36m[DEBUG][0m [test_helpers.dart] ModuleInactiveCache length: 0
+Quizzer: [12:42:16] [36m[DEBUG][0m [test_helpers.dart] CirculatingCache length: 156
+Quizzer: [12:42:16] [36m[DEBUG][0m [test_helpers.dart] DueDateBeyond24hrsCache length: 0
+Quizzer: [12:42:16] [36m[DEBUG][0m [test_helpers.dart] DueDateWithin24hrsCache length: 1
+Quizzer: [12:42:16] [36m[DEBUG][0m [test_helpers.dart] PastDueCache length: 3
+Quizzer: [12:42:16] [36m[DEBUG][0m [test_helpers.dart] EligibleQuestionsCache length: 140
+Quizzer: [12:42:16] [36m[DEBUG][0m [test_helpers.dart] QuestionQueueCache length: 10
+Quizzer: [12:42:16] [36m[DEBUG][0m [test_helpers.dart] AnswerHistoryCache length: 4
+Quizzer: [12:42:17] [34m[INFO][0m [eligibility_check_worker.dart] EligibilityCheckWorker: Found record in PastDueCache, processing...
+Quizzer: [12:42:17] [34m[INFO][0m [eligibility_check_worker.dart] Eligibility Check: 2025-04-28T16:33:41.809237_e737b728-1ae2-41d4-bae0-77ff5a222a0a is NOT eligible (in recent history). Waiting 1s before reprocessing.
+Quizzer: [12:42:17] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:44.982426_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:42:18] [34m[INFO][0m [eligibility_check_worker.dart] EligibilityCheckWorker: Found record in PastDueCache, processing...
+Quizzer: [12:42:18] [34m[INFO][0m [eligibility_check_worker.dart] Eligibility Check: 2025-04-28T20:11:08.342787_e737b728-1ae2-41d4-bae0-77ff5a222a0a is NOT eligible (in recent history). Waiting 1s before reprocessing.
+Quizzer: [12:42:18] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:41.809237_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:42:19] [34m[INFO][0m [eligibility_check_worker.dart] EligibilityCheckWorker: Found record in PastDueCache, processing...
+Quizzer: [12:42:19] [34m[INFO][0m [eligibility_check_worker.dart] Eligibility Check: 2025-04-28T16:33:41.809237_e737b728-1ae2-41d4-bae0-77ff5a222a0a is NOT eligible (in recent history). Waiting 1s before reprocessing.
+Quizzer: [12:42:19] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:08.342787_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:42:19] [34m[INFO][0m [test_helpers.dart] SUCCESS: Cache monitoring loop finished after 0:00:03.011643.
+Quizzer: [12:42:19] [34m[INFO][0m [individual_api_tests.dart] --- Iteration 6 ---
+Quizzer: [12:42:19] [34m[INFO][0m [individual_api_tests.dart] --- State BEFORE requestNextQuestion Call ---
+Quizzer: [12:42:19] [34m[INFO][0m [test_helpers.dart] --- Logging Current Question Details ---
+Quizzer: [12:42:19] [36m[DEBUG][0m [test_helpers.dart]   Question ID: 2025-04-28T20:11:19.085301_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:19] [36m[DEBUG][0m [test_helpers.dart]   Question Type: select_all_that_apply
+Quizzer: [12:42:19] [36m[DEBUG][0m [test_helpers.dart]   Module Name: Is Even Or Odd
+Quizzer: [12:42:19] [36m[DEBUG][0m [test_helpers.dart]   Question Elements: [{type: text, content: Select all the EVEN numbers.}]
+Quizzer: [12:42:19] [36m[DEBUG][0m [test_helpers.dart]   Answer Elements: [{type: text, content: Even numbers are divisible by 2.}]
+Quizzer: [12:42:19] [36m[DEBUG][0m [test_helpers.dart]   Citation: 
+Quizzer: [12:42:19] [36m[DEBUG][0m [test_helpers.dart]   Concepts: 
+Quizzer: [12:42:19] [36m[DEBUG][0m [test_helpers.dart]   Subjects: 
+Quizzer: [12:42:19] [34m[INFO][0m [test_helpers.dart] --- Logging Current User Question Record Details ---
+Quizzer: [12:42:19] [36m[DEBUG][0m [test_helpers.dart]   user_uuid: e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:19] [36m[DEBUG][0m [test_helpers.dart]   question_id: 2025-04-28T20:11:19.085301_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:19] [36m[DEBUG][0m [test_helpers.dart]   revision_streak: 0
+Quizzer: [12:42:19] [36m[DEBUG][0m [test_helpers.dart]   last_revised: 2025-04-29T12:42:15.680848
+Quizzer: [12:42:19] [36m[DEBUG][0m [test_helpers.dart]   predicted_revision_due_history: []
+Quizzer: [12:42:19] [36m[DEBUG][0m [test_helpers.dart]   next_revision_due: 2025-04-29T12:42:15.681092
+Quizzer: [12:42:19] [36m[DEBUG][0m [test_helpers.dart]   time_between_revisions: 0.30999999999999994
+Quizzer: [12:42:19] [36m[DEBUG][0m [test_helpers.dart]   average_times_shown_per_day: Infinity
+Quizzer: [12:42:19] [36m[DEBUG][0m [test_helpers.dart]   is_eligible: null
+Quizzer: [12:42:19] [36m[DEBUG][0m [test_helpers.dart]   in_circulation: 1
+Quizzer: [12:42:19] [36m[DEBUG][0m [test_helpers.dart]   last_updated: 2025-04-29T12:42:15.680848
+Quizzer: [12:42:19] [36m[DEBUG][0m [test_helpers.dart]   total_attempts: 4
+Quizzer: [12:42:19] [34m[INFO][0m [test_helpers.dart] --- Logging Current User Question Record from DB ---
+Quizzer: [12:42:19] [34m[INFO][0m [test_helpers.dart] DB access released.
+Quizzer: [12:42:19] [34m[INFO][0m [test_helpers.dart] DB Record for User: e737b728-1ae2-41d4-bae0-77ff5a222a0a, Question: 2025-04-28T20:11:19.085301_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:19] [36m[DEBUG][0m [test_helpers.dart]   user_uuid: e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:19] [36m[DEBUG][0m [test_helpers.dart]   question_id: 2025-04-28T20:11:19.085301_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:19] [36m[DEBUG][0m [test_helpers.dart]   revision_streak: 0
+Quizzer: [12:42:19] [36m[DEBUG][0m [test_helpers.dart]   last_revised: 2025-04-29T12:42:15.680848
+Quizzer: [12:42:19] [36m[DEBUG][0m [test_helpers.dart]   predicted_revision_due_history: []
+Quizzer: [12:42:19] [36m[DEBUG][0m [test_helpers.dart]   next_revision_due: 2025-04-29T12:42:15.681092
+Quizzer: [12:42:19] [36m[DEBUG][0m [test_helpers.dart]   time_between_revisions: 0.30999999999999994
+Quizzer: [12:42:19] [36m[DEBUG][0m [test_helpers.dart]   average_times_shown_per_day: Infinity
+Quizzer: [12:42:19] [36m[DEBUG][0m [test_helpers.dart]   is_eligible: null
+Quizzer: [12:42:19] [36m[DEBUG][0m [test_helpers.dart]   in_circulation: 1
+Quizzer: [12:42:19] [36m[DEBUG][0m [test_helpers.dart]   last_updated: 2025-04-29T12:42:15.680848
+Quizzer: [12:42:19] [36m[DEBUG][0m [test_helpers.dart]   total_attempts: 4
+Quizzer: [12:42:19] [34m[INFO][0m [test_helpers.dart] Waiting for 0.3 seconds...
+Quizzer: [12:42:19] [34m[INFO][0m [test_helpers.dart] Wait complete.
+Quizzer: [12:42:19] [34m[INFO][0m [individual_api_tests.dart] Calling requestNextQuestion...
+Quizzer: [12:42:19] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:19.085301_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:42:19] [34m[INFO][0m [individual_api_tests.dart] --- State AFTER requestNextQuestion Call ---
+Quizzer: [12:42:19] [34m[INFO][0m [test_helpers.dart] --- Logging Current Question Details ---
+Quizzer: [12:42:19] [36m[DEBUG][0m [test_helpers.dart]   Question ID: 2025-04-28T16:33:34.436018_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:19] [36m[DEBUG][0m [test_helpers.dart]   Question Type: multiple_choice
+Quizzer: [12:42:19] [36m[DEBUG][0m [test_helpers.dart]   Module Name: elementary_addition
+Quizzer: [12:42:19] [36m[DEBUG][0m [test_helpers.dart]   Question Elements: [{type: text, content: 5 + 3 = ?}]
+Quizzer: [12:42:19] [36m[DEBUG][0m [test_helpers.dart]   Answer Elements: [{type: text, content: 8}]
+Quizzer: [12:42:19] [36m[DEBUG][0m [test_helpers.dart]   Options: [7, 22, 8, 12, 9, 53]
+Quizzer: [12:42:19] [36m[DEBUG][0m [test_helpers.dart]   Correct Index: 2
+Quizzer: [12:42:19] [36m[DEBUG][0m [test_helpers.dart]   Citation: 
+Quizzer: [12:42:19] [36m[DEBUG][0m [test_helpers.dart]   Concepts: 
+Quizzer: [12:42:19] [36m[DEBUG][0m [test_helpers.dart]   Subjects: 
+Quizzer: [12:42:19] [34m[INFO][0m [test_helpers.dart] Waiting for 0.3 seconds...
+Quizzer: [12:42:19] [34m[INFO][0m [test_helpers.dart] Wait complete.
+Quizzer: [12:42:19] [34m[INFO][0m [individual_api_tests.dart] Submitting random answer
+Quizzer: [12:42:19] [34m[INFO][0m [test_helpers.dart] --- Generating Random Multiple Choice Answer ---
+Quizzer: [12:42:19] [36m[DEBUG][0m [test_helpers.dart] Selected random option index: 1
+Quizzer: [12:42:19] [34m[INFO][0m [question_answer_attempts_table.dart] Verifying question_answer_attempts table...
+Quizzer: [12:42:19] [34m[INFO][0m [question_answer_attempts_table.dart] question_answer_attempts table already exists. Checking columns...
+Quizzer: [12:42:19] [34m[INFO][0m [question_answer_attempts_table.dart] Column check complete.
+Quizzer: [12:42:19] [34m[INFO][0m [question_answer_attempts_table.dart] Checking if first attempt for Q: 2025-04-28T16:33:34.436018_e737b728-1ae2-41d4-bae0-77ff5a222a0a, User: e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:19] [34m[INFO][0m [question_answer_attempts_table.dart] Is first attempt? false
+Quizzer: [12:42:19] [34m[INFO][0m [question_answer_attempts_table.dart] Adding question attempt for Q: 2025-04-28T16:33:34.436018_e737b728-1ae2-41d4-bae0-77ff5a222a0a, User: e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:19] [34m[INFO][0m [question_answer_attempts_table.dart] SUCCESS: Successfully added question attempt record with result ID: 455. Data: {time_stamp: 2025-04-29T12:42:19.832544, question_id: 2025-04-28T16:33:34.436018_e737b728-1ae2-41d4-bae0-77ff5a222a0a, participant_id: e737b728-1ae2-41d4-bae0-77ff5a222a0a, response_time: 0.269193, response_result: 0, was_first_attempt: 0, knowledge_base: null, question_context_csv: {"subjects":[],"concepts":[]}, last_revised_date: 2025-04-28T21:16:42.367881, days_since_last_revision: 0.6427947298958333, total_attempts: 2, revision_streak: 0}
+Quizzer: [12:42:19] [34m[INFO][0m [test_helpers.dart] Waiting for 0.3 seconds...
+Quizzer: [12:42:20] [34m[INFO][0m [eligibility_check_worker.dart] EligibilityCheckWorker: Found record in PastDueCache, processing...
+Quizzer: [12:42:20] [34m[INFO][0m [eligibility_check_worker.dart] Eligibility Check: 2025-04-28T16:33:44.982426_e737b728-1ae2-41d4-bae0-77ff5a222a0a is NOT eligible (in recent history). Waiting 1s before reprocessing.
+Quizzer: [12:42:20] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:41.809237_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:42:20] [34m[INFO][0m [test_helpers.dart] Wait complete.
+Quizzer: [12:42:20] [34m[INFO][0m [test_helpers.dart] --- Logging Current User Question Record Details ---
+Quizzer: [12:42:20] [36m[DEBUG][0m [test_helpers.dart]   user_uuid: e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:20] [36m[DEBUG][0m [test_helpers.dart]   question_id: 2025-04-28T16:33:34.436018_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:20] [36m[DEBUG][0m [test_helpers.dart]   revision_streak: 0
+Quizzer: [12:42:20] [36m[DEBUG][0m [test_helpers.dart]   last_revised: 2025-04-29T12:42:19.832562
+Quizzer: [12:42:20] [36m[DEBUG][0m [test_helpers.dart]   predicted_revision_due_history: []
+Quizzer: [12:42:20] [36m[DEBUG][0m [test_helpers.dart]   next_revision_due: 2025-04-29T12:42:19.832610
+Quizzer: [12:42:20] [36m[DEBUG][0m [test_helpers.dart]   time_between_revisions: 0.32499999999999996
+Quizzer: [12:42:20] [36m[DEBUG][0m [test_helpers.dart]   average_times_shown_per_day: Infinity
+Quizzer: [12:42:20] [36m[DEBUG][0m [test_helpers.dart]   is_eligible: null
+Quizzer: [12:42:20] [36m[DEBUG][0m [test_helpers.dart]   in_circulation: 1
+Quizzer: [12:42:20] [36m[DEBUG][0m [test_helpers.dart]   last_updated: 2025-04-29T12:42:19.832562
+Quizzer: [12:42:20] [36m[DEBUG][0m [test_helpers.dart]   total_attempts: 3
+Quizzer: [12:42:20] [34m[INFO][0m [test_helpers.dart] --- Logging Current User Question Record from DB ---
+Quizzer: [12:42:20] [34m[INFO][0m [test_helpers.dart] DB access released.
+Quizzer: [12:42:20] [34m[INFO][0m [test_helpers.dart] DB Record for User: e737b728-1ae2-41d4-bae0-77ff5a222a0a, Question: 2025-04-28T16:33:34.436018_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:20] [36m[DEBUG][0m [test_helpers.dart]   user_uuid: e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:20] [36m[DEBUG][0m [test_helpers.dart]   question_id: 2025-04-28T16:33:34.436018_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:20] [36m[DEBUG][0m [test_helpers.dart]   revision_streak: 0
+Quizzer: [12:42:20] [36m[DEBUG][0m [test_helpers.dart]   last_revised: 2025-04-29T12:42:19.832562
+Quizzer: [12:42:20] [36m[DEBUG][0m [test_helpers.dart]   predicted_revision_due_history: []
+Quizzer: [12:42:20] [36m[DEBUG][0m [test_helpers.dart]   next_revision_due: 2025-04-29T12:42:19.832610
+Quizzer: [12:42:20] [36m[DEBUG][0m [test_helpers.dart]   time_between_revisions: 0.32499999999999996
+Quizzer: [12:42:20] [36m[DEBUG][0m [test_helpers.dart]   average_times_shown_per_day: Infinity
+Quizzer: [12:42:20] [36m[DEBUG][0m [test_helpers.dart]   is_eligible: null
+Quizzer: [12:42:20] [36m[DEBUG][0m [test_helpers.dart]   in_circulation: 1
+Quizzer: [12:42:20] [36m[DEBUG][0m [test_helpers.dart]   last_updated: 2025-04-29T12:42:19.832562
+Quizzer: [12:42:20] [36m[DEBUG][0m [test_helpers.dart]   total_attempts: 3
+Quizzer: [12:42:20] [34m[INFO][0m [test_helpers.dart] Waiting for 0.3 seconds...
+Quizzer: [12:42:20] [34m[INFO][0m [test_helpers.dart] Wait complete.
+Quizzer: [12:42:20] [34m[INFO][0m [test_helpers.dart] --- Cache State Check 1 at 0:00:00.000017 (Target: 1s) ---
+Quizzer: [12:42:20] [36m[DEBUG][0m [test_helpers.dart] UnprocessedCache length: 0
+Quizzer: [12:42:20] [36m[DEBUG][0m [test_helpers.dart] NonCirculatingCache length: 25
+Quizzer: [12:42:20] [36m[DEBUG][0m [test_helpers.dart] ModuleInactiveCache length: 0
+Quizzer: [12:42:20] [36m[DEBUG][0m [test_helpers.dart] CirculatingCache length: 156
+Quizzer: [12:42:20] [36m[DEBUG][0m [test_helpers.dart] DueDateBeyond24hrsCache length: 0
+Quizzer: [12:42:20] [36m[DEBUG][0m [test_helpers.dart] DueDateWithin24hrsCache length: 1
+Quizzer: [12:42:20] [36m[DEBUG][0m [test_helpers.dart] PastDueCache length: 4
+Quizzer: [12:42:20] [36m[DEBUG][0m [test_helpers.dart] EligibleQuestionsCache length: 139
+Quizzer: [12:42:20] [36m[DEBUG][0m [test_helpers.dart] QuestionQueueCache length: 10
+Quizzer: [12:42:20] [36m[DEBUG][0m [test_helpers.dart] AnswerHistoryCache length: 5
+Quizzer: [12:42:21] [34m[INFO][0m [eligibility_check_worker.dart] EligibilityCheckWorker: Found record in PastDueCache, processing...
+Quizzer: [12:42:21] [34m[INFO][0m [eligibility_check_worker.dart] Eligibility Check: 2025-04-28T20:11:08.342787_e737b728-1ae2-41d4-bae0-77ff5a222a0a is NOT eligible (in recent history). Waiting 1s before reprocessing.
+Quizzer: [12:42:21] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:44.982426_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:42:22] [34m[INFO][0m [eligibility_check_worker.dart] EligibilityCheckWorker: Found record in PastDueCache, processing...
+Quizzer: [12:42:22] [34m[INFO][0m [eligibility_check_worker.dart] Eligibility Check: 2025-04-28T16:33:44.982426_e737b728-1ae2-41d4-bae0-77ff5a222a0a is NOT eligible (in recent history). Waiting 1s before reprocessing.
+Quizzer: [12:42:22] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:08.342787_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:42:23] [34m[INFO][0m [eligibility_check_worker.dart] EligibilityCheckWorker: Found record in PastDueCache, processing...
+Quizzer: [12:42:23] [34m[INFO][0m [eligibility_check_worker.dart] Eligibility Check: 2025-04-28T20:11:08.342787_e737b728-1ae2-41d4-bae0-77ff5a222a0a is NOT eligible (in recent history). Waiting 1s before reprocessing.
+Quizzer: [12:42:23] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:44.982426_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:42:23] [34m[INFO][0m [test_helpers.dart] SUCCESS: Cache monitoring loop finished after 0:00:03.012391.
+Quizzer: [12:42:23] [34m[INFO][0m [individual_api_tests.dart] --- Iteration 7 ---
+Quizzer: [12:42:23] [34m[INFO][0m [individual_api_tests.dart] --- State BEFORE requestNextQuestion Call ---
+Quizzer: [12:42:23] [34m[INFO][0m [test_helpers.dart] --- Logging Current Question Details ---
+Quizzer: [12:42:23] [36m[DEBUG][0m [test_helpers.dart]   Question ID: 2025-04-28T16:33:34.436018_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:23] [36m[DEBUG][0m [test_helpers.dart]   Question Type: multiple_choice
+Quizzer: [12:42:23] [36m[DEBUG][0m [test_helpers.dart]   Module Name: elementary_addition
+Quizzer: [12:42:23] [36m[DEBUG][0m [test_helpers.dart]   Question Elements: [{type: text, content: 5 + 3 = ?}]
+Quizzer: [12:42:23] [36m[DEBUG][0m [test_helpers.dart]   Answer Elements: [{type: text, content: 8}]
+Quizzer: [12:42:23] [36m[DEBUG][0m [test_helpers.dart]   Options: [7, 22, 8, 12, 9, 53]
+Quizzer: [12:42:23] [36m[DEBUG][0m [test_helpers.dart]   Correct Index: 2
+Quizzer: [12:42:23] [36m[DEBUG][0m [test_helpers.dart]   Citation: 
+Quizzer: [12:42:23] [36m[DEBUG][0m [test_helpers.dart]   Concepts: 
+Quizzer: [12:42:23] [36m[DEBUG][0m [test_helpers.dart]   Subjects: 
+Quizzer: [12:42:23] [34m[INFO][0m [test_helpers.dart] --- Logging Current User Question Record Details ---
+Quizzer: [12:42:23] [36m[DEBUG][0m [test_helpers.dart]   user_uuid: e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:23] [36m[DEBUG][0m [test_helpers.dart]   question_id: 2025-04-28T16:33:34.436018_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:23] [36m[DEBUG][0m [test_helpers.dart]   revision_streak: 0
+Quizzer: [12:42:23] [36m[DEBUG][0m [test_helpers.dart]   last_revised: 2025-04-29T12:42:19.832562
+Quizzer: [12:42:23] [36m[DEBUG][0m [test_helpers.dart]   predicted_revision_due_history: []
+Quizzer: [12:42:23] [36m[DEBUG][0m [test_helpers.dart]   next_revision_due: 2025-04-29T12:42:19.832610
+Quizzer: [12:42:23] [36m[DEBUG][0m [test_helpers.dart]   time_between_revisions: 0.32499999999999996
+Quizzer: [12:42:23] [36m[DEBUG][0m [test_helpers.dart]   average_times_shown_per_day: Infinity
+Quizzer: [12:42:23] [36m[DEBUG][0m [test_helpers.dart]   is_eligible: null
+Quizzer: [12:42:23] [36m[DEBUG][0m [test_helpers.dart]   in_circulation: 1
+Quizzer: [12:42:23] [36m[DEBUG][0m [test_helpers.dart]   last_updated: 2025-04-29T12:42:19.832562
+Quizzer: [12:42:23] [36m[DEBUG][0m [test_helpers.dart]   total_attempts: 3
+Quizzer: [12:42:23] [34m[INFO][0m [test_helpers.dart] --- Logging Current User Question Record from DB ---
+Quizzer: [12:42:23] [34m[INFO][0m [test_helpers.dart] DB access released.
+Quizzer: [12:42:23] [34m[INFO][0m [test_helpers.dart] DB Record for User: e737b728-1ae2-41d4-bae0-77ff5a222a0a, Question: 2025-04-28T16:33:34.436018_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:23] [36m[DEBUG][0m [test_helpers.dart]   user_uuid: e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:23] [36m[DEBUG][0m [test_helpers.dart]   question_id: 2025-04-28T16:33:34.436018_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:23] [36m[DEBUG][0m [test_helpers.dart]   revision_streak: 0
+Quizzer: [12:42:23] [36m[DEBUG][0m [test_helpers.dart]   last_revised: 2025-04-29T12:42:19.832562
+Quizzer: [12:42:23] [36m[DEBUG][0m [test_helpers.dart]   predicted_revision_due_history: []
+Quizzer: [12:42:23] [36m[DEBUG][0m [test_helpers.dart]   next_revision_due: 2025-04-29T12:42:19.832610
+Quizzer: [12:42:23] [36m[DEBUG][0m [test_helpers.dart]   time_between_revisions: 0.32499999999999996
+Quizzer: [12:42:23] [36m[DEBUG][0m [test_helpers.dart]   average_times_shown_per_day: Infinity
+Quizzer: [12:42:23] [36m[DEBUG][0m [test_helpers.dart]   is_eligible: null
+Quizzer: [12:42:23] [36m[DEBUG][0m [test_helpers.dart]   in_circulation: 1
+Quizzer: [12:42:23] [36m[DEBUG][0m [test_helpers.dart]   last_updated: 2025-04-29T12:42:19.832562
+Quizzer: [12:42:23] [36m[DEBUG][0m [test_helpers.dart]   total_attempts: 3
+Quizzer: [12:42:23] [34m[INFO][0m [test_helpers.dart] Waiting for 0.3 seconds...
+Quizzer: [12:42:23] [34m[INFO][0m [test_helpers.dart] Wait complete.
+Quizzer: [12:42:23] [34m[INFO][0m [individual_api_tests.dart] Calling requestNextQuestion...
+Quizzer: [12:42:23] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:34.436018_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:42:23] [34m[INFO][0m [individual_api_tests.dart] --- State AFTER requestNextQuestion Call ---
+Quizzer: [12:42:23] [34m[INFO][0m [test_helpers.dart] --- Logging Current Question Details ---
+Quizzer: [12:42:23] [36m[DEBUG][0m [test_helpers.dart]   Question ID: 2025-04-28T16:33:38.284718_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:23] [36m[DEBUG][0m [test_helpers.dart]   Question Type: multiple_choice
+Quizzer: [12:42:23] [36m[DEBUG][0m [test_helpers.dart]   Module Name: elementary_addition
+Quizzer: [12:42:23] [36m[DEBUG][0m [test_helpers.dart]   Question Elements: [{type: text, content: 6 + 8 = ?}]
+Quizzer: [12:42:23] [36m[DEBUG][0m [test_helpers.dart]   Answer Elements: [{type: text, content: 14}]
+Quizzer: [12:42:23] [36m[DEBUG][0m [test_helpers.dart]   Options: [2, 68, 15, 9, 13, 14]
+Quizzer: [12:42:23] [36m[DEBUG][0m [test_helpers.dart]   Correct Index: 5
+Quizzer: [12:42:23] [36m[DEBUG][0m [test_helpers.dart]   Citation: 
+Quizzer: [12:42:23] [36m[DEBUG][0m [test_helpers.dart]   Concepts: 
+Quizzer: [12:42:23] [36m[DEBUG][0m [test_helpers.dart]   Subjects: 
+Quizzer: [12:42:23] [34m[INFO][0m [test_helpers.dart] Waiting for 0.3 seconds...
+Quizzer: [12:42:23] [34m[INFO][0m [test_helpers.dart] Wait complete.
+Quizzer: [12:42:23] [34m[INFO][0m [individual_api_tests.dart] Submitting random answer
+Quizzer: [12:42:23] [34m[INFO][0m [test_helpers.dart] --- Generating Random Multiple Choice Answer ---
+Quizzer: [12:42:23] [36m[DEBUG][0m [test_helpers.dart] Selected random option index: 4
+Quizzer: [12:42:23] [34m[INFO][0m [question_answer_attempts_table.dart] Verifying question_answer_attempts table...
+Quizzer: [12:42:24] [34m[INFO][0m [question_answer_attempts_table.dart] question_answer_attempts table already exists. Checking columns...
+Quizzer: [12:42:24] [34m[INFO][0m [question_answer_attempts_table.dart] Column check complete.
+Quizzer: [12:42:24] [34m[INFO][0m [question_answer_attempts_table.dart] Checking if first attempt for Q: 2025-04-28T16:33:38.284718_e737b728-1ae2-41d4-bae0-77ff5a222a0a, User: e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:24] [34m[INFO][0m [question_answer_attempts_table.dart] Is first attempt? false
+Quizzer: [12:42:24] [34m[INFO][0m [question_answer_attempts_table.dart] Adding question attempt for Q: 2025-04-28T16:33:38.284718_e737b728-1ae2-41d4-bae0-77ff5a222a0a, User: e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:24] [34m[INFO][0m [eligibility_check_worker.dart] EligibilityCheckWorker: Found record in PastDueCache, processing...
+Quizzer: [12:42:24] [34m[INFO][0m [eligibility_check_worker.dart] Eligibility Check: 2025-04-28T16:33:44.982426_e737b728-1ae2-41d4-bae0-77ff5a222a0a is NOT eligible (in recent history). Waiting 1s before reprocessing.
+Quizzer: [12:42:24] [34m[INFO][0m [question_answer_attempts_table.dart] SUCCESS: Successfully added question attempt record with result ID: 456. Data: {time_stamp: 2025-04-29T12:42:23.997064, question_id: 2025-04-28T16:33:38.284718_e737b728-1ae2-41d4-bae0-77ff5a222a0a, participant_id: e737b728-1ae2-41d4-bae0-77ff5a222a0a, response_time: 0.266313, response_result: 0, was_first_attempt: 0, knowledge_base: null, question_context_csv: {"subjects":[],"concepts":[]}, last_revised_date: 2025-04-28T20:38:14.025569, days_since_last_revision: 0.6695598552662037, total_attempts: 3, revision_streak: 1}
+Quizzer: [12:42:24] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:08.342787_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:42:24] [34m[INFO][0m [test_helpers.dart] Waiting for 0.3 seconds...
+Quizzer: [12:42:24] [34m[INFO][0m [test_helpers.dart] Wait complete.
+Quizzer: [12:42:24] [34m[INFO][0m [test_helpers.dart] --- Logging Current User Question Record Details ---
+Quizzer: [12:42:24] [36m[DEBUG][0m [test_helpers.dart]   user_uuid: e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:24] [36m[DEBUG][0m [test_helpers.dart]   question_id: 2025-04-28T16:33:38.284718_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:24] [36m[DEBUG][0m [test_helpers.dart]   revision_streak: 0
+Quizzer: [12:42:24] [36m[DEBUG][0m [test_helpers.dart]   last_revised: 2025-04-29T12:42:23.997136
+Quizzer: [12:42:24] [36m[DEBUG][0m [test_helpers.dart]   predicted_revision_due_history: []
+Quizzer: [12:42:24] [36m[DEBUG][0m [test_helpers.dart]   next_revision_due: 2025-04-29T12:42:23.997360
+Quizzer: [12:42:24] [36m[DEBUG][0m [test_helpers.dart]   time_between_revisions: 0.32499999999999996
+Quizzer: [12:42:24] [36m[DEBUG][0m [test_helpers.dart]   average_times_shown_per_day: Infinity
+Quizzer: [12:42:24] [36m[DEBUG][0m [test_helpers.dart]   is_eligible: null
+Quizzer: [12:42:24] [36m[DEBUG][0m [test_helpers.dart]   in_circulation: 1
+Quizzer: [12:42:24] [36m[DEBUG][0m [test_helpers.dart]   last_updated: 2025-04-29T12:42:23.997136
+Quizzer: [12:42:24] [36m[DEBUG][0m [test_helpers.dart]   total_attempts: 4
+Quizzer: [12:42:24] [34m[INFO][0m [test_helpers.dart] --- Logging Current User Question Record from DB ---
+Quizzer: [12:42:24] [34m[INFO][0m [test_helpers.dart] DB access released.
+Quizzer: [12:42:24] [34m[INFO][0m [test_helpers.dart] DB Record for User: e737b728-1ae2-41d4-bae0-77ff5a222a0a, Question: 2025-04-28T16:33:38.284718_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:24] [36m[DEBUG][0m [test_helpers.dart]   user_uuid: e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:24] [36m[DEBUG][0m [test_helpers.dart]   question_id: 2025-04-28T16:33:38.284718_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:24] [36m[DEBUG][0m [test_helpers.dart]   revision_streak: 0
+Quizzer: [12:42:24] [36m[DEBUG][0m [test_helpers.dart]   last_revised: 2025-04-29T12:42:23.997136
+Quizzer: [12:42:24] [36m[DEBUG][0m [test_helpers.dart]   predicted_revision_due_history: []
+Quizzer: [12:42:24] [36m[DEBUG][0m [test_helpers.dart]   next_revision_due: 2025-04-29T12:42:23.997360
+Quizzer: [12:42:24] [36m[DEBUG][0m [test_helpers.dart]   time_between_revisions: 0.32499999999999996
+Quizzer: [12:42:24] [36m[DEBUG][0m [test_helpers.dart]   average_times_shown_per_day: Infinity
+Quizzer: [12:42:24] [36m[DEBUG][0m [test_helpers.dart]   is_eligible: null
+Quizzer: [12:42:24] [36m[DEBUG][0m [test_helpers.dart]   in_circulation: 1
+Quizzer: [12:42:24] [36m[DEBUG][0m [test_helpers.dart]   last_updated: 2025-04-29T12:42:23.997136
+Quizzer: [12:42:24] [36m[DEBUG][0m [test_helpers.dart]   total_attempts: 4
+Quizzer: [12:42:24] [34m[INFO][0m [test_helpers.dart] Waiting for 0.3 seconds...
+Quizzer: [12:42:24] [34m[INFO][0m [test_helpers.dart] Wait complete.
+Quizzer: [12:42:24] [34m[INFO][0m [test_helpers.dart] --- Cache State Check 1 at 0:00:00.000046 (Target: 1s) ---
+Quizzer: [12:42:24] [36m[DEBUG][0m [test_helpers.dart] UnprocessedCache length: 0
+Quizzer: [12:42:24] [36m[DEBUG][0m [test_helpers.dart] NonCirculatingCache length: 25
+Quizzer: [12:42:24] [36m[DEBUG][0m [test_helpers.dart] ModuleInactiveCache length: 0
+Quizzer: [12:42:24] [36m[DEBUG][0m [test_helpers.dart] CirculatingCache length: 156
+Quizzer: [12:42:24] [36m[DEBUG][0m [test_helpers.dart] DueDateBeyond24hrsCache length: 0
+Quizzer: [12:42:24] [36m[DEBUG][0m [test_helpers.dart] DueDateWithin24hrsCache length: 1
+Quizzer: [12:42:24] [36m[DEBUG][0m [test_helpers.dart] PastDueCache length: 5
+Quizzer: [12:42:24] [36m[DEBUG][0m [test_helpers.dart] EligibleQuestionsCache length: 138
+Quizzer: [12:42:24] [36m[DEBUG][0m [test_helpers.dart] QuestionQueueCache length: 10
+Quizzer: [12:42:24] [36m[DEBUG][0m [test_helpers.dart] AnswerHistoryCache length: 6
+Quizzer: [12:42:25] [34m[INFO][0m [eligibility_check_worker.dart] EligibilityCheckWorker: Found record in PastDueCache, processing...
+Quizzer: [12:42:25] [34m[INFO][0m [eligibility_check_worker.dart] Eligibility Check: 2025-04-28T20:11:13.682006_e737b728-1ae2-41d4-bae0-77ff5a222a0a is NOT eligible (in recent history). Waiting 1s before reprocessing.
+Quizzer: [12:42:25] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:44.982426_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:42:26] [34m[INFO][0m [eligibility_check_worker.dart] EligibilityCheckWorker: Found record in PastDueCache, processing...
+Quizzer: [12:42:26] [34m[INFO][0m [eligibility_check_worker.dart] Eligibility Check: 2025-04-28T20:11:08.342787_e737b728-1ae2-41d4-bae0-77ff5a222a0a is NOT eligible (in recent history). Waiting 1s before reprocessing.
+Quizzer: [12:42:26] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:13.682006_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:42:27] [34m[INFO][0m [eligibility_check_worker.dart] EligibilityCheckWorker: Found record in PastDueCache, processing...
+Quizzer: [12:42:27] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:08.342787_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:42:27] [34m[INFO][0m [eligibility_check_worker.dart] EligibilityCheckWorker: Found record in PastDueCache, processing...
+Quizzer: [12:42:27] [34m[INFO][0m [eligibility_check_worker.dart] Eligibility Check: 2025-04-28T16:33:34.436018_e737b728-1ae2-41d4-bae0-77ff5a222a0a is NOT eligible (in recent history). Waiting 1s before reprocessing.
+Quizzer: [12:42:27] [34m[INFO][0m [test_helpers.dart] SUCCESS: Cache monitoring loop finished after 0:00:03.013938.
+Quizzer: [12:42:27] [34m[INFO][0m [individual_api_tests.dart] --- Iteration 8 ---
+Quizzer: [12:42:27] [34m[INFO][0m [individual_api_tests.dart] --- State BEFORE requestNextQuestion Call ---
+Quizzer: [12:42:27] [34m[INFO][0m [test_helpers.dart] --- Logging Current Question Details ---
+Quizzer: [12:42:27] [36m[DEBUG][0m [test_helpers.dart]   Question ID: 2025-04-28T16:33:38.284718_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:27] [36m[DEBUG][0m [test_helpers.dart]   Question Type: multiple_choice
+Quizzer: [12:42:27] [36m[DEBUG][0m [test_helpers.dart]   Module Name: elementary_addition
+Quizzer: [12:42:27] [36m[DEBUG][0m [test_helpers.dart]   Question Elements: [{type: text, content: 6 + 8 = ?}]
+Quizzer: [12:42:27] [36m[DEBUG][0m [test_helpers.dart]   Answer Elements: [{type: text, content: 14}]
+Quizzer: [12:42:27] [36m[DEBUG][0m [test_helpers.dart]   Options: [2, 68, 15, 9, 13, 14]
+Quizzer: [12:42:27] [36m[DEBUG][0m [test_helpers.dart]   Correct Index: 5
+Quizzer: [12:42:27] [36m[DEBUG][0m [test_helpers.dart]   Citation: 
+Quizzer: [12:42:27] [36m[DEBUG][0m [test_helpers.dart]   Concepts: 
+Quizzer: [12:42:27] [36m[DEBUG][0m [test_helpers.dart]   Subjects: 
+Quizzer: [12:42:27] [34m[INFO][0m [test_helpers.dart] --- Logging Current User Question Record Details ---
+Quizzer: [12:42:27] [36m[DEBUG][0m [test_helpers.dart]   user_uuid: e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:27] [36m[DEBUG][0m [test_helpers.dart]   question_id: 2025-04-28T16:33:38.284718_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:27] [36m[DEBUG][0m [test_helpers.dart]   revision_streak: 0
+Quizzer: [12:42:27] [36m[DEBUG][0m [test_helpers.dart]   last_revised: 2025-04-29T12:42:23.997136
+Quizzer: [12:42:27] [36m[DEBUG][0m [test_helpers.dart]   predicted_revision_due_history: []
+Quizzer: [12:42:27] [36m[DEBUG][0m [test_helpers.dart]   next_revision_due: 2025-04-29T12:42:23.997360
+Quizzer: [12:42:27] [36m[DEBUG][0m [test_helpers.dart]   time_between_revisions: 0.32499999999999996
+Quizzer: [12:42:27] [36m[DEBUG][0m [test_helpers.dart]   average_times_shown_per_day: Infinity
+Quizzer: [12:42:27] [36m[DEBUG][0m [test_helpers.dart]   is_eligible: null
+Quizzer: [12:42:27] [36m[DEBUG][0m [test_helpers.dart]   in_circulation: 1
+Quizzer: [12:42:27] [36m[DEBUG][0m [test_helpers.dart]   last_updated: 2025-04-29T12:42:23.997136
+Quizzer: [12:42:27] [36m[DEBUG][0m [test_helpers.dart]   total_attempts: 4
+Quizzer: [12:42:27] [34m[INFO][0m [test_helpers.dart] --- Logging Current User Question Record from DB ---
+Quizzer: [12:42:27] [34m[INFO][0m [test_helpers.dart] DB access released.
+Quizzer: [12:42:27] [34m[INFO][0m [test_helpers.dart] DB Record for User: e737b728-1ae2-41d4-bae0-77ff5a222a0a, Question: 2025-04-28T16:33:38.284718_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:27] [36m[DEBUG][0m [test_helpers.dart]   user_uuid: e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:27] [36m[DEBUG][0m [test_helpers.dart]   question_id: 2025-04-28T16:33:38.284718_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:27] [36m[DEBUG][0m [test_helpers.dart]   revision_streak: 0
+Quizzer: [12:42:27] [36m[DEBUG][0m [test_helpers.dart]   last_revised: 2025-04-29T12:42:23.997136
+Quizzer: [12:42:27] [36m[DEBUG][0m [test_helpers.dart]   predicted_revision_due_history: []
+Quizzer: [12:42:27] [36m[DEBUG][0m [test_helpers.dart]   next_revision_due: 2025-04-29T12:42:23.997360
+Quizzer: [12:42:27] [36m[DEBUG][0m [test_helpers.dart]   time_between_revisions: 0.32499999999999996
+Quizzer: [12:42:27] [36m[DEBUG][0m [test_helpers.dart]   average_times_shown_per_day: Infinity
+Quizzer: [12:42:27] [36m[DEBUG][0m [test_helpers.dart]   is_eligible: null
+Quizzer: [12:42:27] [36m[DEBUG][0m [test_helpers.dart]   in_circulation: 1
+Quizzer: [12:42:27] [36m[DEBUG][0m [test_helpers.dart]   last_updated: 2025-04-29T12:42:23.997136
+Quizzer: [12:42:27] [36m[DEBUG][0m [test_helpers.dart]   total_attempts: 4
+Quizzer: [12:42:27] [34m[INFO][0m [test_helpers.dart] Waiting for 0.3 seconds...
+Quizzer: [12:42:28] [34m[INFO][0m [test_helpers.dart] Wait complete.
+Quizzer: [12:42:28] [34m[INFO][0m [individual_api_tests.dart] Calling requestNextQuestion...
+Quizzer: [12:42:28] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:38.284718_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:42:28] [34m[INFO][0m [individual_api_tests.dart] --- State AFTER requestNextQuestion Call ---
+Quizzer: [12:42:28] [34m[INFO][0m [test_helpers.dart] --- Logging Current Question Details ---
+Quizzer: [12:42:28] [36m[DEBUG][0m [test_helpers.dart]   Question ID: 2025-04-28T20:11:07.988538_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:28] [36m[DEBUG][0m [test_helpers.dart]   Question Type: select_all_that_apply
+Quizzer: [12:42:28] [36m[DEBUG][0m [test_helpers.dart]   Module Name: Is Even Or Odd
+Quizzer: [12:42:28] [36m[DEBUG][0m [test_helpers.dart]   Question Elements: [{type: text, content: Select all the EVEN numbers.}]
+Quizzer: [12:42:28] [36m[DEBUG][0m [test_helpers.dart]   Answer Elements: [{type: text, content: Even numbers are divisible by 2.}]
+Quizzer: [12:42:28] [36m[DEBUG][0m [test_helpers.dart]   Citation: 
+Quizzer: [12:42:28] [36m[DEBUG][0m [test_helpers.dart]   Concepts: 
+Quizzer: [12:42:28] [36m[DEBUG][0m [test_helpers.dart]   Subjects: 
+Quizzer: [12:42:28] [34m[INFO][0m [test_helpers.dart] Waiting for 0.3 seconds...
+Quizzer: [12:42:28] [34m[INFO][0m [eligibility_check_worker.dart] EligibilityCheckWorker: Found record in PastDueCache, processing...
+Quizzer: [12:42:28] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:34.436018_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:42:28] [34m[INFO][0m [eligibility_check_worker.dart] EligibilityCheckWorker: Found record in PastDueCache, processing...
+Quizzer: [12:42:28] [34m[INFO][0m [eligibility_check_worker.dart] Eligibility Check: 2025-04-28T16:33:34.436018_e737b728-1ae2-41d4-bae0-77ff5a222a0a is NOT eligible (in recent history). Waiting 1s before reprocessing.
+Quizzer: [12:42:28] [34m[INFO][0m [test_helpers.dart] Wait complete.
+Quizzer: [12:42:28] [34m[INFO][0m [individual_api_tests.dart] Submitting random answer
+Quizzer: [12:42:28] [34m[INFO][0m [test_helpers.dart] --- Generating Random Select-All-That-Apply Answer ---
+Quizzer: [12:42:28] [36m[DEBUG][0m [test_helpers.dart] Selected random indices: [0, 1, 2, 3, 4, 5]
+Quizzer: [12:42:28] [34m[INFO][0m [question_answer_attempts_table.dart] Verifying question_answer_attempts table...
+Quizzer: [12:42:28] [34m[INFO][0m [question_answer_attempts_table.dart] question_answer_attempts table already exists. Checking columns...
+Quizzer: [12:42:28] [34m[INFO][0m [question_answer_attempts_table.dart] Column check complete.
+Quizzer: [12:42:28] [34m[INFO][0m [question_answer_attempts_table.dart] Checking if first attempt for Q: 2025-04-28T20:11:07.988538_e737b728-1ae2-41d4-bae0-77ff5a222a0a, User: e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:28] [34m[INFO][0m [question_answer_attempts_table.dart] Is first attempt? false
+Quizzer: [12:42:28] [34m[INFO][0m [question_answer_attempts_table.dart] Adding question attempt for Q: 2025-04-28T20:11:07.988538_e737b728-1ae2-41d4-bae0-77ff5a222a0a, User: e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:28] [34m[INFO][0m [question_answer_attempts_table.dart] SUCCESS: Successfully added question attempt record with result ID: 457. Data: {time_stamp: 2025-04-29T12:42:28.383616, question_id: 2025-04-28T20:11:07.988538_e737b728-1ae2-41d4-bae0-77ff5a222a0a, participant_id: e737b728-1ae2-41d4-bae0-77ff5a222a0a, response_time: 0.268757, response_result: 0, was_first_attempt: 0, knowledge_base: null, question_context_csv: {"subjects":[],"concepts":[]}, last_revised_date: 2025-04-28T21:06:57.049505, days_since_last_revision: 0.6496682188773149, total_attempts: 3, revision_streak: 0}
+Quizzer: [12:42:28] [34m[INFO][0m [test_helpers.dart] Waiting for 0.3 seconds...
+Quizzer: [12:42:28] [34m[INFO][0m [test_helpers.dart] Wait complete.
+Quizzer: [12:42:28] [34m[INFO][0m [test_helpers.dart] --- Logging Current User Question Record Details ---
+Quizzer: [12:42:28] [36m[DEBUG][0m [test_helpers.dart]   user_uuid: e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:28] [36m[DEBUG][0m [test_helpers.dart]   question_id: 2025-04-28T20:11:07.988538_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:28] [36m[DEBUG][0m [test_helpers.dart]   revision_streak: 0
+Quizzer: [12:42:28] [36m[DEBUG][0m [test_helpers.dart]   last_revised: 2025-04-29T12:42:28.383675
+Quizzer: [12:42:28] [36m[DEBUG][0m [test_helpers.dart]   predicted_revision_due_history: []
+Quizzer: [12:42:28] [36m[DEBUG][0m [test_helpers.dart]   next_revision_due: 2025-04-29T12:42:28.383841
+Quizzer: [12:42:28] [36m[DEBUG][0m [test_helpers.dart]   time_between_revisions: 0.30999999999999994
+Quizzer: [12:42:28] [36m[DEBUG][0m [test_helpers.dart]   average_times_shown_per_day: Infinity
+Quizzer: [12:42:28] [36m[DEBUG][0m [test_helpers.dart]   is_eligible: null
+Quizzer: [12:42:28] [36m[DEBUG][0m [test_helpers.dart]   in_circulation: 1
+Quizzer: [12:42:28] [36m[DEBUG][0m [test_helpers.dart]   last_updated: 2025-04-29T12:42:28.383675
+Quizzer: [12:42:28] [36m[DEBUG][0m [test_helpers.dart]   total_attempts: 4
+Quizzer: [12:42:28] [34m[INFO][0m [test_helpers.dart] --- Logging Current User Question Record from DB ---
+Quizzer: [12:42:28] [34m[INFO][0m [test_helpers.dart] DB access released.
+Quizzer: [12:42:28] [34m[INFO][0m [test_helpers.dart] DB Record for User: e737b728-1ae2-41d4-bae0-77ff5a222a0a, Question: 2025-04-28T20:11:07.988538_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:28] [36m[DEBUG][0m [test_helpers.dart]   user_uuid: e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:28] [36m[DEBUG][0m [test_helpers.dart]   question_id: 2025-04-28T20:11:07.988538_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:28] [36m[DEBUG][0m [test_helpers.dart]   revision_streak: 0
+Quizzer: [12:42:28] [36m[DEBUG][0m [test_helpers.dart]   last_revised: 2025-04-29T12:42:28.383675
+Quizzer: [12:42:28] [36m[DEBUG][0m [test_helpers.dart]   predicted_revision_due_history: []
+Quizzer: [12:42:28] [36m[DEBUG][0m [test_helpers.dart]   next_revision_due: 2025-04-29T12:42:28.383841
+Quizzer: [12:42:28] [36m[DEBUG][0m [test_helpers.dart]   time_between_revisions: 0.30999999999999994
+Quizzer: [12:42:28] [36m[DEBUG][0m [test_helpers.dart]   average_times_shown_per_day: Infinity
+Quizzer: [12:42:28] [36m[DEBUG][0m [test_helpers.dart]   is_eligible: null
+Quizzer: [12:42:28] [36m[DEBUG][0m [test_helpers.dart]   in_circulation: 1
+Quizzer: [12:42:28] [36m[DEBUG][0m [test_helpers.dart]   last_updated: 2025-04-29T12:42:28.383675
+Quizzer: [12:42:28] [36m[DEBUG][0m [test_helpers.dart]   total_attempts: 4
+Quizzer: [12:42:28] [34m[INFO][0m [test_helpers.dart] Waiting for 0.3 seconds...
+Quizzer: [12:42:28] [34m[INFO][0m [test_helpers.dart] Wait complete.
+Quizzer: [12:42:28] [34m[INFO][0m [test_helpers.dart] --- Cache State Check 1 at 0:00:00.000016 (Target: 1s) ---
+Quizzer: [12:42:28] [36m[DEBUG][0m [test_helpers.dart] UnprocessedCache length: 0
+Quizzer: [12:42:28] [36m[DEBUG][0m [test_helpers.dart] NonCirculatingCache length: 25
+Quizzer: [12:42:28] [36m[DEBUG][0m [test_helpers.dart] ModuleInactiveCache length: 0
+Quizzer: [12:42:28] [36m[DEBUG][0m [test_helpers.dart] CirculatingCache length: 156
+Quizzer: [12:42:28] [36m[DEBUG][0m [test_helpers.dart] DueDateBeyond24hrsCache length: 0
+Quizzer: [12:42:28] [36m[DEBUG][0m [test_helpers.dart] DueDateWithin24hrsCache length: 1
+Quizzer: [12:42:28] [36m[DEBUG][0m [test_helpers.dart] PastDueCache length: 4
+Quizzer: [12:42:28] [36m[DEBUG][0m [test_helpers.dart] EligibleQuestionsCache length: 139
+Quizzer: [12:42:28] [36m[DEBUG][0m [test_helpers.dart] QuestionQueueCache length: 10
+Quizzer: [12:42:28] [36m[DEBUG][0m [test_helpers.dart] AnswerHistoryCache length: 7
+Quizzer: [12:42:29] [34m[INFO][0m [eligibility_check_worker.dart] EligibilityCheckWorker: Found record in PastDueCache, processing...
+Quizzer: [12:42:29] [34m[INFO][0m [eligibility_check_worker.dart] Eligibility Check: 2025-04-28T20:11:13.682006_e737b728-1ae2-41d4-bae0-77ff5a222a0a is NOT eligible (in recent history). Waiting 1s before reprocessing.
+Quizzer: [12:42:29] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:34.436018_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:42:30] [34m[INFO][0m [eligibility_check_worker.dart] EligibilityCheckWorker: Found record in PastDueCache, processing...
+Quizzer: [12:42:30] [34m[INFO][0m [eligibility_check_worker.dart] Eligibility Check: 2025-04-28T16:33:34.436018_e737b728-1ae2-41d4-bae0-77ff5a222a0a is NOT eligible (in recent history). Waiting 1s before reprocessing.
+Quizzer: [12:42:30] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:13.682006_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:42:31] [34m[INFO][0m [eligibility_check_worker.dart] EligibilityCheckWorker: Found record in PastDueCache, processing...
+Quizzer: [12:42:31] [34m[INFO][0m [eligibility_check_worker.dart] Eligibility Check: 2025-04-28T20:11:19.085301_e737b728-1ae2-41d4-bae0-77ff5a222a0a is NOT eligible (in recent history). Waiting 1s before reprocessing.
+Quizzer: [12:42:31] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:34.436018_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:42:31] [34m[INFO][0m [test_helpers.dart] SUCCESS: Cache monitoring loop finished after 0:00:03.012549.
+Quizzer: [12:42:31] [34m[INFO][0m [individual_api_tests.dart] --- Iteration 9 ---
+Quizzer: [12:42:31] [34m[INFO][0m [individual_api_tests.dart] --- State BEFORE requestNextQuestion Call ---
+Quizzer: [12:42:31] [34m[INFO][0m [test_helpers.dart] --- Logging Current Question Details ---
+Quizzer: [12:42:31] [36m[DEBUG][0m [test_helpers.dart]   Question ID: 2025-04-28T20:11:07.988538_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:31] [36m[DEBUG][0m [test_helpers.dart]   Question Type: select_all_that_apply
+Quizzer: [12:42:31] [36m[DEBUG][0m [test_helpers.dart]   Module Name: Is Even Or Odd
+Quizzer: [12:42:31] [36m[DEBUG][0m [test_helpers.dart]   Question Elements: [{type: text, content: Select all the EVEN numbers.}]
+Quizzer: [12:42:31] [36m[DEBUG][0m [test_helpers.dart]   Answer Elements: [{type: text, content: Even numbers are divisible by 2.}]
+Quizzer: [12:42:31] [36m[DEBUG][0m [test_helpers.dart]   Citation: 
+Quizzer: [12:42:31] [36m[DEBUG][0m [test_helpers.dart]   Concepts: 
+Quizzer: [12:42:31] [36m[DEBUG][0m [test_helpers.dart]   Subjects: 
+Quizzer: [12:42:31] [34m[INFO][0m [test_helpers.dart] --- Logging Current User Question Record Details ---
+Quizzer: [12:42:31] [36m[DEBUG][0m [test_helpers.dart]   user_uuid: e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:31] [36m[DEBUG][0m [test_helpers.dart]   question_id: 2025-04-28T20:11:07.988538_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:31] [36m[DEBUG][0m [test_helpers.dart]   revision_streak: 0
+Quizzer: [12:42:31] [36m[DEBUG][0m [test_helpers.dart]   last_revised: 2025-04-29T12:42:28.383675
+Quizzer: [12:42:31] [36m[DEBUG][0m [test_helpers.dart]   predicted_revision_due_history: []
+Quizzer: [12:42:32] [36m[DEBUG][0m [test_helpers.dart]   next_revision_due: 2025-04-29T12:42:28.383841
+Quizzer: [12:42:32] [36m[DEBUG][0m [test_helpers.dart]   time_between_revisions: 0.30999999999999994
+Quizzer: [12:42:32] [36m[DEBUG][0m [test_helpers.dart]   average_times_shown_per_day: Infinity
+Quizzer: [12:42:32] [36m[DEBUG][0m [test_helpers.dart]   is_eligible: null
+Quizzer: [12:42:32] [36m[DEBUG][0m [test_helpers.dart]   in_circulation: 1
+Quizzer: [12:42:32] [36m[DEBUG][0m [test_helpers.dart]   last_updated: 2025-04-29T12:42:28.383675
+Quizzer: [12:42:32] [36m[DEBUG][0m [test_helpers.dart]   total_attempts: 4
+Quizzer: [12:42:32] [34m[INFO][0m [test_helpers.dart] --- Logging Current User Question Record from DB ---
+Quizzer: [12:42:32] [34m[INFO][0m [test_helpers.dart] DB access released.
+Quizzer: [12:42:32] [34m[INFO][0m [test_helpers.dart] DB Record for User: e737b728-1ae2-41d4-bae0-77ff5a222a0a, Question: 2025-04-28T20:11:07.988538_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:32] [36m[DEBUG][0m [test_helpers.dart]   user_uuid: e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:32] [36m[DEBUG][0m [test_helpers.dart]   question_id: 2025-04-28T20:11:07.988538_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:32] [36m[DEBUG][0m [test_helpers.dart]   revision_streak: 0
+Quizzer: [12:42:32] [36m[DEBUG][0m [test_helpers.dart]   last_revised: 2025-04-29T12:42:28.383675
+Quizzer: [12:42:32] [36m[DEBUG][0m [test_helpers.dart]   predicted_revision_due_history: []
+Quizzer: [12:42:32] [36m[DEBUG][0m [test_helpers.dart]   next_revision_due: 2025-04-29T12:42:28.383841
+Quizzer: [12:42:32] [36m[DEBUG][0m [test_helpers.dart]   time_between_revisions: 0.30999999999999994
+Quizzer: [12:42:32] [36m[DEBUG][0m [test_helpers.dart]   average_times_shown_per_day: Infinity
+Quizzer: [12:42:32] [36m[DEBUG][0m [test_helpers.dart]   is_eligible: null
+Quizzer: [12:42:32] [36m[DEBUG][0m [test_helpers.dart]   in_circulation: 1
+Quizzer: [12:42:32] [36m[DEBUG][0m [test_helpers.dart]   last_updated: 2025-04-29T12:42:28.383675
+Quizzer: [12:42:32] [36m[DEBUG][0m [test_helpers.dart]   total_attempts: 4
+Quizzer: [12:42:32] [34m[INFO][0m [test_helpers.dart] Waiting for 0.3 seconds...
+Quizzer: [12:42:32] [34m[INFO][0m [test_helpers.dart] Wait complete.
+Quizzer: [12:42:32] [34m[INFO][0m [individual_api_tests.dart] Calling requestNextQuestion...
+Quizzer: [12:42:32] [34m[INFO][0m [eligibility_check_worker.dart] EligibilityCheckWorker: Found record in PastDueCache, processing...
+Quizzer: [12:42:32] [34m[INFO][0m [eligibility_check_worker.dart] Eligibility Check: 2025-04-28T16:33:38.284718_e737b728-1ae2-41d4-bae0-77ff5a222a0a is NOT eligible (in recent history). Waiting 1s before reprocessing.
+Quizzer: [12:42:32] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:19.085301_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:42:32] [34m[INFO][0m [individual_api_tests.dart] --- State AFTER requestNextQuestion Call ---
+Quizzer: [12:42:32] [34m[INFO][0m [test_helpers.dart] --- Logging Current Question Details ---
+Quizzer: [12:42:32] [36m[DEBUG][0m [test_helpers.dart]   Question ID: 2025-04-28T16:33:38.557745_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:32] [36m[DEBUG][0m [test_helpers.dart]   Question Type: multiple_choice
+Quizzer: [12:42:32] [36m[DEBUG][0m [test_helpers.dart]   Module Name: elementary_addition
+Quizzer: [12:42:32] [36m[DEBUG][0m [test_helpers.dart]   Question Elements: [{type: text, content: 6 + 9 = ?}]
+Quizzer: [12:42:32] [36m[DEBUG][0m [test_helpers.dart]   Answer Elements: [{type: text, content: 15}]
+Quizzer: [12:42:32] [36m[DEBUG][0m [test_helpers.dart]   Options: [13, 8, 15, 16, 69, 14]
+Quizzer: [12:42:32] [36m[DEBUG][0m [test_helpers.dart]   Correct Index: 2
+Quizzer: [12:42:32] [36m[DEBUG][0m [test_helpers.dart]   Citation: 
+Quizzer: [12:42:32] [36m[DEBUG][0m [test_helpers.dart]   Concepts: 
+Quizzer: [12:42:32] [36m[DEBUG][0m [test_helpers.dart]   Subjects: 
+Quizzer: [12:42:32] [34m[INFO][0m [test_helpers.dart] Waiting for 0.3 seconds...
+Quizzer: [12:42:32] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:07.988538_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:42:32] [34m[INFO][0m [test_helpers.dart] Wait complete.
+Quizzer: [12:42:32] [34m[INFO][0m [individual_api_tests.dart] Submitting random answer
+Quizzer: [12:42:32] [34m[INFO][0m [test_helpers.dart] --- Generating Random Multiple Choice Answer ---
+Quizzer: [12:42:32] [36m[DEBUG][0m [test_helpers.dart] Selected random option index: 2
+Quizzer: [12:42:32] [34m[INFO][0m [question_answer_attempts_table.dart] Verifying question_answer_attempts table...
+Quizzer: [12:42:32] [34m[INFO][0m [question_answer_attempts_table.dart] question_answer_attempts table already exists. Checking columns...
+Quizzer: [12:42:32] [34m[INFO][0m [question_answer_attempts_table.dart] Column check complete.
+Quizzer: [12:42:32] [34m[INFO][0m [question_answer_attempts_table.dart] Checking if first attempt for Q: 2025-04-28T16:33:38.557745_e737b728-1ae2-41d4-bae0-77ff5a222a0a, User: e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:32] [34m[INFO][0m [question_answer_attempts_table.dart] Is first attempt? false
+Quizzer: [12:42:32] [34m[INFO][0m [question_answer_attempts_table.dart] Adding question attempt for Q: 2025-04-28T16:33:38.557745_e737b728-1ae2-41d4-bae0-77ff5a222a0a, User: e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:32] [34m[INFO][0m [question_answer_attempts_table.dart] SUCCESS: Successfully added question attempt record with result ID: 458. Data: {time_stamp: 2025-04-29T12:42:32.582468, question_id: 2025-04-28T16:33:38.557745_e737b728-1ae2-41d4-bae0-77ff5a222a0a, participant_id: e737b728-1ae2-41d4-bae0-77ff5a222a0a, response_time: 0.270805, response_result: 1, was_first_attempt: 0, knowledge_base: null, question_context_csv: {"subjects":[],"concepts":[]}, last_revised_date: 2025-04-28T21:02:57.749653, days_since_last_revision: 0.6524864909143518, total_attempts: 4, revision_streak: 0}
+Quizzer: [12:42:32] [34m[INFO][0m [test_helpers.dart] Waiting for 0.3 seconds...
+Quizzer: [12:42:32] [34m[INFO][0m [test_helpers.dart] Wait complete.
+Quizzer: [12:42:32] [34m[INFO][0m [test_helpers.dart] --- Logging Current User Question Record Details ---
+Quizzer: [12:42:32] [36m[DEBUG][0m [test_helpers.dart]   user_uuid: e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:32] [36m[DEBUG][0m [test_helpers.dart]   question_id: 2025-04-28T16:33:38.557745_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:32] [36m[DEBUG][0m [test_helpers.dart]   revision_streak: 1
+Quizzer: [12:42:32] [36m[DEBUG][0m [test_helpers.dart]   last_revised: 2025-04-29T12:42:32.582497
+Quizzer: [12:42:32] [36m[DEBUG][0m [test_helpers.dart]   predicted_revision_due_history: []
+Quizzer: [12:42:32] [36m[DEBUG][0m [test_helpers.dart]   next_revision_due: 2025-04-29T21:25:11.888482
+Quizzer: [12:42:32] [36m[DEBUG][0m [test_helpers.dart]   time_between_revisions: 0.30999999999999994
+Quizzer: [12:42:32] [36m[DEBUG][0m [test_helpers.dart]   average_times_shown_per_day: 2.755163025018042
+Quizzer: [12:42:32] [36m[DEBUG][0m [test_helpers.dart]   is_eligible: null
+Quizzer: [12:42:32] [36m[DEBUG][0m [test_helpers.dart]   in_circulation: 1
+Quizzer: [12:42:32] [36m[DEBUG][0m [test_helpers.dart]   last_updated: 2025-04-29T12:42:32.582497
+Quizzer: [12:42:32] [36m[DEBUG][0m [test_helpers.dart]   total_attempts: 5
+Quizzer: [12:42:32] [34m[INFO][0m [test_helpers.dart] --- Logging Current User Question Record from DB ---
+Quizzer: [12:42:32] [34m[INFO][0m [test_helpers.dart] DB access released.
+Quizzer: [12:42:32] [34m[INFO][0m [test_helpers.dart] DB Record for User: e737b728-1ae2-41d4-bae0-77ff5a222a0a, Question: 2025-04-28T16:33:38.557745_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:32] [36m[DEBUG][0m [test_helpers.dart]   user_uuid: e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:32] [36m[DEBUG][0m [test_helpers.dart]   question_id: 2025-04-28T16:33:38.557745_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:32] [36m[DEBUG][0m [test_helpers.dart]   revision_streak: 1
+Quizzer: [12:42:32] [36m[DEBUG][0m [test_helpers.dart]   last_revised: 2025-04-29T12:42:32.582497
+Quizzer: [12:42:32] [36m[DEBUG][0m [test_helpers.dart]   predicted_revision_due_history: []
+Quizzer: [12:42:32] [36m[DEBUG][0m [test_helpers.dart]   next_revision_due: 2025-04-29T21:25:11.888482
+Quizzer: [12:42:32] [36m[DEBUG][0m [test_helpers.dart]   time_between_revisions: 0.30999999999999994
+Quizzer: [12:42:32] [36m[DEBUG][0m [test_helpers.dart]   average_times_shown_per_day: 2.755163025018042
+Quizzer: [12:42:32] [36m[DEBUG][0m [test_helpers.dart]   is_eligible: null
+Quizzer: [12:42:32] [36m[DEBUG][0m [test_helpers.dart]   in_circulation: 1
+Quizzer: [12:42:32] [36m[DEBUG][0m [test_helpers.dart]   last_updated: 2025-04-29T12:42:32.582497
+Quizzer: [12:42:32] [36m[DEBUG][0m [test_helpers.dart]   total_attempts: 5
+Quizzer: [12:42:32] [34m[INFO][0m [test_helpers.dart] Waiting for 0.3 seconds...
+Quizzer: [12:42:33] [34m[INFO][0m [test_helpers.dart] Wait complete.
+Quizzer: [12:42:33] [34m[INFO][0m [test_helpers.dart] --- Cache State Check 1 at 0:00:00.000020 (Target: 1s) ---
+Quizzer: [12:42:33] [36m[DEBUG][0m [test_helpers.dart] UnprocessedCache length: 0
+Quizzer: [12:42:33] [36m[DEBUG][0m [test_helpers.dart] NonCirculatingCache length: 25
+Quizzer: [12:42:33] [36m[DEBUG][0m [test_helpers.dart] ModuleInactiveCache length: 0
+Quizzer: [12:42:33] [36m[DEBUG][0m [test_helpers.dart] CirculatingCache length: 156
+Quizzer: [12:42:33] [36m[DEBUG][0m [test_helpers.dart] DueDateBeyond24hrsCache length: 0
+Quizzer: [12:42:33] [36m[DEBUG][0m [test_helpers.dart] DueDateWithin24hrsCache length: 1
+Quizzer: [12:42:33] [36m[DEBUG][0m [test_helpers.dart] PastDueCache length: 5
+Quizzer: [12:42:33] [36m[DEBUG][0m [test_helpers.dart] EligibleQuestionsCache length: 138
+Quizzer: [12:42:33] [36m[DEBUG][0m [test_helpers.dart] QuestionQueueCache length: 10
+Quizzer: [12:42:33] [36m[DEBUG][0m [test_helpers.dart] AnswerHistoryCache length: 8
+Quizzer: [12:42:33] [34m[INFO][0m [eligibility_check_worker.dart] EligibilityCheckWorker: Found record in PastDueCache, processing...
+Quizzer: [12:42:33] [34m[INFO][0m [eligibility_check_worker.dart] Eligibility Check: 2025-04-28T16:33:34.436018_e737b728-1ae2-41d4-bae0-77ff5a222a0a is NOT eligible (in recent history). Waiting 1s before reprocessing.
+Quizzer: [12:42:33] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:38.284718_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:42:34] [34m[INFO][0m [eligibility_check_worker.dart] EligibilityCheckWorker: Found record in PastDueCache, processing...
+Quizzer: [12:42:34] [34m[INFO][0m [eligibility_check_worker.dart] Eligibility Check: 2025-04-28T20:11:19.085301_e737b728-1ae2-41d4-bae0-77ff5a222a0a is NOT eligible (in recent history). Waiting 1s before reprocessing.
+Quizzer: [12:42:34] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:34.436018_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:42:35] [34m[INFO][0m [eligibility_check_worker.dart] EligibilityCheckWorker: Found record in PastDueCache, processing...
+Quizzer: [12:42:35] [34m[INFO][0m [eligibility_check_worker.dart] Eligibility Check: 2025-04-28T16:33:34.436018_e737b728-1ae2-41d4-bae0-77ff5a222a0a is NOT eligible (in recent history). Waiting 1s before reprocessing.
+Quizzer: [12:42:35] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:19.085301_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:42:36] [34m[INFO][0m [test_helpers.dart] SUCCESS: Cache monitoring loop finished after 0:00:03.004584.
+Quizzer: [12:42:36] [34m[INFO][0m [individual_api_tests.dart] --- Iteration 10 ---
+Quizzer: [12:42:36] [34m[INFO][0m [individual_api_tests.dart] --- State BEFORE requestNextQuestion Call ---
+Quizzer: [12:42:36] [34m[INFO][0m [test_helpers.dart] --- Logging Current Question Details ---
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   Question ID: 2025-04-28T16:33:38.557745_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   Question Type: multiple_choice
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   Module Name: elementary_addition
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   Question Elements: [{type: text, content: 6 + 9 = ?}]
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   Answer Elements: [{type: text, content: 15}]
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   Options: [13, 8, 15, 16, 69, 14]
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   Correct Index: 2
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   Citation: 
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   Concepts: 
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   Subjects: 
+Quizzer: [12:42:36] [34m[INFO][0m [test_helpers.dart] --- Logging Current User Question Record Details ---
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   user_uuid: e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   question_id: 2025-04-28T16:33:38.557745_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   revision_streak: 1
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   last_revised: 2025-04-29T12:42:32.582497
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   predicted_revision_due_history: []
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   next_revision_due: 2025-04-29T21:25:11.888482
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   time_between_revisions: 0.30999999999999994
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   average_times_shown_per_day: 2.755163025018042
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   is_eligible: null
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   in_circulation: 1
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   last_updated: 2025-04-29T12:42:32.582497
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   total_attempts: 5
+Quizzer: [12:42:36] [34m[INFO][0m [test_helpers.dart] --- Logging Current User Question Record from DB ---
+Quizzer: [12:42:36] [34m[INFO][0m [test_helpers.dart] DB access released.
+Quizzer: [12:42:36] [34m[INFO][0m [test_helpers.dart] DB Record for User: e737b728-1ae2-41d4-bae0-77ff5a222a0a, Question: 2025-04-28T16:33:38.557745_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   user_uuid: e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   question_id: 2025-04-28T16:33:38.557745_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   revision_streak: 1
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   last_revised: 2025-04-29T12:42:32.582497
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   predicted_revision_due_history: []
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   next_revision_due: 2025-04-29T21:25:11.888482
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   time_between_revisions: 0.30999999999999994
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   average_times_shown_per_day: 2.755163025018042
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   is_eligible: null
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   in_circulation: 1
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   last_updated: 2025-04-29T12:42:32.582497
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   total_attempts: 5
+Quizzer: [12:42:36] [34m[INFO][0m [test_helpers.dart] Waiting for 0.3 seconds...
+Quizzer: [12:42:36] [34m[INFO][0m [eligibility_check_worker.dart] EligibilityCheckWorker: Found record in PastDueCache, processing...
+Quizzer: [12:42:36] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:34.436018_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:42:36] [34m[INFO][0m [eligibility_check_worker.dart] EligibilityCheckWorker: Found record in PastDueCache, processing...
+Quizzer: [12:42:36] [34m[INFO][0m [eligibility_check_worker.dart] Eligibility Check: 2025-04-28T16:33:44.982426_e737b728-1ae2-41d4-bae0-77ff5a222a0a is NOT eligible (in recent history). Waiting 1s before reprocessing.
+Quizzer: [12:42:36] [34m[INFO][0m [test_helpers.dart] Wait complete.
+Quizzer: [12:42:36] [34m[INFO][0m [individual_api_tests.dart] Calling requestNextQuestion...
+Quizzer: [12:42:36] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:38.557745_e737b728-1ae2-41d4-bae0-77ff5a222a0a to DueDateWithin24hrsCache.
+Quizzer: [12:42:36] [34m[INFO][0m [individual_api_tests.dart] --- State AFTER requestNextQuestion Call ---
+Quizzer: [12:42:36] [34m[INFO][0m [test_helpers.dart] --- Logging Current Question Details ---
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   Question ID: 2025-04-28T20:11:16.164683_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   Question Type: select_all_that_apply
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   Module Name: Is Even Or Odd
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   Question Elements: [{type: text, content: Select all the ODD numbers.}]
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   Answer Elements: [{type: text, content: Odd numbers are not divisible by 2.}]
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   Citation: 
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   Concepts: 
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   Subjects: 
+Quizzer: [12:42:36] [34m[INFO][0m [test_helpers.dart] Waiting for 0.3 seconds...
+Quizzer: [12:42:36] [34m[INFO][0m [test_helpers.dart] Wait complete.
+Quizzer: [12:42:36] [34m[INFO][0m [individual_api_tests.dart] Submitting random answer
+Quizzer: [12:42:36] [34m[INFO][0m [test_helpers.dart] --- Generating Random Select-All-That-Apply Answer ---
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart] Selected random indices: [1]
+Quizzer: [12:42:36] [34m[INFO][0m [question_answer_attempts_table.dart] Verifying question_answer_attempts table...
+Quizzer: [12:42:36] [34m[INFO][0m [question_answer_attempts_table.dart] question_answer_attempts table already exists. Checking columns...
+Quizzer: [12:42:36] [34m[INFO][0m [question_answer_attempts_table.dart] Column check complete.
+Quizzer: [12:42:36] [34m[INFO][0m [question_answer_attempts_table.dart] Checking if first attempt for Q: 2025-04-28T20:11:16.164683_e737b728-1ae2-41d4-bae0-77ff5a222a0a, User: e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:36] [34m[INFO][0m [question_answer_attempts_table.dart] Is first attempt? false
+Quizzer: [12:42:36] [34m[INFO][0m [question_answer_attempts_table.dart] Adding question attempt for Q: 2025-04-28T20:11:16.164683_e737b728-1ae2-41d4-bae0-77ff5a222a0a, User: e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:36] [34m[INFO][0m [question_answer_attempts_table.dart] SUCCESS: Successfully added question attempt record with result ID: 459. Data: {time_stamp: 2025-04-29T12:42:36.688780, question_id: 2025-04-28T20:11:16.164683_e737b728-1ae2-41d4-bae0-77ff5a222a0a, participant_id: e737b728-1ae2-41d4-bae0-77ff5a222a0a, response_time: 0.25867, response_result: 0, was_first_attempt: 0, knowledge_base: null, question_context_csv: {"subjects":[],"concepts":[]}, last_revised_date: 2025-04-28T21:09:51.054567, days_since_last_revision: 0.6477503959837962, total_attempts: 8, revision_streak: 0}
+Quizzer: [12:42:36] [34m[INFO][0m [test_helpers.dart] Waiting for 0.3 seconds...
+Quizzer: [12:42:36] [34m[INFO][0m [test_helpers.dart] Wait complete.
+Quizzer: [12:42:36] [34m[INFO][0m [test_helpers.dart] --- Logging Current User Question Record Details ---
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   user_uuid: e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   question_id: 2025-04-28T20:11:16.164683_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   revision_streak: 0
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   last_revised: 2025-04-29T12:42:36.688866
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   predicted_revision_due_history: []
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   next_revision_due: 2025-04-29T12:42:36.688996
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   time_between_revisions: 0.23499999999999988
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   average_times_shown_per_day: Infinity
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   is_eligible: null
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   in_circulation: 1
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   last_updated: 2025-04-29T12:42:36.688866
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   total_attempts: 9
+Quizzer: [12:42:36] [34m[INFO][0m [test_helpers.dart] --- Logging Current User Question Record from DB ---
+Quizzer: [12:42:36] [34m[INFO][0m [test_helpers.dart] DB access released.
+Quizzer: [12:42:36] [34m[INFO][0m [test_helpers.dart] DB Record for User: e737b728-1ae2-41d4-bae0-77ff5a222a0a, Question: 2025-04-28T20:11:16.164683_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   user_uuid: e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   question_id: 2025-04-28T20:11:16.164683_e737b728-1ae2-41d4-bae0-77ff5a222a0a
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   revision_streak: 0
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   last_revised: 2025-04-29T12:42:36.688866
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   predicted_revision_due_history: []
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   next_revision_due: 2025-04-29T12:42:36.688996
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   time_between_revisions: 0.23499999999999988
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   average_times_shown_per_day: Infinity
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   is_eligible: null
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   in_circulation: 1
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   last_updated: 2025-04-29T12:42:36.688866
+Quizzer: [12:42:36] [36m[DEBUG][0m [test_helpers.dart]   total_attempts: 9
+Quizzer: [12:42:36] [34m[INFO][0m [test_helpers.dart] Waiting for 0.3 seconds...
+Quizzer: [12:42:37] [34m[INFO][0m [test_helpers.dart] Wait complete.
+Quizzer: [12:42:37] [34m[INFO][0m [test_helpers.dart] --- Cache State Check 1 at 0:00:00.000015 (Target: 1s) ---
+Quizzer: [12:42:37] [36m[DEBUG][0m [test_helpers.dart] UnprocessedCache length: 0
+Quizzer: [12:42:37] [36m[DEBUG][0m [test_helpers.dart] NonCirculatingCache length: 25
+Quizzer: [12:42:37] [36m[DEBUG][0m [test_helpers.dart] ModuleInactiveCache length: 0
+Quizzer: [12:42:37] [36m[DEBUG][0m [test_helpers.dart] CirculatingCache length: 156
+Quizzer: [12:42:37] [36m[DEBUG][0m [test_helpers.dart] DueDateBeyond24hrsCache length: 0
+Quizzer: [12:42:37] [36m[DEBUG][0m [test_helpers.dart] DueDateWithin24hrsCache length: 2
+Quizzer: [12:42:37] [36m[DEBUG][0m [test_helpers.dart] PastDueCache length: 4
+Quizzer: [12:42:37] [36m[DEBUG][0m [test_helpers.dart] EligibleQuestionsCache length: 138
+Quizzer: [12:42:37] [36m[DEBUG][0m [test_helpers.dart] QuestionQueueCache length: 10
+Quizzer: [12:42:37] [36m[DEBUG][0m [test_helpers.dart] AnswerHistoryCache length: 9
+Quizzer: [12:42:37] [34m[INFO][0m [eligibility_check_worker.dart] EligibilityCheckWorker: Found record in PastDueCache, processing...
+Quizzer: [12:42:37] [34m[INFO][0m [eligibility_check_worker.dart] Eligibility Check: 2025-04-28T20:11:07.988538_e737b728-1ae2-41d4-bae0-77ff5a222a0a is NOT eligible (in recent history). Waiting 1s before reprocessing.
+Quizzer: [12:42:37] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T16:33:44.982426_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:42:38] [34m[INFO][0m [eligibility_check_worker.dart] EligibilityCheckWorker: Found record in PastDueCache, processing...
+Quizzer: [12:42:38] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:07.988538_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:42:38] [34m[INFO][0m [eligibility_check_worker.dart] EligibilityCheckWorker: Found record in PastDueCache, processing...
+Quizzer: [12:42:38] [34m[INFO][0m [eligibility_check_worker.dart] Eligibility Check: 2025-04-28T20:11:19.085301_e737b728-1ae2-41d4-bae0-77ff5a222a0a is NOT eligible (in recent history). Waiting 1s before reprocessing.
+Quizzer: [12:42:39] [34m[INFO][0m [eligibility_check_worker.dart] EligibilityCheckWorker: Found record in PastDueCache, processing...
+Quizzer: [12:42:39] [34m[INFO][0m [eligibility_check_worker.dart] Eligibility Check: 2025-04-28T16:33:34.436018_e737b728-1ae2-41d4-bae0-77ff5a222a0a is NOT eligible (in recent history). Waiting 1s before reprocessing.
+Quizzer: [12:42:39] [34m[INFO][0m [pre_process_worker.dart] [PreProcessWorker] Routing 2025-04-28T20:11:19.085301_e737b728-1ae2-41d4-bae0-77ff5a222a0a to PastDueCache.
+Quizzer: [12:42:40] [34m[INFO][0m [test_helpers.dart] SUCCESS: Cache monitoring loop finished after 0:00:03.010893.
+Quizzer: [12:42:40] [34m[INFO][0m [individual_api_tests.dart] User confirmed logged in. Attempting logout...
+Quizzer: [12:42:40] [34m[INFO][0m [question_selection_worker.dart] PresentationSelectionWorker stopping...
+Quizzer: [12:42:40] [34m[INFO][0m [due_date_worker.dart] DueDateWorker stopping...
+Quizzer: [12:42:40] [34m[INFO][0m [pre_process_worker.dart] Stopping PreProcessWorker...
+Quizzer: [12:42:40] [34m[INFO][0m [inactive_module_worker.dart] Stopping InactiveModuleWorker...
+Quizzer: [12:42:40] [34m[INFO][0m Signing out user with scope: SignOutScope.local
+Quizzer: [12:42:40] [36m[DEBUG][0m Removing session
+Quizzer: [12:42:40] [33m[WARNING][0m [eligibility_check_worker.dart] EligibilityCheckWorker: Stopped during processing record 2025-04-28T16:33:34.436018_e737b728-1ae2-41d4-bae0-77ff5a222a0a. Putting back in UnprocessedCache.
+Quizzer: [12:42:40] [34m[INFO][0m [pre_process_worker.dart] PreProcessWorker loop finished.
+Quizzer: [12:42:40] [34m[INFO][0m [individual_api_tests.dart] SUCCESS: logoutUser() called. Verifying logged-out state...
+Quizzer: [12:42:40] [34m[INFO][0m [individual_api_tests.dart] SUCCESS: logoutUser test completed successfully.

@@ -15,7 +15,7 @@ class DueDateBeyond24hrsCache {
   DueDateBeyond24hrsCache._internal(); // Private constructor
 
   final Lock _lock = Lock();
-  List<Map<String, dynamic>> _cache = [];
+  final List<Map<String, dynamic>> _cache = [];
   final UnprocessedCache _unprocessedCache = UnprocessedCache(); // Get singleton instance
 
   // --- Add Record (with duplicate check) ---
@@ -30,7 +30,7 @@ class DueDateBeyond24hrsCache {
       QuizzerLogger.logWarning('Attempted to add invalid record (missing keys) to DueDateBeyond24hrsCache');
       return; // Or throw ArgumentError
     }
-    final String questionId = record['question_id'] as String; // Assume key exists
+    // final String questionId = record['question_id'] as String; // Assume key exists
 
     final dueDateString = record['next_revision_due'];
     if (dueDateString == null || dueDateString is! String) {
@@ -50,10 +50,9 @@ class DueDateBeyond24hrsCache {
         'Record added to DueDateBeyond24hrsCache must have next_revision_due > 24 hours from now. Got: $parsedDueDate'
     );
 
-    // Check again just in case asserts are disabled in production
-    // FIXME potential deletion point
     if (!parsedDueDate.isAfter(twentyFourHoursFromNow)) {
         QuizzerLogger.logWarning('Record failed >24hr check (asserts might be off): $parsedDueDate');
+        _unprocessedCache.addRecord(record);
         return; // Don't add if condition isn't met
     }
 
@@ -117,6 +116,15 @@ class DueDateBeyond24hrsCache {
     return await _lock.synchronized(() {
       // Return a copy to prevent external modification
       return List<Map<String, dynamic>>.from(_cache);
+    });
+  }
+
+  Future<void> clear() async {
+    await _lock.synchronized(() {
+      if (_cache.isNotEmpty) {
+        _cache.clear();
+        // QuizzerLogger.logMessage('AnswerHistoryCache cleared.'); // Optional log
+      }
     });
   }
 }

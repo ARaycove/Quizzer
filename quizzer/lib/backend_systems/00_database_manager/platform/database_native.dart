@@ -79,7 +79,6 @@ Future<Database> initializeDatabase() async {
       // },
       onUpgrade: (Database db, int oldVersion, int newVersion) async {
         QuizzerLogger.logWarning('Database onUpgrade called from $oldVersion to $newVersion.');
-        // TODO: Implement actual database migration logic if schema changes
       }
     )
   );

@@ -47,4 +47,17 @@ class CirculatingQuestionsCache {
       return List<String>.from(_questionIds);
     });
   }
+
+  // --- Clear Cache ---
+
+  /// Clears all question IDs from the cache.
+  /// Ensures thread safety using a lock.
+  Future<void> clear() async {
+    await _lock.synchronized(() {
+      if (_questionIds.isNotEmpty) {
+        _questionIds.clear();
+        // QuizzerLogger.logMessage('CirculatingQuestionsCache cleared.'); // Optional log
+      }
+    });
+  }
 }

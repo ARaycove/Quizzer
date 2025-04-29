@@ -454,7 +454,7 @@ Future<int> addQuestionMultipleChoice({
   return result;
 }
 
-// TODO select_all_that_apply     isValidationDone [ ]
+// select_all_that_apply     isValidationDone [X]
 /// Adds a new select-all-that-apply question to the database.
 Future<int> addQuestionSelectAllThatApply({
   required String timeStamp,

@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:synchronized/synchronized.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart'; // Import for logging
 import 'unprocessed_cache.dart'; // Import for flushing
-import 'package:quizzer/backend_systems/06_question_queue_server/eligibility_check_worker.dart';
 // import 'package:quizzer/backend_systems/logger/quizzer_logging.dart'; // Optional: if logging needed
 
 // ==========================================
@@ -138,6 +137,15 @@ class QuestionQueueCache {
   Future<bool> isEmpty() async {
     return await _lock.synchronized(() {
       return _cache.isEmpty;
+    });
+  }
+
+  Future<void> clear() async {
+    await _lock.synchronized(() {
+      if (_cache.isNotEmpty) {
+        _cache.clear();
+        // QuizzerLogger.logMessage('AnswerHistoryCache cleared.'); // Optional log
+      }
     });
   }
 

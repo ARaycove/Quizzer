@@ -1,23 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'dart:math'; // Import for max function
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
-import 'package:quizzer/backend_systems/09_data_caches/unprocessed_cache.dart';
-import 'package:quizzer/backend_systems/09_data_caches/non_circulating_questions_cache.dart';
-import 'package:quizzer/backend_systems/09_data_caches/module_inactive_cache.dart';
-import 'package:quizzer/backend_systems/09_data_caches/circulating_questions_cache.dart';
-import 'package:quizzer/backend_systems/09_data_caches/due_date_beyond_24hrs_cache.dart';
-import 'package:quizzer/backend_systems/09_data_caches/due_date_within_24hrs_cache.dart';
-import 'package:quizzer/backend_systems/09_data_caches/eligible_questions_cache.dart';
-import 'package:quizzer/backend_systems/09_data_caches/question_queue_cache.dart';
-import 'package:quizzer/backend_systems/09_data_caches/answer_history_cache.dart';
 import 'package:logging/logging.dart';
-import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_question_answer_pairs_table.dart' as uqap_table;
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-import 'package:quizzer/backend_systems/09_data_caches/past_due_cache.dart';
-import 'dart:convert'; // ADDED for jsonDecode
-import 'dart:io'; // ADDED for File operations
 import 'test_helpers.dart'; // Import helper functions
 // ==========================================
 // Main Test Suite
@@ -27,9 +11,9 @@ void main() {
   QuizzerLogger.setupLogging(level: Level.FINE);
   test('login and worker start up', () async {
     final sessionManager = getSessionManager();
-    final email     = 'example_01@example.com';
-    final password  = 'password1';
-    final username  = 'example 01';
+    const email     = 'example_01@example.com';
+    const password  = 'password1';
+    const username  = 'example 01';
 
     QuizzerLogger.printHeader('Attempting initial login for $email...');
     Map<String, dynamic> loginResult = await sessionManager.attemptLogin(email, password);
@@ -90,7 +74,7 @@ void main() {
 
     // REMOVED Cache Monitoring Loop from here
 
-  }, timeout: Timeout(Duration(minutes: 1))); // Reduced timeout slightly
+  }, timeout: const Timeout(Duration(minutes: 1))); // Reduced timeout slightly
 
   test('spam module activation toggle', () async {
     final sessionManager = getSessionManager();
@@ -105,7 +89,6 @@ void main() {
     QuizzerLogger.logMessage('Loaded ${modules.length} modules for spam test.');
 
     const int spamCycles = 50;
-    final random = Random(); // Create Random instance once
     for (int i = 0; i < spamCycles; i++) {
       final bool activate = i % 2 == 0; // Activate on even, deactivate on odd
       // QuizzerLogger.logMessage('Spam Cycle ${i + 1}/$spamCycles: Setting all modules to active=$activate');
@@ -131,56 +114,14 @@ void main() {
     }
     QuizzerLogger.logSuccess('Finished final explicit activation call for all modules.');
 
-  }, timeout: Timeout(const Duration(minutes: 2))); // Allow slightly more time for the loop
+  }, timeout: const Timeout(Duration(minutes: 2))); // Allow slightly more time for the loop
 
   // --- Test Block: Monitor Caches After Spam ---
   test('monitor caches after spam toggle', () async {
       // Call the extracted monitoring function again to see the result of the spam
       // Monitor for 30 seconds this time
       await monitorCaches(monitoringSeconds: 60);
-    }, timeout: Timeout(const Duration(seconds: 45))); // Timeout > monitor duration + buffer
-
-  test('Question loop test', () async {
-    final sessionManager = getSessionManager();
-    assert(sessionManager.userLoggedIn, "User must be logged in for this test");
-
-    QuizzerLogger.printHeader('Starting requestNextQuestion loop test (3 iterations)...');
-
-    for (int i = 1; i <= 3; i++) {
-      QuizzerLogger.printDivider();
-      QuizzerLogger.logMessage('--- Iteration $i ---');
-      QuizzerLogger.logMessage('--- State BEFORE requestNextQuestion Call ---');
-      // Call the new helper function
-      await logCurrentQuestionDetails(sessionManager);
-      await logCurrentUserQuestionRecordDetails(sessionManager);
-      await logCurrentUserRecordFromDB(sessionManager);
-      await waitTime(2000);
-
-
-
-      QuizzerLogger.logMessage('Calling requestNextQuestion...');
-      await sessionManager.requestNextQuestion();
-      QuizzerLogger.logMessage('--- State AFTER requestNextQuestion Call ---');
-      // Call the new helper function again
-      await logCurrentQuestionDetails(sessionManager);
-      await waitTime(2000);
-
-      QuizzerLogger.logMessage('Submitting random answer');
-      if (sessionManager.currentQuestionType == "multiple_choice") {
-        await sessionManager.submitAnswer(userAnswer: getRandomMultipleChoiceAnswer(sessionManager));
-      }
-      
-      await waitTime(250);
-      await logCurrentUserQuestionRecordDetails(sessionManager);
-      await logCurrentUserRecordFromDB(sessionManager);
-      await waitTime(2000);
-
-      // Monitor caches to observe changes
-      await monitorCaches(monitoringSeconds: 3);
-    }
-
-    QuizzerLogger.printHeader('Finished requestNextQuestion loop test.');
-  }, timeout: Timeout(Duration(minutes: 3))); // Allow more time for loops + monitoring
+    }, timeout: const Timeout( Duration(seconds: 45))); // Timeout > monitor duration + buffer
 
   test('Update Module Description Test', () async {
     final sessionManager = getSessionManager();

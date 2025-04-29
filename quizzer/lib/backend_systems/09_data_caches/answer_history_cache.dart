@@ -71,6 +71,19 @@ class AnswerHistoryCache {
      });
   }
 
+  // --- Clear Cache ---
+
+  /// Clears all entries from the answer history cache.
+  /// Ensures thread safety using a lock.
+  Future<void> clear() async {
+    await _lock.synchronized(() {
+      if (_history.isNotEmpty) {
+        _history.clear();
+        // QuizzerLogger.logMessage('AnswerHistoryCache cleared.'); // Optional log
+      }
+    });
+  }
+
   // Optional: Method to peek at the history if needed for debugging/inspection
   Future<List<String>> peekHistory() async {
     return await _lock.synchronized(() {

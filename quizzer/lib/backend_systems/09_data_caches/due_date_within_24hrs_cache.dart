@@ -16,7 +16,7 @@ class DueDateWithin24hrsCache {
   DueDateWithin24hrsCache._internal(); // Private constructor
 
   final Lock _lock = Lock();
-  List<Map<String, dynamic>> _cache = [];
+  final List<Map<String, dynamic>> _cache = [];
   final UnprocessedCache _unprocessedCache = UnprocessedCache(); // Get singleton instance
   final SwitchBoard _switchBoard = SwitchBoard(); // Get SwitchBoard instance
 
@@ -34,7 +34,7 @@ class DueDateWithin24hrsCache {
       QuizzerLogger.logWarning('Attempted to add invalid record (missing keys) to DueDateWithin24hrsCache');
       throw ArgumentError("processed question record is invalid, internal issue needs to be addressed");
     }
-    final String questionId = record['question_id'] as String; // Assume key exists
+    // final String questionId = record['question_id'] as String; // Assume key exists
 
     final dueDateString = record['next_revision_due'];
     if (dueDateString == null || dueDateString is! String) {
@@ -156,5 +156,14 @@ class DueDateWithin24hrsCache {
      return await _lock.synchronized(() {
          return _cache.length;
      });
+  }
+
+  Future<void> clear() async {
+    await _lock.synchronized(() {
+      if (_cache.isNotEmpty) {
+        _cache.clear();
+        // QuizzerLogger.logMessage('AnswerHistoryCache cleared.'); // Optional log
+      }
+    });
   }
 }

@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:synchronized/synchronized.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart'; // Uncomment if logging needed
 import 'unprocessed_cache.dart'; // Import UnprocessedCache
-import 'due_date_within_24hrs_cache.dart'; // Import target cache
 import 'past_due_cache.dart'; // ADDED: Import new target cache
 import 'package:quizzer/backend_systems/06_question_queue_server/switch_board.dart'; // Import SwitchBoard
 // import 'package:quizzer/backend_systems/logger/quizzer_logging.dart'; // Optional: if logging needed
@@ -19,7 +18,7 @@ class EligibleQuestionsCache {
   EligibleQuestionsCache._internal(); // Private constructor
 
   final Lock _lock = Lock();
-  List<Map<String, dynamic>> _cache = [];
+  final List<Map<String, dynamic>> _cache = [];
   final UnprocessedCache _unprocessedCache = UnprocessedCache(); // Get singleton instance
 
   // --- Notification Stream ---
@@ -35,7 +34,7 @@ class EligibleQuestionsCache {
   Future<void> addRecord(Map<String, dynamic> record) async {
     // Assert required key exists
     assert(record.containsKey('question_id'), 'Record added to EligibleQuestionsCache must contain question_id');
-    final String questionId = record['question_id'] as String; // Assume assertion passes
+    // final String questionId = record['question_id'] as String; // Assume assertion passes
 
     await _lock.synchronized(() {
         final bool wasEmpty = _cache.isEmpty;
@@ -212,6 +211,15 @@ class EligibleQuestionsCache {
     } else {
        QuizzerLogger.logWarning('EligibleQuestionsCache was empty, nothing to flush.'); // Optional log
     }
+  }
+  
+  Future<void> clear() async {
+    await _lock.synchronized(() {
+      if (_cache.isNotEmpty) {
+        _cache.clear();
+        // QuizzerLogger.logMessage('AnswerHistoryCache cleared.'); // Optional log
+      }
+    });
   }
 
   // --- Dispose Stream Controller ---

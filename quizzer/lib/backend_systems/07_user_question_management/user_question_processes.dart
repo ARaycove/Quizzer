@@ -1,10 +1,6 @@
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_question_answer_pairs_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_attempts_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pairs_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile_table.dart' as user_profile;
 import 'package:quizzer/backend_systems/00_database_manager/tables/modules_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
-import 'package:quizzer/backend_systems/08_memory_retention_algo/memory_retention_algorithm.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:sqflite/sqflite.dart';

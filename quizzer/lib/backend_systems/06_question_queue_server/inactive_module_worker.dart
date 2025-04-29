@@ -36,7 +36,7 @@ class InactiveModuleWorker {
   }
 
   /// Stops the worker loop.
-  void stop() {
+  Future<void> stop() async{
     if (!_isRunning) {
       QuizzerLogger.logWarning('InactiveModuleWorker already stopped.');
       return;

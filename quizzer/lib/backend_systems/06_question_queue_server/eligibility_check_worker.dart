@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
-import 'package:quizzer/backend_systems/09_data_caches/due_date_within_24hrs_cache.dart';
 import 'package:quizzer/backend_systems/09_data_caches/eligible_questions_cache.dart';
 import 'package:quizzer/backend_systems/09_data_caches/unprocessed_cache.dart';
 import 'package:quizzer/backend_systems/09_data_caches/answer_history_cache.dart'; // Needed for check
@@ -100,8 +99,8 @@ class EligibilityCheckWorker {
   final EligibleQuestionsCache  _eligibleCache = EligibleQuestionsCache();
   final UnprocessedCache        _unprocessedCache = UnprocessedCache();
   final AnswerHistoryCache      _historyCache = AnswerHistoryCache(); // For check #1
-  final DatabaseMonitor         _dbMonitor = getDatabaseMonitor();       // For DB access
-  final SessionManager          _sessionManager = SessionManager();       // For userId
+  // final DatabaseMonitor         _dbMonitor = getDatabaseMonitor();       // For DB access
+  // final SessionManager          _sessionManager = SessionManager();       // For userId
   final SwitchBoard             _switchBoard = SwitchBoard();             // Get SwitchBoard instance
 
   /// Starts the worker loop.
@@ -157,7 +156,7 @@ class EligibilityCheckWorker {
      Map<String, dynamic> record;
      do {
        if (!_isRunning) break;
-       record = await _pastDueCache.getAndRemoveOldestRecord();
+       record = await _pastDueCache.getAndRemoveRandomRecord();
        if (record.isNotEmpty) {
          await _processSingleRecord(record, processedInCycle);
        }
@@ -198,7 +197,7 @@ class EligibilityCheckWorker {
 
     } else {
       // If not empty, get and process one record from PastDueCache (CHANGED)
-      final record = await _pastDueCache.getAndRemoveOldestRecord();
+      final record = await _pastDueCache.getAndRemoveRandomRecord();
       if (record.isNotEmpty) {
         QuizzerLogger.logMessage('EligibilityCheckWorker: Found record in PastDueCache, processing...');
         await _processSingleRecord(record, {}); // Pass empty set for cycle tracking
@@ -234,13 +233,21 @@ class EligibilityCheckWorker {
 
     // Perform the actual eligibility check
     bool isEligible = await isUserRecordEligible(record);
-
     if (isEligible) {
-       // QuizzerLogger.logMessage('Eligibility Check: $questionId is eligible.');
        await _eligibleCache.addRecord(record);
     } else {
-       // QuizzerLogger.logMessage('Eligibility Check: $questionId is NOT eligible, adding to unprocessed.');
-       await _unprocessedCache.addRecord(record);
+       // Check if the reason for ineligibility was recent history
+       bool inRecentHistory = await _historyCache.isInRecentHistory(questionId); // Re-check history
+       if (inRecentHistory) {
+          QuizzerLogger.logMessage('Eligibility Check: $questionId is NOT eligible (in recent history). Waiting 1s before reprocessing.');
+          await Future.delayed(const Duration(seconds: 1));
+          if (!_isRunning) return; // Check if stopped during wait
+          await _unprocessedCache.addRecord(record); // Add back after delay
+       } else {
+          // Ineligible for other reasons (not due, inactive, etc.) - add back immediately
+          QuizzerLogger.logMessage('Eligibility Check: $questionId is NOT eligible (other reason), adding to unprocessed immediately.');
+          await _unprocessedCache.addRecord(record);
+       }
     }
   }
 }

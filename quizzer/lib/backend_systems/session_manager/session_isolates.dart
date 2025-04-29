@@ -5,31 +5,16 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 // Spin up necessary processes and get userID from local profile, effectively intialize any session specific variables that should only be brought after successful login
 Future<String?> initializeSession(Map<String, dynamic> data) async {
-  // TODO Need to fix, get rid of try catch and nullable type
   final email = data['email'] as String;
   final monitor = getDatabaseMonitor();
   Database? db;
+  db = await monitor.requestDatabaseAccess();
 
-  try {
-    while (db == null) {
-      db = await monitor.requestDatabaseAccess();
-      if (db == null) {
-        QuizzerLogger.logMessage('Database access denied, waiting...');
-        await Future.delayed(const Duration(milliseconds: 100));
-      }
-    }
-    QuizzerLogger.logMessage('Database access granted');
+  QuizzerLogger.logMessage('Database access granted');
 
-    final userId = await getUserIdByEmail(email, db);
+  final userId = await getUserIdByEmail(email, db!);
 
-    QuizzerLogger.logSuccess('Session initialized with userId: $userId');
-    monitor.releaseDatabaseAccess();
-    return userId;
-  } 
-  
-  catch (e) {
-    QuizzerLogger.logError('Error initializing session: $e');
-    monitor.releaseDatabaseAccess();
-    return null;
-  }
+  QuizzerLogger.logSuccess('Session initialized with userId: $userId');
+  monitor.releaseDatabaseAccess();
+  return userId;
 } 

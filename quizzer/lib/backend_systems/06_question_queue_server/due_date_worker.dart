@@ -64,14 +64,12 @@ class DueDateWorker {
     QuizzerLogger.logMessage('DueDateWorker loop started.');
     while (_isRunning) {
       final now = DateTime.now();
-      bool didScan = false;
 
       // Check if it's time to scan the 'Beyond 24hrs' cache
       if (_lastBeyondScanTime == null || now.difference(_lastBeyondScanTime!) >= _beyondScanInterval) {
         QuizzerLogger.logMessage('DueDateWorker: Scanning DueDateBeyond24hrsCache...');
         await _scanBeyond24HrsCache();
         _lastBeyondScanTime = now;
-        didScan = true;
         if (!_isRunning) break; // Exit loop if stopped during scan
       }
 
@@ -80,7 +78,6 @@ class DueDateWorker {
         QuizzerLogger.logMessage('DueDateWorker: Scanning DueDateWithin24hrsCache...');
         await _scanWithin24HrsCache();
         _lastWithinScanTime = now;
-        didScan = true;
         if (!_isRunning) break; // Exit loop if stopped during scan
       }
 

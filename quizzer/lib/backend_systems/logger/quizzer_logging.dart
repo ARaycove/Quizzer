@@ -1,5 +1,3 @@
-// TODO: Implement logging for the quizzer app
-
 // Logger should follow functional programming paradigm
 
 // Logger should be able to log messages at different levels taking a parameter for the log level
@@ -36,7 +34,6 @@ class QuizzerLogger {
 
   // Create a logger instance
   static final _logger = Logger('QuizzerApp');
-  static bool _isInitialized = false; // Flag to prevent re-initialization
   static IOSink? _logFileSink; // Sink for writing to file
   static const String _logFileName = 'quizzer_log.txt';
   static const String _logDir = 'runtime_cache';
@@ -226,7 +223,7 @@ class QuizzerLogger {
   }
 
   static void printDivider() {
-    stdout.writeln('${_blue}${'-' * 80}$_reset');
+    stdout.writeln('$_blue${'-' * 80}$_reset');
   }
 
   static Future<void> dispose() async {
@@ -236,7 +233,6 @@ class QuizzerLogger {
       print('Quizzer: Log file sink closed.');
       _logFileSink = null;
     }
-    _isInitialized = false; // Allow re-initialization if needed
   }
 }
 

@@ -13,7 +13,7 @@ class NonCirculatingQuestionsCache {
   NonCirculatingQuestionsCache._internal(); // Private constructor
 
   final Lock _lock = Lock();
-  List<Map<String, dynamic>> _cache = [];
+  final List<Map<String, dynamic>> _cache = [];
 
   // --- Notification Stream ---
   // Used to notify listeners (like CirculationWorker) when a record is added to an empty cache.
@@ -36,7 +36,7 @@ class NonCirculatingQuestionsCache {
       QuizzerLogger.logWarning('Attempted to add invalid record (missing keys) to NonCirculatingCache');
       return; // Or throw ArgumentError
     }
-    final String questionId = record['question_id'] as String; // Assume key exists
+    // final String questionId = record['question_id'] as String; // Assume key exists
 
     // Assert that the record is indeed non-circulating
     assert(record['in_circulation'] == 0, 'Record added to NonCirculatingCache must have in_circulation == 0');
@@ -101,6 +101,15 @@ class NonCirculatingQuestionsCache {
      });
   }
 
+  Future<void> clear() async {
+    await _lock.synchronized(() {
+      if (_cache.isNotEmpty) {
+        _cache.clear();
+        // QuizzerLogger.logMessage('AnswerHistoryCache cleared.'); // Optional log
+      }
+    });
+  }
+  
   // --- Close Stream Controller ---
   /// Closes the stream controller. Should be called when the cache is no longer needed.
   void dispose() {

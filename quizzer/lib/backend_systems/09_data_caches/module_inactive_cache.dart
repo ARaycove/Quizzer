@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:synchronized/synchronized.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart'; // Assuming logger might be needed
-import 'unprocessed_cache.dart'; // Import for flushing
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart'; // For DB access
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pairs_table.dart' show getModuleNameForQuestionId; // Function to get module name
 import 'package:sqflite_common_ffi/sqflite_ffi.dart'; // For Database type
@@ -98,9 +97,9 @@ class ModuleInactiveCache {
   Future<int> peekTotalRecordCount() async {
     return await _lock.synchronized(() {
       int totalCount = 0;
-      _cache.values.forEach((recordList) {
+      for (final recordList in _cache.values) {
         totalCount += recordList.length;
-      });
+      }
       return totalCount;
     });
   }
@@ -122,6 +121,15 @@ class ModuleInactiveCache {
       } else {
         // Module not found or is empty
         return <String, dynamic>{};
+      }
+    });
+  }
+
+  Future<void> clear() async {
+    await _lock.synchronized(() {
+      if (_cache.isNotEmpty) {
+        _cache.clear();
+        // QuizzerLogger.logMessage('AnswerHistoryCache cleared.'); // Optional log
       }
     });
   }

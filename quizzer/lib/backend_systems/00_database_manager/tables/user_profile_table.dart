@@ -394,6 +394,35 @@ Future<Map<String, int>> getUserSubjectInterests(String userId, Database db) asy
 
 // --- Helper Functions ---
 
+/// Updates the total_study_time for a user by adding the specified amount of hours.
+/// The time is converted to days before adding to the total_study_time column.
+///
+/// [userUuid]: The UUID of the user whose study time needs updating.
+/// [hoursToAdd]: The duration in hours (double) to add to the total study time.
+/// [db]: The database instance.
+Future<void> updateTotalStudyTime(String userUuid, double hoursToAdd, Database db) async {
+  QuizzerLogger.logMessage('Updating total_study_time for User: $userUuid, adding: $hoursToAdd hours');
+
+  // Convert hours to days for storage
+  final double daysToAdd = hoursToAdd / 24.0;
+  QuizzerLogger.logValue('Converted hours to days: $daysToAdd');
+
+  // We assume verifyUserProfileTable has been called before or during DB initialization.
+
+  final int rowsAffected = await db.rawUpdate(
+    // Use COALESCE to handle potential NULL values, treating them as 0.0
+    'UPDATE user_profile SET total_study_time = COALESCE(total_study_time, 0.0) + ? WHERE uuid = ?',
+    [daysToAdd, userUuid]
+  );
+
+  if (rowsAffected == 0) {
+    QuizzerLogger.logWarning('Failed to update total_study_time: No matching record found for User: $userUuid');
+    // Consider if this should throw an error if the user *must* exist. For now, just a warning.
+  } else {
+    QuizzerLogger.logSuccess('Successfully updated total_study_time for User: $userUuid (added $daysToAdd days)');
+  }
+}
+
 /// Increments the total_questions_answered count for a specific user.
 Future<void> incrementTotalQuestionsAnswered(String userUuid, Database db) async {
   QuizzerLogger.logMessage('Incrementing total_questions_answered for User: $userUuid');
@@ -439,4 +468,6 @@ Future<List<String>> getAllUserEmails(Database db) async {
   return emails;
 }
 
+
+// updateTotalStudyTime
 // TODO: FIXME Add in functionality for loginThreshold preference
