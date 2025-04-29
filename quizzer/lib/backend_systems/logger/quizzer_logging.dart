@@ -36,6 +36,10 @@ class QuizzerLogger {
 
   // Create a logger instance
   static final _logger = Logger('QuizzerApp');
+  static bool _isInitialized = false; // Flag to prevent re-initialization
+  static IOSink? _logFileSink; // Sink for writing to file
+  static const String _logFileName = 'quizzer_log.txt';
+  static const String _logDir = 'runtime_cache';
 
   // --- Source Filtering --- 
   static List<String> _excludedSources = [
@@ -156,9 +160,29 @@ class QuizzerLogger {
 
       // Prepend "Quizzer:" before printing
       print("Quizzer: $coreFormattedMessage"); // print allows logs to be shown when testing on Android
+
+      // --- Log to File --- 
+      if (_logFileSink != null) {
+        _logFileSink!.writeln("Quizzer: $coreFormattedMessage");
+      }
+      // ------------------
     });
     // Use the logger itself for the initialization message now
     logMessage('QuizzerLogger initialized with level: ${level.name}'); 
+
+    // --- File Setup --- 
+    final String logFilePath = p.join(_logDir, _logFileName);
+    // Ensure directory exists
+    final Directory dir = Directory(_logDir);
+    if (!dir.existsSync()) {
+      print('Quizzer: Creating log directory: $_logDir'); // Use print before logger is fully ready
+      dir.createSync(recursive: true);
+    }
+    // Open file sink in write mode (overwrites existing file)
+    // Errors opening file will now crash (Fail Fast)
+    _logFileSink = File(logFilePath).openWrite(mode: FileMode.write);
+    print('Quizzer: Logging to file: $logFilePath');
+    // ----------------
   }
 
   // Logging functions using the standard logger
@@ -203,6 +227,16 @@ class QuizzerLogger {
 
   static void printDivider() {
     stdout.writeln('${_blue}${'-' * 80}$_reset');
+  }
+
+  static Future<void> dispose() async {
+    if (_logFileSink != null) {
+      await _logFileSink!.flush();
+      await _logFileSink!.close();
+      print('Quizzer: Log file sink closed.');
+      _logFileSink = null;
+    }
+    _isInitialized = false; // Allow re-initialization if needed
   }
 }
 

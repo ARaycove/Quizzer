@@ -74,9 +74,13 @@ class SwitchBoard {
 
   // --- Past Due Cache Stream (New) ---
   final StreamController<void> _pastDueCacheController = StreamController<void>.broadcast();
+  // Single stream for low eligible cache conditions
+  final StreamController<void> _eligibleCacheLowController = StreamController<void>.broadcast(); // Consolidated
 
   /// Stream that fires when a record is added to a previously empty PastDueCache.
   Stream<void> get onPastDueCacheAdded => _pastDueCacheController.stream;
+  // Public getter for the consolidated stream
+  Stream<void> get onEligibleCacheLowSignal => _eligibleCacheLowController.stream; // Consolidated
 
   /// Signals that a record has been added to the PastDueCache when it was empty.
   void signalPastDueCacheAdded() {
@@ -87,7 +91,16 @@ class SwitchBoard {
        QuizzerLogger.logWarning('SwitchBoard: Attempted to signal on closed PastDueCache stream.');
     }
   }
-  // -------------------------------------
+
+  // Consolidated signal method
+  void signalEligibleCacheLow() { // Consolidated
+    if (!_eligibleCacheLowController.isClosed) {
+       QuizzerLogger.logMessage('SwitchBoard: Signaling EligibleCacheLow added.');
+      _eligibleCacheLowController.add(null);
+    } else {
+       QuizzerLogger.logWarning('SwitchBoard: Attempted to signal on closed EligibleCacheLow stream.');
+    }
+  }
 
   // --- Dispose Method ---
   /// Closes all stream controllers. Should be called on application shutdown.
@@ -97,6 +110,7 @@ class SwitchBoard {
     _moduleActivatedController.close(); // Close original controller
     _moduleRecentlyActivatedController.close(); // Close new controller
     _pastDueCacheController.close(); // Close new PastDue stream
+    _eligibleCacheLowController.close(); // Consolidated
     QuizzerLogger.logMessage('SwitchBoard disposed.');
   }
   // --------------------

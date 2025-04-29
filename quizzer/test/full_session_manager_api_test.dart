@@ -16,220 +16,9 @@ import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dar
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_question_answer_pairs_table.dart' as uqap_table;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:quizzer/backend_systems/09_data_caches/past_due_cache.dart';
-
-// ==========================================
-// Helper Function to Log Current Question Details
-// ==========================================
-Future<void> logCurrentQuestionDetails(SessionManager manager) async {
-  QuizzerLogger.logMessage("--- Logging Current Question Details ---");
-  final details = manager.currentQuestionStaticData;
-
-  if (details == null) {
-    QuizzerLogger.logValue("currentQuestionStaticData: null");
-    QuizzerLogger.printDivider();
-    return;
-  }
-
-  // Check if it's the dummy question (assuming dummy has null question_id)
-  if (details['question_id'] == null) {
-     QuizzerLogger.logValue("currentQuestionStaticData: Dummy 'No Questions' Record");
-  } else {
-    // Log details using getters for a real question, formatting as key: value
-    QuizzerLogger.logValue("  Question ID: ${manager.currentQuestionId}");
-    QuizzerLogger.logValue("  Question Type: ${manager.currentQuestionType}");
-    QuizzerLogger.logValue("  Module Name: ${manager.currentModuleName}");
-    // Log actual content
-    QuizzerLogger.logValue("  Question Elements: ${manager.currentQuestionElements}");
-    QuizzerLogger.logValue("  Answer Elements: ${manager.currentQuestionAnswerElements}");
-    // Log options and correct index/order based on type
-    if (manager.currentQuestionType == 'multiple_choice') {
-      QuizzerLogger.logValue("  Options: ${manager.currentQuestionOptions}");
-      QuizzerLogger.logValue("  Correct Index: ${manager.currentCorrectOptionIndex}");
-    } else if (manager.currentQuestionType == 'sort_order') {
-      QuizzerLogger.logValue("  Correct Order: ${manager.currentCorrectOrder}"); // Log the list itself
-    }
-    // Log other optional fields
-    QuizzerLogger.logValue("  Citation: ${manager.currentCitation ?? 'N/A'}");
-    QuizzerLogger.logValue("  Concepts: ${manager.currentConcepts ?? 'N/A'}");
-    QuizzerLogger.logValue("  Subjects: ${manager.currentSubjects ?? 'N/A'}");
-  }
-  QuizzerLogger.printDivider();
-}
-
-// ==========================================
-// Helper Function to Log Current User Question Record Details
-// ==========================================
-Future<void> logCurrentUserQuestionRecordDetails(SessionManager manager) async {
-  QuizzerLogger.logMessage("--- Logging Current User Question Record Details ---");
-  final record = manager.currentQuestionUserRecord;
-
-  if (record == null) {
-    QuizzerLogger.logValue("currentQuestionUserRecord: null");
-    QuizzerLogger.printDivider();
-    return;
-  }
-
-  // Log each key-value pair in the record
-  record.forEach((key, value) {
-    QuizzerLogger.logValue("  $key: $value");
-  });
-
-  QuizzerLogger.printDivider();
-}
-
-// ==========================================
-// Helper Function to Generate Random MC Answer
-// ==========================================
-int? getRandomMultipleChoiceAnswer(SessionManager manager) {
-  QuizzerLogger.logMessage("--- Generating Random Multiple Choice Answer ---");
-  final details = manager.currentQuestionStaticData;
-
-  if (details == null) {
-    QuizzerLogger.logWarning("Cannot generate answer: currentQuestionStaticData is null.");
-    QuizzerLogger.printDivider();
-    return null;
-  }
-
-  if (manager.currentQuestionType != 'multiple_choice') {
-    QuizzerLogger.logWarning(
-        "Cannot generate MC answer: Current question type is '${manager.currentQuestionType}'.");
-    QuizzerLogger.printDivider();
-    return null;
-  }
-
-  final options = manager.currentQuestionOptions;
-  if (options.isEmpty) {
-    QuizzerLogger.logError(
-        "Cannot generate MC answer: Options list is empty.");
-    QuizzerLogger.printDivider();
-    return null; // Or throw an error, depending on desired strictness
-  }
-
-  final randomIndex = Random().nextInt(options.length);
-  QuizzerLogger.logValue("Selected random option index: $randomIndex");
-  QuizzerLogger.printDivider();
-  return randomIndex;
-}
-
-// ==========================================
-// Helper Function for Waiting
-// ==========================================
-Future<void> waitTime(int milliseconds) async {
-  final double seconds = milliseconds / 1000.0;
-  QuizzerLogger.logMessage("Waiting for ${seconds.toStringAsFixed(1)} seconds...");
-  await Future.delayed(Duration(milliseconds: milliseconds));
-  QuizzerLogger.logMessage("Wait complete.");
-}
-
-// ==========================================
-// Helper Function to Log User Record From DB
-// ==========================================
-Future<void> logCurrentUserRecordFromDB(SessionManager manager) async {
-  QuizzerLogger.logMessage("--- Logging Current User Question Record from DB ---");
-  final dbMonitor = getDatabaseMonitor(); // Get monitor instance
-  final userId = manager.userId;
-  final questionId = manager.currentQuestionStaticData?['question_id'] as String?;
-
-  if (userId == null) {
-    QuizzerLogger.logWarning("Cannot log from DB: User not logged in (userId is null).");
-    QuizzerLogger.printDivider();
-    return;
-  }
-  if (questionId == null) {
-    QuizzerLogger.logWarning("Cannot log from DB: No current question loaded (questionId is null).");
-    QuizzerLogger.printDivider();
-    return;
-  }
-
-  Database? db;
-  db = await dbMonitor.requestDatabaseAccess();
-  if (db == null) {
-    // Fail fast if DB is unavailable during the test
-    throw StateError('Database access unavailable during test logging.');
-  }
-
-  final Map<String, dynamic>? record = await uqap_table.getUserQuestionAnswerPairById(
-    userId,      // Positional argument 1
-    questionId,  // Positional argument 2
-    db,          // Positional argument 3
-  );
-
-  // Release lock IMMEDIATELY after the DB operation completes or throws
-  dbMonitor.releaseDatabaseAccess();
-  QuizzerLogger.logMessage("DB access released.");
-  db = null; // Prevent reuse after release
-
-  if (record == null) {
-      // This case should ideally not be hit if the function throws as documented
-      QuizzerLogger.logError("getUserQuestionAnswerPairById returned null unexpectedly for User: $userId, Question: $questionId");
-  } else {
-    // Log the record
-    QuizzerLogger.logMessage("DB Record for User: $userId, Question: $questionId");
-    record.forEach((key, value) {
-      QuizzerLogger.logValue("  $key: $value");
-    });
-  }
-    
-  QuizzerLogger.printDivider();
-}
-
-// ==========================================
-// Helper Function for Cache Monitoring
-// ==========================================
-Future<void> monitorCaches({int monitoringSeconds = 10}) async {
-  QuizzerLogger.printHeader('Starting cache monitoring loop ($monitoringSeconds seconds)...');
-  // Get cache instances directly using factory constructors
-  final unprocessedCache      = UnprocessedCache();
-  final nonCirculatingCache   = NonCirculatingQuestionsCache();
-  final moduleInactiveCache   = ModuleInactiveCache();
-  final circulatingCache      = CirculatingQuestionsCache();
-  final dueDateBeyondCache    = DueDateBeyond24hrsCache();
-  final dueDateWithinCache    = DueDateWithin24hrsCache();
-  final pastDueCache          = PastDueCache();
-  final eligibleCache         = EligibleQuestionsCache();
-  final queueCache            = QuestionQueueCache();
-  final historyCache          = AnswerHistoryCache();
-
-  final stopwatch = Stopwatch()..start();
-  const checkInterval = Duration(seconds: 3);
-  int checkCount = 0;
-
-  while (stopwatch.elapsed.inSeconds < monitoringSeconds) {
-    // Perform the check first
-    checkCount++;
-    QuizzerLogger.logMessage('--- Cache State Check $checkCount at ${stopwatch.elapsed} (Target: ${monitoringSeconds}s) ---');
-    // Peek into each cache and log its length
-    final unprocessedList = await unprocessedCache.peekAllRecords();
-    QuizzerLogger.logValue('UnprocessedCache length: ${unprocessedList.length}');
-    final nonCirculatingList = await nonCirculatingCache.peekAllRecords();
-    QuizzerLogger.logValue('NonCirculatingCache length: ${nonCirculatingList.length}');
-    final moduleInactiveLength = await moduleInactiveCache.peekTotalRecordCount();
-    QuizzerLogger.logValue('ModuleInactiveCache length: $moduleInactiveLength');
-    final circulatingList = await circulatingCache.peekAllQuestionIds();
-    QuizzerLogger.logValue('CirculatingCache length: ${circulatingList.length}');
-    final beyond24List = await dueDateBeyondCache.peekAllRecords();
-    QuizzerLogger.logValue('DueDateBeyond24hrsCache length: ${beyond24List.length}');
-    final within24List = await dueDateWithinCache.peekAllRecords();
-    QuizzerLogger.logValue('DueDateWithin24hrsCache length: ${within24List.length}');
-    final pastDueList = await pastDueCache.peekAllRecords();
-    QuizzerLogger.logValue('PastDueCache length: ${pastDueList.length}');
-    final eligibleList = await eligibleCache.peekAllRecords();
-    QuizzerLogger.logValue('EligibleQuestionsCache length: ${eligibleList.length}');
-    final queueList = await queueCache.peekAllRecords();
-    QuizzerLogger.logValue('QuestionQueueCache length: ${queueList.length}');
-    final historyList = await historyCache.peekHistory();
-    QuizzerLogger.logValue('AnswerHistoryCache length: ${historyList.length}');
-    QuizzerLogger.printDivider();
-
-    // Wait for the next interval, unless the total duration is already met
-    if (stopwatch.elapsed.inSeconds < monitoringSeconds) {
-      await Future.delayed(checkInterval);
-    }
-  }
-  stopwatch.stop();
-  QuizzerLogger.logSuccess('Cache monitoring loop finished after ${stopwatch.elapsed}.');
-}
-
+import 'dart:convert'; // ADDED for jsonDecode
+import 'dart:io'; // ADDED for File operations
+import 'test_helpers.dart'; // Import helper functions
 // ==========================================
 // Main Test Suite
 // ==========================================
@@ -303,6 +92,95 @@ void main() {
 
   }, timeout: Timeout(Duration(minutes: 1))); // Reduced timeout slightly
 
+  test('spam module activation toggle', () async {
+    final sessionManager = getSessionManager();
+    assert(sessionManager.userLoggedIn, "User must be logged in for this test");
+
+    QuizzerLogger.printHeader('Starting Module Activation Spam Test (50 Cycles)...');
+
+    // Load modules once
+    final moduleData = await sessionManager.loadModules();
+    final List<Map<String, dynamic>> modules = moduleData['modules'] as List<Map<String, dynamic>>? ?? [];
+    expect(modules, isNotEmpty, reason: "No modules found to perform spam test.");
+    QuizzerLogger.logMessage('Loaded ${modules.length} modules for spam test.');
+
+    const int spamCycles = 50;
+    final random = Random(); // Create Random instance once
+    for (int i = 0; i < spamCycles; i++) {
+      final bool activate = i % 2 == 0; // Activate on even, deactivate on odd
+      // QuizzerLogger.logMessage('Spam Cycle ${i + 1}/$spamCycles: Setting all modules to active=$activate');
+      for (final module in modules) {
+        final moduleName = module['module_name'] as String?;
+        if (moduleName != null) {
+          // Fire and forget - DO NOT await
+          sessionManager.toggleModuleActivation(moduleName, activate);
+        }
+      }
+    }
+
+    QuizzerLogger.logSuccess('Finished sending $spamCycles toggle cycles (with 67-100ms random delay) for ${modules.length} modules.');
+
+    // Explicitly activate all modules after the spam loop
+    QuizzerLogger.logMessage('Explicitly activating all modules after spam cycle...');
+    for (final module in modules) {
+        final moduleName = module['module_name'] as String?;
+        if (moduleName != null) {
+            // Fire and forget
+            sessionManager.toggleModuleActivation(moduleName, true);
+        }
+    }
+    QuizzerLogger.logSuccess('Finished final explicit activation call for all modules.');
+
+  }, timeout: Timeout(const Duration(minutes: 2))); // Allow slightly more time for the loop
+
+  // --- Test Block: Monitor Caches After Spam ---
+  test('monitor caches after spam toggle', () async {
+      // Call the extracted monitoring function again to see the result of the spam
+      // Monitor for 30 seconds this time
+      await monitorCaches(monitoringSeconds: 60);
+    }, timeout: Timeout(const Duration(seconds: 45))); // Timeout > monitor duration + buffer
+
+  test('Question loop test', () async {
+    final sessionManager = getSessionManager();
+    assert(sessionManager.userLoggedIn, "User must be logged in for this test");
+
+    QuizzerLogger.printHeader('Starting requestNextQuestion loop test (3 iterations)...');
+
+    for (int i = 1; i <= 3; i++) {
+      QuizzerLogger.printDivider();
+      QuizzerLogger.logMessage('--- Iteration $i ---');
+      QuizzerLogger.logMessage('--- State BEFORE requestNextQuestion Call ---');
+      // Call the new helper function
+      await logCurrentQuestionDetails(sessionManager);
+      await logCurrentUserQuestionRecordDetails(sessionManager);
+      await logCurrentUserRecordFromDB(sessionManager);
+      await waitTime(2000);
+
+
+
+      QuizzerLogger.logMessage('Calling requestNextQuestion...');
+      await sessionManager.requestNextQuestion();
+      QuizzerLogger.logMessage('--- State AFTER requestNextQuestion Call ---');
+      // Call the new helper function again
+      await logCurrentQuestionDetails(sessionManager);
+      await waitTime(2000);
+
+      QuizzerLogger.logMessage('Submitting random answer');
+      if (sessionManager.currentQuestionType == "multiple_choice") {
+        await sessionManager.submitAnswer(userAnswer: getRandomMultipleChoiceAnswer(sessionManager));
+      }
+      
+      await waitTime(250);
+      await logCurrentUserQuestionRecordDetails(sessionManager);
+      await logCurrentUserRecordFromDB(sessionManager);
+      await waitTime(2000);
+
+      // Monitor caches to observe changes
+      await monitorCaches(monitoringSeconds: 3);
+    }
+
+    QuizzerLogger.printHeader('Finished requestNextQuestion loop test.');
+  }, timeout: Timeout(Duration(minutes: 3))); // Allow more time for loops + monitoring
 
   test('Update Module Description Test', () async {
     final sessionManager = getSessionManager();
@@ -362,5 +240,7 @@ void main() {
 
     QuizzerLogger.printHeader('Finished Update Module Description Test.');
   });
+
+
 }
 

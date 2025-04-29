@@ -42,13 +42,18 @@ void main() async {
         optionsSet.add(randomOption);
       }
 
-      // Convert options Set to List<String> and shuffle
-      final List<String> optionsList = optionsSet.map((o) => o.toString()).toList();
+      // Convert options Set to List<Map<String, dynamic>> and shuffle
+      final List<Map<String, dynamic>> optionsList = optionsSet.map((option) {
+        return {'type': 'text', 'content': option.toString()};
+      }).toList();
       optionsList.shuffle(random);
 
-      // Find the index of the correct answer in the shuffled list
-      final int correctIndex = optionsList.indexOf(correctAnswer.toString());
-      assert(correctIndex != -1, 'Correct answer not found in options list!');
+      // Find the index of the correct answer MAP in the shuffled list
+      final String correctAnswerString = correctAnswer.toString();
+      final int correctIndex = optionsList.indexWhere((optionMap) {
+        return optionMap['content'] == correctAnswerString;
+      });
+      assert(correctIndex != -1, 'Correct answer map not found in options list!');
 
       // Create the question map
       final Map<String, dynamic> questionMap = {
@@ -61,7 +66,7 @@ void main() async {
         'answerElements': [
           {'type': 'text', 'content': correctAnswer.toString()}
         ],
-        'options': optionsList,
+        'options': optionsList, // Use the list of maps
         'correctOptionIndex': correctIndex,
       };
 
@@ -94,4 +99,4 @@ void main() async {
   } catch (e) {
     print('Error writing questions to file: $e');
   }
-} 
+}

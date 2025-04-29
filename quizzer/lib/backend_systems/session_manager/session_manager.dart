@@ -1,3 +1,4 @@
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile_table.dart';
 import 'package:quizzer/backend_systems/07_user_question_management/user_question_processes.dart' show validateAllModuleQuestions;
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pairs_table.dart' as q_pairs_table;
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_question_answer_pairs_table.dart' as uqap_table;
@@ -8,6 +9,7 @@ import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dar
 import 'package:quizzer/backend_systems/04_module_management/module_isolates.dart';
 import 'package:quizzer/backend_systems/02_login_authentication/user_auth.dart';
 import 'package:quizzer/backend_systems/session_manager/session_isolates.dart';
+import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:hive/hive.dart';
 import 'package:supabase/supabase.dart';
@@ -119,10 +121,12 @@ class SessionManager {
   List<Map<String, dynamic>>  get currentQuestionAnswerElements => _currentQuestionDetails!['answer_elements'] 
   as List<Map<String, dynamic>>;
 
-  List<String>                get currentQuestionOptions        => _currentQuestionDetails!['options'] 
-  as List<String>; // Parsed in DB layer
+  List<Map<String, dynamic>> get currentQuestionOptions        => _currentQuestionDetails!['options'] 
+  as List<Map<String, dynamic>>; // Corrected type
 
   int?                        get currentCorrectOptionIndex     => _currentQuestionDetails!['correct_option_index'] as int?; // Nullable if not MC or not set
+
+  List<int>                   get currentCorrectIndices         => _currentQuestionDetails!['index_options_that_apply'] as List<int>? ?? []; // For select_all_that_apply
 
   List<Map<String, dynamic>>  get currentCorrectOrder           => _currentQuestionDetails!['correct_order'] 
   as List<Map<String, dynamic>>; // Parsed in DB layer
@@ -458,6 +462,14 @@ class SessionManager {
   /// Updates user-question stats, calculates next due date, and records the attempt.
   /// Returns a map: {success: bool, message: String}
   Future<Map<String, dynamic>> submitAnswer({required dynamic userAnswer}) async {
+    // --- ADDED: Check for Dummy Record State --- 
+    if (_currentQuestionRecord == null) {
+      // This means the dummy "No Questions" record is loaded
+      QuizzerLogger.logWarning('submitAnswer called when no real question was loaded (currentQuestionRecord is null).');
+      return {'success': false, 'message': 'No real question loaded to submit answer for.'};
+    }
+    // --- Original validation continues below ---
+
     // --- 1. Input Validation and State Checks (Fail Fast Internally, Graceful Return for API) ---
     if (userId == null) {
       return {'success': false, 'message': 'User not logged in.'};
@@ -490,6 +502,13 @@ class SessionManager {
           isCorrect = answer_validator.validateMultipleChoiceAnswer(
             userAnswer: userAnswer,
             correctIndex: correctIndex,
+          );
+          break;
+        case 'select_all_that_apply':
+          final List<int> correctIndices = currentCorrectIndices; // Use getter
+          isCorrect = answer_validator.validateSelectAllThatApplyAnswer(
+            userAnswer: userAnswer,
+            correctIndices: correctIndices,
           );
           break;
         // case 'sort_order':
@@ -551,6 +570,135 @@ class SessionManager {
     _currentQuestionRecord = updatedUserRecord;
 
     return {'success': true, 'message': 'Answer submitted successfully.'};
+  }
+
+  //  --------------------------------------------------------------------------------
+  /// Adds a new question to the database.
+  /// Accepts parameters for various question types and routes to the specific
+  /// database function based on `questionType`.
+  /// Uses a try-catch block to handle potential data validation errors from the DB layer
+  /// and return a user-friendly response.
+  Future<Map<String, dynamic>> addNewQuestion({
+    required String questionType,
+    required List<Map<String, dynamic>> questionElements,
+    required List<Map<String, dynamic>> answerElements,
+    required String moduleName,
+    // --- Type-specific --- (Add more as needed)
+    List<Map<String, dynamic>>? options, // For MC
+    int? correctOptionIndex, // For MC
+    List<Map<String, dynamic>>? correctOrderElements, // For Sort Order (placeholder)
+    List<int>? indexOptionsThatApply, // For select_all_that_apply
+    // --- Common Optional/Metadata ---
+    String? citation,
+    String? concepts,
+    String? subjects,
+  }) async {
+    QuizzerLogger.logMessage('SessionManager: Attempting to add new question of type $questionType');
+    // --- 1. Pre-checks --- 
+    if (userId == null) {
+      return {'success': false, 'message': 'User not logged in.'};
+    }
+    final timeStamp = DateTime.now().toIso8601String();
+    final qstContrib = userId!; // Use current user ID as the question contributor
+
+    // --- 2. Database Operation --- 
+    Database? db;
+    int result = -1; // Default to indicate failure/no insert
+    Map<String, dynamic> response;
+
+    try { //Explicit, if bad data is passed we catch the db error and return the message to user. . .
+      db = await _dbMonitor.requestDatabaseAccess();
+      if (db == null) {
+        throw StateError('Failed to acquire database access to add question.');
+      }
+
+      switch (questionType) {
+        case 'multiple_choice':
+          // Validate required fields for this type
+          if (options == null || correctOptionIndex == null) {
+            throw ArgumentError('Missing required fields for multiple_choice: options and correctOptionIndex.');
+          }
+          result = await q_pairs_table.addQuestionMultipleChoice(
+            timeStamp: timeStamp,
+            qstContrib: qstContrib,
+            questionElements: questionElements,
+            answerElements: answerElements,
+            options: options,
+            correctOptionIndex: correctOptionIndex,
+            moduleName: moduleName,
+            ansContrib: qstContrib,         // CHANGED: Directly use qstContrib
+            ansFlagged: false,              // CHANGED: Directly use false
+            hasBeenReviewed: false,         // CHANGED: Directly use false
+            flagForRemoval: false,          // CHANGED: Directly use false
+            citation: citation ?? '',
+            concepts: concepts,
+            subjects: subjects,
+            db: db,
+          );
+          break;
+
+        case 'select_all_that_apply':
+          // Validate required fields for this type
+          if (options == null || indexOptionsThatApply == null) {
+            throw ArgumentError('Missing required fields for select_all_that_apply: options and indexOptionsThatApply.');
+          }
+          result = await q_pairs_table.addQuestionSelectAllThatApply(
+            timeStamp: timeStamp,
+            qstContrib: qstContrib,
+            questionElements: questionElements,
+            answerElements: answerElements,
+            options: options,
+            indexOptionsThatApply: indexOptionsThatApply,
+            moduleName: moduleName,
+            ansContrib: qstContrib,
+            ansFlagged: false,
+            hasBeenReviewed: false,
+            flagForRemoval: false,
+            citation: citation ?? '',
+            concepts: concepts,
+            subjects: subjects,
+            db: db,
+          );
+          break;
+
+        // --- Add cases for other question types here --- 
+        // case 'sort_order':
+        //   if (correctOrderElements == null) { ... }
+        //   result = await uqap_table.addQuestionSortOrder(...);
+        //   break;
+
+        default:
+          throw UnimplementedError('Adding questions of type \'$questionType\' is not yet supported.');
+      }
+      // Check result from DB insert
+      if (result <= 0) { // Insert failed (e.g., duplicate, DB error not caught as exception)
+          response = {'success': false, 'message': 'Failed to add question to database (maybe duplicate?).'};
+      } else {
+          response = {'success': true, 'message': 'Question added successfully.', 'rowId': result};
+      }
+
+    } catch (e, s) {
+      // Catch errors (e.g., ArgumentError, UnimplementedError, FormatException from DB layer)
+      QuizzerLogger.logError('Error adding question: $e\nStackTrace: $s');
+      response = {'success': false, 'message': 'Error adding question: ${e.toString()}'};
+    }
+
+    // --- 3. Release DB Lock --- 
+    // Release lock *after* try-catch completes. 
+    // Adheres to no-finally, but assumes DB operations don't hang indefinitely on error.
+    await updateModuleActivationStatus(userId!, moduleName, true, db!);
+    // TODO validateAll is very inefficient, should probably write a proper function that just adds the userRecord directly to the unprocessedCache and to the table (works but slower at scale)
+    _dbMonitor.releaseDatabaseAccess();
+    await buildModuleRecords();
+
+    db = await _dbMonitor.requestDatabaseAccess();
+    await validateAllModuleQuestions(db!, userId!);
+    _dbMonitor.releaseDatabaseAccess();
+    
+    QuizzerLogger.logMessage('SessionManager.addNewQuestion: DB access released.');
+    
+    // --- 4. Return Result --- 
+    return response;
   }
 
 }

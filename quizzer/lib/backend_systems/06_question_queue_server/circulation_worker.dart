@@ -96,37 +96,36 @@ class CirculationWorker {
       final bool shouldAdd = await _shouldAddNewQuestion();
 
       if (shouldAdd) {
+        QuizzerLogger.logMessage("$shouldAdd : selecting question");
         await _selectAndAddQuestionToCirculation(userId);
-        
-        if (!_isRunning) break; // Check again before sleep
-        // QuizzerLogger.logMessage('CirculationWorker: Sleeping for 1 second after adding...');
+        if (!_isRunning) break; // Check after processing
+      } else {
+        // --- Start PresentationSelectionWorker after first cycle --- 
+        if (_isRunning && _isInitialLoop) {
+          QuizzerLogger.logMessage('CirculationWorker: Starting Presentation Selection Worker (first cycle complete)...');
+          final selectionWorker = PresentationSelectionWorker();
+          selectionWorker.start();
+          _isInitialLoop = false; // Set flag so it doesn't start again
+          QuizzerLogger.logSuccess('CirculationWorker: Presentation Selection Worker started.');
+        }
+        // Conditions not met to add. Determine why and wait appropriately.
+        final bool nonCirculatingIsEmpty = await _nonCirculatingCache.isEmpty();
+        if (nonCirculatingIsEmpty) {
+          // Wait because input is empty
+          QuizzerLogger.logMessage('CirculationWorker: Conditions not met & NonCirculating empty, waiting for non-circulating record...');
+           if (!_isRunning) break;
+          await _nonCirculatingCache.onRecordAdded.first;
+          QuizzerLogger.logMessage('CirculationWorker: Woke up by NonCirculatingCache notification.');
+        } else {
+          // Wait because eligible cache conditions were not met
+          QuizzerLogger.logMessage('CirculationWorker: Conditions not met (Eligible Cache ok), waiting for EligibleCache low signal...');
+           if (!_isRunning) break;
+          await _switchBoard.onEligibleCacheLowSignal.first;
+          QuizzerLogger.logMessage('CirculationWorker: Woke up by EligibleCache low signal.');
+        }
       }
-      // 3. Conditions not met. Check if it's due to empty NonCirculatingCache.
-      final bool nonCirculatingIsEmpty = await _nonCirculatingCache.isEmpty();
-      // --- Start PresentationSelectionWorker after first cycle --- 
-      if (nonCirculatingIsEmpty) {
-          // If conditions not met AND NonCirculatingCache is empty, wait for notification.
-          // QuizzerLogger.logMessage('CirculationWorker: Conditions not met & NonCirculating empty, waiting...');
-          if (_isRunning && _isInitialLoop) {
-            QuizzerLogger.logMessage('CirculationWorker: Starting Presentation Selection Worker (first cycle complete)...');
-            final selectionWorker = PresentationSelectionWorker();
-            selectionWorker.start();
-            _isInitialLoop = false; // Set flag so it doesn't start again
-            QuizzerLogger.logSuccess('CirculationWorker: Presentation Selection Worker started.');
-          }
-          await _nonCirculatingCache.onRecordAdded.first; // Fail Fast on stream error
-          // QuizzerLogger.logMessage('CirculationWorker: Woke up by NonCirculatingCache notification.');
-      }
-      else if (_isRunning && _isInitialLoop) {
-        QuizzerLogger.logMessage('CirculationWorker: Starting Presentation Selection Worker (first cycle complete)...');
-        final selectionWorker = PresentationSelectionWorker();
-        selectionWorker.start();
-        _isInitialLoop = false; // Set flag so it doesn't start again
-        QuizzerLogger.logSuccess('CirculationWorker: Presentation Selection Worker started.');
-      }
+      
 
-
-      // ---------------------------------------------------------
     }
     _stopCompleter?.complete(); // Signal loop completion
     // QuizzerLogger.logMessage('CirculationWorker loop finished.');
@@ -158,21 +157,27 @@ class CirculationWorker {
         QuizzerLogger.logMessage('CirculationWorker: Resuming check after handling recent activation signal.');
     }
     // 2. Now do the rest
+    QuizzerLogger.logMessage("Checking eligible Cache for conditions");
     final eligibleRecords = await _eligibleCache.peekAllRecords();
 
     // Condition 1: Less than 20 eligible questions with streak < 3
     final lowStreakCount = eligibleRecords.where((r) => (r['revision_streak'] as int? ?? 0) < 3).length;
     final bool lowStreakCondition = lowStreakCount < 20;
+    QuizzerLogger.logMessage("lowStreakCondition evaluates to -> $lowStreakCondition");
 
     // Condition 2: Less than 100 total eligible questions
     final totalEligibleCount = eligibleRecords.length;
     final bool lowTotalCondition = totalEligibleCount < 100;
-
+    QuizzerLogger.logMessage("lowTotalCondition evaluates to -> $lowTotalCondition");
+    
+    // --- Proceed only if eligible cache IS low --- 
     // Condition 3: Non-circulating cache must NOT be empty
-    final bool nonCirculatingNotEmpty = !(await _nonCirculatingCache.isEmpty());
+    final bool nonCirculatingEmpty = (await _nonCirculatingCache.isEmpty());
+    QuizzerLogger.logMessage("nonCirculatingNotEmpty evaluate to -> $nonCirculatingEmpty");
 
-    final bool shouldAdd = (lowStreakCondition || lowTotalCondition) && nonCirculatingNotEmpty;
-    // QuizzerLogger.logValue('CirculationWorker: shouldAdd Conditions -> lowStreak (<20): $lowStreakCount ($lowStreakCondition), lowTotal (<100): $totalEligibleCount ($lowTotalCondition), nonCircNotEmpty: $nonCirculatingNotEmpty -> Result: $shouldAdd');
+    // Return true only if eligible is low AND non-circulating has questions
+    final bool shouldAdd = (lowStreakCondition || lowTotalCondition) && !nonCirculatingEmpty;
+    QuizzerLogger.logMessage("shouldAdd evaluates to -> $shouldAdd (Eligible low: ${(lowStreakCondition || lowTotalCondition)}, NonCirculatingEmpty: $nonCirculatingEmpty)");
     return shouldAdd;
   }
 
@@ -207,6 +212,7 @@ class CirculationWorker {
       currentRatio,
       nonCirculatingRecords
     );
+    // Create mutable copy and update circulation status BEFORE passing down
     await _addQuestionToCirculation(userId, selectedRecord);
   }
 
@@ -340,6 +346,8 @@ class CirculationWorker {
        QuizzerLogger.logWarning('CirculationWorker: Selected record $questionId not found in NonCirculatingCache during add.');
        return;
      }
+     Map<String, dynamic> mutableRecord = Map<String, dynamic>.from(removedRecord);
+     mutableRecord['in_circulation'] = 1;
      
      // REMOVED try-finally
      db = await _getDbAccess();
@@ -355,8 +363,8 @@ class CirculationWorker {
      // Release DB lock AFTER successful write
      _dbMonitor.releaseDatabaseAccess();
 
-     // Add the record back to the UnprocessedCache
-     await _unprocessedCache.addRecord(recordToAdd); 
+     // Add the record (already modified by caller) back to the UnprocessedCache
+     await _unprocessedCache.addRecord(mutableRecord); 
   }
 
    // Helper to get DB access (copied from EligibilityCheckWorker, could be utility)

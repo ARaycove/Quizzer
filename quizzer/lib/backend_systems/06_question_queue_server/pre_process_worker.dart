@@ -18,6 +18,13 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'dart:async';
 import 'inactive_module_worker.dart'; // Import the new worker
 
+// TODO: Handle edge case where a record exists in user_question_answer_pairs
+//       but its corresponding question_id does not exist in question_answer_pairs
+//       (e.g., due to incomplete data deletion or sync issue). Currently, this
+//       will cause an assertion failure in _processRecord when getModuleNameForQuestionId
+//       cannot find the question. Consider adding error handling or data validation
+//       either here or in the initial data loading phase to gracefully handle or
+//       remove such orphaned user records.
 
 // ==========================================
 /// Worker responsible for pre-processing user question records.
@@ -110,10 +117,33 @@ class PreProcessWorker {
     QuizzerLogger.logSuccess('Initial Loop: Fetched ${allUserRecords.length} records from DB.');
     if (!_isRunning) { _dbMonitor.releaseDatabaseAccess(); return; } // Check running status
     
+    // --- ADDED: Early exit if no initial records --- 
+    if (allUserRecords.isEmpty) {
+      QuizzerLogger.logMessage('Initial Loop: No existing user records found. Skipping initial cache population and processing.');
+      // Release DB lock before starting downstream workers
+      _dbMonitor.releaseDatabaseAccess();
+      QuizzerLogger.logMessage('Initial Loop: DB access released (no records path).');
+      db = null; // Ensure db variable isn't accidentally reused
+
+      // Still need to start the downstream workers
+      QuizzerLogger.logMessage('PreProcessWorker: Starting Inactive Module Worker (no records path)...');
+      final inactiveWorker = InactiveModuleWorker();
+      inactiveWorker.start();
+
+      QuizzerLogger.logMessage('PreProcessWorker: Starting Eligibility Check Worker (no records path)...');
+      final eligibilityWorker = EligibilityCheckWorker();
+      eligibilityWorker.start();
+
+      QuizzerLogger.logSuccess('PreProcessWorker: Initial loop completed (no records) and downstream workers started.');
+      return; // Exit the initial loop function
+    }
+    // --- END ADDED SECTION ---
+
+    // --- Continue original logic only if records were found ---
     // Assume validateAllModuleQuestions handles its own DB access/release or crashes
     // It needs the db instance passed here though
     QuizzerLogger.logMessage('Initial Loop: Validating User Questions vs Modules...');
-    await user_question_processor.validateAllModuleQuestions(db, _sessionManager.userId!); 
+    await user_question_processor.validateAllModuleQuestions(db, _sessionManager.userId!);
     if (!_isRunning) { _dbMonitor.releaseDatabaseAccess(); return; } // Check running status
 
     // --- Release DB lock BEFORE cache operations ---
@@ -226,15 +256,25 @@ class PreProcessWorker {
       return;
     }
 
-    // Perform DB checks within try/finally to ensure release
+    // Use try-catch ONLY around the specific call that might fail due to missing static data
     try {
       moduleName = await getModuleNameForQuestionId(questionId, db);
-      final Map<String, bool> activationStatus =
-          await user_profile_table.getModuleActivationStatus(_sessionManager.userId!, db);
-      isModuleActive = activationStatus[moduleName] ?? false;
-    } finally {
-      _dbMonitor.releaseDatabaseAccess();
+    } catch (e, s) {
+      // Catch errors specifically related to fetching static data (like assertion in getModuleNameForQuestionId)
+      QuizzerLogger.logError(
+          'PreProcessWorker: Failed to get module name for QID $questionId (likely missing static data in question_answer_pairs). Discarding user record. Error: $e\nStackTrace: $s');
+      // Release the lock and discard the record by returning
+      _dbMonitor.releaseDatabaseAccess(); 
+      return; // Exit processing for this record
     }
+
+    // If getModuleNameForQuestionId succeeded, proceed to get activation status
+    final Map<String, bool> activationStatus =
+        await user_profile_table.getModuleActivationStatus(_sessionManager.userId!, db);
+    isModuleActive = activationStatus[moduleName] ?? false;
+
+    _dbMonitor.releaseDatabaseAccess();
+
 
     // Check if stopped AFTER DB operations but BEFORE routing
     if (!_isRunning) {

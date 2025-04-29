@@ -74,7 +74,7 @@ Future<void> validateModuleQuestionsInUserProfile(String moduleName, Database db
       
       // Add the new record to the UnprocessedCache
       final unprocessedCache = UnprocessedCache(); 
-      await unprocessedCache.addRecord(newUserRecord);
+      await unprocessedCache.addRecord(newUserRecord); // Also add to the unprocessed Cache
     }
   }
   
