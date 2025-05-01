@@ -107,10 +107,10 @@ class SwitchBoard {
   void dispose() {
     QuizzerLogger.logMessage('Disposing SwitchBoard streams...');
     _dueDateWithin24hrsController.close();
-    _moduleActivatedController.close(); // Close original controller
-    _moduleRecentlyActivatedController.close(); // Close new controller
-    _pastDueCacheController.close(); // Close new PastDue stream
-    _eligibleCacheLowController.close(); // Consolidated
+    _moduleActivatedController.close();
+    _moduleRecentlyActivatedController.close();
+    _pastDueCacheController.close();
+    _eligibleCacheLowController.close();
     QuizzerLogger.logMessage('SwitchBoard disposed.');
   }
   // --------------------

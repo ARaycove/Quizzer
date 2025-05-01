@@ -55,7 +55,6 @@ class DueDateWorker {
     }
     QuizzerLogger.logMessage('DueDateWorker stopping...');
     _isRunning = false;
-    await _stopCompleter?.future;
     QuizzerLogger.logMessage('DueDateWorker stopped.');
   }
 

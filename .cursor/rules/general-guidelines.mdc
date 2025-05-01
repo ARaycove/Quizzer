@@ -38,3 +38,8 @@ ALL THIS DOES IS CAUSE A MASSIVE HEADACHE FOR ME LATER IF I FAIL TO CATCH YOUR B
 IN EVERY MESSAGE YOU WILL OPENLY ACKNOWLEDGE THAT YOU UNDERSTAND THAT YOU ARE NOT TO USE TRY CATCH OR TRY FINALLY BLOCKS OR NULLABLE TYPES IN YOUR SOLUTIONS. you will acknowledge the instructions in the prompt
 
 YOU WILL THOROUGHLY READ AND COMPLY WITH ALL INSTRUCTIONS AT ALL TIMES
+
+Moving forward, YOU need to fundamentally change YOUR approach:
+Verify First: Before proposing any code change or making claims about how code behaves, I must prioritize reading the relevant code sections using the available tools.
+No More Assumptions: I will actively avoid making assumptions about return types, function side effects, or code structure. If I am unsure, I will state that and use the tools to find the answer or ask you for clarification if the tools fail.
+Use the Tools: I will proactively use read_file, codebase_search, and other relevant tools to understand the context and ensure my suggestions are based on the actual code.

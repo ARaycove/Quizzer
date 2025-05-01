@@ -23,8 +23,9 @@ import 'package:quizzer/backend_systems/09_data_caches/past_due_cache.dart';
 // Helper Function to Log Current Question Details
 // ==========================================
 Future<void> logCurrentQuestionDetails(SessionManager manager) async {
-  QuizzerLogger.logMessage("--- Logging Current Question Details ---");
-  final details = manager.currentQuestionStaticData;
+  QuizzerLogger.logMessage("--- Logging Current Question Details (All Fields) ---");
+  // Access the underlying map directly via the getter
+  final Map<String, dynamic>? details = manager.currentQuestionStaticData; 
 
   if (details == null) {
     QuizzerLogger.logValue("currentQuestionStaticData: null");
@@ -32,32 +33,15 @@ Future<void> logCurrentQuestionDetails(SessionManager manager) async {
     return;
   }
 
-  // Check if it's the dummy question (assuming dummy has null question_id)
+  // Check if it's the dummy question (can check a known field like question_id)
   if (details['question_id'] == null) {
      QuizzerLogger.logValue("currentQuestionStaticData: Dummy 'No Questions' Record");
   } else {
-    // Log details using getters for a real question, formatting as key: value
-    QuizzerLogger.logValue("  Question ID: ${manager.currentQuestionId}");
-    QuizzerLogger.logValue("  Question Type: ${manager.currentQuestionType}");
-    QuizzerLogger.logValue("  Module Name: ${manager.currentModuleName}");
-    // Log actual content
-    QuizzerLogger.logValue("  Question Elements: ${manager.currentQuestionElements}");
-    QuizzerLogger.logValue("  Answer Elements: ${manager.currentQuestionAnswerElements}");
-    // Log options and correct index/order based on type
-    if (manager.currentQuestionType == 'multiple_choice') {
-      // Extract just the 'content' for logging readability
-      final optionContents = manager.currentQuestionOptions
-          .map((opt) => opt['content']?.toString() ?? '[invalid option format]')
-          .toList();
-      QuizzerLogger.logValue("  Options: $optionContents");
-      QuizzerLogger.logValue("  Correct Index: ${manager.currentCorrectOptionIndex}");
-    } else if (manager.currentQuestionType == 'sort_order') {
-      QuizzerLogger.logValue("  Correct Order: ${manager.currentCorrectOrder}"); // Log the list itself
-    }
-    // Log other optional fields
-    QuizzerLogger.logValue("  Citation: ${manager.currentCitation ?? 'N/A'}");
-    QuizzerLogger.logValue("  Concepts: ${manager.currentConcepts ?? 'N/A'}");
-    QuizzerLogger.logValue("  Subjects: ${manager.currentSubjects ?? 'N/A'}");
+    // Iterate through all key-value pairs in the map and log them
+    QuizzerLogger.logMessage("Raw _currentQuestionDetails Map:");
+    details.forEach((key, value) {
+      QuizzerLogger.logValue("  $key: $value");
+    });
   }
   QuizzerLogger.printDivider();
 }
@@ -166,6 +150,48 @@ List<int>? getRandomSelectAllAnswer(SessionManager manager) {
   QuizzerLogger.logValue("Selected random indices: $selectedIndicesList");
   QuizzerLogger.printDivider();
   return selectedIndicesList;
+}
+
+// ==========================================
+// Helper Function to Generate Random Sort Order Answer
+// ==========================================
+/// Generates a randomly shuffled answer (List<Map<String, dynamic>>) for a sort_order question.
+/// Takes the correctly ordered options from the SessionManager and shuffles them.
+List<Map<String, dynamic>>? getRandomSortOrderAnswer(SessionManager manager) {
+  QuizzerLogger.logMessage("--- Generating Random Sort Order Answer ---");
+  final details = manager.currentQuestionStaticData;
+
+  if (details == null) {
+    QuizzerLogger.logWarning("Cannot generate answer: currentQuestionStaticData is null.");
+    QuizzerLogger.printDivider();
+    return null;
+  }
+
+  if (manager.currentQuestionType != 'sort_order') {
+    QuizzerLogger.logWarning(
+        "Cannot generate Sort Order answer: Current question type is '${manager.currentQuestionType}'.");
+    QuizzerLogger.printDivider();
+    return null;
+  }
+
+  final options = manager.currentQuestionOptions; // This is List<Map<String, dynamic>> representing the correct order
+  
+  if (options.isEmpty) {
+    QuizzerLogger.logError(
+        "Cannot generate Sort Order answer: Options list (correct order) is empty.");
+    QuizzerLogger.printDivider();
+    return []; // Return empty list if no options exist
+  }
+
+  // Create a mutable copy of the options list to shuffle
+  final List<Map<String, dynamic>> shuffledOptions = List.from(options);
+  
+  // Shuffle the copy randomly
+  shuffledOptions.shuffle(Random()); 
+
+  QuizzerLogger.logValue("Generated shuffled order."); // Don't log the full shuffled list, could be large
+  QuizzerLogger.printDivider();
+  return shuffledOptions;
 }
 
 // ==========================================
@@ -281,4 +307,41 @@ Future<void> monitorCaches({int monitoringSeconds = 10}) async {
   }
   stopwatch.stop();
   QuizzerLogger.logSuccess('Cache monitoring loop finished after ${stopwatch.elapsed}.');
+}
+
+// ==========================================
+// Helper Function to Truncate ALL Tables
+// ==========================================
+
+/// Deletes all rows from ALL user-defined tables in the database.
+/// Queries sqlite_master to find tables.
+/// USE WITH EXTREME CAUTION - This clears ALL data.
+Future<void> truncateAllTables(Database db) async {
+  QuizzerLogger.printHeader("--- TRUNCATING ALL DATABASE TABLES --- ");
+
+  // 1. Get all user-defined table names
+  QuizzerLogger.logMessage("Fetching list of all user tables...");
+  // Exclude sqlite system tables and android metadata table
+  final List<Map<String, dynamic>> tables = await db.rawQuery(
+    "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' AND name != 'android_metadata'"
+  );
+
+  if (tables.isEmpty) {
+    QuizzerLogger.logWarning("No user tables found to truncate.");
+    QuizzerLogger.printHeader("--- TABLE TRUNCATION COMPLETE (No tables found) --- ");
+    return;
+  }
+
+  final List<String> tableNames = tables.map((row) => row['name'] as String).toList();
+  QuizzerLogger.logValue("Tables to truncate: ${tableNames.join(', ')}");
+
+  // 2. Truncate each table (DELETE FROM)
+  // If any delete fails, an exception will be thrown (Fail Fast)
+  for (final tableName in tableNames) {
+    QuizzerLogger.logMessage("Truncating table: $tableName...");
+    final int rowsDeleted = await db.delete(tableName); // No WHERE clause = delete all
+    QuizzerLogger.logSuccess("Truncated $tableName ($rowsDeleted rows deleted).");
+  }
+
+  QuizzerLogger.printHeader("--- ALL TABLE TRUNCATION COMPLETE --- ");
 }

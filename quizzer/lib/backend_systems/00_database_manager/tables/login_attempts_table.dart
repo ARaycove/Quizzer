@@ -3,6 +3,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'dart:convert';
 import 'dart:io';
+import '00_table_helper.dart'; // Import the helper file
 
 Future<String> getDeviceInfo() async {
   String deviceData = "";
@@ -114,19 +115,26 @@ Future<bool> addLoginAttemptRecord({
   final String timestamp = DateTime.now().toIso8601String();
   final String loginAttemptId = timestamp + userId;
   
-  // Insert the record - if this fails, it will throw an error and crash
-    await db.insert(
-      'login_attempts',
-      {
-        'login_attempt_id': loginAttemptId,
-        'user_id': userId,
-        'email': email,
-        'timestamp': timestamp,
-        'status_code': statusCode,
-        'ip_address': ipAddress,
-        'device_info': deviceInfo,
-      },
-    );
+  // Prepare the raw data map
+  final Map<String, dynamic> data = {
+    'login_attempt_id': loginAttemptId,
+    'user_id': userId, // Can be null if getUserIdByEmail returns invalid
+    'email': email,
+    'timestamp': timestamp,
+    'status_code': statusCode,
+    'ip_address': ipAddress,
+    'device_info': deviceInfo,
+  };
+
+  // Use the universal insert helper
+  final int result = await insertRawData('login_attempts', data, db);
+
+  if (result > 0) {
     QuizzerLogger.logMessage('Login attempt recorded successfully: $loginAttemptId');
-  return true;
+    return true;
+  } else {
+    // Log a warning if insert returned 0 (should not happen without conflict algorithm)
+    QuizzerLogger.logWarning('Insert operation for login attempt $loginAttemptId returned 0.');
+    return false; // Indicate potential failure
+  }
 }

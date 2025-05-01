@@ -54,7 +54,6 @@ class PresentationSelectionWorker {
     if (!_isRunning) return;
     QuizzerLogger.logMessage('PresentationSelectionWorker stopping...');
     _isRunning = false;
-    await _stopCompleter?.future;
     QuizzerLogger.logMessage('PresentationSelectionWorker stopped.');
   }
 

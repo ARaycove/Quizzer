@@ -128,7 +128,6 @@ class EligibilityCheckWorker {
     // QuizzerLogger.logMessage('EligibilityCheckWorker stopping...');
     _isRunning = false;
     // Wait for the current loop iteration to finish
-    await _stopCompleter?.future;
     // QuizzerLogger.logMessage('EligibilityCheckWorker stopped.');
   }
 

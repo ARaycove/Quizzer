@@ -1,5 +1,6 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
+import '00_table_helper.dart'; // Import the helper file
 
 // Table name and field constants
 const String modulesTableName = 'modules';
@@ -68,26 +69,37 @@ Future<void> insertModule({
   await verifyModulesTable(db);
   final now = DateTime.now().millisecondsSinceEpoch;
   
-  await db.insert(
+  // Prepare the raw data map - join lists into strings as needed by schema
+  final Map<String, dynamic> data = {
+    moduleNameField: name,
+    descriptionField: description,
+    primarySubjectField: primarySubject,
+    subjectsField: subjects, // Pass raw list for JSON encoding
+    relatedConceptsField: relatedConcepts, // Pass raw list for JSON encoding
+    questionIdsField: questionIds, // Pass raw list for JSON encoding
+    creationDateField: now,
+    creatorIdField: creatorId,
+    lastModifiedField: now,
+    totalQuestionsField: questionIds.length,
+    hasBeenSyncedField: 0,
+    lastSyncField: null, // Helper will handle null
+  };
+
+  // Use the universal insert helper with ConflictAlgorithm.replace
+  final int result = await insertRawData(
     modulesTableName,
-    {
-      moduleNameField: name,
-      descriptionField: description,
-      primarySubjectField: primarySubject,
-      subjectsField: subjects.join(','),
-      relatedConceptsField: relatedConcepts.join(','),
-      questionIdsField: questionIds.join(','),
-      creationDateField: now,
-      creatorIdField: creatorId,
-      lastModifiedField: now,
-      totalQuestionsField: questionIds.length,
-      hasBeenSyncedField: 0,
-      lastSyncField: null,
-    },
+    data,
+    db,
     conflictAlgorithm: ConflictAlgorithm.replace,
   );
   
-  QuizzerLogger.logSuccess('Module $name inserted successfully');
+  // Log based on result (insertRawData returns row ID or 0/-1 on failure/ignore)
+  if (result > 0) { // replace returns rowID
+    QuizzerLogger.logSuccess('Module $name inserted/replaced successfully');
+  } else {
+     // This case might indicate an issue if replace was expected to always work
+     QuizzerLogger.logWarning('Insert/replace operation for module $name returned $result.');
+  }
 }
 
 // Update a module
@@ -104,90 +116,129 @@ Future<void> updateModule({
   await verifyModulesTable(db);
   final updates = <String, dynamic>{};
   
+  // Prepare map with raw data - lists will be handled by encodeValueForDB in the helper
   if (description != null) updates[descriptionField] = description;
   if (primarySubject != null) updates[primarySubjectField] = primarySubject;
-  if (subjects != null) updates[subjectsField] = subjects.join(',');
-  if (relatedConcepts != null) updates[relatedConceptsField] = relatedConcepts.join(',');
+  if (subjects != null) updates[subjectsField] = subjects; // Pass raw list
+  if (relatedConcepts != null) updates[relatedConceptsField] = relatedConcepts; // Pass raw list
   if (questionIds != null) {
-    updates[questionIdsField] = questionIds.join(',');
+    updates[questionIdsField] = questionIds; // Pass raw list
     updates[totalQuestionsField] = questionIds.length;
   }
   
+  // Add fields that are always updated
   updates[lastModifiedField] = DateTime.now().millisecondsSinceEpoch;
-  updates[hasBeenSyncedField] = 0;
+  updates[hasBeenSyncedField] = 0; // Mark as needing sync after update
 
-  await db.update(
+  // Use the universal update helper (encoding happens inside)
+  final int result = await updateRawData(
     modulesTableName,
     updates,
-    where: '$moduleNameField = ?',
-    whereArgs: [name],
+    '$moduleNameField = ?', // where clause
+    [name],                 // whereArgs
+    db,
   );
   
-  QuizzerLogger.logSuccess('Module $name updated successfully');
+  // Log based on result (updateRawData returns number of rows affected)
+  if (result > 0) {
+    QuizzerLogger.logSuccess('Module $name updated successfully ($result row affected).');
+  } else {
+    QuizzerLogger.logWarning('Update operation for module $name affected 0 rows. Module might not exist or data was unchanged.');
+  }
 }
 
 // Get a module by name
 Future<Map<String, dynamic>?> getModule(String name, Database db) async {
   QuizzerLogger.logMessage('Fetching module: $name');
   await verifyModulesTable(db);
-  final List<Map<String, dynamic>> maps = await db.query(
+  
+  // Use the universal query helper
+  final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
     modulesTableName,
+    db,
     where: '$moduleNameField = ?',
     whereArgs: [name],
+    limit: 2, // Limit to 2 to detect if PK constraint is violated
   );
 
-  if (maps.isEmpty) {
+  if (results.isEmpty) {
     QuizzerLogger.logMessage('Module $name not found');
     return null;
+  } else if (results.length > 1) {
+    // This shouldn't happen if moduleNameField is a primary key
+    QuizzerLogger.logError('Found multiple modules with the same name: $name. PK constraint violation?');
+    throw StateError('Found multiple modules with the same primary key: $name');
   }
 
-  final module = maps.first;
-  final result = {
-    'module_name': module[moduleNameField],
-    'description': module[descriptionField],
-    'primary_subject': module[primarySubjectField],
-    'subjects': (module[subjectsField] as String).split(','),
-    'related_concepts': (module[relatedConceptsField] as String).split(','),
-    'question_ids': (module[questionIdsField] as String).split(','),
-    'creation_date': DateTime.fromMillisecondsSinceEpoch(module[creationDateField]),
-    'creator_id': module[creatorIdField],
-    'last_modified': DateTime.fromMillisecondsSinceEpoch(module[lastModifiedField]),
-    'total_questions': module[totalQuestionsField],
-    'has_been_synced': module[hasBeenSyncedField] == 1,
-    'last_sync': module[lastSyncField] != null 
-        ? DateTime.fromMillisecondsSinceEpoch(module[lastSyncField])
+  // Get the single, already decoded map
+  final decodedModule = results.first;
+
+  // Manually handle type conversions not covered by the generic decoder
+  // Specifically: Convert integer timestamps to DateTime
+  final Map<String, dynamic> finalResult = {
+    moduleNameField: decodedModule[moduleNameField],
+    descriptionField: decodedModule[descriptionField],
+    primarySubjectField: decodedModule[primarySubjectField],
+    subjectsField: decodedModule[subjectsField], // Already decoded to List<String> or similar by helper
+    relatedConceptsField: decodedModule[relatedConceptsField], // Already decoded
+    questionIdsField: decodedModule[questionIdsField], // Already decoded
+    creationDateField: DateTime.fromMillisecondsSinceEpoch(decodedModule[creationDateField] as int),
+    creatorIdField: decodedModule[creatorIdField],
+    lastModifiedField: DateTime.fromMillisecondsSinceEpoch(decodedModule[lastModifiedField] as int),
+    totalQuestionsField: decodedModule[totalQuestionsField],
+    hasBeenSyncedField: decodedModule[hasBeenSyncedField] == 1, // Convert int (0/1) to bool
+    lastSyncField: decodedModule[lastSyncField] != null 
+        ? DateTime.fromMillisecondsSinceEpoch(decodedModule[lastSyncField] as int)
         : null,
   };
   
-  QuizzerLogger.logValue('Retrieved module: $result');
-  
-  return result;
+  QuizzerLogger.logValue('Retrieved and processed module: $finalResult');
+  return finalResult;
 }
 
 // Get all modules
 Future<List<Map<String, dynamic>>> getAllModules(Database db) async {
   QuizzerLogger.logMessage('Fetching all modules');
   await verifyModulesTable(db);
-  final List<Map<String, dynamic>> maps = await db.query(modulesTableName);
   
-  final result = maps.map((module) => {
-    'module_name': module[moduleNameField],
-    'description': module[descriptionField],
-    'primary_subject': module[primarySubjectField],
-    'subjects': (module[subjectsField] as String).split(','),
-    'related_concepts': (module[relatedConceptsField] as String).split(','),
-    'question_ids': (module[questionIdsField] as String).split(','),
-    'creation_date': DateTime.fromMillisecondsSinceEpoch(module[creationDateField]),
-    'creator_id': module[creatorIdField],
-    'last_modified': DateTime.fromMillisecondsSinceEpoch(module[lastModifiedField]),
-    'total_questions': module[totalQuestionsField],
-    'has_been_synced': module[hasBeenSyncedField] == 1,
-    'last_sync': module[lastSyncField] != null 
-        ? DateTime.fromMillisecondsSinceEpoch(module[lastSyncField])
-        : null,
-  }).toList();
-  
-  QuizzerLogger.logValue('Retrieved modules: $result');
-  
-  return result;
+  // Use the universal query helper
+  final List<Map<String, dynamic>> decodedModules = await queryAndDecodeDatabase(
+    modulesTableName,
+    db,
+    // No WHERE clause needed to get all
+  );
+
+  // Process the decoded results to perform final type conversions (like int timestamps to DateTime)
+  final List<Map<String, dynamic>> finalResults = [];
+  for (final decodedModule in decodedModules) {
+      // Basic check for essential fields
+      if (decodedModule[moduleNameField] == null || 
+          decodedModule[creationDateField] == null || 
+          decodedModule[lastModifiedField] == null) {
+        QuizzerLogger.logWarning('Skipping module due to missing essential fields: ${decodedModule[moduleNameField] ?? 'Unknown'}');
+        continue; // Skip this potentially malformed module
+      }
+
+      // Perform the same type conversions as in getModule
+      final Map<String, dynamic> processedModule = {
+        moduleNameField: decodedModule[moduleNameField],
+        descriptionField: decodedModule[descriptionField],
+        primarySubjectField: decodedModule[primarySubjectField],
+        subjectsField: decodedModule[subjectsField], // Already List<dynamic>? or null
+        relatedConceptsField: decodedModule[relatedConceptsField], // Already List<dynamic>? or null
+        questionIdsField: decodedModule[questionIdsField], // Already List<dynamic>? or null
+        creationDateField: DateTime.fromMillisecondsSinceEpoch(decodedModule[creationDateField] as int),
+        creatorIdField: decodedModule[creatorIdField],
+        lastModifiedField: DateTime.fromMillisecondsSinceEpoch(decodedModule[lastModifiedField] as int),
+        totalQuestionsField: decodedModule[totalQuestionsField],
+        hasBeenSyncedField: (decodedModule[hasBeenSyncedField] == 1 || decodedModule[hasBeenSyncedField] == true), // Handle int or bool
+        lastSyncField: decodedModule[lastSyncField] != null 
+            ? DateTime.fromMillisecondsSinceEpoch(decodedModule[lastSyncField] as int)
+            : null,
+      };
+      finalResults.add(processedModule);
+  }
+
+  QuizzerLogger.logValue('Retrieved and processed ${finalResults.length} modules');
+  return finalResults;
 }

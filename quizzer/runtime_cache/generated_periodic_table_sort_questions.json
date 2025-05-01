@@ -1,0 +1,7602 @@
+[
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nPo - Polonium (Atomic #: 84)\nOs - Osmium (Atomic #: 76)\nCr - Chromium (Atomic #: 24)\nHe - Helium (Atomic #: 2)\nH - Hydrogen (Atomic #: 1)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Po - Polonium"
+      },
+      {
+        "type": "text",
+        "content": "Os - Osmium"
+      },
+      {
+        "type": "text",
+        "content": "Cr - Chromium"
+      },
+      {
+        "type": "text",
+        "content": "He - Helium"
+      },
+      {
+        "type": "text",
+        "content": "H - Hydrogen"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nMt - Meitnerium (Atomic #: 109)\nCf - Californium (Atomic #: 98)\nSr - Strontium (Atomic #: 38)\nGa - Gallium (Atomic #: 31)\nH - Hydrogen (Atomic #: 1)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Mt - Meitnerium"
+      },
+      {
+        "type": "text",
+        "content": "Cf - Californium"
+      },
+      {
+        "type": "text",
+        "content": "Sr - Strontium"
+      },
+      {
+        "type": "text",
+        "content": "Ga - Gallium"
+      },
+      {
+        "type": "text",
+        "content": "H - Hydrogen"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nTs - Tennessine (Atomic #: 117)\nDs - Darmstadtium (Atomic #: 110)\nMd - Mendelevium (Atomic #: 101)\nBa - Barium (Atomic #: 56)\nB - Boron (Atomic #: 5)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Ts - Tennessine"
+      },
+      {
+        "type": "text",
+        "content": "Ds - Darmstadtium"
+      },
+      {
+        "type": "text",
+        "content": "Md - Mendelevium"
+      },
+      {
+        "type": "text",
+        "content": "Ba - Barium"
+      },
+      {
+        "type": "text",
+        "content": "B - Boron"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nBk - Berkelium (Atomic #: 97)\nU - Uranium (Atomic #: 92)\nTa - Tantalum (Atomic #: 73)\nLu - Lutetium (Atomic #: 71)\nDy - Dysprosium (Atomic #: 66)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Bk - Berkelium"
+      },
+      {
+        "type": "text",
+        "content": "U - Uranium"
+      },
+      {
+        "type": "text",
+        "content": "Ta - Tantalum"
+      },
+      {
+        "type": "text",
+        "content": "Lu - Lutetium"
+      },
+      {
+        "type": "text",
+        "content": "Dy - Dysprosium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nTs - Tennessine (Atomic #: 117)\nLv - Livermorium (Atomic #: 116)\nPu - Plutonium (Atomic #: 94)\nHo - Holmium (Atomic #: 67)\nCd - Cadmium (Atomic #: 48)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Ts - Tennessine"
+      },
+      {
+        "type": "text",
+        "content": "Lv - Livermorium"
+      },
+      {
+        "type": "text",
+        "content": "Pu - Plutonium"
+      },
+      {
+        "type": "text",
+        "content": "Ho - Holmium"
+      },
+      {
+        "type": "text",
+        "content": "Cd - Cadmium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nNp - Neptunium (Atomic #: 93)\nPt - Platinum (Atomic #: 78)\nTa - Tantalum (Atomic #: 73)\nXe - Xenon (Atomic #: 54)\nSr - Strontium (Atomic #: 38)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Np - Neptunium"
+      },
+      {
+        "type": "text",
+        "content": "Pt - Platinum"
+      },
+      {
+        "type": "text",
+        "content": "Ta - Tantalum"
+      },
+      {
+        "type": "text",
+        "content": "Xe - Xenon"
+      },
+      {
+        "type": "text",
+        "content": "Sr - Strontium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nDs - Darmstadtium (Atomic #: 110)\nRf - Rutherfordium (Atomic #: 104)\nLr - Lawrencium (Atomic #: 103)\nGd - Gadolinium (Atomic #: 64)\nPm - Promethium (Atomic #: 61)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Ds - Darmstadtium"
+      },
+      {
+        "type": "text",
+        "content": "Rf - Rutherfordium"
+      },
+      {
+        "type": "text",
+        "content": "Lr - Lawrencium"
+      },
+      {
+        "type": "text",
+        "content": "Gd - Gadolinium"
+      },
+      {
+        "type": "text",
+        "content": "Pm - Promethium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nAm - Americium (Atomic #: 95)\nNp - Neptunium (Atomic #: 93)\nTl - Thallium (Atomic #: 81)\nW - Tungsten (Atomic #: 74)\nRh - Rhodium (Atomic #: 45)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Am - Americium"
+      },
+      {
+        "type": "text",
+        "content": "Np - Neptunium"
+      },
+      {
+        "type": "text",
+        "content": "Tl - Thallium"
+      },
+      {
+        "type": "text",
+        "content": "W - Tungsten"
+      },
+      {
+        "type": "text",
+        "content": "Rh - Rhodium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nFl - Flerovium (Atomic #: 114)\nAc - Actinium (Atomic #: 89)\nTa - Tantalum (Atomic #: 73)\nSn - Tin (Atomic #: 50)\nFe - Iron (Atomic #: 26)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Fl - Flerovium"
+      },
+      {
+        "type": "text",
+        "content": "Ac - Actinium"
+      },
+      {
+        "type": "text",
+        "content": "Ta - Tantalum"
+      },
+      {
+        "type": "text",
+        "content": "Sn - Tin"
+      },
+      {
+        "type": "text",
+        "content": "Fe - Iron"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nOg - Oganesson (Atomic #: 118)\nEs - Einsteinium (Atomic #: 99)\nRe - Rhenium (Atomic #: 75)\nTe - Tellurium (Atomic #: 52)\nMo - Molybdenum (Atomic #: 42)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Og - Oganesson"
+      },
+      {
+        "type": "text",
+        "content": "Es - Einsteinium"
+      },
+      {
+        "type": "text",
+        "content": "Re - Rhenium"
+      },
+      {
+        "type": "text",
+        "content": "Te - Tellurium"
+      },
+      {
+        "type": "text",
+        "content": "Mo - Molybdenum"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nPa - Protactinium (Atomic #: 91)\nYb - Ytterbium (Atomic #: 70)\nDy - Dysprosium (Atomic #: 66)\nGd - Gadolinium (Atomic #: 64)\nSm - Samarium (Atomic #: 62)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Pa - Protactinium"
+      },
+      {
+        "type": "text",
+        "content": "Yb - Ytterbium"
+      },
+      {
+        "type": "text",
+        "content": "Dy - Dysprosium"
+      },
+      {
+        "type": "text",
+        "content": "Gd - Gadolinium"
+      },
+      {
+        "type": "text",
+        "content": "Sm - Samarium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nNo - Nobelium (Atomic #: 102)\nBi - Bismuth (Atomic #: 83)\nPb - Lead (Atomic #: 82)\nMg - Magnesium (Atomic #: 12)\nBe - Beryllium (Atomic #: 4)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "No - Nobelium"
+      },
+      {
+        "type": "text",
+        "content": "Bi - Bismuth"
+      },
+      {
+        "type": "text",
+        "content": "Pb - Lead"
+      },
+      {
+        "type": "text",
+        "content": "Mg - Magnesium"
+      },
+      {
+        "type": "text",
+        "content": "Be - Beryllium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nCn - Copernicium (Atomic #: 112)\nRe - Rhenium (Atomic #: 75)\nTb - Terbium (Atomic #: 65)\nCo - Cobalt (Atomic #: 27)\nHe - Helium (Atomic #: 2)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Cn - Copernicium"
+      },
+      {
+        "type": "text",
+        "content": "Re - Rhenium"
+      },
+      {
+        "type": "text",
+        "content": "Tb - Terbium"
+      },
+      {
+        "type": "text",
+        "content": "Co - Cobalt"
+      },
+      {
+        "type": "text",
+        "content": "He - Helium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nDs - Darmstadtium (Atomic #: 110)\nMt - Meitnerium (Atomic #: 109)\nBi - Bismuth (Atomic #: 83)\nSm - Samarium (Atomic #: 62)\nPm - Promethium (Atomic #: 61)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Ds - Darmstadtium"
+      },
+      {
+        "type": "text",
+        "content": "Mt - Meitnerium"
+      },
+      {
+        "type": "text",
+        "content": "Bi - Bismuth"
+      },
+      {
+        "type": "text",
+        "content": "Sm - Samarium"
+      },
+      {
+        "type": "text",
+        "content": "Pm - Promethium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nHs - Hassium (Atomic #: 108)\nRb - Rubidium (Atomic #: 37)\nFe - Iron (Atomic #: 26)\nCr - Chromium (Atomic #: 24)\nN - Nitrogen (Atomic #: 7)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Hs - Hassium"
+      },
+      {
+        "type": "text",
+        "content": "Rb - Rubidium"
+      },
+      {
+        "type": "text",
+        "content": "Fe - Iron"
+      },
+      {
+        "type": "text",
+        "content": "Cr - Chromium"
+      },
+      {
+        "type": "text",
+        "content": "N - Nitrogen"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nTh - Thorium (Atomic #: 90)\nPm - Promethium (Atomic #: 61)\nCu - Copper (Atomic #: 29)\nAr - Argon (Atomic #: 18)\nLi - Lithium (Atomic #: 3)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Th - Thorium"
+      },
+      {
+        "type": "text",
+        "content": "Pm - Promethium"
+      },
+      {
+        "type": "text",
+        "content": "Cu - Copper"
+      },
+      {
+        "type": "text",
+        "content": "Ar - Argon"
+      },
+      {
+        "type": "text",
+        "content": "Li - Lithium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nCf - Californium (Atomic #: 98)\nPu - Plutonium (Atomic #: 94)\nAg - Silver (Atomic #: 47)\nSe - Selenium (Atomic #: 34)\nTi - Titanium (Atomic #: 22)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Cf - Californium"
+      },
+      {
+        "type": "text",
+        "content": "Pu - Plutonium"
+      },
+      {
+        "type": "text",
+        "content": "Ag - Silver"
+      },
+      {
+        "type": "text",
+        "content": "Se - Selenium"
+      },
+      {
+        "type": "text",
+        "content": "Ti - Titanium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nRf - Rutherfordium (Atomic #: 104)\nAc - Actinium (Atomic #: 89)\nTa - Tantalum (Atomic #: 73)\nPr - Praseodymium (Atomic #: 59)\nS - Sulfur (Atomic #: 16)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Rf - Rutherfordium"
+      },
+      {
+        "type": "text",
+        "content": "Ac - Actinium"
+      },
+      {
+        "type": "text",
+        "content": "Ta - Tantalum"
+      },
+      {
+        "type": "text",
+        "content": "Pr - Praseodymium"
+      },
+      {
+        "type": "text",
+        "content": "S - Sulfur"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nBi - Bismuth (Atomic #: 83)\nTm - Thulium (Atomic #: 69)\nRh - Rhodium (Atomic #: 45)\nMo - Molybdenum (Atomic #: 42)\nBe - Beryllium (Atomic #: 4)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Bi - Bismuth"
+      },
+      {
+        "type": "text",
+        "content": "Tm - Thulium"
+      },
+      {
+        "type": "text",
+        "content": "Rh - Rhodium"
+      },
+      {
+        "type": "text",
+        "content": "Mo - Molybdenum"
+      },
+      {
+        "type": "text",
+        "content": "Be - Beryllium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nPu - Plutonium (Atomic #: 94)\nCd - Cadmium (Atomic #: 48)\nNb - Niobium (Atomic #: 41)\nMn - Manganese (Atomic #: 25)\nCa - Calcium (Atomic #: 20)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Pu - Plutonium"
+      },
+      {
+        "type": "text",
+        "content": "Cd - Cadmium"
+      },
+      {
+        "type": "text",
+        "content": "Nb - Niobium"
+      },
+      {
+        "type": "text",
+        "content": "Mn - Manganese"
+      },
+      {
+        "type": "text",
+        "content": "Ca - Calcium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nCn - Copernicium (Atomic #: 112)\nTh - Thorium (Atomic #: 90)\nFe - Iron (Atomic #: 26)\nO - Oxygen (Atomic #: 8)\nLi - Lithium (Atomic #: 3)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Cn - Copernicium"
+      },
+      {
+        "type": "text",
+        "content": "Th - Thorium"
+      },
+      {
+        "type": "text",
+        "content": "Fe - Iron"
+      },
+      {
+        "type": "text",
+        "content": "O - Oxygen"
+      },
+      {
+        "type": "text",
+        "content": "Li - Lithium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nDs - Darmstadtium (Atomic #: 110)\nRe - Rhenium (Atomic #: 75)\nIn - Indium (Atomic #: 49)\nBr - Bromine (Atomic #: 35)\nC - Carbon (Atomic #: 6)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Ds - Darmstadtium"
+      },
+      {
+        "type": "text",
+        "content": "Re - Rhenium"
+      },
+      {
+        "type": "text",
+        "content": "In - Indium"
+      },
+      {
+        "type": "text",
+        "content": "Br - Bromine"
+      },
+      {
+        "type": "text",
+        "content": "C - Carbon"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nFr - Francium (Atomic #: 87)\nBi - Bismuth (Atomic #: 83)\nNd - Neodymium (Atomic #: 60)\nFe - Iron (Atomic #: 26)\nC - Carbon (Atomic #: 6)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Fr - Francium"
+      },
+      {
+        "type": "text",
+        "content": "Bi - Bismuth"
+      },
+      {
+        "type": "text",
+        "content": "Nd - Neodymium"
+      },
+      {
+        "type": "text",
+        "content": "Fe - Iron"
+      },
+      {
+        "type": "text",
+        "content": "C - Carbon"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nAt - Astatine (Atomic #: 85)\nBa - Barium (Atomic #: 56)\nPd - Palladium (Atomic #: 46)\nY - Yttrium (Atomic #: 39)\nNi - Nickel (Atomic #: 28)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "At - Astatine"
+      },
+      {
+        "type": "text",
+        "content": "Ba - Barium"
+      },
+      {
+        "type": "text",
+        "content": "Pd - Palladium"
+      },
+      {
+        "type": "text",
+        "content": "Y - Yttrium"
+      },
+      {
+        "type": "text",
+        "content": "Ni - Nickel"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nLv - Livermorium (Atomic #: 116)\nDs - Darmstadtium (Atomic #: 110)\nRn - Radon (Atomic #: 86)\nTa - Tantalum (Atomic #: 73)\nTb - Terbium (Atomic #: 65)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Lv - Livermorium"
+      },
+      {
+        "type": "text",
+        "content": "Ds - Darmstadtium"
+      },
+      {
+        "type": "text",
+        "content": "Rn - Radon"
+      },
+      {
+        "type": "text",
+        "content": "Ta - Tantalum"
+      },
+      {
+        "type": "text",
+        "content": "Tb - Terbium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nSn - Tin (Atomic #: 50)\nMo - Molybdenum (Atomic #: 42)\nSi - Silicon (Atomic #: 14)\nNe - Neon (Atomic #: 10)\nLi - Lithium (Atomic #: 3)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Sn - Tin"
+      },
+      {
+        "type": "text",
+        "content": "Mo - Molybdenum"
+      },
+      {
+        "type": "text",
+        "content": "Si - Silicon"
+      },
+      {
+        "type": "text",
+        "content": "Ne - Neon"
+      },
+      {
+        "type": "text",
+        "content": "Li - Lithium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nTh - Thorium (Atomic #: 90)\nNd - Neodymium (Atomic #: 60)\nSn - Tin (Atomic #: 50)\nV - Vanadium (Atomic #: 23)\nB - Boron (Atomic #: 5)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Th - Thorium"
+      },
+      {
+        "type": "text",
+        "content": "Nd - Neodymium"
+      },
+      {
+        "type": "text",
+        "content": "Sn - Tin"
+      },
+      {
+        "type": "text",
+        "content": "V - Vanadium"
+      },
+      {
+        "type": "text",
+        "content": "B - Boron"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nSg - Seaborgium (Atomic #: 106)\nTa - Tantalum (Atomic #: 73)\nHo - Holmium (Atomic #: 67)\nCs - Cesium (Atomic #: 55)\nO - Oxygen (Atomic #: 8)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Sg - Seaborgium"
+      },
+      {
+        "type": "text",
+        "content": "Ta - Tantalum"
+      },
+      {
+        "type": "text",
+        "content": "Ho - Holmium"
+      },
+      {
+        "type": "text",
+        "content": "Cs - Cesium"
+      },
+      {
+        "type": "text",
+        "content": "O - Oxygen"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nDs - Darmstadtium (Atomic #: 110)\nEs - Einsteinium (Atomic #: 99)\nEu - Europium (Atomic #: 63)\nTc - Technetium (Atomic #: 43)\nSi - Silicon (Atomic #: 14)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Ds - Darmstadtium"
+      },
+      {
+        "type": "text",
+        "content": "Es - Einsteinium"
+      },
+      {
+        "type": "text",
+        "content": "Eu - Europium"
+      },
+      {
+        "type": "text",
+        "content": "Tc - Technetium"
+      },
+      {
+        "type": "text",
+        "content": "Si - Silicon"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nNp - Neptunium (Atomic #: 93)\nPt - Platinum (Atomic #: 78)\nEu - Europium (Atomic #: 63)\nPr - Praseodymium (Atomic #: 59)\nK - Potassium (Atomic #: 19)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Np - Neptunium"
+      },
+      {
+        "type": "text",
+        "content": "Pt - Platinum"
+      },
+      {
+        "type": "text",
+        "content": "Eu - Europium"
+      },
+      {
+        "type": "text",
+        "content": "Pr - Praseodymium"
+      },
+      {
+        "type": "text",
+        "content": "K - Potassium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nDb - Dubnium (Atomic #: 105)\nLr - Lawrencium (Atomic #: 103)\nCs - Cesium (Atomic #: 55)\nV - Vanadium (Atomic #: 23)\nB - Boron (Atomic #: 5)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Db - Dubnium"
+      },
+      {
+        "type": "text",
+        "content": "Lr - Lawrencium"
+      },
+      {
+        "type": "text",
+        "content": "Cs - Cesium"
+      },
+      {
+        "type": "text",
+        "content": "V - Vanadium"
+      },
+      {
+        "type": "text",
+        "content": "B - Boron"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nCm - Curium (Atomic #: 96)\nPo - Polonium (Atomic #: 84)\nEu - Europium (Atomic #: 63)\nCr - Chromium (Atomic #: 24)\nO - Oxygen (Atomic #: 8)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Cm - Curium"
+      },
+      {
+        "type": "text",
+        "content": "Po - Polonium"
+      },
+      {
+        "type": "text",
+        "content": "Eu - Europium"
+      },
+      {
+        "type": "text",
+        "content": "Cr - Chromium"
+      },
+      {
+        "type": "text",
+        "content": "O - Oxygen"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nSg - Seaborgium (Atomic #: 106)\nGd - Gadolinium (Atomic #: 64)\nBa - Barium (Atomic #: 56)\nTe - Tellurium (Atomic #: 52)\nCl - Chlorine (Atomic #: 17)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Sg - Seaborgium"
+      },
+      {
+        "type": "text",
+        "content": "Gd - Gadolinium"
+      },
+      {
+        "type": "text",
+        "content": "Ba - Barium"
+      },
+      {
+        "type": "text",
+        "content": "Te - Tellurium"
+      },
+      {
+        "type": "text",
+        "content": "Cl - Chlorine"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nMc - Moscovium (Atomic #: 115)\nRe - Rhenium (Atomic #: 75)\nTa - Tantalum (Atomic #: 73)\nNb - Niobium (Atomic #: 41)\nZn - Zinc (Atomic #: 30)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Mc - Moscovium"
+      },
+      {
+        "type": "text",
+        "content": "Re - Rhenium"
+      },
+      {
+        "type": "text",
+        "content": "Ta - Tantalum"
+      },
+      {
+        "type": "text",
+        "content": "Nb - Niobium"
+      },
+      {
+        "type": "text",
+        "content": "Zn - Zinc"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nDs - Darmstadtium (Atomic #: 110)\nOs - Osmium (Atomic #: 76)\nCs - Cesium (Atomic #: 55)\nGe - Germanium (Atomic #: 32)\nHe - Helium (Atomic #: 2)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Ds - Darmstadtium"
+      },
+      {
+        "type": "text",
+        "content": "Os - Osmium"
+      },
+      {
+        "type": "text",
+        "content": "Cs - Cesium"
+      },
+      {
+        "type": "text",
+        "content": "Ge - Germanium"
+      },
+      {
+        "type": "text",
+        "content": "He - Helium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nPa - Protactinium (Atomic #: 91)\nIn - Indium (Atomic #: 49)\nMn - Manganese (Atomic #: 25)\nF - Fluorine (Atomic #: 9)\nLi - Lithium (Atomic #: 3)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Pa - Protactinium"
+      },
+      {
+        "type": "text",
+        "content": "In - Indium"
+      },
+      {
+        "type": "text",
+        "content": "Mn - Manganese"
+      },
+      {
+        "type": "text",
+        "content": "F - Fluorine"
+      },
+      {
+        "type": "text",
+        "content": "Li - Lithium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nPm - Promethium (Atomic #: 61)\nPd - Palladium (Atomic #: 46)\nZn - Zinc (Atomic #: 30)\nSc - Scandium (Atomic #: 21)\nLi - Lithium (Atomic #: 3)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Pm - Promethium"
+      },
+      {
+        "type": "text",
+        "content": "Pd - Palladium"
+      },
+      {
+        "type": "text",
+        "content": "Zn - Zinc"
+      },
+      {
+        "type": "text",
+        "content": "Sc - Scandium"
+      },
+      {
+        "type": "text",
+        "content": "Li - Lithium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nLv - Livermorium (Atomic #: 116)\nHs - Hassium (Atomic #: 108)\nPb - Lead (Atomic #: 82)\nV - Vanadium (Atomic #: 23)\nLi - Lithium (Atomic #: 3)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Lv - Livermorium"
+      },
+      {
+        "type": "text",
+        "content": "Hs - Hassium"
+      },
+      {
+        "type": "text",
+        "content": "Pb - Lead"
+      },
+      {
+        "type": "text",
+        "content": "V - Vanadium"
+      },
+      {
+        "type": "text",
+        "content": "Li - Lithium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nCm - Curium (Atomic #: 96)\nPu - Plutonium (Atomic #: 94)\nTa - Tantalum (Atomic #: 73)\nLa - Lanthanum (Atomic #: 57)\nGe - Germanium (Atomic #: 32)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Cm - Curium"
+      },
+      {
+        "type": "text",
+        "content": "Pu - Plutonium"
+      },
+      {
+        "type": "text",
+        "content": "Ta - Tantalum"
+      },
+      {
+        "type": "text",
+        "content": "La - Lanthanum"
+      },
+      {
+        "type": "text",
+        "content": "Ge - Germanium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nDy - Dysprosium (Atomic #: 66)\nRb - Rubidium (Atomic #: 37)\nGa - Gallium (Atomic #: 31)\nSc - Scandium (Atomic #: 21)\nN - Nitrogen (Atomic #: 7)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Dy - Dysprosium"
+      },
+      {
+        "type": "text",
+        "content": "Rb - Rubidium"
+      },
+      {
+        "type": "text",
+        "content": "Ga - Gallium"
+      },
+      {
+        "type": "text",
+        "content": "Sc - Scandium"
+      },
+      {
+        "type": "text",
+        "content": "N - Nitrogen"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nLv - Livermorium (Atomic #: 116)\nZr - Zirconium (Atomic #: 40)\nZn - Zinc (Atomic #: 30)\nCo - Cobalt (Atomic #: 27)\nCl - Chlorine (Atomic #: 17)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Lv - Livermorium"
+      },
+      {
+        "type": "text",
+        "content": "Zr - Zirconium"
+      },
+      {
+        "type": "text",
+        "content": "Zn - Zinc"
+      },
+      {
+        "type": "text",
+        "content": "Co - Cobalt"
+      },
+      {
+        "type": "text",
+        "content": "Cl - Chlorine"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nMt - Meitnerium (Atomic #: 109)\nNo - Nobelium (Atomic #: 102)\nEr - Erbium (Atomic #: 68)\nIn - Indium (Atomic #: 49)\nRu - Ruthenium (Atomic #: 44)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Mt - Meitnerium"
+      },
+      {
+        "type": "text",
+        "content": "No - Nobelium"
+      },
+      {
+        "type": "text",
+        "content": "Er - Erbium"
+      },
+      {
+        "type": "text",
+        "content": "In - Indium"
+      },
+      {
+        "type": "text",
+        "content": "Ru - Ruthenium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nRn - Radon (Atomic #: 86)\nTl - Thallium (Atomic #: 81)\nHf - Hafnium (Atomic #: 72)\nV - Vanadium (Atomic #: 23)\nSi - Silicon (Atomic #: 14)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Rn - Radon"
+      },
+      {
+        "type": "text",
+        "content": "Tl - Thallium"
+      },
+      {
+        "type": "text",
+        "content": "Hf - Hafnium"
+      },
+      {
+        "type": "text",
+        "content": "V - Vanadium"
+      },
+      {
+        "type": "text",
+        "content": "Si - Silicon"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nRg - Roentgenium (Atomic #: 111)\nHg - Mercury (Atomic #: 80)\nEu - Europium (Atomic #: 63)\nBa - Barium (Atomic #: 56)\nC - Carbon (Atomic #: 6)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Rg - Roentgenium"
+      },
+      {
+        "type": "text",
+        "content": "Hg - Mercury"
+      },
+      {
+        "type": "text",
+        "content": "Eu - Europium"
+      },
+      {
+        "type": "text",
+        "content": "Ba - Barium"
+      },
+      {
+        "type": "text",
+        "content": "C - Carbon"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nTl - Thallium (Atomic #: 81)\nCd - Cadmium (Atomic #: 48)\nNi - Nickel (Atomic #: 28)\nP - Phosphorus (Atomic #: 15)\nLi - Lithium (Atomic #: 3)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Tl - Thallium"
+      },
+      {
+        "type": "text",
+        "content": "Cd - Cadmium"
+      },
+      {
+        "type": "text",
+        "content": "Ni - Nickel"
+      },
+      {
+        "type": "text",
+        "content": "P - Phosphorus"
+      },
+      {
+        "type": "text",
+        "content": "Li - Lithium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nRa - Radium (Atomic #: 88)\nEr - Erbium (Atomic #: 68)\nNd - Neodymium (Atomic #: 60)\nXe - Xenon (Atomic #: 54)\nNb - Niobium (Atomic #: 41)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Ra - Radium"
+      },
+      {
+        "type": "text",
+        "content": "Er - Erbium"
+      },
+      {
+        "type": "text",
+        "content": "Nd - Neodymium"
+      },
+      {
+        "type": "text",
+        "content": "Xe - Xenon"
+      },
+      {
+        "type": "text",
+        "content": "Nb - Niobium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nHs - Hassium (Atomic #: 108)\nBi - Bismuth (Atomic #: 83)\nPt - Platinum (Atomic #: 78)\nGd - Gadolinium (Atomic #: 64)\nPm - Promethium (Atomic #: 61)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Hs - Hassium"
+      },
+      {
+        "type": "text",
+        "content": "Bi - Bismuth"
+      },
+      {
+        "type": "text",
+        "content": "Pt - Platinum"
+      },
+      {
+        "type": "text",
+        "content": "Gd - Gadolinium"
+      },
+      {
+        "type": "text",
+        "content": "Pm - Promethium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nRg - Roentgenium (Atomic #: 111)\nMd - Mendelevium (Atomic #: 101)\nRn - Radon (Atomic #: 86)\nRe - Rhenium (Atomic #: 75)\nPd - Palladium (Atomic #: 46)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Rg - Roentgenium"
+      },
+      {
+        "type": "text",
+        "content": "Md - Mendelevium"
+      },
+      {
+        "type": "text",
+        "content": "Rn - Radon"
+      },
+      {
+        "type": "text",
+        "content": "Re - Rhenium"
+      },
+      {
+        "type": "text",
+        "content": "Pd - Palladium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nHs - Hassium (Atomic #: 108)\nTl - Thallium (Atomic #: 81)\nHg - Mercury (Atomic #: 80)\nSm - Samarium (Atomic #: 62)\nY - Yttrium (Atomic #: 39)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Hs - Hassium"
+      },
+      {
+        "type": "text",
+        "content": "Tl - Thallium"
+      },
+      {
+        "type": "text",
+        "content": "Hg - Mercury"
+      },
+      {
+        "type": "text",
+        "content": "Sm - Samarium"
+      },
+      {
+        "type": "text",
+        "content": "Y - Yttrium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nFm - Fermium (Atomic #: 100)\nRa - Radium (Atomic #: 88)\nBa - Barium (Atomic #: 56)\nFe - Iron (Atomic #: 26)\nO - Oxygen (Atomic #: 8)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Fm - Fermium"
+      },
+      {
+        "type": "text",
+        "content": "Ra - Radium"
+      },
+      {
+        "type": "text",
+        "content": "Ba - Barium"
+      },
+      {
+        "type": "text",
+        "content": "Fe - Iron"
+      },
+      {
+        "type": "text",
+        "content": "O - Oxygen"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nOg - Oganesson (Atomic #: 118)\nBh - Bohrium (Atomic #: 107)\nOs - Osmium (Atomic #: 76)\nRe - Rhenium (Atomic #: 75)\nBe - Beryllium (Atomic #: 4)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Og - Oganesson"
+      },
+      {
+        "type": "text",
+        "content": "Bh - Bohrium"
+      },
+      {
+        "type": "text",
+        "content": "Os - Osmium"
+      },
+      {
+        "type": "text",
+        "content": "Re - Rhenium"
+      },
+      {
+        "type": "text",
+        "content": "Be - Beryllium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nRg - Roentgenium (Atomic #: 111)\nYb - Ytterbium (Atomic #: 70)\nPr - Praseodymium (Atomic #: 59)\nNe - Neon (Atomic #: 10)\nB - Boron (Atomic #: 5)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Rg - Roentgenium"
+      },
+      {
+        "type": "text",
+        "content": "Yb - Ytterbium"
+      },
+      {
+        "type": "text",
+        "content": "Pr - Praseodymium"
+      },
+      {
+        "type": "text",
+        "content": "Ne - Neon"
+      },
+      {
+        "type": "text",
+        "content": "B - Boron"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nLv - Livermorium (Atomic #: 116)\nRn - Radon (Atomic #: 86)\nTm - Thulium (Atomic #: 69)\nCs - Cesium (Atomic #: 55)\nNb - Niobium (Atomic #: 41)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Lv - Livermorium"
+      },
+      {
+        "type": "text",
+        "content": "Rn - Radon"
+      },
+      {
+        "type": "text",
+        "content": "Tm - Thulium"
+      },
+      {
+        "type": "text",
+        "content": "Cs - Cesium"
+      },
+      {
+        "type": "text",
+        "content": "Nb - Niobium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nAt - Astatine (Atomic #: 85)\nMo - Molybdenum (Atomic #: 42)\nMg - Magnesium (Atomic #: 12)\nNe - Neon (Atomic #: 10)\nF - Fluorine (Atomic #: 9)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "At - Astatine"
+      },
+      {
+        "type": "text",
+        "content": "Mo - Molybdenum"
+      },
+      {
+        "type": "text",
+        "content": "Mg - Magnesium"
+      },
+      {
+        "type": "text",
+        "content": "Ne - Neon"
+      },
+      {
+        "type": "text",
+        "content": "F - Fluorine"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nLv - Livermorium (Atomic #: 116)\nYb - Ytterbium (Atomic #: 70)\nNd - Neodymium (Atomic #: 60)\nCs - Cesium (Atomic #: 55)\nNi - Nickel (Atomic #: 28)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Lv - Livermorium"
+      },
+      {
+        "type": "text",
+        "content": "Yb - Ytterbium"
+      },
+      {
+        "type": "text",
+        "content": "Nd - Neodymium"
+      },
+      {
+        "type": "text",
+        "content": "Cs - Cesium"
+      },
+      {
+        "type": "text",
+        "content": "Ni - Nickel"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nCf - Californium (Atomic #: 98)\nPr - Praseodymium (Atomic #: 59)\nY - Yttrium (Atomic #: 39)\nTi - Titanium (Atomic #: 22)\nSc - Scandium (Atomic #: 21)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Cf - Californium"
+      },
+      {
+        "type": "text",
+        "content": "Pr - Praseodymium"
+      },
+      {
+        "type": "text",
+        "content": "Y - Yttrium"
+      },
+      {
+        "type": "text",
+        "content": "Ti - Titanium"
+      },
+      {
+        "type": "text",
+        "content": "Sc - Scandium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nRf - Rutherfordium (Atomic #: 104)\nMd - Mendelevium (Atomic #: 101)\nRe - Rhenium (Atomic #: 75)\nBa - Barium (Atomic #: 56)\nZr - Zirconium (Atomic #: 40)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Rf - Rutherfordium"
+      },
+      {
+        "type": "text",
+        "content": "Md - Mendelevium"
+      },
+      {
+        "type": "text",
+        "content": "Re - Rhenium"
+      },
+      {
+        "type": "text",
+        "content": "Ba - Barium"
+      },
+      {
+        "type": "text",
+        "content": "Zr - Zirconium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nAc - Actinium (Atomic #: 89)\nPt - Platinum (Atomic #: 78)\nOs - Osmium (Atomic #: 76)\nCr - Chromium (Atomic #: 24)\nN - Nitrogen (Atomic #: 7)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Ac - Actinium"
+      },
+      {
+        "type": "text",
+        "content": "Pt - Platinum"
+      },
+      {
+        "type": "text",
+        "content": "Os - Osmium"
+      },
+      {
+        "type": "text",
+        "content": "Cr - Chromium"
+      },
+      {
+        "type": "text",
+        "content": "N - Nitrogen"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nRa - Radium (Atomic #: 88)\nMn - Manganese (Atomic #: 25)\nTi - Titanium (Atomic #: 22)\nO - Oxygen (Atomic #: 8)\nLi - Lithium (Atomic #: 3)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Ra - Radium"
+      },
+      {
+        "type": "text",
+        "content": "Mn - Manganese"
+      },
+      {
+        "type": "text",
+        "content": "Ti - Titanium"
+      },
+      {
+        "type": "text",
+        "content": "O - Oxygen"
+      },
+      {
+        "type": "text",
+        "content": "Li - Lithium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nCn - Copernicium (Atomic #: 112)\nLr - Lawrencium (Atomic #: 103)\nBk - Berkelium (Atomic #: 97)\nBi - Bismuth (Atomic #: 83)\nSe - Selenium (Atomic #: 34)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Cn - Copernicium"
+      },
+      {
+        "type": "text",
+        "content": "Lr - Lawrencium"
+      },
+      {
+        "type": "text",
+        "content": "Bk - Berkelium"
+      },
+      {
+        "type": "text",
+        "content": "Bi - Bismuth"
+      },
+      {
+        "type": "text",
+        "content": "Se - Selenium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nCn - Copernicium (Atomic #: 112)\nFm - Fermium (Atomic #: 100)\nIn - Indium (Atomic #: 49)\nB - Boron (Atomic #: 5)\nLi - Lithium (Atomic #: 3)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Cn - Copernicium"
+      },
+      {
+        "type": "text",
+        "content": "Fm - Fermium"
+      },
+      {
+        "type": "text",
+        "content": "In - Indium"
+      },
+      {
+        "type": "text",
+        "content": "B - Boron"
+      },
+      {
+        "type": "text",
+        "content": "Li - Lithium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nHs - Hassium (Atomic #: 108)\nRf - Rutherfordium (Atomic #: 104)\nBi - Bismuth (Atomic #: 83)\nLu - Lutetium (Atomic #: 71)\nAs - Arsenic (Atomic #: 33)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Hs - Hassium"
+      },
+      {
+        "type": "text",
+        "content": "Rf - Rutherfordium"
+      },
+      {
+        "type": "text",
+        "content": "Bi - Bismuth"
+      },
+      {
+        "type": "text",
+        "content": "Lu - Lutetium"
+      },
+      {
+        "type": "text",
+        "content": "As - Arsenic"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nHs - Hassium (Atomic #: 108)\nFm - Fermium (Atomic #: 100)\nIr - Iridium (Atomic #: 77)\nRh - Rhodium (Atomic #: 45)\nBe - Beryllium (Atomic #: 4)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Hs - Hassium"
+      },
+      {
+        "type": "text",
+        "content": "Fm - Fermium"
+      },
+      {
+        "type": "text",
+        "content": "Ir - Iridium"
+      },
+      {
+        "type": "text",
+        "content": "Rh - Rhodium"
+      },
+      {
+        "type": "text",
+        "content": "Be - Beryllium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nNh - Nihonium (Atomic #: 113)\nRf - Rutherfordium (Atomic #: 104)\nW - Tungsten (Atomic #: 74)\nIn - Indium (Atomic #: 49)\nS - Sulfur (Atomic #: 16)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Nh - Nihonium"
+      },
+      {
+        "type": "text",
+        "content": "Rf - Rutherfordium"
+      },
+      {
+        "type": "text",
+        "content": "W - Tungsten"
+      },
+      {
+        "type": "text",
+        "content": "In - Indium"
+      },
+      {
+        "type": "text",
+        "content": "S - Sulfur"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nRf - Rutherfordium (Atomic #: 104)\nRn - Radon (Atomic #: 86)\nTc - Technetium (Atomic #: 43)\nZr - Zirconium (Atomic #: 40)\nGe - Germanium (Atomic #: 32)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Rf - Rutherfordium"
+      },
+      {
+        "type": "text",
+        "content": "Rn - Radon"
+      },
+      {
+        "type": "text",
+        "content": "Tc - Technetium"
+      },
+      {
+        "type": "text",
+        "content": "Zr - Zirconium"
+      },
+      {
+        "type": "text",
+        "content": "Ge - Germanium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nRe - Rhenium (Atomic #: 75)\nEu - Europium (Atomic #: 63)\nAs - Arsenic (Atomic #: 33)\nTi - Titanium (Atomic #: 22)\nCl - Chlorine (Atomic #: 17)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Re - Rhenium"
+      },
+      {
+        "type": "text",
+        "content": "Eu - Europium"
+      },
+      {
+        "type": "text",
+        "content": "As - Arsenic"
+      },
+      {
+        "type": "text",
+        "content": "Ti - Titanium"
+      },
+      {
+        "type": "text",
+        "content": "Cl - Chlorine"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nTa - Tantalum (Atomic #: 73)\nTm - Thulium (Atomic #: 69)\nTb - Terbium (Atomic #: 65)\nPm - Promethium (Atomic #: 61)\nNa - Sodium (Atomic #: 11)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Ta - Tantalum"
+      },
+      {
+        "type": "text",
+        "content": "Tm - Thulium"
+      },
+      {
+        "type": "text",
+        "content": "Tb - Terbium"
+      },
+      {
+        "type": "text",
+        "content": "Pm - Promethium"
+      },
+      {
+        "type": "text",
+        "content": "Na - Sodium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nRn - Radon (Atomic #: 86)\nPo - Polonium (Atomic #: 84)\nHo - Holmium (Atomic #: 67)\nCd - Cadmium (Atomic #: 48)\nNe - Neon (Atomic #: 10)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Rn - Radon"
+      },
+      {
+        "type": "text",
+        "content": "Po - Polonium"
+      },
+      {
+        "type": "text",
+        "content": "Ho - Holmium"
+      },
+      {
+        "type": "text",
+        "content": "Cd - Cadmium"
+      },
+      {
+        "type": "text",
+        "content": "Ne - Neon"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nTh - Thorium (Atomic #: 90)\nRn - Radon (Atomic #: 86)\nPr - Praseodymium (Atomic #: 59)\nV - Vanadium (Atomic #: 23)\nK - Potassium (Atomic #: 19)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Th - Thorium"
+      },
+      {
+        "type": "text",
+        "content": "Rn - Radon"
+      },
+      {
+        "type": "text",
+        "content": "Pr - Praseodymium"
+      },
+      {
+        "type": "text",
+        "content": "V - Vanadium"
+      },
+      {
+        "type": "text",
+        "content": "K - Potassium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nUue - Ununennium (Atomic #: 119)\nRn - Radon (Atomic #: 86)\nSb - Antimony (Atomic #: 51)\nZr - Zirconium (Atomic #: 40)\nGe - Germanium (Atomic #: 32)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Uue - Ununennium"
+      },
+      {
+        "type": "text",
+        "content": "Rn - Radon"
+      },
+      {
+        "type": "text",
+        "content": "Sb - Antimony"
+      },
+      {
+        "type": "text",
+        "content": "Zr - Zirconium"
+      },
+      {
+        "type": "text",
+        "content": "Ge - Germanium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nCn - Copernicium (Atomic #: 112)\nDb - Dubnium (Atomic #: 105)\nAu - Gold (Atomic #: 79)\nTe - Tellurium (Atomic #: 52)\nRh - Rhodium (Atomic #: 45)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Cn - Copernicium"
+      },
+      {
+        "type": "text",
+        "content": "Db - Dubnium"
+      },
+      {
+        "type": "text",
+        "content": "Au - Gold"
+      },
+      {
+        "type": "text",
+        "content": "Te - Tellurium"
+      },
+      {
+        "type": "text",
+        "content": "Rh - Rhodium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nDb - Dubnium (Atomic #: 105)\nRa - Radium (Atomic #: 88)\nRn - Radon (Atomic #: 86)\nNi - Nickel (Atomic #: 28)\nCa - Calcium (Atomic #: 20)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Db - Dubnium"
+      },
+      {
+        "type": "text",
+        "content": "Ra - Radium"
+      },
+      {
+        "type": "text",
+        "content": "Rn - Radon"
+      },
+      {
+        "type": "text",
+        "content": "Ni - Nickel"
+      },
+      {
+        "type": "text",
+        "content": "Ca - Calcium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nNh - Nihonium (Atomic #: 113)\nPa - Protactinium (Atomic #: 91)\nW - Tungsten (Atomic #: 74)\nSr - Strontium (Atomic #: 38)\nZn - Zinc (Atomic #: 30)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Nh - Nihonium"
+      },
+      {
+        "type": "text",
+        "content": "Pa - Protactinium"
+      },
+      {
+        "type": "text",
+        "content": "W - Tungsten"
+      },
+      {
+        "type": "text",
+        "content": "Sr - Strontium"
+      },
+      {
+        "type": "text",
+        "content": "Zn - Zinc"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nCm - Curium (Atomic #: 96)\nPm - Promethium (Atomic #: 61)\nAg - Silver (Atomic #: 47)\nMo - Molybdenum (Atomic #: 42)\nCa - Calcium (Atomic #: 20)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Cm - Curium"
+      },
+      {
+        "type": "text",
+        "content": "Pm - Promethium"
+      },
+      {
+        "type": "text",
+        "content": "Ag - Silver"
+      },
+      {
+        "type": "text",
+        "content": "Mo - Molybdenum"
+      },
+      {
+        "type": "text",
+        "content": "Ca - Calcium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nHs - Hassium (Atomic #: 108)\nSn - Tin (Atomic #: 50)\nBr - Bromine (Atomic #: 35)\nZn - Zinc (Atomic #: 30)\nB - Boron (Atomic #: 5)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Hs - Hassium"
+      },
+      {
+        "type": "text",
+        "content": "Sn - Tin"
+      },
+      {
+        "type": "text",
+        "content": "Br - Bromine"
+      },
+      {
+        "type": "text",
+        "content": "Zn - Zinc"
+      },
+      {
+        "type": "text",
+        "content": "B - Boron"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nHs - Hassium (Atomic #: 108)\nEs - Einsteinium (Atomic #: 99)\nBk - Berkelium (Atomic #: 97)\nKr - Krypton (Atomic #: 36)\nF - Fluorine (Atomic #: 9)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Hs - Hassium"
+      },
+      {
+        "type": "text",
+        "content": "Es - Einsteinium"
+      },
+      {
+        "type": "text",
+        "content": "Bk - Berkelium"
+      },
+      {
+        "type": "text",
+        "content": "Kr - Krypton"
+      },
+      {
+        "type": "text",
+        "content": "F - Fluorine"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nMt - Meitnerium (Atomic #: 109)\nRa - Radium (Atomic #: 88)\nGd - Gadolinium (Atomic #: 64)\nZr - Zirconium (Atomic #: 40)\nCo - Cobalt (Atomic #: 27)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Mt - Meitnerium"
+      },
+      {
+        "type": "text",
+        "content": "Ra - Radium"
+      },
+      {
+        "type": "text",
+        "content": "Gd - Gadolinium"
+      },
+      {
+        "type": "text",
+        "content": "Zr - Zirconium"
+      },
+      {
+        "type": "text",
+        "content": "Co - Cobalt"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nRg - Roentgenium (Atomic #: 111)\nEr - Erbium (Atomic #: 68)\nSb - Antimony (Atomic #: 51)\nPd - Palladium (Atomic #: 46)\nAs - Arsenic (Atomic #: 33)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Rg - Roentgenium"
+      },
+      {
+        "type": "text",
+        "content": "Er - Erbium"
+      },
+      {
+        "type": "text",
+        "content": "Sb - Antimony"
+      },
+      {
+        "type": "text",
+        "content": "Pd - Palladium"
+      },
+      {
+        "type": "text",
+        "content": "As - Arsenic"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nCf - Californium (Atomic #: 98)\nPt - Platinum (Atomic #: 78)\nSm - Samarium (Atomic #: 62)\nI - Iodine (Atomic #: 53)\nAr - Argon (Atomic #: 18)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Cf - Californium"
+      },
+      {
+        "type": "text",
+        "content": "Pt - Platinum"
+      },
+      {
+        "type": "text",
+        "content": "Sm - Samarium"
+      },
+      {
+        "type": "text",
+        "content": "I - Iodine"
+      },
+      {
+        "type": "text",
+        "content": "Ar - Argon"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nGd - Gadolinium (Atomic #: 64)\nSb - Antimony (Atomic #: 51)\nIn - Indium (Atomic #: 49)\nY - Yttrium (Atomic #: 39)\nLi - Lithium (Atomic #: 3)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Gd - Gadolinium"
+      },
+      {
+        "type": "text",
+        "content": "Sb - Antimony"
+      },
+      {
+        "type": "text",
+        "content": "In - Indium"
+      },
+      {
+        "type": "text",
+        "content": "Y - Yttrium"
+      },
+      {
+        "type": "text",
+        "content": "Li - Lithium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nDs - Darmstadtium (Atomic #: 110)\nCf - Californium (Atomic #: 98)\nBk - Berkelium (Atomic #: 97)\nBi - Bismuth (Atomic #: 83)\nTl - Thallium (Atomic #: 81)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Ds - Darmstadtium"
+      },
+      {
+        "type": "text",
+        "content": "Cf - Californium"
+      },
+      {
+        "type": "text",
+        "content": "Bk - Berkelium"
+      },
+      {
+        "type": "text",
+        "content": "Bi - Bismuth"
+      },
+      {
+        "type": "text",
+        "content": "Tl - Thallium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nTh - Thorium (Atomic #: 90)\nEu - Europium (Atomic #: 63)\nRu - Ruthenium (Atomic #: 44)\nGe - Germanium (Atomic #: 32)\nCu - Copper (Atomic #: 29)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Th - Thorium"
+      },
+      {
+        "type": "text",
+        "content": "Eu - Europium"
+      },
+      {
+        "type": "text",
+        "content": "Ru - Ruthenium"
+      },
+      {
+        "type": "text",
+        "content": "Ge - Germanium"
+      },
+      {
+        "type": "text",
+        "content": "Cu - Copper"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nPu - Plutonium (Atomic #: 94)\nCe - Cerium (Atomic #: 58)\nAg - Silver (Atomic #: 47)\nRu - Ruthenium (Atomic #: 44)\nMo - Molybdenum (Atomic #: 42)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Pu - Plutonium"
+      },
+      {
+        "type": "text",
+        "content": "Ce - Cerium"
+      },
+      {
+        "type": "text",
+        "content": "Ag - Silver"
+      },
+      {
+        "type": "text",
+        "content": "Ru - Ruthenium"
+      },
+      {
+        "type": "text",
+        "content": "Mo - Molybdenum"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nAu - Gold (Atomic #: 79)\nPm - Promethium (Atomic #: 61)\nZr - Zirconium (Atomic #: 40)\nY - Yttrium (Atomic #: 39)\nO - Oxygen (Atomic #: 8)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Au - Gold"
+      },
+      {
+        "type": "text",
+        "content": "Pm - Promethium"
+      },
+      {
+        "type": "text",
+        "content": "Zr - Zirconium"
+      },
+      {
+        "type": "text",
+        "content": "Y - Yttrium"
+      },
+      {
+        "type": "text",
+        "content": "O - Oxygen"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nOg - Oganesson (Atomic #: 118)\nPt - Platinum (Atomic #: 78)\nTm - Thulium (Atomic #: 69)\nPd - Palladium (Atomic #: 46)\nMg - Magnesium (Atomic #: 12)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Og - Oganesson"
+      },
+      {
+        "type": "text",
+        "content": "Pt - Platinum"
+      },
+      {
+        "type": "text",
+        "content": "Tm - Thulium"
+      },
+      {
+        "type": "text",
+        "content": "Pd - Palladium"
+      },
+      {
+        "type": "text",
+        "content": "Mg - Magnesium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nSg - Seaborgium (Atomic #: 106)\nHo - Holmium (Atomic #: 67)\nNb - Niobium (Atomic #: 41)\nY - Yttrium (Atomic #: 39)\nK - Potassium (Atomic #: 19)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Sg - Seaborgium"
+      },
+      {
+        "type": "text",
+        "content": "Ho - Holmium"
+      },
+      {
+        "type": "text",
+        "content": "Nb - Niobium"
+      },
+      {
+        "type": "text",
+        "content": "Y - Yttrium"
+      },
+      {
+        "type": "text",
+        "content": "K - Potassium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nCf - Californium (Atomic #: 98)\nRa - Radium (Atomic #: 88)\nOs - Osmium (Atomic #: 76)\nIn - Indium (Atomic #: 49)\nNb - Niobium (Atomic #: 41)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Cf - Californium"
+      },
+      {
+        "type": "text",
+        "content": "Ra - Radium"
+      },
+      {
+        "type": "text",
+        "content": "Os - Osmium"
+      },
+      {
+        "type": "text",
+        "content": "In - Indium"
+      },
+      {
+        "type": "text",
+        "content": "Nb - Niobium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nSg - Seaborgium (Atomic #: 106)\nFr - Francium (Atomic #: 87)\nW - Tungsten (Atomic #: 74)\nEu - Europium (Atomic #: 63)\nNe - Neon (Atomic #: 10)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Sg - Seaborgium"
+      },
+      {
+        "type": "text",
+        "content": "Fr - Francium"
+      },
+      {
+        "type": "text",
+        "content": "W - Tungsten"
+      },
+      {
+        "type": "text",
+        "content": "Eu - Europium"
+      },
+      {
+        "type": "text",
+        "content": "Ne - Neon"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nLr - Lawrencium (Atomic #: 103)\nAu - Gold (Atomic #: 79)\nLu - Lutetium (Atomic #: 71)\nS - Sulfur (Atomic #: 16)\nAl - Aluminium (Atomic #: 13)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Lr - Lawrencium"
+      },
+      {
+        "type": "text",
+        "content": "Au - Gold"
+      },
+      {
+        "type": "text",
+        "content": "Lu - Lutetium"
+      },
+      {
+        "type": "text",
+        "content": "S - Sulfur"
+      },
+      {
+        "type": "text",
+        "content": "Al - Aluminium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nLv - Livermorium (Atomic #: 116)\nPa - Protactinium (Atomic #: 91)\nTc - Technetium (Atomic #: 43)\nNb - Niobium (Atomic #: 41)\nMn - Manganese (Atomic #: 25)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Lv - Livermorium"
+      },
+      {
+        "type": "text",
+        "content": "Pa - Protactinium"
+      },
+      {
+        "type": "text",
+        "content": "Tc - Technetium"
+      },
+      {
+        "type": "text",
+        "content": "Nb - Niobium"
+      },
+      {
+        "type": "text",
+        "content": "Mn - Manganese"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nFl - Flerovium (Atomic #: 114)\nLu - Lutetium (Atomic #: 71)\nRu - Ruthenium (Atomic #: 44)\nSr - Strontium (Atomic #: 38)\nKr - Krypton (Atomic #: 36)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Fl - Flerovium"
+      },
+      {
+        "type": "text",
+        "content": "Lu - Lutetium"
+      },
+      {
+        "type": "text",
+        "content": "Ru - Ruthenium"
+      },
+      {
+        "type": "text",
+        "content": "Sr - Strontium"
+      },
+      {
+        "type": "text",
+        "content": "Kr - Krypton"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nSm - Samarium (Atomic #: 62)\nXe - Xenon (Atomic #: 54)\nKr - Krypton (Atomic #: 36)\nNi - Nickel (Atomic #: 28)\nAl - Aluminium (Atomic #: 13)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Sm - Samarium"
+      },
+      {
+        "type": "text",
+        "content": "Xe - Xenon"
+      },
+      {
+        "type": "text",
+        "content": "Kr - Krypton"
+      },
+      {
+        "type": "text",
+        "content": "Ni - Nickel"
+      },
+      {
+        "type": "text",
+        "content": "Al - Aluminium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nDs - Darmstadtium (Atomic #: 110)\nDb - Dubnium (Atomic #: 105)\nRn - Radon (Atomic #: 86)\nBi - Bismuth (Atomic #: 83)\nGa - Gallium (Atomic #: 31)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Ds - Darmstadtium"
+      },
+      {
+        "type": "text",
+        "content": "Db - Dubnium"
+      },
+      {
+        "type": "text",
+        "content": "Rn - Radon"
+      },
+      {
+        "type": "text",
+        "content": "Bi - Bismuth"
+      },
+      {
+        "type": "text",
+        "content": "Ga - Gallium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nAm - Americium (Atomic #: 95)\nHf - Hafnium (Atomic #: 72)\nI - Iodine (Atomic #: 53)\nCd - Cadmium (Atomic #: 48)\nFe - Iron (Atomic #: 26)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Am - Americium"
+      },
+      {
+        "type": "text",
+        "content": "Hf - Hafnium"
+      },
+      {
+        "type": "text",
+        "content": "I - Iodine"
+      },
+      {
+        "type": "text",
+        "content": "Cd - Cadmium"
+      },
+      {
+        "type": "text",
+        "content": "Fe - Iron"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nUue - Ununennium (Atomic #: 119)\nBk - Berkelium (Atomic #: 97)\nDy - Dysprosium (Atomic #: 66)\nRb - Rubidium (Atomic #: 37)\nV - Vanadium (Atomic #: 23)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Uue - Ununennium"
+      },
+      {
+        "type": "text",
+        "content": "Bk - Berkelium"
+      },
+      {
+        "type": "text",
+        "content": "Dy - Dysprosium"
+      },
+      {
+        "type": "text",
+        "content": "Rb - Rubidium"
+      },
+      {
+        "type": "text",
+        "content": "V - Vanadium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nUue - Ununennium (Atomic #: 119)\nAt - Astatine (Atomic #: 85)\nBa - Barium (Atomic #: 56)\nTc - Technetium (Atomic #: 43)\nKr - Krypton (Atomic #: 36)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Uue - Ununennium"
+      },
+      {
+        "type": "text",
+        "content": "At - Astatine"
+      },
+      {
+        "type": "text",
+        "content": "Ba - Barium"
+      },
+      {
+        "type": "text",
+        "content": "Tc - Technetium"
+      },
+      {
+        "type": "text",
+        "content": "Kr - Krypton"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nAc - Actinium (Atomic #: 89)\nPm - Promethium (Atomic #: 61)\nNd - Neodymium (Atomic #: 60)\nNb - Niobium (Atomic #: 41)\nRb - Rubidium (Atomic #: 37)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Ac - Actinium"
+      },
+      {
+        "type": "text",
+        "content": "Pm - Promethium"
+      },
+      {
+        "type": "text",
+        "content": "Nd - Neodymium"
+      },
+      {
+        "type": "text",
+        "content": "Nb - Niobium"
+      },
+      {
+        "type": "text",
+        "content": "Rb - Rubidium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nSg - Seaborgium (Atomic #: 106)\nLr - Lawrencium (Atomic #: 103)\nOs - Osmium (Atomic #: 76)\nSb - Antimony (Atomic #: 51)\nAr - Argon (Atomic #: 18)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Sg - Seaborgium"
+      },
+      {
+        "type": "text",
+        "content": "Lr - Lawrencium"
+      },
+      {
+        "type": "text",
+        "content": "Os - Osmium"
+      },
+      {
+        "type": "text",
+        "content": "Sb - Antimony"
+      },
+      {
+        "type": "text",
+        "content": "Ar - Argon"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nSm - Samarium (Atomic #: 62)\nCd - Cadmium (Atomic #: 48)\nSr - Strontium (Atomic #: 38)\nAl - Aluminium (Atomic #: 13)\nLi - Lithium (Atomic #: 3)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Sm - Samarium"
+      },
+      {
+        "type": "text",
+        "content": "Cd - Cadmium"
+      },
+      {
+        "type": "text",
+        "content": "Sr - Strontium"
+      },
+      {
+        "type": "text",
+        "content": "Al - Aluminium"
+      },
+      {
+        "type": "text",
+        "content": "Li - Lithium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (highest to lowest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (highest to lowest) is:\nUue - Ununennium (Atomic #: 119)\nCn - Copernicium (Atomic #: 112)\nPb - Lead (Atomic #: 82)\nYb - Ytterbium (Atomic #: 70)\nGd - Gadolinium (Atomic #: 64)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Uue - Ununennium"
+      },
+      {
+        "type": "text",
+        "content": "Cn - Copernicium"
+      },
+      {
+        "type": "text",
+        "content": "Pb - Lead"
+      },
+      {
+        "type": "text",
+        "content": "Yb - Ytterbium"
+      },
+      {
+        "type": "text",
+        "content": "Gd - Gadolinium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nGe - Germanium (Atomic #: 32)\nAs - Arsenic (Atomic #: 33)\nAu - Gold (Atomic #: 79)\nSg - Seaborgium (Atomic #: 106)\nMc - Moscovium (Atomic #: 115)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Ge - Germanium"
+      },
+      {
+        "type": "text",
+        "content": "As - Arsenic"
+      },
+      {
+        "type": "text",
+        "content": "Au - Gold"
+      },
+      {
+        "type": "text",
+        "content": "Sg - Seaborgium"
+      },
+      {
+        "type": "text",
+        "content": "Mc - Moscovium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nMn - Manganese (Atomic #: 25)\nEu - Europium (Atomic #: 63)\nAu - Gold (Atomic #: 79)\nCf - Californium (Atomic #: 98)\nRg - Roentgenium (Atomic #: 111)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Mn - Manganese"
+      },
+      {
+        "type": "text",
+        "content": "Eu - Europium"
+      },
+      {
+        "type": "text",
+        "content": "Au - Gold"
+      },
+      {
+        "type": "text",
+        "content": "Cf - Californium"
+      },
+      {
+        "type": "text",
+        "content": "Rg - Roentgenium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nCr - Chromium (Atomic #: 24)\nFl - Flerovium (Atomic #: 114)\nLv - Livermorium (Atomic #: 116)\nOg - Oganesson (Atomic #: 118)\nUue - Ununennium (Atomic #: 119)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Cr - Chromium"
+      },
+      {
+        "type": "text",
+        "content": "Fl - Flerovium"
+      },
+      {
+        "type": "text",
+        "content": "Lv - Livermorium"
+      },
+      {
+        "type": "text",
+        "content": "Og - Oganesson"
+      },
+      {
+        "type": "text",
+        "content": "Uue - Ununennium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nH - Hydrogen (Atomic #: 1)\nY - Yttrium (Atomic #: 39)\nTe - Tellurium (Atomic #: 52)\nPt - Platinum (Atomic #: 78)\nAc - Actinium (Atomic #: 89)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "H - Hydrogen"
+      },
+      {
+        "type": "text",
+        "content": "Y - Yttrium"
+      },
+      {
+        "type": "text",
+        "content": "Te - Tellurium"
+      },
+      {
+        "type": "text",
+        "content": "Pt - Platinum"
+      },
+      {
+        "type": "text",
+        "content": "Ac - Actinium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nLi - Lithium (Atomic #: 3)\nS - Sulfur (Atomic #: 16)\nAg - Silver (Atomic #: 47)\nAc - Actinium (Atomic #: 89)\nFl - Flerovium (Atomic #: 114)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Li - Lithium"
+      },
+      {
+        "type": "text",
+        "content": "S - Sulfur"
+      },
+      {
+        "type": "text",
+        "content": "Ag - Silver"
+      },
+      {
+        "type": "text",
+        "content": "Ac - Actinium"
+      },
+      {
+        "type": "text",
+        "content": "Fl - Flerovium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nB - Boron (Atomic #: 5)\nNe - Neon (Atomic #: 10)\nNd - Neodymium (Atomic #: 60)\nDb - Dubnium (Atomic #: 105)\nMc - Moscovium (Atomic #: 115)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "B - Boron"
+      },
+      {
+        "type": "text",
+        "content": "Ne - Neon"
+      },
+      {
+        "type": "text",
+        "content": "Nd - Neodymium"
+      },
+      {
+        "type": "text",
+        "content": "Db - Dubnium"
+      },
+      {
+        "type": "text",
+        "content": "Mc - Moscovium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nH - Hydrogen (Atomic #: 1)\nCr - Chromium (Atomic #: 24)\nCu - Copper (Atomic #: 29)\nLu - Lutetium (Atomic #: 71)\nSg - Seaborgium (Atomic #: 106)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "H - Hydrogen"
+      },
+      {
+        "type": "text",
+        "content": "Cr - Chromium"
+      },
+      {
+        "type": "text",
+        "content": "Cu - Copper"
+      },
+      {
+        "type": "text",
+        "content": "Lu - Lutetium"
+      },
+      {
+        "type": "text",
+        "content": "Sg - Seaborgium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nH - Hydrogen (Atomic #: 1)\nNi - Nickel (Atomic #: 28)\nSe - Selenium (Atomic #: 34)\nYb - Ytterbium (Atomic #: 70)\nCf - Californium (Atomic #: 98)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "H - Hydrogen"
+      },
+      {
+        "type": "text",
+        "content": "Ni - Nickel"
+      },
+      {
+        "type": "text",
+        "content": "Se - Selenium"
+      },
+      {
+        "type": "text",
+        "content": "Yb - Ytterbium"
+      },
+      {
+        "type": "text",
+        "content": "Cf - Californium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nSc - Scandium (Atomic #: 21)\nGe - Germanium (Atomic #: 32)\nHf - Hafnium (Atomic #: 72)\nPb - Lead (Atomic #: 82)\nAc - Actinium (Atomic #: 89)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Sc - Scandium"
+      },
+      {
+        "type": "text",
+        "content": "Ge - Germanium"
+      },
+      {
+        "type": "text",
+        "content": "Hf - Hafnium"
+      },
+      {
+        "type": "text",
+        "content": "Pb - Lead"
+      },
+      {
+        "type": "text",
+        "content": "Ac - Actinium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nMg - Magnesium (Atomic #: 12)\nLa - Lanthanum (Atomic #: 57)\nHf - Hafnium (Atomic #: 72)\nPo - Polonium (Atomic #: 84)\nSg - Seaborgium (Atomic #: 106)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Mg - Magnesium"
+      },
+      {
+        "type": "text",
+        "content": "La - Lanthanum"
+      },
+      {
+        "type": "text",
+        "content": "Hf - Hafnium"
+      },
+      {
+        "type": "text",
+        "content": "Po - Polonium"
+      },
+      {
+        "type": "text",
+        "content": "Sg - Seaborgium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nH - Hydrogen (Atomic #: 1)\nTi - Titanium (Atomic #: 22)\nPr - Praseodymium (Atomic #: 59)\nEs - Einsteinium (Atomic #: 99)\nTs - Tennessine (Atomic #: 117)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "H - Hydrogen"
+      },
+      {
+        "type": "text",
+        "content": "Ti - Titanium"
+      },
+      {
+        "type": "text",
+        "content": "Pr - Praseodymium"
+      },
+      {
+        "type": "text",
+        "content": "Es - Einsteinium"
+      },
+      {
+        "type": "text",
+        "content": "Ts - Tennessine"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nF - Fluorine (Atomic #: 9)\nSi - Silicon (Atomic #: 14)\nI - Iodine (Atomic #: 53)\nAt - Astatine (Atomic #: 85)\nFr - Francium (Atomic #: 87)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "F - Fluorine"
+      },
+      {
+        "type": "text",
+        "content": "Si - Silicon"
+      },
+      {
+        "type": "text",
+        "content": "I - Iodine"
+      },
+      {
+        "type": "text",
+        "content": "At - Astatine"
+      },
+      {
+        "type": "text",
+        "content": "Fr - Francium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nRb - Rubidium (Atomic #: 37)\nCe - Cerium (Atomic #: 58)\nTa - Tantalum (Atomic #: 73)\nFl - Flerovium (Atomic #: 114)\nTs - Tennessine (Atomic #: 117)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Rb - Rubidium"
+      },
+      {
+        "type": "text",
+        "content": "Ce - Cerium"
+      },
+      {
+        "type": "text",
+        "content": "Ta - Tantalum"
+      },
+      {
+        "type": "text",
+        "content": "Fl - Flerovium"
+      },
+      {
+        "type": "text",
+        "content": "Ts - Tennessine"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nC - Carbon (Atomic #: 6)\nRh - Rhodium (Atomic #: 45)\nDy - Dysprosium (Atomic #: 66)\nAm - Americium (Atomic #: 95)\nBk - Berkelium (Atomic #: 97)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "C - Carbon"
+      },
+      {
+        "type": "text",
+        "content": "Rh - Rhodium"
+      },
+      {
+        "type": "text",
+        "content": "Dy - Dysprosium"
+      },
+      {
+        "type": "text",
+        "content": "Am - Americium"
+      },
+      {
+        "type": "text",
+        "content": "Bk - Berkelium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nH - Hydrogen (Atomic #: 1)\nN - Nitrogen (Atomic #: 7)\nPo - Polonium (Atomic #: 84)\nPa - Protactinium (Atomic #: 91)\nPu - Plutonium (Atomic #: 94)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "H - Hydrogen"
+      },
+      {
+        "type": "text",
+        "content": "N - Nitrogen"
+      },
+      {
+        "type": "text",
+        "content": "Po - Polonium"
+      },
+      {
+        "type": "text",
+        "content": "Pa - Protactinium"
+      },
+      {
+        "type": "text",
+        "content": "Pu - Plutonium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nHe - Helium (Atomic #: 2)\nY - Yttrium (Atomic #: 39)\nMo - Molybdenum (Atomic #: 42)\nTl - Thallium (Atomic #: 81)\nLv - Livermorium (Atomic #: 116)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "He - Helium"
+      },
+      {
+        "type": "text",
+        "content": "Y - Yttrium"
+      },
+      {
+        "type": "text",
+        "content": "Mo - Molybdenum"
+      },
+      {
+        "type": "text",
+        "content": "Tl - Thallium"
+      },
+      {
+        "type": "text",
+        "content": "Lv - Livermorium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nMg - Magnesium (Atomic #: 12)\nY - Yttrium (Atomic #: 39)\nFm - Fermium (Atomic #: 100)\nFl - Flerovium (Atomic #: 114)\nUue - Ununennium (Atomic #: 119)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Mg - Magnesium"
+      },
+      {
+        "type": "text",
+        "content": "Y - Yttrium"
+      },
+      {
+        "type": "text",
+        "content": "Fm - Fermium"
+      },
+      {
+        "type": "text",
+        "content": "Fl - Flerovium"
+      },
+      {
+        "type": "text",
+        "content": "Uue - Ununennium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nLi - Lithium (Atomic #: 3)\nMg - Magnesium (Atomic #: 12)\nGa - Gallium (Atomic #: 31)\nGe - Germanium (Atomic #: 32)\nPr - Praseodymium (Atomic #: 59)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Li - Lithium"
+      },
+      {
+        "type": "text",
+        "content": "Mg - Magnesium"
+      },
+      {
+        "type": "text",
+        "content": "Ga - Gallium"
+      },
+      {
+        "type": "text",
+        "content": "Ge - Germanium"
+      },
+      {
+        "type": "text",
+        "content": "Pr - Praseodymium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nGe - Germanium (Atomic #: 32)\nY - Yttrium (Atomic #: 39)\nRh - Rhodium (Atomic #: 45)\nHg - Mercury (Atomic #: 80)\nNo - Nobelium (Atomic #: 102)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Ge - Germanium"
+      },
+      {
+        "type": "text",
+        "content": "Y - Yttrium"
+      },
+      {
+        "type": "text",
+        "content": "Rh - Rhodium"
+      },
+      {
+        "type": "text",
+        "content": "Hg - Mercury"
+      },
+      {
+        "type": "text",
+        "content": "No - Nobelium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nH - Hydrogen (Atomic #: 1)\nCr - Chromium (Atomic #: 24)\nZr - Zirconium (Atomic #: 40)\nAc - Actinium (Atomic #: 89)\nDs - Darmstadtium (Atomic #: 110)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "H - Hydrogen"
+      },
+      {
+        "type": "text",
+        "content": "Cr - Chromium"
+      },
+      {
+        "type": "text",
+        "content": "Zr - Zirconium"
+      },
+      {
+        "type": "text",
+        "content": "Ac - Actinium"
+      },
+      {
+        "type": "text",
+        "content": "Ds - Darmstadtium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nHe - Helium (Atomic #: 2)\nLi - Lithium (Atomic #: 3)\nOs - Osmium (Atomic #: 76)\nCf - Californium (Atomic #: 98)\nLr - Lawrencium (Atomic #: 103)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "He - Helium"
+      },
+      {
+        "type": "text",
+        "content": "Li - Lithium"
+      },
+      {
+        "type": "text",
+        "content": "Os - Osmium"
+      },
+      {
+        "type": "text",
+        "content": "Cf - Californium"
+      },
+      {
+        "type": "text",
+        "content": "Lr - Lawrencium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nO - Oxygen (Atomic #: 8)\nZr - Zirconium (Atomic #: 40)\nAg - Silver (Atomic #: 47)\nBi - Bismuth (Atomic #: 83)\nMc - Moscovium (Atomic #: 115)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "O - Oxygen"
+      },
+      {
+        "type": "text",
+        "content": "Zr - Zirconium"
+      },
+      {
+        "type": "text",
+        "content": "Ag - Silver"
+      },
+      {
+        "type": "text",
+        "content": "Bi - Bismuth"
+      },
+      {
+        "type": "text",
+        "content": "Mc - Moscovium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nN - Nitrogen (Atomic #: 7)\nPm - Promethium (Atomic #: 61)\nBk - Berkelium (Atomic #: 97)\nBh - Bohrium (Atomic #: 107)\nHs - Hassium (Atomic #: 108)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "N - Nitrogen"
+      },
+      {
+        "type": "text",
+        "content": "Pm - Promethium"
+      },
+      {
+        "type": "text",
+        "content": "Bk - Berkelium"
+      },
+      {
+        "type": "text",
+        "content": "Bh - Bohrium"
+      },
+      {
+        "type": "text",
+        "content": "Hs - Hassium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nSn - Tin (Atomic #: 50)\nXe - Xenon (Atomic #: 54)\nNd - Neodymium (Atomic #: 60)\nDy - Dysprosium (Atomic #: 66)\nAu - Gold (Atomic #: 79)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Sn - Tin"
+      },
+      {
+        "type": "text",
+        "content": "Xe - Xenon"
+      },
+      {
+        "type": "text",
+        "content": "Nd - Neodymium"
+      },
+      {
+        "type": "text",
+        "content": "Dy - Dysprosium"
+      },
+      {
+        "type": "text",
+        "content": "Au - Gold"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nCs - Cesium (Atomic #: 55)\nPm - Promethium (Atomic #: 61)\nLu - Lutetium (Atomic #: 71)\nAt - Astatine (Atomic #: 85)\nCf - Californium (Atomic #: 98)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Cs - Cesium"
+      },
+      {
+        "type": "text",
+        "content": "Pm - Promethium"
+      },
+      {
+        "type": "text",
+        "content": "Lu - Lutetium"
+      },
+      {
+        "type": "text",
+        "content": "At - Astatine"
+      },
+      {
+        "type": "text",
+        "content": "Cf - Californium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nH - Hydrogen (Atomic #: 1)\nCo - Cobalt (Atomic #: 27)\nTa - Tantalum (Atomic #: 73)\nRa - Radium (Atomic #: 88)\nTs - Tennessine (Atomic #: 117)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "H - Hydrogen"
+      },
+      {
+        "type": "text",
+        "content": "Co - Cobalt"
+      },
+      {
+        "type": "text",
+        "content": "Ta - Tantalum"
+      },
+      {
+        "type": "text",
+        "content": "Ra - Radium"
+      },
+      {
+        "type": "text",
+        "content": "Ts - Tennessine"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nSr - Strontium (Atomic #: 38)\nTe - Tellurium (Atomic #: 52)\nPr - Praseodymium (Atomic #: 59)\nPu - Plutonium (Atomic #: 94)\nCm - Curium (Atomic #: 96)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Sr - Strontium"
+      },
+      {
+        "type": "text",
+        "content": "Te - Tellurium"
+      },
+      {
+        "type": "text",
+        "content": "Pr - Praseodymium"
+      },
+      {
+        "type": "text",
+        "content": "Pu - Plutonium"
+      },
+      {
+        "type": "text",
+        "content": "Cm - Curium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nBr - Bromine (Atomic #: 35)\nKr - Krypton (Atomic #: 36)\nAg - Silver (Atomic #: 47)\nNd - Neodymium (Atomic #: 60)\nHo - Holmium (Atomic #: 67)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Br - Bromine"
+      },
+      {
+        "type": "text",
+        "content": "Kr - Krypton"
+      },
+      {
+        "type": "text",
+        "content": "Ag - Silver"
+      },
+      {
+        "type": "text",
+        "content": "Nd - Neodymium"
+      },
+      {
+        "type": "text",
+        "content": "Ho - Holmium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nSc - Scandium (Atomic #: 21)\nMo - Molybdenum (Atomic #: 42)\nCe - Cerium (Atomic #: 58)\nPr - Praseodymium (Atomic #: 59)\nEs - Einsteinium (Atomic #: 99)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Sc - Scandium"
+      },
+      {
+        "type": "text",
+        "content": "Mo - Molybdenum"
+      },
+      {
+        "type": "text",
+        "content": "Ce - Cerium"
+      },
+      {
+        "type": "text",
+        "content": "Pr - Praseodymium"
+      },
+      {
+        "type": "text",
+        "content": "Es - Einsteinium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nNa - Sodium (Atomic #: 11)\nGe - Germanium (Atomic #: 32)\nZr - Zirconium (Atomic #: 40)\nNp - Neptunium (Atomic #: 93)\nNh - Nihonium (Atomic #: 113)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Na - Sodium"
+      },
+      {
+        "type": "text",
+        "content": "Ge - Germanium"
+      },
+      {
+        "type": "text",
+        "content": "Zr - Zirconium"
+      },
+      {
+        "type": "text",
+        "content": "Np - Neptunium"
+      },
+      {
+        "type": "text",
+        "content": "Nh - Nihonium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nK - Potassium (Atomic #: 19)\nBa - Barium (Atomic #: 56)\nBi - Bismuth (Atomic #: 83)\nBh - Bohrium (Atomic #: 107)\nTs - Tennessine (Atomic #: 117)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "K - Potassium"
+      },
+      {
+        "type": "text",
+        "content": "Ba - Barium"
+      },
+      {
+        "type": "text",
+        "content": "Bi - Bismuth"
+      },
+      {
+        "type": "text",
+        "content": "Bh - Bohrium"
+      },
+      {
+        "type": "text",
+        "content": "Ts - Tennessine"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nTi - Titanium (Atomic #: 22)\nKr - Krypton (Atomic #: 36)\nTm - Thulium (Atomic #: 69)\nOs - Osmium (Atomic #: 76)\nMt - Meitnerium (Atomic #: 109)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Ti - Titanium"
+      },
+      {
+        "type": "text",
+        "content": "Kr - Krypton"
+      },
+      {
+        "type": "text",
+        "content": "Tm - Thulium"
+      },
+      {
+        "type": "text",
+        "content": "Os - Osmium"
+      },
+      {
+        "type": "text",
+        "content": "Mt - Meitnerium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nCl - Chlorine (Atomic #: 17)\nZr - Zirconium (Atomic #: 40)\nSm - Samarium (Atomic #: 62)\nTh - Thorium (Atomic #: 90)\nFl - Flerovium (Atomic #: 114)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Cl - Chlorine"
+      },
+      {
+        "type": "text",
+        "content": "Zr - Zirconium"
+      },
+      {
+        "type": "text",
+        "content": "Sm - Samarium"
+      },
+      {
+        "type": "text",
+        "content": "Th - Thorium"
+      },
+      {
+        "type": "text",
+        "content": "Fl - Flerovium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nHe - Helium (Atomic #: 2)\nB - Boron (Atomic #: 5)\nSi - Silicon (Atomic #: 14)\nPm - Promethium (Atomic #: 61)\nEs - Einsteinium (Atomic #: 99)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "He - Helium"
+      },
+      {
+        "type": "text",
+        "content": "B - Boron"
+      },
+      {
+        "type": "text",
+        "content": "Si - Silicon"
+      },
+      {
+        "type": "text",
+        "content": "Pm - Promethium"
+      },
+      {
+        "type": "text",
+        "content": "Es - Einsteinium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nLi - Lithium (Atomic #: 3)\nIn - Indium (Atomic #: 49)\nIr - Iridium (Atomic #: 77)\nPt - Platinum (Atomic #: 78)\nHg - Mercury (Atomic #: 80)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Li - Lithium"
+      },
+      {
+        "type": "text",
+        "content": "In - Indium"
+      },
+      {
+        "type": "text",
+        "content": "Ir - Iridium"
+      },
+      {
+        "type": "text",
+        "content": "Pt - Platinum"
+      },
+      {
+        "type": "text",
+        "content": "Hg - Mercury"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nV - Vanadium (Atomic #: 23)\nCe - Cerium (Atomic #: 58)\nRe - Rhenium (Atomic #: 75)\nRg - Roentgenium (Atomic #: 111)\nNh - Nihonium (Atomic #: 113)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "V - Vanadium"
+      },
+      {
+        "type": "text",
+        "content": "Ce - Cerium"
+      },
+      {
+        "type": "text",
+        "content": "Re - Rhenium"
+      },
+      {
+        "type": "text",
+        "content": "Rg - Roentgenium"
+      },
+      {
+        "type": "text",
+        "content": "Nh - Nihonium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nO - Oxygen (Atomic #: 8)\nHo - Holmium (Atomic #: 67)\nRe - Rhenium (Atomic #: 75)\nBi - Bismuth (Atomic #: 83)\nAt - Astatine (Atomic #: 85)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "O - Oxygen"
+      },
+      {
+        "type": "text",
+        "content": "Ho - Holmium"
+      },
+      {
+        "type": "text",
+        "content": "Re - Rhenium"
+      },
+      {
+        "type": "text",
+        "content": "Bi - Bismuth"
+      },
+      {
+        "type": "text",
+        "content": "At - Astatine"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nNe - Neon (Atomic #: 10)\nAl - Aluminium (Atomic #: 13)\nSe - Selenium (Atomic #: 34)\nSr - Strontium (Atomic #: 38)\nNp - Neptunium (Atomic #: 93)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Ne - Neon"
+      },
+      {
+        "type": "text",
+        "content": "Al - Aluminium"
+      },
+      {
+        "type": "text",
+        "content": "Se - Selenium"
+      },
+      {
+        "type": "text",
+        "content": "Sr - Strontium"
+      },
+      {
+        "type": "text",
+        "content": "Np - Neptunium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nN - Nitrogen (Atomic #: 7)\nS - Sulfur (Atomic #: 16)\nCs - Cesium (Atomic #: 55)\nPt - Platinum (Atomic #: 78)\nPo - Polonium (Atomic #: 84)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "N - Nitrogen"
+      },
+      {
+        "type": "text",
+        "content": "S - Sulfur"
+      },
+      {
+        "type": "text",
+        "content": "Cs - Cesium"
+      },
+      {
+        "type": "text",
+        "content": "Pt - Platinum"
+      },
+      {
+        "type": "text",
+        "content": "Po - Polonium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nAl - Aluminium (Atomic #: 13)\nRh - Rhodium (Atomic #: 45)\nHo - Holmium (Atomic #: 67)\nTl - Thallium (Atomic #: 81)\nEs - Einsteinium (Atomic #: 99)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Al - Aluminium"
+      },
+      {
+        "type": "text",
+        "content": "Rh - Rhodium"
+      },
+      {
+        "type": "text",
+        "content": "Ho - Holmium"
+      },
+      {
+        "type": "text",
+        "content": "Tl - Thallium"
+      },
+      {
+        "type": "text",
+        "content": "Es - Einsteinium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nKr - Krypton (Atomic #: 36)\nCd - Cadmium (Atomic #: 48)\nLa - Lanthanum (Atomic #: 57)\nTa - Tantalum (Atomic #: 73)\nOs - Osmium (Atomic #: 76)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Kr - Krypton"
+      },
+      {
+        "type": "text",
+        "content": "Cd - Cadmium"
+      },
+      {
+        "type": "text",
+        "content": "La - Lanthanum"
+      },
+      {
+        "type": "text",
+        "content": "Ta - Tantalum"
+      },
+      {
+        "type": "text",
+        "content": "Os - Osmium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nB - Boron (Atomic #: 5)\nN - Nitrogen (Atomic #: 7)\nF - Fluorine (Atomic #: 9)\nNa - Sodium (Atomic #: 11)\nRf - Rutherfordium (Atomic #: 104)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "B - Boron"
+      },
+      {
+        "type": "text",
+        "content": "N - Nitrogen"
+      },
+      {
+        "type": "text",
+        "content": "F - Fluorine"
+      },
+      {
+        "type": "text",
+        "content": "Na - Sodium"
+      },
+      {
+        "type": "text",
+        "content": "Rf - Rutherfordium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nF - Fluorine (Atomic #: 9)\nMo - Molybdenum (Atomic #: 42)\nCe - Cerium (Atomic #: 58)\nTa - Tantalum (Atomic #: 73)\nPu - Plutonium (Atomic #: 94)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "F - Fluorine"
+      },
+      {
+        "type": "text",
+        "content": "Mo - Molybdenum"
+      },
+      {
+        "type": "text",
+        "content": "Ce - Cerium"
+      },
+      {
+        "type": "text",
+        "content": "Ta - Tantalum"
+      },
+      {
+        "type": "text",
+        "content": "Pu - Plutonium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nNa - Sodium (Atomic #: 11)\nY - Yttrium (Atomic #: 39)\nTa - Tantalum (Atomic #: 73)\nFr - Francium (Atomic #: 87)\nCn - Copernicium (Atomic #: 112)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Na - Sodium"
+      },
+      {
+        "type": "text",
+        "content": "Y - Yttrium"
+      },
+      {
+        "type": "text",
+        "content": "Ta - Tantalum"
+      },
+      {
+        "type": "text",
+        "content": "Fr - Francium"
+      },
+      {
+        "type": "text",
+        "content": "Cn - Copernicium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nCl - Chlorine (Atomic #: 17)\nCa - Calcium (Atomic #: 20)\nI - Iodine (Atomic #: 53)\nCe - Cerium (Atomic #: 58)\nEr - Erbium (Atomic #: 68)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Cl - Chlorine"
+      },
+      {
+        "type": "text",
+        "content": "Ca - Calcium"
+      },
+      {
+        "type": "text",
+        "content": "I - Iodine"
+      },
+      {
+        "type": "text",
+        "content": "Ce - Cerium"
+      },
+      {
+        "type": "text",
+        "content": "Er - Erbium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nGa - Gallium (Atomic #: 31)\nY - Yttrium (Atomic #: 39)\nCs - Cesium (Atomic #: 55)\nPb - Lead (Atomic #: 82)\nMt - Meitnerium (Atomic #: 109)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Ga - Gallium"
+      },
+      {
+        "type": "text",
+        "content": "Y - Yttrium"
+      },
+      {
+        "type": "text",
+        "content": "Cs - Cesium"
+      },
+      {
+        "type": "text",
+        "content": "Pb - Lead"
+      },
+      {
+        "type": "text",
+        "content": "Mt - Meitnerium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nHe - Helium (Atomic #: 2)\nY - Yttrium (Atomic #: 39)\nRu - Ruthenium (Atomic #: 44)\nGd - Gadolinium (Atomic #: 64)\nBi - Bismuth (Atomic #: 83)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "He - Helium"
+      },
+      {
+        "type": "text",
+        "content": "Y - Yttrium"
+      },
+      {
+        "type": "text",
+        "content": "Ru - Ruthenium"
+      },
+      {
+        "type": "text",
+        "content": "Gd - Gadolinium"
+      },
+      {
+        "type": "text",
+        "content": "Bi - Bismuth"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nMg - Magnesium (Atomic #: 12)\nK - Potassium (Atomic #: 19)\nTi - Titanium (Atomic #: 22)\nBr - Bromine (Atomic #: 35)\nIr - Iridium (Atomic #: 77)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Mg - Magnesium"
+      },
+      {
+        "type": "text",
+        "content": "K - Potassium"
+      },
+      {
+        "type": "text",
+        "content": "Ti - Titanium"
+      },
+      {
+        "type": "text",
+        "content": "Br - Bromine"
+      },
+      {
+        "type": "text",
+        "content": "Ir - Iridium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nCl - Chlorine (Atomic #: 17)\nTa - Tantalum (Atomic #: 73)\nAt - Astatine (Atomic #: 85)\nRa - Radium (Atomic #: 88)\nCf - Californium (Atomic #: 98)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Cl - Chlorine"
+      },
+      {
+        "type": "text",
+        "content": "Ta - Tantalum"
+      },
+      {
+        "type": "text",
+        "content": "At - Astatine"
+      },
+      {
+        "type": "text",
+        "content": "Ra - Radium"
+      },
+      {
+        "type": "text",
+        "content": "Cf - Californium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nP - Phosphorus (Atomic #: 15)\nCa - Calcium (Atomic #: 20)\nSn - Tin (Atomic #: 50)\nTh - Thorium (Atomic #: 90)\nCm - Curium (Atomic #: 96)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "P - Phosphorus"
+      },
+      {
+        "type": "text",
+        "content": "Ca - Calcium"
+      },
+      {
+        "type": "text",
+        "content": "Sn - Tin"
+      },
+      {
+        "type": "text",
+        "content": "Th - Thorium"
+      },
+      {
+        "type": "text",
+        "content": "Cm - Curium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nMn - Manganese (Atomic #: 25)\nNi - Nickel (Atomic #: 28)\nGa - Gallium (Atomic #: 31)\nAg - Silver (Atomic #: 47)\nLa - Lanthanum (Atomic #: 57)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Mn - Manganese"
+      },
+      {
+        "type": "text",
+        "content": "Ni - Nickel"
+      },
+      {
+        "type": "text",
+        "content": "Ga - Gallium"
+      },
+      {
+        "type": "text",
+        "content": "Ag - Silver"
+      },
+      {
+        "type": "text",
+        "content": "La - Lanthanum"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nV - Vanadium (Atomic #: 23)\nZn - Zinc (Atomic #: 30)\nCd - Cadmium (Atomic #: 48)\nCs - Cesium (Atomic #: 55)\nPr - Praseodymium (Atomic #: 59)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "V - Vanadium"
+      },
+      {
+        "type": "text",
+        "content": "Zn - Zinc"
+      },
+      {
+        "type": "text",
+        "content": "Cd - Cadmium"
+      },
+      {
+        "type": "text",
+        "content": "Cs - Cesium"
+      },
+      {
+        "type": "text",
+        "content": "Pr - Praseodymium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nRb - Rubidium (Atomic #: 37)\nTb - Terbium (Atomic #: 65)\nLu - Lutetium (Atomic #: 71)\nIr - Iridium (Atomic #: 77)\nDb - Dubnium (Atomic #: 105)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Rb - Rubidium"
+      },
+      {
+        "type": "text",
+        "content": "Tb - Terbium"
+      },
+      {
+        "type": "text",
+        "content": "Lu - Lutetium"
+      },
+      {
+        "type": "text",
+        "content": "Ir - Iridium"
+      },
+      {
+        "type": "text",
+        "content": "Db - Dubnium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nCl - Chlorine (Atomic #: 17)\nSr - Strontium (Atomic #: 38)\nNb - Niobium (Atomic #: 41)\nSg - Seaborgium (Atomic #: 106)\nOg - Oganesson (Atomic #: 118)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Cl - Chlorine"
+      },
+      {
+        "type": "text",
+        "content": "Sr - Strontium"
+      },
+      {
+        "type": "text",
+        "content": "Nb - Niobium"
+      },
+      {
+        "type": "text",
+        "content": "Sg - Seaborgium"
+      },
+      {
+        "type": "text",
+        "content": "Og - Oganesson"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nBe - Beryllium (Atomic #: 4)\nCr - Chromium (Atomic #: 24)\nSm - Samarium (Atomic #: 62)\nFr - Francium (Atomic #: 87)\nEs - Einsteinium (Atomic #: 99)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Be - Beryllium"
+      },
+      {
+        "type": "text",
+        "content": "Cr - Chromium"
+      },
+      {
+        "type": "text",
+        "content": "Sm - Samarium"
+      },
+      {
+        "type": "text",
+        "content": "Fr - Francium"
+      },
+      {
+        "type": "text",
+        "content": "Es - Einsteinium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nLi - Lithium (Atomic #: 3)\nV - Vanadium (Atomic #: 23)\nTc - Technetium (Atomic #: 43)\nAg - Silver (Atomic #: 47)\nLv - Livermorium (Atomic #: 116)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Li - Lithium"
+      },
+      {
+        "type": "text",
+        "content": "V - Vanadium"
+      },
+      {
+        "type": "text",
+        "content": "Tc - Technetium"
+      },
+      {
+        "type": "text",
+        "content": "Ag - Silver"
+      },
+      {
+        "type": "text",
+        "content": "Lv - Livermorium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nC - Carbon (Atomic #: 6)\nLa - Lanthanum (Atomic #: 57)\nIr - Iridium (Atomic #: 77)\nEs - Einsteinium (Atomic #: 99)\nRg - Roentgenium (Atomic #: 111)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "C - Carbon"
+      },
+      {
+        "type": "text",
+        "content": "La - Lanthanum"
+      },
+      {
+        "type": "text",
+        "content": "Ir - Iridium"
+      },
+      {
+        "type": "text",
+        "content": "Es - Einsteinium"
+      },
+      {
+        "type": "text",
+        "content": "Rg - Roentgenium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nBe - Beryllium (Atomic #: 4)\nSi - Silicon (Atomic #: 14)\nRb - Rubidium (Atomic #: 37)\nNd - Neodymium (Atomic #: 60)\nBi - Bismuth (Atomic #: 83)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Be - Beryllium"
+      },
+      {
+        "type": "text",
+        "content": "Si - Silicon"
+      },
+      {
+        "type": "text",
+        "content": "Rb - Rubidium"
+      },
+      {
+        "type": "text",
+        "content": "Nd - Neodymium"
+      },
+      {
+        "type": "text",
+        "content": "Bi - Bismuth"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nAl - Aluminium (Atomic #: 13)\nPo - Polonium (Atomic #: 84)\nNo - Nobelium (Atomic #: 102)\nRf - Rutherfordium (Atomic #: 104)\nTs - Tennessine (Atomic #: 117)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Al - Aluminium"
+      },
+      {
+        "type": "text",
+        "content": "Po - Polonium"
+      },
+      {
+        "type": "text",
+        "content": "No - Nobelium"
+      },
+      {
+        "type": "text",
+        "content": "Rf - Rutherfordium"
+      },
+      {
+        "type": "text",
+        "content": "Ts - Tennessine"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nAl - Aluminium (Atomic #: 13)\nAc - Actinium (Atomic #: 89)\nCf - Californium (Atomic #: 98)\nCn - Copernicium (Atomic #: 112)\nUue - Ununennium (Atomic #: 119)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Al - Aluminium"
+      },
+      {
+        "type": "text",
+        "content": "Ac - Actinium"
+      },
+      {
+        "type": "text",
+        "content": "Cf - Californium"
+      },
+      {
+        "type": "text",
+        "content": "Cn - Copernicium"
+      },
+      {
+        "type": "text",
+        "content": "Uue - Ununennium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nF - Fluorine (Atomic #: 9)\nMn - Manganese (Atomic #: 25)\nPm - Promethium (Atomic #: 61)\nFr - Francium (Atomic #: 87)\nHs - Hassium (Atomic #: 108)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "F - Fluorine"
+      },
+      {
+        "type": "text",
+        "content": "Mn - Manganese"
+      },
+      {
+        "type": "text",
+        "content": "Pm - Promethium"
+      },
+      {
+        "type": "text",
+        "content": "Fr - Francium"
+      },
+      {
+        "type": "text",
+        "content": "Hs - Hassium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nGa - Gallium (Atomic #: 31)\nHo - Holmium (Atomic #: 67)\nEr - Erbium (Atomic #: 68)\nIr - Iridium (Atomic #: 77)\nRg - Roentgenium (Atomic #: 111)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Ga - Gallium"
+      },
+      {
+        "type": "text",
+        "content": "Ho - Holmium"
+      },
+      {
+        "type": "text",
+        "content": "Er - Erbium"
+      },
+      {
+        "type": "text",
+        "content": "Ir - Iridium"
+      },
+      {
+        "type": "text",
+        "content": "Rg - Roentgenium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nAl - Aluminium (Atomic #: 13)\nV - Vanadium (Atomic #: 23)\nSm - Samarium (Atomic #: 62)\nMd - Mendelevium (Atomic #: 101)\nDs - Darmstadtium (Atomic #: 110)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Al - Aluminium"
+      },
+      {
+        "type": "text",
+        "content": "V - Vanadium"
+      },
+      {
+        "type": "text",
+        "content": "Sm - Samarium"
+      },
+      {
+        "type": "text",
+        "content": "Md - Mendelevium"
+      },
+      {
+        "type": "text",
+        "content": "Ds - Darmstadtium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nSi - Silicon (Atomic #: 14)\nRh - Rhodium (Atomic #: 45)\nTm - Thulium (Atomic #: 69)\nCm - Curium (Atomic #: 96)\nFm - Fermium (Atomic #: 100)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Si - Silicon"
+      },
+      {
+        "type": "text",
+        "content": "Rh - Rhodium"
+      },
+      {
+        "type": "text",
+        "content": "Tm - Thulium"
+      },
+      {
+        "type": "text",
+        "content": "Cm - Curium"
+      },
+      {
+        "type": "text",
+        "content": "Fm - Fermium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nZr - Zirconium (Atomic #: 40)\nI - Iodine (Atomic #: 53)\nPr - Praseodymium (Atomic #: 59)\nCf - Californium (Atomic #: 98)\nNh - Nihonium (Atomic #: 113)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Zr - Zirconium"
+      },
+      {
+        "type": "text",
+        "content": "I - Iodine"
+      },
+      {
+        "type": "text",
+        "content": "Pr - Praseodymium"
+      },
+      {
+        "type": "text",
+        "content": "Cf - Californium"
+      },
+      {
+        "type": "text",
+        "content": "Nh - Nihonium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nP - Phosphorus (Atomic #: 15)\nCl - Chlorine (Atomic #: 17)\nSc - Scandium (Atomic #: 21)\nPt - Platinum (Atomic #: 78)\nHs - Hassium (Atomic #: 108)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "P - Phosphorus"
+      },
+      {
+        "type": "text",
+        "content": "Cl - Chlorine"
+      },
+      {
+        "type": "text",
+        "content": "Sc - Scandium"
+      },
+      {
+        "type": "text",
+        "content": "Pt - Platinum"
+      },
+      {
+        "type": "text",
+        "content": "Hs - Hassium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nRh - Rhodium (Atomic #: 45)\nPr - Praseodymium (Atomic #: 59)\nGd - Gadolinium (Atomic #: 64)\nTm - Thulium (Atomic #: 69)\nRf - Rutherfordium (Atomic #: 104)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Rh - Rhodium"
+      },
+      {
+        "type": "text",
+        "content": "Pr - Praseodymium"
+      },
+      {
+        "type": "text",
+        "content": "Gd - Gadolinium"
+      },
+      {
+        "type": "text",
+        "content": "Tm - Thulium"
+      },
+      {
+        "type": "text",
+        "content": "Rf - Rutherfordium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nCu - Copper (Atomic #: 29)\nY - Yttrium (Atomic #: 39)\nHf - Hafnium (Atomic #: 72)\nTa - Tantalum (Atomic #: 73)\nTl - Thallium (Atomic #: 81)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Cu - Copper"
+      },
+      {
+        "type": "text",
+        "content": "Y - Yttrium"
+      },
+      {
+        "type": "text",
+        "content": "Hf - Hafnium"
+      },
+      {
+        "type": "text",
+        "content": "Ta - Tantalum"
+      },
+      {
+        "type": "text",
+        "content": "Tl - Thallium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nH - Hydrogen (Atomic #: 1)\nSc - Scandium (Atomic #: 21)\nSm - Samarium (Atomic #: 62)\nPo - Polonium (Atomic #: 84)\nNh - Nihonium (Atomic #: 113)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "H - Hydrogen"
+      },
+      {
+        "type": "text",
+        "content": "Sc - Scandium"
+      },
+      {
+        "type": "text",
+        "content": "Sm - Samarium"
+      },
+      {
+        "type": "text",
+        "content": "Po - Polonium"
+      },
+      {
+        "type": "text",
+        "content": "Nh - Nihonium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nN - Nitrogen (Atomic #: 7)\nAt - Astatine (Atomic #: 85)\nCm - Curium (Atomic #: 96)\nNh - Nihonium (Atomic #: 113)\nOg - Oganesson (Atomic #: 118)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "N - Nitrogen"
+      },
+      {
+        "type": "text",
+        "content": "At - Astatine"
+      },
+      {
+        "type": "text",
+        "content": "Cm - Curium"
+      },
+      {
+        "type": "text",
+        "content": "Nh - Nihonium"
+      },
+      {
+        "type": "text",
+        "content": "Og - Oganesson"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nCa - Calcium (Atomic #: 20)\nKr - Krypton (Atomic #: 36)\nY - Yttrium (Atomic #: 39)\nRu - Ruthenium (Atomic #: 44)\nMd - Mendelevium (Atomic #: 101)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Ca - Calcium"
+      },
+      {
+        "type": "text",
+        "content": "Kr - Krypton"
+      },
+      {
+        "type": "text",
+        "content": "Y - Yttrium"
+      },
+      {
+        "type": "text",
+        "content": "Ru - Ruthenium"
+      },
+      {
+        "type": "text",
+        "content": "Md - Mendelevium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nNe - Neon (Atomic #: 10)\nSn - Tin (Atomic #: 50)\nIr - Iridium (Atomic #: 77)\nRn - Radon (Atomic #: 86)\nOg - Oganesson (Atomic #: 118)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Ne - Neon"
+      },
+      {
+        "type": "text",
+        "content": "Sn - Tin"
+      },
+      {
+        "type": "text",
+        "content": "Ir - Iridium"
+      },
+      {
+        "type": "text",
+        "content": "Rn - Radon"
+      },
+      {
+        "type": "text",
+        "content": "Og - Oganesson"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nH - Hydrogen (Atomic #: 1)\nTc - Technetium (Atomic #: 43)\nPm - Promethium (Atomic #: 61)\nAm - Americium (Atomic #: 95)\nBk - Berkelium (Atomic #: 97)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "H - Hydrogen"
+      },
+      {
+        "type": "text",
+        "content": "Tc - Technetium"
+      },
+      {
+        "type": "text",
+        "content": "Pm - Promethium"
+      },
+      {
+        "type": "text",
+        "content": "Am - Americium"
+      },
+      {
+        "type": "text",
+        "content": "Bk - Berkelium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nB - Boron (Atomic #: 5)\nP - Phosphorus (Atomic #: 15)\nCr - Chromium (Atomic #: 24)\nCs - Cesium (Atomic #: 55)\nAc - Actinium (Atomic #: 89)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "B - Boron"
+      },
+      {
+        "type": "text",
+        "content": "P - Phosphorus"
+      },
+      {
+        "type": "text",
+        "content": "Cr - Chromium"
+      },
+      {
+        "type": "text",
+        "content": "Cs - Cesium"
+      },
+      {
+        "type": "text",
+        "content": "Ac - Actinium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nNe - Neon (Atomic #: 10)\nMn - Manganese (Atomic #: 25)\nSm - Samarium (Atomic #: 62)\nDy - Dysprosium (Atomic #: 66)\nAc - Actinium (Atomic #: 89)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Ne - Neon"
+      },
+      {
+        "type": "text",
+        "content": "Mn - Manganese"
+      },
+      {
+        "type": "text",
+        "content": "Sm - Samarium"
+      },
+      {
+        "type": "text",
+        "content": "Dy - Dysprosium"
+      },
+      {
+        "type": "text",
+        "content": "Ac - Actinium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nF - Fluorine (Atomic #: 9)\nP - Phosphorus (Atomic #: 15)\nMn - Manganese (Atomic #: 25)\nRu - Ruthenium (Atomic #: 44)\nIn - Indium (Atomic #: 49)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "F - Fluorine"
+      },
+      {
+        "type": "text",
+        "content": "P - Phosphorus"
+      },
+      {
+        "type": "text",
+        "content": "Mn - Manganese"
+      },
+      {
+        "type": "text",
+        "content": "Ru - Ruthenium"
+      },
+      {
+        "type": "text",
+        "content": "In - Indium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nNa - Sodium (Atomic #: 11)\nHo - Holmium (Atomic #: 67)\nOs - Osmium (Atomic #: 76)\nPu - Plutonium (Atomic #: 94)\nMc - Moscovium (Atomic #: 115)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Na - Sodium"
+      },
+      {
+        "type": "text",
+        "content": "Ho - Holmium"
+      },
+      {
+        "type": "text",
+        "content": "Os - Osmium"
+      },
+      {
+        "type": "text",
+        "content": "Pu - Plutonium"
+      },
+      {
+        "type": "text",
+        "content": "Mc - Moscovium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nC - Carbon (Atomic #: 6)\nS - Sulfur (Atomic #: 16)\nAc - Actinium (Atomic #: 89)\nNp - Neptunium (Atomic #: 93)\nCn - Copernicium (Atomic #: 112)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "C - Carbon"
+      },
+      {
+        "type": "text",
+        "content": "S - Sulfur"
+      },
+      {
+        "type": "text",
+        "content": "Ac - Actinium"
+      },
+      {
+        "type": "text",
+        "content": "Np - Neptunium"
+      },
+      {
+        "type": "text",
+        "content": "Cn - Copernicium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nCa - Calcium (Atomic #: 20)\nFe - Iron (Atomic #: 26)\nSr - Strontium (Atomic #: 38)\nHf - Hafnium (Atomic #: 72)\nMt - Meitnerium (Atomic #: 109)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Ca - Calcium"
+      },
+      {
+        "type": "text",
+        "content": "Fe - Iron"
+      },
+      {
+        "type": "text",
+        "content": "Sr - Strontium"
+      },
+      {
+        "type": "text",
+        "content": "Hf - Hafnium"
+      },
+      {
+        "type": "text",
+        "content": "Mt - Meitnerium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nBe - Beryllium (Atomic #: 4)\nP - Phosphorus (Atomic #: 15)\nBr - Bromine (Atomic #: 35)\nNd - Neodymium (Atomic #: 60)\nYb - Ytterbium (Atomic #: 70)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Be - Beryllium"
+      },
+      {
+        "type": "text",
+        "content": "P - Phosphorus"
+      },
+      {
+        "type": "text",
+        "content": "Br - Bromine"
+      },
+      {
+        "type": "text",
+        "content": "Nd - Neodymium"
+      },
+      {
+        "type": "text",
+        "content": "Yb - Ytterbium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nRb - Rubidium (Atomic #: 37)\nZr - Zirconium (Atomic #: 40)\nCe - Cerium (Atomic #: 58)\nRn - Radon (Atomic #: 86)\nLr - Lawrencium (Atomic #: 103)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Rb - Rubidium"
+      },
+      {
+        "type": "text",
+        "content": "Zr - Zirconium"
+      },
+      {
+        "type": "text",
+        "content": "Ce - Cerium"
+      },
+      {
+        "type": "text",
+        "content": "Rn - Radon"
+      },
+      {
+        "type": "text",
+        "content": "Lr - Lawrencium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nS - Sulfur (Atomic #: 16)\nGe - Germanium (Atomic #: 32)\nPr - Praseodymium (Atomic #: 59)\nYb - Ytterbium (Atomic #: 70)\nTh - Thorium (Atomic #: 90)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "S - Sulfur"
+      },
+      {
+        "type": "text",
+        "content": "Ge - Germanium"
+      },
+      {
+        "type": "text",
+        "content": "Pr - Praseodymium"
+      },
+      {
+        "type": "text",
+        "content": "Yb - Ytterbium"
+      },
+      {
+        "type": "text",
+        "content": "Th - Thorium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nCd - Cadmium (Atomic #: 48)\nCs - Cesium (Atomic #: 55)\nYb - Ytterbium (Atomic #: 70)\nLu - Lutetium (Atomic #: 71)\nNh - Nihonium (Atomic #: 113)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Cd - Cadmium"
+      },
+      {
+        "type": "text",
+        "content": "Cs - Cesium"
+      },
+      {
+        "type": "text",
+        "content": "Yb - Ytterbium"
+      },
+      {
+        "type": "text",
+        "content": "Lu - Lutetium"
+      },
+      {
+        "type": "text",
+        "content": "Nh - Nihonium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nAr - Argon (Atomic #: 18)\nZr - Zirconium (Atomic #: 40)\nFr - Francium (Atomic #: 87)\nNh - Nihonium (Atomic #: 113)\nMc - Moscovium (Atomic #: 115)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Ar - Argon"
+      },
+      {
+        "type": "text",
+        "content": "Zr - Zirconium"
+      },
+      {
+        "type": "text",
+        "content": "Fr - Francium"
+      },
+      {
+        "type": "text",
+        "content": "Nh - Nihonium"
+      },
+      {
+        "type": "text",
+        "content": "Mc - Moscovium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nO - Oxygen (Atomic #: 8)\nAr - Argon (Atomic #: 18)\nPr - Praseodymium (Atomic #: 59)\nNd - Neodymium (Atomic #: 60)\nTb - Terbium (Atomic #: 65)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "O - Oxygen"
+      },
+      {
+        "type": "text",
+        "content": "Ar - Argon"
+      },
+      {
+        "type": "text",
+        "content": "Pr - Praseodymium"
+      },
+      {
+        "type": "text",
+        "content": "Nd - Neodymium"
+      },
+      {
+        "type": "text",
+        "content": "Tb - Terbium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nSe - Selenium (Atomic #: 34)\nTe - Tellurium (Atomic #: 52)\nGd - Gadolinium (Atomic #: 64)\nMd - Mendelevium (Atomic #: 101)\nNo - Nobelium (Atomic #: 102)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Se - Selenium"
+      },
+      {
+        "type": "text",
+        "content": "Te - Tellurium"
+      },
+      {
+        "type": "text",
+        "content": "Gd - Gadolinium"
+      },
+      {
+        "type": "text",
+        "content": "Md - Mendelevium"
+      },
+      {
+        "type": "text",
+        "content": "No - Nobelium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nCo - Cobalt (Atomic #: 27)\nZn - Zinc (Atomic #: 30)\nIn - Indium (Atomic #: 49)\nTh - Thorium (Atomic #: 90)\nPu - Plutonium (Atomic #: 94)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Co - Cobalt"
+      },
+      {
+        "type": "text",
+        "content": "Zn - Zinc"
+      },
+      {
+        "type": "text",
+        "content": "In - Indium"
+      },
+      {
+        "type": "text",
+        "content": "Th - Thorium"
+      },
+      {
+        "type": "text",
+        "content": "Pu - Plutonium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nTe - Tellurium (Atomic #: 52)\nPm - Promethium (Atomic #: 61)\nTm - Thulium (Atomic #: 69)\nOs - Osmium (Atomic #: 76)\nRa - Radium (Atomic #: 88)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Te - Tellurium"
+      },
+      {
+        "type": "text",
+        "content": "Pm - Promethium"
+      },
+      {
+        "type": "text",
+        "content": "Tm - Thulium"
+      },
+      {
+        "type": "text",
+        "content": "Os - Osmium"
+      },
+      {
+        "type": "text",
+        "content": "Ra - Radium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nNa - Sodium (Atomic #: 11)\nAl - Aluminium (Atomic #: 13)\nPb - Lead (Atomic #: 82)\nAm - Americium (Atomic #: 95)\nMd - Mendelevium (Atomic #: 101)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Na - Sodium"
+      },
+      {
+        "type": "text",
+        "content": "Al - Aluminium"
+      },
+      {
+        "type": "text",
+        "content": "Pb - Lead"
+      },
+      {
+        "type": "text",
+        "content": "Am - Americium"
+      },
+      {
+        "type": "text",
+        "content": "Md - Mendelevium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nBe - Beryllium (Atomic #: 4)\nP - Phosphorus (Atomic #: 15)\nTi - Titanium (Atomic #: 22)\nBr - Bromine (Atomic #: 35)\nTs - Tennessine (Atomic #: 117)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Be - Beryllium"
+      },
+      {
+        "type": "text",
+        "content": "P - Phosphorus"
+      },
+      {
+        "type": "text",
+        "content": "Ti - Titanium"
+      },
+      {
+        "type": "text",
+        "content": "Br - Bromine"
+      },
+      {
+        "type": "text",
+        "content": "Ts - Tennessine"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nH - Hydrogen (Atomic #: 1)\nSe - Selenium (Atomic #: 34)\nLa - Lanthanum (Atomic #: 57)\nRn - Radon (Atomic #: 86)\nDs - Darmstadtium (Atomic #: 110)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "H - Hydrogen"
+      },
+      {
+        "type": "text",
+        "content": "Se - Selenium"
+      },
+      {
+        "type": "text",
+        "content": "La - Lanthanum"
+      },
+      {
+        "type": "text",
+        "content": "Rn - Radon"
+      },
+      {
+        "type": "text",
+        "content": "Ds - Darmstadtium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nNe - Neon (Atomic #: 10)\nPd - Palladium (Atomic #: 46)\nPb - Lead (Atomic #: 82)\nRa - Radium (Atomic #: 88)\nAc - Actinium (Atomic #: 89)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Ne - Neon"
+      },
+      {
+        "type": "text",
+        "content": "Pd - Palladium"
+      },
+      {
+        "type": "text",
+        "content": "Pb - Lead"
+      },
+      {
+        "type": "text",
+        "content": "Ra - Radium"
+      },
+      {
+        "type": "text",
+        "content": "Ac - Actinium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nP - Phosphorus (Atomic #: 15)\nRu - Ruthenium (Atomic #: 44)\nLa - Lanthanum (Atomic #: 57)\nHf - Hafnium (Atomic #: 72)\nRn - Radon (Atomic #: 86)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "P - Phosphorus"
+      },
+      {
+        "type": "text",
+        "content": "Ru - Ruthenium"
+      },
+      {
+        "type": "text",
+        "content": "La - Lanthanum"
+      },
+      {
+        "type": "text",
+        "content": "Hf - Hafnium"
+      },
+      {
+        "type": "text",
+        "content": "Rn - Radon"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nFe - Iron (Atomic #: 26)\nSe - Selenium (Atomic #: 34)\nPd - Palladium (Atomic #: 46)\nIn - Indium (Atomic #: 49)\nHo - Holmium (Atomic #: 67)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Fe - Iron"
+      },
+      {
+        "type": "text",
+        "content": "Se - Selenium"
+      },
+      {
+        "type": "text",
+        "content": "Pd - Palladium"
+      },
+      {
+        "type": "text",
+        "content": "In - Indium"
+      },
+      {
+        "type": "text",
+        "content": "Ho - Holmium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nTi - Titanium (Atomic #: 22)\nGe - Germanium (Atomic #: 32)\nI - Iodine (Atomic #: 53)\nTb - Terbium (Atomic #: 65)\nTs - Tennessine (Atomic #: 117)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Ti - Titanium"
+      },
+      {
+        "type": "text",
+        "content": "Ge - Germanium"
+      },
+      {
+        "type": "text",
+        "content": "I - Iodine"
+      },
+      {
+        "type": "text",
+        "content": "Tb - Terbium"
+      },
+      {
+        "type": "text",
+        "content": "Ts - Tennessine"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nCu - Copper (Atomic #: 29)\nSe - Selenium (Atomic #: 34)\nTb - Terbium (Atomic #: 65)\nLu - Lutetium (Atomic #: 71)\nSg - Seaborgium (Atomic #: 106)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Cu - Copper"
+      },
+      {
+        "type": "text",
+        "content": "Se - Selenium"
+      },
+      {
+        "type": "text",
+        "content": "Tb - Terbium"
+      },
+      {
+        "type": "text",
+        "content": "Lu - Lutetium"
+      },
+      {
+        "type": "text",
+        "content": "Sg - Seaborgium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nCa - Calcium (Atomic #: 20)\nKr - Krypton (Atomic #: 36)\nHo - Holmium (Atomic #: 67)\nYb - Ytterbium (Atomic #: 70)\nFr - Francium (Atomic #: 87)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Ca - Calcium"
+      },
+      {
+        "type": "text",
+        "content": "Kr - Krypton"
+      },
+      {
+        "type": "text",
+        "content": "Ho - Holmium"
+      },
+      {
+        "type": "text",
+        "content": "Yb - Ytterbium"
+      },
+      {
+        "type": "text",
+        "content": "Fr - Francium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nAs - Arsenic (Atomic #: 33)\nLa - Lanthanum (Atomic #: 57)\nPm - Promethium (Atomic #: 61)\nBh - Bohrium (Atomic #: 107)\nHs - Hassium (Atomic #: 108)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "As - Arsenic"
+      },
+      {
+        "type": "text",
+        "content": "La - Lanthanum"
+      },
+      {
+        "type": "text",
+        "content": "Pm - Promethium"
+      },
+      {
+        "type": "text",
+        "content": "Bh - Bohrium"
+      },
+      {
+        "type": "text",
+        "content": "Hs - Hassium"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nRb - Rubidium (Atomic #: 37)\nNd - Neodymium (Atomic #: 60)\nEu - Europium (Atomic #: 63)\nTm - Thulium (Atomic #: 69)\nOg - Oganesson (Atomic #: 118)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "Rb - Rubidium"
+      },
+      {
+        "type": "text",
+        "content": "Nd - Neodymium"
+      },
+      {
+        "type": "text",
+        "content": "Eu - Europium"
+      },
+      {
+        "type": "text",
+        "content": "Tm - Thulium"
+      },
+      {
+        "type": "text",
+        "content": "Og - Oganesson"
+      }
+    ]
+  },
+  {
+    "questionType": "sort_order",
+    "moduleName": "periodic_table",
+    "questionElements": [
+      {
+        "type": "text",
+        "content": "Sort the following elements by atomic number (lowest to highest):"
+      }
+    ],
+    "answerElements": [
+      {
+        "type": "text",
+        "content": "The correct order by atomic number (lowest to highest) is:\nP - Phosphorus (Atomic #: 15)\nTb - Terbium (Atomic #: 65)\nYb - Ytterbium (Atomic #: 70)\nIr - Iridium (Atomic #: 77)\nLv - Livermorium (Atomic #: 116)"
+      }
+    ],
+    "options": [
+      {
+        "type": "text",
+        "content": "P - Phosphorus"
+      },
+      {
+        "type": "text",
+        "content": "Tb - Terbium"
+      },
+      {
+        "type": "text",
+        "content": "Yb - Ytterbium"
+      },
+      {
+        "type": "text",
+        "content": "Ir - Iridium"
+      },
+      {
+        "type": "text",
+        "content": "Lv - Livermorium"
+      }
+    ]
+  }
+]

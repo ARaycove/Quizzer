@@ -59,8 +59,8 @@ class InactiveModuleWorker {
   Future<void> _performLoopLogic() async {
     QuizzerLogger.logMessage('InactiveModuleWorker: Waiting for module deactivation signal...');
     // Wait for the next deactivation signal from the SwitchBoard
+    if (!_isRunning) return; // Check if stopped while waiting
     final String activatedModuleName = await _switchBoard.onModuleActivated.first;
-
     if (!_isRunning) return; // Check if stopped while waiting
 
     QuizzerLogger.logMessage('InactiveModuleWorker: Received signal for module: $activatedModuleName. Processing...');

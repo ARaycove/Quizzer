@@ -1,5 +1,9 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
+import 'dart:convert';
+import '00_table_helper.dart'; // Import the new helper file
+
+// --- Universal Encoding/Decoding Helpers --- Removed, moved to 00_table_helper.dart ---
 
 Future<void> verifyQuestionAnswerPairTable(Database db) async {
   
@@ -87,47 +91,14 @@ bool _checkCompletionStatus(String questionElements, String answerElements) {
   return questionElements.isNotEmpty && answerElements.isNotEmpty;
 }
 
-String _formatElements(List<Map<String, dynamic>> elements) {
-  return elements.map((e) => '${e['type']}:${e['content']}').join(',');
-}
-
-List<Map<String, dynamic>> _parseElements(String csvString) {
-  if (csvString.isEmpty) return [];
-  
-  return csvString.split(',').map((element) {
-    final parts = element.split(':');
-    return {
-      'type': parts[0],
-      'content': parts[1],
-    };
-  }).toList();
-}
-
-// Helper to format List<int> to CSV string
-String _formatIndices(List<int> indices) {
-  return indices.map((index) => index.toString()).join(',');
-}
-
-// Helper to parse CSV string to List<int>
-List<int> _parseIndices(String? csvString) {
-  if (csvString == null || csvString.isEmpty) return [];
-  
-  try {
-    return csvString.split(',').map((s) => int.parse(s.trim())).toList();
-  } on FormatException catch (e) {
-    QuizzerLogger.logError('Failed to parse indices CSV: "$csvString". Error: $e');
-    // Fail Fast: Re-throw as StateError for data integrity issues
-    throw StateError('Invalid format for index_options_that_apply CSV: "$csvString"'); 
-  }
-}
-
 Future<int> editQuestionAnswerPair({
   required String questionId,
   required Database db,
   String? citation,
   List<Map<String, dynamic>>? questionElements,
   List<Map<String, dynamic>>? answerElements,
-  List<Map<String, dynamic>>? correctOrderElements,
+  // Specific field for Select All That Apply - expecting List<int>
+  List<int>? indexOptionsThatApply,
   bool? ansFlagged,
   String? ansContrib,
   String? concepts,
@@ -137,44 +108,52 @@ Future<int> editQuestionAnswerPair({
   bool? flagForRemoval,
   String? moduleName,
   String? questionType,
-  List<Map<String, dynamic>>? options,
+  // Specific field for Multiple Choice/Select All - expecting List<Map<String, dynamic>>
+  List<Map<String, dynamic>>? options, 
+  // Specific field for Multiple Choice/True False - expecting int
   int? correctOptionIndex,
-  
+  // Specific field for Sort Order - expecting List<Map<String, dynamic>>
+  List<Map<String, dynamic>>? correctOrderElements, 
 }) async {
   // First verify that the table exists
   await verifyQuestionAnswerPairTable(db);
 
-  Map<String, dynamic> values = {};
+  // Prepare map for raw values to update 
+  Map<String, dynamic> valuesToUpdate = {};
   
-  if (citation != null) values['citation'] = citation;
-  if (questionElements != null) values['question_elements'] = _formatElements(questionElements);
-  if (answerElements != null) values['answer_elements'] = _formatElements(answerElements);
-  if (ansFlagged != null) values['ans_flagged'] = ansFlagged;
-  if (ansContrib != null) values['ans_contrib'] = ansContrib;
-  if (concepts != null) values['concepts'] = concepts;
-  if (subjects != null) values['subjects'] = subjects;
-  if (qstReviewer != null) values['qst_reviewer'] = qstReviewer;
-  if (hasBeenReviewed != null) values['has_been_reviewed'] = hasBeenReviewed;
-  if (flagForRemoval != null) values['flag_for_removal'] = flagForRemoval;
-  if (moduleName != null) values['module_name'] = moduleName;
-  if (questionType != null) values['question_type'] = questionType;
-  if (options != null) values['options'] = _formatElements(options);
-  if (correctOptionIndex != null) values['correct_option_index'] = correctOptionIndex;
-  if (correctOrderElements != null) {values['correct_order'] = _formatElements(correctOrderElements);}
+  // Add non-null fields to the map without encoding here
+  if (citation != null) valuesToUpdate['citation'] = citation;
+  if (questionElements != null) valuesToUpdate['question_elements'] = questionElements;
+  if (answerElements != null) valuesToUpdate['answer_elements'] = answerElements;
+  if (indexOptionsThatApply != null) valuesToUpdate['index_options_that_apply'] = indexOptionsThatApply;
+  if (ansFlagged != null) valuesToUpdate['ans_flagged'] = ansFlagged;
+  if (ansContrib != null) valuesToUpdate['ans_contrib'] = ansContrib;
+  if (concepts != null) valuesToUpdate['concepts'] = concepts;
+  if (subjects != null) valuesToUpdate['subjects'] = subjects;
+  if (qstReviewer != null) valuesToUpdate['qst_reviewer'] = qstReviewer;
+  if (hasBeenReviewed != null) valuesToUpdate['has_been_reviewed'] = hasBeenReviewed;
+  if (flagForRemoval != null) valuesToUpdate['flag_for_removal'] = flagForRemoval;
+  if (moduleName != null) valuesToUpdate['module_name'] = moduleName;
+  if (questionType != null) valuesToUpdate['question_type'] = questionType;
+  if (options != null) valuesToUpdate['options'] = options;
+  if (correctOptionIndex != null) valuesToUpdate['correct_option_index'] = correctOptionIndex;
+  if (correctOrderElements != null) valuesToUpdate['correct_order'] = correctOrderElements;
 
-  // Get current values to check completion status
-  final current = await getQuestionAnswerPairById(questionId, db);
-  values.addAll(current);
-  values['completed'] = _checkCompletionStatus(
-    values['question_elements'] ?? '',
-    values['answer_elements'] ?? '',
-  );
+  // If no values were provided to update, log and return 0 rows affected.
+  if (valuesToUpdate.isEmpty) {
+    QuizzerLogger.logWarning('editQuestionAnswerPair called for question $questionId with no fields to update.');
+    return 0;
+  }
 
-  return await db.update(
+  QuizzerLogger.logMessage('Updating question $questionId with fields: ${valuesToUpdate.keys.join(', ')}');
+
+  // Use the universal update helper (encoding happens inside)
+  return await updateRawData(
     'question_answer_pairs',
-    values,
-    where: 'question_id = ?',
-    whereArgs: [questionId],
+    valuesToUpdate, // Pass the map with raw values
+    'question_id = ?', // where clause
+    [questionId],      // whereArgs
+    db,
   );
 }
 
@@ -183,61 +162,35 @@ Future<int> editQuestionAnswerPair({
 Future<Map<String, dynamic>> getQuestionAnswerPairById(String questionId, Database db) async {
   // First verify that the table exists
   await verifyQuestionAnswerPairTable(db);
-
-  QuizzerLogger.logMessage('Fetching question_answer_pair with ID: $questionId');
-
-  final List<Map<String, dynamic>> maps = await db.query(
+  // Use the single helper function
+  final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
     'question_answer_pairs',
-    where: 'question_id = ?', // Query by the composite question_id directly
-    whereArgs: [questionId],   // Use the provided questionId
+    db,
+    where: 'question_id = ?',
+    whereArgs: [questionId],
+    limit: 2, // Limit to 2 to check if more than one exists
   );
-  // Create a new map instead of modifying the read-only query result
-  final Map<String, dynamic> result = Map<String, dynamic>.from(maps.first);
-  
-  // Parse the element CSV strings if they exist
-  if(result.containsKey('question_elements')){
-      result['question_elements'] = _parseElements(result['question_elements']);
-  }
-  if(result.containsKey('answer_elements')){
-      result['answer_elements'] = _parseElements(result['answer_elements']);
-  }
-  // Parse options string into List<Map<String, dynamic>>
-  if (result.containsKey('options')) {
-    final optionsCsv = result['options'] as String?;
-    if (optionsCsv != null && optionsCsv.isNotEmpty) {
-      result['options'] = _parseElements(optionsCsv);
-    } else {
-      result['options'] = <Map<String, dynamic>>[]; // Empty list if null or empty CSV
-    }
+
+  // Perform checks previously done in queryDecodedSingle
+  if (results.isEmpty) {
+    QuizzerLogger.logError('Query for single row (getQuestionAnswerPairById) returned no results for ID: $questionId');
+    throw StateError('Expected exactly one row for question ID $questionId, but found none.');
+  } else if (results.length > 1) {
+    QuizzerLogger.logError('Query for single row (getQuestionAnswerPairById) returned ${results.length} results for ID: $questionId');
+    throw StateError('Expected exactly one row for question ID $questionId, but found ${results.length}.');
   }
 
-  // Parse correct_order CSV string into List<Map<String, dynamic>>
-  if (result.containsKey('correct_order')) {
-    final correctOrderCsv = result['correct_order'] as String?;
-    if (correctOrderCsv != null && correctOrderCsv.isNotEmpty) {
-      result['correct_order'] = _parseElements(correctOrderCsv);
-    } else {
-      result['correct_order'] = <Map<String, dynamic>>[]; // Empty list if null or empty CSV
-    }
-  }
-
-  // Parse index_options_that_apply CSV string into List<int>
-  if (result.containsKey('index_options_that_apply')) {
-    result['index_options_that_apply'] = _parseIndices(result['index_options_that_apply'] as String?);
-  }
-  // Ensure subjects is parsed if needed, although it might already be a string
-  // if (result.containsKey('subjects')) { ... parsing logic if needed ... }
-
-  QuizzerLogger.logSuccess('Successfully fetched question $questionId');
-  return result;
+  // Return the single decoded row
+  return results.first;
 }
 
 Future<List<Map<String, dynamic>>>  getQuestionAnswerPairsBySubject(String subject, Database db) async {
   // First verify that the table exists
   await verifyQuestionAnswerPairTable(db);
-
-  return await db.query(
+  // Use the helper function to query and decode the list of rows
+  return await queryAndDecodeDatabase(
     'question_answer_pairs',
+    db,
     where: 'subjects LIKE ?',
     whereArgs: ['%$subject%'],
   );
@@ -246,9 +199,10 @@ Future<List<Map<String, dynamic>>>  getQuestionAnswerPairsBySubject(String subje
 Future<List<Map<String, dynamic>>>  getQuestionAnswerPairsByConcept(String concept, Database db) async {
   // First verify that the table exists
   await verifyQuestionAnswerPairTable(db);
-
-  return await db.query(
+  // Use the helper function to query and decode the list of rows
+  return await queryAndDecodeDatabase(
     'question_answer_pairs',
+    db,
     where: 'concepts LIKE ?',
     whereArgs: ['%$concept%'],
   );
@@ -257,27 +211,42 @@ Future<List<Map<String, dynamic>>>  getQuestionAnswerPairsByConcept(String conce
 Future<List<Map<String, dynamic>>>  getQuestionAnswerPairsBySubjectAndConcept(String subject, String concept, Database db) async {
   // First verify that the table exists
   await verifyQuestionAnswerPairTable(db);
-
-  return await db.query(
+  // Use the helper function to query and decode the list of rows
+  return await queryAndDecodeDatabase(
     'question_answer_pairs',
+    db,
     where: 'subjects LIKE ? AND concepts LIKE ?',
     whereArgs: ['%$subject%', '%$concept%'],
   );
 }
+
 Future<Map<String, dynamic>?>       getRandomQuestionAnswerPair(Database db) async {
   // First verify that the table exists
   await verifyQuestionAnswerPairTable(db);
 
+  // Cannot use standard queryDecodedList due to ORDER BY RANDOM()
   final List<Map<String, dynamic>> maps = await db.rawQuery(
     'SELECT * FROM question_answer_pairs ORDER BY RANDOM() LIMIT 1'
   );
-  return maps.isEmpty ? null : maps.first;
+  
+  if (maps.isEmpty) {
+    return null;
+  }
+
+  // Manually decode the single result from rawQuery
+  final Map<String, dynamic> rawResult = maps.first;
+  final Map<String, dynamic> decodedResult = {};
+  for (final entry in rawResult.entries) {
+    decodedResult[entry.key] = decodeValueFromDB(entry.value);
+  }
+  return decodedResult;
 }
 
 Future<List<Map<String, dynamic>>>  getAllQuestionAnswerPairs(Database db) async {
   // First verify that the table exists
   await verifyQuestionAnswerPairTable(db);
-  return await db.query('question_answer_pairs');
+  // Use the helper function to query and decode all rows
+  return await queryAndDecodeDatabase('question_answer_pairs', db);
 }
 
 Future<int> removeQuestionAnswerPair(String timeStamp, String qstContrib, Database db) async {
@@ -372,185 +341,239 @@ Future<Set<String>> getUniqueConcepts(Database db) async {
   return concepts;
 }
 
-// We should have a dedicated function to add a question answer pair, for each question type
-/// Adds a new multiple-choice question to the database.
-/// Requires specific fields relevant to multiple-choice questions.
-Future<int> addQuestionMultipleChoice({
-  required String timeStamp, // Used for generating question_id
-  required String qstContrib, // Used for generating question_id
+// --- Add Question Functions ---
+
+Future<String> addQuestionMultipleChoice({
+  required String moduleName,
   required List<Map<String, dynamic>> questionElements,
   required List<Map<String, dynamic>> answerElements,
-  // Options format: List<Map<String, dynamic>>, where each map represents one option,
-  // typically like {'type': 'text', 'content': 'option_text'}. Each map is one option.
   required List<Map<String, dynamic>> options,
-  required int correctOptionIndex, // Specific to multiple choice
-  required String moduleName,
-  required String ansContrib, // Assuming this is still required
-  required bool ansFlagged, // Assuming required
-  required bool hasBeenReviewed, // Assuming required
-  required bool flagForRemoval, // Assuming required
-  String citation = '',
+  required int correctOptionIndex,
+  required String qstContrib, // Added contributor ID
+  required Database db,
+  String? citation,
   String? concepts,
   String? subjects,
-  String? qstReviewer,
-  required Database db,
 }) async {
-  // First verify that the table exists
   await verifyQuestionAnswerPairTable(db);
+  final String timeStamp = DateTime.now().toIso8601String();
+  final String questionId = '${timeStamp}_$qstContrib';
 
-  // Generate question_id
-  final questionId = '${timeStamp}_$qstContrib';
-
-  // Format elements and options using the element formatter
-  final formattedQuestionElements = _formatElements(questionElements);
-  final formattedAnswerElements   = _formatElements(answerElements);
-  final formattedOptions          = _formatElements(options); // CHANGED: Use _formatElements
-
-  // Check completion status based on formatted elements
-  final bool completed = _checkCompletionStatus(formattedQuestionElements, formattedAnswerElements);
-
-  // Prepare data map
+  // Prepare the raw data map (values will be encoded by the helper)
   final Map<String, dynamic> data = {
     'time_stamp': timeStamp,
     'citation': citation,
-    'question_elements': formattedQuestionElements,
-    'answer_elements': formattedAnswerElements,
-    'ans_flagged': ansFlagged ? 1 : 0,
-    'ans_contrib': ansContrib,
-    'concepts': concepts ?? '', // Use empty string if null
-    'subjects': subjects ?? '', // Use empty string if null
+    'question_elements': questionElements,
+    'answer_elements': answerElements,
+    'ans_flagged': false,
+    'ans_contrib': '', // Default empty
+    'concepts': concepts,
+    'subjects': subjects,
     'qst_contrib': qstContrib,
-    'qst_reviewer': qstReviewer, // Nullable is okay for DB
-    'has_been_reviewed': hasBeenReviewed ? 1 : 0,
-    'flag_for_removal': flagForRemoval ? 1 : 0,
-    'completed': completed ? 1 : 0,
+    'qst_reviewer': '', // Default empty
+    'has_been_reviewed': false,
+    'flag_for_removal': false,
+    // Check completion based on raw lists before encoding
+    'completed': _checkCompletionStatus(
+        questionElements.isNotEmpty ? json.encode(questionElements) : '', // Check if list is not empty before encoding for check
+        answerElements.isNotEmpty ? json.encode(answerElements) : ''
+    ),
     'module_name': moduleName,
-    'question_type': 'multiple_choice', // Set type explicitly
-    'options': formattedOptions, // Use the newly formatted options string
+    'question_type': 'multiple_choice',
+    'options': options,
     'correct_option_index': correctOptionIndex,
     'question_id': questionId,
-    // 'correct_order': null, // Explicitly null for non-sort_order types (DB allows NULL)
   };
 
-  // Remove null value keys specifically for qst_reviewer before insert
-  // Other nulls were handled with ?? '' or are nullable in the schema.
-  if (data['qst_reviewer'] == null) {
-      data.remove('qst_reviewer');
-  }
+  // Use the universal insert helper
+  await insertRawData('question_answer_pairs', data, db);
 
-  QuizzerLogger.logMessage('Adding multiple_choice question with ID: $questionId');
-  final result = await db.insert(
-    'question_answer_pairs',
-    data,
-    // Using ignore conflict algorithm, assuming question_id should be unique
-    // If timestamp+contrib isn't guaranteed unique, consider ConflictAlgorithm.replace or fail
-    conflictAlgorithm: ConflictAlgorithm.ignore,
-  );
-  if (result == 0) {
-     QuizzerLogger.logWarning('Failed to insert multiple_choice question $questionId (maybe duplicate?)');
-  } else {
-     QuizzerLogger.logSuccess('Successfully added multiple_choice question $questionId with row ID: $result');
-  }
-  return result;
+  return questionId; // Return the generated question ID regardless of insert result (consistent with previous logic)
 }
 
-// select_all_that_apply     isValidationDone [X]
-/// Adds a new select-all-that-apply question to the database.
-Future<int> addQuestionSelectAllThatApply({
-  required String timeStamp,
-  required String qstContrib,
+Future<String> addQuestionSelectAllThatApply({
+  required String moduleName,
   required List<Map<String, dynamic>> questionElements,
   required List<Map<String, dynamic>> answerElements,
   required List<Map<String, dynamic>> options,
-  required List<int> indexOptionsThatApply, // Specific to this type
-  required String moduleName,
-  required String ansContrib,
-  required bool ansFlagged,
-  required bool hasBeenReviewed,
-  required bool flagForRemoval,
-  String citation = '',
+  required List<int> indexOptionsThatApply, // Use List<int>
+  required String qstContrib,
+  required Database db,
+  String? citation,
   String? concepts,
   String? subjects,
-  String? qstReviewer,
-  required Database db,
 }) async {
-  // First verify that the table exists
   await verifyQuestionAnswerPairTable(db);
+  final String timeStamp = DateTime.now().toIso8601String();
+  final String questionId = '${timeStamp}_$qstContrib';
 
-  // Generate question_id
-  final questionId = '${timeStamp}_$qstContrib';
-
-  // Format elements, options, and indices
-  final formattedQuestionElements = _formatElements(questionElements);
-  final formattedAnswerElements   = _formatElements(answerElements);
-  final formattedOptions          = _formatElements(options);
-  final formattedIndices          = _formatIndices(indexOptionsThatApply);
-
-  // Check completion status
-  final bool completed = _checkCompletionStatus(formattedQuestionElements, formattedAnswerElements);
-
-  // Prepare data map
+  // Prepare the raw data map
   final Map<String, dynamic> data = {
     'time_stamp': timeStamp,
     'citation': citation,
-    'question_elements': formattedQuestionElements,
-    'answer_elements': formattedAnswerElements,
-    'ans_flagged': ansFlagged ? 1 : 0,
-    'ans_contrib': ansContrib,
-    'concepts': concepts ?? '',
-    'subjects': subjects ?? '',
+    'question_elements': questionElements,
+    'answer_elements': answerElements,
+    'ans_flagged': false,
+    'ans_contrib': '',
+    'concepts': concepts,
+    'subjects': subjects,
     'qst_contrib': qstContrib,
-    'qst_reviewer': qstReviewer,
-    'has_been_reviewed': hasBeenReviewed ? 1 : 0,
-    'flag_for_removal': flagForRemoval ? 1 : 0,
-    'completed': completed ? 1 : 0,
+    'qst_reviewer': '',
+    'has_been_reviewed': false,
+    'flag_for_removal': false,
+    'completed': _checkCompletionStatus(
+        questionElements.isNotEmpty ? json.encode(questionElements) : '',
+        answerElements.isNotEmpty ? json.encode(answerElements) : ''
+    ),
     'module_name': moduleName,
-    'question_type': 'select_all_that_apply', // Set type explicitly
-    'options': formattedOptions,
-    'index_options_that_apply': formattedIndices, // Use the formatted indices string
-    'correct_option_index': null, // Explicitly null for this type
+    'question_type': 'select_all_that_apply',
+    'options': options,
+    'index_options_that_apply': indexOptionsThatApply,
     'question_id': questionId,
   };
 
-  // Remove null value key specifically for qst_reviewer
-  if (data['qst_reviewer'] == null) {
-      data.remove('qst_reviewer');
-  }
+  // Use the universal insert helper
+  await insertRawData('question_answer_pairs', data, db);
 
-  QuizzerLogger.logMessage('Adding select_all_that_apply question with ID: $questionId');
-  final result = await db.insert(
-    'question_answer_pairs',
-    data,
-    conflictAlgorithm: ConflictAlgorithm.ignore, // Assume question_id should be unique
-  );
-  if (result == 0) {
-     QuizzerLogger.logWarning('Failed to insert select_all_that_apply question $questionId (maybe duplicate?)');
-  } else {
-     QuizzerLogger.logSuccess('Successfully added select_all_that_apply question $questionId with row ID: $result');
-  }
-  return result;
+  return questionId;
 }
 
+Future<String> addQuestionTrueFalse({
+  required String moduleName,
+  required List<Map<String, dynamic>> questionElements,
+  required List<Map<String, dynamic>> answerElements,
+  required int correctOptionIndex, // 0 for True, 1 for False
+  required String qstContrib,
+  required Database db,
+  String? citation,
+  String? concepts,
+  String? subjects,
+}) async {
+  await verifyQuestionAnswerPairTable(db);
+  final String timeStamp = DateTime.now().toIso8601String();
+  final String questionId = '${timeStamp}_$qstContrib';
 
-// TODO true_false                isValidationDone [ ]
+  // Prepare the raw data map
+  final Map<String, dynamic> data = {
+    'time_stamp': timeStamp,
+    'citation': citation,
+    'question_elements': questionElements,
+    'answer_elements': answerElements,
+    'ans_flagged': false,
+    'ans_contrib': '',
+    'concepts': concepts,
+    'subjects': subjects,
+    'qst_contrib': qstContrib,
+    'qst_reviewer': '',
+    'has_been_reviewed': false,
+    'flag_for_removal': false,
+    'completed': _checkCompletionStatus(
+        questionElements.isNotEmpty ? json.encode(questionElements) : '',
+        answerElements.isNotEmpty ? json.encode(answerElements) : ''
+    ),
+    'module_name': moduleName,
+    'question_type': 'true_false',
+    'correct_option_index': correctOptionIndex,
+    'question_id': questionId,
+    // 'options' column is intentionally left NULL/unspecified for true_false type
+  };
 
+  // Use the universal insert helper
+  await insertRawData('question_answer_pairs', data, db);
+
+  return questionId;
+}
 
 // TODO sort_order                isValidationDone [ ]
+// Reuse question_elements, answer_elements, options
+// unique field for answer validation -> options
 
+// Question Elements    -> provide the question
+// Answer Elements      -> provide an explanation for the correct Asnwer
+// options              -> stores items that need to be sorted (must be in stored in the exact order that is the correct sorted order)
+
+// For validation we will need to accept the same options object, and it will need to match the exactly the options field for the sort_order question.
+// UI can randomize the presentation of the options, but for logic, we are simply matching lists against lists.
+
+/// Adds a new sort_order question to the database, following existing patterns.
+///
+/// Args:
+///   moduleId: The ID of the module this question belongs to.
+///   questionElements: A list of maps representing the question content.
+///   answerElements: A list of maps representing the explanation/answer rationale.
+///   options: A list of strings representing the items to be sorted, **in the correct final order**.
+///   qstContrib: The contributor ID for this question.
+///   db: The database instance.
+///   citation: Optional citation string.
+///   concepts: Optional comma-separated concepts string.
+///   subjects: Optional comma-separated subjects string.
+///
+/// Returns:
+///   The unique question_id generated for this question (format: timestamp_qstContrib).
+Future<String> addSortOrderQuestion({
+  required String moduleId,
+  required List<Map<String, dynamic>> questionElements,
+  required List<Map<String, dynamic>> answerElements,
+  required List<Map<String, dynamic>> options, // Items in the correct sorted order
+  required String qstContrib, // Added contributor ID to match pattern
+  required Database db,
+  String? citation,
+  String? concepts,
+  String? subjects,
+}) async {
+  // First verify that the table exists
+  await verifyQuestionAnswerPairTable(db); // Ensure table and columns are ready
+
+  // Generate ID components using the established pattern
+  final String timeStamp = DateTime.now().toIso8601String();
+  final String questionId = '${timeStamp}_$qstContrib';
+
+  // Prepare the raw data map - matching fields and defaults from other add functions
+  final Map<String, dynamic> rawData = {
+    'time_stamp': timeStamp, // Part of legacy primary key and used for ID
+    'citation': citation,
+    'question_elements': questionElements, // Will be JSON encoded by helper
+    'answer_elements': answerElements,     // Will be JSON encoded by helper
+    'ans_flagged': false, // Default
+    'ans_contrib': '', // Default
+    'concepts': concepts,
+    'subjects': subjects,
+    'qst_contrib': qstContrib, // Store contributor ID
+    'qst_reviewer': '', // Default
+    'has_been_reviewed': false, // Default
+    'flag_for_removal': false, // Default
+    // Use the helper to check completion status, mirroring other add functions
+    'completed': _checkCompletionStatus(
+        questionElements.isNotEmpty ? json.encode(questionElements) : '',
+        answerElements.isNotEmpty ? json.encode(answerElements) : ''
+    ),
+    'module_name': moduleId,
+    'question_type': 'sort_order', // Use string literal
+    'options': options, // Store correctly ordered list, will be JSON encoded by helper
+    'question_id': questionId, // Store the generated ID
+    // Fields specific to other types are omitted (correct_option_index, index_options_that_apply, correct_order)
+  };
+
+  QuizzerLogger.logMessage('Adding sort_order question with ID: $questionId for module $moduleId');
+
+  // Use the universal insert helper (encoding happens inside)
+  await insertRawData(
+    'question_answer_pairs',
+    rawData,
+    db,
+  );
+
+  return questionId; // Return the generated ID
+}
 
 // TODO matching                  isValidationDone [ ]
 
-
 // TODO fill_in_the_blank         isValidationDone [ ]
-
 
 // TODO short_answer              isValidationDone [ ]
 
-
 // TODO hot_spot (clicks image)   isValidationDone [ ]
 
-
 // TODO label_diagram             isValidationDone [ ]
-
 
 // TODO math                      isValidationDone [ ]

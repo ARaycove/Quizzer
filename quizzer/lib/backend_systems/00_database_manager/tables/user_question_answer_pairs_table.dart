@@ -2,6 +2,7 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:sqflite/sqflite.dart';
 import 'dart:async';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
+import '00_table_helper.dart'; // Import the helper file
 
 Future<void> verifyUserQuestionAnswerPairTable(Database db) async {
   
@@ -51,31 +52,48 @@ Future<void> verifyUserQuestionAnswerPairTable(Database db) async {
   }
 }
 
+/// questionAnswerReference is question_id field
 Future<int> addUserQuestionAnswerPair({
   required String userUuid,
-  required String questionAnswerReference,
+  required String questionAnswerReference, // Renamed to questionId for consistency?
   required int revisionStreak,
   required String? lastRevised,
   required String predictedRevisionDueHistory,
   required String nextRevisionDue,
   required double timeBetweenRevisions,
   required double averageTimesShownPerDay,
-  required bool inCirculation,
   required Database db,
 }) async {
   await verifyUserQuestionAnswerPairTable(db);
 
-  return await db.insert('user_question_answer_pairs', {
+  // Prepare raw data map
+  final Map<String, dynamic> data = {
     'user_uuid': userUuid,
-    'question_id': questionAnswerReference,
+    'question_id': questionAnswerReference, // Use the parameter name
     'revision_streak': revisionStreak,
     'last_revised': lastRevised,
     'predicted_revision_due_history': predictedRevisionDueHistory,
     'next_revision_due': nextRevisionDue,
     'time_between_revisions': timeBetweenRevisions,
     'average_times_shown_per_day': averageTimesShownPerDay,
-    'in_circulation': inCirculation ? 1 : 0,
-  });
+    'in_circulation': false, // Default to false, pass bool directly
+    'last_updated': DateTime.now().toIso8601String(), // Add last_updated on creation
+    'total_attempts': 0, // Initialize total_attempts on creation
+  };
+
+  // Use universal insert helper
+  final int result = await insertRawData(
+      'user_question_answer_pairs',
+      data,
+      db,
+  );
+  // Log success/failure based on result
+  if (result > 0) {
+    QuizzerLogger.logSuccess('Added user_question_answer_pair for User: $userUuid, Q: $questionAnswerReference');
+  } else {
+    QuizzerLogger.logWarning('Insert operation for user_question_answer_pair (User: $userUuid, Q: $questionAnswerReference) returned $result.');
+  }
+  return result; 
 }
 
 Future<int> editUserQuestionAnswerPair({
@@ -90,10 +108,11 @@ Future<int> editUserQuestionAnswerPair({
   double? averageTimesShownPerDay,
   bool? isEligible,
   bool? inCirculation,
-  String? lastUpdated,
+  String? lastUpdated, // Keep allowing specific lastUpdated override
 }) async {
   await verifyUserQuestionAnswerPairTable(db);
 
+  // Prepare raw data map
   Map<String, dynamic> values = {};
   
   if (revisionStreak != null) values['revision_streak'] = revisionStreak;
@@ -102,42 +121,70 @@ Future<int> editUserQuestionAnswerPair({
   if (nextRevisionDue != null) values['next_revision_due'] = nextRevisionDue;
   if (timeBetweenRevisions != null) values['time_between_revisions'] = timeBetweenRevisions;
   if (averageTimesShownPerDay != null) values['average_times_shown_per_day'] = averageTimesShownPerDay;
-  if (isEligible != null) values['is_eligible'] = isEligible ? 1 : 0;
-  if (inCirculation != null) values['in_circulation'] = inCirculation ? 1 : 0;
-  if (lastUpdated != null) values['last_updated'] = lastUpdated;
+  if (isEligible != null) values['is_eligible'] = isEligible; // Pass bool directly
+  if (inCirculation != null) values['in_circulation'] = inCirculation; // Pass bool directly
+  
+  // Always add/update the last_updated timestamp unless explicitly provided
+  values['last_updated'] = lastUpdated ?? DateTime.now().toIso8601String();
 
-  return await db.update(
+  // If only last_updated was set (e.g. from setCirculationStatus without other changes),
+  // the map might still be empty excluding that. Check if other keys exist.
+  if (values.keys.where((k) => k != 'last_updated').isEmpty) {
+     QuizzerLogger.logWarning('editUserQuestionAnswerPair called for User: $userUuid, Q: $questionId with no fields to update besides last_updated.');
+     // Optionally return 0 if only timestamp was updated implicitly?
+     // For now, let the update proceed even if only timestamp changed.
+  }
+
+  // Use universal update helper
+  final int result = await updateRawData(
     'user_question_answer_pairs',
     values,
-    where: 'user_uuid = ? AND question_id = ?',
-    whereArgs: [userUuid, questionId],
+    'user_uuid = ? AND question_id = ?', // where clause
+    [userUuid, questionId],             // whereArgs
+    db,
   );
+
+  // Log based on result
+  if (result > 0) {
+    QuizzerLogger.logSuccess('Edited user_question_answer_pair for User: $userUuid, Q: $questionId ($result row affected).');
+  } else {
+    QuizzerLogger.logWarning('Update operation for user_question_answer_pair (User: $userUuid, Q: $questionId) affected 0 rows. Record might not exist.');
+  }
+  return result;
 }
 
 Future<Map<String, dynamic>> getUserQuestionAnswerPairById(String userUuid, String questionId, Database db) async {
   await verifyUserQuestionAnswerPairTable(db);
   
-  final List<Map<String, dynamic>> result = await db.query(
+  // Use the universal query helper
+  final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
     'user_question_answer_pairs',
+    db,
     where: 'user_uuid = ? AND question_id = ?',
     whereArgs: [userUuid, questionId],
+    limit: 2, // Limit to 2 to detect if more than one exists
   );
   
-  // Check if the result is empty
-  if (result.isEmpty) {
-    // Throw an exception if no record is found for the given IDs
-    throw ArgumentError(
-        'No user question answer pair found for userUuid: $userUuid and questionAnswerReference: $questionId. Invalid IDs provided.');
+  // Check if the result is empty or has too many rows
+  if (results.isEmpty) {
+    QuizzerLogger.logError('No user question answer pair found for userUuid: $userUuid and questionId: $questionId.');
+    throw StateError('No record found for user $userUuid, question $questionId');
+  } else if (results.length > 1) {
+    QuizzerLogger.logError('Found multiple records for userUuid: $userUuid and questionId: $questionId. PK constraint violation?');
+    throw StateError('Found multiple records for PK user $userUuid, question $questionId');
   }
   
-  // Return the first record if found
-  return result.first;
+  // Return the single, decoded record
+  QuizzerLogger.logSuccess('Successfully fetched user_question_answer_pair for User: $userUuid, Q: $questionId');
+  return results.first;
 }
 
 Future<List<Map<String, dynamic>>> getUserQuestionAnswerPairsByUser(String userUuid, Database db) async {
   await verifyUserQuestionAnswerPairTable(db);
-  return await db.query(
+  // Use universal query helper
+  return await queryAndDecodeDatabase(
     'user_question_answer_pairs',
+    db,
     where: 'user_uuid = ?',
     whereArgs: [userUuid],
   );
@@ -145,19 +192,21 @@ Future<List<Map<String, dynamic>>> getUserQuestionAnswerPairsByUser(String userU
 
 Future<List<Map<String, dynamic>>> getQuestionsInCirculation(String userUuid, Database db) async {
   await verifyUserQuestionAnswerPairTable(db);
-
-  return await db.query(
+  // Use universal query helper
+  return await queryAndDecodeDatabase(
     'user_question_answer_pairs',
+    db,
     where: 'user_uuid = ? AND in_circulation = ?',
-    whereArgs: [userUuid, 1],
+    whereArgs: [userUuid, 1], // Query for in_circulation = 1 (true)
   );
 }
 
 Future<List<Map<String, dynamic>>> getAllUserQuestionAnswerPairs(Database db, String userUuid) async {
   await verifyUserQuestionAnswerPairTable(db);
-
-  return await db.query(
+  // Use universal query helper
+  return await queryAndDecodeDatabase(
       'user_question_answer_pairs',
+      db,
       where: 'user_uuid = ?',
       whereArgs: [userUuid]
   );
@@ -209,20 +258,26 @@ Future<void> setCirculationStatus(
   // Ensure table exists before update
   await verifyUserQuestionAnswerPairTable(db);
 
-  // Perform the update using the existing edit function
-  final int rowsAffected = await editUserQuestionAnswerPair(
-      userUuid: userUuid,
-      questionId: questionId,
-      db: db,
-      inCirculation: isInCirculation, // Use the provided boolean value
-      lastUpdated: DateTime.now().toIso8601String());
+  // Perform the update using the universal update helper directly
+  final Map<String, dynamic> updateData = {
+    'in_circulation': isInCirculation, // Pass bool directly
+    'last_updated': DateTime.now().toIso8601String(),
+  };
+  
+  final int rowsAffected = await updateRawData(
+    'user_question_answer_pairs',
+    updateData,
+    'user_uuid = ? AND question_id = ?', // where
+    [userUuid, questionId],             // whereArgs
+    db,
+  );
 
   if (rowsAffected == 0) {
     // Fail fast if the specific record wasn't found for update
-    QuizzerLogger.logWarning(
+    QuizzerLogger.logError(
         'Update circulation status failed: No record found for user $userUuid and question $questionId');
     // NOTE: Throwing here because if this is called, the record SHOULD exist.
-    throw Exception(
+    throw StateError(
         'Record not found for user $userUuid and question $questionId during circulation update.');
   }
 

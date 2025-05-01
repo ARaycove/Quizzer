@@ -46,3 +46,69 @@ bool validateSelectAllThatApplyAnswer({
   return userAnswerSet.length == correctIndicesSet.length && // Ensure no duplicates affected length check
          userAnswerSet.containsAll(correctIndicesSet);
 }
+
+/// Validates a user's answer for a true/false question.
+///
+/// Args:
+///   userAnswer: The answer submitted by the user (expected to be 0 for True, 1 for False).
+///   correctIndex: The correct index stored in the question details (0 or 1).
+///
+/// Returns:
+///   true if the answer is correct, false otherwise.
+bool validateTrueFalseAnswer({
+  required dynamic userAnswer,
+  required int correctIndex,
+}) {
+  // Basic validation: correctIndex must be 0 or 1 for true/false
+  assert(correctIndex == 0 || correctIndex == 1, 
+         'Invalid correctIndex ($correctIndex) for true/false validation.');
+
+  // Check if user answer is the correct type (int) and value (0 or 1) and matches the correct index
+  final bool isCorrect = (userAnswer is int && userAnswer == correctIndex);
+  return isCorrect;
+}
+
+// --- Sort Order Validation ---
+
+/// Validates a user's answer for a sort_order question.
+///
+/// Args:
+///   userAnswer: The answer submitted by the user (expected to be List<String> in the user's chosen order).
+///   correctOrder: The list representing the correct order (typically from the 'options' field).
+///
+/// Returns:
+///   true if the user's list matches the correct order exactly, false otherwise.
+bool validateSortOrderAnswer({
+  required List<Map<String, dynamic>> userAnswer,
+  required List<Map<String, dynamic>> correctOrder,
+}) {
+  // 1. Check if lists have the same length
+  //    (Type check List<Map<String, dynamic>> is handled by the function signature)
+  if (userAnswer.length != correctOrder.length) {
+    return false; // Different number of items
+  }
+
+  // 2. Compare elements element by element based on 'content' field
+  for (int i = 0; i < correctOrder.length; i++) {
+    final userMap = userAnswer[i];
+    final correctMap = correctOrder[i];
+
+    // Basic check: ensure both are maps and contain 'content'
+    // Using `containsKey` for safety, though `[]` access would throw on missing key (Fail Fast)
+    if (!userMap.containsKey('content') || !correctMap.containsKey('content')) {
+        // Or log error and return false if missing keys are invalid states
+        throw StateError('Sort order element map missing \'content\' key at index $i');
+    }
+
+    // Compare the content fields
+    if (userMap['content'] != correctMap['content']) {
+      return false; // Mismatch found at this position
+    }
+  }
+
+  // If all elements matched in order based on content, the answer is correct
+  return true;
+}
+
+
+

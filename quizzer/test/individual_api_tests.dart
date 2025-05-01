@@ -3,6 +3,11 @@ import 'package:logging/logging.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'test_helpers.dart';
+import 'dart:io';
+import 'dart:convert';
+import 'dart:math'; // Import for Random class
+import 'package:sqflite/sqflite.dart'; // Import for Database type
+import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart'; // Import for getDatabaseMonitor
 
 void main() {
   // Ensure logger is initialized first, setting level to FINE to see logValue messages
@@ -41,6 +46,10 @@ void main() {
     QuizzerLogger.logMessage("Workers initialized as intended???");
   });
 
+  test('monitor caches for 5 seconds after login', () async {
+    await monitorCaches(monitoringSeconds: 5);
+  });
+  
   test('simulate activating all modules', () async {
     final sessionManager = getSessionManager();
     assert(sessionManager.userLoggedIn, "User must be logged in for this test");
@@ -75,6 +84,31 @@ void main() {
   }, timeout: const Timeout(Duration(minutes: 1))); // Reduced timeout slightly
 
 
+// =============================================================================================
+// Rest of Tests (environment set up)
+  // marked skipped right now [x]
+  test('requestNextQuestion cycle test (50 iterations)', () async {
+    final sessionManager = getSessionManager();
+    assert(sessionManager.userLoggedIn, "User must be logged in for this test");
+
+    QuizzerLogger.printHeader('Starting requestNextQuestion cycle test (50 iterations)...');
+
+    for (int i = 1; i <= 50; i++) {
+      QuizzerLogger.printDivider();
+      QuizzerLogger.logMessage('--- Cycle Test Iteration $i ---');
+      
+      QuizzerLogger.logMessage('Calling requestNextQuestion...');
+      await sessionManager.requestNextQuestion();
+      
+      QuizzerLogger.logMessage('Logging current question details...');
+      await logCurrentQuestionDetails(sessionManager);
+      
+      QuizzerLogger.logMessage('Monitoring caches for 1 second...');
+      await monitorCaches(monitoringSeconds: 1);
+    }
+
+    QuizzerLogger.printHeader('Finished requestNextQuestion cycle test.');
+  }, timeout: const Timeout(Duration(minutes: 5)), skip: true); // Timeout allows for 50s monitoring + overhead
 
   test('Question loop test', () async {
     final sessionManager = getSessionManager();
@@ -82,7 +116,7 @@ void main() {
 
     QuizzerLogger.printHeader('Starting requestNextQuestion loop test (3 iterations)...');
 
-    for (int i = 1; i <= 10; i++) {
+    for (int i = 1; i <= 100; i++) {
     QuizzerLogger.printDivider();
       QuizzerLogger.logMessage('--- Iteration $i ---');
       QuizzerLogger.logMessage('--- State BEFORE requestNextQuestion Call ---');
@@ -90,7 +124,7 @@ void main() {
       await logCurrentQuestionDetails(sessionManager);
       await logCurrentUserQuestionRecordDetails(sessionManager);
       await logCurrentUserRecordFromDB(sessionManager);
-      await waitTime(250);
+      await waitTime(100);
 
 
 
@@ -99,19 +133,40 @@ void main() {
       QuizzerLogger.logMessage('--- State AFTER requestNextQuestion Call ---');
       // Call the new helper function again
       await logCurrentQuestionDetails(sessionManager);
-      await waitTime(250);
+      await waitTime(100);
 
-      QuizzerLogger.logMessage('Submitting random answer');
+      // Log duplicated so we can find it!!
+      QuizzerLogger.logMessage('Submitted random answer to question of type: ${sessionManager.currentQuestionType}');
+      // Test has been modified to answer correctly for multiple choice and select_all_that_apply
+      dynamic provided;
       if (sessionManager.currentQuestionType == "multiple_choice") {
-        await sessionManager.submitAnswer(userAnswer: getRandomMultipleChoiceAnswer(sessionManager));
-      } else if (sessionManager.currentQuestionType == "select_all_that_apply") {
-        await sessionManager.submitAnswer(userAnswer: getRandomSelectAllAnswer(sessionManager));
+        // provided = getRandomMultipleChoiceAnswer(sessionManager);
+        provided = sessionManager.currentCorrectOptionIndex;
+        await sessionManager.submitAnswer(userAnswer: provided);
+
+      } 
+      else if (sessionManager.currentQuestionType == "select_all_that_apply") {
+        // provided = getRandomSelectAllAnswer(sessionManager);
+        provided = sessionManager.currentCorrectIndices;
+        await sessionManager.submitAnswer(userAnswer: provided);
+
+      } 
+      else if (sessionManager.currentQuestionType == "true_false") {
+        // provided = Random().nextInt(2);
+        provided = sessionManager.currentCorrectOptionIndex;
+        await sessionManager.submitAnswer(userAnswer: provided);
+      }
+      else if (sessionManager.currentQuestionType == "sort_order") {
+        provided = getRandomSortOrderAnswer(sessionManager);
+        await sessionManager.submitAnswer(userAnswer: provided);
       }
       
-      await waitTime(250);
+      await waitTime(100);
       await logCurrentUserQuestionRecordDetails(sessionManager);
       await logCurrentUserRecordFromDB(sessionManager);
-      await waitTime(250);
+      QuizzerLogger.logMessage('Submitted random answer to question of type: ${sessionManager.currentQuestionType}');
+      QuizzerLogger.logMessage("Provided answer: $provided");
+      await waitTime(100);
 
       // Monitor caches to observe changes
       await monitorCaches(monitoringSeconds: 1);

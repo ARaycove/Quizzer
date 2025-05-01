@@ -106,8 +106,8 @@ class SessionManager {
   Map<String, dynamic>? get currentQuestionUserRecord => _currentQuestionRecord;
   Map<String, dynamic>? get currentQuestionStaticData => _currentQuestionDetails;
   
-  bool                  get showingAnswer             => _isAnswerDisplayed;
-  int?                  get optionSelected            => _multipleChoiceOptionSelected;
+  
+  // int?                  get optionSelected            => _multipleChoiceOptionSelected;
   DateTime?             get timeQuestionDisplayed     => _timeDisplayed;
   DateTime?             get timeAnswerGiven           => _timeAnswerGiven;
 
@@ -119,18 +119,47 @@ class SessionManager {
   String                      get currentQuestionId             => _currentQuestionDetails!['question_id'] 
   as String;
 
-  List<Map<String, dynamic>>  get currentQuestionElements       => _currentQuestionDetails!['question_elements'] 
-  as List<Map<String, dynamic>>;
+  // Safely cast List<dynamic> to List<Map<String, dynamic>>
+  List<Map<String, dynamic>>  get currentQuestionElements { 
+    final dynamic elements = _currentQuestionDetails!['question_elements'];
+    if (elements is List) {
+      // Explicitly create List<Map<String, dynamic>> from List<dynamic>
+      return List<Map<String, dynamic>>.from(elements.map((item) => Map<String, dynamic>.from(item as Map)));
+    } 
+    return []; // Return empty list if null or not a list
+  }
 
-  List<Map<String, dynamic>>  get currentQuestionAnswerElements => _currentQuestionDetails!['answer_elements'] 
-  as List<Map<String, dynamic>>;
+  // Safely cast List<dynamic> to List<Map<String, dynamic>>
+  List<Map<String, dynamic>>  get currentQuestionAnswerElements { 
+    final dynamic elements = _currentQuestionDetails!['answer_elements'];
+    if (elements is List) {
+      // Explicitly create List<Map<String, dynamic>> from List<dynamic>
+      return List<Map<String, dynamic>>.from(elements.map((item) => Map<String, dynamic>.from(item as Map)));
+    }
+    return []; // Return empty list if null or not a list
+  }
 
-  List<Map<String, dynamic>> get currentQuestionOptions        => _currentQuestionDetails!['options'] 
-  as List<Map<String, dynamic>>; // Corrected type
+  List<Map<String, dynamic>> get currentQuestionOptions { 
+    final dynamic options = _currentQuestionDetails!['options'];
+    if (options is List) {
+      // Explicitly create List<Map<String, dynamic>> from List<dynamic>
+      return List<Map<String, dynamic>>.from(options.map((item) => Map<String, dynamic>.from(item as Map)));
+    }
+    return []; // Return empty list if null or not a list
+  }
 
   int?                        get currentCorrectOptionIndex     => _currentQuestionDetails!['correct_option_index'] as int?; // Nullable if not MC or not set
 
-  List<int>                   get currentCorrectIndices         => _currentQuestionDetails!['index_options_that_apply'] as List<int>? ?? []; // For select_all_that_apply
+  // Safely cast List<dynamic> to List<int>
+  List<int>                   get currentCorrectIndices {        
+    final dynamic indices = _currentQuestionDetails?['index_options_that_apply']; // Use null-aware access
+    if (indices is List) {
+       // Attempt to create a List<int> from the List<dynamic>
+       // If any item is not an int, the 'item as int' cast will throw, adhering to Fail Fast.
+       return List<int>.from(indices.map((item) => item as int));
+    }
+    return []; // Return empty list if null or not a list
+  }
 
   List<Map<String, dynamic>>  get currentCorrectOrder           => _currentQuestionDetails!['correct_order'] 
   as List<Map<String, dynamic>>; // Parsed in DB layer
@@ -326,6 +355,7 @@ class SessionManager {
     await preProcessWorker.stop(); 
     await inactiveModuleWorker.stop();
     QuizzerLogger.logSuccess("Background workers stopped.");
+    
 
     // 2. Clear Caches (TODO: Implement clear methods in caches)
     QuizzerLogger.logMessage("Clearing data caches...");
@@ -340,6 +370,10 @@ class SessionManager {
     _unprocessedCache.    clear();
     _historyCache.        clear();
     QuizzerLogger.logSuccess("Data caches cleared (Placeholder - Clear methods TBD).");
+
+    QuizzerLogger.logMessage("Disposing SwitchBoard");
+    // TODO potential error here, when logging out ensure properly state reset of backend systems (_isRunning flags should terminate loops and force workers to reawait the start command)
+    // _switchBoard.dispose();
 
     // Update total study time
     if (sessionStartTime != null && userId != null) {
@@ -600,10 +634,23 @@ class SessionManager {
             correctIndices: correctIndices,
           );
           break;
-        // case 'sort_order':
-        //   // Compare userAnswer (List?) with currentCorrectOrder
-        //   isCorrect = /* ... comparison logic ... */ ;
-        //   break;
+        case 'true_false':
+          // User answer should be 0 (True) or 1 (False)
+          assert(currentCorrectOptionIndex != null);
+          isCorrect = answer_validator.validateTrueFalseAnswer(
+            userAnswer: userAnswer,
+            correctIndex: currentCorrectOptionIndex!,
+          );
+          break;
+        case 'sort_order':
+          // Get the correct order (List<Map<String, dynamic>>) using existing getter
+          final List<Map<String, dynamic>> correctOrder = currentQuestionOptions;
+          // Validate user's answer (expected List<Map<String, dynamic>>)
+          isCorrect = answer_validator.validateSortOrderAnswer(
+            userAnswer: userAnswer,
+            correctOrder: correctOrder,
+          );
+          break;
         // case 'text_input':
         //   // Compare userAnswer (String?) with currentQuestionAnswerElements
         //   isCorrect = /* ... comparison logic ... */ ;
@@ -648,12 +695,13 @@ class SessionManager {
        averageTimesShownPerDay: updatedUserRecord['average_times_shown_per_day'] as double,
        lastUpdated: updatedUserRecord['last_updated'] as String,
      );
-
-     // Explicitly increment total_attempts using the dedicated function
+    // ADDED: Increment total questions answered in user_profile table
+     // Explicitly increment total_attempts using the dedicated function -> for the questionObject
      await uqap_table.incrementTotalAttempts(userId!, questionId, db);
+     await incrementTotalQuestionsAnswered(userId!, db);
 
-      // Release lock AFTER successful operations
-      _dbMonitor.releaseDatabaseAccess();
+    // Release lock AFTER successful operations
+    _dbMonitor.releaseDatabaseAccess();
 
     // --- 7. Update In-Memory State ---
     _currentQuestionRecord = updatedUserRecord;
@@ -665,17 +713,15 @@ class SessionManager {
   /// Adds a new question to the database.
   /// Accepts parameters for various question types and routes to the specific
   /// database function based on `questionType`.
-  /// Uses a try-catch block to handle potential data validation errors from the DB layer
-  /// and return a user-friendly response.
+  /// Throws errors directly if validation fails or DB operations fail (Fail Fast).
   Future<Map<String, dynamic>> addNewQuestion({
     required String questionType,
     required List<Map<String, dynamic>> questionElements,
     required List<Map<String, dynamic>> answerElements,
     required String moduleName,
     // --- Type-specific --- (Add more as needed)
-    List<Map<String, dynamic>>? options, // For MC
-    int? correctOptionIndex, // For MC
-    List<Map<String, dynamic>>? correctOrderElements, // For Sort Order (placeholder)
+    List<Map<String, dynamic>>? options, // For MC & SelectAll
+    int? correctOptionIndex, // For MC & TrueFalse
     List<int>? indexOptionsThatApply, // For select_all_that_apply
     // --- Common Optional/Metadata ---
     String? citation,
@@ -684,98 +730,115 @@ class SessionManager {
   }) async {
     QuizzerLogger.logMessage('SessionManager: Attempting to add new question of type $questionType');
     // --- 1. Pre-checks --- 
-    if (userId == null) {
-      return {'success': false, 'message': 'User not logged in.'};
-    }
-    final timeStamp = DateTime.now().toIso8601String();
-    final qstContrib = userId!; // Use current user ID as the question contributor
+    assert(userId != null, 'User must be logged in to add a question.'); 
 
-    // --- 2. Database Operation --- 
+    final String timeStamp = DateTime.now().toIso8601String();
+    final String qstContrib = userId!; // Use current user ID as the question contributor
+
+    // --- 2. Database Operation (Lock Acquisition) --- 
     Database? db;
-    int result = -1; // Default to indicate failure/no insert
+    int result = 0; // Initialize result
     Map<String, dynamic> response;
 
-    try { //Explicit, if bad data is passed we catch the db error and return the message to user. . .
-      db = await _dbMonitor.requestDatabaseAccess();
-      if (db == null) {
-        throw StateError('Failed to acquire database access to add question.');
-      }
+    // Acquire DB Lock (Fail Fast - throw if unavailable)
+    db = await _dbMonitor.requestDatabaseAccess();
+    // Assert that db is not null after awaiting access
+    assert(db != null, 'Failed to acquire database access to add question.');
 
-      switch (questionType) {
-        case 'multiple_choice':
-          // Validate required fields for this type
-          if (options == null || correctOptionIndex == null) {
-            throw ArgumentError('Missing required fields for multiple_choice: options and correctOptionIndex.');
-          }
-          result = await q_pairs_table.addQuestionMultipleChoice(
-            timeStamp: timeStamp,
-            qstContrib: qstContrib,
+    switch (questionType) {
+      case 'multiple_choice':
+        // Validate required fields for this type
+        if (options == null || correctOptionIndex == null) {
+          _dbMonitor.releaseDatabaseAccess(); // Release lock before throwing
+          throw ArgumentError('Missing required fields for multiple_choice: options and correctOptionIndex.');
+        }
+        // Call refactored function with correct args
+        await q_pairs_table.addQuestionMultipleChoice(
+          moduleName: moduleName,
+          questionElements: questionElements,
+          answerElements: answerElements,
+          options: options,
+          correctOptionIndex: correctOptionIndex,
+          qstContrib: qstContrib, 
+          db: db!,
+          citation: citation,
+          concepts: concepts,
+          subjects: subjects,
+        );
+        break;
+
+      case 'select_all_that_apply':
+        // Validate required fields for this type
+        if (options == null || indexOptionsThatApply == null) {
+          _dbMonitor.releaseDatabaseAccess(); // Release lock before throwing
+          throw ArgumentError('Missing required fields for select_all_that_apply: options and indexOptionsThatApply.');
+        }
+        // Call refactored function with correct args
+        await q_pairs_table.addQuestionSelectAllThatApply(
+          moduleName: moduleName,
+          questionElements: questionElements,
+          answerElements: answerElements,
+          options: options,
+          indexOptionsThatApply: indexOptionsThatApply,
+          qstContrib: qstContrib,
+          db: db!,
+          citation: citation,
+          concepts: concepts,
+          subjects: subjects,
+        );
+        break;
+
+      // --- Add cases for other question types here --- 
+      case 'true_false':
+        // Validate required fields for this type using assert (Fail Fast)
+        if (correctOptionIndex == null) {
+            _dbMonitor.releaseDatabaseAccess(); // Release lock before throwing
+            throw ArgumentError('Missing required field correctOptionIndex for true_false');
+        }
+        
+        // Call refactored function with correct args
+        await q_pairs_table.addQuestionTrueFalse(
+            moduleName: moduleName,
             questionElements: questionElements,
             answerElements: answerElements,
-            options: options,
-            correctOptionIndex: correctOptionIndex,
-            moduleName: moduleName,
-            ansContrib: qstContrib,         // CHANGED: Directly use qstContrib
-            ansFlagged: false,              // CHANGED: Directly use false
-            hasBeenReviewed: false,         // CHANGED: Directly use false
-            flagForRemoval: false,          // CHANGED: Directly use false
-            citation: citation ?? '',
-            concepts: concepts,
-            subjects: subjects,
-            db: db,
-          );
-          break;
-
-        case 'select_all_that_apply':
-          // Validate required fields for this type
-          if (options == null || indexOptionsThatApply == null) {
-            throw ArgumentError('Missing required fields for select_all_that_apply: options and indexOptionsThatApply.');
-          }
-          result = await q_pairs_table.addQuestionSelectAllThatApply(
-            timeStamp: timeStamp,
+            correctOptionIndex: correctOptionIndex, // Already checked non-null
             qstContrib: qstContrib,
-            questionElements: questionElements,
-            answerElements: answerElements,
-            options: options,
-            indexOptionsThatApply: indexOptionsThatApply,
-            moduleName: moduleName,
-            ansContrib: qstContrib,
-            ansFlagged: false,
-            hasBeenReviewed: false,
-            flagForRemoval: false,
-            citation: citation ?? '',
+            db: db!,
+            citation: citation,
             concepts: concepts,
             subjects: subjects,
-            db: db,
           );
-          break;
+        break;
+      
+      case 'sort_order':
+        // Validate the new sortOrderOptions parameter
+        if (options == null) {
+          _dbMonitor.releaseDatabaseAccess(); // Release lock before throwing
+          throw ArgumentError('Missing required field for sort_order: sortOrderOptions (List<String>).');
+        }
+        // Call the specific function using the correct parameter
+        await q_pairs_table.addSortOrderQuestion(
+          moduleId: moduleName,
+          questionElements: questionElements,
+          answerElements: answerElements,
+          options: options, // Pass the validated List<String>
+          qstContrib: qstContrib,
+          db: db!, // Use non-null assertion after lock check
+          citation: citation,
+          concepts: concepts,
+          subjects: subjects,
+        );
+        break;
 
-        // --- Add cases for other question types here --- 
-        // case 'sort_order':
-        //   if (correctOrderElements == null) { ... }
-        //   result = await uqap_table.addQuestionSortOrder(...);
-        //   break;
-
-        default:
-          throw UnimplementedError('Adding questions of type \'$questionType\' is not yet supported.');
-      }
-      // Check result from DB insert
-      if (result <= 0) { // Insert failed (e.g., duplicate, DB error not caught as exception)
-          response = {'success': false, 'message': 'Failed to add question to database (maybe duplicate?).'};
-      } else {
-          response = {'success': true, 'message': 'Question added successfully.', 'rowId': result};
-      }
-
-    } catch (e, s) {
-      // Catch errors (e.g., ArgumentError, UnimplementedError, FormatException from DB layer)
-      QuizzerLogger.logError('Error adding question: $e\nStackTrace: $s');
-      response = {'success': false, 'message': 'Error adding question: ${e.toString()}'};
+      default:
+        _dbMonitor.releaseDatabaseAccess(); // Release lock before throwing
+        throw UnimplementedError('Adding questions of type \'$questionType\' is not yet supported.');
     }
 
-    // --- 3. Release DB Lock --- 
+    // --- 3. Release DB Lock ---
     // Release lock *after* try-catch completes. 
     // Adheres to no-finally, but assumes DB operations don't hang indefinitely on error.
-    await updateModuleActivationStatus(userId!, moduleName, true, db!);
+    await updateModuleActivationStatus(userId!, moduleName, true, db);
     // TODO validateAll is very inefficient, should probably write a proper function that just adds the userRecord directly to the unprocessedCache and to the table (works but slower at scale)
     _dbMonitor.releaseDatabaseAccess();
     await buildModuleRecords();
@@ -786,7 +849,8 @@ class SessionManager {
     
     QuizzerLogger.logMessage('SessionManager.addNewQuestion: DB access released.');
     
-    // --- 4. Return Result --- 
+    // --- 4. Return Result ---
+    response = {};
     return response;
   }
 

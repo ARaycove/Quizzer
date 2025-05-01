@@ -76,7 +76,6 @@ class CirculationWorker {
     await _activationSubscription?.cancel(); // Cancel stream subscription
     _activationSubscription = null;
     QuizzerLogger.logMessage('CirculationWorker: Unsubscribed from onModuleRecentlyActivated stream.');
-    await _stopCompleter?.future; // Wait for loop completion
     // QuizzerLogger.logMessage('CirculationWorker stopped.');
   }
   // ----------------------

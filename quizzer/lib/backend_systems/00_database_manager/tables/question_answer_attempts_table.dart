@@ -1,5 +1,6 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
+import '00_table_helper.dart'; // Import the helper file
 
 /// Verifies the existence and schema of the question_answer_attempts table.
 Future<void> verifyQuestionAnswerAttemptTable(Database db) async {
@@ -65,13 +66,15 @@ Future<void> verifyQuestionAnswerAttemptTable(Database db) async {
 /// Checks if this is the first attempt for a given user and question.
 Future<bool> _checkWasFirstAttempt(String questionId, String userId, Database db) async {
   QuizzerLogger.logMessage('Checking if first attempt for Q: $questionId, User: $userId');
-  final List<Map<String, dynamic>> result = await db.query(
+  // Use the universal query helper, we only care if the list is empty or not.
+  final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
     'question_answer_attempts',
+    db,
     where: 'participant_id = ? AND question_id = ?',
     whereArgs: [userId, questionId],
     limit: 1, // We only need to know if at least one exists
   );
-  final bool isFirst = result.isEmpty;
+  final bool isFirst = results.isEmpty;
   QuizzerLogger.logMessage('Is first attempt? $isFirst');
   return isFirst;
 }
@@ -86,7 +89,7 @@ Future<int> addQuestionAnswerAttempt({
   required String participantId,      
   required double responseTime,       
   required int responseResult,       // Accuracy rating (0=incorrect, 1=correct)
-  required String questionContextCsv, 
+  required String questionContextCsv, // NOTE: Schema expects TEXT, ensure input is string/JSON
   required int totalAttempts,        // Renamed: Total attempts *before* this one
   required int revisionStreak,       // Renamed: Streak *before* this attempt
   String? lastRevisedDate,           // Nullable timestamp of last revision
@@ -103,27 +106,35 @@ Future<int> addQuestionAnswerAttempt({
 
   QuizzerLogger.logMessage('Adding question attempt for Q: $questionId, User: $participantId');
   
+  // Prepare the raw data map
   final Map<String, dynamic> attemptData = {
     'time_stamp': timeStamp,
     'question_id': questionId,
     'participant_id': participantId,
     'response_time': responseTime,
     'response_result': responseResult, 
-    'was_first_attempt': wasFirstAttempt ? 1 : 0,
+    'was_first_attempt': wasFirstAttempt, // Pass bool, helper encodes to 1/0
     'knowledge_base': knowledgeBase,
-    'question_context_csv': questionContextCsv,
+    'question_context_csv': questionContextCsv, // Expecting String/JSON based on schema comment
     'last_revised_date': lastRevisedDate, 
     'days_since_last_revision': daysSinceLastRevision,
     'total_attempts': totalAttempts,
     'revision_streak': revisionStreak,
   };
 
-  final int resultId = await db.insert(
+  // Use the universal insert helper
+  final int resultId = await insertRawData(
     'question_answer_attempts',
     attemptData,
+    db,
     conflictAlgorithm: ConflictAlgorithm.ignore, // Or .fail if duplicates are critical errors
   );
-  QuizzerLogger.logSuccess('Successfully added question attempt record with result ID: $resultId. Data: $attemptData');
+
+  if (resultId > 0) {
+    QuizzerLogger.logSuccess('Successfully added question attempt record with result ID: $resultId. Data: $attemptData');
+  } else {
+    QuizzerLogger.logWarning('Insert operation for attempt (Q: $questionId, User: $participantId, Time: $timeStamp) returned $resultId. Might be ignored duplicate.');
+  }
   return resultId;
 }
 
@@ -133,8 +144,10 @@ Future<int> addQuestionAnswerAttempt({
 Future<List<Map<String, dynamic>>> getAttemptsByQuestionAndUser(String questionId, String userId, Database db) async {
   await verifyQuestionAnswerAttemptTable(db);
   QuizzerLogger.logMessage('Fetching attempts for Q: $questionId, User: $userId');
-  return await db.query(
+  // Use the universal query helper
+  return await queryAndDecodeDatabase(
     'question_answer_attempts',
+    db,
     where: 'participant_id = ? AND question_id = ?',
     whereArgs: [userId, questionId],
     orderBy: 'time_stamp DESC', // Order by most recent first
@@ -145,8 +158,10 @@ Future<List<Map<String, dynamic>>> getAttemptsByQuestionAndUser(String questionI
 Future<List<Map<String, dynamic>>> getAttemptsByUser(String userId, Database db) async {
   await verifyQuestionAnswerAttemptTable(db);
   QuizzerLogger.logMessage('Fetching all attempts for User: $userId');
-  return await db.query(
+  // Use the universal query helper
+  return await queryAndDecodeDatabase(
     'question_answer_attempts',
+    db,
     where: 'participant_id = ?',
     whereArgs: [userId],
     orderBy: 'time_stamp DESC', // Order by most recent first

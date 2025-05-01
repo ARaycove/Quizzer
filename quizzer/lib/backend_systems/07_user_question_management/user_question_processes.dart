@@ -40,7 +40,11 @@ Future<void> validateModuleQuestionsInUserProfile(String moduleName, Database db
     return;
   }
   
-  final questionIds = module['question_ids'] as List<String>;
+  // Verbose -> just here to log
+  // QuizzerLogger.logMessage("Getting list of question ids from this ->\n $module");
+  // Correctly handle List<dynamic> from decoded data
+  final List<dynamic> dynamicQuestionIds = module['question_ids'] as List<dynamic>? ?? []; 
+  final List<String> questionIds = List<String>.from(dynamicQuestionIds.map((id) => id.toString()));
   
   // Get all existing user question-answer pairs
   final existingPairs = await getUserQuestionAnswerPairsByUser(userId, db);
@@ -61,7 +65,6 @@ Future<void> validateModuleQuestionsInUserProfile(String moduleName, Database db
         nextRevisionDue: DateTime.now().toIso8601String(),
         timeBetweenRevisions: 0.37,
         averageTimesShownPerDay: 0.0,
-        inCirculation: false,
         db: db
       );
       

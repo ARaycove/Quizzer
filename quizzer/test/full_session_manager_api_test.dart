@@ -3,12 +3,41 @@ import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:logging/logging.dart';
 import 'test_helpers.dart'; // Import helper functions
+import 'dart:io';
+import 'dart:convert';
+import 'dart:math'; // Import for Random class
+import 'package:sqflite/sqflite.dart'; // Import for Database type
+import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart'; // Import for getDatabaseMonitor
 // ==========================================
 // Main Test Suite
 // ==========================================
+// This is a full test of all Quizzer functionality.
+// All tests are ran in sequence
+// We first truncate the test database, add questions, activate modules
+// Run a spam test, test the results of that, edit module description
+// Run the requestNextQuestion on a loop to ensure questions are cycling (without answer submissions)
+// Run the main Question Loop with answer submissions and monitor caches to see how questions move
+
 void main() {
   // Ensure logger is initialized first, setting level to FINE to see logValue messages
   QuizzerLogger.setupLogging(level: Level.FINE);
+  /// CLEAR FIRST (simulating first time user / empty database for testing)
+  test('Truncate all database tables', () async {
+    QuizzerLogger.printHeader('Starting database truncation test...');
+    final dbMonitor = getDatabaseMonitor(); // Get the monitor instance
+    Database? db;
+    db = await dbMonitor.requestDatabaseAccess();
+    assert(db != null, 'Failed to acquire database access for truncation.');
+    QuizzerLogger.logMessage('Database access acquired for truncation.');
+    // Call the truncate helper function, asserting non-null db
+    await truncateAllTables(db!); // Use null assertion operator
+    QuizzerLogger.logSuccess('truncateAllTables helper function completed.');
+    dbMonitor.releaseDatabaseAccess(); // Release is likely synchronous
+    QuizzerLogger.logWarning('DB was null, could not release access (might not have been acquired).');
+    QuizzerLogger.printHeader('Database truncation test finished.');
+  });
+
+  /// login and initiate question server background processes (simulates both the attemptLogin and creation of NewUsers)
   test('login and worker start up', () async {
     final sessionManager = getSessionManager();
     const email     = 'example_01@example.com';
@@ -42,7 +71,280 @@ void main() {
     expect(sessionManager.userId, isNotNull);
     QuizzerLogger.logMessage("Workers initialized as intended???");
   });
+  /// Test Add Question Functionality (monitoring caches after each individual block add)
+  // --- Test for adding Vowel/Consonant True/False questions --- 
+  test('add all Vowel or Consonant questions', () async {
+    final sessionManager = getSessionManager();
+    assert(sessionManager.userLoggedIn, "User must be logged in for this test");
 
+    QuizzerLogger.printHeader('Starting Add All Vowel/Consonant Questions Test...');
+
+    // 1. Read the JSON file
+    const filePath = 'runtime_cache/is_vowel_or_consonant_questions.json'; // Updated path
+    QuizzerLogger.logMessage('Reading questions from: $filePath');
+    final file = File(filePath);
+    assert(await file.exists(), "JSON file not found: $filePath. Run the generation script first.");
+    final jsonString = await file.readAsString();
+
+    // 2. Decode JSON
+    List<dynamic> questionsJson = jsonDecode(jsonString) as List<dynamic>;
+    QuizzerLogger.logSuccess('Successfully decoded ${questionsJson.length} questions from JSON.');
+
+    // 3. Loop and add each question
+    int addedCount = 0;
+    for (final questionData in questionsJson) {
+      final questionMap = questionData as Map<String, dynamic>; 
+
+      // Extract parameters 
+      final String moduleName = questionMap['module_name'] as String;
+      final String questionType = questionMap['question_type'] as String;
+      final List<Map<String, dynamic>> questionElements = (questionMap['question_elements'] as List<dynamic>)
+          .map((e) => Map<String, dynamic>.from(e as Map)).toList();
+      final List<Map<String, dynamic>> answerElements = (questionMap['answer_elements'] as List<dynamic>)
+          .map((e) => Map<String, dynamic>.from(e as Map)).toList();
+      // Extract correct_option_index for true_false
+      final int correctOptionIndex = questionMap['correct_option_index'] as int; 
+
+      // Assert the type is correct before calling addNewQuestion
+      assert(questionType == 'true_false', 
+             "Unexpected question type found in JSON: $questionType. Expected 'true_false'.");
+
+      // Call addNewQuestion for true_false type
+      sessionManager.addNewQuestion(
+        questionType: questionType,
+        moduleName: moduleName,
+        questionElements: questionElements,
+        answerElements: answerElements,
+        correctOptionIndex: correctOptionIndex, // Pass the index
+      );
+      
+      addedCount++;
+    }
+    await monitorCaches(monitoringSeconds: 10);
+    QuizzerLogger.logSuccess('Successfully attempted to add $addedCount vowel/consonant questions.');
+    QuizzerLogger.printHeader('Finished Add All Vowel/Consonant Questions Test.');
+  }, timeout: const Timeout(Duration(minutes: 20))); // Adjust timeout as needed
+
+  test('add all Is Even or Odd questions', () async {
+      final sessionManager = getSessionManager();
+      assert(sessionManager.userLoggedIn, "User must be logged in for this test");
+
+      QuizzerLogger.printHeader('Starting Add All Number Properties Questions Test...');
+
+      // 1. Read the JSON file
+      final filePath = 'runtime_cache/number_properties_questions.json';
+      QuizzerLogger.logMessage('Reading questions from: $filePath');
+      final file = File(filePath);
+      assert(await file.exists(), "JSON file not found: $filePath. Run the generation script first.");
+      final jsonString = await file.readAsString();
+
+      // 2. Decode JSON (Removed try-catch for Fail Fast)
+      List<dynamic> questionsJson = jsonDecode(jsonString) as List<dynamic>;
+      QuizzerLogger.logSuccess('Successfully decoded ${questionsJson.length} questions from JSON.');
+
+      // 3. Loop and add each question
+      int addedCount = 0;
+      for (final questionData in questionsJson) {
+        // Cast to Map<String, dynamic> for easier access
+        final questionMap = questionData as Map<String, dynamic>; 
+
+        // Extract parameters (with type casting)
+        final String moduleName = questionMap['moduleName'] as String;
+        final String questionType = questionMap['questionType'] as String;
+        // Cast inner list elements too
+        final List<Map<String, dynamic>> questionElements = (questionMap['questionElements'] as List<dynamic>)
+            .map((e) => Map<String, dynamic>.from(e as Map)).toList();
+        final List<Map<String, dynamic>> answerElements = (questionMap['answerElements'] as List<dynamic>)
+            .map((e) => Map<String, dynamic>.from(e as Map)).toList();
+        final List<Map<String, dynamic>> options = (questionMap['options'] as List<dynamic>)
+            .map((e) => Map<String, dynamic>.from(e as Map)).toList();
+        // Specifically cast indexOptionsThatApply to List<int>
+        final List<int> indexOptionsThatApply = (questionMap['indexOptionsThatApply'] as List<dynamic>)
+            .map((e) => e as int).toList(); 
+
+        // Assert the type is correct before calling addNewQuestion
+        assert(questionType == 'select_all_that_apply', 
+              "Unexpected question type found in JSON: $questionType");
+
+        // Call addNewQuestion
+        final response = await sessionManager.addNewQuestion(
+          questionType: questionType,
+          moduleName: moduleName,
+          questionElements: questionElements,
+          answerElements: answerElements,
+          options: options,
+          indexOptionsThatApply: indexOptionsThatApply,
+          // Set other common fields to defaults or null as needed
+          citation: null,
+          concepts: null,
+          subjects: null,
+          // Correct option index is not used for this type
+          correctOptionIndex: null, 
+          correctOrderElements: null,
+        );
+
+        addedCount++;
+        
+        // Log current state (Note: Won't show the *just added* question details)
+        await logCurrentQuestionDetails(sessionManager);
+        // Wait 250ms between adds
+        await waitTime(50); 
+      }
+
+      QuizzerLogger.logSuccess('Successfully attempted to add $addedCount questions.');
+      QuizzerLogger.printHeader('Finished Add All Number Properties Questions Test.');
+
+      // Monitor caches to see if questions were processed
+      await monitorCaches(monitoringSeconds: 10);
+    
+    }, timeout: Timeout(Duration(minutes: 3))); // Increased timeout for monitoring
+
+  test('Add Questions From JSON Test', () async {
+  final sessionManager = getSessionManager();
+  assert(sessionManager.userLoggedIn, "User must be logged in for this test");
+
+  QuizzerLogger.printHeader('Starting Add Questions From JSON Test...');
+
+  // 1. Load the JSON file
+  const String jsonPath = 'runtime_cache/elementary_addition_questions.json';
+  QuizzerLogger.logMessage('Loading questions from: $jsonPath');
+  final File jsonFile = File(jsonPath);
+  if (!await jsonFile.exists()) {
+    throw Exception('JSON test data file not found at $jsonPath. Run generate_math_questions.dart first.');
+  }
+  final String jsonString = await jsonFile.readAsString();
+  final List<dynamic> questionsData = jsonDecode(jsonString) as List<dynamic>;
+  QuizzerLogger.logSuccess('Loaded ${questionsData.length} questions from JSON.');
+
+  int successCount = 0;
+  int failureCount = 0;
+
+  // 2. Iterate and add questions
+  for (final questionDynamic in questionsData) {
+    final questionMap = questionDynamic as Map<String, dynamic>; // Cast
+
+    // 3. Use SessionManager to add the question
+    QuizzerLogger.logMessage('Adding question: ${questionMap['questionElements']?[0]?['content'] ?? 'N/A'}');
+
+    // Ensure data types match the API expectations
+    final List<Map<String, dynamic>> questionElements = 
+        List<Map<String, dynamic>>.from(questionMap['questionElements'] ?? []);
+    final List<Map<String, dynamic>> answerElements = 
+        List<Map<String, dynamic>>.from(questionMap['answerElements'] ?? []);
+    final List<Map<String, dynamic>>? options = 
+        (questionMap['options'] as List<dynamic>?)
+            ?.map((e) => Map<String, dynamic>.from(e as Map)).toList(); 
+    final int? correctOptionIndex = questionMap['correctOptionIndex'] as int?;
+
+    await sessionManager.addNewQuestion(
+      questionType: questionMap['questionType'] as String,
+      questionElements: questionElements,
+      answerElements: answerElements,
+      moduleName: questionMap['moduleName'] as String,
+      options: options,
+      correctOptionIndex: correctOptionIndex,
+      // Pass other potential fields if they exist in JSON, otherwise they default
+      citation: questionMap['citation'] as String?,
+      concepts: questionMap['concepts'] as String?,
+      subjects: questionMap['subjects'] as String?,
+    );
+    // 5. Wait
+    await waitTime(50);
+  }
+
+  await monitorCaches(monitoringSeconds: 15);
+  QuizzerLogger.printDivider();
+  QuizzerLogger.logSuccess('Finished adding questions. Success: $successCount, Failed: $failureCount');
+  QuizzerLogger.printHeader('Finished Add Questions From JSON Test.');
+
+}, timeout: Timeout(Duration(minutes: 5))); // Increase timeout for file IO and looping
+
+  test('add generated periodic table sort_order questions', () async {
+    final sessionManager = getSessionManager();
+    assert(sessionManager.userLoggedIn, "User must be logged in for this test");
+    assert(sessionManager.userId != null, "User ID must be available");
+
+    QuizzerLogger.printHeader('Starting Test: Add Periodic Table Sort Order Questions');
+
+    final jsonFilePath = 'runtime_cache/generated_periodic_table_sort_questions.json';
+    final jsonFile = File(jsonFilePath);
+
+    if (!await jsonFile.exists()) {
+      throw StateError('Generated question file not found at: $jsonFilePath. Run generate script first.');
+    }
+
+    List<dynamic> questionsJson = [];
+    try {
+      final jsonString = await jsonFile.readAsString();
+      questionsJson = jsonDecode(jsonString) as List<dynamic>;
+      QuizzerLogger.logSuccess('Successfully read and parsed ${questionsJson.length} questions from $jsonFilePath');
+    } catch (e) {
+      throw StateError('Error reading or parsing JSON file $jsonFilePath: $e');
+    }
+
+    int addedCount = 0;
+    int errorCount = 0;
+
+    for (final questionData in questionsJson) {
+      if (questionData is! Map<String, dynamic>) {
+        QuizzerLogger.logWarning('Skipping invalid data entry (not a Map): $questionData');
+        errorCount++;
+        continue;
+      }
+
+      try {
+        // Extract parameters, performing necessary casts
+        final String questionType = questionData['questionType'] as String;
+        final String moduleName = questionData['moduleName'] as String;
+        // Safely cast lists of maps
+        final List<Map<String, dynamic>> questionElements = 
+            List<Map<String, dynamic>>.from((questionData['questionElements'] as List<dynamic>)
+                .map((e) => Map<String, dynamic>.from(e as Map)));
+        final List<Map<String, dynamic>> answerElements = 
+            List<Map<String, dynamic>>.from((questionData['answerElements'] as List<dynamic>)
+                .map((e) => Map<String, dynamic>.from(e as Map)));
+        // Options for sort_order are expected as List<Map<String, dynamic>> containing {'type': 'text', 'content': 'Symbol - Name'}
+        final List<Map<String, dynamic>> options = 
+            List<Map<String, dynamic>>.from((questionData['options'] as List<dynamic>)
+                .map((e) => Map<String, dynamic>.from(e as Map)));
+
+        // Assert the type is correct before calling addNewQuestion
+        assert(questionType == 'sort_order', 
+              "Unexpected question type found in JSON: $questionType");
+
+        // Call addNewQuestion - use the 'options' field as SessionManager expects
+        await sessionManager.addNewQuestion(
+          questionType: questionType,
+          moduleName: moduleName,
+          questionElements: questionElements,
+          answerElements: answerElements,
+          options: options, // Pass the List<Map<String, dynamic>>
+          // Other fields are null/not applicable for sort_order
+          correctOptionIndex: null, 
+          indexOptionsThatApply: null,
+          citation: null,
+          concepts: null,
+          subjects: null,
+        );
+        addedCount++;
+        // Optional: Add a small delay if needed, e.g., await waitTime(50);
+      } catch (e, stackTrace) {
+        QuizzerLogger.logError('Error adding sort_order question: $e\n$stackTrace');
+        errorCount++;
+        // Decide whether to continue or stop on error
+        // continue;
+        rethrow; // Re-throwing will stop the test on the first error
+      }
+    }
+
+    QuizzerLogger.logSuccess('Attempted to add ${questionsJson.length} questions. Added: $addedCount, Errors: $errorCount');
+    expect(errorCount, 0, reason: "Errors occurred while adding sort_order questions.");
+    QuizzerLogger.printHeader('Finished Test: Add Periodic Table Sort Order Questions');
+
+    // Optional: Monitor caches or add further checks after adding questions
+    // await monitorCaches(monitoringSeconds: 5);
+  });
+  /// Simulate activation of modules
   test('simulate activating all modules', () async {
     final sessionManager = getSessionManager();
     assert(sessionManager.userLoggedIn, "User must be logged in for this test");
@@ -76,6 +378,7 @@ void main() {
 
   }, timeout: const Timeout(Duration(minutes: 1))); // Reduced timeout slightly
 
+  /// Test Robustness of system
   test('spam module activation toggle', () async {
     final sessionManager = getSessionManager();
     assert(sessionManager.userLoggedIn, "User must be logged in for this test");
@@ -120,8 +423,8 @@ void main() {
   test('monitor caches after spam toggle', () async {
       // Call the extracted monitoring function again to see the result of the spam
       // Monitor for 30 seconds this time
-      await monitorCaches(monitoringSeconds: 60);
-    }, timeout: const Timeout( Duration(seconds: 45))); // Timeout > monitor duration + buffer
+      await monitorCaches(monitoringSeconds: 30);
+    }, timeout: const Timeout( Duration(seconds: 120))); // Timeout > monitor duration + buffer
 
   test('Update Module Description Test', () async {
     final sessionManager = getSessionManager();
@@ -181,6 +484,7 @@ void main() {
 
     QuizzerLogger.printHeader('Finished Update Module Description Test.');
   });
+
 
 
 }
