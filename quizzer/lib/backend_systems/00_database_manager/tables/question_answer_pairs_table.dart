@@ -484,17 +484,6 @@ Future<String> addQuestionTrueFalse({
   return questionId;
 }
 
-// TODO sort_order                isValidationDone [ ]
-// Reuse question_elements, answer_elements, options
-// unique field for answer validation -> options
-
-// Question Elements    -> provide the question
-// Answer Elements      -> provide an explanation for the correct Asnwer
-// options              -> stores items that need to be sorted (must be in stored in the exact order that is the correct sorted order)
-
-// For validation we will need to accept the same options object, and it will need to match the exactly the options field for the sort_order question.
-// UI can randomize the presentation of the options, but for logic, we are simply matching lists against lists.
-
 /// Adds a new sort_order question to the database, following existing patterns.
 ///
 /// Args:

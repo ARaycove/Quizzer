@@ -115,7 +115,13 @@ Future<void> _ensureLocalProfileExists(String email) async {
   bool isEmailInList = emailList.contains(email);
   // If not in list add profile
   // TODO Fetch username from cloud database if username == "not_found" for later once cloud data is implemented
-  if (!isEmailInList) {user_profile.createNewUserProfile(email, "not_found", db);}
+  QuizzerLogger.logMessage("Is user in list -> $isEmailInList");
+  if (!isEmailInList) {await user_profile.createNewUserProfile(email, "not_found", db);}
+
+  emailList = await user_profile.getAllUserEmails(db);
+  isEmailInList = emailList.contains(email);
+  QuizzerLogger.logMessage("Is user in list -> $isEmailInList");
+
   monitor.releaseDatabaseAccess(); // Release DB after successful creation
 }
 

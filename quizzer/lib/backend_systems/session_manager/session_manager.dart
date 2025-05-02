@@ -311,6 +311,7 @@ class SessionManager {
   // This initializing spins up sub-system processes that rely on the user profile information
   Future<Map<String, dynamic>> attemptLogin(String email, String password) async {
     // Ensure async initialization is complete before proceeding
+    QuizzerLogger.logMessage("Logging in user with email: $email");
     await initializationComplete;
 
     // Now it's safe to access _storage
@@ -323,8 +324,13 @@ class SessionManager {
 
     if (response['success'] == true) {
       await _initializeLogin(email); // initialize function spins up necessary background processes
+      // Once that's complete, request the first question
+      await requestNextQuestion();
     }
-    return response; // Response information is for front-end UI, not necessary for backend
+
+    // Response information is for front-end UI, not necessary for backend
+    // Send signal to UI that it's ok to login now
+    return response; 
   }
 
   //  --------------------------------------------------------------------------------

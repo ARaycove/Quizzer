@@ -26,7 +26,7 @@ Future<String> getUserIdByEmail(String emailAddress, Database db) async {
         return userId!;
     } else {
         QuizzerLogger.logError('No user found with email:');
-        return "invalid_email_user";
+        throw StateError("INVALID, NO USERID WITH THAT EMAIL. . .");
     }
 }
 
@@ -189,13 +189,14 @@ Future<Map<String, dynamic>> verifyNonDuplicateProfile(String email, String user
     whereArgs: [username],
   );
   
-  if (usernameCheck.isNotEmpty) {
-    QuizzerLogger.logError('Username already taken: $username');
-    return {
-      'isValid': false,
-      'message': 'This username is already taken'
-    };
-  }
+  // TODO Implement proper username uniqueness (maybe?)
+  // if (usernameCheck.isNotEmpty) {
+  //   QuizzerLogger.logError('Username already taken: $username');
+  //   return {
+  //     'isValid': false,
+  //     'message': 'This username is already taken'
+  //   };
+  // }
   
   // If we get here, both email and username are unique
   QuizzerLogger.logSuccess('Email and username are available');

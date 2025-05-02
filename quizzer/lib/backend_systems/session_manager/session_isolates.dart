@@ -6,6 +6,7 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 // Spin up necessary processes and get userID from local profile, effectively intialize any session specific variables that should only be brought after successful login
 Future<String?> initializeSession(Map<String, dynamic> data) async {
   final email = data['email'] as String;
+  QuizzerLogger.logMessage("Recorded email to log in. . .: $email");
   final monitor = getDatabaseMonitor();
   Database? db;
   db = await monitor.requestDatabaseAccess();

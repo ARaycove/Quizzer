@@ -94,7 +94,7 @@ void main() {
     QuizzerLogger.printHeader('Starting requestNextQuestion cycle test (50 iterations)...');
 
     for (int i = 1; i <= 50; i++) {
-      QuizzerLogger.printDivider();
+    QuizzerLogger.printDivider();
       QuizzerLogger.logMessage('--- Cycle Test Iteration $i ---');
       
       QuizzerLogger.logMessage('Calling requestNextQuestion...');
