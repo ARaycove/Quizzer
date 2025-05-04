@@ -10,6 +10,7 @@ import 'dart:convert'; // Needed only if we bring back deep copy
 import 'package:quizzer/UI_systems/03_add_question_page/widgets/add_question_widget/widget_add_question.dart';
 import 'package:quizzer/UI_systems/03_add_question_page/widgets/widget_submit_clear_buttons.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
+import 'package:quizzer/UI_systems/03_add_question_page/helpers/image_picker_helper.dart';
 
 // ==========================================
 
@@ -88,42 +89,44 @@ class _AddQuestionAnswerPageState extends State<AddQuestionAnswerPage> {
   // --- Placeholder Handlers (Re-added) --- 
 
   // Renamed param to reflect it can be type OR content
-  void _handleAddElement(String typeOrContent, String category) {
-    setState(() {
-      Map<String, dynamic>? newElement;
-      if (typeOrContent == 'image') {
-        // TODO: Implement image picker logic here
-        // For now, add placeholder or show unimplemented message
-        QuizzerLogger.logWarning("Image picking not implemented for $category elements.");
-        // Optionally add a placeholder image element:
-        // newElement = {'type': 'image', 'content': 'placeholder.png'};
-        return; // Don't add anything until picker is ready
-      } else if (typeOrContent.isNotEmpty) {
-        // Assume it's text content from the TextField
-        newElement = {'type': 'text', 'content': typeOrContent};
-      } else {
-        // Should not happen if TextField onSubmitted checks for empty, but good practice
-        QuizzerLogger.logWarning("Attempted to add empty element to $category");
-        return;
-      }
+  void _handleAddElement(String typeOrContent, String category) async { // Make async
+    Map<String, dynamic>? newElement; // Declare outside setState
 
-      if (newElement != null) {
+    if (typeOrContent == 'image') {
+      // Call the image picker helper
+      final String? stagedImagePath = await pickAndStageImage(); // Await the helper
+      if (stagedImagePath != null) {
+        newElement = {'type': 'image', 'content': stagedImagePath};
+        QuizzerLogger.logMessage("Image element prepared with staged path: $stagedImagePath");
+      } else {
+        QuizzerLogger.logWarning("Image picking failed or was cancelled.");
+        return; // Don't add anything if picking failed
+      }
+    } else if (typeOrContent.isNotEmpty) {
+      // Assume it's text content from the TextField
+      newElement = {'type': 'text', 'content': typeOrContent};
+    } else {
+      QuizzerLogger.logWarning("Attempted to add empty element to $category");
+      return;
+    }
+
+    // If an element was created (either text or image), add it
+    if (newElement != null) {
+      setState(() { // Keep setState wrapping the list modification
         if (category == 'question') {
-          _currentQuestionElements.add(newElement);
-          // QuizzerLogger.logValue("Added question element:", newElement);
+          _currentQuestionElements.add(newElement!);
           QuizzerLogger.logMessage("Added question element:");
           QuizzerLogger.logValue(newElement.toString());
         } else if (category == 'answer') {
-          _currentAnswerElements.add(newElement);
-          // QuizzerLogger.logValue("Added answer element:", newElement);
+          _currentAnswerElements.add(newElement!);
           QuizzerLogger.logMessage("Added answer element:");
           QuizzerLogger.logValue(newElement.toString());
         } else {
           QuizzerLogger.logError("_handleAddElement: Unknown category '$category'");
         }
         _previewRebuildCounter++; // Increment counter
-      }
-    });
+      });
+    }
   }
   void _handleRemoveElement(int index, String category) {
     QuizzerLogger.logMessage("Attempting to remove element index $index from $category");
@@ -351,47 +354,79 @@ class _AddQuestionAnswerPageState extends State<AddQuestionAnswerPage> {
    }
 
    // --- Save/Submit Logic using SessionManager ---
-   void _handleSubmitQuestion() async { // Keep async for Snackbars etc.
+   void _handleSubmitQuestion() async {
      QuizzerLogger.logMessage("Attempting to submit question via SessionManager...");
 
      // --- 0. Validation ---
      if (!_validateQuestionData()) {
        return; // Stop if validation fails
      }
-     
+
+     // --- ADDED: 0.5. Finalize Staged Images ---
+     try {
+       // Pass the CURRENT state lists to the helper. It modifies them in place.
+       await finalizeStagedImages(_currentQuestionElements, _currentAnswerElements);
+     } catch (e) {
+       QuizzerLogger.logError("Failed to finalize staged images during submit: $e");
+       if (mounted) {
+         ScaffoldMessenger.of(context).showSnackBar(
+           SnackBar(content: Text('Error processing images: $e'), backgroundColor: ColorWheel.buttonError)
+         );
+       }
+       return; // Stop submission if image finalization fails
+     }
+     // --- END ADDED ---
+
      // --- 1. Gather Data & Call SessionManager (Fire and Forget) ---
-     QuizzerLogger.logMessage("Validation passed. Calling SessionManager.addNewQuestion (no await)...");
-     
+     QuizzerLogger.logMessage("Validation passed. Calling SessionManager.addNewQuestion (no await)... ");
+
      // Call without await and remove try-catch
-     _session.addNewQuestion( 
+     // Use the potentially modified element lists
+     _session.addNewQuestion(
        // Required parameters
        moduleName: _moduleController.text,
        questionType: _questionTypeController.text,
-       questionElements: _currentQuestionElements,
-       answerElements: _currentAnswerElements,
+       questionElements: _currentQuestionElements, // Use list potentially updated by finalizeStagedImages
+       answerElements: _currentAnswerElements,   // Use list potentially updated by finalizeStagedImages
        // Optional / Type-specific parameters (pass null if not applicable/empty)
-       options: _currentOptions.isNotEmpty ? _currentOptions : null, 
-       correctOptionIndex: _currentCorrectOptionIndex, 
-       indexOptionsThatApply: _currentCorrectIndicesSATA.isNotEmpty ? _currentCorrectIndicesSATA : null, 
+       options: _currentOptions.isNotEmpty ? _currentOptions : null,
+       correctOptionIndex: _currentCorrectOptionIndex,
+       indexOptionsThatApply: _currentCorrectIndicesSATA.isNotEmpty ? _currentCorrectIndicesSATA : null,
        // Optional Metadata (pass null if not collected/available)
-       citation: null, 
-       concepts: null, 
-       subjects: null, 
+       citation: null,
+       concepts: null,
+       subjects: null,
      );
-       
+
      // --- 2. Assume Success Immediately (UI Update) ---
      // No response check needed as we don't await
      QuizzerLogger.logSuccess("Question submission initiated (fire and forget). Assuming success for UI.");
+     
+     // --- ADDED: 2.5 Cleanup Staging Directory ---
+     // Collect filenames from the submitted elements
+     final Set<String> submittedImageFilenames = { 
+       ..._currentQuestionElements.where((e) => e['type'] == 'image').map((e) => e['content'] as String), 
+       ..._currentAnswerElements.where((e) => e['type'] == 'image').map((e) => e['content'] as String), 
+     };
+     // Call cleanup asynchronously (don't block UI thread)
+     cleanupStagingDirectory(submittedImageFilenames).then((_) { 
+         QuizzerLogger.logMessage("Async staging cleanup call finished.");
+     }).catchError((error) { 
+        QuizzerLogger.logError("Async staging cleanup failed: $error");
+        // Log error but don't disrupt user flow
+     });
+     // --- END ADDED ---
+     
      if (mounted) { // Still check mounted for Snack Bar
     ScaffoldMessenger.of(context).showSnackBar(
            const SnackBar(content: Text('Question Submitted!'), backgroundColor: ColorWheel.buttonSuccess),
          );
      }
      // Clear the form immediately
-     _resetQuestionState(); 
+     _resetQuestionState();
      // Optionally navigate back
      // Navigator.pop(context);
-   
+
      // Removed try-catch block and await
   }
 

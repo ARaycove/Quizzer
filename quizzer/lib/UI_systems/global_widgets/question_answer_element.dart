@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/UI_systems/color_wheel.dart';
+import 'package:path/path.dart' as p;
 
 // ==========================================
 //        Element Renderer Widget
@@ -146,21 +147,46 @@ Future<Widget> _buildAsyncWidgetFuture(String? type, String? content) async {
        return _buildErrorIconRow('Missing image path', isWarning: true);
      }
      try {
-       final String fullPath = 'images/question_answer_pair_assets/$content'; 
-       final file = File(fullPath);
-       if (await file.exists()) {
-         return Image.file(file, fit: BoxFit.contain, 
-           errorBuilder: (c, e, s) {
-              QuizzerLogger.logError("ElementRenderer: Error loading image file $fullPath: $e");
-              return _buildErrorIconRow('Image unavailable', isWarning: true);
-           }
-         );
+       // FINAL CORRECTED LOGIC (Content is filename only):
+       // 1. Define base directories
+       const String assetsDir = 'images/question_answer_pair_assets';
+       const String stagingDir = 'images/input_staging';
+       final String filename = content; // Content IS the filename
+
+       // 2. Construct full paths
+       final String assetsPath = p.join(assetsDir, filename); 
+       final String stagingPath = p.join(stagingDir, filename);
+
+       // 3. Check assets dir first, then staging dir
+       String imagePathToLoad = ''; // Path where the image is actually found
+       File fileToCheck;
+
+       fileToCheck = File(assetsPath);
+       if (await fileToCheck.exists()) {
+         imagePathToLoad = assetsPath;
+         QuizzerLogger.logValue("ElementRenderer: Found image in assets: $imagePathToLoad");
        } else {
-         QuizzerLogger.logWarning("ElementRenderer: Image file not found: $fullPath");
-         return _buildErrorIconRow('Image not found', isWarning: false);
+         fileToCheck = File(stagingPath);
+         if (await fileToCheck.exists()) {
+           imagePathToLoad = stagingPath;
+           QuizzerLogger.logValue("ElementRenderer: Found image in staging: $imagePathToLoad");
+         } else {
+           // File not found in either location
+           QuizzerLogger.logWarning("ElementRenderer: Image file '$filename' not found in $assetsDir or $stagingDir");
+           return _buildErrorIconRow('Image not found', isWarning: false);
+         }
        }
+
+       // 4. Load the image from the found path
+       return Image.file(File(imagePathToLoad), fit: BoxFit.contain, 
+         errorBuilder: (c, e, s) {
+            QuizzerLogger.logError("ElementRenderer: Error loading image file $imagePathToLoad: $e");
+            return _buildErrorIconRow('Image unavailable', isWarning: true);
+         }
+       );
+
      } catch (e) {
-       QuizzerLogger.logError("ElementRenderer: Error accessing image '$content': $e");
+       QuizzerLogger.logError("ElementRenderer: Error accessing image '$content' (filename): $e");
        return _buildErrorIconRow('Error loading image', isWarning: true);
      }
   } else {

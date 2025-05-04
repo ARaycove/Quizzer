@@ -175,7 +175,6 @@ void main() {
     QuizzerLogger.printHeader('Finished requestNextQuestion loop test.');
   }, timeout: const Timeout(Duration(minutes: 300))); // Allow more time for loops + monitoring
 
-
   test('logoutUser test', () async {
     final sessionManager = getSessionManager();
     QuizzerLogger.printHeader('Starting logoutUser test...');

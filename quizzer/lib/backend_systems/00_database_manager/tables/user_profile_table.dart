@@ -4,6 +4,10 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/question_answ
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'dart:convert';
 
+// TODO Enforce and introduce primary and secondary languages
+// This will be used to determine whether questions should be synced based on language
+// User's should be able to opt into new languages by updating secondary languages
+
 /// Gets the user ID for a given email address.
 /// Throws a StateError if no user is found.
 Future<String> getUserIdByEmail(String emailAddress, Database db) async {

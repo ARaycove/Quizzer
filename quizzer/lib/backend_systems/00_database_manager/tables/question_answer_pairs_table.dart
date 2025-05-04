@@ -2,6 +2,12 @@ import 'package:sqflite/sqflite.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'dart:convert';
 import '00_table_helper.dart'; // Import the new helper file
+import 'package:quizzer/backend_systems/12_switch_board/switch_board.dart'; // Import SwitchBoard
+
+// Get SwitchBoard instance for signaling
+final SwitchBoard _switchBoard = SwitchBoard();
+
+// TODO flag questions by user's primary language
 
 // --- Universal Encoding/Decoding Helpers --- Removed, moved to 00_table_helper.dart ---
 
@@ -35,6 +41,8 @@ Future<void> verifyQuestionAnswerPairTable(Database db) async {
         question_id TEXT,        -- Added for unique question identification
         correct_order TEXT,      -- Added for sort_order
         index_options_that_apply TEXT,
+        has_been_synced INTEGER DEFAULT 0,  -- Added for outbound sync tracking
+        edits_are_synced INTEGER DEFAULT 0, -- Added for outbound edit sync tracking
         PRIMARY KEY (time_stamp, qst_contrib)
       )
     ''');
@@ -80,6 +88,20 @@ Future<void> verifyQuestionAnswerPairTable(Database db) async {
       QuizzerLogger.logMessage('Adding index_options_that_apply column to question_answer_pairs table.');
       // Add index_options_that_apply column as TEXT to store CSV list of integers
       await db.execute('ALTER TABLE question_answer_pairs ADD COLUMN index_options_that_apply TEXT');
+    }
+
+    // Check for has_been_synced
+    final bool hasBeenSyncedCol = columns.any((column) => column['name'] == 'has_been_synced');
+    if (!hasBeenSyncedCol) {
+      QuizzerLogger.logMessage('Adding has_been_synced column to question_answer_pairs table.');
+      await db.execute('ALTER TABLE question_answer_pairs ADD COLUMN has_been_synced INTEGER DEFAULT 0');
+    }
+
+    // Check for edits_are_synced
+    final bool hasEditsAreSyncedCol = columns.any((column) => column['name'] == 'edits_are_synced');
+    if (!hasEditsAreSyncedCol) {
+      QuizzerLogger.logMessage('Adding edits_are_synced column to question_answer_pairs table.');
+      await db.execute('ALTER TABLE question_answer_pairs ADD COLUMN edits_are_synced INTEGER DEFAULT 0');
     }
 
     // TODO: Add checks for columns needed by other future question types here
@@ -145,16 +167,21 @@ Future<int> editQuestionAnswerPair({
     return 0;
   }
 
+  // *** Always mark edits as needing sync ***
+  valuesToUpdate['edits_are_synced'] = 0;
+
   QuizzerLogger.logMessage('Updating question $questionId with fields: ${valuesToUpdate.keys.join(', ')}');
 
   // Use the universal update helper (encoding happens inside)
-  return await updateRawData(
+  final result = await updateRawData(
     'question_answer_pairs',
     valuesToUpdate, // Pass the map with raw values
     'question_id = ?', // where clause
     [questionId],      // whereArgs
     db,
   );
+  _switchBoard.signalOutboundSyncNeeded(); // Signal after successful update
+  return result;
 }
 
 /// Fetches a single question-answer pair by its composite ID.
@@ -341,6 +368,70 @@ Future<Set<String>> getUniqueConcepts(Database db) async {
   return concepts;
 }
 
+/// Updates the synchronization flags for a specific question-answer pair.
+/// Does NOT trigger a new sync signal.
+///
+/// Args:
+///   questionId: The ID of the question to update.
+///   hasBeenSynced: The new boolean state for the has_been_synced flag.
+///   editsAreSynced: The new boolean state for the edits_are_synced flag.
+///   db: The database instance.
+Future<void> updateQuestionSyncFlags({
+  required String questionId,
+  required bool hasBeenSynced,
+  required bool editsAreSynced,
+  required Database db,
+}) async {
+  QuizzerLogger.logMessage('Updating sync flags for QID: $questionId (Synced: $hasBeenSynced, Edits Synced: $editsAreSynced)');
+  // Ensure table exists (though likely already verified by caller)
+  await verifyQuestionAnswerPairTable(db);
+
+  // Prepare the update map, converting booleans to integers (1/0)
+  final Map<String, dynamic> updates = {
+    'has_been_synced': hasBeenSynced ? 1 : 0,
+    'edits_are_synced': editsAreSynced ? 1 : 0,
+  };
+
+  // Use the universal update helper
+  final int rowsAffected = await updateRawData(
+    'question_answer_pairs',
+    updates,
+    'question_id = ?', // where clause
+    [questionId],      // whereArgs
+    db,
+  );
+
+  // Log if the expected row wasn't updated
+  if (rowsAffected == 0) {
+    QuizzerLogger.logWarning('updateQuestionSyncFlags affected 0 rows for QID: $questionId. Record might not exist?');
+  } else {
+    QuizzerLogger.logSuccess('Successfully updated sync flags for QID: $questionId');
+  }
+  // No signal is sent here as requested
+}
+
+/// Fetches all question-answer pairs that need outbound synchronization.
+/// DOES NOT, decode the records
+/// This includes records that have never been synced (`has_been_synced = 0`)
+/// or records that have local edits pending sync (`edits_are_synced = 0`).
+Future<List<Map<String, dynamic>>> getUnsyncedQuestionAnswerPairs(Database db) async {
+  QuizzerLogger.logMessage('Fetching unsynced question-answer pairs...');
+  // Ensure table and sync columns exist
+  await verifyQuestionAnswerPairTable(db);
+
+  // Use the universal query helper
+  final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
+    'question_answer_pairs',
+    db,
+    where: 'has_been_synced = 0 OR edits_are_synced = 0',
+    // No whereArgs needed
+  );
+
+  QuizzerLogger.logSuccess('Fetched ${results.length} unsynced question-answer pairs.');
+  return results;
+}
+
+// ===============================================================================
 // --- Add Question Functions ---
 
 Future<String> addQuestionMultipleChoice({
@@ -383,10 +474,13 @@ Future<String> addQuestionMultipleChoice({
     'options': options,
     'correct_option_index': correctOptionIndex,
     'question_id': questionId,
+    'has_been_synced': 0, // Initialize sync flags
+    'edits_are_synced': 0,
   };
 
   // Use the universal insert helper
   await insertRawData('question_answer_pairs', data, db);
+  _switchBoard.signalOutboundSyncNeeded(); // Signal after successful insert
 
   return questionId; // Return the generated question ID regardless of insert result (consistent with previous logic)
 }
@@ -430,10 +524,13 @@ Future<String> addQuestionSelectAllThatApply({
     'options': options,
     'index_options_that_apply': indexOptionsThatApply,
     'question_id': questionId,
+    'has_been_synced': 0, // Initialize sync flags
+    'edits_are_synced': 0,
   };
 
   // Use the universal insert helper
   await insertRawData('question_answer_pairs', data, db);
+  _switchBoard.signalOutboundSyncNeeded(); // Signal after successful insert
 
   return questionId;
 }
@@ -475,11 +572,14 @@ Future<String> addQuestionTrueFalse({
     'question_type': 'true_false',
     'correct_option_index': correctOptionIndex,
     'question_id': questionId,
+    'has_been_synced': 0, // Initialize sync flags
+    'edits_are_synced': 0,
     // 'options' column is intentionally left NULL/unspecified for true_false type
   };
 
   // Use the universal insert helper
   await insertRawData('question_answer_pairs', data, db);
+  _switchBoard.signalOutboundSyncNeeded(); // Signal after successful insert
 
   return questionId;
 }
@@ -540,6 +640,8 @@ Future<String> addSortOrderQuestion({
     'question_type': 'sort_order', // Use string literal
     'options': options, // Store correctly ordered list, will be JSON encoded by helper
     'question_id': questionId, // Store the generated ID
+    'has_been_synced': 0, // Initialize sync flags
+    'edits_are_synced': 0,
     // Fields specific to other types are omitted (correct_option_index, index_options_that_apply, correct_order)
   };
 
@@ -551,6 +653,7 @@ Future<String> addSortOrderQuestion({
     rawData,
     db,
   );
+  _switchBoard.signalOutboundSyncNeeded(); // Signal after successful insert
 
   return questionId; // Return the generated ID
 }
@@ -566,3 +669,4 @@ Future<String> addSortOrderQuestion({
 // TODO label_diagram             isValidationDone [ ]
 
 // TODO math                      isValidationDone [ ]
+

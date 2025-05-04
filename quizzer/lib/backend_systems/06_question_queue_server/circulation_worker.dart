@@ -15,7 +15,7 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/question_answ
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile_table.dart' as user_profile_table;
 // Workers
 import 'package:quizzer/backend_systems/06_question_queue_server/question_selection_worker.dart';
-import 'switch_board.dart'; // Import SwitchBoard
+import '../12_switch_board/switch_board.dart'; // Import SwitchBoard
 
 // ==========================================
 // Circulation Worker

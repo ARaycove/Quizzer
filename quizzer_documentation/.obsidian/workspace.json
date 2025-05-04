@@ -116,8 +116,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 281.5,
-    "collapsed": true
+    "width": 281.5
   },
   "right": {
     "id": "1361b1d659fdf502",
@@ -210,6 +209,7 @@
   },
   "active": "d47008925d227bd1",
   "lastOpenFiles": [
+    "Diagrams/Quizzer_Flow_Chart.md",
     "Diagrams/Question_Answer_Pair_Generation.md",
     "Diagrams/NewUserSignUp-LoginPage.png",
     "Diagrams/LoginPage.png",

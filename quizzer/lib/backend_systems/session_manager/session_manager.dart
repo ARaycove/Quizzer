@@ -32,12 +32,13 @@ import 'package:quizzer/backend_systems/09_data_caches/question_queue_cache.dart
 import 'package:quizzer/backend_systems/09_data_caches/answer_history_cache.dart';
 import 'package:quizzer/backend_systems/06_question_queue_server/question_selection_worker.dart';
 import 'session_toggle_scheduler.dart'; // Import the new scheduler
-import 'package:quizzer/backend_systems/06_question_queue_server/switch_board.dart'; // Import SwitchBoard
+import 'package:quizzer/backend_systems/12_switch_board/switch_board.dart'; // Import SwitchBoard
 import 'package:quizzer/backend_systems/session_manager/session_helper.dart';
 import 'package:quizzer/backend_systems/session_manager/session_answer_validation.dart' as answer_validator;
 import 'package:quizzer/backend_systems/06_question_queue_server/circulation_worker.dart';
 import 'package:quizzer/backend_systems/06_question_queue_server/due_date_worker.dart';
 import 'package:quizzer/backend_systems/06_question_queue_server/eligibility_check_worker.dart';
+import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/outbound_sync/outbound_sync_worker.dart'; // Import the new worker
 
 
 
@@ -139,13 +140,18 @@ class SessionManager {
     return []; // Return empty list if null or not a list
   }
 
+  // REVERTED: Assumes options arrive decoded from table_helper
   List<Map<String, dynamic>> get currentQuestionOptions { 
-    final dynamic options = _currentQuestionDetails!['options'];
+    final dynamic options = _currentQuestionDetails?['options']; 
     if (options is List) {
-      // Explicitly create List<Map<String, dynamic>> from List<dynamic>
+      // Attempt direct conversion, assuming items are maps. Fail Fast if not.
       return List<Map<String, dynamic>>.from(options.map((item) => Map<String, dynamic>.from(item as Map)));
     }
-    return []; // Return empty list if null or not a list
+    // If null or not a List, return empty. Log if it's an unexpected type.
+    if (options != null) { 
+        QuizzerLogger.logWarning('currentQuestionOptions: Expected List but got ${options.runtimeType}');
+    }
+    return [];
   }
 
   int?                        get currentCorrectOptionIndex     => _currentQuestionDetails!['correct_option_index'] as int?; // Nullable if not MC or not set
@@ -209,6 +215,13 @@ class SessionManager {
       // Decide how to handle critical init failure - maybe rethrow?
       // For now, just completing with error lets awaiters handle it.
     });
+
+    // Start background workers that don't depend on login state
+    QuizzerLogger.logMessage("SessionManager Constructor: Starting OutboundSyncWorker...");
+    final outboundSyncWorker = OutboundSyncWorker();
+    outboundSyncWorker.start();
+    QuizzerLogger.logSuccess("SessionManager Constructor: OutboundSyncWorker started.");
+    // TODO: Start other non-login-dependent workers here if any
   }
 
   // Initialize Hive storage (private)
@@ -249,7 +262,8 @@ class SessionManager {
     await psw.onInitialLoopComplete.first; // Waits for the signal
     // ----------------------------------------------------------------------
 
-    // TODO: Implement separate data sync process initialization if needed
+    // OutboundSyncWorker is now started in the constructor
+    // TODO: Start InboundSyncWorker here when implemented
 
   }
   
@@ -352,6 +366,7 @@ class SessionManager {
     final eligibilityWorker     = EligibilityCheckWorker();
     final preProcessWorker      = PreProcessWorker(); 
     final inactiveModuleWorker  = InactiveModuleWorker();
+    final outboundSyncWorker    = OutboundSyncWorker(); // Get the outbound sync worker instance
     
     // Stop them (await completion)
     await psw.stop();
@@ -360,6 +375,7 @@ class SessionManager {
     await eligibilityWorker.stop();
     await preProcessWorker.stop(); 
     await inactiveModuleWorker.stop();
+    await outboundSyncWorker.stop(); // Stop the outbound sync worker
     QuizzerLogger.logSuccess("Background workers stopped.");
     
 
@@ -499,6 +515,7 @@ class SessionManager {
     // 3. Signal deactivation if needed, then flush other caches
     if (!activate) {
        _eligibleCache.flushToPastDueCache();
+       _queueCache.flushToUnprocessedCache();
        
     } else {
       _switchBoard.signalModuleActivated(moduleName);
@@ -572,6 +589,11 @@ class SessionManager {
 
     // Fetch details - Let exceptions propagate (Fail Fast)
     staticDetails = await q_pairs_table.getQuestionAnswerPairById(questionId, db);
+
+    // --- DIAGNOSTIC LOGGING --- 
+    final dynamic fetchedOptions = staticDetails['options'];
+    QuizzerLogger.logValue('SessionManager.requestNextQuestion: Fetched options type: ${fetchedOptions.runtimeType}, value: $fetchedOptions');
+    // --- END DIAGNOSTIC LOGGING ---
 
     // --- Release DB Lock (After successful operation) ---
     _dbMonitor.releaseDatabaseAccess();
@@ -859,6 +881,9 @@ class SessionManager {
     response = {};
     return response;
   }
+
+  // TODO Need a service feature that enables text to speech, take in String input, send to service, return audio recording. UI will use this api call to get an audio recording, receive it, then play it.
+  // To test in isolation we will generate a few sentences and then pass to service, save the audio recording to a file, then use a different software to play it.
 
 }
 

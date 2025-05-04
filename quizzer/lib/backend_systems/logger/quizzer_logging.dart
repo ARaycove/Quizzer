@@ -41,12 +41,11 @@ class QuizzerLogger {
   // --- Source Filtering --- 
   static List<String> _excludedSources = [
     "user_question_processes.dart",
-    // "user_profile_table.dart",
     "database_monitor.dart",
     "question_answer_pairs_table.dart",
     "login_attempts_table.dart",
     "login_attempts_record.dart",
-    "session_manager.dart",
+    // "session_manager.dart",
     "circulation_worker.dart",
     "question_queue_monitor.dart",
     "module_updates_process.dart",
@@ -57,7 +56,12 @@ class QuizzerLogger {
     "module_inactive_cache.dart",
     "session_toggle_scheduler.dart",
     "unprocessed_cache.dart",
-    "past_due_cache.dart"
+    "past_due_cache.dart",
+    "eligibility_check_worker.dart",
+    "due_date_worker.dart",
+    "pre_process_worker.dart",
+    "inactive_module_worker.dart",
+    "user_profile_table.dart"
   ]; // List of source filenames to exclude
 
   /// Sets the list of source filenames (e.g., 'my_table.dart') to exclude from logging.

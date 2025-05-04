@@ -22,6 +22,7 @@ void main() {
   // Ensure logger is initialized first, setting level to FINE to see logValue messages
   QuizzerLogger.setupLogging(level: Level.FINE);
   /// CLEAR FIRST (simulating first time user / empty database for testing)
+  /// WARNING TEST ENVIRONMENT, CLEARS TABLES FOR CLEAN TESTS EVERYTIME
   test('Truncate all database tables', () async {
     QuizzerLogger.printHeader('Starting database truncation test...');
     final dbMonitor = getDatabaseMonitor(); // Get the monitor instance
@@ -124,7 +125,7 @@ void main() {
     QuizzerLogger.logSuccess('Successfully attempted to add $addedCount vowel/consonant questions.');
     QuizzerLogger.printHeader('Finished Add All Vowel/Consonant Questions Test.');
   }, timeout: const Timeout(Duration(minutes: 20))); // Adjust timeout as needed
-
+  // Select all that apply questions
   test('add all Is Even or Odd questions', () async {
       final sessionManager = getSessionManager();
       assert(sessionManager.userLoggedIn, "User must be logged in for this test");
@@ -179,8 +180,7 @@ void main() {
           concepts: null,
           subjects: null,
           // Correct option index is not used for this type
-          correctOptionIndex: null, 
-          correctOrderElements: null,
+          correctOptionIndex: null,
         );
 
         addedCount++;
@@ -198,7 +198,7 @@ void main() {
       await monitorCaches(monitoringSeconds: 10);
     
     }, timeout: Timeout(Duration(minutes: 3))); // Increased timeout for monitoring
-
+  //  Multiple choice
   test('Add Questions From JSON Test', () async {
   final sessionManager = getSessionManager();
   assert(sessionManager.userLoggedIn, "User must be logged in for this test");
@@ -258,7 +258,7 @@ void main() {
   QuizzerLogger.printHeader('Finished Add Questions From JSON Test.');
 
 }, timeout: Timeout(Duration(minutes: 5))); // Increase timeout for file IO and looping
-
+  // Sort Order Questions
   test('add generated periodic table sort_order questions', () async {
     final sessionManager = getSessionManager();
     assert(sessionManager.userLoggedIn, "User must be logged in for this test");

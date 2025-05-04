@@ -211,7 +211,11 @@ Map<String, Map<String, dynamic>> buildDummyNoQuestionsRecord() {
     // Format follows the parsed structure from getQuestionAnswerPairById
     'question_elements': [{'type': 'text', 'content': 'No new questions available right now. Check back later!'}], 
     'answer_elements': [{'type': 'text', 'content': ''}], // Empty answer
-    'options': ['Okay', 'Add new modules', 'Check Back Later!'], 
+    'options': [
+      {'type': 'text', 'content': 'Okay'},
+      {'type': 'text', 'content': 'Add new modules'},
+      {'type': 'text', 'content': 'Check Back Later!'},
+    ], 
     'correct_option_index': 0, // Index of the 'Okay' option (or -1 if no default correct)
     'module_name': 'System', // Placeholder module
     'subjects': '', // Placeholder subjects

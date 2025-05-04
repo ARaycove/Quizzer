@@ -153,7 +153,7 @@ class _SortOrderQuestionWidgetState extends State<SortOrderQuestionWidget> {
 
     try {
       // Submit the user's order (represented by the list of original indices)
-      _session.submitAnswer(userAnswer: _originalIndices); 
+      _session.submitAnswer(userAnswer: _currentUserOrderedOptions); 
       QuizzerLogger.logSuccess('Answer submission initiated (Sort Order).');
     } catch (e) {
        QuizzerLogger.logError('Sync error submitting answer (Sort Order): $e');

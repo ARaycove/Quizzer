@@ -72,6 +72,24 @@ class SwitchBoard {
   }
   // -------------------------------------
 
+  // --- Outbound Sync Needed Stream ---
+  // Notifies when local data has changed and might need syncing *out* to the server.
+  final StreamController<void> _outboundSyncNeededController = StreamController<void>.broadcast();
+
+  /// Stream that fires when local data changes potentially requiring an outbound sync.
+  Stream<void> get onOutboundSyncNeeded => _outboundSyncNeededController.stream;
+
+  /// Signals that local data has changed and might need outbound synchronization.
+  void signalOutboundSyncNeeded() {
+    if (!_outboundSyncNeededController.isClosed) {
+      // QuizzerLogger.logMessage('SwitchBoard: Signaling Outbound Sync Needed.'); // Keep commented for less noise initially
+      _outboundSyncNeededController.add(null);
+    } else {
+      QuizzerLogger.logWarning('SwitchBoard: Attempted to signal on closed OutboundSyncNeeded stream.');
+    }
+  }
+  // -------------------------------------
+
   // --- Past Due Cache Stream (New) ---
   final StreamController<void> _pastDueCacheController = StreamController<void>.broadcast();
   // Single stream for low eligible cache conditions
@@ -111,6 +129,7 @@ class SwitchBoard {
     _moduleRecentlyActivatedController.close();
     _pastDueCacheController.close();
     _eligibleCacheLowController.close();
+    _outboundSyncNeededController.close();
     QuizzerLogger.logMessage('SwitchBoard disposed.');
   }
   // --------------------
