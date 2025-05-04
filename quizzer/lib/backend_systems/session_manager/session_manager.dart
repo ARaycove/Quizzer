@@ -182,16 +182,16 @@ class SessionManager {
   // SessionManager Constructor (Initializes Supabase and starts async init)
   SessionManager._internal()
       // Initialize cache instance variables
-      : _unprocessedCache = UnprocessedCache(),
-        _nonCirculatingCache = NonCirculatingQuestionsCache(),
-        _moduleInactiveCache = ModuleInactiveCache(),
-        _circulatingCache = CirculatingQuestionsCache(),
-        _dueDateBeyondCache = DueDateBeyond24hrsCache(),
-        _dueDateWithinCache = DueDateWithin24hrsCache(),
-        _eligibleCache = EligibleQuestionsCache(),
-        _queueCache = QuestionQueueCache(),
-        _historyCache = AnswerHistoryCache(),
-        _switchBoard = SwitchBoard() // Initialize SwitchBoard
+      : _unprocessedCache       = UnprocessedCache(),
+        _nonCirculatingCache    = NonCirculatingQuestionsCache(),
+        _moduleInactiveCache    = ModuleInactiveCache(),
+        _circulatingCache       = CirculatingQuestionsCache(),
+        _dueDateBeyondCache     = DueDateBeyond24hrsCache(),
+        _dueDateWithinCache     = DueDateWithin24hrsCache(),
+        _eligibleCache          = EligibleQuestionsCache(),
+        _queueCache             = QuestionQueueCache(),
+        _historyCache           = AnswerHistoryCache(),
+        _switchBoard            = SwitchBoard()
          {
     supabase = SupabaseClient(
       'https://yruvxuvzztnahuuiqxit.supabase.co',

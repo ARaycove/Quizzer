@@ -13,12 +13,24 @@ import 'package:quizzer/UI_systems/global_widgets/question_answer_element.dart';
 //  Local ElementRenderer definition REMOVED 
 
 class MultipleChoiceQuestionWidget extends StatefulWidget {
-  // Callback to inform HomePage to request the next question
+  // Data passed in
+  final List<Map<String, dynamic>> questionElements;
+  final List<Map<String, dynamic>> answerElements;
+  final List<Map<String, dynamic>> options;
+  final int? correctOptionIndex; // Original correct index
+  final bool isDisabled;
+  
+  // Callback
   final VoidCallback onNextQuestion; 
 
   const MultipleChoiceQuestionWidget({
-    super.key,
-    required this.onNextQuestion, // Add callback requirement
+    super.key, // Keep key for state management
+    required this.questionElements,
+    required this.answerElements,
+    required this.options,
+    required this.correctOptionIndex,
+    required this.onNextQuestion,
+    this.isDisabled = false, // Default to false
   });
 
   @override
@@ -31,9 +43,10 @@ class MultipleChoiceQuestionWidget extends StatefulWidget {
 class _MultipleChoiceQuestionWidgetState
     extends State<MultipleChoiceQuestionWidget> {
       
-  final SessionManager _session = SessionManager();
+  // Session manager might still be needed for submitAnswer ONLY
+  final SessionManager _session = SessionManager(); 
   
-  // State variables for the widget
+  // State remains internal to the widget's presentation logic
   List<Map<String, dynamic>> _shuffledOptions = [];
   List<int> _originalIndices = []; // Map shuffled index back to original index
   int? _selectedOptionIndex; // Index *in the shuffled list* that was selected
@@ -42,61 +55,110 @@ class _MultipleChoiceQuestionWidgetState
   @override
   void initState() {
     super.initState();
-    QuizzerLogger.logMessage("MultipleChoiceQuestionWidget initState (New Instance)");
+    QuizzerLogger.logMessage("MultipleChoiceQuestionWidget initState");
     _loadAndShuffleOptions();
   }
 
+  // Called when widget receives new data (e.g., HomePage rebuilds with new question)
+  @override
+  void didUpdateWidget(covariant MultipleChoiceQuestionWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Check if the core data has actually changed before resetting state
+    // Basic check: if options list instance changes, reload.
+    // More robust checks might compare question content if needed.
+    if (widget.options != oldWidget.options || widget.correctOptionIndex != oldWidget.correctOptionIndex) {
+        QuizzerLogger.logMessage("MultipleChoiceQuestionWidget didUpdateWidget: Data changed, shuffling.");
+        _loadAndShuffleOptions();
+    } else {
+        QuizzerLogger.logMessage("MultipleChoiceQuestionWidget didUpdateWidget: Data same, no shuffle.");
+    }
+  }
+
   void _loadAndShuffleOptions() {
-    final originalOptions = _session.currentQuestionOptions;
+    // Use data from widget parameters
+    final originalOptions = widget.options; 
 
     if (originalOptions.isEmpty) {
-       QuizzerLogger.logWarning("MultipleChoiceQuestionWidget: No options found for question ${_session.currentQuestionId}.");
-       setState(() {
-         _shuffledOptions = [];
-         _originalIndices = [];
-         _selectedOptionIndex = null;
-         _isAnswerSubmitted = false;
-       });
+       QuizzerLogger.logWarning("MultipleChoiceQuestionWidget: Passed empty options.");
+       if (mounted) {
+         setState(() {
+           _shuffledOptions = [];
+           _originalIndices = [];
+           _selectedOptionIndex = null;
+           _isAnswerSubmitted = false;
+         });
+       }
        return;
     }
 
-    final List<int> indices = List<int>.generate(originalOptions.length, (i) => i);
-    final random = Random();
-    indices.shuffle(random);
-    final newShuffledOptions = indices.map((i) => originalOptions[i]).toList();
+    List<Map<String, dynamic>> newShuffledOptions;
+    List<int> newOriginalIndices;
+
+    if (widget.isDisabled) {
+      // If disabled, do not shuffle. Use the original order.
+      QuizzerLogger.logMessage("MultipleChoiceQuestionWidget: Disabled state, not shuffling options.");
+      newShuffledOptions = List<Map<String, dynamic>>.from(originalOptions); // Create a copy
+      newOriginalIndices = List<int>.generate(originalOptions.length, (i) => i);
+    } else {
+      // If enabled, shuffle the options.
+      QuizzerLogger.logMessage("MultipleChoiceQuestionWidget: Enabled state, shuffling options.");
+      final List<int> indices = List<int>.generate(originalOptions.length, (i) => i);
+      indices.shuffle(Random());
+      newShuffledOptions = indices.map((i) => originalOptions[i]).toList();
+      newOriginalIndices = indices;
+    }
     
-    _shuffledOptions = newShuffledOptions;
-    _originalIndices = indices; 
-    _selectedOptionIndex = null; 
-    _isAnswerSubmitted = false;  
-    QuizzerLogger.logValue("MultipleChoiceQuestionWidget: Options shuffled in initState for question ${_session.currentQuestionId}. Original indices order: $_originalIndices");
+    // Reset internal state
+    bool shouldAutoSubmit = widget.isDisabled;
+    // Determine default selected index for disabled preview (use correct index if available, else 0)
+    int? defaultSelectedIndex = shouldAutoSubmit 
+                                ? (widget.correctOptionIndex != null 
+                                    ? newOriginalIndices.indexOf(widget.correctOptionIndex!) 
+                                    : 0) 
+                                : null;
+                                
+    if (mounted) {
+        setState(() {
+          _shuffledOptions = newShuffledOptions;
+          _originalIndices = newOriginalIndices; 
+          _selectedOptionIndex = defaultSelectedIndex; // Set selection for disabled view
+          _isAnswerSubmitted = shouldAutoSubmit; // Set submitted if disabled 
+          if (shouldAutoSubmit) {
+            QuizzerLogger.logMessage("MCQ: Disabled state, auto-setting submitted=true, selectedIndex=$defaultSelectedIndex for preview.");
+          }
+        });
+    } else {
+         _shuffledOptions = newShuffledOptions;
+         _originalIndices = newOriginalIndices; 
+         _selectedOptionIndex = defaultSelectedIndex;
+         _isAnswerSubmitted = shouldAutoSubmit;
+    }
+    QuizzerLogger.logValue("MultipleChoiceQuestionWidget: Options loaded. Original indices mapping: $_originalIndices"); 
   }
 
   Future<void> _handleOptionSelected(int selectedShuffledIndex) async { 
-    if (_isAnswerSubmitted) return; // Prevent re-submission
+    // Disable interaction if widget is disabled or already submitted
+    if (widget.isDisabled || _isAnswerSubmitted) return; 
 
-    // Map the selected shuffled index back to its original index
     final int originalIndex = _originalIndices[selectedShuffledIndex];
-
     QuizzerLogger.logMessage('Option selected (shuffled index: $selectedShuffledIndex, original index: $originalIndex). Submitting answer...');
     
     setState(() {
-      _selectedOptionIndex = selectedShuffledIndex; // Store the index *from the shuffled list*
+      _selectedOptionIndex = selectedShuffledIndex; 
       _isAnswerSubmitted = true;
     });
 
-    // Submit the *original* index to the session manager without awaiting
     try {
-      /*await*/ _session.submitAnswer(userAnswer: originalIndex); // Removed await
+      // Still use session manager to submit the answer
+      _session.submitAnswer(userAnswer: originalIndex); 
       QuizzerLogger.logSuccess('Answer submission initiated to SessionManager.'); 
     } catch (e) {
        QuizzerLogger.logError('Synchronous error during submitAnswer call: $e'); 
-       // Optionally revert state or show error to user if the *initiation* fails
        setState(() {
          _isAnswerSubmitted = false; 
          _selectedOptionIndex = null;
        });
-       if(mounted) { // Check if widget is still in the tree
+       if(mounted) { 
          ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Error initiating answer submission: ${e.toString()}'), 
@@ -108,30 +170,32 @@ class _MultipleChoiceQuestionWidgetState
   }
 
   void _handleNextQuestion() {
+    // Disable if needed
+    if (widget.isDisabled) return; 
     QuizzerLogger.logMessage("Next Question button tapped.");
     widget.onNextQuestion(); 
   }
 
-
   @override
   Widget build(BuildContext context) {
-    QuizzerLogger.logValue("MultipleChoiceQuestionWidget building. Submitted: $_isAnswerSubmitted, Selected Shuffled Index: $_selectedOptionIndex");
-
-    final questionElements = _session.currentQuestionElements;
-    final answerElements = _session.currentQuestionAnswerElements;
-    final int? correctOriginalIndex = _session.currentCorrectOptionIndex; 
+    QuizzerLogger.logValue("MCQ build. Disabled: ${widget.isDisabled}, Submitted: $_isAnswerSubmitted, Selected Shuffled: $_selectedOptionIndex");
+    
+    // Use passed-in data
+    final questionElements = widget.questionElements;
+    final answerElements = widget.answerElements;
+    final int? correctOriginalIndex = widget.correctOptionIndex; 
     
     if (_shuffledOptions.isEmpty && questionElements.isEmpty) {
-       QuizzerLogger.logWarning("MultipleChoiceQuestionWidget build: No elements or options available. Displaying error/empty state.");
-       return const Center(child: Text("No question loaded or question data is empty.", style: TextStyle(color: ColorWheel.secondaryText)));
+       return const Center(child: Text("No question data provided.", style: TextStyle(color: ColorWheel.secondaryText)));
     }
 
-    if (correctOriginalIndex == null) {
-        QuizzerLogger.logError("MultipleChoiceQuestionWidget build: correctOriginalIndex is null for question ${_session.currentQuestionId}. Cannot determine correctness.");
+    if (correctOriginalIndex == null && !widget.isDisabled) {
+        // Only error out if *not* disabled; disabled preview might not have correct index yet
+        QuizzerLogger.logError("MultipleChoiceQuestionWidget build: correctOriginalIndex is null. Cannot determine correctness.");
         return const Center(child: Text("Error: Question data is incomplete (missing correct index).", style: TextStyle(color: ColorWheel.warning)));
     }
 
-    // --- Render UI ---
+    // --- Render UI --- 
     const Color correctColor = ColorWheel.buttonSuccess;
     const Color incorrectColor = ColorWheel.buttonError;
     const Color defaultOptionBgColor = ColorWheel.secondaryBackground;
@@ -143,28 +207,29 @@ class _MultipleChoiceQuestionWidgetState
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // --- Question Elements ---
+            // --- Question Elements --- (Uses passed-in questionElements)
             Container(
               padding: ColorWheel.standardPadding,
               decoration: BoxDecoration(
                 color: ColorWheel.secondaryBackground,
                 borderRadius: ColorWheel.cardBorderRadius,
               ),
-              child: ElementRenderer(elements: questionElements), // Uses the global renderer
+              child: ElementRenderer(elements: questionElements), 
             ),
             const SizedBox(height: ColorWheel.majorSectionSpacing),
 
-            // --- Options ---
+            // --- Options --- 
             ListView.builder(
               shrinkWrap: true, 
               physics: const NeverScrollableScrollPhysics(), 
               itemCount: _shuffledOptions.length,
               itemBuilder: (context, index) {
                 final optionData = _shuffledOptions[index]; 
-                final int currentOriginalIndex = _originalIndices[index]; 
+                final int currentOriginalIndex = _originalIndices.length > index ? _originalIndices[index] : -1; // Safety check
                 
                 final bool isSelected = _selectedOptionIndex == index;
-                final bool isCorrect = currentOriginalIndex == correctOriginalIndex;
+                // Use passed-in correctOriginalIndex
+                final bool isCorrect = currentOriginalIndex == correctOriginalIndex; 
                 
                 Color optionBgColor = defaultOptionBgColor;
                 Color borderColor = Colors.transparent;
@@ -182,8 +247,8 @@ class _MultipleChoiceQuestionWidgetState
                      trailingIcon = Icons.check_circle_outline;
                      showAnswerForThisOption = true; 
                   }
-                } else if (isSelected) {
-                  // This case might not be visually needed anymore if selection instantly triggers submission state
+                } else if (isSelected && !widget.isDisabled) {
+                  // Only show selection border if enabled and not submitted
                   borderColor = selectedOptionBorderColor;
                   optionBgColor = selectedOptionBorderColor.withOpacity(0.1);
                 }
@@ -191,7 +256,8 @@ class _MultipleChoiceQuestionWidgetState
                 return Padding(
                   padding: const EdgeInsets.symmetric(vertical: 4.0),
                   child: InkWell(
-                    onTap: () => _handleOptionSelected(index), 
+                    // Disable onTap if isDisabled or submitted
+                    onTap: (widget.isDisabled || _isAnswerSubmitted) ? null : () => _handleOptionSelected(index), 
                     borderRadius: ColorWheel.buttonBorderRadius,
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
@@ -209,21 +275,20 @@ class _MultipleChoiceQuestionWidgetState
                                 isSelected ? Icons.radio_button_checked : Icons.radio_button_unchecked,
                                 color: _isAnswerSubmitted 
                                        ? (isCorrect ? correctColor : (isSelected ? incorrectColor : ColorWheel.secondaryText)) 
-                                       : (isSelected ? selectedOptionBorderColor : ColorWheel.primaryText),
+                                       : (isSelected && !widget.isDisabled ? selectedOptionBorderColor : ColorWheel.primaryText),
                                 size: 20,
                               ),
                               const SizedBox(width: ColorWheel.relatedElementSpacing),
-                              // Use ElementRenderer for the option content itself
-                              Expanded(child: ElementRenderer(elements: [optionData])), // Use global renderer
+                              Expanded(child: ElementRenderer(elements: [optionData])), 
                               if (_isAnswerSubmitted && trailingIcon != null)
                                 Icon(trailingIcon, color: isCorrect ? correctColor : (isSelected ? incorrectColor : ColorWheel.secondaryText)),
                             ],
                           ),
-                          // --- Display Answer Elements ---
+                          // --- Display Answer Elements --- (Uses passed-in answerElements)
                           if (_isAnswerSubmitted && showAnswerForThisOption)
                             Padding(
                               padding: const EdgeInsets.only(top: ColorWheel.relatedElementSpacing, left: 32.0), 
-                              child: ElementRenderer(elements: answerElements), // Use global renderer
+                              child: ElementRenderer(elements: answerElements), 
                             ),
                         ],
                       ),
@@ -234,7 +299,7 @@ class _MultipleChoiceQuestionWidgetState
             ),
             const SizedBox(height: ColorWheel.majorSectionSpacing),
 
-            // --- Next Question Button ---
+            // --- Next Question Button --- 
             if (_isAnswerSubmitted)
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
@@ -244,7 +309,8 @@ class _MultipleChoiceQuestionWidgetState
                     borderRadius: ColorWheel.buttonBorderRadius,
                   ),
                 ),
-                onPressed: _handleNextQuestion,
+                // Disable onPressed if isDisabled
+                onPressed: widget.isDisabled ? null : _handleNextQuestion,
                 child: const Text('Next Question', style: ColorWheel.buttonText),
               ),
           ],

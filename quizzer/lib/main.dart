@@ -189,7 +189,7 @@ class QuizzerApp extends StatelessWidget {
         '/login':           (context) => const LoginPage(),
         '/home':            (context) => const HomePage(),
         '/menu':            (context) => const MenuPage(),
-        // '/add_question':    (context) => const AddQuestionAnswerPage(),
+        '/add_question':    (context) => const AddQuestionAnswerPage(),
         '/display_modules': (context) => const DisplayModulesPage(),
         '/signup':          (context) => const NewUserPage(),
       },

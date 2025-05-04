@@ -128,7 +128,7 @@ Widget _buildStaticWidget(String? type, String? content) {
    }
    switch (type) {
      case 'text': 
-       return Text(content, style: ColorWheel.defaultText);
+       return Text(content, style: ColorWheel.defaultText.copyWith(color: ColorWheel.primaryText));
      // Add other synchronous types here
      default:
        QuizzerLogger.logWarning('ElementRenderer static build encountered unsupported type: $type');

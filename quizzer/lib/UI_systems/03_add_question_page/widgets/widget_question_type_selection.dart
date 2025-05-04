@@ -5,10 +5,10 @@ import 'package:quizzer/UI_systems/color_wheel.dart';
 // Question types mapping
 const Map<String, String> _questionTypes = {
   'multiple_choice': 'Multiple Choice',
-  // TODO: Add other question types here as they become available
-  // 'sort_order': 'Sort Order',
-  // 'true_false': 'True/False',
-  // ... and so on
+  'select_all_that_apply': 'Select All That Apply',
+  'true_false': 'True/False',
+  'sort_order': 'Sort Order',
+  // TODO: Add other question types here as they become available (10 in total planned)
 };
 
 class QuestionTypeSelection extends StatelessWidget {

@@ -11,11 +11,24 @@ import 'package:quizzer/UI_systems/global_widgets/question_answer_element.dart';
 // ==========================================
 
 class SelectAllThatApplyQuestionWidget extends StatefulWidget {
+  // Data passed in
+  final List<Map<String, dynamic>> questionElements;
+  final List<Map<String, dynamic>> answerElements;
+  final List<Map<String, dynamic>> options;
+  final List<int> correctIndices; // Original correct indices
+  final bool isDisabled;
+  
+  // Callback
   final VoidCallback onNextQuestion;
 
   const SelectAllThatApplyQuestionWidget({
     super.key,
+    required this.questionElements,
+    required this.answerElements,
+    required this.options,
+    required this.correctIndices,
     required this.onNextQuestion,
+    this.isDisabled = false,
   });
 
   @override
@@ -25,47 +38,100 @@ class SelectAllThatApplyQuestionWidget extends StatefulWidget {
 
 class _SelectAllThatApplyQuestionWidgetState
     extends State<SelectAllThatApplyQuestionWidget> {
-  final SessionManager _session = SessionManager();
+      
+  final SessionManager _session = SessionManager(); // Keep for submitAnswer
   
+  // Internal state
   List<Map<String, dynamic>> _shuffledOptions = [];
-  List<int> _originalIndices = []; // Map shuffled index back to original index
-  Set<int> _selectedShuffledIndices = {}; // Indices *in the shuffled list*
+  List<int> _originalIndices = []; 
+  Set<int> _selectedShuffledIndices = {}; 
   bool _isAnswerSubmitted = false;
 
   @override
   void initState() {
     super.initState();
-    QuizzerLogger.logMessage("SelectAllThatApplyQuestionWidget initState (New Instance)");
+    QuizzerLogger.logMessage("SelectAllThatApplyQuestionWidget initState");
     _loadAndShuffleOptions();
   }
 
+  @override
+  void didUpdateWidget(covariant SelectAllThatApplyQuestionWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.options != oldWidget.options || widget.correctIndices != oldWidget.correctIndices) {
+        QuizzerLogger.logMessage("SelectAllThatApplyQuestionWidget didUpdateWidget: Data changed, shuffling.");
+        _loadAndShuffleOptions();
+    } else {
+        QuizzerLogger.logMessage("SelectAllThatApplyQuestionWidget didUpdateWidget: Data same, no shuffle.");
+    }
+  }
+
   void _loadAndShuffleOptions() {
-    final originalOptions = _session.currentQuestionOptions;
+    final originalOptions = widget.options;
 
     if (originalOptions.isEmpty) {
-      QuizzerLogger.logWarning("SelectAllThatApplyQuestionWidget: No options found for question ${_session.currentQuestionId}.");
-      // Set state to empty
-       _shuffledOptions = [];
-       _originalIndices = [];
-       _selectedShuffledIndices = {};
-       _isAnswerSubmitted = false;
-       return;
+      QuizzerLogger.logWarning("SelectAllThatApplyQuestionWidget: Passed empty options.");
+      if (mounted) {
+          setState(() { 
+             _shuffledOptions = []; _originalIndices = []; 
+             _selectedShuffledIndices = {}; _isAnswerSubmitted = false; 
+          });
+      } else {
+             _shuffledOptions = []; _originalIndices = []; 
+             _selectedShuffledIndices = {}; _isAnswerSubmitted = false; 
+      }
+      return;
     }
 
-    final List<int> indices = List<int>.generate(originalOptions.length, (i) => i);
-    final random = Random();
-    indices.shuffle(random);
+    List<Map<String, dynamic>> newShuffledOptions;
+    List<int> newOriginalIndices;
 
-    // Directly set state variables in initState
-    _shuffledOptions = indices.map((i) => originalOptions[i]).toList();
-    _originalIndices = indices;
-    _selectedShuffledIndices = {}; // Reset selections
-    _isAnswerSubmitted = false;   // Reset submission status
-    QuizzerLogger.logValue("SelectAllThatApplyQuestionWidget: Options shuffled in initState for question ${_session.currentQuestionId}. Original indices order: $_originalIndices");
+    if (widget.isDisabled) {
+      // If disabled, do not shuffle.
+      QuizzerLogger.logMessage("SelectAllThatApplyQuestionWidget: Disabled state, not shuffling.");
+      newShuffledOptions = List<Map<String, dynamic>>.from(originalOptions);
+      newOriginalIndices = List<int>.generate(originalOptions.length, (i) => i);
+    } else {
+      // If enabled, shuffle.
+      QuizzerLogger.logMessage("SelectAllThatApplyQuestionWidget: Enabled state, shuffling.");
+      final List<int> indices = List<int>.generate(originalOptions.length, (i) => i);
+      indices.shuffle(Random());
+      newShuffledOptions = indices.map((i) => originalOptions[i]).toList();
+      newOriginalIndices = indices;
+    }
+    
+    // Determine default selections for disabled preview
+    bool shouldAutoSubmit = widget.isDisabled;
+    Set<int> defaultSelectedIndices = {};
+    if (shouldAutoSubmit) {
+      // Find the *shuffled* indices that correspond to the correct *original* indices
+      for (int i = 0; i < newOriginalIndices.length; i++) {
+         // newOriginalIndices[i] gives the original index for the item at shuffled position i
+         if (widget.correctIndices.contains(newOriginalIndices[i])) {
+             defaultSelectedIndices.add(i); // Add the shuffled index `i`
+         }
+      }
+      QuizzerLogger.logMessage("SATA: Disabled state, auto-setting submitted=true, selectedIndices(shuffled)=$defaultSelectedIndices for preview.");
+    }
+
+    if (mounted) {
+      setState(() {
+        _shuffledOptions = newShuffledOptions;
+        _originalIndices = newOriginalIndices;
+        _selectedShuffledIndices = defaultSelectedIndices; // Set selections if disabled
+        _isAnswerSubmitted = shouldAutoSubmit; // Set submitted if disabled
+      });
+    } else {
+        _shuffledOptions = newShuffledOptions;
+        _originalIndices = newOriginalIndices;
+        _selectedShuffledIndices = defaultSelectedIndices;
+        _isAnswerSubmitted = shouldAutoSubmit;  
+    }
+     QuizzerLogger.logValue("SelectAllThatApplyQuestionWidget: Options loaded. Original indices mapping: $_originalIndices"); 
   }
 
   void _handleOptionToggled(int toggledShuffledIndex) { 
-    if (_isAnswerSubmitted) return; // Don't allow changes after submission
+    // Disable interaction if widget is disabled or submitted
+    if (widget.isDisabled || _isAnswerSubmitted) return; 
 
     setState(() {
       if (_selectedShuffledIndices.contains(toggledShuffledIndex)) {
@@ -77,30 +143,26 @@ class _SelectAllThatApplyQuestionWidgetState
   }
 
   void _handleSubmitAnswer() {
-    if (_isAnswerSubmitted || _selectedShuffledIndices.isEmpty) return; 
+    // Disable if widget is disabled, already submitted, or nothing selected
+    if (widget.isDisabled || _isAnswerSubmitted || _selectedShuffledIndices.isEmpty) return; 
 
-    // Convert selected *shuffled* indices back to *original* indices
     final List<int> selectedOriginalIndices = _selectedShuffledIndices
         .map((shuffledIndex) => _originalIndices[shuffledIndex])
         .toList();
-    selectedOriginalIndices.sort(); // Ensure consistent order for comparison/logging
+    selectedOriginalIndices.sort();
 
     QuizzerLogger.logMessage('Submitting answer. Selected original indices: $selectedOriginalIndices');
     
     setState(() {
-      _isAnswerSubmitted = true; // Lock selections, show feedback/next button
+      _isAnswerSubmitted = true; 
     });
 
-    // Submit the list of original indices (fire-and-forget)
     try {
       _session.submitAnswer(userAnswer: selectedOriginalIndices); 
       QuizzerLogger.logSuccess('Answer submission initiated (Select All).');
     } catch (e) {
        QuizzerLogger.logError('Sync error submitting answer (Select All): $e');
-       // Revert state on sync error during the call itself
-       setState(() {
-         _isAnswerSubmitted = false; 
-       });
+       setState(() { _isAnswerSubmitted = false; }); // Revert only submission flag
        ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error submitting: ${e.toString()}'), backgroundColor: ColorWheel.buttonError),
         );
@@ -108,21 +170,23 @@ class _SelectAllThatApplyQuestionWidgetState
   }
 
   void _handleNextQuestion() {
+    if (widget.isDisabled) return;
     widget.onNextQuestion(); 
   }
 
   @override
   Widget build(BuildContext context) {
-    final questionElements = _session.currentQuestionElements;
-    final answerElements = _session.currentQuestionAnswerElements;
-    // Correct indices are the *original* indices
-    final Set<int> correctOriginalIndices = _session.currentCorrectIndices.toSet();
+    // Use passed-in data
+    final questionElements = widget.questionElements;
+    final answerElements = widget.answerElements;
+    final Set<int> correctOriginalIndices = widget.correctIndices.toSet();
 
     if (questionElements.isEmpty && _shuffledOptions.isEmpty) {
-        return const Center(child: Text("No question loaded.", style: ColorWheel.secondaryTextStyle));
+        return const Center(child: Text("No question data provided.", style: ColorWheel.secondaryTextStyle));
     }
 
-    final bool canSubmit = _selectedShuffledIndices.isNotEmpty && !_isAnswerSubmitted;
+    // Determine if submit button should be shown (only when enabled)
+    final bool canSubmit = !widget.isDisabled && _selectedShuffledIndices.isNotEmpty && !_isAnswerSubmitted;
 
     return SingleChildScrollView(
       child: Padding(
@@ -130,7 +194,7 @@ class _SelectAllThatApplyQuestionWidgetState
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // --- Question Elements ---
+            // --- Question Elements --- (Uses passed-in questionElements)
             Container(
               padding: ColorWheel.standardPadding,
               decoration: BoxDecoration(color: ColorWheel.secondaryBackground, borderRadius: ColorWheel.cardBorderRadius),
@@ -138,7 +202,7 @@ class _SelectAllThatApplyQuestionWidgetState
             ),
             const SizedBox(height: ColorWheel.majorSectionSpacing),
 
-            // --- Options ---
+            // --- Options --- (Uses internal state, but takes correctIndices from widget)
             ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
@@ -147,6 +211,7 @@ class _SelectAllThatApplyQuestionWidgetState
                 final optionData = _shuffledOptions[index];
                 final int currentOriginalIndex = _originalIndices[index];
                 final bool isSelected = _selectedShuffledIndices.contains(index);
+                // Use passed-in correctOriginalIndices
                 final bool isCorrect = correctOriginalIndices.contains(currentOriginalIndex);
                 
                 // Declare variables outside the if blocks for broader scope
@@ -181,7 +246,7 @@ class _SelectAllThatApplyQuestionWidgetState
                      iconColor = ColorWheel.buttonError;
                    }
                    // else: !isCorrect && !isSelected -> icon = null, iconColor = transparent (handled by default)
-                } else if (isSelected) {
+                } else if (isSelected && !widget.isDisabled) {
                    // Selection phase (before submit)
                    borderColor = ColorWheel.accent;
                    checkboxColor = ColorWheel.accent;
@@ -190,7 +255,8 @@ class _SelectAllThatApplyQuestionWidgetState
                 return Padding(
                   padding: const EdgeInsets.symmetric(vertical: 4.0),
                   child: InkWell(
-                    onTap: () => _handleOptionToggled(index),
+                    // Disable onTap if isDisabled or submitted
+                    onTap: (widget.isDisabled || _isAnswerSubmitted) ? null : () => _handleOptionToggled(index),
                     borderRadius: ColorWheel.buttonBorderRadius,
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
@@ -203,10 +269,10 @@ class _SelectAllThatApplyQuestionWidgetState
                         children: [
                           Checkbox(
                             value: isSelected,
-                            onChanged: _isAnswerSubmitted ? null : (bool? value) => _handleOptionToggled(index),
+                            // Disable onChanged if isDisabled or submitted
+                            onChanged: (widget.isDisabled || _isAnswerSubmitted) ? null : (bool? value) => _handleOptionToggled(index),
                             activeColor: checkboxColor ?? ColorWheel.accent, 
                             checkColor: ColorWheel.primaryText, 
-                            // Use the border color logic for the checkbox side when submitted
                             side: BorderSide(color: _isAnswerSubmitted ? borderColor : ColorWheel.secondaryText), 
                           ),
                           const SizedBox(width: ColorWheel.relatedElementSpacing / 2),
@@ -225,34 +291,38 @@ class _SelectAllThatApplyQuestionWidgetState
             ),
             const SizedBox(height: ColorWheel.majorSectionSpacing / 2),
             
-            // --- Answer Elements (Show After Submission) ---
+            // --- Answer Elements --- (Uses passed-in answerElements)
             if (_isAnswerSubmitted)
               Padding(
                 padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
                 child: Container(
                    padding: ColorWheel.standardPadding,
                    decoration: BoxDecoration(color: ColorWheel.secondaryBackground.withOpacity(0.5), borderRadius: ColorWheel.cardBorderRadius),
-                   child: ElementRenderer(elements: answerElements),
+                   child: ElementRenderer(elements: widget.answerElements),
                  ),
               ),
 
-            // --- Submit / Next Question Buttons ---
-            if (canSubmit) // Show Submit button if options are selected and not yet submitted
+            // --- Submit / Next Question Buttons --- 
+            // Only show Submit if it *can* be submitted (enabled, options selected, not submitted)
+            if (canSubmit) 
               Padding(
                  padding: const EdgeInsets.only(top: 8.0),
                  child: ElevatedButton(
-                   style: ElevatedButton.styleFrom(backgroundColor: ColorWheel.buttonSuccess), // Use accent or success?
-                   onPressed: _handleSubmitAnswer,
+                   style: ElevatedButton.styleFrom(backgroundColor: ColorWheel.buttonSuccess), 
+                   // onPressed is implicitly enabled because `canSubmit` is true
+                   onPressed: _handleSubmitAnswer, 
                    child: const Text('Submit Answer', style: ColorWheel.buttonTextBold),
                  ),
               ),
               
-            if (_isAnswerSubmitted) // Show Next button after submission
+            // Only show Next if submitted (isDisabled doesn't affect Next button display, only onPressed)
+            if (_isAnswerSubmitted) 
                Padding(
                  padding: const EdgeInsets.only(top: 8.0),
                  child: ElevatedButton(
                    style: ElevatedButton.styleFrom(backgroundColor: ColorWheel.buttonSuccess),
-                   onPressed: _handleNextQuestion,
+                   // Disable onPressed if isDisabled
+                   onPressed: widget.isDisabled ? null : _handleNextQuestion,
                    child: const Text('Next Question', style: ColorWheel.buttonText),
                  ),
               ),

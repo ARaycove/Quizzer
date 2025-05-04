@@ -1,329 +1,491 @@
-// /*
-// Add Question Answer Pair Page Description:
-// This page provides a streamlined interface for creating complete question-answer pairs.
-// Key features:
-// - Source Material Selection with citation display
-// - Question and Answer entry fields
-// - Media support for both questions and answers
-// - Subject classification and concept tagging
-// - Content moderation tags
-// - Preview functionality
-// - Submit button for saving to database
+import 'package:flutter/material.dart';
+import 'package:quizzer/UI_systems/03_add_question_page/widgets/widget_module_selection.dart';
+import 'package:quizzer/UI_systems/03_add_question_page/widgets/widget_question_type_selection.dart';
+import 'package:quizzer/UI_systems/03_add_question_page/widgets/widget_bulk_add_button.dart';
+import 'package:quizzer/UI_systems/global_widgets/widget_global_app_bar.dart';
+import 'package:quizzer/UI_systems/color_wheel.dart';
+import 'package:quizzer/UI_systems/03_add_question_page/widgets/widget_live_preview.dart';
+import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
+import 'dart:convert'; // Needed only if we bring back deep copy
+import 'package:quizzer/UI_systems/03_add_question_page/widgets/add_question_widget/widget_add_question.dart';
+import 'package:quizzer/UI_systems/03_add_question_page/widgets/widget_submit_clear_buttons.dart';
+import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 
-// TODO: Future Improvements
-// 1. Math Support
-//    - Add LaTeX/math equation support for text elements
-//    - Add inline math editor with preview
-//    - Add common math symbols toolbar
+// ==========================================
 
-// 2. Media Elements
-//    - Add audio element support with file upload
-//    - Add video element support with file upload
-//    - Add media player preview for audio/video elements
-//    - Add file size limits and format validation
+class AddQuestionAnswerPage extends StatefulWidget {
+  const AddQuestionAnswerPage({super.key});
 
-// 3. User Guidance
-//    - Add tooltips to explain:
-//      * Module field purpose and usage
-//      * Question type selection
-//      * Multiple choice options
-//      * Text and media element buttons
-//      * Reordering functionality
-//      * Double-tap to edit
-// */
+  @override
+  State<AddQuestionAnswerPage> createState() => _AddQuestionAnswerPageState();
+}
 
-// // TODO [Question Bank Upload Feature]
-// // Implement functionality to upload questions in batches via formatted JSON file:
-// // - Add a file upload button in the UI
-// // - Create JSON schema for batch question format
-// // - Add validation for uploaded file format
-// // - Create batch processing logic for questions
-// // - Add progress indicator for batch upload
-// // - Handle errors and provide feedback
-// // - Consider adding template download option for users
+class _AddQuestionAnswerPageState extends State<AddQuestionAnswerPage> {
+  // Instantiate SessionManager
+  final SessionManager _session = SessionManager();
 
-// import 'package:flutter/material.dart';
-// import 'package:image_picker/image_picker.dart';
-// import 'package:quizzer/UI_systems/03_add_question_page/widget_module_selection.dart';
-// import 'package:quizzer/UI_systems/03_add_question_page/widget_question_type_selection.dart';
-// import 'package:quizzer/UI_systems/03_add_question_page/widget_question_answer_element.dart';
-// import 'package:quizzer/UI_systems/03_add_question_page/widget_question_entry_options_dialog.dart';
-// import 'package:quizzer/UI_systems/03_add_question_page/widget_submit_clear_buttons.dart';
-// import 'package:quizzer/UI_systems/03_add_question_page/widget_bulk_add_button.dart';
-// import 'package:quizzer/UI_systems/global_widgets/widget_global_app_bar.dart';
-// import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
-// import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
-// import 'package:quizzer/UI_systems/color_wheel.dart';
-// // ==========================================
+  // Controllers for selection widgets
+  final _moduleController = TextEditingController();
+  final _questionTypeController = TextEditingController();
 
-// // Widgets
-// class AddQuestionAnswerPage extends StatefulWidget {
-//   const AddQuestionAnswerPage({super.key});
+  // --- State for the question being built ---
+  // Re-introducing state based on addNewQuestion structure
+  List<Map<String, dynamic>> _currentQuestionElements = [];
+  List<Map<String, dynamic>> _currentAnswerElements = [];
+  List<Map<String, dynamic>> _currentOptions = [];
+  int?      _currentCorrectOptionIndex;       // For MC, TF
+  List<int> _currentCorrectIndicesSATA = [];  // For SATA
+  // Note: _currentIsCorrectAnswerTrueTF is redundant, use _currentCorrectOptionIndex (0/1) for TF
+  // --- End State Variables ---
 
-//   @override
-//   State<AddQuestionAnswerPage> createState() => _AddQuestionAnswerPageState();
-// }
+  // --- Counter to force preview rebuild ---
+  int _previewRebuildCounter = 0;
 
-// class _AddQuestionAnswerPageState extends State<AddQuestionAnswerPage> {
-//   final                 _moduleController       = TextEditingController();
-//   final                 _questionTypeController = TextEditingController();
-//   final List<QAContent> _questionElements       = [];
-//   final List<QAContent> _answerElements         = [];
-//   final                 _imagePicker            = ImagePicker();
-//   final List<String>    _options                = [];
-//   int                   _correctOptionIndex     = -1;
-//   SessionManager        session                 = getSessionManager();
+  @override
+  void initState() {
+    super.initState();
+    // Initialize controllers and listeners
+    _moduleController.text = 'general'; // Default module
+    _questionTypeController.text = 'multiple_choice'; // Default question type
+    _questionTypeController.addListener(_onQuestionTypeChanged);
 
-//   @override
-//   void initState() {
-//     super.initState();
-//     _moduleController.text = 'general';
-//     _questionTypeController.text = 'multiple_choice';
-//     _questionTypeController.addListener(_handleQuestionTypeChange);
-//   }
+    // Initialize state for a new, blank question
+    _resetQuestionState();
+  }
 
-//   @override
-//   void dispose() {
-//     _moduleController.dispose();
-//     _questionTypeController.dispose();
-//     super.dispose();
-//   }
+  @override
+  void dispose() {
+    _questionTypeController.removeListener(_onQuestionTypeChanged);
+    _moduleController.dispose();
+    _questionTypeController.dispose();
+    super.dispose();
+  }
 
-//   void _handleQuestionTypeChange() {
-//     setState(() {
-//       // Reset options when question type changes
-//       _options.clear();
-//       _correctOptionIndex = -1;
-//     });
-//   }
+  // Reset state when question type changes or for a new question
+  void _resetQuestionState() {
+    setState(() {
+          // Start with EMPTY lists
+          _currentQuestionElements = [];
+          _currentAnswerElements = [];
+          _currentOptions = [];
+          
+          // Reset type-specific answers
+          final type = _questionTypeController.text;
+          _currentCorrectOptionIndex = (type == 'true_false') ? 0 : null; // Default TF to True
+          _currentCorrectIndicesSATA = [];
+          _previewRebuildCounter++; // Increment counter
+          
+          QuizzerLogger.logMessage("Resetting question state for type: $type (EMPTY)");
+      });
+  }
 
-//   void _handleOptionsChanged(List<String> newOptions) {
-//     setState(() {
-//       _options.clear();
-//       _options.addAll(newOptions);
-//     });
-//   }
+  // Listener for question type changes
+  void _onQuestionTypeChanged() {
+    _resetQuestionState(); // Reset state when type changes
+    // No need for setState here as _resetQuestionState calls it
+  }
 
-//   void _handleCorrectOptionChanged(int newIndex) {
-//     setState(() {
-//       _correctOptionIndex = newIndex;
-//     });
-//   }
+  // --- Placeholder Handlers (Re-added) --- 
 
-//   String getCurrentModuleSelection() {
-//     final currentModule = _moduleController.text;
-//     QuizzerLogger.logMessage('Fetching current module selection: $currentModule');
-//     return currentModule;
-//   }
+  // Renamed param to reflect it can be type OR content
+  void _handleAddElement(String typeOrContent, String category) {
+    setState(() {
+      Map<String, dynamic>? newElement;
+      if (typeOrContent == 'image') {
+        // TODO: Implement image picker logic here
+        // For now, add placeholder or show unimplemented message
+        QuizzerLogger.logWarning("Image picking not implemented for $category elements.");
+        // Optionally add a placeholder image element:
+        // newElement = {'type': 'image', 'content': 'placeholder.png'};
+        return; // Don't add anything until picker is ready
+      } else if (typeOrContent.isNotEmpty) {
+        // Assume it's text content from the TextField
+        newElement = {'type': 'text', 'content': typeOrContent};
+      } else {
+        // Should not happen if TextField onSubmitted checks for empty, but good practice
+        QuizzerLogger.logWarning("Attempted to add empty element to $category");
+        return;
+      }
 
-//   void _handleQuestionElementsChanged(List<QAContent> newElements) {
-//     setState(() {
-//       _questionElements.clear();
-//       _questionElements.addAll(newElements);
-//     });
-//   }
+      if (newElement != null) {
+        if (category == 'question') {
+          _currentQuestionElements.add(newElement);
+          // QuizzerLogger.logValue("Added question element:", newElement);
+          QuizzerLogger.logMessage("Added question element:");
+          QuizzerLogger.logValue(newElement.toString());
+        } else if (category == 'answer') {
+          _currentAnswerElements.add(newElement);
+          // QuizzerLogger.logValue("Added answer element:", newElement);
+          QuizzerLogger.logMessage("Added answer element:");
+          QuizzerLogger.logValue(newElement.toString());
+        } else {
+          QuizzerLogger.logError("_handleAddElement: Unknown category '$category'");
+        }
+        _previewRebuildCounter++; // Increment counter
+      }
+    });
+  }
+  void _handleRemoveElement(int index, String category) {
+    QuizzerLogger.logMessage("Attempting to remove element index $index from $category");
+    setState(() {
+       List<Map<String, dynamic>> targetList;
+       if (category == 'question') {
+          targetList = _currentQuestionElements;
+       } else if (category == 'answer') {
+          targetList = _currentAnswerElements;
+       } else {
+          QuizzerLogger.logError("_handleRemoveElement: Unknown category '$category'");
+          return;
+       }
 
-//   void _handleAnswerElementsChanged(List<QAContent> newElements) {
-//     setState(() {
-//       _answerElements.clear();
-//       _answerElements.addAll(newElements);
-//     });
-//   }
+       if (index >= 0 && index < targetList.length) {
+          targetList.removeAt(index);
+          _previewRebuildCounter++; // Increment counter
+          QuizzerLogger.logSuccess("Removed element index $index from $category");
+       } else {
+          QuizzerLogger.logWarning("_handleRemoveElement: Invalid index $index for $category list (length ${targetList.length})");
+       }
+    });
+  }
+  void _handleEditElement(int index, String category, Map<String, dynamic> updatedElement) {
+    QuizzerLogger.logMessage("Updating $category element at index $index");
+    setState(() {
+      List<Map<String, dynamic>> targetList;
+      if (category == 'question') {
+        targetList = _currentQuestionElements;
+      } else if (category == 'answer') {
+        targetList = _currentAnswerElements;
+      } else {
+        QuizzerLogger.logError("_handleEditElement: Unknown category '$category'");
+        return;
+      }
 
-//   void _handleSubmit() async {
-//     if (_validateForm()) {
-//       QuizzerLogger.logMessage('Submitting question-answer pair...');
-//       final String module          = _moduleController.text;
-//       final String questionType    = _questionTypeController.text;
+      if (index >= 0 && index < targetList.length) {
+        targetList[index] = updatedElement;
+        _previewRebuildCounter++; // Increment counter
+        QuizzerLogger.logSuccess("Updated $category element at index $index.");
+      } else {
+        QuizzerLogger.logWarning("_handleEditElement: Invalid index $index for $category list (length ${targetList.length})");
+      }
+    });
+  }
+
+  void _handleAddOption(Map<String, dynamic> newOption) { // Accept the new option map
+    QuizzerLogger.logMessage("Placeholder: Add option ${newOption['content']}");
+    setState(() {
+        _currentOptions.add(newOption);
+        if (_currentOptions.length == 1 && _questionTypeController.text == 'multiple_choice') {
+          _currentCorrectOptionIndex = 0;
+        }
+        _previewRebuildCounter++; // Increment counter
+     });
+  }
+
+  void _handleRemoveOption(int index) {
+    QuizzerLogger.logMessage("Placeholder: Remove option index $index");
+    setState(() {
+        if (index >= 0 && index < _currentOptions.length) {
+           _currentOptions.removeAt(index);
+           if (_currentOptions.isEmpty) {
+              _currentCorrectOptionIndex = null;
+              _currentCorrectIndicesSATA = [];
+           } else {
+              // Add logic here to adjust MC/SATA indices if needed after removal
+           }
+           _previewRebuildCounter++; // Increment counter
+        } else {
+          QuizzerLogger.logWarning("_handleRemoveOption: Invalid index $index");
+        }
+    });
+  }
+
+  void _handleEditOption(int index, Map<String, dynamic> updatedOption) {
+    QuizzerLogger.logMessage("Updating option at index $index");
+    setState(() {
+       if (index >= 0 && index < _currentOptions.length) {
+          _currentOptions[index] = updatedOption;
+          _previewRebuildCounter++; // Increment counter
+          QuizzerLogger.logSuccess("Updated option at index $index.");
+       } else {
+         QuizzerLogger.logWarning("_handleEditOption: Invalid index $index for options list (length ${_currentOptions.length})");
+       }
+    });
+  }
+  
+  void _handleSetCorrectOptionIndex(int index) {
+    QuizzerLogger.logMessage("Placeholder: Set single correct index to $index");
+    setState(() {
+       _currentCorrectOptionIndex = index;
+       // If TF, ensure index is 0 or 1
+       if (_questionTypeController.text == 'true_false' && (index != 0 && index != 1)){
+         _currentCorrectOptionIndex = 0; // Default back to 0 (True) if invalid
+         QuizzerLogger.logWarning("Invalid index $index set for True/False. Defaulting to 0.");
+       }
+       _previewRebuildCounter++; // Increment counter
+    });
+  }
+  void _handleToggleCorrectOptionSATA(int index) {
+     QuizzerLogger.logMessage("Placeholder: Toggle SATA correct for $index");
+    setState(() {
+         if (_currentCorrectIndicesSATA.contains(index)) {
+             _currentCorrectIndicesSATA.remove(index);
+         } else {
+             _currentCorrectIndicesSATA.add(index);
+         }
+         _currentCorrectIndicesSATA.sort();
+         _previewRebuildCounter++; // Increment counter
+     });
+  }
+   void _handleReorderElements(List<Map<String, dynamic>> reorderedElements, String category) {
+      QuizzerLogger.logMessage("Placeholder: Reorder $category elements");
+      setState(() {
+         if (category == 'question') {
+             _currentQuestionElements = reorderedElements;
+         } else if (category == 'answer') {
+             _currentAnswerElements = reorderedElements;
+         } else if (category == 'options') { // Assuming options might be reorderable later
+             _currentOptions = reorderedElements;
+         }
+         _previewRebuildCounter++; // Increment counter
+      });
+   }
+
+   // --- Handle Option Reordering ---
+   void _handleReorderOptions(List<Map<String, dynamic>> reorderedOptions) {
+      QuizzerLogger.logMessage("Handling option reorder");
+      setState(() {
+        // Find the original indices before updating the list
+        final int? oldCorrectIndexMC = _currentCorrectOptionIndex;
+        final List<int> oldCorrectIndicesSATA = List.from(_currentCorrectIndicesSATA);
+        final List<Map<String, dynamic>> oldOptions = List.from(_currentOptions);
+
+        // Update the options list
+        _currentOptions = reorderedOptions;
+
+        // --- Adjust Correct Indices --- 
+        // If the item(s) marked as correct have moved, update their indices.
+        
+        // For MC/TF: Find where the previously correct item moved to.
+        if (oldCorrectIndexMC != null && oldCorrectIndexMC >= 0 && oldCorrectIndexMC < oldOptions.length) {
+          final Map<String, dynamic> previouslyCorrectItem = oldOptions[oldCorrectIndexMC];
+          // Find its new index in the reordered list
+          final int newCorrectIndexMC = _currentOptions.indexWhere(
+            (option) => option == previouslyCorrectItem // Simple identity check might suffice if objects are same
+                      // Or compare content if necessary:
+                      // option['type'] == previouslyCorrectItem['type'] && option['content'] == previouslyCorrectItem['content']
+          );
+          if (newCorrectIndexMC != -1) {
+            _currentCorrectOptionIndex = newCorrectIndexMC;
+             QuizzerLogger.logValue("MC correct index updated from $oldCorrectIndexMC to $newCorrectIndexMC after reorder.");
+          } else {
+             QuizzerLogger.logWarning("Could not find previously correct MC option after reorder. Index reset.");
+             _currentCorrectOptionIndex = null; // Or default? Handle error case.
+          }
+        }
+
+        // For SATA: Find the new indices for all previously correct items.
+        if (oldCorrectIndicesSATA.isNotEmpty) {
+          List<int> newCorrectIndicesSATA = [];
+          for (int oldIndex in oldCorrectIndicesSATA) {
+             if (oldIndex >= 0 && oldIndex < oldOptions.length) {
+               final Map<String, dynamic> previouslyCorrectItem = oldOptions[oldIndex];
+               final int newIndex = _currentOptions.indexWhere((option) => option == previouslyCorrectItem);
+               if (newIndex != -1) {
+                 newCorrectIndicesSATA.add(newIndex);
+               }
+             }
+          }
+          newCorrectIndicesSATA.sort(); // Keep sorted
+          _currentCorrectIndicesSATA = newCorrectIndicesSATA;
+          QuizzerLogger.logValue("SATA correct indices updated from $oldCorrectIndicesSATA to $newCorrectIndicesSATA after reorder.");
+        }
+
+        // --- End Adjust Correct Indices ---
+
+        _previewRebuildCounter++; // Increment counter
+      });
+   }
+
+   // --- Validation Logic ---
+   bool _validateQuestionData() {
+      final String currentType = _questionTypeController.text;
+      bool isValid = true; // Assume valid initially
+      String errorMessage = "";
+
+      // 1. Question Elements not empty
+      if (_currentQuestionElements.isEmpty) {
+         errorMessage = "Question Elements cannot be empty.";
+         isValid = false;
+      }
+      // 2. Answer Elements not empty
+      else if (_currentAnswerElements.isEmpty) {
+         errorMessage = "Answer Explanation Elements cannot be empty.";
+         isValid = false;
+      }
+      // 3. Option count for relevant types
+      else if ((currentType == 'multiple_choice' || currentType == 'select_all_that_apply' || currentType == 'sort_order') && _currentOptions.length < 2) {
+         errorMessage = "$currentType questions require at least 2 options.";
+         isValid = false;
+      }
+      // 4. Correct answer selection for relevant types
+      else if ((currentType == 'multiple_choice' || currentType == 'true_false') && _currentCorrectOptionIndex == null) {
+         errorMessage = "A correct answer must be selected for $currentType.";
+         isValid = false;
+      }
+      else if (currentType == 'select_all_that_apply' && _currentCorrectIndicesSATA.isEmpty) {
+         errorMessage = "At least one correct answer must be selected for Select All That Apply.";
+         isValid = false;
+      }
+
+      // Log and show SnackBar if invalid
+      if (!isValid) {
+         QuizzerLogger.logWarning("Question validation failed: $errorMessage");
+         if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Validation Failed: $errorMessage'), backgroundColor: ColorWheel.buttonError)
+            );
+         }
+      }
       
-//       // Get current timestamp
-//       final String timeStamp = DateTime.now().toIso8601String();
-      
-//       // Convert QAContent objects to maps
-//       final List<Map<String, dynamic>> questionElementsMaps = 
-//           _questionElements.map((element) => element.toMap()).toList();
-//       final List<Map<String, dynamic>> answerElementsMaps = 
-//           _answerElements.map((element) => element.toMap()).toList();
-      
-//       // Call the API to add the question-answer pair
-//       await session.addQuestionAnswerPair(
-//         timeStamp: timeStamp,
-//         questionElements: questionElementsMaps,
-//         answerElements: answerElementsMaps,
-//         moduleName: module,
-//         questionType: questionType,
-//         sourcePaths: null, // Add source paths if there are media files
-//         options: questionType == 'multiple_choice' ? _options : null,
-//         correctOptionIndex: questionType == 'multiple_choice' ? _correctOptionIndex : null,
-//       );
-      
-//       QuizzerLogger.logMessage('Question-answer pair submitted successfully');
+      return isValid;
+   }
 
-//       _showSuccessSnackBar('Question-Answer pair saved successfully!');
-//       _handleClear();
-//     }
-//   }
+   // --- Save/Submit Logic using SessionManager ---
+   void _handleSubmitQuestion() async { // Keep async for Snackbars etc.
+     QuizzerLogger.logMessage("Attempting to submit question via SessionManager...");
 
-//   bool _validateForm() {
-//     QuizzerLogger.logMessage('Starting form validation...');
-//     // Check if module is selected
-//     // TODO: Formal validation of module name
-//     if (_moduleController.text.isEmpty) {
-//       QuizzerLogger.logMessage('Module validation failed: Expected non-empty module, got empty');
-//       _showErrorSnackBar('Please select a module');
-//       return false;
-//     }
-//     QuizzerLogger.logMessage('Module validation passed: Selected module is "${_moduleController.text}"');
+     // --- 0. Validation ---
+     if (!_validateQuestionData()) {
+       return; // Stop if validation fails
+     }
+     
+     // --- 1. Gather Data & Call SessionManager (Fire and Forget) ---
+     QuizzerLogger.logMessage("Validation passed. Calling SessionManager.addNewQuestion (no await)...");
+     
+     // Call without await and remove try-catch
+     _session.addNewQuestion( 
+       // Required parameters
+       moduleName: _moduleController.text,
+       questionType: _questionTypeController.text,
+       questionElements: _currentQuestionElements,
+       answerElements: _currentAnswerElements,
+       // Optional / Type-specific parameters (pass null if not applicable/empty)
+       options: _currentOptions.isNotEmpty ? _currentOptions : null, 
+       correctOptionIndex: _currentCorrectOptionIndex, 
+       indexOptionsThatApply: _currentCorrectIndicesSATA.isNotEmpty ? _currentCorrectIndicesSATA : null, 
+       // Optional Metadata (pass null if not collected/available)
+       citation: null, 
+       concepts: null, 
+       subjects: null, 
+     );
+       
+     // --- 2. Assume Success Immediately (UI Update) ---
+     // No response check needed as we don't await
+     QuizzerLogger.logSuccess("Question submission initiated (fire and forget). Assuming success for UI.");
+     if (mounted) { // Still check mounted for Snack Bar
+    ScaffoldMessenger.of(context).showSnackBar(
+           const SnackBar(content: Text('Question Submitted!'), backgroundColor: ColorWheel.buttonSuccess),
+         );
+     }
+     // Clear the form immediately
+     _resetQuestionState(); 
+     // Optionally navigate back
+     // Navigator.pop(context);
+   
+     // Removed try-catch block and await
+  }
 
-//     // Check if question type is selected
-//     if (_questionTypeController.text.isEmpty) {
-//       QuizzerLogger.logMessage('Question type validation failed: Expected non-empty type, got empty');
-//       _showErrorSnackBar('Please select a question type');
-//       return false;
-//     }
-//     QuizzerLogger.logMessage('Question type validation passed: Selected type is "${_questionTypeController.text}"');
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      // 1. Global App Bar
+      appBar: GlobalAppBar(
+        title: 'Add/Edit Question',
+      ),
+      backgroundColor: ColorWheel.primaryBackground,
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: ListView(
+          children: [
+            // 2. Module Selection Widget
+            ModuleSelection(controller: _moduleController),
+            const SizedBox(height: 16),
+            // 3. Question Type Selection Widget
+            QuestionTypeSelection(controller: _questionTypeController),
+            const SizedBox(height: 24),
 
-//     // Check if question has content
-//     if (_questionElements.isEmpty) {
-//       QuizzerLogger.logMessage('Question content validation failed: Expected at least one element, got none');
-//       _showErrorSnackBar('Please add content to the question');
-//       return false;
-//     }
-//     QuizzerLogger.logMessage('Question content validation passed: Found ${_questionElements.length} elements');
+            // --- Editing Controls Area --- (Moved Here)
+            AddQuestionWidget(
+               questionType: _questionTypeController.text,
+               questionElements: _currentQuestionElements,
+               answerElements: _currentAnswerElements,
+               options: _currentOptions,
+               correctOptionIndex: _currentCorrectOptionIndex,
+               correctIndicesSATA: _currentCorrectIndicesSATA,
+               onAddElement: _handleAddElement,
+               onRemoveElement: _handleRemoveElement,
+               onEditElement: _handleEditElement,
+               onAddOption: _handleAddOption,
+               onRemoveOption: _handleRemoveOption,
+               onEditOption: _handleEditOption,
+               onSetCorrectOptionIndex: _handleSetCorrectOptionIndex,
+               onToggleCorrectOptionSATA: _handleToggleCorrectOptionSATA,
+               onReorderElements: _handleReorderElements,
+               onReorderOptions: _handleReorderOptions,
+            ),
+            const SizedBox(height: 24),
 
-//     // Check if answer has content
-//     if (_answerElements.isEmpty) {
-//       QuizzerLogger.logMessage('Answer content validation failed: Expected at least one element, got none');
-//       _showErrorSnackBar('Please add content to the answer');
-//       return false;
-//     }
-//     QuizzerLogger.logMessage('Answer content validation passed: Found ${_answerElements.length} elements');
+            // 4. Live Preview
+            const Text("Live Preview:", style: ColorWheel.titleText),
+            const SizedBox(height: 8),
+            Container(
+               padding: const EdgeInsets.all(8),
+               decoration: BoxDecoration(
+                  border: Border.all(color: ColorWheel.secondaryText.withOpacity(0.5)),
+                  borderRadius: ColorWheel.cardBorderRadius,
+               ),
+               child: LivePreviewWidget(
+                  key: ValueKey('live-preview-$_previewRebuildCounter'),
+                  questionType: _questionTypeController.text,
+                  questionElements: _currentQuestionElements,
+                  answerElements: _currentAnswerElements,
+                  options: _currentOptions,
+                  correctOptionIndexMC: _currentCorrectOptionIndex,
+                  correctIndicesSATA: _currentCorrectIndicesSATA,
+                  isCorrectAnswerTrueTF: (_questionTypeController.text == 'true_false')
+                                          ? (_currentCorrectOptionIndex == 0)
+                                          : null,
+               ),
+            ),
+            const SizedBox(height: 24),
 
-//     // Additional validation for multiple choice questions
-//     if (_questionTypeController.text == 'multiple_choice') {
-//       if (_options.isEmpty) {
-//         QuizzerLogger.logMessage('Multiple choice options validation failed: Expected at least one option, got none');
-//         _showErrorSnackBar('Please add options for the multiple choice question');
-//         return false;
-//       }
-//       QuizzerLogger.logMessage('Multiple choice options validation passed: Found ${_options.length} options');
+            // --- Submit/Clear Buttons ---
+            SubmitClearButtons(
+               onSubmit: _handleSubmitQuestion,
+               onClear: _resetQuestionState, // Use existing reset logic for Clear
+            ),
 
-//       if (_correctOptionIndex == -1) {
-//         QuizzerLogger.logMessage('Correct option validation failed: Expected selected option, got none');
-//         _showErrorSnackBar('Please select the correct answer for the multiple choice question');
-//         return false;
-//       }
-//       QuizzerLogger.logMessage('Correct option validation passed: Selected option index is $_correctOptionIndex');
-//     }
+            const SizedBox(height: 24), // Spacing at the bottom
 
-//     // Log final form data
-//     QuizzerLogger.logMessage('Form validation completed successfully');
-//     QuizzerLogger.logMessage('Final form data:');
-//     QuizzerLogger.logMessage('Module: ${_moduleController.text}');
-//     QuizzerLogger.logMessage('Question Type: ${_questionTypeController.text}');
-//     QuizzerLogger.logMessage('Question Elements: ${_questionElements.map((e) => '{"type":"${e.type}","content":"${e.content}"}').join(',')}');
-//     QuizzerLogger.logMessage('Answer Elements: ${_answerElements.map((e) => '{"type":"${e.type}","content":"${e.content}"}').join(',')}');
-//     if (_questionTypeController.text == 'multiple_choice') {
-//       QuizzerLogger.logMessage('Options: ${_options.join(',')}');
-//       QuizzerLogger.logMessage('Correct Option Index: $_correctOptionIndex');
-//     }
+            // 5. Divider
+            const Divider(thickness: 1.0, color: ColorWheel.secondaryText),
+            const SizedBox(height: 16),
 
-//     return true;
-//   }
+            // 6. Bulk Add Widget
+            const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                BulkAddButton(),
+              ],
+            ),
+            const SizedBox(height: 16),
 
-//   void _showErrorSnackBar(String message) {
-//     ScaffoldMessenger.of(context).showSnackBar(
-//       SnackBar(
-//         content: Text(message),
-//         backgroundColor: ColorWheel.buttonError,
-//         duration: const Duration(seconds: 3),
-//       ),
-//     );
-//   }
-
-//   void _showSuccessSnackBar(String message) {
-//     ScaffoldMessenger.of(context).showSnackBar(
-//       SnackBar(
-//         content: Text(message),
-//         backgroundColor: ColorWheel.buttonSuccess,
-//         duration: const Duration(seconds: 3),
-//       ),
-//     );
-//   }
-
-//   void _handleClear() {
-//     setState(() {
-//       _questionElements.clear();
-//       _answerElements.clear();
-//       _options.clear();
-//       _correctOptionIndex = -1;
-//       _moduleController.text = 'general';
-//       _questionTypeController.text = 'multiple_choice';
-//     });
-//     QuizzerLogger.logMessage('Cleared all form fields');
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: GlobalAppBar(
-//         title: 'Add Question-Answer Pair',
-//       ),
-//       backgroundColor: ColorWheel.primaryBackground,
-//       body: SingleChildScrollView(
-//         padding: const EdgeInsets.all(ColorWheel.standardPaddingValue),
-//         child: Column(
-//           crossAxisAlignment: CrossAxisAlignment.start,
-//           children: [
-//             ModuleSelection(controller: _moduleController),
-//             const SizedBox(height: ColorWheel.standardPaddingValue),
-//             QuestionTypeSelection(controller: _questionTypeController),
-//             const SizedBox(height: ColorWheel.majorSectionSpacing),
-//             const Text(
-//               'Question Entry',
-//               style: ColorWheel.titleText,
-//             ),
-//             const SizedBox(height: ColorWheel.standardPaddingValue),
-//             QuestionAnswerElement(
-//               elements: _questionElements,
-//               onElementsChanged: _handleQuestionElementsChanged,
-//               isQuestion: true,
-//               picker: _imagePicker,
-//             ),
-//             if (_questionTypeController.text == 'multiple_choice')
-//               Padding(
-//                 padding: const EdgeInsets.only(top: ColorWheel.standardPaddingValue),
-//                 child: QuestionEntryOptionsDialog(
-//                   options: _options,
-//                   onOptionsChanged: _handleOptionsChanged,
-//                   correctOptionIndex: _correctOptionIndex,
-//                   onCorrectOptionChanged: _handleCorrectOptionChanged,
-//                 ),
-//               ),
-//             const SizedBox(height: ColorWheel.majorSectionSpacing),
-//             const Text(
-//               'Answer Entry',
-//               style: ColorWheel.titleText,
-//             ),
-//             const SizedBox(height: ColorWheel.standardPaddingValue),
-//             QuestionAnswerElement(
-//               elements: _answerElements,
-//               onElementsChanged: _handleAnswerElementsChanged,
-//               isQuestion: false,
-//               picker: _imagePicker,
-//             ),
-//             const SizedBox(height: ColorWheel.majorSectionSpacing),
-//             SubmitClearButtons(
-//               onSubmit: _handleSubmit,
-//               onClear: _handleClear,
-//             ),
-//             const SizedBox(height: 20.0),
-//             const Divider(thickness: 1.0),
-//             const SizedBox(height: 10.0),
-//             Center(child: BulkAddButton()),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// } 
+            // --- Editing Controls Area (Removed from here) ---
+            
+            // --- Live Preview Area (Removed from here) ---
+          ],
+        ),
+      ),
+    );
+  }
+} 

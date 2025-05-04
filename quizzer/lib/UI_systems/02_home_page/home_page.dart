@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/UI_systems/color_wheel.dart';
+import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'widget_home_page_top_bar.dart'; // Import the refactored Top Bar
-// Import the question widget from its new location
-import 'question_widgets/widget_multiple_choice_question.dart'; 
-import 'question_widgets/widget_select_all_that_apply_question.dart'; // Added import
-import 'question_widgets/widget_true_false_question.dart'; // Added import
-import 'question_widgets/widget_sort_order_question.dart'; // Added import
+// Corrected package imports for MOVED question widgets
+import 'package:quizzer/UI_systems/question_widgets/widget_multiple_choice_question.dart'; 
+import 'package:quizzer/UI_systems/question_widgets/widget_select_all_that_apply_question.dart'; 
+import 'package:quizzer/UI_systems/question_widgets/widget_true_false_question.dart'; 
+import 'package:quizzer/UI_systems/question_widgets/widget_sort_order_question.dart'; 
 // TODO: Import other actual question widgets as they are implemented.
 
 /// HomePage acts as the main container, displaying the appropriate question widget.
@@ -39,7 +40,8 @@ class _HomePageState extends State<HomePage> { // State class
           Navigator.pushNamed(context, '/menu');
         },
       ),
-      body: _buildQuestionBody(), // Pass session implicitly via state field
+      // Directly build the body, assuming SessionManager handles its initialization
+      body: _buildQuestionBody(), 
     );
   }
 
@@ -48,32 +50,78 @@ class _HomePageState extends State<HomePage> { // State class
     // Use ValueKey with currentQuestionId to ensure widget state resets for new questions
     final key = ValueKey(session.currentQuestionId);
     
+    // Fetch data DIRECTLY from session manager when needed
+    QuizzerLogger.logValue("HomePage building question type: ${session.currentQuestionType} with key: $key");
+
     switch (session.currentQuestionType) {
       case 'multiple_choice':
-        return MultipleChoiceQuestionWidget(key: key, onNextQuestion: _requestNextQuestion);
+        final correctIndex = session.currentCorrectOptionIndex;
+        if (correctIndex == null) {
+             return _buildErrorWidget('Missing correct index for multiple_choice', key);
+        }
+        return MultipleChoiceQuestionWidget(
+          key: key, 
+          onNextQuestion: _requestNextQuestion,
+          questionElements: session.currentQuestionElements,
+          answerElements: session.currentQuestionAnswerElements,
+          options: session.currentQuestionOptions,
+          correctOptionIndex: correctIndex,
+        );
 
       case 'select_all_that_apply': 
-        return SelectAllThatApplyQuestionWidget(key: key, onNextQuestion: _requestNextQuestion);
+        return SelectAllThatApplyQuestionWidget(
+          key: key, 
+          onNextQuestion: _requestNextQuestion,
+          questionElements: session.currentQuestionElements,
+          answerElements: session.currentQuestionAnswerElements,
+          options: session.currentQuestionOptions,
+          correctIndices: session.currentCorrectIndices,
+        );
 
       case 'true_false': 
-        return TrueFalseQuestionWidget(key: key, onNextQuestion: _requestNextQuestion);
+        final correctIndex = session.currentCorrectOptionIndex;
+        if (correctIndex == null || (correctIndex != 0 && correctIndex != 1)) {
+             return _buildErrorWidget('Invalid correct index ($correctIndex) for true_false', key);
+        }
+        return TrueFalseQuestionWidget(
+          key: key, 
+          onNextQuestion: _requestNextQuestion,
+          questionElements: session.currentQuestionElements,
+          answerElements: session.currentQuestionAnswerElements,
+          isCorrectAnswerTrue: correctIndex == 0, // 0 is convention for True
+        );
         
       case 'sort_order': 
-        return SortOrderQuestionWidget(key: key, onNextQuestion: _requestNextQuestion);
+        return SortOrderQuestionWidget(
+          key: key, 
+          onNextQuestion: _requestNextQuestion,
+          questionElements: session.currentQuestionElements,
+          answerElements: session.currentQuestionAnswerElements,
+          options: session.currentQuestionOptions, // Pass the correctly ordered options
+        );
 
       // --- Add placeholders for other known types ---
       // case 'matching':
       //   return MatchingWidget(key: key, onNextQuestion: _requestNextQuestion);
 
       default:
-        // Also give error display a key in case it needs to update
-        return Center(
-          key: key, 
-          child: Text(
-            'Error: Unsupported or missing question type (${session.currentQuestionType})',
-            style: const TextStyle(color: ColorWheel.warning),
-          ),
-        );
+        return _buildErrorWidget('Unsupported or missing question type (${session.currentQuestionType})', key);
     }
+  }
+  
+  // Helper widget to display errors consistently
+  Widget _buildErrorWidget(String message, Key key) {
+      QuizzerLogger.logError("HomePage - Building Error Widget: $message");
+      return Center(
+         key: key, 
+         child: Padding(
+           padding: const EdgeInsets.all(16.0),
+           child: Text(
+             'Error: $message',
+             style: const TextStyle(color: ColorWheel.warning, fontSize: 16),
+             textAlign: TextAlign.center,
+           ),
+         ),
+       );
   }
 }
