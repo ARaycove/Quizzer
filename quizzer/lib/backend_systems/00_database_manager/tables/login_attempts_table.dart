@@ -4,6 +4,7 @@ import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'dart:convert';
 import 'dart:io';
 import '00_table_helper.dart'; // Import the helper file
+import 'package:quizzer/backend_systems/12_switch_board/switch_board.dart'; // Import SwitchBoard
 
 Future<String> getDeviceInfo() async {
   String deviceData = "";
@@ -79,6 +80,36 @@ Future<bool> doesLoginAttemptsTableExist(Database db) async {
   return tables.isNotEmpty;
 }
 
+/// Verifies that all necessary columns, including sync fields, exist in the login_attempts table.
+/// Adds missing columns if the table exists but is missing them.
+Future<void> verifyLoginAttemptsTableFields(Database db) async {
+  if (!await doesLoginAttemptsTableExist(db)) {
+    // Table doesn't exist, so createLoginAttemptsTable will handle the full schema.
+    await createLoginAttemptsTable(db);
+    return;
+  }
+
+  // Table exists, check for specific columns.
+  final List<Map<String, dynamic>> columns = await db.rawQuery(
+    "PRAGMA table_info(login_attempts)"
+  );
+  
+  final Set<String> columnNames = columns.map((column) => column['name'] as String).toSet();
+
+  if (!columnNames.contains('has_been_synced')) {
+    QuizzerLogger.logMessage('Adding has_been_synced column to login_attempts table.');
+    await db.execute('ALTER TABLE login_attempts ADD COLUMN has_been_synced INTEGER DEFAULT 0');
+  }
+  if (!columnNames.contains('edits_are_synced')) {
+    QuizzerLogger.logMessage('Adding edits_are_synced column to login_attempts table.');
+    await db.execute('ALTER TABLE login_attempts ADD COLUMN edits_are_synced INTEGER DEFAULT 0');
+  }
+  if (!columnNames.contains('last_modified_timestamp')) {
+    QuizzerLogger.logMessage('Adding last_modified_timestamp column to login_attempts table.');
+    await db.execute('ALTER TABLE login_attempts ADD COLUMN last_modified_timestamp TEXT');
+  }
+}
+
 Future<void> createLoginAttemptsTable(Database db) async {
   await db.execute('''
   CREATE TABLE login_attempts(
@@ -89,6 +120,9 @@ Future<void> createLoginAttemptsTable(Database db) async {
     status_code TEXT NOT NULL,
     ip_address TEXT,
     device_info TEXT,
+    has_been_synced INTEGER DEFAULT 0,
+    edits_are_synced INTEGER DEFAULT 0,
+    last_modified_timestamp TEXT,
     FOREIGN KEY (user_id) REFERENCES user_profile(uuid)
   )
   ''');
@@ -101,18 +135,14 @@ Future<bool> addLoginAttemptRecord({
 }) async {
   // First get the userId by email
   String? userId = await getUserIdByEmail(email, db);
-  
-  // Check if table exists and create if needed
-  bool checkTable = await doesLoginAttemptsTableExist(db);
-  if (checkTable == false) {
-    await createLoginAttemptsTable(db);
-  }
+
+  await verifyLoginAttemptsTableFields(db); // Call the new verification function
   
   String ipAddress = await getUserIpAddress();
   String deviceInfo = await getDeviceInfo();
   
   // Current timestamp in ISO 8601 format
-  final String timestamp = DateTime.now().toIso8601String();
+  final String timestamp = DateTime.now().toUtc().toIso8601String();
   final String loginAttemptId = timestamp + userId;
   
   // Prepare the raw data map
@@ -124,6 +154,9 @@ Future<bool> addLoginAttemptRecord({
     'status_code': statusCode,
     'ip_address': ipAddress,
     'device_info': deviceInfo,
+    'has_been_synced': 0,
+    'edits_are_synced': 0,
+    'last_modified_timestamp': timestamp,
   };
 
   // Use the universal insert helper
@@ -131,10 +164,33 @@ Future<bool> addLoginAttemptRecord({
 
   if (result > 0) {
     QuizzerLogger.logMessage('Login attempt recorded successfully: $loginAttemptId');
+    // Signal the SwitchBoard that new data might need syncing
+    final SwitchBoard switchBoard = getSwitchBoard(); // Get SwitchBoard instance
+    switchBoard.signalOutboundSyncNeeded();
     return true;
   } else {
     // Log a warning if insert returned 0 (should not happen without conflict algorithm)
     QuizzerLogger.logWarning('Insert operation for login attempt $loginAttemptId returned 0.');
     return false; // Indicate potential failure
   }
+}
+
+// --- Get Unsynced Records ---
+
+/// Fetches all login attempts that need outbound synchronization.
+/// This includes records that have never been synced (`has_been_synced = 0`)
+/// or records that have local edits pending sync (`edits_are_synced = 0`).
+/// Login attempts are not typically edited, so `edits_are_synced` might always be 0 or 1 after initial sync.
+/// Does NOT decode the records.
+Future<List<Map<String, dynamic>>> getUnsyncedLoginAttempts(Database db) async {
+  QuizzerLogger.logMessage('Fetching unsynced login attempts...');
+  await verifyLoginAttemptsTableFields(db); // Ensure table and sync columns exist
+
+  final List<Map<String, dynamic>> results = await db.query(
+    'login_attempts',
+    where: 'has_been_synced = 0 OR edits_are_synced = 0', // Though edits_are_synced might be less relevant here
+  );
+
+  QuizzerLogger.logSuccess('Fetched ${results.length} unsynced login attempts.');
+  return results;
 }

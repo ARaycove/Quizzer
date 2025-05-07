@@ -3,6 +3,7 @@ import 'package:sqflite/sqflite.dart';
 import 'dart:async';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import '00_table_helper.dart'; // Import the helper file
+import 'package:quizzer/backend_systems/12_switch_board/switch_board.dart'; // Import SwitchBoard
 
 Future<void> verifyUserQuestionAnswerPairTable(Database db) async {
   
@@ -24,8 +25,12 @@ Future<void> verifyUserQuestionAnswerPairTable(Database db) async {
         average_times_shown_per_day REAL,
         is_eligible INTEGER,
         in_circulation INTEGER,
-        last_updated TEXT,
         total_attempts INTEGER NOT NULL DEFAULT 0,
+        -- Sync Fields --
+        has_been_synced INTEGER DEFAULT 0,
+        edits_are_synced INTEGER DEFAULT 0,
+        last_modified_timestamp TEXT,
+        -- ------------- --
         PRIMARY KEY (user_uuid, question_id)
       )
     ''');
@@ -36,18 +41,27 @@ Future<void> verifyUserQuestionAnswerPairTable(Database db) async {
     );
     final Set<String> columnNames = columns.map((col) => col['name'] as String).toSet();
 
-    // Check for last_updated (existing check)
-    if (!columnNames.contains('last_updated')) {
-      QuizzerLogger.logWarning('Adding missing column: last_updated');
-      await db.execute(
-        "ALTER TABLE user_question_answer_pairs ADD COLUMN last_updated TEXT"
-      );
-    }
     // Check for total_attempts (new check)
     if (!columnNames.contains('total_attempts')) {
        QuizzerLogger.logWarning('Adding missing column: total_attempts');
       // Add with default 0 for existing rows
       await db.execute("ALTER TABLE user_question_answer_pairs ADD COLUMN total_attempts INTEGER NOT NULL DEFAULT 0");
+    }
+
+    // Add checks for new sync columns
+    if (!columnNames.contains('has_been_synced')) {
+      QuizzerLogger.logMessage('Adding has_been_synced column to user_question_answer_pairs table.');
+      await db.execute('ALTER TABLE user_question_answer_pairs ADD COLUMN has_been_synced INTEGER DEFAULT 0');
+    }
+    if (!columnNames.contains('edits_are_synced')) {
+      QuizzerLogger.logMessage('Adding edits_are_synced column to user_question_answer_pairs table.');
+      await db.execute('ALTER TABLE user_question_answer_pairs ADD COLUMN edits_are_synced INTEGER DEFAULT 0');
+    }
+    if (!columnNames.contains('last_modified_timestamp')) {
+      QuizzerLogger.logMessage('Adding last_modified_timestamp column to user_question_answer_pairs table.');
+      await db.execute('ALTER TABLE user_question_answer_pairs ADD COLUMN last_modified_timestamp TEXT');
+      // Optionally backfill with last_updated for existing rows
+      // await db.rawUpdate('UPDATE user_question_answer_pairs SET last_modified_timestamp = last_updated WHERE last_modified_timestamp IS NULL');
     }
   }
 }
@@ -77,8 +91,11 @@ Future<int> addUserQuestionAnswerPair({
     'time_between_revisions': timeBetweenRevisions,
     'average_times_shown_per_day': averageTimesShownPerDay,
     'in_circulation': false, // Default to false, pass bool directly
-    'last_updated': DateTime.now().toIso8601String(), // Add last_updated on creation
     'total_attempts': 0, // Initialize total_attempts on creation
+    // Sync Fields
+    'has_been_synced': 0,
+    'edits_are_synced': 0,
+    'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(), // Use current time
   };
 
   // Use universal insert helper
@@ -90,6 +107,9 @@ Future<int> addUserQuestionAnswerPair({
   // Log success/failure based on result
   if (result > 0) {
     QuizzerLogger.logSuccess('Added user_question_answer_pair for User: $userUuid, Q: $questionAnswerReference');
+    // Signal SwitchBoard
+    final SwitchBoard switchBoard = getSwitchBoard();
+    switchBoard.signalOutboundSyncNeeded();
   } else {
     QuizzerLogger.logWarning('Insert operation for user_question_answer_pair (User: $userUuid, Q: $questionAnswerReference) returned $result.');
   }
@@ -108,7 +128,6 @@ Future<int> editUserQuestionAnswerPair({
   double? averageTimesShownPerDay,
   bool? isEligible,
   bool? inCirculation,
-  String? lastUpdated, // Keep allowing specific lastUpdated override
 }) async {
   await verifyUserQuestionAnswerPairTable(db);
 
@@ -124,15 +143,16 @@ Future<int> editUserQuestionAnswerPair({
   if (isEligible != null) values['is_eligible'] = isEligible; // Pass bool directly
   if (inCirculation != null) values['in_circulation'] = inCirculation; // Pass bool directly
   
-  // Always add/update the last_updated timestamp unless explicitly provided
-  values['last_updated'] = lastUpdated ?? DateTime.now().toIso8601String();
+  // Add sync fields for edit
+  values['edits_are_synced'] = 0;
+  values['last_modified_timestamp'] = DateTime.now().toUtc().toIso8601String();
 
   // If only last_updated was set (e.g. from setCirculationStatus without other changes),
   // the map might still be empty excluding that. Check if other keys exist.
-  if (values.keys.where((k) => k != 'last_updated').isEmpty) {
-     QuizzerLogger.logWarning('editUserQuestionAnswerPair called for User: $userUuid, Q: $questionId with no fields to update besides last_updated.');
-     // Optionally return 0 if only timestamp was updated implicitly?
-     // For now, let the update proceed even if only timestamp changed.
+  if (values.keys.where((k) => k != 'edits_are_synced' && k != 'last_modified_timestamp').isEmpty) {
+     QuizzerLogger.logWarning('editUserQuestionAnswerPair called for User: $userUuid, Q: $questionId with no fields to update besides sync/timestamp fields.');
+     // Optionally return 0 if only sync/timestamp fields were updated implicitly?
+     // For now, let the update proceed.
   }
 
   // Use universal update helper
@@ -147,6 +167,9 @@ Future<int> editUserQuestionAnswerPair({
   // Log based on result
   if (result > 0) {
     QuizzerLogger.logSuccess('Edited user_question_answer_pair for User: $userUuid, Q: $questionId ($result row affected).');
+    // Signal SwitchBoard
+    final SwitchBoard switchBoard = getSwitchBoard();
+    switchBoard.signalOutboundSyncNeeded();
   } else {
     QuizzerLogger.logWarning('Update operation for user_question_answer_pair (User: $userUuid, Q: $questionId) affected 0 rows. Record might not exist.');
   }
@@ -231,9 +254,10 @@ Future<void> incrementTotalAttempts(String userUuid, String questionId, Database
   // Ensure the table and column exist before attempting update
   await verifyUserQuestionAnswerPairTable(db);
 
+  final String currentTime = DateTime.now().toUtc().toIso8601String();
   final int rowsAffected = await db.rawUpdate(
-    'UPDATE user_question_answer_pairs SET total_attempts = total_attempts + 1 WHERE user_uuid = ? AND question_id = ?',
-    [userUuid, questionId]
+    'UPDATE user_question_answer_pairs SET total_attempts = total_attempts + 1, edits_are_synced = 0, last_modified_timestamp = ? WHERE user_uuid = ? AND question_id = ?',
+    [currentTime, userUuid, questionId] // No longer setting last_updated here
   );
 
   if (rowsAffected == 0) {
@@ -241,6 +265,9 @@ Future<void> incrementTotalAttempts(String userUuid, String questionId, Database
     // Depending on desired behavior, could throw an exception here if the record *should* exist.
   } else {
     QuizzerLogger.logSuccess('Successfully incremented total attempts for User: $userUuid, Question: $questionId');
+    // Signal SwitchBoard
+    final SwitchBoard switchBoard = getSwitchBoard();
+    switchBoard.signalOutboundSyncNeeded();
   }
 }
 
@@ -261,7 +288,8 @@ Future<void> setCirculationStatus(
   // Perform the update using the universal update helper directly
   final Map<String, dynamic> updateData = {
     'in_circulation': isInCirculation, // Pass bool directly
-    'last_updated': DateTime.now().toIso8601String(),
+    'edits_are_synced': 0,
+    'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
   };
   
   final int rowsAffected = await updateRawData(
@@ -283,7 +311,37 @@ Future<void> setCirculationStatus(
 
   QuizzerLogger.logSuccess(
       'Successfully set circulation status ($statusString) for question $questionId. Rows affected: $rowsAffected');
+  // Signal SwitchBoard
+  final SwitchBoard switchBoard = getSwitchBoard();
+  switchBoard.signalOutboundSyncNeeded();
 }
 
 // Optional: Add a similar function to set inCirculation to false if needed later.
 // Future<void> removeQuestionFromCirculation(...) async { ... inCirculation: false ... } // This comment is now redundant
+
+// --- Get Unsynced Records ---
+
+/// Fetches all user-question-answer pairs that need outbound synchronization.
+/// This includes records that have never been synced (`has_been_synced = 0`)
+/// or records that have local edits pending sync (`edits_are_synced = 0`).
+/// Does NOT decode the records.
+Future<List<Map<String, dynamic>>> getUnsyncedUserQuestionAnswerPairs(Database db) async {
+  QuizzerLogger.logMessage('Fetching unsynced user-question-answer pairs...');
+  // Ensure table and sync columns exist (verification is usually called by other functions,
+  // but good to have if this is called independently)
+  await verifyUserQuestionAnswerPairTable(db);
+
+  // Use the universal query helper. Since we want raw, undecoded data for the sync worker,
+  // we can use db.query directly or ensure queryAndDecodeDatabase can return raw if needed.
+  // For now, assuming queryAndDecodeDatabase is acceptable or a raw query is preferred.
+  // Sticking to queryAndDecodeDatabase for consistency if it handles raw data well,
+  // otherwise, a direct db.query would be fine here.
+  // Let's use db.query for clarity that we want raw data, as the QAP table does.
+  final List<Map<String, dynamic>> results = await db.query(
+    'user_question_answer_pairs',
+    where: 'has_been_synced = 0 OR edits_are_synced = 0',
+  );
+
+  QuizzerLogger.logSuccess('Fetched ${results.length} unsynced user-question-answer pairs.');
+  return results;
+}

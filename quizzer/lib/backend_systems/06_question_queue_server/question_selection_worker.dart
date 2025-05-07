@@ -4,6 +4,7 @@ import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/backend_systems/09_data_caches/eligible_questions_cache.dart';
 import 'package:quizzer/backend_systems/09_data_caches/question_queue_cache.dart';
+import 'package:quizzer/backend_systems/09_data_caches/temp_question_details.dart';
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 // Table Imports
@@ -28,10 +29,11 @@ class PresentationSelectionWorker {
   bool _isInitialLoop = true;
 
   // --- Dependencies ---
-  final SessionManager          _sessionManager = SessionManager();
-  final EligibleQuestionsCache  _eligibleCache = EligibleQuestionsCache();
-  final QuestionQueueCache      _queueCache = QuestionQueueCache();
-  final DatabaseMonitor         _dbMonitor = getDatabaseMonitor();
+  final SessionManager            _sessionManager = SessionManager();
+  final EligibleQuestionsCache    _eligibleCache = EligibleQuestionsCache();
+  final QuestionQueueCache        _queueCache = QuestionQueueCache();
+  final TempQuestionDetailsCache  _tempDetailsCache = TempQuestionDetailsCache();
+  final DatabaseMonitor           _dbMonitor = getDatabaseMonitor();
   // final UnprocessedCache        _unprocessedCache = UnprocessedCache();
 
   // --- Notification Stream (for Initial Loop Completion) ---
@@ -190,7 +192,31 @@ class PresentationSelectionWorker {
     }
     // QuizzerLogger.logSuccess('PSW Select: Successfully got and removed $questionId from EligibleCache.');
 
-    // 2. Place it in queue
+    // 2. Get static question details from question_answer_pairs table and place that record into the temp Cache
+    // This requires you to use the db monitor and get that specific question's details
+    Database? db = await _getDbAccessWithRetry(); // Uses existing helper that includes retries and throws on failure
+    // If db is null here, _getDbAccessWithRetry would have thrown, so we can assume db is non-null if we proceed.
+
+    // QuizzerLogger.logMessage('PSW Select: Fetching static details for $questionId from q_pairs_table...');
+    final Map<String, dynamic> staticQuestionDetails = await q_pairs_table.getQuestionAnswerPairById(questionId, db);
+
+    if (staticQuestionDetails.isEmpty) {
+      QuizzerLogger.logError('PSW Select: CRITICAL - Fetched empty static details for $questionId from DB. This should not happen if question_id is valid.');
+      _dbMonitor.releaseDatabaseAccess(); // Release lock before returning
+      // If static details are missing, we probably shouldn't queue the user record either.
+      // Returning to avoid putting potentially orphaned user record in queue without its details.
+      return;
+    }
+    
+    // QuizzerLogger.logMessage('PSW Select: Adding static details for $questionId to TempQuestionDetailsCache...');
+    await _tempDetailsCache.addRecord(questionId, staticQuestionDetails);
+    // QuizzerLogger.logSuccess('PSW Select: Successfully added $questionId static details to TempQuestionDetailsCache.');
+
+    // QuizzerLogger.logMessage('PSW Select: Releasing DB lock for $questionId...');
+    _dbMonitor.releaseDatabaseAccess();
+    db = null; // Prevent accidental reuse
+
+    // 3. Place it in queue
     // QuizzerLogger.logMessage('PSW Select: Adding fetched record $questionId to QueueCache...');
     await _queueCache.addRecord(recordToQueue);
     // QuizzerLogger.logSuccess('PSW Select: Successfully added $questionId to QueueCache.');

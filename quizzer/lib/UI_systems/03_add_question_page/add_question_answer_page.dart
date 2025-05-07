@@ -6,7 +6,6 @@ import 'package:quizzer/UI_systems/global_widgets/widget_global_app_bar.dart';
 import 'package:quizzer/UI_systems/color_wheel.dart';
 import 'package:quizzer/UI_systems/03_add_question_page/widgets/widget_live_preview.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
-import 'dart:convert'; // Needed only if we bring back deep copy
 import 'package:quizzer/UI_systems/03_add_question_page/widgets/add_question_widget/widget_add_question.dart';
 import 'package:quizzer/UI_systems/03_add_question_page/widgets/widget_submit_clear_buttons.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
@@ -111,22 +110,20 @@ class _AddQuestionAnswerPageState extends State<AddQuestionAnswerPage> {
     }
 
     // If an element was created (either text or image), add it
-    if (newElement != null) {
-      setState(() { // Keep setState wrapping the list modification
-        if (category == 'question') {
-          _currentQuestionElements.add(newElement!);
-          QuizzerLogger.logMessage("Added question element:");
-          QuizzerLogger.logValue(newElement.toString());
-        } else if (category == 'answer') {
-          _currentAnswerElements.add(newElement!);
-          QuizzerLogger.logMessage("Added answer element:");
-          QuizzerLogger.logValue(newElement.toString());
-        } else {
-          QuizzerLogger.logError("_handleAddElement: Unknown category '$category'");
-        }
-        _previewRebuildCounter++; // Increment counter
-      });
-    }
+    setState(() { // Keep setState wrapping the list modification
+      if (category == 'question') {
+        _currentQuestionElements.add(newElement!);
+        QuizzerLogger.logMessage("Added question element:");
+        QuizzerLogger.logValue(newElement.toString());
+      } else if (category == 'answer') {
+        _currentAnswerElements.add(newElement!);
+        QuizzerLogger.logMessage("Added answer element:");
+        QuizzerLogger.logValue(newElement.toString());
+      } else {
+        QuizzerLogger.logError("_handleAddElement: Unknown category '$category'");
+      }
+      _previewRebuildCounter++; // Increment counter
+    });
   }
   void _handleRemoveElement(int index, String category) {
     QuizzerLogger.logMessage("Attempting to remove element index $index from $category");

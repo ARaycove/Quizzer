@@ -197,9 +197,7 @@ class QuizzerApp extends StatelessWidget {
   }
 }
 
-// Completed Items!
-// (complete) Bulk add questions to the database
-
-
-// Question Types (Questions have different potential types)
-// 1. multiple_choice                                                   (complete)
+// TODO
+// Practice Exam 1 from CLEP BOOK
+// - continue with question 52 (last entered was question 51)
+// Practice Exam 2 from CLEP BOOK

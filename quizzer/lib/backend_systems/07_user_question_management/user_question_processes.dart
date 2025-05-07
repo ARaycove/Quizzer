@@ -62,7 +62,7 @@ Future<void> validateModuleQuestionsInUserProfile(String moduleName, Database db
         revisionStreak: 0,
         lastRevised: null,
         predictedRevisionDueHistory: '[]',
-        nextRevisionDue: DateTime.now().toIso8601String(),
+        nextRevisionDue: DateTime.now().toUtc().toIso8601String(),
         timeBetweenRevisions: 0.37,
         averageTimesShownPerDay: 0.0,
         db: db

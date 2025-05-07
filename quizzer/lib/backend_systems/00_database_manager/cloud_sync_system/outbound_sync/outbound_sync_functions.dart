@@ -53,6 +53,9 @@ Future<bool> pushRecordToSupabase(String tableName, Map<String, dynamic> recordD
 // Outbound Sync - Table-Specific Functions
 // ==========================================
 
+// FIXME, if synced question answer pair has image elements, these need to be pushed to SupaBase as well without this extra logic a file name with no file will be sent out, need to also send the file that goes with the question answer pair
+// TODO Implement a separate service that handles the syncing of images based on the specific questions that a user has locally active (ensuring we only sync images that are relevant for questions currently in circulation)
+
 /// Fetches unsynced question-answer pairs and attempts to push them.
 Future<void> syncQuestionAnswerPairs(Database db) async {
   QuizzerLogger.logMessage('Starting sync for QuestionAnswerPairs...');
@@ -71,6 +74,12 @@ Future<void> syncQuestionAnswerPairs(Database db) async {
   for (final record in unsyncedRecords) {
     final questionId = record['question_id'] as String; // Assume non-null
     final hasBeenSynced = record['has_been_synced'] as int;
+
+    // Ensure last_modified_timestamp is populated (UTC ISO8601)
+    if (record['last_modified_timestamp'] == null || (record['last_modified_timestamp'] is String && (record['last_modified_timestamp'] as String).isEmpty)) {
+      QuizzerLogger.logMessage('QID $questionId is missing last_modified_timestamp. Setting to current UTC time.');
+      record['last_modified_timestamp'] = DateTime.now().toUtc().toIso8601String();
+    }
 
     String targetTable;
     bool newHasBeenSynced = false;

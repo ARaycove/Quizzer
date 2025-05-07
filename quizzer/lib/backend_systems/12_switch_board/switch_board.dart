@@ -103,20 +103,20 @@ class SwitchBoard {
   /// Signals that a record has been added to the PastDueCache when it was empty.
   void signalPastDueCacheAdded() {
     if (!_pastDueCacheController.isClosed) {
-       QuizzerLogger.logMessage('SwitchBoard: Signaling PastDueCache added.');
+      //  QuizzerLogger.logMessage('Signaling PastDueCache added.');
       _pastDueCacheController.add(null);
     } else {
-       QuizzerLogger.logWarning('SwitchBoard: Attempted to signal on closed PastDueCache stream.');
+       QuizzerLogger.logWarning('Attempted to signal on closed PastDueCache stream.');
     }
   }
 
   // Consolidated signal method
   void signalEligibleCacheLow() { // Consolidated
     if (!_eligibleCacheLowController.isClosed) {
-       QuizzerLogger.logMessage('SwitchBoard: Signaling EligibleCacheLow added.');
+      //  QuizzerLogger.logMessage('SwitchBoard: Signaling EligibleCacheLow added.');
       _eligibleCacheLowController.add(null);
     } else {
-       QuizzerLogger.logWarning('SwitchBoard: Attempted to signal on closed EligibleCacheLow stream.');
+       QuizzerLogger.logWarning('Attempted to signal on closed EligibleCacheLow stream.');
     }
   }
 

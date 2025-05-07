@@ -622,35 +622,6 @@ class _AddQuestionWidgetState extends State<AddQuestionWidget> {
     );
   }
 
-  // --- Helper for Individual Element Items (Question/Answer) ---
-  Widget _buildElementItem(
-      Map<String, dynamic> element,
-      int index,
-      String category,
-      Function(int index, String category) onRemove,
-      Function(int index, String category, Map<String, dynamic> updatedElement) onEdit)
-  {
-    // TODO: Add GestureDetector for double-tap edit (point 1)
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 4.0),
-      color: ColorWheel.secondaryBackground,
-      elevation: 1.0,
-      shape: RoundedRectangleBorder(borderRadius: ColorWheel.buttonBorderRadius),
-      child: ListTile(
-        dense: true,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
-        title: ElementRenderer(elements: [element]), // Render the element content
-        trailing: IconButton(
-          icon: const Icon(Icons.remove_circle_outline, size: 20, color: ColorWheel.buttonError),
-          tooltip: 'Remove Element',
-          onPressed: () => onRemove(index, category),
-          visualDensity: VisualDensity.compact,
-          padding: EdgeInsets.zero,
-        ),
-      ),
-    );
-  }
-
    // --- Helper for Individual Option Items ---
   Widget _buildOptionItem(Map<String, dynamic> option, int index) {
     bool isCorrect = false;

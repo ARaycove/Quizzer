@@ -1,6 +1,7 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import '00_table_helper.dart'; // Import the helper file
+import 'package:quizzer/backend_systems/12_switch_board/switch_board.dart'; // Import SwitchBoard
 
 /// Verifies the existence and schema of the question_answer_attempts table.
 Future<void> verifyQuestionAnswerAttemptTable(Database db) async {
@@ -25,7 +26,11 @@ Future<void> verifyQuestionAnswerAttemptTable(Database db) async {
         days_since_last_revision REAL NULL,  -- Calculated days since last revision (nullable)
         total_attempts INTEGER NOT NULL,     -- Renamed: Count of previous attempts + 1 (i.e., attempt number)
         revision_streak INTEGER NOT NULL,    -- Renamed: Streak *before* this attempt
-        -- Composite primary key to uniquely identify an attempt
+        -- Sync Fields --
+        has_been_synced INTEGER DEFAULT 0,
+        edits_are_synced INTEGER DEFAULT 0,
+        last_modified_timestamp TEXT,        -- Store as ISO8601 UTC string
+        -- ------------- --
         PRIMARY KEY (participant_id, question_id, time_stamp) 
       )
     ''');
@@ -57,6 +62,21 @@ Future<void> verifyQuestionAnswerAttemptTable(Database db) async {
       // Add with default 0 for existing rows
       await db.execute("ALTER TABLE question_answer_attempts ADD COLUMN revision_streak INTEGER NOT NULL DEFAULT 0");
     }
+
+    // Add checks for new sync columns
+    if (!columnNames.contains('has_been_synced')) {
+      QuizzerLogger.logMessage('Adding has_been_synced column to question_answer_attempts table.');
+      await db.execute('ALTER TABLE question_answer_attempts ADD COLUMN has_been_synced INTEGER DEFAULT 0');
+    }
+    if (!columnNames.contains('edits_are_synced')) {
+      QuizzerLogger.logMessage('Adding edits_are_synced column to question_answer_attempts table.');
+      await db.execute('ALTER TABLE question_answer_attempts ADD COLUMN edits_are_synced INTEGER DEFAULT 0');
+    }
+    if (!columnNames.contains('last_modified_timestamp')) {
+      QuizzerLogger.logMessage('Adding last_modified_timestamp column to question_answer_attempts table.');
+      await db.execute('ALTER TABLE question_answer_attempts ADD COLUMN last_modified_timestamp TEXT');
+    }
+
     QuizzerLogger.logMessage('Column check complete.');
   }
 }
@@ -120,6 +140,10 @@ Future<int> addQuestionAnswerAttempt({
     'days_since_last_revision': daysSinceLastRevision,
     'total_attempts': totalAttempts,
     'revision_streak': revisionStreak,
+    // Add sync fields
+    'has_been_synced': 0,
+    'edits_are_synced': 0,
+    'last_modified_timestamp': timeStamp, // Use creation timestamp for initial last_modified
   };
 
   // Use the universal insert helper
@@ -132,6 +156,9 @@ Future<int> addQuestionAnswerAttempt({
 
   if (resultId > 0) {
     QuizzerLogger.logSuccess('Successfully added question attempt record with result ID: $resultId. Data: $attemptData');
+    // Signal the SwitchBoard that new data might need syncing
+    final SwitchBoard switchBoard = getSwitchBoard(); // Get SwitchBoard instance
+    switchBoard.signalOutboundSyncNeeded();
   } else {
     QuizzerLogger.logWarning('Insert operation for attempt (Q: $questionId, User: $participantId, Time: $timeStamp) returned $resultId. Might be ignored duplicate.');
   }
@@ -166,4 +193,23 @@ Future<List<Map<String, dynamic>>> getAttemptsByUser(String userId, Database db)
     whereArgs: [userId],
     orderBy: 'time_stamp DESC', // Order by most recent first
   );
+}
+
+// --- Get Unsynced Records ---
+
+/// Fetches all question answer attempts that need outbound synchronization.
+/// This includes records that have never been synced (`has_been_synced = 0`)
+/// or records that have local edits pending sync (`edits_are_synced = 0`).
+/// Does NOT decode the records.
+Future<List<Map<String, dynamic>>> getUnsyncedQuestionAnswerAttempts(Database db) async {
+  QuizzerLogger.logMessage('Fetching unsynced question answer attempts...');
+  await verifyQuestionAnswerAttemptTable(db); // Ensure table and sync columns exist
+
+  final List<Map<String, dynamic>> results = await db.query(
+    'question_answer_attempts',
+    where: 'has_been_synced = 0 OR edits_are_synced = 0',
+  );
+
+  QuizzerLogger.logSuccess('Fetched ${results.length} unsynced question answer attempts.');
+  return results;
 }

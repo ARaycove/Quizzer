@@ -48,7 +48,7 @@ Future<void> recordQuestionAnswerAttempt({
     });
 
     await attempt_table.addQuestionAnswerAttempt(
-      timeStamp: timeAnswerGiven.toIso8601String(),
+      timeStamp: timeAnswerGiven.toUtc().toIso8601String(),
       questionId: questionId,
       participantId: userId,
       responseTime: responseTimeSeconds,

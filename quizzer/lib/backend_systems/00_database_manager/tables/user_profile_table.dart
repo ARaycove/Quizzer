@@ -3,6 +3,7 @@ import 'package:uuid/uuid.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pairs_table.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'dart:convert';
+import 'package:quizzer/backend_systems/12_switch_board/switch_board.dart';
 
 // TODO Enforce and introduce primary and secondary languages
 // This will be used to determine whether questions should be synced based on language
@@ -57,7 +58,7 @@ Future<bool> createNewUserProfile(String email, String username, Database db) as
   QuizzerLogger.logMessage('Generated UUID for new user: $userUUID');
   
   // Get current timestamp for account creation date
-  final String creationTimestamp = DateTime.now().toIso8601String();
+  final String creationTimestamp = DateTime.now().toUtc().toIso8601String();
   
   // Insert the new user profile with minimal required fields
   // If db.insert fails, it should throw an exception (Fail Fast)
@@ -68,9 +69,16 @@ Future<bool> createNewUserProfile(String email, String username, Database db) as
     'role': 'base_user',
     'account_status': 'active',
     'account_creation_date': creationTimestamp,
+    // Initialize sync fields
+    'has_been_synced': 0,
+    'edits_are_synced': 0, // Edits are synced by definition on creation (or rather, no edits yet)
+    'last_modified_timestamp': creationTimestamp, 
   });
   
   QuizzerLogger.logSuccess('New user profile created successfully: $userUUID');
+  // Signal SwitchBoard after successful insert
+  final SwitchBoard switchBoard = getSwitchBoard();
+  switchBoard.signalOutboundSyncNeeded();
   return true;
 }
 
@@ -130,7 +138,10 @@ Future<void> verifyUserProfileTable(Database db) async {
         content_portfolio TEXT,
         activation_status_of_modules TEXT,
         completion_status_of_modules TEXT,
-        tutorial_progress INTEGER DEFAULT 0
+        tutorial_progress INTEGER DEFAULT 0,
+        has_been_synced INTEGER DEFAULT 0,
+        edits_are_synced INTEGER DEFAULT 0,
+        last_modified_timestamp TEXT
       )
     ''');
     
@@ -138,6 +149,27 @@ Future<void> verifyUserProfileTable(Database db) async {
   } else {
     // Check if tutorial_progress column exists, add it if not
     await verifyTutorialProgressColumn(db);
+
+    // Add checks for new sync columns
+    final List<Map<String, dynamic>> columns = await db.rawQuery(
+      "PRAGMA table_info(user_profile)"
+    );
+    final Set<String> columnNames = columns.map((column) => column['name'] as String).toSet();
+
+    if (!columnNames.contains('has_been_synced')) {
+      QuizzerLogger.logMessage('Adding has_been_synced column to user_profile table.');
+      await db.execute('ALTER TABLE user_profile ADD COLUMN has_been_synced INTEGER DEFAULT 0');
+    }
+    if (!columnNames.contains('edits_are_synced')) {
+      QuizzerLogger.logMessage('Adding edits_are_synced column to user_profile table.');
+      await db.execute('ALTER TABLE user_profile ADD COLUMN edits_are_synced INTEGER DEFAULT 0');
+    }
+    if (!columnNames.contains('last_modified_timestamp')) {
+      QuizzerLogger.logMessage('Adding last_modified_timestamp column to user_profile table.');
+      await db.execute('ALTER TABLE user_profile ADD COLUMN last_modified_timestamp TEXT');
+      // Optionally backfill last_modified_timestamp with account_creation_date for existing rows
+      // await db.rawUpdate('UPDATE user_profile SET last_modified_timestamp = account_creation_date WHERE last_modified_timestamp IS NULL');
+    }
   }
 }
 
@@ -211,15 +243,22 @@ Future<Map<String, dynamic>> verifyNonDuplicateProfile(String email, String user
 }
 
 Future<bool> updateLastLogin(String timestamp, String emailAddress, Database db) async {
-  // QuizzerLogger.logMessage('Updating last login for email: $emailAddress');
+  QuizzerLogger.logMessage('Updating last login for email: $emailAddress');
   await verifyUserProfileTable(db);
   await db.update(
     'user_profile',
-    {'last_login': timestamp},
+    {
+      'last_login': timestamp,
+      'edits_are_synced': 0,
+      'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
+    },
     where: 'email = ?',
     whereArgs: [emailAddress],
   );
   QuizzerLogger.logSuccess('Last login updated successfully');
+  // Signal SwitchBoard
+  final SwitchBoard switchBoard = getSwitchBoard();
+  switchBoard.signalOutboundSyncNeeded();
   return true;
 }
 
@@ -255,11 +294,18 @@ Future<bool> updateTutorialProgress(String userId, int progress, Database db) as
   await verifyTutorialProgressColumn(db);
   await db.update(
       'user_profile',
-      {'tutorial_progress': progress},
+      {
+        'tutorial_progress': progress,
+        'edits_are_synced': 0,
+        'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
+      },
       where: 'uuid = ?',
       whereArgs: [userId],
   );
   QuizzerLogger.logSuccess('Tutorial progress updated successfully');
+  // Signal SwitchBoard
+  final SwitchBoard switchBoard = getSwitchBoard();
+  switchBoard.signalOutboundSyncNeeded();
   return true;
 }
 
@@ -307,11 +353,18 @@ Future<bool> updateModuleActivationStatus(String userId, String moduleName, bool
   // Update the database
   await db.update(
     'user_profile',
-    {'activation_status_of_modules': statusJson},
+    {
+      'activation_status_of_modules': statusJson,
+      'edits_are_synced': 0,
+      'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
+    },
     where: 'uuid = ?',
     whereArgs: [userId],
   );
   
+  // Signal SwitchBoard
+  final SwitchBoard switchBoard = getSwitchBoard();
+  switchBoard.signalOutboundSyncNeeded();
   return true;
 }
 
@@ -382,7 +435,11 @@ Future<Map<String, int>> getUserSubjectInterests(String userId, Database db) asy
     final String updatedInterestsJson = json.encode(interestData);
     final int rowsAffected = await db.update(
       'user_profile',
-      {'interest_data': updatedInterestsJson},
+      {
+        'interest_data': updatedInterestsJson,
+        'edits_are_synced': 0,
+        'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
+      },
       where: 'uuid = ?',
       whereArgs: [userId],
     );
@@ -390,6 +447,9 @@ Future<Map<String, int>> getUserSubjectInterests(String userId, Database db) asy
        QuizzerLogger.logError('Failed to update interest_data for user $userId - user might no longer exist.');
     } else {
       QuizzerLogger.logSuccess('Updated user profile interest_data with new subject interests for user $userId.');
+      // Signal SwitchBoard only if update was successful
+      final SwitchBoard switchBoard = getSwitchBoard();
+      switchBoard.signalOutboundSyncNeeded();
     }
   }
 
@@ -416,8 +476,8 @@ Future<void> updateTotalStudyTime(String userUuid, double hoursToAdd, Database d
 
   final int rowsAffected = await db.rawUpdate(
     // Use COALESCE to handle potential NULL values, treating them as 0.0
-    'UPDATE user_profile SET total_study_time = COALESCE(total_study_time, 0.0) + ? WHERE uuid = ?',
-    [daysToAdd, userUuid]
+    'UPDATE user_profile SET total_study_time = COALESCE(total_study_time, 0.0) + ?, edits_are_synced = 0, last_modified_timestamp = ? WHERE uuid = ?',
+    [daysToAdd, DateTime.now().toUtc().toIso8601String(), userUuid]
   );
 
   if (rowsAffected == 0) {
@@ -425,6 +485,9 @@ Future<void> updateTotalStudyTime(String userUuid, double hoursToAdd, Database d
     // Consider if this should throw an error if the user *must* exist. For now, just a warning.
   } else {
     QuizzerLogger.logSuccess('Successfully updated total_study_time for User: $userUuid (added $daysToAdd days)');
+    // Signal SwitchBoard
+    final SwitchBoard switchBoard = getSwitchBoard();
+    switchBoard.signalOutboundSyncNeeded();
   }
 }
 
@@ -436,8 +499,8 @@ Future<void> incrementTotalQuestionsAnswered(String userUuid, Database db) async
   // We assume verifyUserProfileTable is called prior to DB operations usually.
 
   final int rowsAffected = await db.rawUpdate(
-    'UPDATE user_profile SET total_questions_answered = total_questions_answered + 1 WHERE uuid = ?',
-    [userUuid]
+    'UPDATE user_profile SET total_questions_answered = total_questions_answered + 1, edits_are_synced = 0, last_modified_timestamp = ? WHERE uuid = ?',
+    [DateTime.now().toUtc().toIso8601String(), userUuid]
   );
 
   if (rowsAffected == 0) {
@@ -445,6 +508,9 @@ Future<void> incrementTotalQuestionsAnswered(String userUuid, Database db) async
     // Consider if this should throw an error if the user *must* exist at this point.
   } else {
     QuizzerLogger.logSuccess('Successfully incremented total_questions_answered for User: $userUuid');
+    // Signal SwitchBoard
+    final SwitchBoard switchBoard = getSwitchBoard();
+    switchBoard.signalOutboundSyncNeeded();
   }
 }
 
@@ -473,6 +539,23 @@ Future<List<String>> getAllUserEmails(Database db) async {
   return emails;
 }
 
+// --- Get Unsynced Records ---
 
-// updateTotalStudyTime
+/// Fetches all user profiles that need outbound synchronization.
+/// This includes records that have never been synced (`has_been_synced = 0`)
+/// or records that have local edits pending sync (`edits_are_synced = 0`).
+/// Does NOT decode the records.
+Future<List<Map<String, dynamic>>> getUnsyncedUserProfiles(Database db) async {
+  QuizzerLogger.logMessage('Fetching unsynced user profiles...');
+  await verifyUserProfileTable(db); // Ensure table and sync columns exist
+
+  final List<Map<String, dynamic>> results = await db.query(
+    'user_profile',
+    where: 'has_been_synced = 0 OR edits_are_synced = 0',
+  );
+
+  QuizzerLogger.logSuccess('Fetched ${results.length} unsynced user profiles.');
+  return results;
+}
+
 // TODO: FIXME Add in functionality for loginThreshold preference

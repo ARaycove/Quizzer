@@ -213,12 +213,12 @@ class _SortOrderQuestionWidgetState extends State<SortOrderQuestionWidget> {
               onReorder: interactionsEnabled ? _handleReorder : (int o, int n) {}, // Conditionally enable reorder 
               itemBuilder: (context, index) {
                 final optionData = _currentUserOrderedOptions[index];
-                final currentOriginalIndex = _originalIndices[index];
-                bool isCorrectPosition = false;
-                if(_isAnswerSubmitted && index < correctOrderOptions.length) {
-                    // Item is in correct final position if its original index matches the current display index
-                   isCorrectPosition = currentOriginalIndex == index; 
-                }
+                // final currentOriginalIndex = _originalIndices[index];
+                // bool isCorrectPosition = false;
+                // if(_isAnswerSubmitted && index < correctOrderOptions.length) {
+                //     // Item is in correct final position if its original index matches the current display index
+                //    isCorrectPosition = currentOriginalIndex == index; 
+                // }
                 
                 final bool isHovered = index == _hoveredIndex;
                 

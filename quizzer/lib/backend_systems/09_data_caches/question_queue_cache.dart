@@ -17,7 +17,7 @@ class QuestionQueueCache {
 
   final Lock _lock = Lock();
   final List<Map<String, dynamic>> _cache = [];
-  static const int queueThreshold = 10; // Threshold for signalling removal
+  static const int queueThreshold = 15; // Threshold for signalling removal
   final UnprocessedCache _unprocessedCache = UnprocessedCache(); // Added
 
   // --- Notification Stream (for removal) ---

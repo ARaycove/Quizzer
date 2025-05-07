@@ -43,6 +43,7 @@ Future<void> verifyQuestionAnswerPairTable(Database db) async {
         index_options_that_apply TEXT,
         has_been_synced INTEGER DEFAULT 0,  -- Added for outbound sync tracking
         edits_are_synced INTEGER DEFAULT 0, -- Added for outbound edit sync tracking
+        last_modified_timestamp TEXT,       -- Store as ISO8601 UTC string
         PRIMARY KEY (time_stamp, qst_contrib)
       )
     ''');
@@ -102,6 +103,17 @@ Future<void> verifyQuestionAnswerPairTable(Database db) async {
     if (!hasEditsAreSyncedCol) {
       QuizzerLogger.logMessage('Adding edits_are_synced column to question_answer_pairs table.');
       await db.execute('ALTER TABLE question_answer_pairs ADD COLUMN edits_are_synced INTEGER DEFAULT 0');
+    }
+
+    // Check for last_modified_timestamp
+    final bool hasLastModifiedCol = columns.any((column) => column['name'] == 'last_modified_timestamp');
+    if (!hasLastModifiedCol) {
+      QuizzerLogger.logMessage('Adding last_modified_timestamp column to question_answer_pairs table.');
+      await db.execute('ALTER TABLE question_answer_pairs ADD COLUMN last_modified_timestamp TEXT');
+      // Optionally, backfill existing rows, e.g., with their time_stamp or current time
+      // For simplicity, new rows will get it, old rows will have NULL until next edit or a separate migration script.
+      // Or, update existing rows to use the 'time_stamp' as the initial last_modified_timestamp:
+      // await db.rawUpdate('UPDATE question_answer_pairs SET last_modified_timestamp = time_stamp WHERE last_modified_timestamp IS NULL');
     }
 
     // TODO: Add checks for columns needed by other future question types here
@@ -169,6 +181,8 @@ Future<int> editQuestionAnswerPair({
 
   // *** Always mark edits as needing sync ***
   valuesToUpdate['edits_are_synced'] = 0;
+  // Update the last_modified_timestamp to current time
+  valuesToUpdate['last_modified_timestamp'] = DateTime.now().toUtc().toIso8601String();
 
   QuizzerLogger.logMessage('Updating question $questionId with fields: ${valuesToUpdate.keys.join(', ')}');
 
@@ -447,7 +461,7 @@ Future<String> addQuestionMultipleChoice({
   String? subjects,
 }) async {
   await verifyQuestionAnswerPairTable(db);
-  final String timeStamp = DateTime.now().toIso8601String();
+  final String timeStamp = DateTime.now().toUtc().toIso8601String();
   final String questionId = '${timeStamp}_$qstContrib';
 
   // Prepare the raw data map (values will be encoded by the helper)
@@ -476,6 +490,7 @@ Future<String> addQuestionMultipleChoice({
     'question_id': questionId,
     'has_been_synced': 0, // Initialize sync flags
     'edits_are_synced': 0,
+    'last_modified_timestamp': timeStamp, // Use creation timestamp
   };
 
   // Use the universal insert helper
@@ -498,7 +513,7 @@ Future<String> addQuestionSelectAllThatApply({
   String? subjects,
 }) async {
   await verifyQuestionAnswerPairTable(db);
-  final String timeStamp = DateTime.now().toIso8601String();
+  final String timeStamp = DateTime.now().toUtc().toIso8601String();
   final String questionId = '${timeStamp}_$qstContrib';
 
   // Prepare the raw data map
@@ -526,6 +541,7 @@ Future<String> addQuestionSelectAllThatApply({
     'question_id': questionId,
     'has_been_synced': 0, // Initialize sync flags
     'edits_are_synced': 0,
+    'last_modified_timestamp': timeStamp, // Use creation timestamp
   };
 
   // Use the universal insert helper
@@ -547,7 +563,7 @@ Future<String> addQuestionTrueFalse({
   String? subjects,
 }) async {
   await verifyQuestionAnswerPairTable(db);
-  final String timeStamp = DateTime.now().toIso8601String();
+  final String timeStamp = DateTime.now().toUtc().toIso8601String();
   final String questionId = '${timeStamp}_$qstContrib';
 
   // Prepare the raw data map
@@ -574,6 +590,7 @@ Future<String> addQuestionTrueFalse({
     'question_id': questionId,
     'has_been_synced': 0, // Initialize sync flags
     'edits_are_synced': 0,
+    'last_modified_timestamp': timeStamp, // Use creation timestamp
     // 'options' column is intentionally left NULL/unspecified for true_false type
   };
 
@@ -614,7 +631,7 @@ Future<String> addSortOrderQuestion({
   await verifyQuestionAnswerPairTable(db); // Ensure table and columns are ready
 
   // Generate ID components using the established pattern
-  final String timeStamp = DateTime.now().toIso8601String();
+  final String timeStamp = DateTime.now().toUtc().toIso8601String();
   final String questionId = '${timeStamp}_$qstContrib';
 
   // Prepare the raw data map - matching fields and defaults from other add functions
@@ -642,6 +659,7 @@ Future<String> addSortOrderQuestion({
     'question_id': questionId, // Store the generated ID
     'has_been_synced': 0, // Initialize sync flags
     'edits_are_synced': 0,
+    'last_modified_timestamp': timeStamp, // Use creation timestamp
     // Fields specific to other types are omitted (correct_option_index, index_options_that_apply, correct_order)
   };
 

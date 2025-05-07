@@ -8,7 +8,10 @@ import 'package:quizzer/UI_systems/question_widgets/widget_multiple_choice_quest
 import 'package:quizzer/UI_systems/question_widgets/widget_select_all_that_apply_question.dart'; 
 import 'package:quizzer/UI_systems/question_widgets/widget_true_false_question.dart'; 
 import 'package:quizzer/UI_systems/question_widgets/widget_sort_order_question.dart'; 
-// TODO: Import other actual question widgets as they are implemented.
+// TODO: Add in Edit Question option next to Flag Icon, should give a pop-up dialog that allows the user to edit the currently active quesiton -> changing it in the DB and signalling a sync(handled at low level)
+
+
+// TODO: Import other actual question widgets as they are implemented. 6 left
 
 /// HomePage acts as the main container, displaying the appropriate question widget.
 class HomePage extends StatefulWidget { // Change to StatefulWidget

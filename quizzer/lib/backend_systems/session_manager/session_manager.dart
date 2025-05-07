@@ -39,8 +39,9 @@ import 'package:quizzer/backend_systems/06_question_queue_server/circulation_wor
 import 'package:quizzer/backend_systems/06_question_queue_server/due_date_worker.dart';
 import 'package:quizzer/backend_systems/06_question_queue_server/eligibility_check_worker.dart';
 import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/outbound_sync/outbound_sync_worker.dart'; // Import the new worker
+import 'package:quizzer/backend_systems/09_data_caches/temp_question_details.dart'; // Added import
 
-
+// TODO, sync worker interferes with smooth UI operations, need to ensure that when submitting answers UI is not awaiting a response from the session manager (otherwise user needs to wait for their turn at the db, but the user shouldn't need to wait for background operations to occur)
 
 /*
 TODO: Implement proper secure storage for the Hive encryption key.
@@ -80,6 +81,7 @@ class SessionManager {
   final       AnswerHistoryCache              _historyCache;
   final       SwitchBoard                     _switchBoard; // Add SwitchBoard instance
   final       PastDueCache                    _pastDueCache = PastDueCache();
+  final       TempQuestionDetailsCache        _tempDetailsCache = TempQuestionDetailsCache();
 
   // user State
               bool                            userLoggedIn = false;
@@ -576,28 +578,27 @@ class SessionManager {
     _currentQuestionRecord = newUserRecord;
     final String questionId = _currentQuestionRecord!['question_id'] as String;
 
-    // 4. Get static question details from DB (Fail Fast)
-    Database? db;
-    Map<String, dynamic> staticDetails = {};
+    // 4. Get static question details from TempQuestionDetailsCache
+    Map<String, dynamic>? staticDetails = await _tempDetailsCache.getAndRemoveRecord(questionId);
 
-    // --- Acquire DB Lock (Fail Fast - throw if unavailable) ---
-    db = await _dbMonitor.requestDatabaseAccess();
-    if (db == null) {
-        throw StateError('Database lock unavailable while fetching question details.');
+    if (staticDetails == null) {
+        // This is a critical error: details for a queued question are missing.
+        // This might indicate a logic flaw where details weren't added or were prematurely removed.
+        QuizzerLogger.logError('SessionManager.requestNextQuestion: CRITICAL - Failed to get question details for QID: $questionId from TempQuestionDetailsCache. The question was in the queue, but its details were not found in the details cache.');
+        // Create a dummy error question to display to the user, or handle error appropriately.
+        // For now, setting a specific error state that the UI can check.
+        final dummyRecords = buildDummyNoQuestionsRecord(); // Or a specific error dummy
+        _currentQuestionDetails = dummyRecords['staticDetails'];
+        _currentQuestionDetails!['question_elements'] = [{'type': 'text', 'content': 'Error: Could not load question details. Please try again.'}];
+        _currentQuestionType = _currentQuestionDetails!['question_type'] as String;
+        _timeDisplayed = DateTime.now();
+        return; // Stop further processing for this question
     }
-    // ---------------------------------------------------------
 
-    // Fetch details - Let exceptions propagate (Fail Fast)
-    staticDetails = await q_pairs_table.getQuestionAnswerPairById(questionId, db);
-
-    // --- DIAGNOSTIC LOGGING --- 
+    // --- DIAGNOSTIC LOGGING (can be kept or removed) ---
     final dynamic fetchedOptions = staticDetails['options'];
     QuizzerLogger.logValue('SessionManager.requestNextQuestion: Fetched options type: ${fetchedOptions.runtimeType}, value: $fetchedOptions');
     // --- END DIAGNOSTIC LOGGING ---
-
-    // --- Release DB Lock (After successful operation) ---
-    _dbMonitor.releaseDatabaseAccess();
-    // ----------------------
 
     // 5. Update state with new details
     _currentQuestionDetails = staticDetails;
@@ -721,7 +722,6 @@ class SessionManager {
        nextRevisionDue: updatedUserRecord['next_revision_due'] as String,
        timeBetweenRevisions: updatedUserRecord['time_between_revisions'] as double,
        averageTimesShownPerDay: updatedUserRecord['average_times_shown_per_day'] as double,
-       lastUpdated: updatedUserRecord['last_updated'] as String,
      );
     // ADDED: Increment total questions answered in user_profile table
      // Explicitly increment total_attempts using the dedicated function -> for the questionObject
