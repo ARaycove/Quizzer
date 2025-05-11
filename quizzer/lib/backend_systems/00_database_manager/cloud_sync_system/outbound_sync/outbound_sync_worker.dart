@@ -107,9 +107,9 @@ class OutboundSyncWorker {
   // -----------------
 
   // --- Core Sync Logic (Refactored) ---
-  /// Performs the outbound synchronization process by calling abstracted, table-specific sync functions.
+  /// The core synchronization logic.
   Future<void> _performSync() async {
-    QuizzerLogger.logMessage('Entering OutboundSyncWorker _performSync()...');
+    QuizzerLogger.logMessage('OutboundSyncWorker: Starting sync cycle.');
 
     // 1. Check connectivity
     final bool isConnected = await _checkConnectivity();
@@ -117,15 +117,44 @@ class OutboundSyncWorker {
       QuizzerLogger.logMessage('OutboundSyncWorker: No network connectivity detected, skipping sync cycle.');
       return;
     }
-    // 2. Get DB Access
-    Database? db = await _getDbAccess();
+    Database? db;
+
+    // 2. Check and Sync Question Answer Pairs
+    db = await _getDbAccess();
+
     await syncQuestionAnswerPairs(db!); // Call the abstracted function
 
-    // 4. Release DB Access (Ensured via finally)
-    QuizzerLogger.logMessage('OutboundSyncWorker: Releasing DB access.');
     _dbMonitor.releaseDatabaseAccess();
 
-    QuizzerLogger.logMessage('OutboundSyncWorker: Sync cycle finished.');
+    // 3. Check and sync Login Attempt Data
+    db = await _getDbAccess();
+
+    await syncLoginAttempts(db!);
+
+    _dbMonitor.releaseDatabaseAccess();
+
+    // 4. Check and sync Question Answer Attempt Data
+    db = await _getDbAccess();
+
+    await syncQuestionAnswerAttempts(db!);
+
+    _dbMonitor.releaseDatabaseAccess();
+
+
+    // 5. Check and sync User Profile Data
+    db = await _getDbAccess();
+
+    await syncUserProfiles(db!);
+    
+    _dbMonitor.releaseDatabaseAccess();
+    
+    // 6. Check and Sync UserQuestionAnswerPairs
+    db = await _getDbAccess(); 
+
+    await syncUserQuestionAnswerPairs(db!);
+
+    _dbMonitor.releaseDatabaseAccess();
+    
   }
   // ----------------------
 
@@ -177,3 +206,4 @@ class OutboundSyncWorker {
    }
    // ------------------------
 }
+

@@ -194,3 +194,22 @@ Future<List<Map<String, dynamic>>> getUnsyncedLoginAttempts(Database db) async {
   QuizzerLogger.logSuccess('Fetched ${results.length} unsynced login attempts.');
   return results;
 }
+
+// --- Delete Record ---
+
+/// Deletes a specific login attempt record from the local database.
+Future<int> deleteLoginAttemptRecord(String loginAttemptId, Database db) async {
+  QuizzerLogger.logMessage('Deleting local login attempt record: $loginAttemptId');
+  // Remove try-catch, let errors propagate (Fail Fast for local DB ops)
+  final int count = await db.delete(
+    'login_attempts',
+    where: 'login_attempt_id = ?',
+    whereArgs: [loginAttemptId],
+  );
+  if (count == 0) {
+    QuizzerLogger.logWarning('Attempted to delete login attempt $loginAttemptId, but no record was found.');
+  } else {
+    QuizzerLogger.logSuccess('Successfully deleted local login attempt $loginAttemptId.');
+  }
+  return count;
+}

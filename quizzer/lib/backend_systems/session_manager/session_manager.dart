@@ -40,6 +40,7 @@ import 'package:quizzer/backend_systems/06_question_queue_server/due_date_worker
 import 'package:quizzer/backend_systems/06_question_queue_server/eligibility_check_worker.dart';
 import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/outbound_sync/outbound_sync_worker.dart'; // Import the new worker
 import 'package:quizzer/backend_systems/09_data_caches/temp_question_details.dart'; // Added import
+import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/inbound_sync/inbound_sync_worker.dart';
 
 // TODO, sync worker interferes with smooth UI operations, need to ensure that when submitting answers UI is not awaiting a response from the session manager (otherwise user needs to wait for their turn at the db, but the user shouldn't need to wait for background operations to occur)
 
@@ -254,6 +255,9 @@ class SessionManager {
     assert(userId != null, "Failed to retrieve userId during login initialization.");
     sessionStartTime = DateTime.now();
 
+    // Run inbound sync after we have userId but before starting background processes
+    await runInboundSync(this);
+      
     // --- Start new background processing pipeline --- 
     final PreProcessWorker preProcessWorker = PreProcessWorker();
     preProcessWorker.start(); // Worker now fetches userId internally
@@ -267,6 +271,11 @@ class SessionManager {
     // OutboundSyncWorker is now started in the constructor
     // TODO: Start InboundSyncWorker here when implemented
 
+    // --- Update last_login at the very end ---
+    Database? db;
+    db = await _dbMonitor.requestDatabaseAccess();
+    await updateLastLogin(userId!, db!);
+    _dbMonitor.releaseDatabaseAccess();
   }
   
   // =================================================================================
@@ -339,6 +348,7 @@ class SessionManager {
     );
 
     if (response['success'] == true) {
+
       await _initializeLogin(email); // initialize function spins up necessary background processes
       // Once that's complete, request the first question
       await requestNextQuestion();

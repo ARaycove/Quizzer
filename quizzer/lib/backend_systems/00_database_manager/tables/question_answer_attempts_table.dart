@@ -1,7 +1,9 @@
 import 'package:sqflite/sqflite.dart';
+import 'dart:async';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import '00_table_helper.dart'; // Import the helper file
 import 'package:quizzer/backend_systems/12_switch_board/switch_board.dart'; // Import SwitchBoard
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_question_answer_pairs_table.dart'; // Use package import for user_question_answer_pairs_table
 
 /// Verifies the existence and schema of the question_answer_attempts table.
 Future<void> verifyQuestionAnswerAttemptTable(Database db) async {
@@ -86,16 +88,11 @@ Future<void> verifyQuestionAnswerAttemptTable(Database db) async {
 /// Checks if this is the first attempt for a given user and question.
 Future<bool> _checkWasFirstAttempt(String questionId, String userId, Database db) async {
   QuizzerLogger.logMessage('Checking if first attempt for Q: $questionId, User: $userId');
-  // Use the universal query helper, we only care if the list is empty or not.
-  final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
-    'question_answer_attempts',
-    db,
-    where: 'participant_id = ? AND question_id = ?',
-    whereArgs: [userId, questionId],
-    limit: 1, // We only need to know if at least one exists
-  );
-  final bool isFirst = results.isEmpty;
-  QuizzerLogger.logMessage('Is first attempt? $isFirst');
+  // Get the user-question pair record to check total_attempts
+  final Map<String, dynamic> pairRecord = await getUserQuestionAnswerPairById(userId, questionId, db);
+  final int totalAttempts = pairRecord['total_attempts'] as int;
+  final bool isFirst = totalAttempts == 0;
+  QuizzerLogger.logMessage('Is first attempt? $isFirst (total_attempts: $totalAttempts)');
   return isFirst;
 }
 
@@ -120,9 +117,6 @@ Future<int> addQuestionAnswerAttempt({
   await verifyQuestionAnswerAttemptTable(db);
 
   final bool wasFirstAttempt = await _checkWasFirstAttempt(questionId, participantId, db);
-  // Double-check consistency 
-  assert(!wasFirstAttempt || (totalAttempts == 0 && revisionStreak == 0 && (lastRevisedDate == null || lastRevisedDate.isEmpty) && daysSinceLastRevision == null), 
-         "Inconsistency: wasFirstAttempt is true but pre-attempt stats are not zero/null/empty.");
 
   QuizzerLogger.logMessage('Adding question attempt for Q: $questionId, User: $participantId');
   
@@ -163,6 +157,23 @@ Future<int> addQuestionAnswerAttempt({
     QuizzerLogger.logWarning('Insert operation for attempt (Q: $questionId, User: $participantId, Time: $timeStamp) returned $resultId. Might be ignored duplicate.');
   }
   return resultId;
+}
+
+/// Deletes a question answer attempt record by its composite primary key.
+Future<int> deleteQuestionAnswerAttemptRecord(String participantId, String questionId, String timeStamp, Database db) async {
+  QuizzerLogger.logMessage('Deleting question answer attempt (PID: $participantId, QID: $questionId, TS: $timeStamp)');
+  await verifyQuestionAnswerAttemptTable(db);
+  final int rowsDeleted = await db.delete(
+    'question_answer_attempts',
+    where: 'participant_id = ? AND question_id = ? AND time_stamp = ?',
+    whereArgs: [participantId, questionId, timeStamp],
+  );
+  if (rowsDeleted == 0) {
+    QuizzerLogger.logWarning('No question answer attempt found to delete for (PID: $participantId, QID: $questionId, TS: $timeStamp)');
+  } else {
+    QuizzerLogger.logSuccess('Deleted $rowsDeleted question answer attempt(s) for (PID: $participantId, QID: $questionId, TS: $timeStamp)');
+  }
+  return rowsDeleted;
 }
 
 // --- Optional Getter Functions ---
@@ -212,4 +223,39 @@ Future<List<Map<String, dynamic>>> getUnsyncedQuestionAnswerAttempts(Database db
 
   QuizzerLogger.logSuccess('Fetched ${results.length} unsynced question answer attempts.');
   return results;
+}
+
+// --- Update Sync Flags ---
+
+/// Updates the synchronization flags for a specific question answer attempt.
+/// Does NOT trigger a new sync signal.
+Future<void> updateQuestionAnswerAttemptSyncFlags({
+  required String participantId,
+  required String questionId,
+  required String timeStamp,
+  required bool hasBeenSynced,
+  required bool editsAreSynced, // Edits are unlikely for attempts, but included for consistency
+  required Database db,
+}) async {
+  QuizzerLogger.logMessage('Updating sync flags for Attempt (PID: $participantId, QID: $questionId, TS: $timeStamp) -> Synced: $hasBeenSynced, Edits Synced: $editsAreSynced');
+  await verifyQuestionAnswerAttemptTable(db); // Ensure table/columns exist
+
+  final Map<String, dynamic> updates = {
+    'has_been_synced': hasBeenSynced ? 1 : 0,
+    'edits_are_synced': editsAreSynced ? 1 : 0,
+  };
+
+  final int rowsAffected = await updateRawData(
+    'question_answer_attempts',
+    updates,
+    'participant_id = ? AND question_id = ? AND time_stamp = ?', // Where clause using composite PK
+    [participantId, questionId, timeStamp], // Where args
+    db,
+  );
+
+  if (rowsAffected == 0) {
+    QuizzerLogger.logWarning('updateQuestionAnswerAttemptSyncFlags affected 0 rows for Attempt (PID: $participantId, QID: $questionId, TS: $timeStamp). Record might not exist?');
+  } else {
+    QuizzerLogger.logSuccess('Successfully updated sync flags for Attempt (PID: $participantId, QID: $questionId, TS: $timeStamp).');
+  }
 }

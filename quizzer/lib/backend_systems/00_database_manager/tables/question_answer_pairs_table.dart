@@ -445,6 +445,39 @@ Future<List<Map<String, dynamic>>> getUnsyncedQuestionAnswerPairs(Database db) a
   return results;
 }
 
+/// Inserts a question-answer pair if it does not exist, or updates it if it does (by question_id).
+/// Used in inbound sync functionality, takes a full record with all details and inserts/updates it
+/// Not to be used outside of the inbound sync
+/// May only be used with fully formed records
+Future<void> insertOrUpdateQuestionAnswerPair(Map<String, dynamic> record, Database db) async {
+  await verifyQuestionAnswerPairTable(db);
+  final String? questionId = record['question_id'] as String?;
+  if (questionId == null) {
+    QuizzerLogger.logError('insertOrUpdateQuestionAnswerPair: Missing question_id in record.');
+    throw StateError('Cannot insert or update question-answer pair without question_id.');
+  }
+  // Check if the record exists
+  final List<Map<String, dynamic>> existing = await db.query(
+    'question_answer_pairs',
+    where: 'question_id = ?',
+    whereArgs: [questionId],
+    limit: 1,
+  );
+  if (existing.isEmpty) {
+    QuizzerLogger.logMessage('insertOrUpdateQuestionAnswerPair: Inserting new record for question_id $questionId');
+    await insertRawData('question_answer_pairs', record, db);
+  } else {
+    QuizzerLogger.logMessage('insertOrUpdateQuestionAnswerPair: Updating existing record for question_id $questionId');
+    await updateRawData(
+      'question_answer_pairs',
+      record,
+      'question_id = ?',
+      [questionId],
+      db,
+    );
+  }
+}
+
 // ===============================================================================
 // --- Add Question Functions ---
 

@@ -31,14 +31,12 @@ class _BulkAddButtonState extends State<BulkAddButton> {
   bool _isLoading = false;
   final SessionManager _session = getSessionManager();
 
-  // ---
-  // Bulk Add Logic
-  // ---
-
   Future<void> _handleBulkAdd(BuildContext context) async {
     setState(() => _isLoading = true);
-    int successCount = 0;
-    int errorCount = 0;
+    String? selectedFileName; // To store filename for logging
+    int itemsProcessed = 0; // Renamed from itemsAttempted
+    int itemsSkipped = 0;
+    int itemsAdded = 0; // Track successful additions via API call completion
 
     // 1. Pick JSON file
     FilePickerResult? result = await FilePicker.platform.pickFiles(
@@ -52,180 +50,285 @@ class _BulkAddButtonState extends State<BulkAddButton> {
       return; // User cancelled picker
     }
 
-    String fileContent;
-    String fileName = result.files.single.name;
-    QuizzerLogger.logMessage('Bulk Add: User selected file: $fileName');
+    // Ensure platform file path is available (will be null on web without specific handling)
+    final path = result.files.single.path;
+    selectedFileName = result.files.single.name;
+    QuizzerLogger.logMessage('Bulk Add: User selected file: $selectedFileName');
 
-    // 2. Read File Content
-    if (kIsWeb) {
-      // Web platform
-      final bytes = result.files.single.bytes;
-      assert(bytes != null, 'File bytes are null on web platform.');
-      fileContent = utf8.decode(bytes!); // Assert non-null
-    } else {
-      // Native platform
-      final path = result.files.single.path;
-      assert(path != null, 'File path is null on native platform.');
-      final file = File(path!); // Assert non-null
-      fileContent = await file.readAsString();
-    }
-    QuizzerLogger.logMessage('Bulk Add: File content read successfully for $fileName.');
-
-    // 3. Decode JSON
-    dynamic decodedJson;
-    // Using try-cast instead of try-catch for basic type check
-    try {
-      decodedJson = jsonDecode(fileContent);
-    } on FormatException catch (e) {
-        QuizzerLogger.logError('Bulk Add: Failed to decode JSON from $fileName. Error: ${e.message}');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: Invalid JSON format in $fileName.'), backgroundColor: ColorWheel.buttonError),
-        );
-        setState(() => _isLoading = false);
-        return;
+    if (path == null) {
+       QuizzerLogger.logError('Bulk Add: File path is null. This method currently only supports non-web platforms.');
+       ScaffoldMessenger.of(context).showSnackBar(
+         SnackBar(content: Text('Error: File path not available (Web platform not fully supported by this method yet).'), backgroundColor: ColorWheel.buttonError),
+       );
+       setState(() => _isLoading = false);
+       return;
     }
 
-    assert(decodedJson is List, 'Bulk Add: Expected JSON root to be a List, but got ${decodedJson.runtimeType}');
+    // 2. Read File Content (non-web only for now)
+    final file = File(path);
+    final String fileContent = await file.readAsString(); // Errors will propagate
+    QuizzerLogger.logMessage('Bulk Add: File content read successfully for $selectedFileName.');
+
+    // 3. Decode JSON - Errors will propagate (Fail Fast)
+    final decodedJson = jsonDecode(fileContent);
+
+    // 4. Basic structure check: Ensure it's a List
+    assert(decodedJson is List, 'Bulk Add Error: Expected JSON root to be a List, but got ${decodedJson.runtimeType}. Aborting.');
     final List<dynamic> questionList = decodedJson as List<dynamic>;
-    QuizzerLogger.logMessage('Bulk Add: JSON decoded successfully. Found ${questionList.length} potential questions.');
+    QuizzerLogger.logMessage('Bulk Add: JSON decoded successfully. Found ${questionList.length} potential questions in $selectedFileName.');
 
-    // 4. Iterate and Validate
+    // 5. Iterate and Add Questions with Pre-validation
     for (int i = 0; i < questionList.length; i++) {
       final item = questionList[i];
-      final itemNumber = i + 1;
+      final itemNumber = i + 1; // 1-based index for logging
+      itemsProcessed++; // Count item being looked at
 
-      if (item is! Map<String, dynamic>) {
-        QuizzerLogger.logError('Bulk Add: Item $itemNumber in $fileName is not a valid Map. Skipping.');
-        errorCount++;
-        continue; // Skip non-map items
+      // --- Start Pre-Validation ---
+      // Basic check: Is item a Map?
+      if (item is! Map) {
+        QuizzerLogger.logWarning('Bulk Add: Item $itemNumber in $selectedFileName is not a valid JSON object (Map). Skipping.');
+        itemsSkipped++;
+        continue;
       }
+      final Map<String, dynamic> questionMap = Map<String, dynamic>.from(item); // Ensure String keys
 
-      final Map<String, dynamic> questionMap = item;
-
-      // Basic Field Validation
+      // Check required common fields
       final String? moduleName = questionMap['moduleName'] as String?;
       final String? questionType = questionMap['questionType'] as String?;
       final List<dynamic>? questionElementsRaw = questionMap['questionElements'] as List?;
       final List<dynamic>? answerElementsRaw = questionMap['answerElements'] as List?;
 
       if (moduleName == null || moduleName.isEmpty) {
-        QuizzerLogger.logError('Bulk Add: Item $itemNumber in $fileName is missing or has empty "moduleName". Skipping.');
-        errorCount++;
-        continue;
+        QuizzerLogger.logWarning('Bulk Add: Item $itemNumber missing or empty "moduleName". Skipping.');
+        itemsSkipped++; continue;
       }
       if (questionType == null || questionType.isEmpty) {
-        QuizzerLogger.logError('Bulk Add: Item $itemNumber in $fileName is missing or has empty "questionType". Skipping.');
-        errorCount++;
-        continue;
-      }
-      if (questionElementsRaw == null || questionElementsRaw.isEmpty) {
-        QuizzerLogger.logError('Bulk Add: Item $itemNumber in $fileName is missing or has empty "questionElements". Skipping.');
-        errorCount++;
-        continue;
-      }
-      if (answerElementsRaw == null || answerElementsRaw.isEmpty) {
-        QuizzerLogger.logError('Bulk Add: Item $itemNumber in $fileName is missing or has empty "answerElements". Skipping.');
-        errorCount++;
-        continue;
+        QuizzerLogger.logWarning('Bulk Add: Item $itemNumber missing or empty "questionType". Skipping.');
+        itemsSkipped++; continue;
       }
 
-      // Element Validation (Basic)
-      bool elementsValid = true;
-      final List<Map<String, dynamic>> questionElements = [];
-      for (final element in questionElementsRaw) {
-        if (element is Map<String, dynamic> && element['type'] is String && element['content'] is String) {
-          questionElements.add(element);
-        } else {
-          QuizzerLogger.logError('Bulk Add: Item $itemNumber in $fileName has invalid structure in "questionElements". Skipping item.');
-          elementsValid = false;
-          break;
-        }
+      // Validate Elements structure (basic check)
+      List<Map<String, dynamic>>? questionElements = _validateElements(questionElementsRaw);
+      if (questionElements == null) {
+        QuizzerLogger.logWarning('Bulk Add: Item $itemNumber has invalid "questionElements". Skipping.');
+        itemsSkipped++; continue;
       }
-      if (!elementsValid) { errorCount++; continue; }
-
-      final List<Map<String, dynamic>> answerElements = [];
-      for (final element in answerElementsRaw) {
-        if (element is Map<String, dynamic> && element['type'] is String && element['content'] is String) {
-          answerElements.add(element);
-        } else {
-          QuizzerLogger.logError('Bulk Add: Item $itemNumber in $fileName has invalid structure in "answerElements". Skipping item.');
-          elementsValid = false;
-          break;
-        }
+      List<Map<String, dynamic>>? answerElements = _validateElements(answerElementsRaw);
+      if (answerElements == null) {
+        QuizzerLogger.logWarning('Bulk Add: Item $itemNumber has invalid "answerElements". Skipping.');
+        itemsSkipped++; continue;
       }
-      if (!elementsValid) { errorCount++; continue; }
 
-      // Multiple Choice Specific Validation
+      // Type-Specific Validation
       List<Map<String, dynamic>>? options;
       int? correctOptionIndex;
-      if (questionType == 'multiple_choice') {
-        final List<dynamic>? optionsRaw = questionMap['options'] as List?;
-        final dynamic correctIndexRaw = questionMap['correctOptionIndex'];
+      List<int>? indexOptionsThatApply;
 
-        if (optionsRaw == null || optionsRaw.isEmpty) {
-          QuizzerLogger.logError('Bulk Add: Item $itemNumber (multiple_choice) in $fileName is missing or has empty "options". Skipping.');
-          errorCount++;
-          continue;
-        }
-        // Convert raw options to List<Map<String, dynamic>>
-        options = optionsRaw.map((o) => {'type': 'text', 'content': o.toString()}).toList(); 
+      switch (questionType) {
+        case 'multiple_choice':
+          final validationResult = _validateMultipleChoice(questionMap);
+          if (validationResult['error'] != null) {
+            QuizzerLogger.logWarning('Bulk Add: Item $itemNumber (multiple_choice) invalid: ${validationResult['error']}. Skipping.');
+            itemsSkipped++; continue;
+          }
+          options = validationResult['options'];
+          correctOptionIndex = validationResult['correctOptionIndex'];
+          break;
 
-        if (correctIndexRaw == null) {
-          QuizzerLogger.logError('Bulk Add: Item $itemNumber (multiple_choice) in $fileName is missing "correctOptionIndex". Skipping.');
-          errorCount++;
-          continue;
-        }
-        
-        // Attempt to parse index safely
-        if (correctIndexRaw is int) {
-          correctOptionIndex = correctIndexRaw;
-        } else if (correctIndexRaw is String) {
-          correctOptionIndex = int.tryParse(correctIndexRaw);
-        }
+        case 'select_all_that_apply':
+          final validationResult = _validateSelectAll(questionMap);
+           if (validationResult['error'] != null) {
+            QuizzerLogger.logWarning('Bulk Add: Item $itemNumber (select_all) invalid: ${validationResult['error']}. Skipping.');
+            itemsSkipped++; continue;
+          }
+          options = validationResult['options'];
+          indexOptionsThatApply = validationResult['indexOptionsThatApply'];
+          break;
 
-        if (correctOptionIndex == null || correctOptionIndex < 0 || correctOptionIndex >= options.length) {
-           QuizzerLogger.logError('Bulk Add: Item $itemNumber (multiple_choice) in $fileName has invalid "correctOptionIndex": $correctIndexRaw. Index out of bounds or not an integer. Skipping.');
-           errorCount++;
-           continue;
-        }
+         case 'true_false':
+            final validationResult = _validateTrueFalse(questionMap);
+            if (validationResult['error'] != null) {
+              QuizzerLogger.logWarning('Bulk Add: Item $itemNumber (true_false) invalid: ${validationResult['error']}. Skipping.');
+              itemsSkipped++; continue;
+            }
+            correctOptionIndex = validationResult['correctOptionIndex'];
+            // Options are implicitly True/False, not needed from JSON for this type usually
+            options = [{'type': 'text', 'content': 'True'}, {'type': 'text', 'content': 'False'}];
+           break;
+
+         case 'sort_order':
+            final validationResult = _validateSortOrder(questionMap);
+            if (validationResult['error'] != null) {
+              QuizzerLogger.logWarning('Bulk Add: Item $itemNumber (sort_order) invalid: ${validationResult['error']}. Skipping.');
+              itemsSkipped++; continue;
+            }
+            // API expects 'options' for sort order items
+            options = validationResult['options'];
+           break;
+
+        // Add cases for other supported types...
+        default:
+          QuizzerLogger.logWarning('Bulk Add: Item $itemNumber has unsupported questionType "$questionType". Skipping.');
+          itemsSkipped++; continue;
       }
+      // --- End Pre-Validation ---
 
-      // 5. Add to Database (if valid)
-      try {
-         await _session.addNewQuestion(
-           questionType: questionType,
-           moduleName: moduleName,
-           questionElements: questionElements,
-           answerElements: answerElements,
-           options: options,
-           correctOptionIndex: correctOptionIndex,
-         );
-         successCount++;
-         QuizzerLogger.logMessage('Bulk Add: Successfully added item $itemNumber from $fileName.');
-      } catch (e) {
-          // This catch block is ONLY for the session manager call, 
-          // adhering to fail-fast for validation but handling DB errors.
-          QuizzerLogger.logError('Bulk Add: Failed to add item $itemNumber from $fileName to database. Error: $e');
-          errorCount++;
-          // Decide whether to continue or halt on DB error. Continuing for now.
-      }
-    }
+      QuizzerLogger.logMessage('Bulk Add: Validation passed for item $itemNumber. Calling API...');
 
-    // 6. Final Feedback
-    QuizzerLogger.logMessage('Bulk Add: Process completed for $fileName. Success: $successCount, Errors: $errorCount');
-    String feedbackMessage = 'Bulk add finished for $fileName. Added: $successCount';
-    if (errorCount > 0) {
-      feedbackMessage += ', Errors: $errorCount (Check logs)';
-    }
+      // 6. Call SessionManager to Add - Errors will propagate and stop the process (Fail Fast)
+      await _session.addNewQuestion(
+        questionType: questionType, // Already validated non-null/empty
+        moduleName: moduleName,     // Already validated non-null/empty
+        questionElements: questionElements, // Already validated non-null
+        answerElements: answerElements,     // Already validated non-null
+        options: options,                   // Validated per type
+        correctOptionIndex: correctOptionIndex, // Validated per type
+        indexOptionsThatApply: indexOptionsThatApply, // Validated per type
+        // Optional fields from map
+        citation: questionMap['citation'] as String?,
+        concepts: questionMap['concepts'] as String?,
+        subjects: questionMap['subjects'] as String?,
+      );
+
+      itemsAdded++; // Increment only if API call succeeds
+      QuizzerLogger.logSuccess('Bulk Add: Successfully added item $itemNumber from $selectedFileName.');
+
+    } // End of loop
+
+    // 7. Simple Completion Log
+    QuizzerLogger.logMessage('Bulk Add: Process finished for $selectedFileName. Items processed: $itemsProcessed, Added: $itemsAdded, Skipped (invalid format/data): $itemsSkipped.');
+
+    // Optional: Show completion SnackBar
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(feedbackMessage),
-        backgroundColor: errorCount == 0 ? ColorWheel.buttonSuccess : ColorWheel.buttonError,
+        content: Text('Bulk add finished for $selectedFileName. Added $itemsAdded, Skipped $itemsSkipped.'),
+        backgroundColor: itemsSkipped > 0 ? ColorWheel.buttonError : ColorWheel.buttonSuccess,
       ),
     );
 
-    setState(() => _isLoading = false);
+    setState(() => _isLoading = false); // Ensure loading state is turned off
   }
+
+  // --- Helper Validation Functions ---
+
+  List<Map<String, dynamic>>? _validateElements(List<dynamic>? elementsRaw) {
+    if (elementsRaw == null || elementsRaw.isEmpty) return null;
+    final List<Map<String, dynamic>> validElements = [];
+    for (final element in elementsRaw) {
+      if (element is Map &&
+          element['type'] is String &&
+          element['content'] is String &&
+          (element['type'] as String).isNotEmpty &&
+          (element['content'] as String).isNotEmpty) {
+        validElements.add(Map<String, dynamic>.from(element));
+      } else {
+        return null; // Invalid structure found
+      }
+    }
+    return validElements;
+  }
+
+   Map<String, dynamic> _validateMultipleChoice(Map<String, dynamic> questionMap) {
+    final List<dynamic>? optionsRaw = questionMap['options'] as List?;
+    final dynamic correctIndexRaw = questionMap['correctOptionIndex'];
+
+    if (optionsRaw == null || optionsRaw.isEmpty) {
+      return {'error': 'Missing or empty "options" list'};
+    }
+     // Ensure options are converted correctly
+    final List<Map<String, dynamic>> options = optionsRaw.map((o) {
+        if (o is Map) return Map<String, dynamic>.from(o);
+        return {'type': 'text', 'content': o.toString()};
+    }).toList();
+
+    if (correctIndexRaw == null) {
+      return {'error': 'Missing "correctOptionIndex"'};
+    }
+    int? correctOptionIndex;
+    if (correctIndexRaw is int) {
+      correctOptionIndex = correctIndexRaw;
+    } else if (correctIndexRaw is String) {
+      correctOptionIndex = int.tryParse(correctIndexRaw);
+    }
+    if (correctOptionIndex == null || correctOptionIndex < 0 || correctOptionIndex >= options.length) {
+      return {'error': 'Invalid "correctOptionIndex" (value: $correctIndexRaw, options count: ${options.length})'};
+    }
+    return {'options': options, 'correctOptionIndex': correctOptionIndex};
+  }
+
+  Map<String, dynamic> _validateSelectAll(Map<String, dynamic> questionMap) {
+    final List<dynamic>? optionsRaw = questionMap['options'] as List?;
+    final List<dynamic>? indicesRaw = questionMap['indexOptionsThatApply'] as List?;
+
+    if (optionsRaw == null || optionsRaw.isEmpty) {
+      return {'error': 'Missing or empty "options" list'};
+    }
+     // Ensure options are converted correctly
+    final List<Map<String, dynamic>> options = optionsRaw.map((o) {
+        if (o is Map) return Map<String, dynamic>.from(o);
+        return {'type': 'text', 'content': o.toString()};
+    }).toList();
+
+
+    if (indicesRaw == null || indicesRaw.isEmpty) {
+      return {'error': 'Missing or empty "indexOptionsThatApply" list'};
+    }
+    final List<int> validIndices = [];
+    for (final indexRaw in indicesRaw) {
+      int? index;
+      if (indexRaw is int) {
+        index = indexRaw;
+      } else if (indexRaw is String) {
+        index = int.tryParse(indexRaw);
+      }
+      if (index == null || index < 0 || index >= options.length) {
+        return {'error': 'Invalid index $indexRaw found in "indexOptionsThatApply" (options count: ${options.length})'};
+      }
+      if (!validIndices.contains(index)) { // Avoid duplicates
+          validIndices.add(index);
+      }
+    }
+     if (validIndices.isEmpty) { // Ensure at least one valid index resulted
+       return {'error': '"indexOptionsThatApply" list resulted in no valid indices'};
+     }
+    validIndices.sort(); // Ensure consistent order if needed by API
+    return {'options': options, 'indexOptionsThatApply': validIndices};
+  }
+
+   Map<String, dynamic> _validateTrueFalse(Map<String, dynamic> questionMap) {
+      final dynamic correctIndexRaw = questionMap['correctOptionIndex'];
+       if (correctIndexRaw == null) {
+         return {'error': 'Missing "correctOptionIndex"'};
+       }
+      int? correctOptionIndex;
+      if (correctIndexRaw is int) {
+        correctOptionIndex = correctIndexRaw;
+      } else if (correctIndexRaw is String) {
+        correctOptionIndex = int.tryParse(correctIndexRaw);
+      }
+       if (correctOptionIndex == null || (correctOptionIndex != 0 && correctOptionIndex != 1)) {
+         return {'error': 'Invalid "correctOptionIndex" for true_false (must be 0 or 1, got: $correctIndexRaw)'};
+       }
+      return {'correctOptionIndex': correctOptionIndex};
+   }
+
+   Map<String, dynamic> _validateSortOrder(Map<String, dynamic> questionMap) {
+      final List<dynamic>? optionsRaw = questionMap['options'] as List?; // API expects 'options' for sortable items
+      if (optionsRaw == null || optionsRaw.isEmpty) {
+        return {'error': 'Missing or empty "options" list (required for sort_order items)'};
+      }
+      // Ensure options are converted correctly
+      final List<Map<String, dynamic>> options = optionsRaw.map((o) {
+          if (o is Map) return Map<String, dynamic>.from(o);
+          return {'type': 'text', 'content': o.toString()};
+      }).toList();
+
+      if (options.length < 2) { // Need at least 2 items to sort
+        return {'error': 'Sort order questions require at least 2 options'};
+      }
+
+      return {'options': options}; // Return the formatted options
+   }
 
   // --- 
   // Build Method

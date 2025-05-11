@@ -41,6 +41,9 @@ class QuizzerLogger {
   // --- Source Filtering --- 
   static List<String> _excludedSources = [
     "user_question_processes.dart",
+    "outbound_sync_functions.dart",
+    "outbound_sync_worker.dart",
+    "widget_multiple_choice_question.dart",
     "database_monitor.dart",
     "question_answer_pairs_table.dart",
     "login_attempts_table.dart",

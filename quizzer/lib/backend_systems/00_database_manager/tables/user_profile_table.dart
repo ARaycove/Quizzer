@@ -4,6 +4,7 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/question_answ
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'dart:convert';
 import 'package:quizzer/backend_systems/12_switch_board/switch_board.dart';
+import '00_table_helper.dart'; // Import the helper file
 
 // TODO Enforce and introduce primary and secondary languages
 // This will be used to determine whether questions should be synced based on language
@@ -242,20 +243,23 @@ Future<Map<String, dynamic>> verifyNonDuplicateProfile(String email, String user
   };
 }
 
-Future<bool> updateLastLogin(String timestamp, String emailAddress, Database db) async {
-  QuizzerLogger.logMessage('Updating last login for email: $emailAddress');
+Future<bool> updateLastLogin(String userId, Database db) async {
+  QuizzerLogger.logMessage('Updating last login for userId: $userId');
   await verifyUserProfileTable(db);
-  await db.update(
+  final String nowTimestamp = DateTime.now().toUtc().toIso8601String();
+  final Map<String, dynamic> updates = {
+    'last_login': nowTimestamp,
+    'edits_are_synced': 0,
+    'last_modified_timestamp': nowTimestamp,
+  };
+  await updateRawData(
     'user_profile',
-    {
-      'last_login': timestamp,
-      'edits_are_synced': 0,
-      'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
-    },
-    where: 'email = ?',
-    whereArgs: [emailAddress],
+    updates,
+    'uuid = ?',
+    [userId],
+    db,
   );
-  QuizzerLogger.logSuccess('Last login updated successfully');
+  QuizzerLogger.logSuccess('Last login updated successfully for userId: $userId');
   // Signal SwitchBoard
   final SwitchBoard switchBoard = getSwitchBoard();
   switchBoard.signalOutboundSyncNeeded();
@@ -541,21 +545,67 @@ Future<List<String>> getAllUserEmails(Database db) async {
 
 // --- Get Unsynced Records ---
 
-/// Fetches all user profiles that need outbound synchronization.
+/// Fetches all user profiles that need outbound synchronization for a specific user.
 /// This includes records that have never been synced (`has_been_synced = 0`)
 /// or records that have local edits pending sync (`edits_are_synced = 0`).
 /// Does NOT decode the records.
-Future<List<Map<String, dynamic>>> getUnsyncedUserProfiles(Database db) async {
-  QuizzerLogger.logMessage('Fetching unsynced user profiles...');
+Future<List<Map<String, dynamic>>> getUnsyncedUserProfiles(Database db, String userId) async {
+  QuizzerLogger.logMessage('Fetching unsynced user profile for user ID: $userId...');
   await verifyUserProfileTable(db); // Ensure table and sync columns exist
 
   final List<Map<String, dynamic>> results = await db.query(
     'user_profile',
-    where: 'has_been_synced = 0 OR edits_are_synced = 0',
+    where: '(has_been_synced = 0 OR edits_are_synced = 0) AND uuid = ?',
+    whereArgs: [userId], // Use the passed userId parameter
   );
 
-  QuizzerLogger.logSuccess('Fetched ${results.length} unsynced user profiles.');
+  QuizzerLogger.logSuccess('Fetched ${results.length} unsynced user profiles for user $userId.');
   return results;
+}
+
+// --- Update Sync Flags ---
+
+/// Updates the synchronization flags for a specific user profile.
+/// Does NOT trigger a new sync signal.
+Future<void> updateUserProfileSyncFlags({
+  required String userId,
+  required bool hasBeenSynced,
+  required bool editsAreSynced,
+  required Database db,
+}) async {
+  QuizzerLogger.logMessage('Updating sync flags for User Profile: $userId -> Synced: $hasBeenSynced, Edits Synced: $editsAreSynced');
+  await verifyUserProfileTable(db); // Ensure table/columns exist
+
+  final Map<String, dynamic> updates = {
+    'has_been_synced': hasBeenSynced ? 1 : 0,
+    'edits_are_synced': editsAreSynced ? 1 : 0,
+  };
+
+  final int rowsAffected = await updateRawData(
+    'user_profile',
+    updates,
+    'uuid = ?', // Where clause using primary key
+    [userId],   // Where args
+    db,
+  );
+
+  if (rowsAffected == 0) {
+    QuizzerLogger.logWarning('updateUserProfileSyncFlags affected 0 rows for User: $userId. Record might not exist?');
+  } else {
+    QuizzerLogger.logSuccess('Successfully updated sync flags for User Profile: $userId.');
+  }
+}
+
+/// Gets the last_login timestamp for a user by userId. Returns null if not found.
+Future<String?> getLastLoginForUser(String userId, Database db) async {
+  final List<Map<String, dynamic>> result = await db.query(
+    'user_profile',
+    columns: ['last_login'],
+    where: 'uuid = ?',
+    whereArgs: [userId],
+  );
+  if (result.isEmpty) return null;
+  return result.first['last_login'] as String?;
 }
 
 // TODO: FIXME Add in functionality for loginThreshold preference

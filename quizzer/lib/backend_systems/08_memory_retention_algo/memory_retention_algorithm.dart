@@ -49,7 +49,7 @@ Map<String, dynamic> calculateNextRevisionDate(String status, int revisionStreak
   
   // Average shown calculation
   const double epsilon = 1e-9; // Small value to prevent division by zero
-  final double averageShown = (numberOfDays.abs() > epsilon) ? (1.0 / numberOfDays) : double.infinity; 
+  final double averageShown = (numberOfDays.abs() > epsilon) ? (1.0 / numberOfDays) : 1; 
 
   // --- End Inlined Calculation Logic ---
 

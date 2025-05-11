@@ -321,27 +321,54 @@ Future<void> setCirculationStatus(
 
 // --- Get Unsynced Records ---
 
-/// Fetches all user-question-answer pairs that need outbound synchronization.
+/// Fetches all user-question-answer pairs for a specific user that need outbound synchronization.
 /// This includes records that have never been synced (`has_been_synced = 0`)
 /// or records that have local edits pending sync (`edits_are_synced = 0`).
 /// Does NOT decode the records.
-Future<List<Map<String, dynamic>>> getUnsyncedUserQuestionAnswerPairs(Database db) async {
-  QuizzerLogger.logMessage('Fetching unsynced user-question-answer pairs...');
-  // Ensure table and sync columns exist (verification is usually called by other functions,
-  // but good to have if this is called independently)
+Future<List<Map<String, dynamic>>> getUnsyncedUserQuestionAnswerPairs(Database db, String userId) async {
+  QuizzerLogger.logMessage('Fetching unsynced user-question-answer pairs for user: $userId...');
   await verifyUserQuestionAnswerPairTable(db);
 
-  // Use the universal query helper. Since we want raw, undecoded data for the sync worker,
-  // we can use db.query directly or ensure queryAndDecodeDatabase can return raw if needed.
-  // For now, assuming queryAndDecodeDatabase is acceptable or a raw query is preferred.
-  // Sticking to queryAndDecodeDatabase for consistency if it handles raw data well,
-  // otherwise, a direct db.query would be fine here.
-  // Let's use db.query for clarity that we want raw data, as the QAP table does.
   final List<Map<String, dynamic>> results = await db.query(
     'user_question_answer_pairs',
-    where: 'has_been_synced = 0 OR edits_are_synced = 0',
+    where: '(has_been_synced = 0 OR edits_are_synced = 0) AND user_uuid = ?',
+    whereArgs: [userId],
   );
 
-  QuizzerLogger.logSuccess('Fetched ${results.length} unsynced user-question-answer pairs.');
+  QuizzerLogger.logSuccess('Fetched ${results.length} unsynced user-question-answer pairs for user $userId.');
   return results;
+}
+
+// --- Update Sync Flags (NEW FUNCTION) ---
+
+/// Updates the synchronization flags for a specific user_question_answer_pair.
+/// Does NOT trigger a new sync signal.
+Future<void> updateUserQuestionAnswerPairSyncFlags({
+  required String userUuid,
+  required String questionId,
+  required bool hasBeenSynced,
+  required bool editsAreSynced,
+  required Database db,
+}) async {
+  QuizzerLogger.logMessage('Updating sync flags for UserQuestionAnswerPair (User: $userUuid, QID: $questionId) -> Synced: $hasBeenSynced, Edits Synced: $editsAreSynced');
+  await verifyUserQuestionAnswerPairTable(db); // Ensure table/columns exist
+
+  final Map<String, dynamic> updates = {
+    'has_been_synced': hasBeenSynced ? 1 : 0,
+    'edits_are_synced': editsAreSynced ? 1 : 0,
+  };
+
+  final int rowsAffected = await updateRawData(
+    'user_question_answer_pairs',
+    updates,
+    'user_uuid = ? AND question_id = ?', // Where clause using composite PK
+    [userUuid, questionId],              // Where args
+    db,
+  );
+
+  if (rowsAffected == 0) {
+    QuizzerLogger.logWarning('updateUserQuestionAnswerPairSyncFlags affected 0 rows for UserQuestionAnswerPair (User: $userUuid, QID: $questionId). Record might not exist?');
+  } else {
+    QuizzerLogger.logSuccess('Successfully updated flags for UserQuestionAnswerPair (User: $userUuid, QID: $questionId).');
+  }
 }
