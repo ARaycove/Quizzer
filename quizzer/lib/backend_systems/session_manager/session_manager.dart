@@ -42,6 +42,7 @@ import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/ou
 import 'package:quizzer/backend_systems/09_data_caches/temp_question_details.dart'; // Added import
 import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/inbound_sync/inbound_sync_worker.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/modules_table.dart' as modules_table;
+import 'package:quizzer/backend_systems/00_database_manager/review_system/get_send_postgre.dart';
 
 // TODO, sync worker interferes with smooth UI operations, need to ensure that when submitting answers UI is not awaiting a response from the session manager (otherwise user needs to wait for their turn at the db, but the user shouldn't need to wait for background operations to occur)
 
@@ -89,7 +90,6 @@ class SessionManager {
               bool                            userLoggedIn = false;
               String?                         userId;
               String?                         userEmail;
-              String?                         userRole;
               String?                         _initialProfileLastModified; // Store initial last_modified_timestamp
   // Current Question information and booleans
               Map<String, dynamic>?           _currentQuestionRecord;         // userQuestionRecord
@@ -112,6 +112,8 @@ class SessionManager {
   Map<String, dynamic>? get currentQuestionUserRecord => _currentQuestionRecord;
   Map<String, dynamic>? get currentQuestionStaticData => _currentQuestionDetails;
   String?               get initialProfileLastModified => _initialProfileLastModified;
+  // ADDED: Getter that dynamically determines user role from JWT
+  String                get userRole => determineUserRoleFromSupabaseSession(supabase.auth.currentSession);
   
   
   // int?                  get optionSelected            => _multipleChoiceOptionSelected;
@@ -308,7 +310,6 @@ class SessionManager {
     userLoggedIn = false;
     userId = null;
     userEmail = null;
-    userRole = null;
     sessionStartTime = null;
     _clearQuestionState(); // Clear current question state
     clearPageHistory(); // Clear navigation history
@@ -356,18 +357,9 @@ class SessionManager {
     );
 
     if (response['success'] == true) {
-      // --- STORE USER ROLE ---
-      this.userRole = response['user_role'] as String? ?? 'public_user_unverified'; 
-      QuizzerLogger.logMessage('User role set in SessionManager: ${this.userRole}');
-      // --- END STORE USER ROLE ---
-
       await _initializeLogin(email); // initialize function spins up necessary background processes
       // Once that's complete, request the first question
       await requestNextQuestion();
-    } else {
-      // Even on failure, userAuth might return a default 'user_role'
-      this.userRole = response['user_role'] as String? ?? 'public_user_unverified';
-      QuizzerLogger.logMessage('User role set (on login failure) in SessionManager: ${this.userRole}');
     }
 
     // Response information is for front-end UI, not necessary for backend
@@ -1005,6 +997,57 @@ class SessionManager {
     _dbMonitor.releaseDatabaseAccess();
     return module!;
   }
+  // =====================================================================
+  // --- Review System Interface ---
+
+  /// Fetches a random question requiring review from the backend.
+  ///
+  /// Returns a map containing:
+  /// - \'data\': The decoded question data map, or null if none/error.
+  /// - \'source_table\': The name of the table the question came from, or null.
+  /// - \'primary_key\': The map representing the primary key(s) for deletion, or null.
+  /// - \'error\': An error message string if applicable, or null.
+  Future<Map<String, dynamic>> getReviewQuestion() async {
+    QuizzerLogger.logMessage('SessionManager: Requesting a question for review...');
+    // Directly call the function without the alias
+    return getRandomQuestionToBeReviewed();
+  }
+
+  /// Submits a review decision (approve or deny) for a question.
+  ///
+  /// Args:
+  ///   isApproved: Boolean indicating if the question is approved (true) or denied (false).
+  ///   questionDetails: The full, potentially edited, decoded question data map.
+  ///                    **Required only if isApproved is true.**
+  ///   sourceTable: The name of the review table the question originated from.
+  ///   primaryKey: The map representing the primary key(s) to identify the record in the source table.
+  ///
+  /// Returns:
+  ///   `true` if the operation (approve/deny) was successful, `false` otherwise.
+  Future<bool> submitReview({
+    required bool isApproved,
+    Map<String, dynamic>? questionDetails, // Required only for approval
+    required String sourceTable,
+    required Map<String, dynamic> primaryKey,
+  }) async {
+    QuizzerLogger.logMessage('SessionManager: Submitting review decision (Approved: $isApproved) for PK: $primaryKey from $sourceTable');
+
+    if (isApproved) {
+      // Check if questionDetails are provided for approval
+      if (questionDetails == null) {
+        QuizzerLogger.logError('submitReview: questionDetails are required for approving a question.');
+        // Fail Fast: Throw an error if essential data for the operation is missing.
+        throw ArgumentError('questionDetails cannot be null when approving a question.');
+      }
+      // Call the approve function without the alias
+      return approveQuestion(questionDetails, sourceTable, primaryKey);
+    } else {
+      // Call the deny function without the alias
+      return denyQuestion(sourceTable, primaryKey);
+    }
+  }
+
+  // --- End Review System Interface ---
 }
 
 // Global instance

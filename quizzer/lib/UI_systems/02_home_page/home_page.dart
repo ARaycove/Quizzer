@@ -23,13 +23,26 @@ class HomePage extends StatefulWidget { // Change to StatefulWidget
 
 class _HomePageState extends State<HomePage> { // State class
   final SessionManager session = SessionManager(); // Get session instance once
+  Map<String, dynamic>? _editedQuestionData; // <-- ADDED State variable for callback data
 
   // Method to handle requesting the next question and triggering rebuild
   Future<void> _requestNextQuestion() async {
+    _editedQuestionData = null; // Clear any edited data when requesting next
     await session.requestNextQuestion();
     // Ensure widget is still mounted before calling setState
     if (mounted) { 
       setState(() {}); // Trigger rebuild to show the new question
+    }
+  }
+
+  // --- ADDED: Method to handle data returned from EditQuestionDialog ---
+  Future<void> _handleQuestionEdited(Map<String, dynamic> updatedData) async {
+    QuizzerLogger.logMessage('HomePage: Question edited, storing data and triggering rebuild.');
+    // Store the edited data locally in the state
+    _editedQuestionData = updatedData;
+    
+    if (mounted) {
+      setState(() {}); // Trigger rebuild to reflect edited question data
     }
   }
 
@@ -42,6 +55,7 @@ class _HomePageState extends State<HomePage> { // State class
           session.addPageToHistory('/menu'); 
           Navigator.pushNamed(context, '/menu');
         },
+        onQuestionEdited: _handleQuestionEdited,
       ),
       // Directly build the body, assuming SessionManager handles its initialization
       body: _buildQuestionBody(), 
@@ -52,56 +66,62 @@ class _HomePageState extends State<HomePage> { // State class
   /// Selects and returns the appropriate widget based on the current question type.
   Widget _buildQuestionBody() {
     // Use ValueKey with currentQuestionId to ensure widget state resets for new questions
-    final key = ValueKey(session.currentQuestionId);
-    
-    // Fetch data DIRECTLY from session manager when needed
-    QuizzerLogger.logValue("HomePage building question type: ${session.currentQuestionType} with key: $key");
+    final String currentQuestionId = session.currentQuestionId;
+    final key = ValueKey(currentQuestionId);
 
-    switch (session.currentQuestionType) {
+    // Determine data source: edited data if available, otherwise session
+    final Map<String, dynamic>? dataSource = _editedQuestionData;
+    final String questionType = dataSource?['question_type'] as String? ?? session.currentQuestionType ?? 'error';
+    final List<Map<String, dynamic>> questionElements = (dataSource?['question_elements'] as List<dynamic>? ?? session.currentQuestionElements).map((e) => Map<String, dynamic>.from(e as Map)).toList();
+    final List<Map<String, dynamic>> answerElements = (dataSource?['answer_elements'] as List<dynamic>? ?? session.currentQuestionAnswerElements).map((e) => Map<String, dynamic>.from(e as Map)).toList();
+    final List<Map<String, dynamic>> options = (dataSource?['options'] as List<dynamic>? ?? session.currentQuestionOptions).map((e) => Map<String, dynamic>.from(e as Map)).toList();
+    final int? correctOptionIndex = dataSource?['correct_option_index'] as int? ?? session.currentCorrectOptionIndex;
+    final List<int> correctIndices = (dataSource?['index_options_that_apply'] as List<dynamic>? ?? session.currentCorrectIndices).map((e) => e as int).toList();
+
+    // IMPORTANT: No longer clearing _editedQuestionData here. It's cleared in _requestNextQuestion.
+
+    QuizzerLogger.logValue("HomePage building question type: $questionType with key: $key (using ${dataSource != null ? 'edited data' : 'session data'})");
+
+    switch (questionType) {
       case 'multiple_choice':
-        final correctIndex = session.currentCorrectOptionIndex;
-        if (correctIndex == null) {
-             return _buildErrorWidget('Missing correct index for multiple_choice', key);
-        }
         return MultipleChoiceQuestionWidget(
           key: key, 
           onNextQuestion: _requestNextQuestion,
-          questionElements: session.currentQuestionElements,
-          answerElements: session.currentQuestionAnswerElements,
-          options: session.currentQuestionOptions,
-          correctOptionIndex: correctIndex,
+          questionElements: questionElements, // Use local variable
+          answerElements: answerElements, // Use local variable
+          options: options, // Use local variable
+          correctOptionIndex: correctOptionIndex ?? -1, // Handle null, though validation should prevent it
         );
 
       case 'select_all_that_apply': 
         return SelectAllThatApplyQuestionWidget(
           key: key, 
           onNextQuestion: _requestNextQuestion,
-          questionElements: session.currentQuestionElements,
-          answerElements: session.currentQuestionAnswerElements,
-          options: session.currentQuestionOptions,
-          correctIndices: session.currentCorrectIndices,
+          questionElements: questionElements, // Use local variable
+          answerElements: answerElements, // Use local variable
+          options: options, // Use local variable
+          correctIndices: correctIndices, // Use local variable
         );
 
       case 'true_false': 
-        final correctIndex = session.currentCorrectOptionIndex;
-        if (correctIndex == null || (correctIndex != 0 && correctIndex != 1)) {
-             return _buildErrorWidget('Invalid correct index ($correctIndex) for true_false', key);
+        if (correctOptionIndex == null || (correctOptionIndex != 0 && correctOptionIndex != 1)) {
+             return _buildErrorWidget('Invalid correct index ($correctOptionIndex) for true_false', key);
         }
         return TrueFalseQuestionWidget(
           key: key, 
           onNextQuestion: _requestNextQuestion,
-          questionElements: session.currentQuestionElements,
-          answerElements: session.currentQuestionAnswerElements,
-          isCorrectAnswerTrue: correctIndex == 0, // 0 is convention for True
+          questionElements: questionElements, // Use local variable
+          answerElements: answerElements, // Use local variable
+          isCorrectAnswerTrue: correctOptionIndex == 0, // 0 is convention for True
         );
         
       case 'sort_order': 
         return SortOrderQuestionWidget(
           key: key, 
           onNextQuestion: _requestNextQuestion,
-          questionElements: session.currentQuestionElements,
-          answerElements: session.currentQuestionAnswerElements,
-          options: session.currentQuestionOptions, // Pass the correctly ordered options
+          questionElements: questionElements, // Use local variable
+          answerElements: answerElements, // Use local variable
+          options: options, // Use the correctly ordered options from edited data or session
         );
 
       // --- Add placeholders for other known types ---
@@ -109,7 +129,9 @@ class _HomePageState extends State<HomePage> { // State class
       //   return MatchingWidget(key: key, onNextQuestion: _requestNextQuestion);
 
       default:
-        return _buildErrorWidget('Unsupported or missing question type (${session.currentQuestionType})', key);
+        // Use session's type if dataSource is null, otherwise use the type from dataSource
+        final displayType = dataSource?['question_type'] as String? ?? session.currentQuestionType ?? 'unknown';
+        return _buildErrorWidget('Unsupported or missing question type ($displayType)', key);
     }
   }
   

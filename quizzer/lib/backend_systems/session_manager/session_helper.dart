@@ -208,10 +208,21 @@ String determineUserRoleFromSupabaseSession(Session? supabaseSession) {
   // Directly attempt to decode. Errors during parsing will propagate.
   Map<String, dynamic> decodedToken = Jwt.parseJwt(supabaseSession.accessToken);
   
-  // --- LOG THE ENTIRE DECODED TOKEN FOR DEBUGGING ---
-  QuizzerLogger.logValue("$supabaseSession");
-  QuizzerLogger.logValue("${supabaseSession.accessToken}");
-  QuizzerLogger.logValue('Decoded JWT Token Payload: $decodedToken');
+  // --- LOG REDACTED TOKEN PAYLOAD FOR DEBUGGING ---
+  // QuizzerLogger.logValue("$supabaseSession"); // Avoid logging entire session object
+  QuizzerLogger.logValue("Access Token: [REDACTED]"); // Log redacted token
+
+  // Create a redacted copy for logging
+  final Map<String, dynamic> redactedPayload = Map.from(decodedToken);
+  const String redactedValue = '[REDACTED]';
+  // Redact potentially sensitive fields
+  if (redactedPayload.containsKey('email')) redactedPayload['email'] = redactedValue;
+  if (redactedPayload.containsKey('sub')) redactedPayload['sub'] = redactedValue;
+  if (redactedPayload.containsKey('session_id')) redactedPayload['session_id'] = redactedValue;
+  if (redactedPayload.containsKey('user_metadata')) redactedPayload['user_metadata'] = redactedValue;
+  // Add any other fields considered sensitive here
+  
+  QuizzerLogger.logValue('Decoded JWT Token Payload (Redacted): $redactedPayload');
   // --------------------------------------------------
 
   // The key 'user_role' must match exactly what your Supabase trigger function sets in the claims.

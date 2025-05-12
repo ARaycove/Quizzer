@@ -36,6 +36,10 @@ class _MenuPageState extends State<MenuPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Get the user role dynamically
+    final String userRole = session.userRole; 
+    QuizzerLogger.logValue("Building MenuPage for user role: $userRole");
+
     return Scaffold(
       backgroundColor: ColorWheel.primaryBackground,
       appBar: GlobalAppBar(
@@ -46,6 +50,22 @@ class _MenuPageState extends State<MenuPage> {
         padding: const EdgeInsets.all(ColorWheel.standardPaddingValue),
         child: Column(
           children: [
+            // --- Conditional Admin Panel Button (Moved to Top) ---
+            if (userRole == 'admin' || userRole == 'contributor') ...[
+              _buildMenuButton(
+                icon: Icons.admin_panel_settings, // Suitable icon
+                label: 'Admin Panel',
+                onPressed: () {
+                  QuizzerLogger.logMessage('Admin Panel button pressed by $userRole');
+                  session.addPageToHistory('/admin_panel');
+                  // TODO: Implement Admin Panel Page and navigation
+                  Navigator.pushNamed(context, '/admin_panel'); 
+                },
+              ),
+              const SizedBox(height: ColorWheel.standardPaddingValue),
+            ],
+            // --- End Conditional Button ---
+
             // Add Question Button
             _buildMenuButton(
               icon: Icons.add_circle_outline,
@@ -53,17 +73,6 @@ class _MenuPageState extends State<MenuPage> {
               onPressed: () {
                 session.addPageToHistory('/add_question');
                 Navigator.pushNamed(context, '/add_question');
-              },
-            ),
-            const SizedBox(height: ColorWheel.standardPaddingValue),
-
-            // Add Content Button
-            _buildMenuButton(
-              icon: Icons.content_paste,
-              label: 'Add Content',
-              onPressed: () {
-                QuizzerLogger.logMessage('Add Content button pressed');
-                developer.log('Add Content page not implemented yet');
               },
             ),
             const SizedBox(height: ColorWheel.standardPaddingValue),
@@ -119,17 +128,6 @@ class _MenuPageState extends State<MenuPage> {
               onPressed: () {
                 QuizzerLogger.logMessage('Feedback & Bug Reports button pressed');
                 developer.log('Feedback & Bug Reports page not implemented yet');
-              },
-            ),
-            const SizedBox(height: ColorWheel.standardPaddingValue),
-
-            // Help with Research Button
-            _buildMenuButton(
-              icon: Icons.science,
-              label: 'Help with Research',
-              onPressed: () {
-                QuizzerLogger.logMessage('Help with Research button pressed');
-                developer.log('Help with Research page not implemented yet');
               },
             ),
             const SizedBox(height: ColorWheel.standardPaddingValue),

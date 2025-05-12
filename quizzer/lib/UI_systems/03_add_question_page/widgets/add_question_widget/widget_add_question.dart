@@ -82,6 +82,7 @@ class _AddQuestionWidgetState extends State<AddQuestionWidget> {
     _questionElementFocusNode.addListener(_handleFocusChangeQuestion);
     _optionTextFocusNode.addListener(_handleFocusChangeOption);
     _answerElementFocusNode.addListener(_handleFocusChangeAnswer);
+    _editFocusNode.addListener(_handleEditFocusChange);
   }
 
   @override
@@ -99,6 +100,7 @@ class _AddQuestionWidgetState extends State<AddQuestionWidget> {
     _questionElementFocusNode.dispose();
     _optionTextFocusNode.dispose();
     _answerElementFocusNode.dispose();
+    _editFocusNode.removeListener(_handleEditFocusChange);
     _editFocusNode.dispose(); // Dispose the new focus node
     super.dispose();
   }
@@ -213,6 +215,15 @@ class _AddQuestionWidgetState extends State<AddQuestionWidget> {
     }
 
     _cancelEditing(); // Clear editing state after submitting
+  }
+
+  // --- Handler for Inline Edit Focus Change ---
+  void _handleEditFocusChange() {
+    // If focus is lost *while* editing, submit the change
+    if (!_editFocusNode.hasFocus && (_editingElementIndex != null || _editingOptionIndex != null)) {
+      QuizzerLogger.logMessage("Inline edit field lost focus, submitting edit...");
+      _submitEdit();
+    }
   }
 
   // --- Helper to build True/False ChoiceChips ---
@@ -381,11 +392,6 @@ class _AddQuestionWidgetState extends State<AddQuestionWidget> {
 
               // Call the parent's callback
               widget.onReorderOptions(mutableOptions);
-              
-              // TODO: Crucially, reordering options might require updating 
-              // correctOptionIndex (MC/TF) and correctIndicesSATA (SATA) 
-              // if the correct item(s) moved. This logic needs to be added 
-              // in the parent's _handleReorderOptions.
           },
           // Optional: Add proxy decorator
           proxyDecorator: (Widget child, int index, Animation<double> animation) {
@@ -517,8 +523,10 @@ class _AddQuestionWidgetState extends State<AddQuestionWidget> {
                              autofocus: true,
                              style: const TextStyle(color: ColorWheel.primaryText, fontSize: 16.0),
                              cursorColor: ColorWheel.primaryText,
+                             maxLines: null,
+                             keyboardType: TextInputType.multiline,
                              decoration: const InputDecoration(
-                                contentPadding: const EdgeInsets.symmetric(vertical: 8.0), // Adjust padding
+                                contentPadding: EdgeInsets.symmetric(vertical: 8.0), // Adjust padding
                                 isDense: true,
                                 border: InputBorder.none, // Minimal decoration
                                 focusedBorder: UnderlineInputBorder( // Add underline when focused
@@ -696,6 +704,8 @@ class _AddQuestionWidgetState extends State<AddQuestionWidget> {
                    autofocus: true,
                    style: const TextStyle(color: ColorWheel.primaryText, fontSize: 16.0),
                    cursorColor: ColorWheel.primaryText,
+                   maxLines: null,
+                   keyboardType: TextInputType.multiline,
                    decoration: const InputDecoration(
                       contentPadding: EdgeInsets.symmetric(vertical: 8.0),
                       isDense: true,

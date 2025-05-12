@@ -2,14 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:quizzer/UI_systems/color_wheel.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart'; // Import SessionManager
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart'; // For logging
+import 'package:quizzer/UI_systems/global_widgets/widget_edit_question_dialogue.dart'; // <-- CORRECTED PACKAGE IMPORT
 
 // Convert to StatefulWidget to manage internal state for the flag dialog
 class HomePageTopBar extends StatefulWidget implements PreferredSizeWidget {
   final VoidCallback onMenuPressed;
+  final Future<void> Function(Map<String, dynamic> updatedQuestionData) onQuestionEdited;
 
   const HomePageTopBar({
     super.key,
     required this.onMenuPressed,
+    required this.onQuestionEdited,
   });
 
   @override
@@ -71,16 +74,102 @@ class _HomePageTopBarState extends State<HomePageTopBar> {
       title: const Text('Quizzer', style: TextStyle(color: ColorWheel.primaryText)),
       centerTitle: true,
       actions: [
-        IconButton(
-          icon: const Icon(Icons.flag_outlined, color: ColorWheel.primaryText),
-          tooltip: 'Flag Question',
-          onPressed: () {
+        // --- EDIT BUTTON ---
+        Padding( // Add padding for spacing from the flag button
+          padding: const EdgeInsets.only(right: 8.0), // Adjust spacing as needed
+          child: InkWell( // Use InkWell for tap effect, though onPressed is on IconButton
+            onTap: () async {
+              // Get current question ID
+              final String? currentQuestionId = _session.currentQuestionId;
+              if (currentQuestionId == null || currentQuestionId == "dummy_no_questions") {
+                 QuizzerLogger.logWarning("Edit button pressed but no valid question is active.");
+                 // Optionally show a message to the user
+                 if (mounted) {
+                     ScaffoldMessenger.of(context).showSnackBar(
+                       const SnackBar(content: Text('No active question to edit.'), backgroundColor: ColorWheel.warning),
+                     );
+                 }
+                 return;
+              }
+
+               QuizzerLogger.logMessage('Edit button pressed for question ID: $currentQuestionId');
+               
+               // Fetch current question details
+               try {
+                 final details = await _session.fetchQuestionDetailsById(currentQuestionId);
+                 if (!mounted) return; // Check if widget is still mounted after async call
+
+                 // Show the edit dialog and wait for result
+                 final result = await showDialog(
+                    context: context,
+                    builder: (dialogContext) => EditQuestionDialog(initialQuestionData: details),
+                 );
+
+                 // If dialog submitted and returned data, call the callback
+                 if (result != null && result is Map<String, dynamic>) {
+                     await widget.onQuestionEdited(result); // Call the callback passed from HomePage
+                 }
+               } catch (e) {
+                  QuizzerLogger.logError("Error fetching details or showing edit dialog: $e");
+                  if (mounted) {
+                       ScaffoldMessenger.of(context).showSnackBar(
+                         SnackBar(content: Text('Error opening edit dialog: $e'), backgroundColor: ColorWheel.buttonError),
+                       );
+                  }
+               }
+            },
+            child: const Tooltip(
+              message: 'Edit Question',
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center, // Center vertically
+                children: [
+                  Icon(
+                    Icons.edit_note, // Or Icons.edit
+                    color: ColorWheel.primaryText,
+                    size: 24, // Standard icon size
+                  ),
+                  SizedBox(height: 2), // Small space between icon and text
+                  Text(
+                    'Edit',
+                    style: TextStyle(
+                      color: ColorWheel.primaryText,
+                      fontSize: 10, // Small font size
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        // --- FLAG BUTTON ---
+        InkWell(
+          onTap: () {
             // Show flag dialog using the helper method
             showDialog(
               context: context,
               builder: (dialogContext) => _buildFlagDialog(dialogContext),
             );
           },
+          child: const Tooltip(
+            message: 'Flag Question',
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8.0), // Add some horizontal padding if needed
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.flag_outlined, color: ColorWheel.primaryText, size: 24),
+                  SizedBox(height: 2), // Small space between icon and text
+                  Text(
+                    'Report',
+                    style: TextStyle(
+                      color: ColorWheel.primaryText,
+                      fontSize: 10, // Small font size
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
       ],
     );

@@ -201,7 +201,7 @@ class _EditModuleDialogState extends State<EditModuleDialog> {
                                         context: context,
                                         builder: (context) => EditQuestionDialog(initialQuestionData: details),
                                       );
-                                      if (result == true) {
+                                      if (result != null && result is Map<String, dynamic>) {
                                         await _reloadModuleData();
                                       }
                                     },

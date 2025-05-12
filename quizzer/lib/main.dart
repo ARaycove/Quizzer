@@ -5,12 +5,11 @@ import 'package:quizzer/UI_systems/01_new_user_page/new_user_page.dart';
 import 'package:quizzer/UI_systems/00_login_page/login_page.dart';
 import 'package:quizzer/UI_systems/02_home_page/home_page.dart';
 import 'package:quizzer/UI_systems/05_menu_page/menu_page.dart';
+import 'package:quizzer/UI_systems/06_admin_panel/admin_panel.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:logging/logging.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart'; // Import logging package
 // List to do items, major projects and implementation (order by priority)
-
-// TODO add_question_page should have live preview
 
 
 // TODO Create new async worker that maintains a list of eligible questions and caches questions that won't be up for review until much later
@@ -192,6 +191,7 @@ class QuizzerApp extends StatelessWidget {
         '/add_question':    (context) => const AddQuestionAnswerPage(),
         '/display_modules': (context) => const DisplayModulesPage(),
         '/signup':          (context) => const NewUserPage(),
+        '/admin_panel':     (context) => const AdminPanelPage(),
       },
     );
   }

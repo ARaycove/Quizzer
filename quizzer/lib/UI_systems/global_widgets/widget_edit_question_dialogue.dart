@@ -8,7 +8,13 @@ import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 
 class EditQuestionDialog extends StatefulWidget {
   final Map<String, dynamic> initialQuestionData;
-  const EditQuestionDialog({super.key, required this.initialQuestionData});
+  final bool disableSubmission;
+
+  const EditQuestionDialog({
+    super.key, 
+    required this.initialQuestionData,
+    this.disableSubmission = false,
+  });
 
   @override
   State<EditQuestionDialog> createState() => _EditQuestionDialogState();
@@ -166,19 +172,45 @@ class _EditQuestionDialogState extends State<EditQuestionDialog> {
       }
       return;
     }
-    await _session.updateExistingQuestion(
-      questionId: _questionId,
-      moduleName: _moduleController.text,
-      questionElements: _questionElements,
-      answerElements: _answerElements,
-      options: _options.isNotEmpty ? _options : null,
-      correctOptionIndex: _correctOptionIndex,
-      indexOptionsThatApply: _correctIndicesSATA.isNotEmpty ? _correctIndicesSATA : null,
-      questionType: _questionType,
-      originalModuleName: _originalModuleName, // Pass the original module name
-    );
+
+    // Construct the map of data that will be sent for update
+    // This is also the data we want to return to the caller
+    final Map<String, dynamic> updatedQuestionDataForSession = {
+      'question_id': _questionId, // Essential for SessionManager to identify
+      'module_name': _moduleController.text,
+      'question_elements': _questionElements,
+      'answer_elements': _answerElements,
+      'options': _options.isNotEmpty ? _options : null,
+      'correct_option_index': _correctOptionIndex,
+      'index_options_that_apply': _correctIndicesSATA.isNotEmpty ? _correctIndicesSATA : null,
+      'question_type': _questionType,
+      // Include other fields that SessionManager might need or that UI might use directly
+      // For example, if the dialog modifies 'subjects' or 'concepts', add them here.
+      // For now, keeping it to what's explicitly handled by _session.updateExistingQuestion
+    };
+
+    // --- Conditionally call updateExistingQuestion --- 
+    if (!widget.disableSubmission) {
+      QuizzerLogger.logMessage('EditQuestionDialog: Submitting changes to SessionManager.');
+      await _session.updateExistingQuestion(
+        questionId: _questionId,
+        moduleName: _moduleController.text,
+        questionElements: _questionElements,
+        answerElements: _answerElements,
+        options: _options.isNotEmpty ? _options : null,
+        correctOptionIndex: _correctOptionIndex,
+        indexOptionsThatApply: _correctIndicesSATA.isNotEmpty ? _correctIndicesSATA : null,
+        questionType: _questionType,
+        originalModuleName: _originalModuleName, // Pass the original module name
+      );
+    } else {
+      QuizzerLogger.logMessage('EditQuestionDialog: Submission disabled, skipping SessionManager update.');
+    }
+    // -----------------------------------------------
+
     if (mounted) {
-      Navigator.of(context).pop(true); // Return true to indicate success
+      // Pop with the updated data map regardless of submission status
+      Navigator.of(context).pop(updatedQuestionDataForSession); 
     }
   }
 
@@ -203,7 +235,7 @@ class _EditQuestionDialogState extends State<EditQuestionDialog> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text('Edit Question', style: ColorWheel.titleText),
+                  const Text('Edit Question', style: ColorWheel.titleText),
                   const SizedBox(height: ColorWheel.majorSectionSpacing),
                   ModuleSelection(controller: _moduleController),
                   const SizedBox(height: ColorWheel.formFieldSpacing),
