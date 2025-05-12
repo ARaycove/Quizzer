@@ -230,3 +230,73 @@ Future<bool> buildModuleRecords() async {
   monitor.releaseDatabaseAccess();
   return success;
 }
+
+/// Builds/updates only the specified modules from question-answer pairs and updates the modules table
+/// Accepts a list of module names to update
+Future<bool> buildSpecificModuleRecords(List<String> moduleNames) async {
+  QuizzerLogger.logMessage('Starting targeted module build process for: \\${moduleNames.join(", ")}');
+  final monitor = getDatabaseMonitor();
+
+  Database? db;
+  while (db == null) {
+    db = await monitor.requestDatabaseAccess();
+    if (db == null) {
+      QuizzerLogger.logMessage('Database access denied, waiting...');
+      await Future.delayed(const Duration(milliseconds: 250));
+    }
+  }
+
+  // Get all question-answer pairs
+  final List<Map<String, dynamic>> pairs = await getAllQuestionAnswerPairs(db);
+  QuizzerLogger.logMessage('Retrieved \\${pairs.length} question-answer pairs');
+
+  // Only process the specified modules
+  for (final moduleName in moduleNames.toSet()) {
+    // Get unique subjects and primary subject
+    final Map<String, dynamic> subjectsData = getUniqueSubjectsForModule(pairs, moduleName);
+    final Set<String> uniqueSubjects = subjectsData['subjects'] as Set<String>;
+    final String primarySubject = subjectsData['primary_subject'] as String;
+
+    // Get unique concepts
+    final Set<String> uniqueConcepts = getUniqueConceptsForModule(pairs, moduleName);
+    
+    // Get question IDs and module contributor
+    final Map<String, dynamic> questionsData = getQuestionIdsForModule(pairs, moduleName);
+    final List<String> questionIds = questionsData['question_ids'] as List<String>;
+    final String moduleContributor = questionsData['module_contributor'] as String;
+    
+    // Check if module exists
+    final existingModule = await getModule(moduleName, db);
+    
+    if (existingModule != null) {
+      // Update existing module
+      await updateModule(
+        name: moduleName,
+        subjects: uniqueSubjects.toList(),
+        relatedConcepts: uniqueConcepts.toList(),
+        questionIds: questionIds,
+        db: db
+      );
+      QuizzerLogger.logMessage('Updated module: \\${moduleName}');
+    } else {
+      // Create new module
+      await insertModule(
+        name: moduleName,
+        description: 'Module for \\${moduleName}',
+        primarySubject: primarySubject,
+        subjects: uniqueSubjects.toList(),
+        relatedConcepts: uniqueConcepts.toList(),
+        questionIds: questionIds,
+        creatorId: moduleContributor,
+        db: db
+      );
+      QuizzerLogger.logMessage('Created new module: \\${moduleName}');
+    }
+  }
+
+  bool success = true;
+  QuizzerLogger.logSuccess('Targeted module records built successfully');
+
+  monitor.releaseDatabaseAccess();
+  return success;
+}

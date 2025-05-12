@@ -41,6 +41,7 @@ import 'package:quizzer/backend_systems/06_question_queue_server/eligibility_che
 import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/outbound_sync/outbound_sync_worker.dart'; // Import the new worker
 import 'package:quizzer/backend_systems/09_data_caches/temp_question_details.dart'; // Added import
 import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/inbound_sync/inbound_sync_worker.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/modules_table.dart' as modules_table;
 
 // TODO, sync worker interferes with smooth UI operations, need to ensure that when submitting answers UI is not awaiting a response from the session manager (otherwise user needs to wait for their turn at the db, but the user shouldn't need to wait for background operations to occur)
 
@@ -89,6 +90,7 @@ class SessionManager {
               String?                         userId;
               String?                         userEmail;
               String?                         userRole;
+              String?                         _initialProfileLastModified; // Store initial last_modified_timestamp
   // Current Question information and booleans
               Map<String, dynamic>?           _currentQuestionRecord;         // userQuestionRecord
               Map<String, dynamic>?           _currentQuestionDetails;        // questionAnswerPairRecord
@@ -109,6 +111,7 @@ class SessionManager {
   // --- Public Getters for UI State ---
   Map<String, dynamic>? get currentQuestionUserRecord => _currentQuestionRecord;
   Map<String, dynamic>? get currentQuestionStaticData => _currentQuestionDetails;
+  String?               get initialProfileLastModified => _initialProfileLastModified;
   
   
   // int?                  get optionSelected            => _multipleChoiceOptionSelected;
@@ -219,11 +222,6 @@ class SessionManager {
       // For now, just completing with error lets awaiters handle it.
     });
 
-    // Start background workers that don't depend on login state
-    QuizzerLogger.logMessage("SessionManager Constructor: Starting OutboundSyncWorker...");
-    final outboundSyncWorker = OutboundSyncWorker();
-    outboundSyncWorker.start();
-    QuizzerLogger.logSuccess("SessionManager Constructor: OutboundSyncWorker started.");
     // TODO: Start other non-login-dependent workers here if any
   }
 
@@ -255,6 +253,16 @@ class SessionManager {
     assert(userId != null, "Failed to retrieve userId during login initialization.");
     sessionStartTime = DateTime.now();
 
+
+    // Fetch and store initial last_modified_timestamp before any sync operations
+    Database? db = await _dbMonitor.requestDatabaseAccess();
+    if (db == null) {
+      throw StateError('Failed to acquire database access during login initialization');
+    }
+    _initialProfileLastModified = await getLastModifiedTimestampForUser(userId!, db);
+    QuizzerLogger.logMessage('Stored initial profile last_modified_timestamp: $_initialProfileLastModified');
+    _dbMonitor.releaseDatabaseAccess();
+
     // Run inbound sync after we have userId but before starting background processes
     await runInboundSync(this);
       
@@ -268,14 +276,14 @@ class SessionManager {
     await psw.onInitialLoopComplete.first; // Waits for the signal
     // ----------------------------------------------------------------------
 
-    // OutboundSyncWorker is now started in the constructor
-    // TODO: Start InboundSyncWorker here when implemented
-
     // --- Update last_login at the very end ---
-    Database? db;
     db = await _dbMonitor.requestDatabaseAccess();
     await updateLastLogin(userId!, db!);
     _dbMonitor.releaseDatabaseAccess();
+
+    // Start OutboundSyncWorker after all initialization is complete
+    final outboundSyncWorker = OutboundSyncWorker();
+    await outboundSyncWorker.start();
   }
   
   // =================================================================================
@@ -348,10 +356,18 @@ class SessionManager {
     );
 
     if (response['success'] == true) {
+      // --- STORE USER ROLE ---
+      this.userRole = response['user_role'] as String? ?? 'public_user_unverified'; 
+      QuizzerLogger.logMessage('User role set in SessionManager: ${this.userRole}');
+      // --- END STORE USER ROLE ---
 
       await _initializeLogin(email); // initialize function spins up necessary background processes
       // Once that's complete, request the first question
       await requestNextQuestion();
+    } else {
+      // Even on failure, userAuth might return a default 'user_role'
+      this.userRole = response['user_role'] as String? ?? 'public_user_unverified';
+      QuizzerLogger.logMessage('User role set (on login failure) in SessionManager: ${this.userRole}');
     }
 
     // Response information is for front-end UI, not necessary for backend
@@ -485,9 +501,23 @@ class SessionManager {
   // API for loading module names and their activation status
   Future<Map<String, dynamic>> loadModules() async {
     assert(userId != null);
-    return await handleLoadModules({
+    final result = await handleLoadModules({
       'userId': userId,
     });
+    // Ensure all module fields are properly typed
+    if (result.containsKey('modules')) {
+      final modules = result['modules'] as List<dynamic>;
+      result['modules'] = modules.map((module) {
+        final mod = Map<String, dynamic>.from(module);
+        // Explicitly cast question_ids to List<String> if present
+        if (mod.containsKey('question_ids') && mod['question_ids'] is List) {
+          mod['question_ids'] = List<String>.from(mod['question_ids']);
+        }
+        // Add similar casts for other fields if needed
+        return mod;
+      }).toList();
+    }
+    return result;
   }
 
   //  --------------------------------------------------------------------------------
@@ -895,6 +925,86 @@ class SessionManager {
   // TODO Need a service feature that enables text to speech, take in String input, send to service, return audio recording. UI will use this api call to get an audio recording, receive it, then play it.
   // To test in isolation we will generate a few sentences and then pass to service, save the audio recording to a file, then use a different software to play it.
 
+  /// Fetches the full details of a question by its ID (for UI preview, editing, etc.)
+  Future<Map<String, dynamic>> fetchQuestionDetailsById(String questionId) async {
+    final dbMonitor = getDatabaseMonitor();
+    final db = await dbMonitor.requestDatabaseAccess();
+    if (db == null) {
+      QuizzerLogger.logError('Failed to acquire database access in fetchQuestionDetailsById');
+      throw StateError('Could not acquire database access');
+    }
+    final details = await q_pairs_table.getQuestionAnswerPairById(questionId, db);
+    dbMonitor.releaseDatabaseAccess();
+    return details;
+  }
+
+  /// Updates an existing question in the question_answer_pairs table.
+  /// Returns the number of rows affected (should be 1 if successful).
+  Future<int> updateExistingQuestion({
+    required String questionId,
+    String? citation,
+    List<Map<String, dynamic>>? questionElements,
+    List<Map<String, dynamic>>? answerElements,
+    List<int>? indexOptionsThatApply,
+    bool? ansFlagged,
+    String? ansContrib,
+    String? concepts,
+    String? subjects,
+    String? qstReviewer,
+    bool? hasBeenReviewed,
+    bool? flagForRemoval,
+    String? moduleName,
+    String? questionType,
+    List<Map<String, dynamic>>? options,
+    int? correctOptionIndex,
+    List<Map<String, dynamic>>? correctOrderElements,
+    String? originalModuleName, // NEW optional parameter
+  }) async {
+    // Fail fast if not logged in
+    assert(userId != null, 'User must be logged in to update a question.');
+    Database? db = await _dbMonitor.requestDatabaseAccess();
+    assert(db != null, 'Failed to acquire database access to update question.');
+    final int result = await q_pairs_table.editQuestionAnswerPair(
+      questionId: questionId,
+      db: db!,
+      citation: citation,
+      questionElements: questionElements,
+      answerElements: answerElements,
+      indexOptionsThatApply: indexOptionsThatApply,
+      ansFlagged: ansFlagged,
+      ansContrib: ansContrib,
+      concepts: concepts,
+      subjects: subjects,
+      qstReviewer: qstReviewer,
+      hasBeenReviewed: hasBeenReviewed,
+      flagForRemoval: flagForRemoval,
+      moduleName: moduleName,
+      questionType: questionType,
+      options: options,
+      correctOptionIndex: correctOptionIndex,
+      correctOrderElements: correctOrderElements,
+    );
+    _dbMonitor.releaseDatabaseAccess();
+
+    // Only update the affected modules
+    if (originalModuleName != null && moduleName != null && originalModuleName != moduleName) {
+      // If the module name changed, update both the old and new modules
+      await buildSpecificModuleRecords([originalModuleName, moduleName]);
+    } else if (moduleName != null) {
+      // Only update the current module
+      await buildSpecificModuleRecords([moduleName]);
+    }
+    return result;
+  }
+
+  /// Fetches a module record by its name, including up-to-date question IDs.
+  Future<Map<String, dynamic>> fetchModuleByName(String moduleName) async {
+    assert(userId != null, 'User must be logged in to fetch a module.');
+    Database? db = await _dbMonitor.requestDatabaseAccess();
+    final module = await modules_table.getModule(moduleName, db!);
+    _dbMonitor.releaseDatabaseAccess();
+    return module!;
+  }
 }
 
 // Global instance

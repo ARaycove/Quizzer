@@ -1,66 +1,86 @@
-Quizzer: [19:27:52] [34m[INFO][0m [database_native.dart] Using sqflite FFI factory (Desktop)
-Quizzer: [19:27:52] [34m[INFO][0m [database_native.dart] Desktop SQLite directory ensured: /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/runtime_cache/sqlite
-Quizzer: [19:27:52] [34m[INFO][0m [database_native.dart] Target Database path: /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/runtime_cache/sqlite/quizzer.db
-Quizzer: [19:27:54] [34m[INFO][0m [database_native.dart] Existing database found at /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/runtime_cache/sqlite/quizzer.db. Using it.
-Quizzer: [19:27:54] [34m[INFO][0m [database_native.dart] SUCCESS: Database initialized successfully at: /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/runtime_cache/sqlite/quizzer.db
-Quizzer: [19:27:54] [34m[INFO][0m [question_answer_attempts_table.dart] Fetching unsynced question answer attempts...
-Quizzer: [19:27:54] [34m[INFO][0m [question_answer_attempts_table.dart] Verifying question_answer_attempts table...
-Quizzer: [19:27:54] [34m[INFO][0m [question_answer_attempts_table.dart] question_answer_attempts table already exists. Checking columns...
-Quizzer: [19:27:54] [34m[INFO][0m [question_answer_attempts_table.dart] Column check complete.
-Quizzer: [19:27:54] [34m[INFO][0m [question_answer_attempts_table.dart] SUCCESS: Fetched 0 unsynced question answer attempts.
-Quizzer: [19:28:05] [34m[INFO][0m [login_page.dart] Login attempt for: aacra0820@gmail.com
-Quizzer: [19:28:05] [34m[INFO][0m [session_manager.dart] Logging in user with email: aacra0820@gmail.com
-Quizzer: [19:28:05] [34m[INFO][0m [user_auth.dart] User authentication requested for aacra0820@gmail.com
-Quizzer: [19:28:05] [34m[INFO][0m [user_auth.dart] Attempting Supabase authentication for aacra0820@gmail.com
-Quizzer: [19:28:05] [34m[INFO][0m [user_auth.dart] Attempting Supabase authentication
-Quizzer: [19:28:05] [36m[DEBUG][0m Saving session
-Quizzer: [19:28:05] [34m[INFO][0m [user_auth.dart] SUCCESS: Supabase authentication successful for aacra0820@gmail.com
-Quizzer: [19:28:05] [34m[INFO][0m [user_auth.dart] Handling successful Supabase login for aacra0820@gmail.com
-Quizzer: [19:28:05] [34m[INFO][0m [user_auth.dart] Stored last login (2025-05-11T01:28:05.466456049Z) and token for aacra0820@gmail.com
-Quizzer: [19:28:05] [34m[INFO][0m [user_auth.dart] Ensuring local profile exists for aacra0820@gmail.com
-Quizzer: [19:28:05] [34m[INFO][0m [user_auth.dart] Is user in list -> true
-Quizzer: [19:28:05] [34m[INFO][0m [user_auth.dart] Is user in list -> true
-Quizzer: [19:28:06] [34m[INFO][0m [session_isolates.dart] Recorded email to log in. . .: aacra0820@gmail.com
-Quizzer: [19:28:06] [34m[INFO][0m [session_isolates.dart] Database access granted
-Quizzer: [19:28:06] [34m[INFO][0m [session_isolates.dart] SUCCESS: Session initialized with userId: 77647c42-c888-47e3-8296-6fc452815810
-Quizzer: [19:28:06] [34m[INFO][0m [inbound_sync_worker.dart] Starting inbound sync aggregator...
-Quizzer: [19:28:06] [34m[INFO][0m [inbound_sync_worker.dart] Syncing inbound question_answer_pairs for user 77647c42-c888-47e3-8296-6fc452815810 since 2025-05-11T01:27:16.436977Z...
-Quizzer: [19:28:06] [34m[INFO][0m [inbound_sync_worker.dart] No new question_answer_pairs to sync.
-Quizzer: [19:28:06] [34m[INFO][0m [inbound_sync_worker.dart] SUCCESS: Inbound sync completed successfully.
-Quizzer: [19:28:06] [34m[INFO][0m [question_answer_attempts_table.dart] Fetching unsynced question answer attempts...
-Quizzer: [19:28:06] [34m[INFO][0m [question_answer_attempts_table.dart] Verifying question_answer_attempts table...
-Quizzer: [19:28:06] [34m[INFO][0m [question_answer_attempts_table.dart] question_answer_attempts table already exists. Checking columns...
-Quizzer: [19:28:06] [34m[INFO][0m [question_answer_attempts_table.dart] Column check complete.
-Quizzer: [19:28:06] [34m[INFO][0m [question_answer_attempts_table.dart] SUCCESS: Fetched 0 unsynced question answer attempts.
-Quizzer: [19:28:08] [34m[INFO][0m [question_selection_worker.dart] PresentationSelectionWorker started.
-Quizzer: [19:28:08] [34m[INFO][0m [question_selection_worker.dart] PSW: Starting initial loop...
-Quizzer: [19:28:08] [34m[INFO][0m [question_queue_cache.dart] QuestionQueueCache: Added record 2025-05-07T23:30:34.048169Z_77647c42-c888-47e3-8296-6fc452815810 to empty queue.
-Quizzer: [19:28:08] [36m[DEBUG][0m [session_manager.dart] SessionManager.requestNextQuestion: Fetched options type: List<dynamic>, value: [{type: text, content: Germany's occupation of Austria in 1938}, {type: text, content: a nonaggression agreement between Russia and Germany}, {type: text, content: Italy's invasion of Ethiopia in 1935}, {type: text, content: the German conscription laws instituted in 1933}, {type: text, content: a conversation between Hitler and the British prime minister Neville Chamberlain in Munich in 1938}]
-Quizzer: [19:28:08] [34m[INFO][0m [login_page.dart] Login successful for: aacra0820@gmail.com. Navigating home.
-Quizzer: [19:28:08] [36m[DEBUG][0m [home_page.dart] HomePage building question type: multiple_choice with key: [<'2025-05-07T23:30:34.048169Z_77647c42-c888-47e3-8296-6fc452815810'>]
-Quizzer: [19:28:08] [36m[DEBUG][0m [question_answer_element.dart] ElementRenderer: Found image in assets: images/question_answer_pair_assets/d950d02c-cb75-4157-9a13-297db25d9add.png
-Quizzer: [19:28:08] [34m[INFO][0m [question_queue_cache.dart] QuestionQueueCache: Added record 2025-05-08T00:17:16.351999Z_77647c42-c888-47e3-8296-6fc452815810 to empty queue.
-Quizzer: [19:28:08] [34m[INFO][0m [question_answer_attempts_table.dart] Fetching unsynced question answer attempts...
-Quizzer: [19:28:08] [34m[INFO][0m [question_answer_attempts_table.dart] Verifying question_answer_attempts table...
-Quizzer: [19:28:08] [34m[INFO][0m [question_answer_attempts_table.dart] question_answer_attempts table already exists. Checking columns...
-Quizzer: [19:28:08] [34m[INFO][0m [question_answer_attempts_table.dart] Column check complete.
-Quizzer: [19:28:08] [34m[INFO][0m [question_answer_attempts_table.dart] SUCCESS: Fetched 0 unsynced question answer attempts.
-Quizzer: [19:28:15] [34m[INFO][0m [question_answer_attempts_table.dart] Verifying question_answer_attempts table...
-Quizzer: [19:28:16] [34m[INFO][0m [question_answer_attempts_table.dart] question_answer_attempts table already exists. Checking columns...
-Quizzer: [19:28:16] [34m[INFO][0m [question_answer_attempts_table.dart] Column check complete.
-Quizzer: [19:28:16] [34m[INFO][0m [question_answer_attempts_table.dart] Checking if first attempt for Q: 2025-05-07T23:30:34.048169Z_77647c42-c888-47e3-8296-6fc452815810, User: 77647c42-c888-47e3-8296-6fc452815810
-Quizzer: [19:28:16] [34m[INFO][0m [question_answer_attempts_table.dart] Is first attempt? true (total_attempts: 0)
-Quizzer: [19:28:16] [34m[INFO][0m [question_answer_attempts_table.dart] Adding question attempt for Q: 2025-05-07T23:30:34.048169Z_77647c42-c888-47e3-8296-6fc452815810, User: 77647c42-c888-47e3-8296-6fc452815810
-Quizzer: [19:28:16] [34m[INFO][0m [question_answer_attempts_table.dart] SUCCESS: Successfully added question attempt record with result ID: 1. Data: {time_stamp: 2025-05-11T01:28:15.832310Z, question_id: 2025-05-07T23:30:34.048169Z_77647c42-c888-47e3-8296-6fc452815810, participant_id: 77647c42-c888-47e3-8296-6fc452815810, response_time: 7.402361, response_result: 1, was_first_attempt: true, knowledge_base: null, question_context_csv: {"subjects":[],"concepts":[]}, last_revised_date: null, days_since_last_revision: null, total_attempts: 0, revision_streak: 0, has_been_synced: 0, edits_are_synced: 0, last_modified_timestamp: 2025-05-11T01:28:15.832310Z}
-Quizzer: [19:28:16] [34m[INFO][0m [question_answer_attempts_table.dart] Fetching unsynced question answer attempts...
-Quizzer: [19:28:16] [34m[INFO][0m [question_answer_attempts_table.dart] Verifying question_answer_attempts table...
-Quizzer: [19:28:16] [34m[INFO][0m [question_answer_attempts_table.dart] question_answer_attempts table already exists. Checking columns...
-Quizzer: [19:28:16] [34m[INFO][0m [question_answer_attempts_table.dart] Column check complete.
-Quizzer: [19:28:16] [34m[INFO][0m [question_answer_attempts_table.dart] SUCCESS: Fetched 1 unsynced question answer attempts.
-Quizzer: [19:28:16] [34m[INFO][0m [question_answer_attempts_table.dart] Deleting question answer attempt (PID: 77647c42-c888-47e3-8296-6fc452815810, QID: 2025-05-07T23:30:34.048169Z_77647c42-c888-47e3-8296-6fc452815810, TS: 2025-05-11T01:28:15.832310Z)
-Quizzer: [19:28:16] [34m[INFO][0m [question_answer_attempts_table.dart] Verifying question_answer_attempts table...
-Quizzer: [19:28:16] [34m[INFO][0m [question_answer_attempts_table.dart] question_answer_attempts table already exists. Checking columns...
-Quizzer: [19:28:16] [34m[INFO][0m [question_answer_attempts_table.dart] Column check complete.
-Quizzer: [19:28:16] [34m[INFO][0m [question_answer_attempts_table.dart] SUCCESS: Deleted 1 question answer attempt(s) for (PID: 77647c42-c888-47e3-8296-6fc452815810, QID: 2025-05-07T23:30:34.048169Z_77647c42-c888-47e3-8296-6fc452815810, TS: 2025-05-11T01:28:15.832310Z)
-Quizzer: [19:28:19] [36m[DEBUG][0m [session_manager.dart] SessionManager.requestNextQuestion: Fetched options type: List<dynamic>, value: [{type: text, content: Russia}, {type: text, content: Spain}, {type: text, content: Italy}, {type: text, content: Belgium}, {type: text, content: Portugal}]
-Quizzer: [19:28:19] [36m[DEBUG][0m [home_page.dart] HomePage building question type: multiple_choice with key: [<'2025-05-08T00:17:16.351999Z_77647c42-c888-47e3-8296-6fc452815810'>]
+Quizzer: [19:36:51] [34m[INFO][0m [login_page.dart] Login attempt for: aacra0820@gmail.com
+Quizzer: [19:36:51] [34m[INFO][0m [session_manager.dart] Logging in user with email: aacra0820@gmail.com
+Quizzer: [19:36:51] [34m[INFO][0m [user_auth.dart] User authentication requested for aacra0820@gmail.com
+Quizzer: [19:36:51] [34m[INFO][0m [user_auth.dart] Attempting Supabase authentication for aacra0820@gmail.com
+Quizzer: [19:36:51] [34m[INFO][0m [user_auth.dart] Attempting Supabase authentication
+Quizzer: [19:36:51] [36m[DEBUG][0m Saving session
+Quizzer: [19:36:51] [34m[INFO][0m [user_auth.dart] SUCCESS: Supabase authentication successful for aacra0820@gmail.com
+Quizzer: [19:36:51] [36m[DEBUG][0m [session_helper.dart] Session(providerToken: null, providerRefreshToken: null, expiresIn: 3600, tokenType: bearer, user: User(id: d4250690-9f2b-4770-b813-b12421e5aae6, appMetadata: {provider: email, providers: [email]}, userMetadata: {email: aacra0820@gmail.com, email_verified: true, phone_verified: false, sub: d4250690-9f2b-4770-b813-b12421e5aae6}, aud: authenticated, confirmationSentAt: 2025-04-10T20:53:23.546196Z, recoverySentAt: 2025-04-11T03:54:57.716707Z, emailChangeSentAt: null, newEmail: null, invitedAt: null, actionLink: null, email: aacra0820@gmail.com, phone: , createdAt: 2025-04-10T20:53:23.501392Z, confirmedAt: 2025-04-11T03:48:21.571134Z, emailConfirmedAt: 2025-04-11T03:48:21.571134Z, phoneConfirmedAt: null, lastSignInAt: 2025-05-12T01:36:51.656493872Z, role: authenticated, updatedAt: 2025-05-12T01:36:51.665225Z, identities: [UserIdentity(id: d4250690-9f2b-4770-b813-b12421e5aae6, userId: d4250690-9f2b-4770-b813-b12421e5aae6, identityData: {email: aacra0820@gmail.com, email_verified: false, phone_verified: false, sub: d4250690-9f2b-4770-b813-b12421e5aae6}, identityId: 089495ed-1d2a-4b4d-9b85-f85012ae355e, provider: email, createdAt: 2025-04-10T20:53:23.525002Z, lastSignInAt: 2025-04-10T20:53:23.524929Z, updatedAt: 2025-04-10T20:53:23.525002Z)], factors: null, isAnonymous: false), accessToken: eyJhbGciOiJIUzI1NiIsImtpZCI6IkR1UEdZT3Z6eFhxbklFT3AiLCJ0eXAiOiJKV1QifQ.eyJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTc0NzAxMzgxMX1dLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwiYXVkIjoiYXV0aGVudGljYXRlZCIsImVtYWlsIjoiYWFjcmEwODIwQGdtYWlsLmNvbSIsImV4cCI6MTc0NzAxNzQxMSwiaWF0IjoxNzQ3MDEzODExLCJpc19hbm9ueW1vdXMiOmZhbHNlLCJpc3MiOiJodHRwczovL3lydXZ4dXZ6enRuYWh1dWlxeGl0LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJwaG9uZSI6IiIsInJvbGUiOiJhdXRoZW50aWNhdGVkIiwic2Vzc2lvbl9pZCI6IjkxZjJlM2JlLWJlZWQtNDIyYS05YjdmLTA0NzhlMDUyYzU4ZiIsInN1YiI6ImQ0MjUwNjkwLTlmMmItNDc3MC1iODEzLWIxMjQyMWU1YWFlNiIsInVzZXJfbWV0YWRhdGEiOnsiZW1haWwiOiJhYWNyYTA4MjBAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsInBob25lX3ZlcmlmaWVkIjpmYWxzZSwic3ViIjoiZDQyNTA2OTAtOWYyYi00NzcwLWI4MTMtYjEyNDIxZTVhYWU2In0sInVzZXJfcm9sZSI6ImFkbWluIn0.AnxI0BLZqL7v-39yXPUGkmGcM4Z62vnLwdFk6HTUkqc, refreshToken: Zga4cfu8Ub-NDwdZPlwVoQ)
+Quizzer: [19:36:51] [36m[DEBUG][0m [session_helper.dart] eyJhbGciOiJIUzI1NiIsImtpZCI6IkR1UEdZT3Z6eFhxbklFT3AiLCJ0eXAiOiJKV1QifQ.eyJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTc0NzAxMzgxMX1dLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwiYXVkIjoiYXV0aGVudGljYXRlZCIsImVtYWlsIjoiYWFjcmEwODIwQGdtYWlsLmNvbSIsImV4cCI6MTc0NzAxNzQxMSwiaWF0IjoxNzQ3MDEzODExLCJpc19hbm9ueW1vdXMiOmZhbHNlLCJpc3MiOiJodHRwczovL3lydXZ4dXZ6enRuYWh1dWlxeGl0LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJwaG9uZSI6IiIsInJvbGUiOiJhdXRoZW50aWNhdGVkIiwic2Vzc2lvbl9pZCI6IjkxZjJlM2JlLWJlZWQtNDIyYS05YjdmLTA0NzhlMDUyYzU4ZiIsInN1YiI6ImQ0MjUwNjkwLTlmMmItNDc3MC1iODEzLWIxMjQyMWU1YWFlNiIsInVzZXJfbWV0YWRhdGEiOnsiZW1haWwiOiJhYWNyYTA4MjBAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsInBob25lX3ZlcmlmaWVkIjpmYWxzZSwic3ViIjoiZDQyNTA2OTAtOWYyYi00NzcwLWI4MTMtYjEyNDIxZTVhYWU2In0sInVzZXJfcm9sZSI6ImFkbWluIn0.AnxI0BLZqL7v-39yXPUGkmGcM4Z62vnLwdFk6HTUkqc
+Quizzer: [19:36:51] [36m[DEBUG][0m [session_helper.dart] Decoded JWT Token Payload: {aal: aal1, amr: [{method: password, timestamp: 1747013811}], app_metadata: {provider: email, providers: [email]}, aud: authenticated, email: aacra0820@gmail.com, exp: 1747017411, iat: 1747013811, is_anonymous: false, iss: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, phone: , role: authenticated, session_id: 91f2e3be-beed-422a-9b7f-0478e052c58f, sub: d4250690-9f2b-4770-b813-b12421e5aae6, user_metadata: {email: aacra0820@gmail.com, email_verified: true, phone_verified: false, sub: d4250690-9f2b-4770-b813-b12421e5aae6}, user_role: admin}
+Quizzer: [19:36:51] [36m[DEBUG][0m [session_helper.dart] User role determined from JWT: admin
+Quizzer: [19:36:51] [34m[INFO][0m [user_auth.dart] Handling successful Supabase login for aacra0820@gmail.com
+Quizzer: [19:36:51] [34m[INFO][0m [user_auth.dart] Stored last login (2025-05-12T01:36:51.656493872Z) and token for aacra0820@gmail.com
+Quizzer: [19:36:51] [34m[INFO][0m [user_auth.dart] Ensuring local profile exists for aacra0820@gmail.com
+Quizzer: [19:36:51] [34m[INFO][0m [database_native.dart] Using sqflite FFI factory (Desktop)
+Quizzer: [19:36:51] [34m[INFO][0m [database_native.dart] Desktop SQLite directory ensured: /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/runtime_cache/sqlite
+Quizzer: [19:36:51] [34m[INFO][0m [database_native.dart] Target Database path: /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/runtime_cache/sqlite/quizzer.db
+Quizzer: [19:36:51] [34m[INFO][0m [database_native.dart] Existing database found at /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/runtime_cache/sqlite/quizzer.db. Using it.
+Quizzer: [19:36:51] [34m[INFO][0m [database_native.dart] SUCCESS: Database initialized successfully at: /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/runtime_cache/sqlite/quizzer.db
+Quizzer: [19:36:51] [34m[INFO][0m [user_auth.dart] Is user in list -> true
+Quizzer: [19:36:51] [34m[INFO][0m [user_auth.dart] Is user in list -> true
+Quizzer: [19:36:52] [34m[INFO][0m [session_manager.dart] User role set in SessionManager: admin
+Quizzer: [19:36:52] [34m[INFO][0m [session_isolates.dart] Recorded email to log in. . .: aacra0820@gmail.com
+Quizzer: [19:36:52] [34m[INFO][0m [session_isolates.dart] Database access granted
+Quizzer: [19:36:52] [34m[INFO][0m [session_isolates.dart] SUCCESS: Session initialized with userId: 77647c42-c888-47e3-8296-6fc452815810
+Quizzer: [19:36:52] [34m[INFO][0m [session_manager.dart] Stored initial profile last_modified_timestamp: 2025-05-12T01:29:10.221960Z
+Quizzer: [19:36:52] [34m[INFO][0m [inbound_sync_worker.dart] Starting inbound sync aggregator...
+Quizzer: [19:36:52] [34m[INFO][0m [inbound_sync_worker.dart] Using effective last login timestamp: 2025-05-12T01:29:10.221960Z
+Quizzer: [19:36:52] [34m[INFO][0m [inbound_sync_worker.dart] Syncing inbound question_answer_pairs for user 77647c42-c888-47e3-8296-6fc452815810 since 2025-05-12T01:29:10.221960Z...
+Quizzer: [19:36:52] [34m[INFO][0m [inbound_sync_worker.dart] No new question_answer_pairs to sync.
+Quizzer: [19:36:52] [34m[INFO][0m [inbound_sync_worker.dart] Using effective initial timestamp: 2025-05-12T01:29:10.221960Z
+Quizzer: [19:36:52] [34m[INFO][0m [inbound_sync_worker.dart] Syncing inbound user_question_answer_pairs for user 77647c42-c888-47e3-8296-6fc452815810 since 2025-05-12T01:29:10.221960Z...
+Quizzer: [19:36:52] [34m[INFO][0m [inbound_sync_worker.dart] No new user_question_answer_pairs to sync.
+Quizzer: [19:36:52] [34m[INFO][0m [inbound_sync_worker.dart] Syncing inbound user profile for user 77647c42-c888-47e3-8296-6fc452815810 since 2025-05-12T01:29:10.221960Z...
+Quizzer: [19:36:53] [34m[INFO][0m [inbound_sync_worker.dart] No new user profile to sync.
+Quizzer: [19:36:53] [34m[INFO][0m [inbound_sync_worker.dart] SUCCESS: Inbound sync completed successfully.
+Quizzer: [19:36:55] [34m[INFO][0m [question_selection_worker.dart] PresentationSelectionWorker started.
+Quizzer: [19:36:55] [34m[INFO][0m [question_selection_worker.dart] PSW: Starting initial loop...
+Quizzer: [19:36:55] [34m[INFO][0m [question_queue_cache.dart] QuestionQueueCache: Added record 2025-05-07T22:29:14.752665Z_77647c42-c888-47e3-8296-6fc452815810 to empty queue.
+Quizzer: [19:36:55] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker initialized.
+Quizzer: [19:36:55] [34m[INFO][0m [outbound_sync_worker.dart] Entering OutboundSyncWorker start()...
+Quizzer: [19:36:55] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Subscribing to onOutboundSyncNeeded stream.
+Quizzer: [19:36:55] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Starting sync cycle.
+Quizzer: [19:36:55] [34m[INFO][0m [outbound_sync_worker.dart] Network check successful.
+Quizzer: [19:36:55] [34m[INFO][0m [outbound_sync_worker.dart] Entering OutboundSyncWorker _getDbAccess()...
+Quizzer: [19:36:55] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Database access granted.
+Quizzer: [19:36:55] [34m[INFO][0m [outbound_sync_functions.dart] Starting sync for QuestionAnswerPairs...
+Quizzer: [19:36:55] [34m[INFO][0m [outbound_sync_functions.dart] No unsynced QuestionAnswerPairs found.
+Quizzer: [19:36:55] [34m[INFO][0m [outbound_sync_worker.dart] Entering OutboundSyncWorker _getDbAccess()...
+Quizzer: [19:36:55] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Database access granted.
+Quizzer: [19:36:55] [34m[INFO][0m [outbound_sync_functions.dart] Starting sync for LoginAttempts...
+Quizzer: [19:36:55] [34m[INFO][0m [outbound_sync_functions.dart] Found 1 unsynced LoginAttempts.
+Quizzer: [19:36:55] [36m[DEBUG][0m [outbound_sync_functions.dart] Preparing to push LoginAttempt 2025-05-12T01:36:52.447014Z77647c42-c888-47e3-8296-6fc452815810 to login_attempts
+Quizzer: [19:36:55] [34m[INFO][0m [outbound_sync_functions.dart] SUCCESS: Supabase insert successful for LoginAttempt 2025-05-12T01:36:52.447014Z77647c42-c888-47e3-8296-6fc452815810.
+Quizzer: [19:36:55] [34m[INFO][0m [outbound_sync_functions.dart] Finished sync attempt for LoginAttempts.
+Quizzer: [19:36:55] [34m[INFO][0m [outbound_sync_worker.dart] Entering OutboundSyncWorker _getDbAccess()...
+Quizzer: [19:36:55] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Database access granted.
+Quizzer: [19:36:55] [34m[INFO][0m [outbound_sync_functions.dart] Starting sync for QuestionAnswerAttempts...
+Quizzer: [19:36:55] [34m[INFO][0m [question_answer_attempts_table.dart] Fetching unsynced question answer attempts...
+Quizzer: [19:36:55] [34m[INFO][0m [question_answer_attempts_table.dart] Verifying question_answer_attempts table...
+Quizzer: [19:36:55] [34m[INFO][0m [question_answer_attempts_table.dart] question_answer_attempts table already exists. Checking columns...
+Quizzer: [19:36:55] [34m[INFO][0m [question_answer_attempts_table.dart] Column check complete.
+Quizzer: [19:36:55] [34m[INFO][0m [question_answer_attempts_table.dart] SUCCESS: Fetched 0 unsynced question answer attempts.
+Quizzer: [19:36:55] [34m[INFO][0m [outbound_sync_functions.dart] No unsynced QuestionAnswerAttempts found.
+Quizzer: [19:36:55] [34m[INFO][0m [outbound_sync_worker.dart] Entering OutboundSyncWorker _getDbAccess()...
+Quizzer: [19:36:55] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Database access granted.
+Quizzer: [19:36:55] [34m[INFO][0m [outbound_sync_functions.dart] Starting sync for UserProfiles...
+Quizzer: [19:36:55] [34m[INFO][0m [outbound_sync_functions.dart] Found 1 unsynced UserProfiles for user 77647c42-c888-47e3-8296-6fc452815810.
+Quizzer: [19:36:55] [36m[DEBUG][0m [outbound_sync_functions.dart] Preparing to update UserProfile 77647c42-c888-47e3-8296-6fc452815810 in user_profile
+Quizzer: [19:36:55] [34m[INFO][0m [outbound_sync_functions.dart] Attempting Supabase update for ID 77647c42-c888-47e3-8296-6fc452815810 in table user_profile...
+Quizzer: [19:36:55] [34m[INFO][0m [outbound_sync_functions.dart] SUCCESS: Supabase update presumed successful for ID 77647c42-c888-47e3-8296-6fc452815810 in user_profile.
+Quizzer: [19:36:55] [34m[INFO][0m [outbound_sync_functions.dart] Update successful for UserProfile 77647c42-c888-47e3-8296-6fc452815810. Updating local flags...
+Quizzer: [19:36:56] [34m[INFO][0m [outbound_sync_functions.dart] Finished sync attempt for UserProfiles.
+Quizzer: [19:36:56] [34m[INFO][0m [outbound_sync_worker.dart] Entering OutboundSyncWorker _getDbAccess()...
+Quizzer: [19:36:56] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Database access granted.
+Quizzer: [19:36:56] [34m[INFO][0m [outbound_sync_functions.dart] Starting sync for UserQuestionAnswerPairs...
+Quizzer: [19:36:56] [34m[INFO][0m [outbound_sync_functions.dart] No unsynced UserQuestionAnswerPairs found for user Instance of 'SessionManager'.userId!.
+Quizzer: [19:36:56] [34m[INFO][0m [outbound_sync_worker.dart] Entering OutboundSyncWorker _runLoop()...
+Quizzer: [19:36:56] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Waiting for sync signal...
+Quizzer: [19:36:56] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker started and initial sync performed.
+Quizzer: [19:36:56] [36m[DEBUG][0m [session_manager.dart] SessionManager.requestNextQuestion: Fetched options type: List<dynamic>, value: [{type: text, content: Rousseau}, {type: text, content: Descartes}, {type: text, content: Voltaire}, {type: text, content: Diderot}, {type: text, content: Condorcet}]
+Quizzer: [19:36:56] [34m[INFO][0m [login_page.dart] Login successful for: aacra0820@gmail.com. Navigating home.
+Quizzer: [19:36:56] [36m[DEBUG][0m [home_page.dart] HomePage building question type: multiple_choice with key: [<'2025-05-07T22:29:14.752665Z_77647c42-c888-47e3-8296-6fc452815810'>]
+Quizzer: [12:16:14] [36m[DEBUG][0m Refresh access token
+Quizzer: [12:16:14] [36m[DEBUG][0m Attempt 1 to refresh token
+Quizzer: [12:16:15] [36m[DEBUG][0m Saving session

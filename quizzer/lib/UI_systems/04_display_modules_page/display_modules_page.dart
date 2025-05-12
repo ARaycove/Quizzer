@@ -110,10 +110,13 @@ class _DisplayModulesPageState extends State<DisplayModulesPage> {
                       ),
                     )
                   else
-                    ..._modules.map((module) => ModuleCard(
-                          moduleData: module,
-                          isActivated: _moduleActivationStatus[module['module_name']] ?? false,
-                        )),
+                    ..._modules
+                      .where((module) => (module['total_questions'] ?? 0) > 0)
+                      .map((module) => ModuleCard(
+                            moduleData: module,
+                            isActivated: _moduleActivationStatus[module['module_name']] ?? false,
+                            onModuleUpdated: _loadModules,
+                          )),
                 ],
               ),
             ),

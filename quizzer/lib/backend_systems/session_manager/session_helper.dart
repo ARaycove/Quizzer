@@ -4,7 +4,9 @@ import 'package:quizzer/backend_systems/08_memory_retention_algo/memory_retentio
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_attempts_table.dart' as attempt_table;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart'; 
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart'; // Import DatabaseMonitor
-// import 'package:quizzer/backend_systems/logger/quizzer_logging.dart'; // Logger removed
+import 'package:quizzer/backend_systems/logger/quizzer_logging.dart'; // Logger needed for debugging
+import 'package:supabase/supabase.dart'; // For supabase.Session type
+import 'package:jwt_decode/jwt_decode.dart'; // For decoding JWT
 
 // ==========================================
 // Helper Function for Recording Answer Attempt
@@ -190,6 +192,39 @@ Map<String, dynamic> updateUserQuestionRecordOnAnswer({
 
   return updatedRecord;
 }
+
+// --- Helper to Determine User Role from Supabase Session Object ---
+/// Extracts the 'user_role' claim from the Supabase session object by decoding the JWT.
+///
+/// Returns 'public_user_unverified' if the session or access token is null/empty,
+/// or if the role claim is null/empty after successful JWT decoding.
+/// Throws an error if JWT decoding itself fails.
+String determineUserRoleFromSupabaseSession(Session? supabaseSession) {
+  if (supabaseSession == null || supabaseSession.accessToken.isEmpty) {
+    QuizzerLogger.logWarning('Supabase session or access token is null/empty, defaulting role to "public_user_unverified".');
+    return 'public_user_unverified'; 
+  }
+
+  // Directly attempt to decode. Errors during parsing will propagate.
+  Map<String, dynamic> decodedToken = Jwt.parseJwt(supabaseSession.accessToken);
+  
+  // --- LOG THE ENTIRE DECODED TOKEN FOR DEBUGGING ---
+  QuizzerLogger.logValue("$supabaseSession");
+  QuizzerLogger.logValue("${supabaseSession.accessToken}");
+  QuizzerLogger.logValue('Decoded JWT Token Payload: $decodedToken');
+  // --------------------------------------------------
+
+  // The key 'user_role' must match exactly what your Supabase trigger function sets in the claims.
+  final role = decodedToken['user_role'] as String?;
+
+  if (role == null || role.isEmpty) {
+    QuizzerLogger.logWarning('\'user_role\' claim not found or empty in decoded JWT, defaulting to "public_user_unverified".');
+    return 'public_user_unverified'; // Default if claim is null or empty string
+  }
+  QuizzerLogger.logValue('User role determined from JWT: $role');
+  return role;
+}
+// ----------------------------------------------------------------
 
 /// Builds placeholder records for display when the question queue is empty.
 Map<String, Map<String, dynamic>> buildDummyNoQuestionsRecord() {

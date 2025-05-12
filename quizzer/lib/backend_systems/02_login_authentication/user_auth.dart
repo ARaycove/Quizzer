@@ -6,6 +6,7 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile_
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
 import 'dart:async';
 import 'package:sqflite/sqflite.dart';
+import 'package:quizzer/backend_systems/session_manager/session_helper.dart';
 
 // --- Private Helper Functions ---
 
@@ -70,28 +71,33 @@ Future<void> _handleSuccessfulSupabaseLogin(String email, Box storage, Map<Strin
 Future<Map<String, dynamic>> _attemptSupabaseLogin(String email, String password, SupabaseClient supabase) async {
   QuizzerLogger.logMessage('Attempting Supabase authentication for $email');
   try {
-    QuizzerLogger.logMessage('Attempting Supabase authentication'); // Keep log here
+    QuizzerLogger.logMessage('Attempting Supabase authentication');
     final response = await supabase.auth.signInWithPassword(
       email: email,
       password: password,
     );
     // Success Case
     QuizzerLogger.logSuccess('Supabase authentication successful for $email');
+    
+    // --- EXTRACT USER ROLE ---
+    final String userRole = determineUserRoleFromSupabaseSession(response.session);
+    // --- END EXTRACT USER ROLE ---
+
     return {
         'success': true,
         'message': 'Login successful',
-        'user': response.user!.toJson(), // Assert non-null user on success
-        'session': response.session?.toJson(), // Session can be null
+        'user': response.user!.toJson(), 
+        'session': response.session?.toJson(), 
+        'user_role': userRole,
     };
   } on AuthException catch (e) {
-    // Known Supabase Auth Failure Case
     QuizzerLogger.logWarning('Supabase authentication failed: ${e.message}');
     return {
       'success': false,
-      'message': e.message
+      'message': e.message,
+      'user_role': 'public_user_unverified', // Default on failure
     };
   }
-  // Note: Other exceptions (network errors, etc.) are not caught here and will propagate (Fail Fast).
 }
 
 /// Ensures a local user profile exists for the given email after successful Supabase auth.

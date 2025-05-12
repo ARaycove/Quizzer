@@ -57,11 +57,11 @@ class _BulkAddButtonState extends State<BulkAddButton> {
 
     if (path == null) {
        QuizzerLogger.logError('Bulk Add: File path is null. This method currently only supports non-web platforms.');
-       ScaffoldMessenger.of(context).showSnackBar(
+        ScaffoldMessenger.of(context).showSnackBar(
          SnackBar(content: Text('Error: File path not available (Web platform not fully supported by this method yet).'), backgroundColor: ColorWheel.buttonError),
-       );
-       setState(() => _isLoading = false);
-       return;
+        );
+        setState(() => _isLoading = false);
+        return;
     }
 
     // 2. Read File Content (non-web only for now)
@@ -229,10 +229,10 @@ class _BulkAddButtonState extends State<BulkAddButton> {
   }
 
    Map<String, dynamic> _validateMultipleChoice(Map<String, dynamic> questionMap) {
-    final List<dynamic>? optionsRaw = questionMap['options'] as List?;
-    final dynamic correctIndexRaw = questionMap['correctOptionIndex'];
+        final List<dynamic>? optionsRaw = questionMap['options'] as List?;
+        final dynamic correctIndexRaw = questionMap['correctOptionIndex'];
 
-    if (optionsRaw == null || optionsRaw.isEmpty) {
+        if (optionsRaw == null || optionsRaw.isEmpty) {
       return {'error': 'Missing or empty "options" list'};
     }
      // Ensure options are converted correctly
@@ -241,16 +241,16 @@ class _BulkAddButtonState extends State<BulkAddButton> {
         return {'type': 'text', 'content': o.toString()};
     }).toList();
 
-    if (correctIndexRaw == null) {
+        if (correctIndexRaw == null) {
       return {'error': 'Missing "correctOptionIndex"'};
-    }
+        }
     int? correctOptionIndex;
-    if (correctIndexRaw is int) {
-      correctOptionIndex = correctIndexRaw;
-    } else if (correctIndexRaw is String) {
-      correctOptionIndex = int.tryParse(correctIndexRaw);
-    }
-    if (correctOptionIndex == null || correctOptionIndex < 0 || correctOptionIndex >= options.length) {
+        if (correctIndexRaw is int) {
+          correctOptionIndex = correctIndexRaw;
+        } else if (correctIndexRaw is String) {
+          correctOptionIndex = int.tryParse(correctIndexRaw);
+        }
+        if (correctOptionIndex == null || correctOptionIndex < 0 || correctOptionIndex >= options.length) {
       return {'error': 'Invalid "correctOptionIndex" (value: $correctIndexRaw, options count: ${options.length})'};
     }
     return {'options': options, 'correctOptionIndex': correctOptionIndex};
@@ -328,7 +328,7 @@ class _BulkAddButtonState extends State<BulkAddButton> {
       }
 
       return {'options': options}; // Return the formatted options
-   }
+  }
 
   // --- 
   // Build Method

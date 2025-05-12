@@ -372,3 +372,55 @@ Future<void> updateUserQuestionAnswerPairSyncFlags({
     QuizzerLogger.logSuccess('Successfully updated flags for UserQuestionAnswerPair (User: $userUuid, QID: $questionId).');
   }
 }
+
+/// Inserts a new user question answer pair or updates an existing one.
+/// Uses the composite primary key (user_uuid, question_id) to determine if record exists.
+Future<int> insertOrUpdateUserQuestionAnswerPair({
+  required String userUuid,
+  required String questionId,
+  required int revisionStreak,
+  required String? lastRevised,
+  required String predictedRevisionDueHistory,
+  required String nextRevisionDue,
+  required double timeBetweenRevisions,
+  required double averageTimesShownPerDay,
+  required Database db,
+}) async {
+  await verifyUserQuestionAnswerPairTable(db);
+
+  // First try to get existing record
+  final List<Map<String, dynamic>> existing = await queryAndDecodeDatabase(
+    'user_question_answer_pairs',
+    db,
+    where: 'user_uuid = ? AND question_id = ?',
+    whereArgs: [userUuid, questionId],
+  );
+
+  if (existing.isEmpty) {
+    // No existing record, use add
+    return await addUserQuestionAnswerPair(
+      userUuid: userUuid,
+      questionAnswerReference: questionId,
+      revisionStreak: revisionStreak,
+      lastRevised: lastRevised,
+      predictedRevisionDueHistory: predictedRevisionDueHistory,
+      nextRevisionDue: nextRevisionDue,
+      timeBetweenRevisions: timeBetweenRevisions,
+      averageTimesShownPerDay: averageTimesShownPerDay,
+      db: db,
+    );
+  } else {
+    // Record exists, use edit
+    return await editUserQuestionAnswerPair(
+      userUuid: userUuid,
+      questionId: questionId,
+      revisionStreak: revisionStreak,
+      lastRevised: lastRevised,
+      predictedRevisionDueHistory: predictedRevisionDueHistory,
+      nextRevisionDue: nextRevisionDue,
+      timeBetweenRevisions: timeBetweenRevisions,
+      averageTimesShownPerDay: averageTimesShownPerDay,
+      db: db,
+    );
+  }
+}

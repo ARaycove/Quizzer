@@ -19,6 +19,9 @@ class ColorWheel {
   static const Color buttonError = Color.fromRGBO(214, 71, 71, 1.0);   // Red
   static const Color warning = Color(0xFFFFCDD2); // Light Red (Using Material's red[100])
 
+  static const Color previewDefaultBackground = Color(0xFF232B36); // Dark gray/blue
+  static const Color previewAlternateBackground = Color(0xFF1B3A4B); // Dark cyan/blue
+
   // --- Typography ---
   static const TextStyle defaultText = TextStyle(
     color: primaryText,

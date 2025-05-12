@@ -5,12 +5,12 @@ import 'package:sqflite/sqflite.dart';
 import 'package:supabase/supabase.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pairs_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_question_answer_pairs_table.dart';
 
 /// Syncs question_answer_pairs from the cloud that are newer than last_login
 Future<void> syncQuestionAnswerPairsInbound(
   String userId,
   String lastLogin,
-  Database db,
   SupabaseClient supabaseClient,
 ) async {
   QuizzerLogger.logMessage('Syncing inbound question_answer_pairs for user $userId since $lastLogin...');
@@ -25,11 +25,126 @@ Future<void> syncQuestionAnswerPairsInbound(
   }
 
   QuizzerLogger.logMessage('Found ${cloudRecords.length} new/updated question_answer_pairs to sync.');
+  final DatabaseMonitor monitor = getDatabaseMonitor();
+  Database? db = await monitor.requestDatabaseAccess();
   for (final record in cloudRecords) {
     // Insert or update each record
-    await insertOrUpdateQuestionAnswerPair(record, db);
+    await insertOrUpdateQuestionAnswerPair(record, db!);
   }
+  monitor.releaseDatabaseAccess();
   QuizzerLogger.logSuccess('Synced ${cloudRecords.length} question_answer_pairs from cloud.');
+}
+
+/// Syncs user_question_answer_pairs from the cloud that are newer than the initial profile timestamp
+Future<void> syncUserQuestionAnswerPairsInbound(
+  String userId,
+  String? initialTimestamp,
+  SupabaseClient supabaseClient,
+) async {
+  QuizzerLogger.logMessage('Syncing inbound user_question_answer_pairs for user $userId since $initialTimestamp...');
+  
+  // If no initial timestamp, fetch all records for this user
+  final List<dynamic> cloudRecords = await supabaseClient
+      .from('user_question_answer_pairs')
+      .select('*')
+      .eq('user_uuid', userId)
+      .gt('last_modified_timestamp', initialTimestamp ?? '');
+
+  if (cloudRecords.isEmpty) {
+    QuizzerLogger.logMessage('No new user_question_answer_pairs to sync.');
+    return;
+  }
+
+  QuizzerLogger.logMessage('Found ${cloudRecords.length} new/updated user_question_answer_pairs to sync.');
+  final DatabaseMonitor monitor = getDatabaseMonitor();
+  Database? db = await monitor.requestDatabaseAccess();
+  for (final record in cloudRecords) {
+    // Insert or update each record, explicitly converting numeric values to doubles
+    await insertOrUpdateUserQuestionAnswerPair(
+      userUuid: userId,
+      questionId: record['question_id'],
+      revisionStreak: record['revision_streak'],
+      lastRevised: record['last_revised'],
+      predictedRevisionDueHistory: record['predicted_revision_due_history'],
+      nextRevisionDue: record['next_revision_due'],
+      timeBetweenRevisions: (record['time_between_revisions'] as num).toDouble(),
+      averageTimesShownPerDay: (record['average_times_shown_per_day'] as num).toDouble(),
+      db: db!,
+    );
+  }
+  monitor.releaseDatabaseAccess();
+  QuizzerLogger.logSuccess('Synced ${cloudRecords.length} user_question_answer_pairs from cloud.');
+}
+
+/// Syncs user profile from the cloud that is newer than the initial profile timestamp
+Future<void> syncUserProfileInbound(
+  String userId,
+  String? initialTimestamp,
+  SupabaseClient supabaseClient,
+) async {
+  QuizzerLogger.logMessage('Syncing inbound user profile for user $userId since $initialTimestamp...');
+  
+  // If no initial timestamp, fetch the profile
+  final List<dynamic> cloudRecords = await supabaseClient
+      .from('user_profile')
+      .select('*')
+      .eq('uuid', userId)
+      .gt('last_modified_timestamp', initialTimestamp ?? '');
+
+  if (cloudRecords.isEmpty) {
+    QuizzerLogger.logMessage('No new user profile to sync.');
+    return;
+  }
+
+  QuizzerLogger.logMessage('Found updated user profile to sync.');
+  final record = cloudRecords.first; // Should only be one record per user
+
+  final DatabaseMonitor monitor = getDatabaseMonitor();
+  Database? db = await monitor.requestDatabaseAccess();
+  // Update the local profile (no encoding)
+  await db!.update(
+    'user_profile',
+    {
+      'email': record['email'],
+      'username': record['username'],
+      'role': record['role'],
+      'account_status': record['account_status'],
+      'profile_picture': record['profile_picture'],
+      'birth_date': record['birth_date'],
+      'address': record['address'],
+      'job_title': record['job_title'],
+      'education_level': record['education_level'],
+      'specialization': record['specialization'],
+      'teaching_experience': record['teaching_experience'],
+      'primary_language': record['primary_language'],
+      'secondary_languages': record['secondary_languages'],
+      'study_schedule': record['study_schedule'],
+      'social_links': record['social_links'],
+      'achievement_sharing': record['achievement_sharing'],
+      'interest_data': record['interest_data'],
+      'settings': record['settings'],
+      'notification_preferences': record['notification_preferences'],
+      'learning_streak': record['learning_streak'],
+      'total_study_time': record['total_study_time'],
+      'total_questions_answered': record['total_questions_answered'],
+      'average_session_length': record['average_session_length'],
+      'peak_cognitive_hours': record['peak_cognitive_hours'],
+      'health_data': record['health_data'],
+      'recall_accuracy_trends': record['recall_accuracy_trends'],
+      'content_portfolio': record['content_portfolio'],
+      'activation_status_of_modules': record['activation_status_of_modules'],
+      'completion_status_of_modules': record['completion_status_of_modules'],
+      'tutorial_progress': record['tutorial_progress'],
+      'has_been_synced': 1,
+      'edits_are_synced': 1,
+      'last_modified_timestamp': record['last_modified_timestamp'],
+    },
+    where: 'uuid = ?',
+    whereArgs: [userId],
+  );
+  monitor.releaseDatabaseAccess();
+
+  QuizzerLogger.logSuccess('Synced user profile from cloud.');
 }
 
 Future<void> runInboundSync(SessionManager sessionManager) async {
@@ -37,19 +152,38 @@ Future<void> runInboundSync(SessionManager sessionManager) async {
   final String? userId = sessionManager.userId;
 
   final DatabaseMonitor monitor = getDatabaseMonitor();
-  final Database db = (await monitor.requestDatabaseAccess()) as Database;
+  Database? db = await monitor.requestDatabaseAccess();
 
   // Get last_login timestamp using the imported helper
   // lastLogin is used in the query, inbound sync will fetch all records newer than the last time this device logged in.
-  final String? lastLogin = await getLastLoginForUser(userId!, db);
-  if (lastLogin == null) throw StateError('No last_login timestamp found for user.');
+  final String? lastLogin = await getLastLoginForUser(userId!, db!);
+  monitor.releaseDatabaseAccess();
+  db = null;
+  // If lastLogin is null, set it to 20 years ago to ensure we get all records
+  final String effectiveLastLogin = lastLogin ?? DateTime.now().subtract(const Duration(days: 365 * 20)).toUtc().toIso8601String();
+  QuizzerLogger.logMessage('Using effective last login timestamp: $effectiveLastLogin');
 
   // Sync question_answer_pairs
-  await syncQuestionAnswerPairsInbound(userId, lastLogin, db, sessionManager.supabase);
+  await syncQuestionAnswerPairsInbound(userId, effectiveLastLogin, sessionManager.supabase);
 
-  
-  // TODO: Add calls to sync other tables (e.g., user_question_answer_pairs)
+  // Get initial profile timestamp, if null set to 20 years ago
+  final String? initialTimestamp = sessionManager.initialProfileLastModified;
+  final String effectiveInitialTimestamp = initialTimestamp ?? DateTime.now().subtract(const Duration(days: 365 * 20)).toUtc().toIso8601String();
+  QuizzerLogger.logMessage('Using effective initial timestamp: $effectiveInitialTimestamp');
+
+  // Sync user_question_answer_pairs using the initial profile last_modified_timestamp
+  await syncUserQuestionAnswerPairsInbound(
+    userId,
+    effectiveInitialTimestamp,
+    sessionManager.supabase,
+  );
+
+  // Sync user profile using the initial profile last_modified_timestamp
+  await syncUserProfileInbound(
+    userId,
+    effectiveInitialTimestamp,
+    sessionManager.supabase,
+  );
 
   QuizzerLogger.logSuccess('Inbound sync completed successfully.');
-  monitor.releaseDatabaseAccess();
 }

@@ -70,10 +70,11 @@ Future<bool> createNewUserProfile(String email, String username, Database db) as
     'role': 'base_user',
     'account_status': 'active',
     'account_creation_date': creationTimestamp,
+    'last_login': null,
     // Initialize sync fields
     'has_been_synced': 0,
-    'edits_are_synced': 0, // Edits are synced by definition on creation (or rather, no edits yet)
-    'last_modified_timestamp': creationTimestamp, 
+    'edits_are_synced': 0,
+    'last_modified_timestamp': null, 
   });
   
   QuizzerLogger.logSuccess('New user profile created successfully: $userUUID');
@@ -606,6 +607,18 @@ Future<String?> getLastLoginForUser(String userId, Database db) async {
   );
   if (result.isEmpty) return null;
   return result.first['last_login'] as String?;
+}
+
+/// Gets just the last_modified_timestamp for a user by userId. Returns null if not found.
+Future<String?> getLastModifiedTimestampForUser(String userId, Database db) async {
+  final List<Map<String, dynamic>> result = await db.query(
+    'user_profile',
+    columns: ['last_modified_timestamp'],
+    where: 'uuid = ?',
+    whereArgs: [userId],
+  );
+  if (result.isEmpty) return null;
+  return result.first['last_modified_timestamp'] as String?;
 }
 
 // TODO: FIXME Add in functionality for loginThreshold preference
