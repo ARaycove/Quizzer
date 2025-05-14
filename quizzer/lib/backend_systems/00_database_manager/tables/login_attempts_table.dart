@@ -1,9 +1,9 @@
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_profile_table.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'dart:convert';
 import 'dart:io';
-import '00_table_helper.dart'; // Import the helper file
+import 'table_helper.dart'; // Import the helper file
 import 'package:quizzer/backend_systems/12_switch_board/switch_board.dart'; // Import SwitchBoard
 
 Future<String> getDeviceInfo() async {

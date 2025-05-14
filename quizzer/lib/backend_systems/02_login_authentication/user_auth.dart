@@ -2,7 +2,7 @@ import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/02_login_authentication/login_attempts_record.dart';
 import 'package:supabase/supabase.dart';
 import 'package:hive/hive.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile_table.dart' as user_profile;
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_profile_table.dart' as user_profile;
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
 import 'dart:async';
 import 'package:sqflite/sqflite.dart';

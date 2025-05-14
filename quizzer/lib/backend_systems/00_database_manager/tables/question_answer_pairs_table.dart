@@ -1,7 +1,7 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'dart:convert';
-import '00_table_helper.dart'; // Import the new helper file
+import 'table_helper.dart'; // Import the new helper file
 import 'package:quizzer/backend_systems/12_switch_board/switch_board.dart'; // Import SwitchBoard
 
 // Get SwitchBoard instance for signaling
@@ -261,26 +261,21 @@ Future<List<Map<String, dynamic>>>  getQuestionAnswerPairsBySubjectAndConcept(St
   );
 }
 
-Future<Map<String, dynamic>?>       getRandomQuestionAnswerPair(Database db) async {
+Future<Map<String, dynamic>?> getRandomQuestionAnswerPair(Database db) async {
   // First verify that the table exists
   await verifyQuestionAnswerPairTable(db);
 
-  // Cannot use standard queryDecodedList due to ORDER BY RANDOM()
-  final List<Map<String, dynamic>> maps = await db.rawQuery(
-    'SELECT * FROM question_answer_pairs ORDER BY RANDOM() LIMIT 1'
+  final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
+    'question_answer_pairs', // tableName is still useful for context/logging if helper uses it
+    db,
+    customQuery: 'SELECT * FROM question_answer_pairs ORDER BY RANDOM() LIMIT 1',
+    // whereArgs are not needed for this specific custom query
   );
   
-  if (maps.isEmpty) {
+  if (results.isEmpty) {
     return null;
   }
-
-  // Manually decode the single result from rawQuery
-  final Map<String, dynamic> rawResult = maps.first;
-  final Map<String, dynamic> decodedResult = {};
-  for (final entry in rawResult.entries) {
-    decodedResult[entry.key] = decodeValueFromDB(entry.value);
-  }
-  return decodedResult;
+  return results.first; // queryAndDecodeDatabase now handles the decoding
 }
 
 Future<List<Map<String, dynamic>>>  getAllQuestionAnswerPairs(Database db) async {

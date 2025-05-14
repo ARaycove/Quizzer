@@ -12,7 +12,7 @@ import 'package:quizzer/backend_systems/09_data_caches/circulating_questions_cac
 // Table Access
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_question_answer_pairs_table.dart' as uq_pairs_table;
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pairs_table.dart' as q_pairs_table;
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile_table.dart' as user_profile_table;
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_profile_table.dart' as user_profile_table;
 // Workers
 import 'package:quizzer/backend_systems/06_question_queue_server/question_selection_worker.dart';
 import '../12_switch_board/switch_board.dart'; // Import SwitchBoard

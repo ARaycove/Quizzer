@@ -8,7 +8,7 @@ import 'package:quizzer/backend_systems/09_data_caches/temp_question_details.dar
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 // Table Imports
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile_table.dart' as user_profile_table;
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_profile_table.dart' as user_profile_table;
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pairs_table.dart' as q_pairs_table;
 
 // ==========================================

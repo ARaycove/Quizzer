@@ -1,973 +1,231 @@
-Quizzer: [13:47:07] [34m[INFO][0m [login_page.dart] Login attempt for: aacra0820@gmail.com
-Quizzer: [13:47:07] [34m[INFO][0m [session_manager.dart] Logging in user with email: aacra0820@gmail.com
-Quizzer: [13:47:07] [34m[INFO][0m [user_auth.dart] User authentication requested for aacra0820@gmail.com
-Quizzer: [13:47:07] [34m[INFO][0m [user_auth.dart] Attempting Supabase authentication for aacra0820@gmail.com
-Quizzer: [13:47:07] [34m[INFO][0m [user_auth.dart] Attempting Supabase authentication
-Quizzer: [13:47:08] [36m[DEBUG][0m Saving session
-Quizzer: [13:47:08] [34m[INFO][0m [user_auth.dart] SUCCESS: Supabase authentication successful for aacra0820@gmail.com
-Quizzer: [13:47:08] [36m[DEBUG][0m [session_helper.dart] Access Token: [REDACTED]
-Quizzer: [13:47:08] [36m[DEBUG][0m [session_helper.dart] Decoded JWT Token Payload (Redacted): {aal: aal1, amr: [{method: password, timestamp: 1747079228}], app_metadata: {provider: email, providers: [email]}, aud: authenticated, email: [REDACTED], exp: 1747082828, iat: 1747079228, is_anonymous: false, iss: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, phone: , role: authenticated, session_id: [REDACTED], sub: [REDACTED], user_metadata: [REDACTED], user_role: admin}
-Quizzer: [13:47:08] [36m[DEBUG][0m [session_helper.dart] User role determined from JWT: admin
-Quizzer: [13:47:08] [34m[INFO][0m [user_auth.dart] Handling successful Supabase login for aacra0820@gmail.com
-Quizzer: [13:47:08] [34m[INFO][0m [user_auth.dart] Stored last login (2025-05-12T19:47:08.428883078Z) and token for aacra0820@gmail.com
-Quizzer: [13:47:08] [34m[INFO][0m [user_auth.dart] Ensuring local profile exists for aacra0820@gmail.com
-Quizzer: [13:47:08] [34m[INFO][0m [database_native.dart] Using sqflite FFI factory (Desktop)
-Quizzer: [13:47:08] [34m[INFO][0m [database_native.dart] Desktop SQLite directory ensured: /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/runtime_cache/sqlite
-Quizzer: [13:47:08] [34m[INFO][0m [database_native.dart] Target Database path: /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/runtime_cache/sqlite/quizzer.db
-Quizzer: [13:47:08] [34m[INFO][0m [database_native.dart] Existing database found at /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/runtime_cache/sqlite/quizzer.db. Using it.
-Quizzer: [13:47:08] [34m[INFO][0m [database_native.dart] SUCCESS: Database initialized successfully at: /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/runtime_cache/sqlite/quizzer.db
-Quizzer: [13:47:08] [34m[INFO][0m [user_auth.dart] Is user in list -> true
-Quizzer: [13:47:08] [34m[INFO][0m [user_auth.dart] Is user in list -> true
-Quizzer: [13:47:09] [34m[INFO][0m [session_isolates.dart] Recorded email to log in. . .: aacra0820@gmail.com
-Quizzer: [13:47:09] [34m[INFO][0m [session_isolates.dart] Database access granted
-Quizzer: [13:47:09] [34m[INFO][0m [session_isolates.dart] SUCCESS: Session initialized with userId: 77647c42-c888-47e3-8296-6fc452815810
-Quizzer: [13:47:09] [34m[INFO][0m [session_manager.dart] Stored initial profile last_modified_timestamp: 2025-05-12T19:22:36.266052Z
-Quizzer: [13:47:09] [34m[INFO][0m [inbound_sync_worker.dart] Starting inbound sync aggregator...
-Quizzer: [13:47:09] [34m[INFO][0m [inbound_sync_worker.dart] Using effective last login timestamp: 2025-05-12T19:22:36.266052Z
-Quizzer: [13:47:09] [34m[INFO][0m [inbound_sync_worker.dart] Syncing inbound question_answer_pairs for user 77647c42-c888-47e3-8296-6fc452815810 since 2025-05-12T19:22:36.266052Z...
-Quizzer: [13:47:10] [34m[INFO][0m [inbound_sync_worker.dart] No new question_answer_pairs to sync.
-Quizzer: [13:47:10] [34m[INFO][0m [inbound_sync_worker.dart] Using effective initial timestamp: 2025-05-12T19:22:36.266052Z
-Quizzer: [13:47:10] [34m[INFO][0m [inbound_sync_worker.dart] Syncing inbound user_question_answer_pairs for user 77647c42-c888-47e3-8296-6fc452815810 since 2025-05-12T19:22:36.266052Z...
-Quizzer: [13:47:10] [34m[INFO][0m [inbound_sync_worker.dart] No new user_question_answer_pairs to sync.
-Quizzer: [13:47:10] [34m[INFO][0m [inbound_sync_worker.dart] Syncing inbound user profile for user 77647c42-c888-47e3-8296-6fc452815810 since 2025-05-12T19:22:36.266052Z...
-Quizzer: [13:47:10] [34m[INFO][0m [inbound_sync_worker.dart] No new user profile to sync.
-Quizzer: [13:47:10] [34m[INFO][0m [inbound_sync_worker.dart] SUCCESS: Inbound sync completed successfully.
-Quizzer: [13:47:13] [34m[INFO][0m [question_selection_worker.dart] PresentationSelectionWorker started.
-Quizzer: [13:47:13] [34m[INFO][0m [question_selection_worker.dart] PSW: Starting initial loop...
-Quizzer: [13:47:13] [34m[INFO][0m [question_queue_cache.dart] QuestionQueueCache: Added record 2025-05-08T00:17:03.640403Z_77647c42-c888-47e3-8296-6fc452815810 to empty queue.
-Quizzer: [13:47:13] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker initialized.
-Quizzer: [13:47:13] [34m[INFO][0m [outbound_sync_worker.dart] Entering OutboundSyncWorker start()...
-Quizzer: [13:47:13] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Subscribing to onOutboundSyncNeeded stream.
-Quizzer: [13:47:13] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Starting sync cycle.
-Quizzer: [13:47:13] [34m[INFO][0m [outbound_sync_worker.dart] Network check successful.
-Quizzer: [13:47:13] [34m[INFO][0m [outbound_sync_worker.dart] Entering OutboundSyncWorker _getDbAccess()...
-Quizzer: [13:47:13] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Database access granted.
-Quizzer: [13:47:13] [34m[INFO][0m [outbound_sync_functions.dart] Starting sync for QuestionAnswerPairs...
-Quizzer: [13:47:13] [34m[INFO][0m [outbound_sync_functions.dart] No unsynced QuestionAnswerPairs found.
-Quizzer: [13:47:13] [34m[INFO][0m [outbound_sync_worker.dart] Entering OutboundSyncWorker _getDbAccess()...
-Quizzer: [13:47:13] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Database access granted.
-Quizzer: [13:47:13] [34m[INFO][0m [outbound_sync_functions.dart] Starting sync for LoginAttempts...
-Quizzer: [13:47:13] [34m[INFO][0m [outbound_sync_functions.dart] Found 1 unsynced LoginAttempts.
-Quizzer: [13:47:13] [36m[DEBUG][0m [outbound_sync_functions.dart] Preparing to push LoginAttempt 2025-05-12T19:47:09.581044Z77647c42-c888-47e3-8296-6fc452815810 to login_attempts
-Quizzer: [13:47:14] [34m[INFO][0m [outbound_sync_functions.dart] SUCCESS: Supabase insert successful for LoginAttempt 2025-05-12T19:47:09.581044Z77647c42-c888-47e3-8296-6fc452815810.
-Quizzer: [13:47:14] [34m[INFO][0m [outbound_sync_functions.dart] Finished sync attempt for LoginAttempts.
-Quizzer: [13:47:14] [34m[INFO][0m [outbound_sync_worker.dart] Entering OutboundSyncWorker _getDbAccess()...
-Quizzer: [13:47:14] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Database access granted.
-Quizzer: [13:47:14] [34m[INFO][0m [outbound_sync_functions.dart] Starting sync for QuestionAnswerAttempts...
-Quizzer: [13:47:14] [34m[INFO][0m [question_answer_attempts_table.dart] Fetching unsynced question answer attempts...
-Quizzer: [13:47:14] [34m[INFO][0m [question_answer_attempts_table.dart] Verifying question_answer_attempts table...
-Quizzer: [13:47:14] [34m[INFO][0m [question_answer_attempts_table.dart] question_answer_attempts table already exists. Checking columns...
-Quizzer: [13:47:14] [34m[INFO][0m [question_answer_attempts_table.dart] Column check complete.
-Quizzer: [13:47:14] [34m[INFO][0m [question_answer_attempts_table.dart] SUCCESS: Fetched 0 unsynced question answer attempts.
-Quizzer: [13:47:14] [34m[INFO][0m [outbound_sync_functions.dart] No unsynced QuestionAnswerAttempts found.
-Quizzer: [13:47:14] [34m[INFO][0m [outbound_sync_worker.dart] Entering OutboundSyncWorker _getDbAccess()...
-Quizzer: [13:47:14] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Database access granted.
-Quizzer: [13:47:14] [34m[INFO][0m [outbound_sync_functions.dart] Starting sync for UserProfiles...
-Quizzer: [13:47:14] [34m[INFO][0m [outbound_sync_functions.dart] Found 1 unsynced UserProfiles for user 77647c42-c888-47e3-8296-6fc452815810.
-Quizzer: [13:47:14] [36m[DEBUG][0m [outbound_sync_functions.dart] Preparing to update UserProfile 77647c42-c888-47e3-8296-6fc452815810 in user_profile
-Quizzer: [13:47:14] [34m[INFO][0m [outbound_sync_functions.dart] Attempting Supabase update for ID 77647c42-c888-47e3-8296-6fc452815810 in table user_profile...
-Quizzer: [13:47:14] [34m[INFO][0m [outbound_sync_functions.dart] SUCCESS: Supabase update presumed successful for ID 77647c42-c888-47e3-8296-6fc452815810 in user_profile.
-Quizzer: [13:47:14] [34m[INFO][0m [outbound_sync_functions.dart] Update successful for UserProfile 77647c42-c888-47e3-8296-6fc452815810. Updating local flags...
-Quizzer: [13:47:14] [34m[INFO][0m [outbound_sync_functions.dart] Finished sync attempt for UserProfiles.
-Quizzer: [13:47:14] [34m[INFO][0m [outbound_sync_worker.dart] Entering OutboundSyncWorker _getDbAccess()...
-Quizzer: [13:47:14] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Database access granted.
-Quizzer: [13:47:14] [34m[INFO][0m [outbound_sync_functions.dart] Starting sync for UserQuestionAnswerPairs...
-Quizzer: [13:47:14] [34m[INFO][0m [outbound_sync_functions.dart] No unsynced UserQuestionAnswerPairs found for user Instance of 'SessionManager'.userId!.
-Quizzer: [13:47:14] [34m[INFO][0m [outbound_sync_worker.dart] Entering OutboundSyncWorker _runLoop()...
-Quizzer: [13:47:14] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Waiting for sync signal...
-Quizzer: [13:47:14] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker started and initial sync performed.
-Quizzer: [13:47:14] [36m[DEBUG][0m [session_manager.dart] SessionManager.requestNextQuestion: Fetched options type: List<dynamic>, value: [{type: text, content: members of the anti-Nazi French resistance}, {type: text, content: members of the English Parliament opposed to James I}, {type: text, content: French writers and intellectuals who promoted political reforms}, {type: text, content: influential French university professors}, {type: text, content: Huguenots exiled in England}]
-Quizzer: [13:47:14] [34m[INFO][0m [login_page.dart] Login successful for: aacra0820@gmail.com. Navigating home.
-Quizzer: [13:47:14] [36m[DEBUG][0m [home_page.dart] HomePage building question type: multiple_choice with key: [<'2025-05-08T00:17:03.640403Z_77647c42-c888-47e3-8296-6fc452815810'>] (using session data)
-Quizzer: [13:47:16] [36m[DEBUG][0m [session_helper.dart] Access Token: [REDACTED]
-Quizzer: [13:47:16] [36m[DEBUG][0m [session_helper.dart] Decoded JWT Token Payload (Redacted): {aal: aal1, amr: [{method: password, timestamp: 1747079228}], app_metadata: {provider: email, providers: [email]}, aud: authenticated, email: [REDACTED], exp: 1747082828, iat: 1747079228, is_anonymous: false, iss: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, phone: , role: authenticated, session_id: [REDACTED], sub: [REDACTED], user_metadata: [REDACTED], user_role: admin}
-Quizzer: [13:47:16] [36m[DEBUG][0m [session_helper.dart] User role determined from JWT: admin
-Quizzer: [13:47:16] [36m[DEBUG][0m [menu_page.dart] Building MenuPage for user role: admin
-Quizzer: [13:47:17] [34m[INFO][0m [menu_page.dart] Admin Panel button pressed by admin
-Quizzer: [13:47:19] [36m[DEBUG][0m [session_helper.dart] Access Token: [REDACTED]
-Quizzer: [13:47:19] [36m[DEBUG][0m [session_helper.dart] Decoded JWT Token Payload (Redacted): {aal: aal1, amr: [{method: password, timestamp: 1747079228}], app_metadata: {provider: email, providers: [email]}, aud: authenticated, email: [REDACTED], exp: 1747082828, iat: 1747079228, is_anonymous: false, iss: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, phone: , role: authenticated, session_id: [REDACTED], sub: [REDACTED], user_metadata: [REDACTED], user_role: admin}
-Quizzer: [13:47:19] [36m[DEBUG][0m [session_helper.dart] User role determined from JWT: admin
-Quizzer: [13:47:19] [36m[DEBUG][0m [menu_page.dart] Building MenuPage for user role: admin
-Quizzer: [13:49:24] [34m[INFO][0m [menu_page.dart] Admin Panel button pressed by admin
-Quizzer: [13:49:44] [36m[DEBUG][0m [home_page.dart] HomePage building question type: multiple_choice with key: [<'2025-05-08T00:17:03.640403Z_77647c42-c888-47e3-8296-6fc452815810'>] (using session data)
-Quizzer: [13:49:46] [36m[DEBUG][0m [session_helper.dart] Access Token: [REDACTED]
-Quizzer: [13:49:46] [36m[DEBUG][0m [session_helper.dart] Decoded JWT Token Payload (Redacted): {aal: aal1, amr: [{method: password, timestamp: 1747079228}], app_metadata: {provider: email, providers: [email]}, aud: authenticated, email: [REDACTED], exp: 1747082828, iat: 1747079228, is_anonymous: false, iss: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, phone: , role: authenticated, session_id: [REDACTED], sub: [REDACTED], user_metadata: [REDACTED], user_role: admin}
-Quizzer: [13:49:46] [36m[DEBUG][0m [session_helper.dart] User role determined from JWT: admin
-Quizzer: [13:49:46] [36m[DEBUG][0m [menu_page.dart] Building MenuPage for user role: admin
-Quizzer: [13:49:49] [34m[INFO][0m [display_modules_page.dart] Initializing Display Modules Page
-Quizzer: [13:49:53] [34m[INFO][0m [widget_add_question.dart] _AddQuestionWidgetState: initState CALLED
-Quizzer: [13:49:53] [36m[DEBUG][0m [widget_live_preview.dart] LivePreviewWidget build for type: multiple_choice
-Quizzer: [14:14:52] [36m[DEBUG][0m [widget_live_preview.dart] LivePreviewWidget build for type: multiple_choice
-Quizzer: [14:14:52] [36m[DEBUG][0m [session_helper.dart] Access Token: [REDACTED]
-Quizzer: [14:14:52] [36m[DEBUG][0m [session_helper.dart] Decoded JWT Token Payload (Redacted): {aal: aal1, amr: [{method: password, timestamp: 1747079228}], app_metadata: {provider: email, providers: [email]}, aud: authenticated, email: [REDACTED], exp: 1747082828, iat: 1747079228, is_anonymous: false, iss: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, phone: , role: authenticated, session_id: [REDACTED], sub: [REDACTED], user_metadata: [REDACTED], user_role: admin}
-Quizzer: [14:14:52] [36m[DEBUG][0m [session_helper.dart] User role determined from JWT: admin
-Quizzer: [14:14:52] [36m[DEBUG][0m [menu_page.dart] Building MenuPage for user role: admin
-Quizzer: [14:14:52] [36m[DEBUG][0m [session_helper.dart] Access Token: [REDACTED]
-Quizzer: [14:14:52] [36m[DEBUG][0m [session_helper.dart] Decoded JWT Token Payload (Redacted): {aal: aal1, amr: [{method: password, timestamp: 1747079228}], app_metadata: {provider: email, providers: [email]}, aud: authenticated, email: [REDACTED], exp: 1747082828, iat: 1747079228, is_anonymous: false, iss: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, phone: , role: authenticated, session_id: [REDACTED], sub: [REDACTED], user_metadata: [REDACTED], user_role: admin}
-Quizzer: [14:14:52] [36m[DEBUG][0m [session_helper.dart] User role determined from JWT: admin
-Quizzer: [14:14:52] [36m[DEBUG][0m [menu_page.dart] Building MenuPage for user role: admin
-Quizzer: [14:14:52] [36m[DEBUG][0m [home_page.dart] HomePage building question type: multiple_choice with key: [<'2025-05-08T00:17:03.640403Z_77647c42-c888-47e3-8296-6fc452815810'>] (using session data)
-Quizzer: [14:14:52] [36m[DEBUG][0m [home_page.dart] HomePage building question type: multiple_choice with key: [<'2025-05-08T00:17:03.640403Z_77647c42-c888-47e3-8296-6fc452815810'>] (using session data)
-Quizzer: [14:14:52] [36m[DEBUG][0m [session_helper.dart] Access Token: [REDACTED]
-Quizzer: [14:14:52] [36m[DEBUG][0m [session_helper.dart] Decoded JWT Token Payload (Redacted): {aal: aal1, amr: [{method: password, timestamp: 1747079228}], app_metadata: {provider: email, providers: [email]}, aud: authenticated, email: [REDACTED], exp: 1747082828, iat: 1747079228, is_anonymous: false, iss: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, phone: , role: authenticated, session_id: [REDACTED], sub: [REDACTED], user_metadata: [REDACTED], user_role: admin}
-Quizzer: [14:14:52] [36m[DEBUG][0m [session_helper.dart] User role determined from JWT: admin
-Quizzer: [14:14:52] [36m[DEBUG][0m [menu_page.dart] Building MenuPage for user role: admin
-Quizzer: [14:14:54] [34m[INFO][0m [widget_add_question.dart] _AddQuestionWidgetState: dispose CALLED
-Quizzer: [14:14:58] [36m[DEBUG][0m [home_page.dart] HomePage building question type: multiple_choice with key: [<'2025-05-08T00:17:03.640403Z_77647c42-c888-47e3-8296-6fc452815810'>] (using session data)
-Quizzer: [14:15:00] [36m[DEBUG][0m [session_helper.dart] Access Token: [REDACTED]
-Quizzer: [14:15:00] [36m[DEBUG][0m [session_helper.dart] Decoded JWT Token Payload (Redacted): {aal: aal1, amr: [{method: password, timestamp: 1747079228}], app_metadata: {provider: email, providers: [email]}, aud: authenticated, email: [REDACTED], exp: 1747082828, iat: 1747079228, is_anonymous: false, iss: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, phone: , role: authenticated, session_id: [REDACTED], sub: [REDACTED], user_metadata: [REDACTED], user_role: admin}
-Quizzer: [14:15:00] [36m[DEBUG][0m [session_helper.dart] User role determined from JWT: admin
-Quizzer: [14:15:00] [36m[DEBUG][0m [menu_page.dart] Building MenuPage for user role: admin
-Quizzer: [14:15:02] [34m[INFO][0m [menu_page.dart] Admin Panel button pressed by admin
-Quizzer: [14:15:04] [34m[INFO][0m [admin_panel.dart] Fetching next question for review (Placeholder)
-Quizzer: [14:15:04] [36m[DEBUG][0m [widget_live_preview.dart] LivePreviewWidget build for type: multiple_choice
-Quizzer: [14:18:26] [36m[DEBUG][0m [home_page.dart] HomePage building question type: multiple_choice with key: [<'2025-05-08T00:17:03.640403Z_77647c42-c888-47e3-8296-6fc452815810'>] (using session data)
-Quizzer: [14:18:26] [36m[DEBUG][0m [session_helper.dart] Access Token: [REDACTED]
-Quizzer: [14:18:26] [36m[DEBUG][0m [session_helper.dart] Decoded JWT Token Payload (Redacted): {aal: aal1, amr: [{method: password, timestamp: 1747079228}], app_metadata: {provider: email, providers: [email]}, aud: authenticated, email: [REDACTED], exp: 1747082828, iat: 1747079228, is_anonymous: false, iss: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, phone: , role: authenticated, session_id: [REDACTED], sub: [REDACTED], user_metadata: [REDACTED], user_role: admin}
-Quizzer: [14:18:26] [36m[DEBUG][0m [session_helper.dart] User role determined from JWT: admin
-Quizzer: [14:18:26] [36m[DEBUG][0m [menu_page.dart] Building MenuPage for user role: admin
-Quizzer: [14:18:26] [36m[DEBUG][0m [session_helper.dart] Access Token: [REDACTED]
-Quizzer: [14:18:26] [36m[DEBUG][0m [session_helper.dart] Decoded JWT Token Payload (Redacted): {aal: aal1, amr: [{method: password, timestamp: 1747079228}], app_metadata: {provider: email, providers: [email]}, aud: authenticated, email: [REDACTED], exp: 1747082828, iat: 1747079228, is_anonymous: false, iss: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, phone: , role: authenticated, session_id: [REDACTED], sub: [REDACTED], user_metadata: [REDACTED], user_role: admin}
-Quizzer: [14:18:26] [36m[DEBUG][0m [session_helper.dart] User role determined from JWT: admin
-Quizzer: [14:18:26] [36m[DEBUG][0m [menu_page.dart] Building MenuPage for user role: admin
-Quizzer: [14:18:26] [36m[DEBUG][0m [home_page.dart] HomePage building question type: multiple_choice with key: [<'2025-05-08T00:17:03.640403Z_77647c42-c888-47e3-8296-6fc452815810'>] (using session data)
-Quizzer: [14:18:26] [36m[DEBUG][0m [widget_live_preview.dart] LivePreviewWidget build for type: multiple_choice
-Quizzer: [14:18:26] [36m[DEBUG][0m [session_helper.dart] Access Token: [REDACTED]
-Quizzer: [14:18:26] [36m[DEBUG][0m [session_helper.dart] Decoded JWT Token Payload (Redacted): {aal: aal1, amr: [{method: password, timestamp: 1747079228}], app_metadata: {provider: email, providers: [email]}, aud: authenticated, email: [REDACTED], exp: 1747082828, iat: 1747079228, is_anonymous: false, iss: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, phone: , role: authenticated, session_id: [REDACTED], sub: [REDACTED], user_metadata: [REDACTED], user_role: admin}
-Quizzer: [14:18:26] [36m[DEBUG][0m [session_helper.dart] User role determined from JWT: admin
-Quizzer: [14:18:26] [36m[DEBUG][0m [menu_page.dart] Building MenuPage for user role: admin
-Quizzer: [14:18:26] [36m[DEBUG][0m [session_helper.dart] Access Token: [REDACTED]
-Quizzer: [14:18:26] [36m[DEBUG][0m [session_helper.dart] Decoded JWT Token Payload (Redacted): {aal: aal1, amr: [{method: password, timestamp: 1747079228}], app_metadata: {provider: email, providers: [email]}, aud: authenticated, email: [REDACTED], exp: 1747082828, iat: 1747079228, is_anonymous: false, iss: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, phone: , role: authenticated, session_id: [REDACTED], sub: [REDACTED], user_metadata: [REDACTED], user_role: admin}
-Quizzer: [14:18:26] [36m[DEBUG][0m [session_helper.dart] User role determined from JWT: admin
-Quizzer: [14:18:26] [36m[DEBUG][0m [menu_page.dart] Building MenuPage for user role: admin
-Quizzer: [14:18:26] [36m[DEBUG][0m [home_page.dart] HomePage building question type: multiple_choice with key: [<'2025-05-08T00:17:03.640403Z_77647c42-c888-47e3-8296-6fc452815810'>] (using session data)
-Quizzer: [14:18:31] [34m[INFO][0m [admin_panel.dart] Denying question (Placeholder): review_dummy_1747080904916
-Quizzer: [14:18:31] [34m[INFO][0m [admin_panel.dart] Fetching next question for review (Placeholder)
-Quizzer: [14:18:31] [36m[DEBUG][0m [widget_live_preview.dart] LivePreviewWidget build for type: multiple_choice
-Quizzer: [14:18:33] [34m[INFO][0m [admin_panel.dart] Approving question (Placeholder): review_dummy_1747081111071
-Quizzer: [14:18:33] [34m[INFO][0m [admin_panel.dart] Fetching next question for review (Placeholder)
-Quizzer: [14:18:33] [36m[DEBUG][0m [widget_live_preview.dart] LivePreviewWidget build for type: multiple_choice
-Quizzer: [14:18:35] [34m[INFO][0m [admin_panel.dart] Denying question (Placeholder): review_dummy_1747081113837
-Quizzer: [14:18:35] [34m[INFO][0m [admin_panel.dart] Fetching next question for review (Placeholder)
-Quizzer: [14:18:35] [36m[DEBUG][0m [widget_live_preview.dart] LivePreviewWidget build for type: multiple_choice
-Quizzer: [14:18:37] [34m[INFO][0m [admin_panel.dart] Approving question (Placeholder): review_dummy_1747081115655
-Quizzer: [14:18:37] [34m[INFO][0m [admin_panel.dart] Fetching next question for review (Placeholder)
-Quizzer: [14:18:37] [36m[DEBUG][0m [widget_live_preview.dart] LivePreviewWidget build for type: multiple_choice
-Quizzer: [14:18:39] [34m[INFO][0m [admin_panel.dart] Denying question (Placeholder): review_dummy_1747081117979
-Quizzer: [14:18:39] [34m[INFO][0m [admin_panel.dart] Fetching next question for review (Placeholder)
-Quizzer: [14:18:39] [36m[DEBUG][0m [widget_live_preview.dart] LivePreviewWidget build for type: multiple_choice
-Quizzer: [14:18:42] [34m[INFO][0m [admin_panel.dart] Opening edit dialog for review question: review_dummy_1747081119186
-Quizzer: [14:18:42] [34m[INFO][0m [widget_add_question.dart] _AddQuestionWidgetState: initState CALLED
-Quizzer: [14:18:42] [36m[DEBUG][0m [widget_live_preview.dart] LivePreviewWidget build for type: multiple_choice
-Quizzer: [14:18:45] [34m[INFO][0m [widget_add_question.dart] [DEBUG] Focus changed for 'option' field. Has Focus: true, Text Not Empty: false, Text: ''
-Quizzer: [14:18:46] [34m[INFO][0m [widget_add_question.dart] [DEBUG] Focus changed for 'option' field. Has Focus: false, Text Not Empty: false, Text: ''
-Quizzer: [14:18:46] [34m[INFO][0m [widget_add_question.dart] [DEBUG] Focus changed for 'question' field. Has Focus: true, Text Not Empty: false, Text: ''
-Quizzer: [14:18:47] [34m[INFO][0m [widget_add_question.dart] [DEBUG] Focus changed for 'question' field. Has Focus: false, Text Not Empty: false, Text: ''
-Quizzer: [14:18:47] [34m[INFO][0m [widget_add_question.dart] Starting edit for question element at index 0
-Quizzer: [14:18:51] [34m[INFO][0m [widget_add_question.dart] Submitting edit for question element at index 0
-Quizzer: [14:18:51] [36m[DEBUG][0m [widget_live_preview.dart] LivePreviewWidget build for type: multiple_choice
-Quizzer: [14:18:53] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Woke up by sync signal.
-Quizzer: [14:18:53] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Signal received, performing sync...
-Quizzer: [14:18:53] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Starting sync cycle.
-Quizzer: [14:18:53] [34m[INFO][0m [outbound_sync_worker.dart] Network check successful.
-Quizzer: [14:18:53] [34m[INFO][0m [outbound_sync_worker.dart] Entering OutboundSyncWorker _getDbAccess()...
-Quizzer: [14:18:53] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Database access granted.
-Quizzer: [14:18:53] [34m[INFO][0m [outbound_sync_functions.dart] Starting sync for QuestionAnswerPairs...
-Quizzer: [14:18:53] [34m[INFO][0m [admin_panel.dart] Admin Review Panel: Question edited, updating preview.
-Quizzer: [14:18:53] [36m[DEBUG][0m [widget_live_preview.dart] LivePreviewWidget build for type: multiple_choice
-Quizzer: [14:18:53] [34m[INFO][0m [outbound_sync_functions.dart] No unsynced QuestionAnswerPairs found.
-Quizzer: [14:18:53] [34m[INFO][0m [outbound_sync_worker.dart] Entering OutboundSyncWorker _getDbAccess()...
-Quizzer: [14:18:53] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Database access granted.
-Quizzer: [14:18:53] [34m[INFO][0m [outbound_sync_functions.dart] Starting sync for LoginAttempts...
-Quizzer: [14:18:53] [34m[INFO][0m [outbound_sync_functions.dart] No unsynced LoginAttempts found.
-Quizzer: [14:18:53] [34m[INFO][0m [outbound_sync_worker.dart] Entering OutboundSyncWorker _getDbAccess()...
-Quizzer: [14:18:53] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Database access granted.
-Quizzer: [14:18:53] [34m[INFO][0m [outbound_sync_functions.dart] Starting sync for QuestionAnswerAttempts...
-Quizzer: [14:18:53] [34m[INFO][0m [question_answer_attempts_table.dart] Fetching unsynced question answer attempts...
-Quizzer: [14:18:53] [34m[INFO][0m [question_answer_attempts_table.dart] Verifying question_answer_attempts table...
-Quizzer: [14:18:53] [34m[INFO][0m [question_answer_attempts_table.dart] question_answer_attempts table already exists. Checking columns...
-Quizzer: [14:18:53] [34m[INFO][0m [question_answer_attempts_table.dart] Column check complete.
-Quizzer: [14:18:53] [34m[INFO][0m [question_answer_attempts_table.dart] SUCCESS: Fetched 0 unsynced question answer attempts.
-Quizzer: [14:18:53] [34m[INFO][0m [outbound_sync_functions.dart] No unsynced QuestionAnswerAttempts found.
-Quizzer: [14:18:53] [34m[INFO][0m [outbound_sync_worker.dart] Entering OutboundSyncWorker _getDbAccess()...
-Quizzer: [14:18:53] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Database access granted.
-Quizzer: [14:18:53] [34m[INFO][0m [outbound_sync_functions.dart] Starting sync for UserProfiles...
-Quizzer: [14:18:53] [34m[INFO][0m [outbound_sync_functions.dart] No unsynced UserProfiles found for user 77647c42-c888-47e3-8296-6fc452815810.
-Quizzer: [14:18:53] [34m[INFO][0m [outbound_sync_worker.dart] Entering OutboundSyncWorker _getDbAccess()...
-Quizzer: [14:18:53] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Database access granted.
-Quizzer: [14:18:53] [34m[INFO][0m [outbound_sync_functions.dart] Starting sync for UserQuestionAnswerPairs...
-Quizzer: [14:18:53] [34m[INFO][0m [outbound_sync_functions.dart] No unsynced UserQuestionAnswerPairs found for user Instance of 'SessionManager'.userId!.
-Quizzer: [14:18:53] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Waiting for sync signal...
-Quizzer: [14:18:53] [34m[INFO][0m [widget_add_question.dart] _AddQuestionWidgetState: dispose CALLED
-Quizzer: [14:25:12] [36m[DEBUG][0m [session_helper.dart] Access Token: [REDACTED]
-Quizzer: [14:25:12] [36m[DEBUG][0m [session_helper.dart] Decoded JWT Token Payload (Redacted): {aal: aal1, amr: [{method: password, timestamp: 1747079228}], app_metadata: {provider: email, providers: [email]}, aud: authenticated, email: [REDACTED], exp: 1747082828, iat: 1747079228, is_anonymous: false, iss: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, phone: , role: authenticated, session_id: [REDACTED], sub: [REDACTED], user_metadata: [REDACTED], user_role: admin}
-Quizzer: [14:25:12] [36m[DEBUG][0m [session_helper.dart] User role determined from JWT: admin
-Quizzer: [14:25:12] [36m[DEBUG][0m [menu_page.dart] Building MenuPage for user role: admin
-Quizzer: [14:25:12] [36m[DEBUG][0m [home_page.dart] HomePage building question type: multiple_choice with key: [<'2025-05-08T00:17:03.640403Z_77647c42-c888-47e3-8296-6fc452815810'>] (using session data)
-Quizzer: [14:25:12] [36m[DEBUG][0m [session_helper.dart] Access Token: [REDACTED]
-Quizzer: [14:25:12] [36m[DEBUG][0m [session_helper.dart] Decoded JWT Token Payload (Redacted): {aal: aal1, amr: [{method: password, timestamp: 1747079228}], app_metadata: {provider: email, providers: [email]}, aud: authenticated, email: [REDACTED], exp: 1747082828, iat: 1747079228, is_anonymous: false, iss: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, phone: , role: authenticated, session_id: [REDACTED], sub: [REDACTED], user_metadata: [REDACTED], user_role: admin}
-Quizzer: [14:25:12] [36m[DEBUG][0m [session_helper.dart] User role determined from JWT: admin
-Quizzer: [14:25:12] [36m[DEBUG][0m [menu_page.dart] Building MenuPage for user role: admin
-Quizzer: [14:25:12] [36m[DEBUG][0m [widget_live_preview.dart] LivePreviewWidget build for type: multiple_choice
-Quizzer: [14:25:12] [36m[DEBUG][0m [home_page.dart] HomePage building question type: multiple_choice with key: [<'2025-05-08T00:17:03.640403Z_77647c42-c888-47e3-8296-6fc452815810'>] (using session data)
-Quizzer: [14:25:12] [36m[DEBUG][0m [session_helper.dart] Access Token: [REDACTED]
-Quizzer: [14:25:12] [36m[DEBUG][0m [session_helper.dart] Decoded JWT Token Payload (Redacted): {aal: aal1, amr: [{method: password, timestamp: 1747079228}], app_metadata: {provider: email, providers: [email]}, aud: authenticated, email: [REDACTED], exp: 1747082828, iat: 1747079228, is_anonymous: false, iss: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, phone: , role: authenticated, session_id: [REDACTED], sub: [REDACTED], user_metadata: [REDACTED], user_role: admin}
-Quizzer: [14:25:12] [36m[DEBUG][0m [session_helper.dart] User role determined from JWT: admin
-Quizzer: [14:25:12] [36m[DEBUG][0m [menu_page.dart] Building MenuPage for user role: admin
-Quizzer: [14:25:12] [36m[DEBUG][0m [home_page.dart] HomePage building question type: multiple_choice with key: [<'2025-05-08T00:17:03.640403Z_77647c42-c888-47e3-8296-6fc452815810'>] (using session data)
-Quizzer: [14:25:12] [36m[DEBUG][0m [session_helper.dart] Access Token: [REDACTED]
-Quizzer: [14:25:12] [36m[DEBUG][0m [session_helper.dart] Decoded JWT Token Payload (Redacted): {aal: aal1, amr: [{method: password, timestamp: 1747079228}], app_metadata: {provider: email, providers: [email]}, aud: authenticated, email: [REDACTED], exp: 1747082828, iat: 1747079228, is_anonymous: false, iss: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, phone: , role: authenticated, session_id: [REDACTED], sub: [REDACTED], user_metadata: [REDACTED], user_role: admin}
-Quizzer: [14:25:12] [36m[DEBUG][0m [session_helper.dart] User role determined from JWT: admin
-Quizzer: [14:25:12] [36m[DEBUG][0m [menu_page.dart] Building MenuPage for user role: admin
-Quizzer: [14:25:21] [34m[INFO][0m [admin_panel.dart] Opening edit dialog for review question: review_dummy_1747081119186
-Quizzer: [14:25:21] [34m[INFO][0m [widget_add_question.dart] _AddQuestionWidgetState: initState CALLED
-Quizzer: [14:25:21] [36m[DEBUG][0m [widget_live_preview.dart] LivePreviewWidget build for type: multiple_choice
-Quizzer: [14:25:23] [36m[DEBUG][0m [widget_live_preview.dart] LivePreviewWidget build for type: multiple_choice
-Quizzer: [14:25:25] [34m[INFO][0m [widget_edit_question_dialogue.dart] EditQuestionDialog: Submitting changes to SessionManager.
-Quizzer: [14:25:25] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Woke up by sync signal.
-Quizzer: [14:25:25] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Signal received, performing sync...
-Quizzer: [14:25:25] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Starting sync cycle.
-Quizzer: [14:25:25] [34m[INFO][0m [outbound_sync_worker.dart] Network check successful.
-Quizzer: [14:25:25] [34m[INFO][0m [outbound_sync_worker.dart] Entering OutboundSyncWorker _getDbAccess()...
-Quizzer: [14:25:25] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Database access granted.
-Quizzer: [14:25:25] [34m[INFO][0m [outbound_sync_functions.dart] Starting sync for QuestionAnswerPairs...
-Quizzer: [14:25:25] [34m[INFO][0m [admin_panel.dart] Admin Review Panel: Question edited, updating preview.
-Quizzer: [14:25:25] [36m[DEBUG][0m [widget_live_preview.dart] LivePreviewWidget build for type: multiple_choice
-Quizzer: [14:25:26] [34m[INFO][0m [outbound_sync_functions.dart] No unsynced QuestionAnswerPairs found.
-Quizzer: [14:25:26] [34m[INFO][0m [outbound_sync_worker.dart] Entering OutboundSyncWorker _getDbAccess()...
-Quizzer: [14:25:26] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Database access granted.
-Quizzer: [14:25:26] [34m[INFO][0m [outbound_sync_functions.dart] Starting sync for LoginAttempts...
-Quizzer: [14:25:26] [34m[INFO][0m [outbound_sync_functions.dart] No unsynced LoginAttempts found.
-Quizzer: [14:25:26] [34m[INFO][0m [outbound_sync_worker.dart] Entering OutboundSyncWorker _getDbAccess()...
-Quizzer: [14:25:26] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Database access granted.
-Quizzer: [14:25:26] [34m[INFO][0m [outbound_sync_functions.dart] Starting sync for QuestionAnswerAttempts...
-Quizzer: [14:25:26] [34m[INFO][0m [question_answer_attempts_table.dart] Fetching unsynced question answer attempts...
-Quizzer: [14:25:26] [34m[INFO][0m [question_answer_attempts_table.dart] Verifying question_answer_attempts table...
-Quizzer: [14:25:26] [34m[INFO][0m [question_answer_attempts_table.dart] question_answer_attempts table already exists. Checking columns...
-Quizzer: [14:25:26] [34m[INFO][0m [question_answer_attempts_table.dart] Column check complete.
-Quizzer: [14:25:26] [34m[INFO][0m [question_answer_attempts_table.dart] SUCCESS: Fetched 0 unsynced question answer attempts.
-Quizzer: [14:25:26] [34m[INFO][0m [outbound_sync_functions.dart] No unsynced QuestionAnswerAttempts found.
-Quizzer: [14:25:26] [34m[INFO][0m [outbound_sync_worker.dart] Entering OutboundSyncWorker _getDbAccess()...
-Quizzer: [14:25:26] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Database access granted.
-Quizzer: [14:25:26] [34m[INFO][0m [outbound_sync_functions.dart] Starting sync for UserProfiles...
-Quizzer: [14:25:26] [34m[INFO][0m [widget_add_question.dart] _AddQuestionWidgetState: dispose CALLED
-Quizzer: [14:25:26] [34m[INFO][0m [outbound_sync_functions.dart] No unsynced UserProfiles found for user 77647c42-c888-47e3-8296-6fc452815810.
-Quizzer: [14:25:26] [34m[INFO][0m [outbound_sync_worker.dart] Entering OutboundSyncWorker _getDbAccess()...
-Quizzer: [14:25:26] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Database access granted.
-Quizzer: [14:25:26] [34m[INFO][0m [outbound_sync_functions.dart] Starting sync for UserQuestionAnswerPairs...
-Quizzer: [14:25:26] [34m[INFO][0m [outbound_sync_functions.dart] No unsynced UserQuestionAnswerPairs found for user Instance of 'SessionManager'.userId!.
-Quizzer: [14:25:26] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Waiting for sync signal...
-Quizzer: [14:46:37] [36m[DEBUG][0m Refresh access token
-Quizzer: [14:46:37] [36m[DEBUG][0m Attempt 1 to refresh token
-Quizzer: [14:46:37] [36m[DEBUG][0m Saving session
-Quizzer: [15:25:08] [36m[DEBUG][0m [session_helper.dart] Access Token: [REDACTED]
-Quizzer: [15:25:08] [36m[DEBUG][0m [session_helper.dart] Decoded JWT Token Payload (Redacted): {aal: aal1, amr: [{method: password, timestamp: 1747079228}], app_metadata: {provider: email, providers: [email]}, aud: authenticated, email: [REDACTED], exp: 1747086397, iat: 1747082797, is_anonymous: false, iss: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, phone: , role: authenticated, session_id: [REDACTED], sub: [REDACTED], user_metadata: [REDACTED], user_role: admin}
-Quizzer: [15:25:08] [36m[DEBUG][0m [session_helper.dart] User role determined from JWT: admin
-Quizzer: [15:25:08] [36m[DEBUG][0m [menu_page.dart] Building MenuPage for user role: admin
-Quizzer: [15:25:10] [36m[DEBUG][0m [home_page.dart] HomePage building question type: multiple_choice with key: [<'2025-05-08T00:17:03.640403Z_77647c42-c888-47e3-8296-6fc452815810'>] (using session data)
-Quizzer: [15:26:20] [36m[DEBUG][0m [home_page.dart] HomePage building question type: multiple_choice with key: [<'2025-05-08T00:17:03.640403Z_77647c42-c888-47e3-8296-6fc452815810'>] (using session data)
-Quizzer: [15:26:20] [36m[DEBUG][0m [session_helper.dart] Access Token: [REDACTED]
-Quizzer: [15:26:20] [36m[DEBUG][0m [session_helper.dart] Decoded JWT Token Payload (Redacted): {aal: aal1, amr: [{method: password, timestamp: 1747079228}], app_metadata: {provider: email, providers: [email]}, aud: authenticated, email: [REDACTED], exp: 1747086397, iat: 1747082797, is_anonymous: false, iss: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, phone: , role: authenticated, session_id: [REDACTED], sub: [REDACTED], user_metadata: [REDACTED], user_role: admin}
-Quizzer: [15:26:20] [36m[DEBUG][0m [session_helper.dart] User role determined from JWT: admin
-Quizzer: [15:26:20] [36m[DEBUG][0m [menu_page.dart] Building MenuPage for user role: admin
-Quizzer: [15:26:20] [36m[DEBUG][0m [home_page.dart] HomePage building question type: multiple_choice with key: [<'2025-05-08T00:17:03.640403Z_77647c42-c888-47e3-8296-6fc452815810'>] (using session data)
-Quizzer: [15:26:20] [36m[DEBUG][0m [home_page.dart] HomePage building question type: multiple_choice with key: [<'2025-05-08T00:17:03.640403Z_77647c42-c888-47e3-8296-6fc452815810'>] (using session data)
-Quizzer: [15:26:20] [36m[DEBUG][0m [session_helper.dart] Access Token: [REDACTED]
-Quizzer: [15:26:20] [36m[DEBUG][0m [session_helper.dart] Decoded JWT Token Payload (Redacted): {aal: aal1, amr: [{method: password, timestamp: 1747079228}], app_metadata: {provider: email, providers: [email]}, aud: authenticated, email: [REDACTED], exp: 1747086397, iat: 1747082797, is_anonymous: false, iss: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, phone: , role: authenticated, session_id: [REDACTED], sub: [REDACTED], user_metadata: [REDACTED], user_role: admin}
-Quizzer: [15:26:20] [36m[DEBUG][0m [session_helper.dart] User role determined from JWT: admin
-Quizzer: [15:26:20] [36m[DEBUG][0m [menu_page.dart] Building MenuPage for user role: admin
-Quizzer: [15:26:21] [36m[DEBUG][0m [session_helper.dart] Access Token: [REDACTED]
-Quizzer: [15:26:21] [36m[DEBUG][0m [session_helper.dart] Decoded JWT Token Payload (Redacted): {aal: aal1, amr: [{method: password, timestamp: 1747079228}], app_metadata: {provider: email, providers: [email]}, aud: authenticated, email: [REDACTED], exp: 1747086397, iat: 1747082797, is_anonymous: false, iss: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, phone: , role: authenticated, session_id: [REDACTED], sub: [REDACTED], user_metadata: [REDACTED], user_role: admin}
-Quizzer: [15:26:21] [36m[DEBUG][0m [session_helper.dart] User role determined from JWT: admin
-Quizzer: [15:26:21] [36m[DEBUG][0m [menu_page.dart] Building MenuPage for user role: admin
-Quizzer: [15:26:21] [36m[DEBUG][0m [session_helper.dart] Access Token: [REDACTED]
-Quizzer: [15:26:21] [36m[DEBUG][0m [session_helper.dart] Decoded JWT Token Payload (Redacted): {aal: aal1, amr: [{method: password, timestamp: 1747079228}], app_metadata: {provider: email, providers: [email]}, aud: authenticated, email: [REDACTED], exp: 1747086397, iat: 1747082797, is_anonymous: false, iss: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, phone: , role: authenticated, session_id: [REDACTED], sub: [REDACTED], user_metadata: [REDACTED], user_role: admin}
-Quizzer: [15:26:21] [36m[DEBUG][0m [session_helper.dart] User role determined from JWT: admin
-Quizzer: [15:26:21] [36m[DEBUG][0m [menu_page.dart] Building MenuPage for user role: admin
-Quizzer: [15:26:21] [36m[DEBUG][0m [home_page.dart] HomePage building question type: multiple_choice with key: [<'2025-05-08T00:17:03.640403Z_77647c42-c888-47e3-8296-6fc452815810'>] (using session data)
-Quizzer: [15:27:15] [34m[INFO][0m [question_answer_attempts_table.dart] Verifying question_answer_attempts table...
-Quizzer: [15:27:15] [34m[INFO][0m [question_answer_attempts_table.dart] question_answer_attempts table already exists. Checking columns...
-Quizzer: [15:27:15] [34m[INFO][0m [question_answer_attempts_table.dart] Column check complete.
-Quizzer: [15:27:15] [34m[INFO][0m [question_answer_attempts_table.dart] Checking if first attempt for Q: 2025-05-08T00:17:03.640403Z_77647c42-c888-47e3-8296-6fc452815810, User: 77647c42-c888-47e3-8296-6fc452815810
-Quizzer: [15:27:16] [34m[INFO][0m [question_answer_attempts_table.dart] Is first attempt? false (total_attempts: 2)
-Quizzer: [15:27:16] [34m[INFO][0m [question_answer_attempts_table.dart] Adding question attempt for Q: 2025-05-08T00:17:03.640403Z_77647c42-c888-47e3-8296-6fc452815810, User: 77647c42-c888-47e3-8296-6fc452815810
-Quizzer: [15:27:16] [34m[INFO][0m [question_answer_attempts_table.dart] SUCCESS: Successfully added question attempt record with result ID: 1. Data: {time_stamp: 2025-05-12T21:27:15.822780Z, question_id: 2025-05-08T00:17:03.640403Z_77647c42-c888-47e3-8296-6fc452815810, participant_id: 77647c42-c888-47e3-8296-6fc452815810, response_time: 6001.063115, response_result: 1, was_first_attempt: false, knowledge_base: null, question_context_csv: {"subjects":[],"concepts":[]}, last_revised_date: 2025-05-10T17:33:05.974481, days_since_last_revision: 1.9126139849421295, total_attempts: 2, revision_streak: 2, has_been_synced: 0, edits_are_synced: 0, last_modified_timestamp: 2025-05-12T21:27:15.822780Z}
-Quizzer: [15:27:16] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Woke up by sync signal.
-Quizzer: [15:27:16] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Signal received, performing sync...
-Quizzer: [15:27:16] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Starting sync cycle.
-Quizzer: [15:27:16] [34m[INFO][0m [outbound_sync_worker.dart] Network check successful.
-Quizzer: [15:27:16] [34m[INFO][0m [outbound_sync_worker.dart] Entering OutboundSyncWorker _getDbAccess()...
-Quizzer: [15:27:16] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Database access granted.
-Quizzer: [15:27:16] [34m[INFO][0m [outbound_sync_functions.dart] Starting sync for QuestionAnswerPairs...
-Quizzer: [15:27:16] [34m[INFO][0m [outbound_sync_functions.dart] No unsynced QuestionAnswerPairs found.
-Quizzer: [15:27:16] [34m[INFO][0m [outbound_sync_worker.dart] Entering OutboundSyncWorker _getDbAccess()...
-Quizzer: [15:27:16] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Database access granted.
-Quizzer: [15:27:16] [34m[INFO][0m [outbound_sync_functions.dart] Starting sync for LoginAttempts...
-Quizzer: [15:27:16] [34m[INFO][0m [outbound_sync_functions.dart] No unsynced LoginAttempts found.
-Quizzer: [15:27:16] [34m[INFO][0m [outbound_sync_worker.dart] Entering OutboundSyncWorker _getDbAccess()...
-Quizzer: [15:27:16] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Database access granted.
-Quizzer: [15:27:16] [34m[INFO][0m [outbound_sync_functions.dart] Starting sync for QuestionAnswerAttempts...
-Quizzer: [15:27:16] [34m[INFO][0m [question_answer_attempts_table.dart] Fetching unsynced question answer attempts...
-Quizzer: [15:27:16] [34m[INFO][0m [question_answer_attempts_table.dart] Verifying question_answer_attempts table...
-Quizzer: [15:27:16] [34m[INFO][0m [question_answer_attempts_table.dart] question_answer_attempts table already exists. Checking columns...
-Quizzer: [15:27:16] [34m[INFO][0m [question_answer_attempts_table.dart] Column check complete.
-Quizzer: [15:27:16] [34m[INFO][0m [question_answer_attempts_table.dart] SUCCESS: Fetched 1 unsynced question answer attempts.
-Quizzer: [15:27:16] [34m[INFO][0m [outbound_sync_functions.dart] Found 1 unsynced QuestionAnswerAttempts.
-Quizzer: [15:27:16] [36m[DEBUG][0m [outbound_sync_functions.dart] Preparing to push Attempt (participant_id: 77647c42-c888-47e3-8296-6fc452815810, question_id: 2025-05-08T00:17:03.640403Z_77647c42-c888-47e3-8296-6fc452815810, time_stamp: 2025-05-12T21:27:15.822780Z) to question_answer_attempts
-Quizzer: [15:27:17] [34m[INFO][0m [outbound_sync_functions.dart] SUCCESS: Supabase insert successful for Attempt (participant_id: 77647c42-c888-47e3-8296-6fc452815810, question_id: 2025-05-08T00:17:03.640403Z_77647c42-c888-47e3-8296-6fc452815810, time_stamp: 2025-05-12T21:27:15.822780Z).
-Quizzer: [15:27:17] [34m[INFO][0m [question_answer_attempts_table.dart] Deleting question answer attempt (PID: 77647c42-c888-47e3-8296-6fc452815810, QID: 2025-05-08T00:17:03.640403Z_77647c42-c888-47e3-8296-6fc452815810, TS: 2025-05-12T21:27:15.822780Z)
-Quizzer: [15:27:17] [34m[INFO][0m [question_answer_attempts_table.dart] Verifying question_answer_attempts table...
-Quizzer: [15:27:17] [34m[INFO][0m [question_answer_attempts_table.dart] question_answer_attempts table already exists. Checking columns...
-Quizzer: [15:27:17] [34m[INFO][0m [question_answer_attempts_table.dart] Column check complete.
-Quizzer: [15:27:17] [34m[INFO][0m [question_answer_attempts_table.dart] SUCCESS: Deleted 1 question answer attempt(s) for (PID: 77647c42-c888-47e3-8296-6fc452815810, QID: 2025-05-08T00:17:03.640403Z_77647c42-c888-47e3-8296-6fc452815810, TS: 2025-05-12T21:27:15.822780Z)
-Quizzer: [15:27:17] [34m[INFO][0m [outbound_sync_functions.dart] Finished sync attempt for QuestionAnswerAttempts.
-Quizzer: [15:27:17] [34m[INFO][0m [outbound_sync_worker.dart] Entering OutboundSyncWorker _getDbAccess()...
-Quizzer: [15:27:17] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Database access granted.
-Quizzer: [15:27:17] [34m[INFO][0m [outbound_sync_functions.dart] Starting sync for UserProfiles...
-Quizzer: [15:27:17] [34m[INFO][0m [outbound_sync_functions.dart] Found 1 unsynced UserProfiles for user 77647c42-c888-47e3-8296-6fc452815810.
-Quizzer: [15:27:17] [36m[DEBUG][0m [outbound_sync_functions.dart] Preparing to update UserProfile 77647c42-c888-47e3-8296-6fc452815810 in user_profile
-Quizzer: [15:27:17] [34m[INFO][0m [outbound_sync_functions.dart] Attempting Supabase update for ID 77647c42-c888-47e3-8296-6fc452815810 in table user_profile...
-Quizzer: [15:27:17] [36m[DEBUG][0m [session_manager.dart] SessionManager.requestNextQuestion: Fetched options type: List<dynamic>, value: [{type: text, content: led to significant losses of Russian territory}, {type: text, content: led to significant gains of Russian territory}, {type: text, content: led to the independence of Norway from Sweden}, {type: text, content: led to U.S. involvement in the First World War}, {type: text, content: was the result of Russia's defeat by Japan in 1905}]
-Quizzer: [15:27:17] [36m[DEBUG][0m [home_page.dart] HomePage building question type: multiple_choice with key: [<'2025-05-08T00:16:48.539828Z_77647c42-c888-47e3-8296-6fc452815810'>] (using session data)
-Quizzer: [15:27:17] [34m[INFO][0m [outbound_sync_functions.dart] SUCCESS: Supabase update presumed successful for ID 77647c42-c888-47e3-8296-6fc452815810 in user_profile.
-Quizzer: [15:27:17] [34m[INFO][0m [outbound_sync_functions.dart] Update successful for UserProfile 77647c42-c888-47e3-8296-6fc452815810. Updating local flags...
-Quizzer: [15:27:17] [34m[INFO][0m [outbound_sync_functions.dart] Finished sync attempt for UserProfiles.
-Quizzer: [15:27:17] [34m[INFO][0m [outbound_sync_worker.dart] Entering OutboundSyncWorker _getDbAccess()...
-Quizzer: [15:27:18] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Database access granted.
-Quizzer: [15:27:18] [34m[INFO][0m [outbound_sync_functions.dart] Starting sync for UserQuestionAnswerPairs...
-Quizzer: [15:27:18] [34m[INFO][0m [outbound_sync_functions.dart] Found 1 unsynced UserQuestionAnswerPairs for user Instance of 'SessionManager'.userId!.
-Quizzer: [15:27:18] [34m[INFO][0m [outbound_sync_functions.dart] syncUserQuestionAnswerPairs: Checking server version for (User: 77647c42-c888-47e3-8296-6fc452815810, QID: 2025-05-08T00:17:03.640403Z_77647c42-c888-47e3-8296-6fc452815810) before updating...
-Quizzer: [15:27:18] [34m[INFO][0m [outbound_sync_functions.dart] syncUserQuestionAnswerPairs: Local (User: 77647c42-c888-47e3-8296-6fc452815810, QID: 2025-05-08T00:17:03.640403Z_77647c42-c888-47e3-8296-6fc452815810) is newer. Proceeding with update.
-Quizzer: [15:27:18] [34m[INFO][0m [outbound_sync_functions.dart] Attempting Supabase update with composite key for record matching (user_uuid: 77647c42-c888-47e3-8296-6fc452815810, question_id: 2025-05-08T00:17:03.640403Z_77647c42-c888-47e3-8296-6fc452815810) in table user_question_answer_pairs...
-Quizzer: [15:27:19] [36m[DEBUG][0m [session_helper.dart] Access Token: [REDACTED]
-Quizzer: [15:27:19] [36m[DEBUG][0m [session_helper.dart] Decoded JWT Token Payload (Redacted): {aal: aal1, amr: [{method: password, timestamp: 1747079228}], app_metadata: {provider: email, providers: [email]}, aud: authenticated, email: [REDACTED], exp: 1747086397, iat: 1747082797, is_anonymous: false, iss: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, phone: , role: authenticated, session_id: [REDACTED], sub: [REDACTED], user_metadata: [REDACTED], user_role: admin}
-Quizzer: [15:27:19] [36m[DEBUG][0m [session_helper.dart] User role determined from JWT: admin
-Quizzer: [15:27:19] [36m[DEBUG][0m [menu_page.dart] Building MenuPage for user role: admin
-Quizzer: [15:27:19] [34m[INFO][0m [outbound_sync_functions.dart] SUCCESS: Supabase update with composite key successful for (user_uuid: 77647c42-c888-47e3-8296-6fc452815810, question_id: 2025-05-08T00:17:03.640403Z_77647c42-c888-47e3-8296-6fc452815810) in user_question_answer_pairs.
-Quizzer: [15:27:19] [34m[INFO][0m [outbound_sync_functions.dart] syncUserQuestionAnswerPairs: Operation successful for (User: 77647c42-c888-47e3-8296-6fc452815810, QID: 2025-05-08T00:17:03.640403Z_77647c42-c888-47e3-8296-6fc452815810). Updating local flags...
-Quizzer: [15:27:19] [34m[INFO][0m [outbound_sync_functions.dart] Finished sync attempt for UserQuestionAnswerPairs.
-Quizzer: [15:27:19] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Waiting for sync signal...
-Quizzer: [15:27:22] [34m[INFO][0m [menu_page.dart] Admin Panel button pressed by admin
-Quizzer: [15:27:23] [34m[INFO][0m [session_manager.dart] SessionManager: Requesting a question for review...
-Quizzer: [15:27:24] [34m[INFO][0m [get_send_postgre.dart] Fetching random record from question_answer_pair_new_review (offset: 97 / 563)
-Quizzer: [15:27:24] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Successfully fetched and decoded question 2025-05-04T12:44:56.594619_7465dce6-abcf-4963-92a1-30dd7118c23a from question_answer_pair_new_review
-Quizzer: [15:27:24] [36m[DEBUG][0m [widget_live_preview.dart] LivePreviewWidget build for type: select_all_that_apply
-Quizzer: [15:27:24] [34m[INFO][0m [widget_select_all_that_apply_question.dart] SelectAllThatApplyQuestionWidget initState
-Quizzer: [15:27:24] [34m[INFO][0m [widget_select_all_that_apply_question.dart] SelectAllThatApplyQuestionWidget: Disabled state, not shuffling.
-Quizzer: [15:27:24] [34m[INFO][0m [widget_select_all_that_apply_question.dart] SATA: Disabled state, auto-setting submitted=true, selectedIndices(shuffled)={0, 2, 3, 4, 5} for preview.
-Quizzer: [15:27:24] [36m[DEBUG][0m [widget_select_all_that_apply_question.dart] SelectAllThatApplyQuestionWidget: Options loaded. Original indices mapping: [0, 1, 2, 3, 4, 5]
-Quizzer: [15:27:33] [34m[INFO][0m [widget_review_panel.dart] Approving question...
-Quizzer: [15:27:33] [34m[INFO][0m [session_manager.dart] SessionManager: Submitting review decision (Approved: true) for PK: {question_id: 2025-05-04T12:44:56.594619_7465dce6-abcf-4963-92a1-30dd7118c23a} from question_answer_pair_new_review
-Quizzer: [15:27:33] [34m[INFO][0m [get_send_postgre.dart] Approving question 2025-05-04T12:44:56.594619_7465dce6-abcf-4963-92a1-30dd7118c23a from question_answer_pair_new_review...
-Quizzer: [15:27:33] [36m[DEBUG][0m [get_send_postgre.dart] Upserting question 2025-05-04T12:44:56.594619_7465dce6-abcf-4963-92a1-30dd7118c23a into question_answer_pairs...
-Quizzer: [15:27:33] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Upsert successful for question 2025-05-04T12:44:56.594619_7465dce6-abcf-4963-92a1-30dd7118c23a into question_answer_pairs.
-Quizzer: [15:27:33] [36m[DEBUG][0m [get_send_postgre.dart] Deleting approved question 2025-05-04T12:44:56.594619_7465dce6-abcf-4963-92a1-30dd7118c23a from question_answer_pair_new_review using key: {question_id: 2025-05-04T12:44:56.594619_7465dce6-abcf-4963-92a1-30dd7118c23a}
-Quizzer: [15:27:34] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Successfully deleted approved question 2025-05-04T12:44:56.594619_7465dce6-abcf-4963-92a1-30dd7118c23a from question_answer_pair_new_review.
-Quizzer: [15:27:34] [34m[INFO][0m [widget_review_panel.dart] SUCCESS: Approval successful, fetching next question.
-Quizzer: [15:27:34] [34m[INFO][0m [session_manager.dart] SessionManager: Requesting a question for review...
-Quizzer: [15:27:34] [34m[INFO][0m [get_send_postgre.dart] Fetching random record from question_answer_pair_edits_review (offset: 22 / 29)
-Quizzer: [15:27:34] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Successfully fetched and decoded question 2025-05-07T17:33:48.277946Z_77647c42-c888-47e3-8296-6fc452815810 from question_answer_pair_edits_review
-Quizzer: [15:27:34] [36m[DEBUG][0m [widget_live_preview.dart] LivePreviewWidget build for type: multiple_choice
-Quizzer: [15:37:36] [36m[DEBUG][0m [home_page.dart] HomePage building question type: multiple_choice with key: [<'2025-05-08T00:16:48.539828Z_77647c42-c888-47e3-8296-6fc452815810'>] (using session data)
-Quizzer: [15:37:36] [36m[DEBUG][0m [session_helper.dart] Access Token: [REDACTED]
-Quizzer: [15:37:36] [36m[DEBUG][0m [session_helper.dart] Decoded JWT Token Payload (Redacted): {aal: aal1, amr: [{method: password, timestamp: 1747079228}], app_metadata: {provider: email, providers: [email]}, aud: authenticated, email: [REDACTED], exp: 1747086397, iat: 1747082797, is_anonymous: false, iss: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, phone: , role: authenticated, session_id: [REDACTED], sub: [REDACTED], user_metadata: [REDACTED], user_role: admin}
-Quizzer: [15:37:36] [36m[DEBUG][0m [session_helper.dart] User role determined from JWT: admin
-Quizzer: [15:37:36] [36m[DEBUG][0m [menu_page.dart] Building MenuPage for user role: admin
-Quizzer: [15:37:36] [36m[DEBUG][0m [home_page.dart] HomePage building question type: multiple_choice with key: [<'2025-05-08T00:16:48.539828Z_77647c42-c888-47e3-8296-6fc452815810'>] (using session data)
-Quizzer: [15:37:36] [36m[DEBUG][0m [session_helper.dart] Access Token: [REDACTED]
-Quizzer: [15:37:36] [36m[DEBUG][0m [session_helper.dart] Decoded JWT Token Payload (Redacted): {aal: aal1, amr: [{method: password, timestamp: 1747079228}], app_metadata: {provider: email, providers: [email]}, aud: authenticated, email: [REDACTED], exp: 1747086397, iat: 1747082797, is_anonymous: false, iss: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, phone: , role: authenticated, session_id: [REDACTED], sub: [REDACTED], user_metadata: [REDACTED], user_role: admin}
-Quizzer: [15:37:36] [36m[DEBUG][0m [session_helper.dart] User role determined from JWT: admin
-Quizzer: [15:37:36] [36m[DEBUG][0m [menu_page.dart] Building MenuPage for user role: admin
-Quizzer: [15:37:36] [36m[DEBUG][0m [session_helper.dart] Access Token: [REDACTED]
-Quizzer: [15:37:36] [36m[DEBUG][0m [session_helper.dart] Decoded JWT Token Payload (Redacted): {aal: aal1, amr: [{method: password, timestamp: 1747079228}], app_metadata: {provider: email, providers: [email]}, aud: authenticated, email: [REDACTED], exp: 1747086397, iat: 1747082797, is_anonymous: false, iss: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, phone: , role: authenticated, session_id: [REDACTED], sub: [REDACTED], user_metadata: [REDACTED], user_role: admin}
-Quizzer: [15:37:36] [36m[DEBUG][0m [session_helper.dart] User role determined from JWT: admin
-Quizzer: [15:37:36] [36m[DEBUG][0m [menu_page.dart] Building MenuPage for user role: admin
-Quizzer: [15:37:36] [36m[DEBUG][0m [session_helper.dart] Access Token: [REDACTED]
-Quizzer: [15:37:36] [36m[DEBUG][0m [session_helper.dart] Decoded JWT Token Payload (Redacted): {aal: aal1, amr: [{method: password, timestamp: 1747079228}], app_metadata: {provider: email, providers: [email]}, aud: authenticated, email: [REDACTED], exp: 1747086397, iat: 1747082797, is_anonymous: false, iss: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, phone: , role: authenticated, session_id: [REDACTED], sub: [REDACTED], user_metadata: [REDACTED], user_role: admin}
-Quizzer: [15:37:36] [36m[DEBUG][0m [session_helper.dart] User role determined from JWT: admin
-Quizzer: [15:37:36] [36m[DEBUG][0m [menu_page.dart] Building MenuPage for user role: admin
-Quizzer: [15:37:36] [36m[DEBUG][0m [session_helper.dart] Access Token: [REDACTED]
-Quizzer: [15:37:36] [36m[DEBUG][0m [session_helper.dart] Decoded JWT Token Payload (Redacted): {aal: aal1, amr: [{method: password, timestamp: 1747079228}], app_metadata: {provider: email, providers: [email]}, aud: authenticated, email: [REDACTED], exp: 1747086397, iat: 1747082797, is_anonymous: false, iss: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, phone: , role: authenticated, session_id: [REDACTED], sub: [REDACTED], user_metadata: [REDACTED], user_role: admin}
-Quizzer: [15:37:36] [36m[DEBUG][0m [session_helper.dart] User role determined from JWT: admin
-Quizzer: [15:37:36] [36m[DEBUG][0m [menu_page.dart] Building MenuPage for user role: admin
-Quizzer: [15:37:37] [36m[DEBUG][0m [home_page.dart] HomePage building question type: multiple_choice with key: [<'2025-05-08T00:16:48.539828Z_77647c42-c888-47e3-8296-6fc452815810'>] (using session data)
-Quizzer: [15:37:37] [36m[DEBUG][0m [home_page.dart] HomePage building question type: multiple_choice with key: [<'2025-05-08T00:16:48.539828Z_77647c42-c888-47e3-8296-6fc452815810'>] (using session data)
-Quizzer: [15:37:37] [36m[DEBUG][0m [widget_live_preview.dart] LivePreviewWidget build for type: multiple_choice
-Quizzer: [15:37:45] [34m[INFO][0m [session_manager.dart] SessionManager: Requesting a question for review...
-Quizzer: [15:37:46] [34m[INFO][0m [get_send_postgre.dart] Fetching random record from question_answer_pair_new_review (offset: 205 / 562)
-Quizzer: [15:37:46] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Successfully fetched and decoded question 2025-05-04T12:45:22.840929_7465dce6-abcf-4963-92a1-30dd7118c23a from question_answer_pair_new_review
-Quizzer: [15:37:47] [36m[DEBUG][0m [widget_live_preview.dart] LivePreviewWidget build for type: multiple_choice
-Quizzer: [15:37:50] [34m[INFO][0m [widget_review_panel.dart] Approving question...
-Quizzer: [15:37:50] [34m[INFO][0m [session_manager.dart] SessionManager: Submitting review decision (Approved: true) for PK: {question_id: 2025-05-04T12:45:22.840929_7465dce6-abcf-4963-92a1-30dd7118c23a} from question_answer_pair_new_review
-Quizzer: [15:37:50] [34m[INFO][0m [get_send_postgre.dart] Approving question 2025-05-04T12:45:22.840929_7465dce6-abcf-4963-92a1-30dd7118c23a from question_answer_pair_new_review...
-Quizzer: [15:37:50] [36m[DEBUG][0m [get_send_postgre.dart] Setting last_modified_timestamp to 2025-05-12T21:37:50.226077Z for approval.
-Quizzer: [15:37:50] [36m[DEBUG][0m [get_send_postgre.dart] Upserting question 2025-05-04T12:45:22.840929_7465dce6-abcf-4963-92a1-30dd7118c23a into question_answer_pairs...
-Quizzer: [15:37:50] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Upsert successful for question 2025-05-04T12:45:22.840929_7465dce6-abcf-4963-92a1-30dd7118c23a into question_answer_pairs.
-Quizzer: [15:37:50] [36m[DEBUG][0m [get_send_postgre.dart] Deleting approved question 2025-05-04T12:45:22.840929_7465dce6-abcf-4963-92a1-30dd7118c23a from question_answer_pair_new_review using key: {question_id: 2025-05-04T12:45:22.840929_7465dce6-abcf-4963-92a1-30dd7118c23a}
-Quizzer: [15:37:50] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Successfully deleted approved question 2025-05-04T12:45:22.840929_7465dce6-abcf-4963-92a1-30dd7118c23a from question_answer_pair_new_review.
-Quizzer: [15:37:50] [34m[INFO][0m [widget_review_panel.dart] SUCCESS: Approval successful, fetching next question.
-Quizzer: [15:37:50] [34m[INFO][0m [session_manager.dart] SessionManager: Requesting a question for review...
-Quizzer: [15:37:51] [34m[INFO][0m [get_send_postgre.dart] Fetching random record from question_answer_pair_edits_review (offset: 11 / 29)
-Quizzer: [15:37:51] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Successfully fetched and decoded question 2025-05-04T17:22:50.170351_77647c42-c888-47e3-8296-6fc452815810 from question_answer_pair_edits_review
-Quizzer: [15:37:51] [36m[DEBUG][0m [widget_live_preview.dart] LivePreviewWidget build for type: multiple_choice
-Quizzer: [15:40:11] [36m[DEBUG][0m [home_page.dart] HomePage building question type: multiple_choice with key: [<'2025-05-08T00:16:48.539828Z_77647c42-c888-47e3-8296-6fc452815810'>] (using session data)
-Quizzer: [15:40:11] [36m[DEBUG][0m [home_page.dart] HomePage building question type: multiple_choice with key: [<'2025-05-08T00:16:48.539828Z_77647c42-c888-47e3-8296-6fc452815810'>] (using session data)
-Quizzer: [15:40:11] [36m[DEBUG][0m [session_helper.dart] Access Token: [REDACTED]
-Quizzer: [15:40:11] [36m[DEBUG][0m [session_helper.dart] Decoded JWT Token Payload (Redacted): {aal: aal1, amr: [{method: password, timestamp: 1747079228}], app_metadata: {provider: email, providers: [email]}, aud: authenticated, email: [REDACTED], exp: 1747086397, iat: 1747082797, is_anonymous: false, iss: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, phone: , role: authenticated, session_id: [REDACTED], sub: [REDACTED], user_metadata: [REDACTED], user_role: admin}
-Quizzer: [15:40:11] [36m[DEBUG][0m [session_helper.dart] User role determined from JWT: admin
-Quizzer: [15:40:11] [36m[DEBUG][0m [menu_page.dart] Building MenuPage for user role: admin
-Quizzer: [15:40:11] [36m[DEBUG][0m [session_helper.dart] Access Token: [REDACTED]
-Quizzer: [15:40:11] [36m[DEBUG][0m [session_helper.dart] Decoded JWT Token Payload (Redacted): {aal: aal1, amr: [{method: password, timestamp: 1747079228}], app_metadata: {provider: email, providers: [email]}, aud: authenticated, email: [REDACTED], exp: 1747086397, iat: 1747082797, is_anonymous: false, iss: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, phone: , role: authenticated, session_id: [REDACTED], sub: [REDACTED], user_metadata: [REDACTED], user_role: admin}
-Quizzer: [15:40:11] [36m[DEBUG][0m [session_helper.dart] User role determined from JWT: admin
-Quizzer: [15:40:11] [36m[DEBUG][0m [menu_page.dart] Building MenuPage for user role: admin
-Quizzer: [15:40:11] [36m[DEBUG][0m [session_helper.dart] Access Token: [REDACTED]
-Quizzer: [15:40:11] [36m[DEBUG][0m [session_helper.dart] Decoded JWT Token Payload (Redacted): {aal: aal1, amr: [{method: password, timestamp: 1747079228}], app_metadata: {provider: email, providers: [email]}, aud: authenticated, email: [REDACTED], exp: 1747086397, iat: 1747082797, is_anonymous: false, iss: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, phone: , role: authenticated, session_id: [REDACTED], sub: [REDACTED], user_metadata: [REDACTED], user_role: admin}
-Quizzer: [15:40:11] [36m[DEBUG][0m [session_helper.dart] User role determined from JWT: admin
-Quizzer: [15:40:11] [36m[DEBUG][0m [menu_page.dart] Building MenuPage for user role: admin
-Quizzer: [15:40:11] [36m[DEBUG][0m [home_page.dart] HomePage building question type: multiple_choice with key: [<'2025-05-08T00:16:48.539828Z_77647c42-c888-47e3-8296-6fc452815810'>] (using session data)
-Quizzer: [15:40:11] [36m[DEBUG][0m [home_page.dart] HomePage building question type: multiple_choice with key: [<'2025-05-08T00:16:48.539828Z_77647c42-c888-47e3-8296-6fc452815810'>] (using session data)
-Quizzer: [15:40:11] [36m[DEBUG][0m [session_helper.dart] Access Token: [REDACTED]
-Quizzer: [15:40:11] [36m[DEBUG][0m [session_helper.dart] Decoded JWT Token Payload (Redacted): {aal: aal1, amr: [{method: password, timestamp: 1747079228}], app_metadata: {provider: email, providers: [email]}, aud: authenticated, email: [REDACTED], exp: 1747086397, iat: 1747082797, is_anonymous: false, iss: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, phone: , role: authenticated, session_id: [REDACTED], sub: [REDACTED], user_metadata: [REDACTED], user_role: admin}
-Quizzer: [15:40:11] [36m[DEBUG][0m [session_helper.dart] User role determined from JWT: admin
-Quizzer: [15:40:11] [36m[DEBUG][0m [menu_page.dart] Building MenuPage for user role: admin
-Quizzer: [15:40:11] [36m[DEBUG][0m [session_helper.dart] Access Token: [REDACTED]
-Quizzer: [15:40:11] [36m[DEBUG][0m [session_helper.dart] Decoded JWT Token Payload (Redacted): {aal: aal1, amr: [{method: password, timestamp: 1747079228}], app_metadata: {provider: email, providers: [email]}, aud: authenticated, email: [REDACTED], exp: 1747086397, iat: 1747082797, is_anonymous: false, iss: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, phone: , role: authenticated, session_id: [REDACTED], sub: [REDACTED], user_metadata: [REDACTED], user_role: admin}
-Quizzer: [15:40:11] [36m[DEBUG][0m [session_helper.dart] User role determined from JWT: admin
-Quizzer: [15:40:11] [36m[DEBUG][0m [menu_page.dart] Building MenuPage for user role: admin
-Quizzer: [15:40:11] [36m[DEBUG][0m [widget_live_preview.dart] LivePreviewWidget build for type: multiple_choice
-Quizzer: [15:40:19] [34m[INFO][0m [widget_review_panel.dart] Approving question...
-Quizzer: [15:40:19] [34m[INFO][0m [session_manager.dart] SessionManager: Submitting review decision (Approved: true) for PK: {question_id: 2025-05-04T17:22:50.170351_77647c42-c888-47e3-8296-6fc452815810, last_modified_timestamp: 2025-05-11T21:20:58.715343Z} from question_answer_pair_edits_review
-Quizzer: [15:40:19] [34m[INFO][0m [get_send_postgre.dart] Approving question 2025-05-04T17:22:50.170351_77647c42-c888-47e3-8296-6fc452815810 from question_answer_pair_edits_review...
-Quizzer: [15:40:19] [36m[DEBUG][0m [get_send_postgre.dart] Setting last_modified_timestamp to 2025-05-12T21:40:19.577588Z for approval.
-Quizzer: [15:40:19] [36m[DEBUG][0m [get_send_postgre.dart] Upserting question 2025-05-04T17:22:50.170351_77647c42-c888-47e3-8296-6fc452815810 into question_answer_pairs...
-Quizzer: [15:40:20] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Upsert successful for question 2025-05-04T17:22:50.170351_77647c42-c888-47e3-8296-6fc452815810 into question_answer_pairs.
-Quizzer: [15:40:20] [36m[DEBUG][0m [get_send_postgre.dart] Deleting approved question 2025-05-04T17:22:50.170351_77647c42-c888-47e3-8296-6fc452815810 from question_answer_pair_edits_review using key: {question_id: 2025-05-04T17:22:50.170351_77647c42-c888-47e3-8296-6fc452815810, last_modified_timestamp: 2025-05-11T21:20:58.715343Z}
-Quizzer: [15:40:20] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Successfully deleted approved question 2025-05-04T17:22:50.170351_77647c42-c888-47e3-8296-6fc452815810 from question_answer_pair_edits_review.
-Quizzer: [15:40:20] [34m[INFO][0m [widget_review_panel.dart] SUCCESS: Approval successful, fetching next question.
-Quizzer: [15:40:20] [34m[INFO][0m [session_manager.dart] SessionManager: Requesting a question for review...
-Quizzer: [15:40:21] [34m[INFO][0m [get_send_postgre.dart] Fetching random record from question_answer_pair_new_review (offset: 395 / 561)
-Quizzer: [15:40:21] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Successfully fetched and decoded question 2025-05-04T12:45:56.541012_7465dce6-abcf-4963-92a1-30dd7118c23a from question_answer_pair_new_review
-Quizzer: [15:40:21] [36m[DEBUG][0m [widget_live_preview.dart] LivePreviewWidget build for type: sort_order
-Quizzer: [15:40:21] [34m[INFO][0m [widget_sort_order_question.dart] SortOrderQuestionWidget initState
-Quizzer: [15:40:21] [34m[INFO][0m [widget_sort_order_question.dart] SortOrderWidget: Disabled, not shuffling.
-Quizzer: [15:40:21] [34m[INFO][0m [widget_sort_order_question.dart] SortOrderWidget: Disabled state, auto-setting submitted=true, correct=true for preview.
-Quizzer: [15:40:21] [36m[DEBUG][0m [widget_sort_order_question.dart] SortOrder Initial Map (Display Index -> Correct Index): [0, 1, 2, 3, 4]
-Quizzer: [15:40:31] [34m[INFO][0m [widget_review_panel.dart] Approving question...
-Quizzer: [15:40:31] [34m[INFO][0m [session_manager.dart] SessionManager: Submitting review decision (Approved: true) for PK: {question_id: 2025-05-04T12:45:56.541012_7465dce6-abcf-4963-92a1-30dd7118c23a} from question_answer_pair_new_review
-Quizzer: [15:40:31] [34m[INFO][0m [get_send_postgre.dart] Approving question 2025-05-04T12:45:56.541012_7465dce6-abcf-4963-92a1-30dd7118c23a from question_answer_pair_new_review...
-Quizzer: [15:40:31] [36m[DEBUG][0m [get_send_postgre.dart] Setting last_modified_timestamp to 2025-05-12T21:40:31.737571Z for approval.
-Quizzer: [15:40:31] [36m[DEBUG][0m [get_send_postgre.dart] Upserting question 2025-05-04T12:45:56.541012_7465dce6-abcf-4963-92a1-30dd7118c23a into question_answer_pairs...
-Quizzer: [15:40:32] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Upsert successful for question 2025-05-04T12:45:56.541012_7465dce6-abcf-4963-92a1-30dd7118c23a into question_answer_pairs.
-Quizzer: [15:40:32] [36m[DEBUG][0m [get_send_postgre.dart] Deleting approved question 2025-05-04T12:45:56.541012_7465dce6-abcf-4963-92a1-30dd7118c23a from question_answer_pair_new_review using key: {question_id: 2025-05-04T12:45:56.541012_7465dce6-abcf-4963-92a1-30dd7118c23a}
-Quizzer: [15:40:32] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Successfully deleted approved question 2025-05-04T12:45:56.541012_7465dce6-abcf-4963-92a1-30dd7118c23a from question_answer_pair_new_review.
-Quizzer: [15:40:32] [34m[INFO][0m [widget_review_panel.dart] SUCCESS: Approval successful, fetching next question.
-Quizzer: [15:40:32] [34m[INFO][0m [session_manager.dart] SessionManager: Requesting a question for review...
-Quizzer: [15:40:33] [34m[INFO][0m [get_send_postgre.dart] Fetching random record from question_answer_pair_edits_review (offset: 15 / 28)
-Quizzer: [15:40:33] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Successfully fetched and decoded question 2025-05-04T17:37:46.702622_77647c42-c888-47e3-8296-6fc452815810 from question_answer_pair_edits_review
-Quizzer: [15:40:33] [36m[DEBUG][0m [widget_live_preview.dart] LivePreviewWidget build for type: multiple_choice
-Quizzer: [15:41:35] [34m[INFO][0m [widget_review_panel.dart] Approving question...
-Quizzer: [15:41:35] [34m[INFO][0m [session_manager.dart] SessionManager: Submitting review decision (Approved: true) for PK: {question_id: 2025-05-04T17:37:46.702622_77647c42-c888-47e3-8296-6fc452815810, last_modified_timestamp: 2025-05-11T21:22:23.835589Z} from question_answer_pair_edits_review
-Quizzer: [15:41:35] [34m[INFO][0m [get_send_postgre.dart] Approving question 2025-05-04T17:37:46.702622_77647c42-c888-47e3-8296-6fc452815810 from question_answer_pair_edits_review...
-Quizzer: [15:41:35] [36m[DEBUG][0m [get_send_postgre.dart] Setting last_modified_timestamp to 2025-05-12T21:41:35.061139Z for approval.
-Quizzer: [15:41:35] [36m[DEBUG][0m [get_send_postgre.dart] Upserting question 2025-05-04T17:37:46.702622_77647c42-c888-47e3-8296-6fc452815810 into question_answer_pairs...
-Quizzer: [15:41:35] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Upsert successful for question 2025-05-04T17:37:46.702622_77647c42-c888-47e3-8296-6fc452815810 into question_answer_pairs.
-Quizzer: [15:41:35] [36m[DEBUG][0m [get_send_postgre.dart] Deleting approved question 2025-05-04T17:37:46.702622_77647c42-c888-47e3-8296-6fc452815810 from question_answer_pair_edits_review using key: {question_id: 2025-05-04T17:37:46.702622_77647c42-c888-47e3-8296-6fc452815810, last_modified_timestamp: 2025-05-11T21:22:23.835589Z}
-Quizzer: [15:41:35] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Successfully deleted approved question 2025-05-04T17:37:46.702622_77647c42-c888-47e3-8296-6fc452815810 from question_answer_pair_edits_review.
-Quizzer: [15:41:35] [34m[INFO][0m [widget_review_panel.dart] SUCCESS: Approval successful, fetching next question.
-Quizzer: [15:41:35] [34m[INFO][0m [session_manager.dart] SessionManager: Requesting a question for review...
-Quizzer: [15:41:35] [34m[INFO][0m [get_send_postgre.dart] Fetching random record from question_answer_pair_new_review (offset: 398 / 560)
-Quizzer: [15:41:36] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Successfully fetched and decoded question 2025-05-04T12:45:56.886056_7465dce6-abcf-4963-92a1-30dd7118c23a from question_answer_pair_new_review
-Quizzer: [15:41:36] [36m[DEBUG][0m [widget_live_preview.dart] LivePreviewWidget build for type: sort_order
-Quizzer: [15:41:36] [34m[INFO][0m [widget_sort_order_question.dart] SortOrderQuestionWidget initState
-Quizzer: [15:41:36] [34m[INFO][0m [widget_sort_order_question.dart] SortOrderWidget: Disabled, not shuffling.
-Quizzer: [15:41:36] [34m[INFO][0m [widget_sort_order_question.dart] SortOrderWidget: Disabled state, auto-setting submitted=true, correct=true for preview.
-Quizzer: [15:41:36] [36m[DEBUG][0m [widget_sort_order_question.dart] SortOrder Initial Map (Display Index -> Correct Index): [0, 1, 2, 3, 4]
-Quizzer: [15:41:40] [34m[INFO][0m [widget_review_panel.dart] Approving question...
-Quizzer: [15:41:40] [34m[INFO][0m [session_manager.dart] SessionManager: Submitting review decision (Approved: true) for PK: {question_id: 2025-05-04T12:45:56.886056_7465dce6-abcf-4963-92a1-30dd7118c23a} from question_answer_pair_new_review
-Quizzer: [15:41:40] [34m[INFO][0m [get_send_postgre.dart] Approving question 2025-05-04T12:45:56.886056_7465dce6-abcf-4963-92a1-30dd7118c23a from question_answer_pair_new_review...
-Quizzer: [15:41:40] [36m[DEBUG][0m [get_send_postgre.dart] Setting last_modified_timestamp to 2025-05-12T21:41:40.356437Z for approval.
-Quizzer: [15:41:40] [36m[DEBUG][0m [get_send_postgre.dart] Upserting question 2025-05-04T12:45:56.886056_7465dce6-abcf-4963-92a1-30dd7118c23a into question_answer_pairs...
-Quizzer: [15:41:40] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Upsert successful for question 2025-05-04T12:45:56.886056_7465dce6-abcf-4963-92a1-30dd7118c23a into question_answer_pairs.
-Quizzer: [15:41:40] [36m[DEBUG][0m [get_send_postgre.dart] Deleting approved question 2025-05-04T12:45:56.886056_7465dce6-abcf-4963-92a1-30dd7118c23a from question_answer_pair_new_review using key: {question_id: 2025-05-04T12:45:56.886056_7465dce6-abcf-4963-92a1-30dd7118c23a}
-Quizzer: [15:41:40] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Successfully deleted approved question 2025-05-04T12:45:56.886056_7465dce6-abcf-4963-92a1-30dd7118c23a from question_answer_pair_new_review.
-Quizzer: [15:41:40] [34m[INFO][0m [widget_review_panel.dart] SUCCESS: Approval successful, fetching next question.
-Quizzer: [15:41:40] [34m[INFO][0m [session_manager.dart] SessionManager: Requesting a question for review...
-Quizzer: [15:41:40] [34m[INFO][0m [get_send_postgre.dart] Fetching random record from question_answer_pair_new_review (offset: 309 / 559)
-Quizzer: [15:41:41] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Successfully fetched and decoded question 2025-05-04T12:45:48.924946_7465dce6-abcf-4963-92a1-30dd7118c23a from question_answer_pair_new_review
-Quizzer: [15:41:41] [36m[DEBUG][0m [widget_live_preview.dart] LivePreviewWidget build for type: sort_order
-Quizzer: [15:41:41] [34m[INFO][0m [widget_sort_order_question.dart] SortOrderQuestionWidget initState
-Quizzer: [15:41:41] [34m[INFO][0m [widget_sort_order_question.dart] SortOrderWidget: Disabled, not shuffling.
-Quizzer: [15:41:41] [34m[INFO][0m [widget_sort_order_question.dart] SortOrderWidget: Disabled state, auto-setting submitted=true, correct=true for preview.
-Quizzer: [15:41:41] [36m[DEBUG][0m [widget_sort_order_question.dart] SortOrder Initial Map (Display Index -> Correct Index): [0, 1, 2, 3, 4]
-Quizzer: [15:41:43] [34m[INFO][0m [widget_review_panel.dart] Approving question...
-Quizzer: [15:41:43] [34m[INFO][0m [session_manager.dart] SessionManager: Submitting review decision (Approved: true) for PK: {question_id: 2025-05-04T12:45:48.924946_7465dce6-abcf-4963-92a1-30dd7118c23a} from question_answer_pair_new_review
-Quizzer: [15:41:43] [34m[INFO][0m [get_send_postgre.dart] Approving question 2025-05-04T12:45:48.924946_7465dce6-abcf-4963-92a1-30dd7118c23a from question_answer_pair_new_review...
-Quizzer: [15:41:43] [36m[DEBUG][0m [get_send_postgre.dart] Setting last_modified_timestamp to 2025-05-12T21:41:43.576553Z for approval.
-Quizzer: [15:41:43] [36m[DEBUG][0m [get_send_postgre.dart] Upserting question 2025-05-04T12:45:48.924946_7465dce6-abcf-4963-92a1-30dd7118c23a into question_answer_pairs...
-Quizzer: [15:41:43] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Upsert successful for question 2025-05-04T12:45:48.924946_7465dce6-abcf-4963-92a1-30dd7118c23a into question_answer_pairs.
-Quizzer: [15:41:43] [36m[DEBUG][0m [get_send_postgre.dart] Deleting approved question 2025-05-04T12:45:48.924946_7465dce6-abcf-4963-92a1-30dd7118c23a from question_answer_pair_new_review using key: {question_id: 2025-05-04T12:45:48.924946_7465dce6-abcf-4963-92a1-30dd7118c23a}
-Quizzer: [15:41:43] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Successfully deleted approved question 2025-05-04T12:45:48.924946_7465dce6-abcf-4963-92a1-30dd7118c23a from question_answer_pair_new_review.
-Quizzer: [15:41:43] [34m[INFO][0m [widget_review_panel.dart] SUCCESS: Approval successful, fetching next question.
-Quizzer: [15:41:43] [34m[INFO][0m [session_manager.dart] SessionManager: Requesting a question for review...
-Quizzer: [15:41:44] [34m[INFO][0m [get_send_postgre.dart] Fetching random record from question_answer_pair_edits_review (offset: 23 / 27)
-Quizzer: [15:41:44] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Successfully fetched and decoded question 2025-05-04T17:40:13.206028_77647c42-c888-47e3-8296-6fc452815810 from question_answer_pair_edits_review
-Quizzer: [15:41:44] [36m[DEBUG][0m [widget_live_preview.dart] LivePreviewWidget build for type: multiple_choice
-Quizzer: [15:41:44] [36m[DEBUG][0m [question_answer_element.dart] ElementRenderer: Found image in assets: images/question_answer_pair_assets/e577584b-f035-4721-99d3-fefb86b5fbb7.png
-Quizzer: [15:41:46] [34m[INFO][0m [widget_review_panel.dart] Approving question...
-Quizzer: [15:41:46] [34m[INFO][0m [session_manager.dart] SessionManager: Submitting review decision (Approved: true) for PK: {question_id: 2025-05-04T17:40:13.206028_77647c42-c888-47e3-8296-6fc452815810, last_modified_timestamp: 2025-05-12T18:59:25.031241Z} from question_answer_pair_edits_review
-Quizzer: [15:41:46] [34m[INFO][0m [get_send_postgre.dart] Approving question 2025-05-04T17:40:13.206028_77647c42-c888-47e3-8296-6fc452815810 from question_answer_pair_edits_review...
-Quizzer: [15:41:46] [36m[DEBUG][0m [get_send_postgre.dart] Setting last_modified_timestamp to 2025-05-12T21:41:46.686279Z for approval.
-Quizzer: [15:41:46] [36m[DEBUG][0m [get_send_postgre.dart] Upserting question 2025-05-04T17:40:13.206028_77647c42-c888-47e3-8296-6fc452815810 into question_answer_pairs...
-Quizzer: [15:41:46] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Upsert successful for question 2025-05-04T17:40:13.206028_77647c42-c888-47e3-8296-6fc452815810 into question_answer_pairs.
-Quizzer: [15:41:46] [36m[DEBUG][0m [get_send_postgre.dart] Deleting approved question 2025-05-04T17:40:13.206028_77647c42-c888-47e3-8296-6fc452815810 from question_answer_pair_edits_review using key: {question_id: 2025-05-04T17:40:13.206028_77647c42-c888-47e3-8296-6fc452815810, last_modified_timestamp: 2025-05-12T18:59:25.031241Z}
-Quizzer: [15:41:46] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Successfully deleted approved question 2025-05-04T17:40:13.206028_77647c42-c888-47e3-8296-6fc452815810 from question_answer_pair_edits_review.
-Quizzer: [15:41:46] [34m[INFO][0m [widget_review_panel.dart] SUCCESS: Approval successful, fetching next question.
-Quizzer: [15:41:46] [34m[INFO][0m [session_manager.dart] SessionManager: Requesting a question for review...
-Quizzer: [15:41:47] [34m[INFO][0m [get_send_postgre.dart] Fetching random record from question_answer_pair_new_review (offset: 345 / 558)
-Quizzer: [15:41:47] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Successfully fetched and decoded question 2025-05-04T12:45:52.199540_7465dce6-abcf-4963-92a1-30dd7118c23a from question_answer_pair_new_review
-Quizzer: [15:41:47] [36m[DEBUG][0m [widget_live_preview.dart] LivePreviewWidget build for type: sort_order
-Quizzer: [15:41:47] [34m[INFO][0m [widget_sort_order_question.dart] SortOrderQuestionWidget initState
-Quizzer: [15:41:47] [34m[INFO][0m [widget_sort_order_question.dart] SortOrderWidget: Disabled, not shuffling.
-Quizzer: [15:41:47] [34m[INFO][0m [widget_sort_order_question.dart] SortOrderWidget: Disabled state, auto-setting submitted=true, correct=true for preview.
-Quizzer: [15:41:47] [36m[DEBUG][0m [widget_sort_order_question.dart] SortOrder Initial Map (Display Index -> Correct Index): [0, 1, 2, 3, 4]
-Quizzer: [15:41:49] [34m[INFO][0m [widget_review_panel.dart] Approving question...
-Quizzer: [15:41:49] [34m[INFO][0m [session_manager.dart] SessionManager: Submitting review decision (Approved: true) for PK: {question_id: 2025-05-04T12:45:52.199540_7465dce6-abcf-4963-92a1-30dd7118c23a} from question_answer_pair_new_review
-Quizzer: [15:41:49] [34m[INFO][0m [get_send_postgre.dart] Approving question 2025-05-04T12:45:52.199540_7465dce6-abcf-4963-92a1-30dd7118c23a from question_answer_pair_new_review...
-Quizzer: [15:41:49] [36m[DEBUG][0m [get_send_postgre.dart] Setting last_modified_timestamp to 2025-05-12T21:41:49.558910Z for approval.
-Quizzer: [15:41:49] [36m[DEBUG][0m [get_send_postgre.dart] Upserting question 2025-05-04T12:45:52.199540_7465dce6-abcf-4963-92a1-30dd7118c23a into question_answer_pairs...
-Quizzer: [15:41:49] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Upsert successful for question 2025-05-04T12:45:52.199540_7465dce6-abcf-4963-92a1-30dd7118c23a into question_answer_pairs.
-Quizzer: [15:41:49] [36m[DEBUG][0m [get_send_postgre.dart] Deleting approved question 2025-05-04T12:45:52.199540_7465dce6-abcf-4963-92a1-30dd7118c23a from question_answer_pair_new_review using key: {question_id: 2025-05-04T12:45:52.199540_7465dce6-abcf-4963-92a1-30dd7118c23a}
-Quizzer: [15:41:49] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Successfully deleted approved question 2025-05-04T12:45:52.199540_7465dce6-abcf-4963-92a1-30dd7118c23a from question_answer_pair_new_review.
-Quizzer: [15:41:49] [34m[INFO][0m [widget_review_panel.dart] SUCCESS: Approval successful, fetching next question.
-Quizzer: [15:41:49] [34m[INFO][0m [session_manager.dart] SessionManager: Requesting a question for review...
-Quizzer: [15:41:50] [34m[INFO][0m [get_send_postgre.dart] Fetching random record from question_answer_pair_new_review (offset: 290 / 557)
-Quizzer: [15:41:50] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Successfully fetched and decoded question 2025-05-04T12:45:47.266225_7465dce6-abcf-4963-92a1-30dd7118c23a from question_answer_pair_new_review
-Quizzer: [15:41:50] [36m[DEBUG][0m [widget_live_preview.dart] LivePreviewWidget build for type: sort_order
-Quizzer: [15:41:50] [34m[INFO][0m [widget_sort_order_question.dart] SortOrderQuestionWidget initState
-Quizzer: [15:41:50] [34m[INFO][0m [widget_sort_order_question.dart] SortOrderWidget: Disabled, not shuffling.
-Quizzer: [15:41:50] [34m[INFO][0m [widget_sort_order_question.dart] SortOrderWidget: Disabled state, auto-setting submitted=true, correct=true for preview.
-Quizzer: [15:41:50] [36m[DEBUG][0m [widget_sort_order_question.dart] SortOrder Initial Map (Display Index -> Correct Index): [0, 1, 2, 3, 4]
-Quizzer: [15:41:51] [34m[INFO][0m [widget_review_panel.dart] Approving question...
-Quizzer: [15:41:51] [34m[INFO][0m [session_manager.dart] SessionManager: Submitting review decision (Approved: true) for PK: {question_id: 2025-05-04T12:45:47.266225_7465dce6-abcf-4963-92a1-30dd7118c23a} from question_answer_pair_new_review
-Quizzer: [15:41:51] [34m[INFO][0m [get_send_postgre.dart] Approving question 2025-05-04T12:45:47.266225_7465dce6-abcf-4963-92a1-30dd7118c23a from question_answer_pair_new_review...
-Quizzer: [15:41:51] [36m[DEBUG][0m [get_send_postgre.dart] Setting last_modified_timestamp to 2025-05-12T21:41:51.929480Z for approval.
-Quizzer: [15:41:51] [36m[DEBUG][0m [get_send_postgre.dart] Upserting question 2025-05-04T12:45:47.266225_7465dce6-abcf-4963-92a1-30dd7118c23a into question_answer_pairs...
-Quizzer: [15:41:52] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Upsert successful for question 2025-05-04T12:45:47.266225_7465dce6-abcf-4963-92a1-30dd7118c23a into question_answer_pairs.
-Quizzer: [15:41:52] [36m[DEBUG][0m [get_send_postgre.dart] Deleting approved question 2025-05-04T12:45:47.266225_7465dce6-abcf-4963-92a1-30dd7118c23a from question_answer_pair_new_review using key: {question_id: 2025-05-04T12:45:47.266225_7465dce6-abcf-4963-92a1-30dd7118c23a}
-Quizzer: [15:41:52] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Successfully deleted approved question 2025-05-04T12:45:47.266225_7465dce6-abcf-4963-92a1-30dd7118c23a from question_answer_pair_new_review.
-Quizzer: [15:41:52] [34m[INFO][0m [widget_review_panel.dart] SUCCESS: Approval successful, fetching next question.
-Quizzer: [15:41:52] [34m[INFO][0m [session_manager.dart] SessionManager: Requesting a question for review...
-Quizzer: [15:41:52] [34m[INFO][0m [get_send_postgre.dart] Fetching random record from question_answer_pair_new_review (offset: 281 / 556)
-Quizzer: [15:41:52] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Successfully fetched and decoded question 2025-05-04T12:45:46.396125_7465dce6-abcf-4963-92a1-30dd7118c23a from question_answer_pair_new_review
-Quizzer: [15:41:52] [36m[DEBUG][0m [widget_live_preview.dart] LivePreviewWidget build for type: sort_order
-Quizzer: [15:41:52] [34m[INFO][0m [widget_sort_order_question.dart] SortOrderQuestionWidget initState
-Quizzer: [15:41:52] [34m[INFO][0m [widget_sort_order_question.dart] SortOrderWidget: Disabled, not shuffling.
-Quizzer: [15:41:52] [34m[INFO][0m [widget_sort_order_question.dart] SortOrderWidget: Disabled state, auto-setting submitted=true, correct=true for preview.
-Quizzer: [15:41:52] [36m[DEBUG][0m [widget_sort_order_question.dart] SortOrder Initial Map (Display Index -> Correct Index): [0, 1, 2, 3, 4]
-Quizzer: [15:41:54] [34m[INFO][0m [widget_review_panel.dart] Approving question...
-Quizzer: [15:41:54] [34m[INFO][0m [session_manager.dart] SessionManager: Submitting review decision (Approved: true) for PK: {question_id: 2025-05-04T12:45:46.396125_7465dce6-abcf-4963-92a1-30dd7118c23a} from question_answer_pair_new_review
-Quizzer: [15:41:54] [34m[INFO][0m [get_send_postgre.dart] Approving question 2025-05-04T12:45:46.396125_7465dce6-abcf-4963-92a1-30dd7118c23a from question_answer_pair_new_review...
-Quizzer: [15:41:54] [36m[DEBUG][0m [get_send_postgre.dart] Setting last_modified_timestamp to 2025-05-12T21:41:54.541194Z for approval.
-Quizzer: [15:41:54] [36m[DEBUG][0m [get_send_postgre.dart] Upserting question 2025-05-04T12:45:46.396125_7465dce6-abcf-4963-92a1-30dd7118c23a into question_answer_pairs...
-Quizzer: [15:41:54] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Upsert successful for question 2025-05-04T12:45:46.396125_7465dce6-abcf-4963-92a1-30dd7118c23a into question_answer_pairs.
-Quizzer: [15:41:54] [36m[DEBUG][0m [get_send_postgre.dart] Deleting approved question 2025-05-04T12:45:46.396125_7465dce6-abcf-4963-92a1-30dd7118c23a from question_answer_pair_new_review using key: {question_id: 2025-05-04T12:45:46.396125_7465dce6-abcf-4963-92a1-30dd7118c23a}
-Quizzer: [15:41:54] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Successfully deleted approved question 2025-05-04T12:45:46.396125_7465dce6-abcf-4963-92a1-30dd7118c23a from question_answer_pair_new_review.
-Quizzer: [15:41:54] [34m[INFO][0m [widget_review_panel.dart] SUCCESS: Approval successful, fetching next question.
-Quizzer: [15:41:54] [34m[INFO][0m [session_manager.dart] SessionManager: Requesting a question for review...
-Quizzer: [15:41:55] [34m[INFO][0m [get_send_postgre.dart] Fetching random record from question_answer_pair_new_review (offset: 540 / 555)
-Quizzer: [15:41:55] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Successfully fetched and decoded question 2025-05-08T00:17:16.351999Z_77647c42-c888-47e3-8296-6fc452815810 from question_answer_pair_new_review
-Quizzer: [15:41:55] [36m[DEBUG][0m [widget_live_preview.dart] LivePreviewWidget build for type: multiple_choice
-Quizzer: [15:41:56] [34m[INFO][0m [widget_review_panel.dart] Approving question...
-Quizzer: [15:41:56] [34m[INFO][0m [session_manager.dart] SessionManager: Submitting review decision (Approved: true) for PK: {question_id: 2025-05-08T00:17:16.351999Z_77647c42-c888-47e3-8296-6fc452815810} from question_answer_pair_new_review
-Quizzer: [15:41:56] [34m[INFO][0m [get_send_postgre.dart] Approving question 2025-05-08T00:17:16.351999Z_77647c42-c888-47e3-8296-6fc452815810 from question_answer_pair_new_review...
-Quizzer: [15:41:56] [36m[DEBUG][0m [get_send_postgre.dart] Setting last_modified_timestamp to 2025-05-12T21:41:56.928232Z for approval.
-Quizzer: [15:41:56] [36m[DEBUG][0m [get_send_postgre.dart] Upserting question 2025-05-08T00:17:16.351999Z_77647c42-c888-47e3-8296-6fc452815810 into question_answer_pairs...
-Quizzer: [15:41:57] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Upsert successful for question 2025-05-08T00:17:16.351999Z_77647c42-c888-47e3-8296-6fc452815810 into question_answer_pairs.
-Quizzer: [15:41:57] [36m[DEBUG][0m [get_send_postgre.dart] Deleting approved question 2025-05-08T00:17:16.351999Z_77647c42-c888-47e3-8296-6fc452815810 from question_answer_pair_new_review using key: {question_id: 2025-05-08T00:17:16.351999Z_77647c42-c888-47e3-8296-6fc452815810}
-Quizzer: [15:41:57] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Successfully deleted approved question 2025-05-08T00:17:16.351999Z_77647c42-c888-47e3-8296-6fc452815810 from question_answer_pair_new_review.
-Quizzer: [15:41:57] [34m[INFO][0m [widget_review_panel.dart] SUCCESS: Approval successful, fetching next question.
-Quizzer: [15:41:57] [34m[INFO][0m [session_manager.dart] SessionManager: Requesting a question for review...
-Quizzer: [15:41:57] [34m[INFO][0m [get_send_postgre.dart] Fetching random record from question_answer_pair_new_review (offset: 321 / 554)
-Quizzer: [15:41:57] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Successfully fetched and decoded question 2025-05-04T12:45:50.248855_7465dce6-abcf-4963-92a1-30dd7118c23a from question_answer_pair_new_review
-Quizzer: [15:41:57] [36m[DEBUG][0m [widget_live_preview.dart] LivePreviewWidget build for type: sort_order
-Quizzer: [15:41:57] [34m[INFO][0m [widget_sort_order_question.dart] SortOrderQuestionWidget initState
-Quizzer: [15:41:57] [34m[INFO][0m [widget_sort_order_question.dart] SortOrderWidget: Disabled, not shuffling.
-Quizzer: [15:41:57] [34m[INFO][0m [widget_sort_order_question.dart] SortOrderWidget: Disabled state, auto-setting submitted=true, correct=true for preview.
-Quizzer: [15:41:57] [36m[DEBUG][0m [widget_sort_order_question.dart] SortOrder Initial Map (Display Index -> Correct Index): [0, 1, 2, 3, 4]
-Quizzer: [15:42:00] [34m[INFO][0m [widget_review_panel.dart] Approving question...
-Quizzer: [15:42:00] [34m[INFO][0m [session_manager.dart] SessionManager: Submitting review decision (Approved: true) for PK: {question_id: 2025-05-04T12:45:50.248855_7465dce6-abcf-4963-92a1-30dd7118c23a} from question_answer_pair_new_review
-Quizzer: [15:42:00] [34m[INFO][0m [get_send_postgre.dart] Approving question 2025-05-04T12:45:50.248855_7465dce6-abcf-4963-92a1-30dd7118c23a from question_answer_pair_new_review...
-Quizzer: [15:42:00] [36m[DEBUG][0m [get_send_postgre.dart] Setting last_modified_timestamp to 2025-05-12T21:42:00.051712Z for approval.
-Quizzer: [15:42:00] [36m[DEBUG][0m [get_send_postgre.dart] Upserting question 2025-05-04T12:45:50.248855_7465dce6-abcf-4963-92a1-30dd7118c23a into question_answer_pairs...
-Quizzer: [15:42:00] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Upsert successful for question 2025-05-04T12:45:50.248855_7465dce6-abcf-4963-92a1-30dd7118c23a into question_answer_pairs.
-Quizzer: [15:42:00] [36m[DEBUG][0m [get_send_postgre.dart] Deleting approved question 2025-05-04T12:45:50.248855_7465dce6-abcf-4963-92a1-30dd7118c23a from question_answer_pair_new_review using key: {question_id: 2025-05-04T12:45:50.248855_7465dce6-abcf-4963-92a1-30dd7118c23a}
-Quizzer: [15:42:00] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Successfully deleted approved question 2025-05-04T12:45:50.248855_7465dce6-abcf-4963-92a1-30dd7118c23a from question_answer_pair_new_review.
-Quizzer: [15:42:00] [34m[INFO][0m [widget_review_panel.dart] SUCCESS: Approval successful, fetching next question.
-Quizzer: [15:42:00] [34m[INFO][0m [session_manager.dart] SessionManager: Requesting a question for review...
-Quizzer: [15:42:00] [34m[INFO][0m [get_send_postgre.dart] Fetching random record from question_answer_pair_edits_review (offset: 9 / 26)
-Quizzer: [15:42:01] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Successfully fetched and decoded question 2025-05-04T15:12:13.940980_77647c42-c888-47e3-8296-6fc452815810 from question_answer_pair_edits_review
-Quizzer: [15:42:01] [36m[DEBUG][0m [widget_live_preview.dart] LivePreviewWidget build for type: multiple_choice
-Quizzer: [15:42:01] [34m[INFO][0m [widget_review_panel.dart] Approving question...
-Quizzer: [15:42:01] [34m[INFO][0m [session_manager.dart] SessionManager: Submitting review decision (Approved: true) for PK: {question_id: 2025-05-04T15:12:13.940980_77647c42-c888-47e3-8296-6fc452815810, last_modified_timestamp: 2025-05-11T21:08:27.317266Z} from question_answer_pair_edits_review
-Quizzer: [15:42:02] [34m[INFO][0m [get_send_postgre.dart] Approving question 2025-05-04T15:12:13.940980_77647c42-c888-47e3-8296-6fc452815810 from question_answer_pair_edits_review...
-Quizzer: [15:42:02] [36m[DEBUG][0m [get_send_postgre.dart] Setting last_modified_timestamp to 2025-05-12T21:42:02.001950Z for approval.
-Quizzer: [15:42:02] [36m[DEBUG][0m [get_send_postgre.dart] Upserting question 2025-05-04T15:12:13.940980_77647c42-c888-47e3-8296-6fc452815810 into question_answer_pairs...
-Quizzer: [15:42:02] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Upsert successful for question 2025-05-04T15:12:13.940980_77647c42-c888-47e3-8296-6fc452815810 into question_answer_pairs.
-Quizzer: [15:42:02] [36m[DEBUG][0m [get_send_postgre.dart] Deleting approved question 2025-05-04T15:12:13.940980_77647c42-c888-47e3-8296-6fc452815810 from question_answer_pair_edits_review using key: {question_id: 2025-05-04T15:12:13.940980_77647c42-c888-47e3-8296-6fc452815810, last_modified_timestamp: 2025-05-11T21:08:27.317266Z}
-Quizzer: [15:42:02] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Successfully deleted approved question 2025-05-04T15:12:13.940980_77647c42-c888-47e3-8296-6fc452815810 from question_answer_pair_edits_review.
-Quizzer: [15:42:02] [34m[INFO][0m [widget_review_panel.dart] SUCCESS: Approval successful, fetching next question.
-Quizzer: [15:42:02] [34m[INFO][0m [session_manager.dart] SessionManager: Requesting a question for review...
-Quizzer: [15:42:02] [34m[INFO][0m [get_send_postgre.dart] Fetching random record from question_answer_pair_new_review (offset: 467 / 553)
-Quizzer: [15:42:03] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Successfully fetched and decoded question 2025-05-05T17:19:09.523718_77647c42-c888-47e3-8296-6fc452815810 from question_answer_pair_new_review
-Quizzer: [15:42:03] [36m[DEBUG][0m [widget_live_preview.dart] LivePreviewWidget build for type: multiple_choice
-Quizzer: [15:42:04] [34m[INFO][0m [widget_review_panel.dart] Approving question...
-Quizzer: [15:42:04] [34m[INFO][0m [session_manager.dart] SessionManager: Submitting review decision (Approved: true) for PK: {question_id: 2025-05-05T17:19:09.523718_77647c42-c888-47e3-8296-6fc452815810} from question_answer_pair_new_review
-Quizzer: [15:42:04] [34m[INFO][0m [get_send_postgre.dart] Approving question 2025-05-05T17:19:09.523718_77647c42-c888-47e3-8296-6fc452815810 from question_answer_pair_new_review...
-Quizzer: [15:42:04] [36m[DEBUG][0m [get_send_postgre.dart] Setting last_modified_timestamp to 2025-05-12T21:42:04.005932Z for approval.
-Quizzer: [15:42:04] [36m[DEBUG][0m [get_send_postgre.dart] Upserting question 2025-05-05T17:19:09.523718_77647c42-c888-47e3-8296-6fc452815810 into question_answer_pairs...
-Quizzer: [15:42:04] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Upsert successful for question 2025-05-05T17:19:09.523718_77647c42-c888-47e3-8296-6fc452815810 into question_answer_pairs.
-Quizzer: [15:42:04] [36m[DEBUG][0m [get_send_postgre.dart] Deleting approved question 2025-05-05T17:19:09.523718_77647c42-c888-47e3-8296-6fc452815810 from question_answer_pair_new_review using key: {question_id: 2025-05-05T17:19:09.523718_77647c42-c888-47e3-8296-6fc452815810}
-Quizzer: [15:42:04] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Successfully deleted approved question 2025-05-05T17:19:09.523718_77647c42-c888-47e3-8296-6fc452815810 from question_answer_pair_new_review.
-Quizzer: [15:42:04] [34m[INFO][0m [widget_review_panel.dart] SUCCESS: Approval successful, fetching next question.
-Quizzer: [15:42:04] [34m[INFO][0m [session_manager.dart] SessionManager: Requesting a question for review...
-Quizzer: [15:42:04] [34m[INFO][0m [get_send_postgre.dart] Fetching random record from question_answer_pair_new_review (offset: 107 / 552)
-Quizzer: [15:42:04] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Successfully fetched and decoded question 2025-05-04T12:44:58.421777_7465dce6-abcf-4963-92a1-30dd7118c23a from question_answer_pair_new_review
-Quizzer: [15:42:04] [36m[DEBUG][0m [widget_live_preview.dart] LivePreviewWidget build for type: select_all_that_apply
-Quizzer: [15:42:04] [34m[INFO][0m [widget_select_all_that_apply_question.dart] SelectAllThatApplyQuestionWidget initState
-Quizzer: [15:42:04] [34m[INFO][0m [widget_select_all_that_apply_question.dart] SelectAllThatApplyQuestionWidget: Disabled state, not shuffling.
-Quizzer: [15:42:04] [34m[INFO][0m [widget_select_all_that_apply_question.dart] SATA: Disabled state, auto-setting submitted=true, selectedIndices(shuffled)={2} for preview.
-Quizzer: [15:42:04] [36m[DEBUG][0m [widget_select_all_that_apply_question.dart] SelectAllThatApplyQuestionWidget: Options loaded. Original indices mapping: [0, 1, 2, 3, 4, 5]
-Quizzer: [15:42:06] [34m[INFO][0m [widget_review_panel.dart] Approving question...
-Quizzer: [15:42:06] [34m[INFO][0m [session_manager.dart] SessionManager: Submitting review decision (Approved: true) for PK: {question_id: 2025-05-04T12:44:58.421777_7465dce6-abcf-4963-92a1-30dd7118c23a} from question_answer_pair_new_review
-Quizzer: [15:42:06] [34m[INFO][0m [get_send_postgre.dart] Approving question 2025-05-04T12:44:58.421777_7465dce6-abcf-4963-92a1-30dd7118c23a from question_answer_pair_new_review...
-Quizzer: [15:42:06] [36m[DEBUG][0m [get_send_postgre.dart] Setting last_modified_timestamp to 2025-05-12T21:42:06.929907Z for approval.
-Quizzer: [15:42:06] [36m[DEBUG][0m [get_send_postgre.dart] Upserting question 2025-05-04T12:44:58.421777_7465dce6-abcf-4963-92a1-30dd7118c23a into question_answer_pairs...
-Quizzer: [15:42:07] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Upsert successful for question 2025-05-04T12:44:58.421777_7465dce6-abcf-4963-92a1-30dd7118c23a into question_answer_pairs.
-Quizzer: [15:42:07] [36m[DEBUG][0m [get_send_postgre.dart] Deleting approved question 2025-05-04T12:44:58.421777_7465dce6-abcf-4963-92a1-30dd7118c23a from question_answer_pair_new_review using key: {question_id: 2025-05-04T12:44:58.421777_7465dce6-abcf-4963-92a1-30dd7118c23a}
-Quizzer: [15:42:07] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Successfully deleted approved question 2025-05-04T12:44:58.421777_7465dce6-abcf-4963-92a1-30dd7118c23a from question_answer_pair_new_review.
-Quizzer: [15:42:07] [34m[INFO][0m [widget_review_panel.dart] SUCCESS: Approval successful, fetching next question.
-Quizzer: [15:42:07] [34m[INFO][0m [session_manager.dart] SessionManager: Requesting a question for review...
-Quizzer: [15:42:07] [34m[INFO][0m [get_send_postgre.dart] Fetching random record from question_answer_pair_new_review (offset: 541 / 551)
-Quizzer: [15:42:07] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Successfully fetched and decoded question 2025-05-08T00:17:20.473941Z_77647c42-c888-47e3-8296-6fc452815810 from question_answer_pair_new_review
-Quizzer: [15:42:07] [36m[DEBUG][0m [widget_live_preview.dart] LivePreviewWidget build for type: multiple_choice
-Quizzer: [15:42:09] [34m[INFO][0m [widget_review_panel.dart] Approving question...
-Quizzer: [15:42:09] [34m[INFO][0m [session_manager.dart] SessionManager: Submitting review decision (Approved: true) for PK: {question_id: 2025-05-08T00:17:20.473941Z_77647c42-c888-47e3-8296-6fc452815810} from question_answer_pair_new_review
-Quizzer: [15:42:09] [34m[INFO][0m [get_send_postgre.dart] Approving question 2025-05-08T00:17:20.473941Z_77647c42-c888-47e3-8296-6fc452815810 from question_answer_pair_new_review...
-Quizzer: [15:42:09] [36m[DEBUG][0m [get_send_postgre.dart] Setting last_modified_timestamp to 2025-05-12T21:42:09.070178Z for approval.
-Quizzer: [15:42:09] [36m[DEBUG][0m [get_send_postgre.dart] Upserting question 2025-05-08T00:17:20.473941Z_77647c42-c888-47e3-8296-6fc452815810 into question_answer_pairs...
-Quizzer: [15:42:09] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Upsert successful for question 2025-05-08T00:17:20.473941Z_77647c42-c888-47e3-8296-6fc452815810 into question_answer_pairs.
-Quizzer: [15:42:09] [36m[DEBUG][0m [get_send_postgre.dart] Deleting approved question 2025-05-08T00:17:20.473941Z_77647c42-c888-47e3-8296-6fc452815810 from question_answer_pair_new_review using key: {question_id: 2025-05-08T00:17:20.473941Z_77647c42-c888-47e3-8296-6fc452815810}
-Quizzer: [15:42:09] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Successfully deleted approved question 2025-05-08T00:17:20.473941Z_77647c42-c888-47e3-8296-6fc452815810 from question_answer_pair_new_review.
-Quizzer: [15:42:09] [34m[INFO][0m [widget_review_panel.dart] SUCCESS: Approval successful, fetching next question.
-Quizzer: [15:42:09] [34m[INFO][0m [session_manager.dart] SessionManager: Requesting a question for review...
-Quizzer: [15:42:09] [34m[INFO][0m [get_send_postgre.dart] Fetching random record from question_answer_pair_new_review (offset: 480 / 550)
-Quizzer: [15:42:09] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Successfully fetched and decoded question 2025-05-05T20:37:53.126436_77647c42-c888-47e3-8296-6fc452815810 from question_answer_pair_new_review
-Quizzer: [15:42:09] [36m[DEBUG][0m [widget_live_preview.dart] LivePreviewWidget build for type: multiple_choice
-Quizzer: [15:42:09] [36m[DEBUG][0m [question_answer_element.dart] ElementRenderer: Found image in assets: images/question_answer_pair_assets/2983959b-7d32-4ca2-ba9c-e189dbced7c4.png
-Quizzer: [15:42:11] [34m[INFO][0m [widget_review_panel.dart] Approving question...
-Quizzer: [15:42:11] [34m[INFO][0m [session_manager.dart] SessionManager: Submitting review decision (Approved: true) for PK: {question_id: 2025-05-05T20:37:53.126436_77647c42-c888-47e3-8296-6fc452815810} from question_answer_pair_new_review
-Quizzer: [15:42:11] [34m[INFO][0m [get_send_postgre.dart] Approving question 2025-05-05T20:37:53.126436_77647c42-c888-47e3-8296-6fc452815810 from question_answer_pair_new_review...
-Quizzer: [15:42:11] [36m[DEBUG][0m [get_send_postgre.dart] Setting last_modified_timestamp to 2025-05-12T21:42:11.192038Z for approval.
-Quizzer: [15:42:11] [36m[DEBUG][0m [get_send_postgre.dart] Upserting question 2025-05-05T20:37:53.126436_77647c42-c888-47e3-8296-6fc452815810 into question_answer_pairs...
-Quizzer: [15:42:11] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Upsert successful for question 2025-05-05T20:37:53.126436_77647c42-c888-47e3-8296-6fc452815810 into question_answer_pairs.
-Quizzer: [15:42:11] [36m[DEBUG][0m [get_send_postgre.dart] Deleting approved question 2025-05-05T20:37:53.126436_77647c42-c888-47e3-8296-6fc452815810 from question_answer_pair_new_review using key: {question_id: 2025-05-05T20:37:53.126436_77647c42-c888-47e3-8296-6fc452815810}
-Quizzer: [15:42:11] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Successfully deleted approved question 2025-05-05T20:37:53.126436_77647c42-c888-47e3-8296-6fc452815810 from question_answer_pair_new_review.
-Quizzer: [15:42:11] [34m[INFO][0m [widget_review_panel.dart] SUCCESS: Approval successful, fetching next question.
-Quizzer: [15:42:11] [34m[INFO][0m [session_manager.dart] SessionManager: Requesting a question for review...
-Quizzer: [15:42:11] [34m[INFO][0m [get_send_postgre.dart] Fetching random record from question_answer_pair_new_review (offset: 306 / 549)
-Quizzer: [15:42:11] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Successfully fetched and decoded question 2025-05-04T12:45:49.002505_7465dce6-abcf-4963-92a1-30dd7118c23a from question_answer_pair_new_review
-Quizzer: [15:42:11] [36m[DEBUG][0m [widget_live_preview.dart] LivePreviewWidget build for type: sort_order
-Quizzer: [15:42:11] [34m[INFO][0m [widget_sort_order_question.dart] SortOrderQuestionWidget initState
-Quizzer: [15:42:11] [34m[INFO][0m [widget_sort_order_question.dart] SortOrderWidget: Disabled, not shuffling.
-Quizzer: [15:42:11] [34m[INFO][0m [widget_sort_order_question.dart] SortOrderWidget: Disabled state, auto-setting submitted=true, correct=true for preview.
-Quizzer: [15:42:11] [36m[DEBUG][0m [widget_sort_order_question.dart] SortOrder Initial Map (Display Index -> Correct Index): [0, 1, 2, 3, 4]
-Quizzer: [15:42:12] [34m[INFO][0m [widget_review_panel.dart] Approving question...
-Quizzer: [15:42:12] [34m[INFO][0m [session_manager.dart] SessionManager: Submitting review decision (Approved: true) for PK: {question_id: 2025-05-04T12:45:49.002505_7465dce6-abcf-4963-92a1-30dd7118c23a} from question_answer_pair_new_review
-Quizzer: [15:42:12] [34m[INFO][0m [get_send_postgre.dart] Approving question 2025-05-04T12:45:49.002505_7465dce6-abcf-4963-92a1-30dd7118c23a from question_answer_pair_new_review...
-Quizzer: [15:42:12] [36m[DEBUG][0m [get_send_postgre.dart] Setting last_modified_timestamp to 2025-05-12T21:42:12.855291Z for approval.
-Quizzer: [15:42:12] [36m[DEBUG][0m [get_send_postgre.dart] Upserting question 2025-05-04T12:45:49.002505_7465dce6-abcf-4963-92a1-30dd7118c23a into question_answer_pairs...
-Quizzer: [15:42:13] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Upsert successful for question 2025-05-04T12:45:49.002505_7465dce6-abcf-4963-92a1-30dd7118c23a into question_answer_pairs.
-Quizzer: [15:42:13] [36m[DEBUG][0m [get_send_postgre.dart] Deleting approved question 2025-05-04T12:45:49.002505_7465dce6-abcf-4963-92a1-30dd7118c23a from question_answer_pair_new_review using key: {question_id: 2025-05-04T12:45:49.002505_7465dce6-abcf-4963-92a1-30dd7118c23a}
-Quizzer: [15:42:13] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Successfully deleted approved question 2025-05-04T12:45:49.002505_7465dce6-abcf-4963-92a1-30dd7118c23a from question_answer_pair_new_review.
-Quizzer: [15:42:13] [34m[INFO][0m [widget_review_panel.dart] SUCCESS: Approval successful, fetching next question.
-Quizzer: [15:42:13] [34m[INFO][0m [session_manager.dart] SessionManager: Requesting a question for review...
-Quizzer: [15:42:13] [34m[INFO][0m [get_send_postgre.dart] Fetching random record from question_answer_pair_edits_review (offset: 11 / 25)
-Quizzer: [15:42:13] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Successfully fetched and decoded question 2025-05-04T17:28:07.319095_77647c42-c888-47e3-8296-6fc452815810 from question_answer_pair_edits_review
-Quizzer: [15:42:13] [36m[DEBUG][0m [widget_live_preview.dart] LivePreviewWidget build for type: multiple_choice
-Quizzer: [15:42:14] [34m[INFO][0m [widget_review_panel.dart] Approving question...
-Quizzer: [15:42:14] [34m[INFO][0m [session_manager.dart] SessionManager: Submitting review decision (Approved: true) for PK: {question_id: 2025-05-04T17:28:07.319095_77647c42-c888-47e3-8296-6fc452815810, last_modified_timestamp: 2025-05-11T21:21:25.360769Z} from question_answer_pair_edits_review
-Quizzer: [15:42:14] [34m[INFO][0m [get_send_postgre.dart] Approving question 2025-05-04T17:28:07.319095_77647c42-c888-47e3-8296-6fc452815810 from question_answer_pair_edits_review...
-Quizzer: [15:42:14] [36m[DEBUG][0m [get_send_postgre.dart] Setting last_modified_timestamp to 2025-05-12T21:42:14.567419Z for approval.
-Quizzer: [15:42:14] [36m[DEBUG][0m [get_send_postgre.dart] Upserting question 2025-05-04T17:28:07.319095_77647c42-c888-47e3-8296-6fc452815810 into question_answer_pairs...
-Quizzer: [15:42:14] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Upsert successful for question 2025-05-04T17:28:07.319095_77647c42-c888-47e3-8296-6fc452815810 into question_answer_pairs.
-Quizzer: [15:42:14] [36m[DEBUG][0m [get_send_postgre.dart] Deleting approved question 2025-05-04T17:28:07.319095_77647c42-c888-47e3-8296-6fc452815810 from question_answer_pair_edits_review using key: {question_id: 2025-05-04T17:28:07.319095_77647c42-c888-47e3-8296-6fc452815810, last_modified_timestamp: 2025-05-11T21:21:25.360769Z}
-Quizzer: [15:42:14] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Successfully deleted approved question 2025-05-04T17:28:07.319095_77647c42-c888-47e3-8296-6fc452815810 from question_answer_pair_edits_review.
-Quizzer: [15:42:14] [34m[INFO][0m [widget_review_panel.dart] SUCCESS: Approval successful, fetching next question.
-Quizzer: [15:42:14] [34m[INFO][0m [session_manager.dart] SessionManager: Requesting a question for review...
-Quizzer: [15:42:15] [34m[INFO][0m [get_send_postgre.dart] Fetching random record from question_answer_pair_new_review (offset: 338 / 548)
-Quizzer: [15:42:15] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Successfully fetched and decoded question 2025-05-04T12:45:52.027365_7465dce6-abcf-4963-92a1-30dd7118c23a from question_answer_pair_new_review
-Quizzer: [15:42:15] [36m[DEBUG][0m [widget_live_preview.dart] LivePreviewWidget build for type: sort_order
-Quizzer: [15:42:15] [34m[INFO][0m [widget_sort_order_question.dart] SortOrderQuestionWidget initState
-Quizzer: [15:42:15] [34m[INFO][0m [widget_sort_order_question.dart] SortOrderWidget: Disabled, not shuffling.
-Quizzer: [15:42:15] [34m[INFO][0m [widget_sort_order_question.dart] SortOrderWidget: Disabled state, auto-setting submitted=true, correct=true for preview.
-Quizzer: [15:42:15] [36m[DEBUG][0m [widget_sort_order_question.dart] SortOrder Initial Map (Display Index -> Correct Index): [0, 1, 2, 3, 4]
-Quizzer: [15:42:16] [34m[INFO][0m [widget_review_panel.dart] Approving question...
-Quizzer: [15:42:16] [34m[INFO][0m [session_manager.dart] SessionManager: Submitting review decision (Approved: true) for PK: {question_id: 2025-05-04T12:45:52.027365_7465dce6-abcf-4963-92a1-30dd7118c23a} from question_answer_pair_new_review
-Quizzer: [15:42:16] [34m[INFO][0m [get_send_postgre.dart] Approving question 2025-05-04T12:45:52.027365_7465dce6-abcf-4963-92a1-30dd7118c23a from question_answer_pair_new_review...
-Quizzer: [15:42:16] [36m[DEBUG][0m [get_send_postgre.dart] Setting last_modified_timestamp to 2025-05-12T21:42:16.703515Z for approval.
-Quizzer: [15:42:16] [36m[DEBUG][0m [get_send_postgre.dart] Upserting question 2025-05-04T12:45:52.027365_7465dce6-abcf-4963-92a1-30dd7118c23a into question_answer_pairs...
-Quizzer: [15:42:16] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Upsert successful for question 2025-05-04T12:45:52.027365_7465dce6-abcf-4963-92a1-30dd7118c23a into question_answer_pairs.
-Quizzer: [15:42:16] [36m[DEBUG][0m [get_send_postgre.dart] Deleting approved question 2025-05-04T12:45:52.027365_7465dce6-abcf-4963-92a1-30dd7118c23a from question_answer_pair_new_review using key: {question_id: 2025-05-04T12:45:52.027365_7465dce6-abcf-4963-92a1-30dd7118c23a}
-Quizzer: [15:42:16] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Successfully deleted approved question 2025-05-04T12:45:52.027365_7465dce6-abcf-4963-92a1-30dd7118c23a from question_answer_pair_new_review.
-Quizzer: [15:42:16] [34m[INFO][0m [widget_review_panel.dart] SUCCESS: Approval successful, fetching next question.
-Quizzer: [15:42:16] [34m[INFO][0m [session_manager.dart] SessionManager: Requesting a question for review...
-Quizzer: [15:42:17] [34m[INFO][0m [get_send_postgre.dart] Fetching random record from question_answer_pair_edits_review (offset: 15 / 24)
-Quizzer: [15:42:17] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Successfully fetched and decoded question 2025-05-04T17:46:32.462485_77647c42-c888-47e3-8296-6fc452815810 from question_answer_pair_edits_review
-Quizzer: [15:42:17] [36m[DEBUG][0m [widget_live_preview.dart] LivePreviewWidget build for type: multiple_choice
-Quizzer: [15:42:19] [34m[INFO][0m [widget_review_panel.dart] Approving question...
-Quizzer: [15:42:19] [34m[INFO][0m [session_manager.dart] SessionManager: Submitting review decision (Approved: true) for PK: {question_id: 2025-05-04T17:46:32.462485_77647c42-c888-47e3-8296-6fc452815810, last_modified_timestamp: 2025-05-11T21:22:52.434807Z} from question_answer_pair_edits_review
-Quizzer: [15:42:19] [34m[INFO][0m [get_send_postgre.dart] Approving question 2025-05-04T17:46:32.462485_77647c42-c888-47e3-8296-6fc452815810 from question_answer_pair_edits_review...
-Quizzer: [15:42:19] [36m[DEBUG][0m [get_send_postgre.dart] Setting last_modified_timestamp to 2025-05-12T21:42:19.607816Z for approval.
-Quizzer: [15:42:19] [36m[DEBUG][0m [get_send_postgre.dart] Upserting question 2025-05-04T17:46:32.462485_77647c42-c888-47e3-8296-6fc452815810 into question_answer_pairs...
-Quizzer: [15:42:19] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Upsert successful for question 2025-05-04T17:46:32.462485_77647c42-c888-47e3-8296-6fc452815810 into question_answer_pairs.
-Quizzer: [15:42:19] [36m[DEBUG][0m [get_send_postgre.dart] Deleting approved question 2025-05-04T17:46:32.462485_77647c42-c888-47e3-8296-6fc452815810 from question_answer_pair_edits_review using key: {question_id: 2025-05-04T17:46:32.462485_77647c42-c888-47e3-8296-6fc452815810, last_modified_timestamp: 2025-05-11T21:22:52.434807Z}
-Quizzer: [15:42:19] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Successfully deleted approved question 2025-05-04T17:46:32.462485_77647c42-c888-47e3-8296-6fc452815810 from question_answer_pair_edits_review.
-Quizzer: [15:42:19] [34m[INFO][0m [widget_review_panel.dart] SUCCESS: Approval successful, fetching next question.
-Quizzer: [15:42:19] [34m[INFO][0m [session_manager.dart] SessionManager: Requesting a question for review...
-Quizzer: [15:42:20] [34m[INFO][0m [get_send_postgre.dart] Fetching random record from question_answer_pair_new_review (offset: 315 / 547)
-Quizzer: [15:42:20] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Successfully fetched and decoded question 2025-05-04T12:45:49.898732_7465dce6-abcf-4963-92a1-30dd7118c23a from question_answer_pair_new_review
-Quizzer: [15:42:20] [36m[DEBUG][0m [widget_live_preview.dart] LivePreviewWidget build for type: sort_order
-Quizzer: [15:42:20] [34m[INFO][0m [widget_sort_order_question.dart] SortOrderQuestionWidget initState
-Quizzer: [15:42:20] [34m[INFO][0m [widget_sort_order_question.dart] SortOrderWidget: Disabled, not shuffling.
-Quizzer: [15:42:20] [34m[INFO][0m [widget_sort_order_question.dart] SortOrderWidget: Disabled state, auto-setting submitted=true, correct=true for preview.
-Quizzer: [15:42:20] [36m[DEBUG][0m [widget_sort_order_question.dart] SortOrder Initial Map (Display Index -> Correct Index): [0, 1, 2, 3, 4]
-Quizzer: [15:45:31] [34m[INFO][0m [widget_review_panel.dart] Approving question...
-Quizzer: [15:45:31] [34m[INFO][0m [session_manager.dart] SessionManager: Submitting review decision (Approved: true) for PK: {question_id: 2025-05-04T12:45:49.898732_7465dce6-abcf-4963-92a1-30dd7118c23a} from question_answer_pair_new_review
-Quizzer: [15:45:31] [34m[INFO][0m [get_send_postgre.dart] Approving question 2025-05-04T12:45:49.898732_7465dce6-abcf-4963-92a1-30dd7118c23a from question_answer_pair_new_review...
-Quizzer: [15:45:31] [36m[DEBUG][0m [get_send_postgre.dart] Setting last_modified_timestamp to 2025-05-12T21:45:31.994667Z for approval.
-Quizzer: [15:45:31] [36m[DEBUG][0m [get_send_postgre.dart] Upserting question 2025-05-04T12:45:49.898732_7465dce6-abcf-4963-92a1-30dd7118c23a into question_answer_pairs...
-Quizzer: [15:45:32] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Upsert successful for question 2025-05-04T12:45:49.898732_7465dce6-abcf-4963-92a1-30dd7118c23a into question_answer_pairs.
-Quizzer: [15:45:32] [36m[DEBUG][0m [get_send_postgre.dart] Deleting approved question 2025-05-04T12:45:49.898732_7465dce6-abcf-4963-92a1-30dd7118c23a from question_answer_pair_new_review using key: {question_id: 2025-05-04T12:45:49.898732_7465dce6-abcf-4963-92a1-30dd7118c23a}
-Quizzer: [15:45:33] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Successfully deleted approved question 2025-05-04T12:45:49.898732_7465dce6-abcf-4963-92a1-30dd7118c23a from question_answer_pair_new_review.
-Quizzer: [15:45:33] [34m[INFO][0m [widget_review_panel.dart] SUCCESS: Approval successful, fetching next question.
-Quizzer: [15:45:33] [34m[INFO][0m [session_manager.dart] SessionManager: Requesting a question for review...
-Quizzer: [15:45:33] [34m[INFO][0m [get_send_postgre.dart] Fetching random record from question_answer_pair_edits_review (offset: 7 / 23)
-Quizzer: [15:45:33] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Successfully fetched and decoded question 2025-05-04T15:10:06.583040_77647c42-c888-47e3-8296-6fc452815810 from question_answer_pair_edits_review
-Quizzer: [15:45:33] [36m[DEBUG][0m [widget_live_preview.dart] LivePreviewWidget build for type: multiple_choice
-Quizzer: [15:45:37] [34m[INFO][0m [widget_review_panel.dart] Opening edit dialog for review question: 2025-05-04T15:10:06.583040_77647c42-c888-47e3-8296-6fc452815810
-Quizzer: [15:45:37] [34m[INFO][0m [widget_add_question.dart] _AddQuestionWidgetState: initState CALLED
-Quizzer: [15:45:37] [36m[DEBUG][0m [widget_live_preview.dart] LivePreviewWidget build for type: multiple_choice
-Quizzer: [15:45:39] [34m[INFO][0m [widget_add_question.dart] Starting edit for option at index 0
-Quizzer: [15:45:49] [34m[INFO][0m [widget_add_question.dart] Submitting edit for option at index 0
-Quizzer: [15:45:49] [36m[DEBUG][0m [widget_live_preview.dart] LivePreviewWidget build for type: multiple_choice
-Quizzer: [15:45:55] [34m[INFO][0m [widget_edit_question_dialogue.dart] EditQuestionDialog: Submission disabled, skipping SessionManager update.
-Quizzer: [15:45:55] [34m[INFO][0m [widget_review_panel.dart] ReviewPanelWidget: Question edited locally, updating preview state.
-Quizzer: [15:45:55] [36m[DEBUG][0m [widget_live_preview.dart] LivePreviewWidget build for type: multiple_choice
-Quizzer: [15:45:55] [34m[INFO][0m [widget_add_question.dart] _AddQuestionWidgetState: dispose CALLED
-Quizzer: [15:45:57] [36m[DEBUG][0m Refresh access token
-Quizzer: [15:45:57] [36m[DEBUG][0m Attempt 1 to refresh token
-Quizzer: [15:45:57] [36m[DEBUG][0m Saving session
-Quizzer: [15:45:58] [34m[INFO][0m [widget_review_panel.dart] Denying question...
-Quizzer: [15:45:58] [34m[INFO][0m [session_manager.dart] SessionManager: Submitting review decision (Approved: false) for PK: {question_id: 2025-05-04T15:10:06.583040_77647c42-c888-47e3-8296-6fc452815810, last_modified_timestamp: 2025-05-11T21:08:01.694562Z} from question_answer_pair_edits_review
-Quizzer: [15:45:58] [34m[INFO][0m [get_send_postgre.dart] Denying question 2025-05-04T15:10:06.583040_77647c42-c888-47e3-8296-6fc452815810 from question_answer_pair_edits_review...
-Quizzer: [15:45:58] [36m[DEBUG][0m [get_send_postgre.dart] Deleting denied question 2025-05-04T15:10:06.583040_77647c42-c888-47e3-8296-6fc452815810 from question_answer_pair_edits_review using key: {question_id: 2025-05-04T15:10:06.583040_77647c42-c888-47e3-8296-6fc452815810, last_modified_timestamp: 2025-05-11T21:08:01.694562Z}
-Quizzer: [15:45:59] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Successfully deleted denied question 2025-05-04T15:10:06.583040_77647c42-c888-47e3-8296-6fc452815810 from question_answer_pair_edits_review.
-Quizzer: [15:45:59] [34m[INFO][0m [widget_review_panel.dart] SUCCESS: Denial successful, fetching next question.
-Quizzer: [15:45:59] [34m[INFO][0m [session_manager.dart] SessionManager: Requesting a question for review...
-Quizzer: [15:46:00] [34m[INFO][0m [get_send_postgre.dart] Fetching random record from question_answer_pair_new_review (offset: 288 / 546)
-Quizzer: [15:46:00] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Successfully fetched and decoded question 2025-05-04T12:45:47.357715_7465dce6-abcf-4963-92a1-30dd7118c23a from question_answer_pair_new_review
-Quizzer: [15:46:00] [36m[DEBUG][0m [widget_live_preview.dart] LivePreviewWidget build for type: sort_order
-Quizzer: [15:46:00] [34m[INFO][0m [widget_sort_order_question.dart] SortOrderQuestionWidget initState
-Quizzer: [15:46:00] [34m[INFO][0m [widget_sort_order_question.dart] SortOrderWidget: Disabled, not shuffling.
-Quizzer: [15:46:00] [34m[INFO][0m [widget_sort_order_question.dart] SortOrderWidget: Disabled state, auto-setting submitted=true, correct=true for preview.
-Quizzer: [15:46:00] [36m[DEBUG][0m [widget_sort_order_question.dart] SortOrder Initial Map (Display Index -> Correct Index): [0, 1, 2, 3, 4]
-Quizzer: [15:46:58] [34m[INFO][0m [widget_review_panel.dart] Approving question...
-Quizzer: [15:46:58] [34m[INFO][0m [session_manager.dart] SessionManager: Submitting review decision (Approved: true) for PK: {question_id: 2025-05-04T12:45:47.357715_7465dce6-abcf-4963-92a1-30dd7118c23a} from question_answer_pair_new_review
-Quizzer: [15:46:58] [34m[INFO][0m [get_send_postgre.dart] Approving question 2025-05-04T12:45:47.357715_7465dce6-abcf-4963-92a1-30dd7118c23a from question_answer_pair_new_review...
-Quizzer: [15:46:58] [36m[DEBUG][0m [get_send_postgre.dart] Setting last_modified_timestamp to 2025-05-12T21:46:58.224851Z for approval.
-Quizzer: [15:46:58] [36m[DEBUG][0m [get_send_postgre.dart] Upserting question 2025-05-04T12:45:47.357715_7465dce6-abcf-4963-92a1-30dd7118c23a into question_answer_pairs...
-Quizzer: [15:46:58] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Upsert successful for question 2025-05-04T12:45:47.357715_7465dce6-abcf-4963-92a1-30dd7118c23a into question_answer_pairs.
-Quizzer: [15:46:58] [36m[DEBUG][0m [get_send_postgre.dart] Deleting approved question 2025-05-04T12:45:47.357715_7465dce6-abcf-4963-92a1-30dd7118c23a from question_answer_pair_new_review using key: {question_id: 2025-05-04T12:45:47.357715_7465dce6-abcf-4963-92a1-30dd7118c23a}
-Quizzer: [15:46:58] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Successfully deleted approved question 2025-05-04T12:45:47.357715_7465dce6-abcf-4963-92a1-30dd7118c23a from question_answer_pair_new_review.
-Quizzer: [15:46:58] [34m[INFO][0m [widget_review_panel.dart] SUCCESS: Approval successful, fetching next question.
-Quizzer: [15:46:58] [34m[INFO][0m [session_manager.dart] SessionManager: Requesting a question for review...
-Quizzer: [15:46:59] [34m[INFO][0m [get_send_postgre.dart] Fetching random record from question_answer_pair_new_review (offset: 321 / 545)
-Quizzer: [15:46:59] [34m[INFO][0m [get_send_postgre.dart] SUCCESS: Successfully fetched and decoded question 2025-05-04T12:45:50.649750_7465dce6-abcf-4963-92a1-30dd7118c23a from question_answer_pair_new_review
-Quizzer: [15:46:59] [36m[DEBUG][0m [widget_live_preview.dart] LivePreviewWidget build for type: sort_order
-Quizzer: [15:46:59] [34m[INFO][0m [widget_sort_order_question.dart] SortOrderQuestionWidget initState
-Quizzer: [15:46:59] [34m[INFO][0m [widget_sort_order_question.dart] SortOrderWidget: Disabled, not shuffling.
-Quizzer: [15:46:59] [34m[INFO][0m [widget_sort_order_question.dart] SortOrderWidget: Disabled state, auto-setting submitted=true, correct=true for preview.
-Quizzer: [15:46:59] [36m[DEBUG][0m [widget_sort_order_question.dart] SortOrder Initial Map (Display Index -> Correct Index): [0, 1, 2, 3, 4]
-Quizzer: [15:47:03] [36m[DEBUG][0m [session_helper.dart] Access Token: [REDACTED]
-Quizzer: [15:47:03] [36m[DEBUG][0m [session_helper.dart] Decoded JWT Token Payload (Redacted): {aal: aal1, amr: [{method: password, timestamp: 1747079228}], app_metadata: {provider: email, providers: [email]}, aud: authenticated, email: [REDACTED], exp: 1747089957, iat: 1747086357, is_anonymous: false, iss: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, phone: , role: authenticated, session_id: [REDACTED], sub: [REDACTED], user_metadata: [REDACTED], user_role: admin}
-Quizzer: [15:47:03] [36m[DEBUG][0m [session_helper.dart] User role determined from JWT: admin
-Quizzer: [15:47:03] [36m[DEBUG][0m [menu_page.dart] Building MenuPage for user role: admin
-Quizzer: [15:47:06] [34m[INFO][0m [add_question_answer_page.dart] Resetting question state for type: multiple_choice (EMPTY)
-Quizzer: [15:47:06] [34m[INFO][0m [widget_add_question.dart] _AddQuestionWidgetState: initState CALLED
-Quizzer: [15:47:07] [33m[WARNING][0m [widget_live_preview.dart] LivePreviewWidget: Preview requires at least one question element.
-Quizzer: [15:47:08] [34m[INFO][0m [widget_add_question.dart] [DEBUG] Focus changed for 'question' field. Has Focus: true, Text Not Empty: false, Text: ''
-Quizzer: [15:47:14] [34m[INFO][0m [add_question_answer_page.dart] Added question element:
-Quizzer: [15:47:14] [36m[DEBUG][0m [add_question_answer_page.dart] {type: text, content: Error, SHIVER ME TIMBERS!!!}
-Quizzer: [15:47:14] [34m[INFO][0m [widget_add_question.dart] [DEBUG] Focus changed for 'question' field. Has Focus: false, Text Not Empty: false, Text: ''
-Quizzer: [15:47:14] [33m[WARNING][0m [widget_live_preview.dart] LivePreviewWidget: Preview requires at least one option for type "multiple_choice".
-Quizzer: [15:47:14] [34m[INFO][0m [widget_add_question.dart] [DEBUG] Focus changed for 'question' field. Has Focus: true, Text Not Empty: false, Text: ''
-Quizzer: [15:47:15] [34m[INFO][0m [widget_add_question.dart] [DEBUG] Focus changed for 'question' field. Has Focus: false, Text Not Empty: false, Text: ''
-Quizzer: [15:47:16] [34m[INFO][0m [widget_add_question.dart] Starting edit for question element at index 0
-Quizzer: [15:53:01] [36m[DEBUG][0m [home_page.dart] HomePage building question type: multiple_choice with key: [<'2025-05-08T00:16:48.539828Z_77647c42-c888-47e3-8296-6fc452815810'>] (using session data)
-Quizzer: [15:53:01] [36m[DEBUG][0m [home_page.dart] HomePage building question type: multiple_choice with key: [<'2025-05-08T00:16:48.539828Z_77647c42-c888-47e3-8296-6fc452815810'>] (using session data)
-Quizzer: [15:53:01] [36m[DEBUG][0m [home_page.dart] HomePage building question type: multiple_choice with key: [<'2025-05-08T00:16:48.539828Z_77647c42-c888-47e3-8296-6fc452815810'>] (using session data)
-Quizzer: [15:53:01] [33m[WARNING][0m [widget_live_preview.dart] LivePreviewWidget: Preview requires at least one option for type "multiple_choice".
-Quizzer: [15:53:01] [36m[DEBUG][0m [session_helper.dart] Access Token: [REDACTED]
-Quizzer: [15:53:01] [36m[DEBUG][0m [session_helper.dart] Decoded JWT Token Payload (Redacted): {aal: aal1, amr: [{method: password, timestamp: 1747079228}], app_metadata: {provider: email, providers: [email]}, aud: authenticated, email: [REDACTED], exp: 1747089957, iat: 1747086357, is_anonymous: false, iss: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, phone: , role: authenticated, session_id: [REDACTED], sub: [REDACTED], user_metadata: [REDACTED], user_role: admin}
-Quizzer: [15:53:01] [36m[DEBUG][0m [session_helper.dart] User role determined from JWT: admin
-Quizzer: [15:53:01] [36m[DEBUG][0m [menu_page.dart] Building MenuPage for user role: admin
-Quizzer: [15:53:01] [36m[DEBUG][0m [session_helper.dart] Access Token: [REDACTED]
-Quizzer: [15:53:01] [36m[DEBUG][0m [session_helper.dart] Decoded JWT Token Payload (Redacted): {aal: aal1, amr: [{method: password, timestamp: 1747079228}], app_metadata: {provider: email, providers: [email]}, aud: authenticated, email: [REDACTED], exp: 1747089957, iat: 1747086357, is_anonymous: false, iss: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, phone: , role: authenticated, session_id: [REDACTED], sub: [REDACTED], user_metadata: [REDACTED], user_role: admin}
-Quizzer: [15:53:01] [36m[DEBUG][0m [session_helper.dart] User role determined from JWT: admin
-Quizzer: [15:53:01] [36m[DEBUG][0m [menu_page.dart] Building MenuPage for user role: admin
-Quizzer: [15:53:01] [36m[DEBUG][0m [session_helper.dart] Access Token: [REDACTED]
-Quizzer: [15:53:01] [36m[DEBUG][0m [session_helper.dart] Decoded JWT Token Payload (Redacted): {aal: aal1, amr: [{method: password, timestamp: 1747079228}], app_metadata: {provider: email, providers: [email]}, aud: authenticated, email: [REDACTED], exp: 1747089957, iat: 1747086357, is_anonymous: false, iss: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, phone: , role: authenticated, session_id: [REDACTED], sub: [REDACTED], user_metadata: [REDACTED], user_role: admin}
-Quizzer: [15:53:01] [36m[DEBUG][0m [session_helper.dart] User role determined from JWT: admin
-Quizzer: [15:53:01] [36m[DEBUG][0m [menu_page.dart] Building MenuPage for user role: admin
-Quizzer: [15:53:02] [36m[DEBUG][0m [session_helper.dart] Access Token: [REDACTED]
-Quizzer: [15:53:02] [36m[DEBUG][0m [session_helper.dart] Decoded JWT Token Payload (Redacted): {aal: aal1, amr: [{method: password, timestamp: 1747079228}], app_metadata: {provider: email, providers: [email]}, aud: authenticated, email: [REDACTED], exp: 1747089957, iat: 1747086357, is_anonymous: false, iss: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, phone: , role: authenticated, session_id: [REDACTED], sub: [REDACTED], user_metadata: [REDACTED], user_role: admin}
-Quizzer: [15:53:02] [36m[DEBUG][0m [session_helper.dart] User role determined from JWT: admin
-Quizzer: [15:53:02] [36m[DEBUG][0m [menu_page.dart] Building MenuPage for user role: admin
-Quizzer: [15:53:02] [36m[DEBUG][0m [session_helper.dart] Access Token: [REDACTED]
-Quizzer: [15:53:02] [36m[DEBUG][0m [session_helper.dart] Decoded JWT Token Payload (Redacted): {aal: aal1, amr: [{method: password, timestamp: 1747079228}], app_metadata: {provider: email, providers: [email]}, aud: authenticated, email: [REDACTED], exp: 1747089957, iat: 1747086357, is_anonymous: false, iss: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, phone: , role: authenticated, session_id: [REDACTED], sub: [REDACTED], user_metadata: [REDACTED], user_role: admin}
-Quizzer: [15:53:02] [36m[DEBUG][0m [session_helper.dart] User role determined from JWT: admin
-Quizzer: [15:53:02] [36m[DEBUG][0m [menu_page.dart] Building MenuPage for user role: admin
-Quizzer: [15:53:02] [36m[DEBUG][0m [home_page.dart] HomePage building question type: multiple_choice with key: [<'2025-05-08T00:16:48.539828Z_77647c42-c888-47e3-8296-6fc452815810'>] (using session data)
-Quizzer: [15:53:02] [36m[DEBUG][0m [session_helper.dart] Access Token: [REDACTED]
-Quizzer: [15:53:02] [36m[DEBUG][0m [session_helper.dart] Decoded JWT Token Payload (Redacted): {aal: aal1, amr: [{method: password, timestamp: 1747079228}], app_metadata: {provider: email, providers: [email]}, aud: authenticated, email: [REDACTED], exp: 1747089957, iat: 1747086357, is_anonymous: false, iss: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, phone: , role: authenticated, session_id: [REDACTED], sub: [REDACTED], user_metadata: [REDACTED], user_role: admin}
-Quizzer: [15:53:02] [36m[DEBUG][0m [session_helper.dart] User role determined from JWT: admin
-Quizzer: [15:53:02] [36m[DEBUG][0m [menu_page.dart] Building MenuPage for user role: admin
-Quizzer: [15:53:06] [34m[INFO][0m [widget_add_question.dart] Submitting edit for question element at index 0
-Quizzer: [15:53:06] [34m[INFO][0m [add_question_answer_page.dart] Updating question element at index 0
-Quizzer: [15:53:06] [34m[INFO][0m [add_question_answer_page.dart] SUCCESS: Updated question element at index 0.
-Quizzer: [15:53:06] [33m[WARNING][0m [widget_live_preview.dart] LivePreviewWidget: Preview requires at least one option for type "multiple_choice".
-Quizzer: [15:53:08] [34m[INFO][0m [widget_add_question.dart] Starting edit for question element at index 0
-Quizzer: [15:53:24] [34m[INFO][0m [widget_add_question.dart] [DEBUG] Focus changed for 'option' field. Has Focus: true, Text Not Empty: false, Text: ''
-Quizzer: [15:53:26] [34m[INFO][0m [widget_add_question.dart] [DEBUG] Focus changed for 'option' field. Has Focus: false, Text Not Empty: false, Text: ''
-Quizzer: [15:55:11] [36m[DEBUG][0m [home_page.dart] HomePage building question type: multiple_choice with key: [<'2025-05-08T00:16:48.539828Z_77647c42-c888-47e3-8296-6fc452815810'>] (using session data)
-Quizzer: [15:55:11] [36m[DEBUG][0m [session_helper.dart] Access Token: [REDACTED]
-Quizzer: [15:55:11] [36m[DEBUG][0m [session_helper.dart] Decoded JWT Token Payload (Redacted): {aal: aal1, amr: [{method: password, timestamp: 1747079228}], app_metadata: {provider: email, providers: [email]}, aud: authenticated, email: [REDACTED], exp: 1747089957, iat: 1747086357, is_anonymous: false, iss: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, phone: , role: authenticated, session_id: [REDACTED], sub: [REDACTED], user_metadata: [REDACTED], user_role: admin}
-Quizzer: [15:55:11] [36m[DEBUG][0m [session_helper.dart] User role determined from JWT: admin
-Quizzer: [15:55:11] [36m[DEBUG][0m [menu_page.dart] Building MenuPage for user role: admin
-Quizzer: [15:55:11] [36m[DEBUG][0m [session_helper.dart] Access Token: [REDACTED]
-Quizzer: [15:55:11] [36m[DEBUG][0m [session_helper.dart] Decoded JWT Token Payload (Redacted): {aal: aal1, amr: [{method: password, timestamp: 1747079228}], app_metadata: {provider: email, providers: [email]}, aud: authenticated, email: [REDACTED], exp: 1747089957, iat: 1747086357, is_anonymous: false, iss: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, phone: , role: authenticated, session_id: [REDACTED], sub: [REDACTED], user_metadata: [REDACTED], user_role: admin}
-Quizzer: [15:55:11] [36m[DEBUG][0m [session_helper.dart] User role determined from JWT: admin
-Quizzer: [15:55:11] [36m[DEBUG][0m [menu_page.dart] Building MenuPage for user role: admin
-Quizzer: [15:55:11] [36m[DEBUG][0m [home_page.dart] HomePage building question type: multiple_choice with key: [<'2025-05-08T00:16:48.539828Z_77647c42-c888-47e3-8296-6fc452815810'>] (using session data)
-Quizzer: [15:55:11] [33m[WARNING][0m [widget_live_preview.dart] LivePreviewWidget: Preview requires at least one option for type "multiple_choice".
-Quizzer: [15:55:11] [36m[DEBUG][0m [home_page.dart] HomePage building question type: multiple_choice with key: [<'2025-05-08T00:16:48.539828Z_77647c42-c888-47e3-8296-6fc452815810'>] (using session data)
-Quizzer: [15:55:11] [36m[DEBUG][0m [session_helper.dart] Access Token: [REDACTED]
-Quizzer: [15:55:11] [36m[DEBUG][0m [session_helper.dart] Decoded JWT Token Payload (Redacted): {aal: aal1, amr: [{method: password, timestamp: 1747079228}], app_metadata: {provider: email, providers: [email]}, aud: authenticated, email: [REDACTED], exp: 1747089957, iat: 1747086357, is_anonymous: false, iss: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, phone: , role: authenticated, session_id: [REDACTED], sub: [REDACTED], user_metadata: [REDACTED], user_role: admin}
-Quizzer: [15:55:11] [36m[DEBUG][0m [session_helper.dart] User role determined from JWT: admin
-Quizzer: [15:55:11] [36m[DEBUG][0m [menu_page.dart] Building MenuPage for user role: admin
-Quizzer: [15:55:11] [36m[DEBUG][0m [session_helper.dart] Access Token: [REDACTED]
-Quizzer: [15:55:11] [36m[DEBUG][0m [session_helper.dart] Decoded JWT Token Payload (Redacted): {aal: aal1, amr: [{method: password, timestamp: 1747079228}], app_metadata: {provider: email, providers: [email]}, aud: authenticated, email: [REDACTED], exp: 1747089957, iat: 1747086357, is_anonymous: false, iss: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, phone: , role: authenticated, session_id: [REDACTED], sub: [REDACTED], user_metadata: [REDACTED], user_role: admin}
-Quizzer: [15:55:11] [36m[DEBUG][0m [session_helper.dart] User role determined from JWT: admin
-Quizzer: [15:55:11] [36m[DEBUG][0m [menu_page.dart] Building MenuPage for user role: admin
-Quizzer: [15:55:11] [36m[DEBUG][0m [session_helper.dart] Access Token: [REDACTED]
-Quizzer: [15:55:11] [36m[DEBUG][0m [session_helper.dart] Decoded JWT Token Payload (Redacted): {aal: aal1, amr: [{method: password, timestamp: 1747079228}], app_metadata: {provider: email, providers: [email]}, aud: authenticated, email: [REDACTED], exp: 1747089957, iat: 1747086357, is_anonymous: false, iss: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, phone: , role: authenticated, session_id: [REDACTED], sub: [REDACTED], user_metadata: [REDACTED], user_role: admin}
-Quizzer: [15:55:11] [36m[DEBUG][0m [session_helper.dart] User role determined from JWT: admin
-Quizzer: [15:55:11] [36m[DEBUG][0m [menu_page.dart] Building MenuPage for user role: admin
-Quizzer: [15:55:11] [36m[DEBUG][0m [home_page.dart] HomePage building question type: multiple_choice with key: [<'2025-05-08T00:16:48.539828Z_77647c42-c888-47e3-8296-6fc452815810'>] (using session data)
-Quizzer: [15:55:11] [36m[DEBUG][0m [session_helper.dart] Access Token: [REDACTED]
-Quizzer: [15:55:11] [36m[DEBUG][0m [session_helper.dart] Decoded JWT Token Payload (Redacted): {aal: aal1, amr: [{method: password, timestamp: 1747079228}], app_metadata: {provider: email, providers: [email]}, aud: authenticated, email: [REDACTED], exp: 1747089957, iat: 1747086357, is_anonymous: false, iss: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, phone: , role: authenticated, session_id: [REDACTED], sub: [REDACTED], user_metadata: [REDACTED], user_role: admin}
-Quizzer: [15:55:11] [36m[DEBUG][0m [session_helper.dart] User role determined from JWT: admin
-Quizzer: [15:55:11] [36m[DEBUG][0m [menu_page.dart] Building MenuPage for user role: admin
-Quizzer: [15:55:15] [34m[INFO][0m [widget_add_question.dart] [DEBUG] Focus changed for 'option' field. Has Focus: true, Text Not Empty: false, Text: ''
-Quizzer: [15:55:16] [34m[INFO][0m [widget_add_question.dart] [DEBUG] Focus changed for 'option' field. Has Focus: false, Text Not Empty: false, Text: ''
-Quizzer: [15:55:17] [34m[INFO][0m [add_question_answer_page.dart] Attempting to remove element index 0 from question
-Quizzer: [15:55:17] [34m[INFO][0m [add_question_answer_page.dart] SUCCESS: Removed element index 0 from question
-Quizzer: [15:55:18] [33m[WARNING][0m [widget_live_preview.dart] LivePreviewWidget: Preview requires at least one question element.
-Quizzer: [15:55:18] [34m[INFO][0m [widget_add_question.dart] [DEBUG] Focus changed for 'option' field. Has Focus: true, Text Not Empty: false, Text: ''
-Quizzer: [15:55:18] [34m[INFO][0m [widget_add_question.dart] [DEBUG] Focus changed for 'option' field. Has Focus: false, Text Not Empty: false, Text: ''
-Quizzer: [15:55:18] [34m[INFO][0m [widget_add_question.dart] [DEBUG] Focus changed for 'question' field. Has Focus: true, Text Not Empty: false, Text: ''
-Quizzer: [15:55:21] [34m[INFO][0m [widget_add_question.dart] [DEBUG] Focus changed for 'question' field. Has Focus: false, Text Not Empty: true, Text: 'HOW ABOUT NOW'
-Quizzer: [15:55:21] [34m[INFO][0m [widget_add_question.dart] Submitting question 'HOW ABOUT NOW' via focus loss
-Quizzer: [15:55:21] [34m[INFO][0m [add_question_answer_page.dart] Added question element:
-Quizzer: [15:55:21] [36m[DEBUG][0m [add_question_answer_page.dart] {type: text, content: HOW ABOUT NOW}
-Quizzer: [15:55:21] [33m[WARNING][0m [widget_live_preview.dart] LivePreviewWidget: Preview requires at least one option for type "multiple_choice".
-Quizzer: [15:55:24] [34m[INFO][0m [add_question_answer_page.dart] Attempting to remove element index 0 from question
-Quizzer: [15:55:24] [34m[INFO][0m [add_question_answer_page.dart] SUCCESS: Removed element index 0 from question
-Quizzer: [15:55:25] [33m[WARNING][0m [widget_live_preview.dart] LivePreviewWidget: Preview requires at least one question element.
-Quizzer: [15:55:25] [34m[INFO][0m [widget_add_question.dart] [DEBUG] Focus changed for 'question' field. Has Focus: true, Text Not Empty: false, Text: ''
-Quizzer: [15:55:28] [34m[INFO][0m [add_question_answer_page.dart] Added question element:
-Quizzer: [15:55:28] [36m[DEBUG][0m [add_question_answer_page.dart] {type: text, content: How about now}
-Quizzer: [15:55:28] [34m[INFO][0m [widget_add_question.dart] [DEBUG] Focus changed for 'question' field. Has Focus: false, Text Not Empty: false, Text: ''
-Quizzer: [15:55:28] [33m[WARNING][0m [widget_live_preview.dart] LivePreviewWidget: Preview requires at least one option for type "multiple_choice".
-Quizzer: [15:55:28] [34m[INFO][0m [widget_add_question.dart] [DEBUG] Focus changed for 'question' field. Has Focus: true, Text Not Empty: false, Text: ''
-Quizzer: [15:55:29] [34m[INFO][0m [widget_add_question.dart] [DEBUG] Focus changed for 'question' field. Has Focus: false, Text Not Empty: false, Text: ''
-Quizzer: [15:55:30] [34m[INFO][0m [widget_add_question.dart] [DEBUG] Focus changed for 'option' field. Has Focus: true, Text Not Empty: false, Text: ''
-Quizzer: [15:55:31] [34m[INFO][0m [widget_add_question.dart] [DEBUG] Focus changed for 'option' field. Has Focus: false, Text Not Empty: false, Text: ''
-Quizzer: [15:55:37] [36m[DEBUG][0m [session_helper.dart] Access Token: [REDACTED]
-Quizzer: [15:55:37] [36m[DEBUG][0m [session_helper.dart] Decoded JWT Token Payload (Redacted): {aal: aal1, amr: [{method: password, timestamp: 1747079228}], app_metadata: {provider: email, providers: [email]}, aud: authenticated, email: [REDACTED], exp: 1747089957, iat: 1747086357, is_anonymous: false, iss: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, phone: , role: authenticated, session_id: [REDACTED], sub: [REDACTED], user_metadata: [REDACTED], user_role: admin}
-Quizzer: [15:55:37] [36m[DEBUG][0m [session_helper.dart] User role determined from JWT: admin
-Quizzer: [15:55:37] [36m[DEBUG][0m [menu_page.dart] Building MenuPage for user role: admin
-Quizzer: [15:55:38] [34m[INFO][0m [widget_add_question.dart] _AddQuestionWidgetState: dispose CALLED
-Quizzer: [15:55:39] [34m[INFO][0m [add_question_answer_page.dart] Resetting question state for type: multiple_choice (EMPTY)
-Quizzer: [15:55:39] [34m[INFO][0m [widget_add_question.dart] _AddQuestionWidgetState: initState CALLED
-Quizzer: [15:55:39] [33m[WARNING][0m [widget_live_preview.dart] LivePreviewWidget: Preview requires at least one question element.
-Quizzer: [15:55:40] [34m[INFO][0m [widget_add_question.dart] [DEBUG] Focus changed for 'question' field. Has Focus: true, Text Not Empty: false, Text: ''
-Quizzer: [15:55:44] [34m[INFO][0m [add_question_answer_page.dart] Added question element:
-Quizzer: [15:55:44] [36m[DEBUG][0m [add_question_answer_page.dart] {type: text, content: How about now!!???}
-Quizzer: [15:55:44] [34m[INFO][0m [widget_add_question.dart] [DEBUG] Focus changed for 'question' field. Has Focus: false, Text Not Empty: false, Text: ''
-Quizzer: [15:55:44] [33m[WARNING][0m [widget_live_preview.dart] LivePreviewWidget: Preview requires at least one option for type "multiple_choice".
-Quizzer: [15:55:44] [34m[INFO][0m [widget_add_question.dart] [DEBUG] Focus changed for 'question' field. Has Focus: true, Text Not Empty: false, Text: ''
-Quizzer: [15:55:45] [34m[INFO][0m [widget_add_question.dart] [DEBUG] Focus changed for 'question' field. Has Focus: false, Text Not Empty: false, Text: ''
-Quizzer: [15:55:46] [34m[INFO][0m [widget_add_question.dart] Starting edit for question element at index 0
-Quizzer: [15:55:49] [34m[INFO][0m [widget_add_question.dart] Inline edit field lost focus, submitting edit...
-Quizzer: [15:55:49] [34m[INFO][0m [widget_add_question.dart] Submitting edit for question element at index 0
-Quizzer: [15:55:49] [34m[INFO][0m [add_question_answer_page.dart] Updating question element at index 0
-Quizzer: [15:55:49] [34m[INFO][0m [add_question_answer_page.dart] SUCCESS: Updated question element at index 0.
-Quizzer: [15:55:49] [33m[WARNING][0m [widget_live_preview.dart] LivePreviewWidget: Preview requires at least one option for type "multiple_choice".
-Quizzer: [15:55:51] [34m[INFO][0m [widget_add_question.dart] [DEBUG] Focus changed for 'option' field. Has Focus: true, Text Not Empty: false, Text: ''
-Quizzer: [15:55:52] [34m[INFO][0m [widget_add_question.dart] [DEBUG] Focus changed for 'option' field. Has Focus: false, Text Not Empty: false, Text: ''
-Quizzer: [15:55:58] [34m[INFO][0m [widget_add_question.dart] [DEBUG] Focus changed for 'option' field. Has Focus: true, Text Not Empty: false, Text: ''
-Quizzer: [15:55:59] [34m[INFO][0m [widget_add_question.dart] [DEBUG] Focus changed for 'option' field. Has Focus: false, Text Not Empty: false, Text: ''
-Quizzer: [15:55:59] [34m[INFO][0m [widget_add_question.dart] Starting edit for question element at index 0
-Quizzer: [15:56:00] [34m[INFO][0m [widget_add_question.dart] Inline edit field lost focus, submitting edit...
-Quizzer: [15:56:00] [34m[INFO][0m [widget_add_question.dart] Submitting edit for question element at index 0
-Quizzer: [15:56:00] [34m[INFO][0m [add_question_answer_page.dart] Updating question element at index 0
-Quizzer: [15:56:00] [34m[INFO][0m [add_question_answer_page.dart] SUCCESS: Updated question element at index 0.
-Quizzer: [15:56:00] [34m[INFO][0m [widget_add_question.dart] [DEBUG] Focus changed for 'answer' field. Has Focus: true, Text Not Empty: false, Text: ''
-Quizzer: [15:56:00] [33m[WARNING][0m [widget_live_preview.dart] LivePreviewWidget: Preview requires at least one option for type "multiple_choice".
-Quizzer: [15:56:04] [34m[INFO][0m [add_question_answer_page.dart] Added answer element:
-Quizzer: [15:56:04] [36m[DEBUG][0m [add_question_answer_page.dart] {type: text, content: Found it??}
-Quizzer: [15:56:04] [34m[INFO][0m [widget_add_question.dart] [DEBUG] Focus changed for 'answer' field. Has Focus: false, Text Not Empty: false, Text: ''
-Quizzer: [15:56:04] [33m[WARNING][0m [widget_live_preview.dart] LivePreviewWidget: Preview requires at least one option for type "multiple_choice".
-Quizzer: [15:56:04] [34m[INFO][0m [widget_add_question.dart] [DEBUG] Focus changed for 'answer' field. Has Focus: true, Text Not Empty: false, Text: ''
-Quizzer: [15:56:06] [34m[INFO][0m [widget_add_question.dart] [DEBUG] Focus changed for 'answer' field. Has Focus: false, Text Not Empty: false, Text: ''
-Quizzer: [15:56:06] [34m[INFO][0m [widget_add_question.dart] Starting edit for answer element at index 0
-Quizzer: [15:56:10] [34m[INFO][0m [widget_add_question.dart] Inline edit field lost focus, submitting edit...
-Quizzer: [15:56:10] [34m[INFO][0m [widget_add_question.dart] Submitting edit for answer element at index 0
-Quizzer: [15:56:10] [34m[INFO][0m [add_question_answer_page.dart] Updating answer element at index 0
-Quizzer: [15:56:10] [34m[INFO][0m [add_question_answer_page.dart] SUCCESS: Updated answer element at index 0.
-Quizzer: [15:56:11] [33m[WARNING][0m [widget_live_preview.dart] LivePreviewWidget: Preview requires at least one option for type "multiple_choice".
-Quizzer: [15:56:11] [34m[INFO][0m [widget_add_question.dart] [DEBUG] Focus changed for 'option' field. Has Focus: true, Text Not Empty: false, Text: ''
-Quizzer: [15:56:12] [34m[INFO][0m [add_question_answer_page.dart] Placeholder: Add option 1
-Quizzer: [15:56:12] [34m[INFO][0m [widget_add_question.dart] [DEBUG] Focus changed for 'option' field. Has Focus: false, Text Not Empty: false, Text: ''
-Quizzer: [15:56:13] [36m[DEBUG][0m [widget_live_preview.dart] LivePreviewWidget build for type: multiple_choice
-Quizzer: [15:56:13] [34m[INFO][0m [widget_add_question.dart] [DEBUG] Focus changed for 'option' field. Has Focus: true, Text Not Empty: false, Text: ''
-Quizzer: [15:56:13] [34m[INFO][0m [add_question_answer_page.dart] Placeholder: Add option 2
-Quizzer: [15:56:13] [34m[INFO][0m [widget_add_question.dart] [DEBUG] Focus changed for 'option' field. Has Focus: false, Text Not Empty: false, Text: ''
-Quizzer: [15:56:13] [36m[DEBUG][0m [widget_live_preview.dart] LivePreviewWidget build for type: multiple_choice
-Quizzer: [15:56:13] [34m[INFO][0m [widget_add_question.dart] [DEBUG] Focus changed for 'option' field. Has Focus: true, Text Not Empty: false, Text: ''
-Quizzer: [15:56:14] [34m[INFO][0m [add_question_answer_page.dart] Placeholder: Add option 3
-Quizzer: [15:56:14] [34m[INFO][0m [widget_add_question.dart] [DEBUG] Focus changed for 'option' field. Has Focus: false, Text Not Empty: false, Text: ''
-Quizzer: [15:56:14] [36m[DEBUG][0m [widget_live_preview.dart] LivePreviewWidget build for type: multiple_choice
-Quizzer: [15:56:14] [34m[INFO][0m [widget_add_question.dart] [DEBUG] Focus changed for 'option' field. Has Focus: true, Text Not Empty: false, Text: ''
-Quizzer: [15:56:18] [34m[INFO][0m [add_question_answer_page.dart] Placeholder: Add option Ice Cream
-Quizzer: [15:56:18] [34m[INFO][0m [widget_add_question.dart] [DEBUG] Focus changed for 'option' field. Has Focus: false, Text Not Empty: false, Text: ''
-Quizzer: [15:56:18] [36m[DEBUG][0m [widget_live_preview.dart] LivePreviewWidget build for type: multiple_choice
-Quizzer: [15:56:18] [34m[INFO][0m [widget_add_question.dart] [DEBUG] Focus changed for 'option' field. Has Focus: true, Text Not Empty: false, Text: ''
-Quizzer: [15:56:20] [34m[INFO][0m [widget_add_question.dart] [DEBUG] Focus changed for 'option' field. Has Focus: false, Text Not Empty: false, Text: ''
-Quizzer: [15:56:20] [34m[INFO][0m [add_question_answer_page.dart] Placeholder: Set single correct index to 3
-Quizzer: [15:56:20] [36m[DEBUG][0m [widget_live_preview.dart] LivePreviewWidget build for type: multiple_choice
-Quizzer: [15:56:21] [34m[INFO][0m [add_question_answer_page.dart] Placeholder: Set single correct index to 3
-Quizzer: [15:56:21] [36m[DEBUG][0m [widget_live_preview.dart] LivePreviewWidget build for type: multiple_choice
-Quizzer: [15:56:29] [36m[DEBUG][0m [home_page.dart] HomePage building question type: multiple_choice with key: [<'2025-05-08T00:16:48.539828Z_77647c42-c888-47e3-8296-6fc452815810'>] (using session data)
-Quizzer: [15:56:29] [34m[INFO][0m [widget_add_question.dart] _AddQuestionWidgetState: dispose CALLED
+Quizzer: [18:07:11] [33m[WARNING][0m [main.dart] _QuizzerAppState: BUILD CALLED. _criticalError is: null
+Quizzer: [18:07:29] [34m[INFO][0m [login_page.dart] Login attempt for: aacra0820@gmail.com
+Quizzer: [18:07:29] [34m[INFO][0m [session_manager.dart] Logging in user with email: aacra0820@gmail.com
+Quizzer: [18:07:29] [34m[INFO][0m [user_auth.dart] User authentication requested for aacra0820@gmail.com
+Quizzer: [18:07:29] [34m[INFO][0m [user_auth.dart] Attempting Supabase authentication for aacra0820@gmail.com
+Quizzer: [18:07:29] [34m[INFO][0m [user_auth.dart] Attempting Supabase authentication
+Quizzer: [18:07:30] [36m[DEBUG][0m Saving session
+Quizzer: [18:07:30] [34m[INFO][0m [user_auth.dart] SUCCESS: Supabase authentication successful for aacra0820@gmail.com
+Quizzer: [18:07:30] [36m[DEBUG][0m [session_helper.dart] Access Token: [REDACTED]
+Quizzer: [18:07:30] [36m[DEBUG][0m [session_helper.dart] Decoded JWT Token Payload (Redacted): {aal: aal1, amr: [{method: password, timestamp: 1747181250}], app_metadata: {provider: email, providers: [email]}, aud: authenticated, email: [REDACTED], exp: 1747184850, iat: 1747181250, is_anonymous: false, iss: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, phone: , role: authenticated, session_id: [REDACTED], sub: [REDACTED], user_metadata: [REDACTED], user_role: admin}
+Quizzer: [18:07:30] [36m[DEBUG][0m [session_helper.dart] User role determined from JWT: admin
+Quizzer: [18:07:30] [34m[INFO][0m [user_auth.dart] Handling successful Supabase login for aacra0820@gmail.com
+Quizzer: [18:07:30] [34m[INFO][0m [user_auth.dart] Stored last login (2025-05-14T00:07:30.504334722Z) and token for aacra0820@gmail.com
+Quizzer: [18:07:30] [34m[INFO][0m [user_auth.dart] Ensuring local profile exists for aacra0820@gmail.com
+Quizzer: [18:07:30] [34m[INFO][0m [database_native.dart] Using sqflite FFI factory (Desktop)
+Quizzer: [18:07:30] [34m[INFO][0m [database_native.dart] Desktop SQLite directory ensured: /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/runtime_cache/sqlite
+Quizzer: [18:07:30] [34m[INFO][0m [database_native.dart] Target Database path: /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/runtime_cache/sqlite/quizzer.db
+Quizzer: [18:07:30] [34m[INFO][0m [database_native.dart] Existing database found at /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/runtime_cache/sqlite/quizzer.db. Using it.
+Quizzer: [18:07:30] [34m[INFO][0m [database_native.dart] SUCCESS: Database initialized successfully at: /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/runtime_cache/sqlite/quizzer.db
+Quizzer: [18:07:31] [34m[INFO][0m [user_auth.dart] Is user in list -> true
+Quizzer: [18:07:31] [34m[INFO][0m [user_auth.dart] Is user in list -> true
+Quizzer: [18:07:31] [34m[INFO][0m [session_isolates.dart] Recorded email to log in. . .: aacra0820@gmail.com
+Quizzer: [18:07:31] [34m[INFO][0m [session_isolates.dart] Database access granted
+Quizzer: [18:07:31] [34m[INFO][0m [session_isolates.dart] SUCCESS: Session initialized with userId: 77647c42-c888-47e3-8296-6fc452815810
+Quizzer: [18:07:31] [34m[INFO][0m [session_manager.dart] Stored initial profile last_modified_timestamp: 2025-05-14T00:01:43.560154Z
+Quizzer: [18:07:31] [34m[INFO][0m [inbound_sync_worker.dart] Starting inbound sync aggregator...
+Quizzer: [18:07:31] [34m[INFO][0m [inbound_sync_worker.dart] Using effective last login timestamp: 2025-05-14T00:01:43.560154Z
+Quizzer: [18:07:31] [34m[INFO][0m [inbound_sync_worker.dart] Syncing inbound question_answer_pairs for user 77647c42-c888-47e3-8296-6fc452815810 since 2025-05-14T00:01:43.560154Z...
+Quizzer: [18:07:32] [34m[INFO][0m [inbound_sync_worker.dart] No new question_answer_pairs to sync.
+Quizzer: [18:07:32] [34m[INFO][0m [inbound_sync_worker.dart] Using effective initial timestamp: 2025-05-14T00:01:43.560154Z
+Quizzer: [18:07:32] [34m[INFO][0m [inbound_sync_worker.dart] Syncing inbound user_question_answer_pairs for user 77647c42-c888-47e3-8296-6fc452815810 since 2025-05-14T00:01:43.560154Z...
+Quizzer: [18:07:32] [34m[INFO][0m [inbound_sync_worker.dart] No new user_question_answer_pairs to sync.
+Quizzer: [18:07:32] [34m[INFO][0m [inbound_sync_worker.dart] Syncing inbound user profile for user 77647c42-c888-47e3-8296-6fc452815810 since 2025-05-14T00:01:43.560154Z...
+Quizzer: [18:07:32] [34m[INFO][0m [inbound_sync_worker.dart] No new user profile to sync.
+Quizzer: [18:07:32] [34m[INFO][0m [inbound_sync_worker.dart] SUCCESS: Inbound sync completed successfully.
+Quizzer: [18:07:34] [34m[INFO][0m [question_selection_worker.dart] PresentationSelectionWorker started.
+Quizzer: [18:07:34] [34m[INFO][0m [question_selection_worker.dart] PSW: Starting initial loop...
+Quizzer: [18:07:35] [34m[INFO][0m [question_queue_cache.dart] QuestionQueueCache: Added record 2025-05-04T16:55:43.933118_77647c42-c888-47e3-8296-6fc452815810 to empty queue.
+Quizzer: [18:07:35] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker initialized.
+Quizzer: [18:07:35] [34m[INFO][0m [outbound_sync_worker.dart] Entering OutboundSyncWorker start()...
+Quizzer: [18:07:35] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Subscribing to onOutboundSyncNeeded stream.
+Quizzer: [18:07:35] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Starting sync cycle.
+Quizzer: [18:07:35] [34m[INFO][0m [outbound_sync_worker.dart] Network check successful.
+Quizzer: [18:07:35] [34m[INFO][0m [outbound_sync_worker.dart] Entering OutboundSyncWorker _getDbAccess()...
+Quizzer: [18:07:35] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Database access granted.
+Quizzer: [18:07:35] [34m[INFO][0m [outbound_sync_functions.dart] Starting sync for QuestionAnswerPairs...
+Quizzer: [18:07:35] [34m[INFO][0m [outbound_sync_functions.dart] No unsynced QuestionAnswerPairs found.
+Quizzer: [18:07:35] [34m[INFO][0m [outbound_sync_worker.dart] Entering OutboundSyncWorker _getDbAccess()...
+Quizzer: [18:07:35] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Database access granted.
+Quizzer: [18:07:35] [34m[INFO][0m [outbound_sync_functions.dart] Starting sync for LoginAttempts...
+Quizzer: [18:07:35] [34m[INFO][0m [outbound_sync_functions.dart] Found 1 unsynced LoginAttempts.
+Quizzer: [18:07:35] [36m[DEBUG][0m [outbound_sync_functions.dart] Preparing to push LoginAttempt 2025-05-14T00:07:31.465255Z77647c42-c888-47e3-8296-6fc452815810 to login_attempts
+Quizzer: [18:07:35] [34m[INFO][0m [outbound_sync_functions.dart] SUCCESS: Supabase insert successful for LoginAttempt 2025-05-14T00:07:31.465255Z77647c42-c888-47e3-8296-6fc452815810.
+Quizzer: [18:07:35] [34m[INFO][0m [outbound_sync_functions.dart] Finished sync attempt for LoginAttempts.
+Quizzer: [18:07:35] [34m[INFO][0m [outbound_sync_worker.dart] Entering OutboundSyncWorker _getDbAccess()...
+Quizzer: [18:07:36] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Database access granted.
+Quizzer: [18:07:36] [34m[INFO][0m [outbound_sync_functions.dart] Starting sync for QuestionAnswerAttempts...
+Quizzer: [18:07:36] [34m[INFO][0m [question_answer_attempts_table.dart] Fetching unsynced question answer attempts...
+Quizzer: [18:07:36] [34m[INFO][0m [question_answer_attempts_table.dart] Verifying question_answer_attempts table...
+Quizzer: [18:07:36] [34m[INFO][0m [question_answer_attempts_table.dart] question_answer_attempts table already exists. Checking columns...
+Quizzer: [18:07:36] [34m[INFO][0m [question_answer_attempts_table.dart] Column check complete.
+Quizzer: [18:07:36] [34m[INFO][0m [question_answer_attempts_table.dart] SUCCESS: Fetched 0 unsynced question answer attempts.
+Quizzer: [18:07:36] [34m[INFO][0m [outbound_sync_functions.dart] No unsynced QuestionAnswerAttempts found.
+Quizzer: [18:07:36] [34m[INFO][0m [outbound_sync_worker.dart] Entering OutboundSyncWorker _getDbAccess()...
+Quizzer: [18:07:36] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Database access granted.
+Quizzer: [18:07:36] [34m[INFO][0m [outbound_sync_functions.dart] Starting sync for UserProfiles...
+Quizzer: [18:07:36] [34m[INFO][0m [outbound_sync_functions.dart] Found 1 unsynced UserProfiles for user 77647c42-c888-47e3-8296-6fc452815810.
+Quizzer: [18:07:36] [36m[DEBUG][0m [outbound_sync_functions.dart] Preparing to update UserProfile 77647c42-c888-47e3-8296-6fc452815810 in user_profile
+Quizzer: [18:07:36] [34m[INFO][0m [outbound_sync_functions.dart] Attempting Supabase update for ID 77647c42-c888-47e3-8296-6fc452815810 in table user_profile...
+Quizzer: [18:07:36] [34m[INFO][0m [outbound_sync_functions.dart] SUCCESS: Supabase update presumed successful for ID 77647c42-c888-47e3-8296-6fc452815810 in user_profile.
+Quizzer: [18:07:36] [34m[INFO][0m [outbound_sync_functions.dart] Update successful for UserProfile 77647c42-c888-47e3-8296-6fc452815810. Updating local flags...
+Quizzer: [18:07:36] [34m[INFO][0m [outbound_sync_functions.dart] Finished sync attempt for UserProfiles.
+Quizzer: [18:07:36] [34m[INFO][0m [outbound_sync_worker.dart] Entering OutboundSyncWorker _getDbAccess()...
+Quizzer: [18:07:36] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Database access granted.
+Quizzer: [18:07:36] [34m[INFO][0m [outbound_sync_functions.dart] Starting sync for UserQuestionAnswerPairs...
+Quizzer: [18:07:36] [34m[INFO][0m [outbound_sync_functions.dart] No unsynced UserQuestionAnswerPairs found for user Instance of 'SessionManager'.userId!.
+Quizzer: [18:07:36] [34m[INFO][0m [outbound_sync_worker.dart] Entering OutboundSyncWorker _runLoop()...
+Quizzer: [18:07:36] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Waiting for sync signal...
+Quizzer: [18:07:36] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker started and initial sync performed.
+Quizzer: [18:07:36] [36m[DEBUG][0m [session_manager.dart] SessionManager.requestNextQuestion: Fetched options type: List<dynamic>, value: [{type: text, content: Montesquieu}, {type: text, content: Machiavelli}, {type: text, content: Monteverdi}, {type: text, content: Michelet}, {type: text, content: Mendel}]
+Quizzer: [18:07:36] [34m[INFO][0m [login_page.dart] Login successful for: aacra0820@gmail.com. Navigating home.
+Quizzer: [18:07:36] [36m[DEBUG][0m [home_page.dart] HomePage building question type: multiple_choice with key: [<'2025-05-04T16:55:43.933118_77647c42-c888-47e3-8296-6fc452815810'>] (using session data)
+Quizzer: [18:07:36] [36m[DEBUG][0m [question_answer_element.dart] ElementRenderer: Found image in assets: images/question_answer_pair_assets/72d36000-b070-4473-9cb8-4443ba824bc2.png
+Quizzer: [18:07:38] [36m[DEBUG][0m [session_helper.dart] Access Token: [REDACTED]
+Quizzer: [18:07:38] [36m[DEBUG][0m [session_helper.dart] Decoded JWT Token Payload (Redacted): {aal: aal1, amr: [{method: password, timestamp: 1747181250}], app_metadata: {provider: email, providers: [email]}, aud: authenticated, email: [REDACTED], exp: 1747184850, iat: 1747181250, is_anonymous: false, iss: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, phone: , role: authenticated, session_id: [REDACTED], sub: [REDACTED], user_metadata: [REDACTED], user_role: admin}
+Quizzer: [18:07:38] [36m[DEBUG][0m [session_helper.dart] User role determined from JWT: admin
+Quizzer: [18:07:38] [36m[DEBUG][0m [menu_page.dart] Building MenuPage for user role: admin
+Quizzer: [18:07:39] [34m[INFO][0m [menu_page.dart] Session state reset for logout
+Quizzer: [18:07:39] [31m[ERROR][0m [global_error_handler.dart] CRITICAL ERROR REPORTED TO UI: Unhandled Flutter error caught by PlatformDispatcher
+Error: Exception: Simulated critical error during logout - testing general exception
+StackTrace: #0      SessionManager.logoutUser (package:quizzer/backend_systems/session_manager/session_manager.dart:356:5)
+#1      _MenuPageState.build.<anonymous closure> (package:quizzer/UI_systems/05_menu_page/menu_page.dart:142:25)
+#2      _InkResponseState.handleTap (package:flutter/src/material/ink_well.dart:1185:21)
+#3      GestureRecognizer.invokeCallback (package:flutter/src/gestures/recognizer.dart:357:24)
+#4      TapGestureRecognizer.handleTapUp (package:flutter/src/gestures/tap.dart:653:11)
+#5      BaseTapGestureRecognizer._checkUp (package:flutter/src/gestures/tap.dart:307:5)
+#6      BaseTapGestureRecognizer.handlePrimaryPointer (package:flutter/src/gestures/tap.dart:240:7)
+#7      PrimaryPointerGestureRecognizer.handleEvent (package:flutter/src/gestures/recognizer.dart:718:9)
+#8      PointerRouter._dispatch (package:flutter/src/gestures/pointer_router.dart:97:12)
+#9      PointerRouter._dispatchEventToRoutes.<anonymous closure> (package:flutter/src/gestures/pointer_router.dart:143:9)
+#10     _LinkedHashMapMixin.forEach (dart:_compact_hash:763:13)
+#11     PointerRouter._dispatchEventToRoutes (package:flutter/src/gestures/pointer_router.dart:141:18)
+#12     PointerRouter.route (package:flutter/src/gestures/pointer_router.dart:131:7)
+#13     GestureBinding.handleEvent (package:flutter/src/gestures/binding.dart:530:19)
+#14     GestureBinding.dispatchEvent (package:flutter/src/gestures/binding.dart:499:22)
+#15     RendererBinding.dispatchEvent (package:flutter/src/rendering/binding.dart:460:11)
+#16     GestureBinding._handlePointerEventImmediately (package:flutter/src/gestures/binding.dart:437:7)
+#17     GestureBinding.handlePointerEvent (package:flutter/src/gestures/binding.dart:394:5)
+#18     GestureBinding._flushPointerEventQueue (package:flutter/src/gestures/binding.dart:341:7)
+#19     GestureBinding._handlePointerDataPacket (package:flutter/src/gestures/binding.dart:308:9)
+#20     _invoke1 (dart:ui/hooks.dart:332:13)
+#21     PlatformDispatcher._dispatchPointerDataPacket (dart:ui/platform_dispatcher.dart:451:7)
+#22     _dispatchPointerDataPacket (dart:ui/hooks.dart:267:31)
+
+Quizzer: [18:07:39] [34m[INFO][0m [main.dart] _QuizzerAppState: Received critical error notification. Current error: null, New error: CriticalErrorDetails(message: Unhandled Flutter error caught by PlatformDispatcher, error: Exception: Simulated critical error during logout - testing general exception, stackTrace: #0      SessionManager.logoutUser (package:quizzer/backend_systems/session_manager/session_manager.dart:356:5)
+#1      _MenuPageState.build.<anonymous closure> (package:quizzer/UI_systems/05_menu_page/menu_page.dart:142:25)
+#2      _InkResponseState.handleTap (package:flutter/src/material/ink_well.dart:1185:21)
+#3      GestureRecognizer.invokeCallback (package:flutter/src/gestures/recognizer.dart:357:24)
+#4      TapGestureRecognizer.handleTapUp (package:flutter/src/gestures/tap.dart:653:11)
+#5      BaseTapGestureRecognizer._checkUp (package:flutter/src/gestures/tap.dart:307:5)
+#6      BaseTapGestureRecognizer.handlePrimaryPointer (package:flutter/src/gestures/tap.dart:240:7)
+#7      PrimaryPointerGestureRecognizer.handleEvent (package:flutter/src/gestures/recognizer.dart:718:9)
+#8      PointerRouter._dispatch (package:flutter/src/gestures/pointer_router.dart:97:12)
+#9      PointerRouter._dispatchEventToRoutes.<anonymous closure> (package:flutter/src/gestures/pointer_router.dart:143:9)
+#10     _LinkedHashMapMixin.forEach (dart:_compact_hash:763:13)
+#11     PointerRouter._dispatchEventToRoutes (package:flutter/src/gestures/pointer_router.dart:141:18)
+#12     PointerRouter.route (package:flutter/src/gestures/pointer_router.dart:131:7)
+#13     GestureBinding.handleEvent (package:flutter/src/gestures/binding.dart:530:19)
+#14     GestureBinding.dispatchEvent (package:flutter/src/gestures/binding.dart:499:22)
+#15     RendererBinding.dispatchEvent (package:flutter/src/rendering/binding.dart:460:11)
+#16     GestureBinding._handlePointerEventImmediately (package:flutter/src/gestures/binding.dart:437:7)
+#17     GestureBinding.handlePointerEvent (package:flutter/src/gestures/binding.dart:394:5)
+#18     GestureBinding._flushPointerEventQueue (package:flutter/src/gestures/binding.dart:341:7)
+#19     GestureBinding._handlePointerDataPacket (package:flutter/src/gestures/binding.dart:308:9)
+#20     _invoke1 (dart:ui/hooks.dart:332:13)
+#21     PlatformDispatcher._dispatchPointerDataPacket (dart:ui/platform_dispatcher.dart:451:7)
+#22     _dispatchPointerDataPacket (dart:ui/hooks.dart:267:31)
+)
+Quizzer: [18:07:39] [34m[INFO][0m [main.dart] _QuizzerAppState: setState completed. _criticalError is now: CriticalErrorDetails(message: Unhandled Flutter error caught by PlatformDispatcher, error: Exception: Simulated critical error during logout - testing general exception, stackTrace: #0      SessionManager.logoutUser (package:quizzer/backend_systems/session_manager/session_manager.dart:356:5)
+#1      _MenuPageState.build.<anonymous closure> (package:quizzer/UI_systems/05_menu_page/menu_page.dart:142:25)
+#2      _InkResponseState.handleTap (package:flutter/src/material/ink_well.dart:1185:21)
+#3      GestureRecognizer.invokeCallback (package:flutter/src/gestures/recognizer.dart:357:24)
+#4      TapGestureRecognizer.handleTapUp (package:flutter/src/gestures/tap.dart:653:11)
+#5      BaseTapGestureRecognizer._checkUp (package:flutter/src/gestures/tap.dart:307:5)
+#6      BaseTapGestureRecognizer.handlePrimaryPointer (package:flutter/src/gestures/tap.dart:240:7)
+#7      PrimaryPointerGestureRecognizer.handleEvent (package:flutter/src/gestures/recognizer.dart:718:9)
+#8      PointerRouter._dispatch (package:flutter/src/gestures/pointer_router.dart:97:12)
+#9      PointerRouter._dispatchEventToRoutes.<anonymous closure> (package:flutter/src/gestures/pointer_router.dart:143:9)
+#10     _LinkedHashMapMixin.forEach (dart:_compact_hash:763:13)
+#11     PointerRouter._dispatchEventToRoutes (package:flutter/src/gestures/pointer_router.dart:141:18)
+#12     PointerRouter.route (package:flutter/src/gestures/pointer_router.dart:131:7)
+#13     GestureBinding.handleEvent (package:flutter/src/gestures/binding.dart:530:19)
+#14     GestureBinding.dispatchEvent (package:flutter/src/gestures/binding.dart:499:22)
+#15     RendererBinding.dispatchEvent (package:flutter/src/rendering/binding.dart:460:11)
+#16     GestureBinding._handlePointerEventImmediately (package:flutter/src/gestures/binding.dart:437:7)
+#17     GestureBinding.handlePointerEvent (package:flutter/src/gestures/binding.dart:394:5)
+#18     GestureBinding._flushPointerEventQueue (package:flutter/src/gestures/binding.dart:341:7)
+#19     GestureBinding._handlePointerDataPacket (package:flutter/src/gestures/binding.dart:308:9)
+#20     _invoke1 (dart:ui/hooks.dart:332:13)
+#21     PlatformDispatcher._dispatchPointerDataPacket (dart:ui/platform_dispatcher.dart:451:7)
+#22     _dispatchPointerDataPacket (dart:ui/hooks.dart:267:31)
+)
+Quizzer: [18:07:39] [34m[INFO][0m [main.dart] _QuizzerAppState: Navigation to /critical_error attempted.
+Quizzer: [18:07:39] [33m[WARNING][0m [main.dart] _QuizzerAppState: BUILD CALLED. _criticalError is: Unhandled Flutter error caught by PlatformDispatcher
+Quizzer: [18:21:44] [33m[WARNING][0m [main.dart] _QuizzerAppState: BUILD CALLED. _criticalError is: Unhandled Flutter error caught by PlatformDispatcher
+Quizzer: [18:21:44] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Initialized. Placeholder: Attempting to send quizzer_log.txt to server.
+Quizzer: [18:26:34] [33m[WARNING][0m [main.dart] _QuizzerAppState: BUILD CALLED. _criticalError is: Unhandled Flutter error caught by PlatformDispatcher
+Quizzer: [18:28:20] [33m[WARNING][0m [main.dart] _QuizzerAppState: BUILD CALLED. _criticalError is: Unhandled Flutter error caught by PlatformDispatcher
+Quizzer: [18:48:17] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: User feedback submitted: ""
+Quizzer: [18:48:19] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: User feedback submitted: ""
+Quizzer: [18:48:19] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: User feedback submitted: ""
+Quizzer: [18:48:20] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: User feedback submitted: ""
+Quizzer: [18:48:20] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: User feedback submitted: ""
+Quizzer: [18:48:21] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: User feedback submitted: ""
+Quizzer: [18:50:29] [33m[WARNING][0m [main.dart] _QuizzerAppState: BUILD CALLED. _criticalError is: Unhandled Flutter error caught by PlatformDispatcher
+Quizzer: [18:50:41] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: User feedback submitted: "feeddddddbackkkkkk"
+Quizzer: [18:57:15] [33m[WARNING][0m [main.dart] _QuizzerAppState: BUILD CALLED. _criticalError is: Unhandled Flutter error caught by PlatformDispatcher
+Quizzer: [18:59:51] [33m[WARNING][0m [main.dart] _QuizzerAppState: BUILD CALLED. _criticalError is: Unhandled Flutter error caught by PlatformDispatcher
+Quizzer: [18:59:53] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 1, Message: "Okay, one more poke and I'm calling HR."
+Quizzer: [18:59:54] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 2, Message: "This button has feelings, you know."
+Quizzer: [18:59:55] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 3, Message: "This button has feelings, you know."
+Quizzer: [18:59:56] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 4, Message: "I already got the feedback, you can restart now."
+Quizzer: [18:59:57] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 5, Message: "Stop poking me!"
+Quizzer: [18:59:58] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 6, Message: "Do you always poke buttons this much?"
+Quizzer: [18:59:59] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 7, Message: "Seriously though..."
+Quizzer: [19:00:00] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 8, Message: "I already got the feedback, you can restart now."
+Quizzer: [19:00:05] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 9, Message: "Ow, that hurts!"
+Quizzer: [19:00:07] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 10, Message: "Stop poking me!"
+Quizzer: [19:00:16] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 11, Message: "Ow, that hurts!"
+Quizzer: [19:00:16] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 12, Message: "Stop poking me!"
+Quizzer: [19:00:16] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 13, Message: "Okay, one more poke and I'm calling HR."
+Quizzer: [19:00:16] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 14, Message: "Seriously though..."
+Quizzer: [19:00:17] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 15, Message: "Stop poking me!"
+Quizzer: [19:00:17] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 16, Message: "This button has feelings, you know."
+Quizzer: [19:00:17] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 17, Message: "Ow, that hurts!"
+Quizzer: [19:00:17] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 18, Message: "Do you always poke buttons this much?"
+Quizzer: [19:00:17] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 19, Message: "Stop poking me!"
+Quizzer: [19:00:17] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 20, Message: "Okay, one more poke and I'm calling HR."
+Quizzer: [19:00:18] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 21, Message: "Do you always poke buttons this much?"
+Quizzer: [19:00:18] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 22, Message: "Seriously though..."
+Quizzer: [19:00:18] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 23, Message: "This button has feelings, you know."
+Quizzer: [19:00:18] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 24, Message: "Don't poke the button anymore!!"
+Quizzer: [19:00:18] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 25, Message: "Do you always poke buttons this much?"
+Quizzer: [19:00:18] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 26, Message: "Are you not entertained?"
+Quizzer: [19:00:19] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 27, Message: "This button has feelings, you know."
+Quizzer: [19:00:19] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 28, Message: "I already got the feedback, you can restart now."
+Quizzer: [19:00:20] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 29, Message: "Stop poking me!"
+Quizzer: [19:00:20] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 30, Message: "Seriously though..."
+Quizzer: [19:00:20] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 31, Message: "Seriously though..."
+Quizzer: [19:00:20] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 32, Message: "Do you always poke buttons this much?"
+Quizzer: [19:00:22] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 33, Message: "Don't poke the button anymore!!"
+Quizzer: [19:00:22] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 34, Message: "Stop poking me!"
+Quizzer: [19:00:22] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 35, Message: "This button has feelings, you know."
+Quizzer: [19:00:22] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 36, Message: "This button has feelings, you know."
+Quizzer: [19:00:22] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 37, Message: "Okay, one more poke and I'm calling HR."
+Quizzer: [19:00:22] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 38, Message: "Don't poke the button anymore!!"
+Quizzer: [19:00:23] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 39, Message: "Stop poking me!"
+Quizzer: [19:00:23] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 40, Message: "Do you always poke buttons this much?"
+Quizzer: [19:00:23] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 41, Message: "Don't poke the button anymore!!"
+Quizzer: [19:00:25] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 42, Message: "Seriously though..."
+Quizzer: [19:00:25] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 43, Message: "Don't poke the button anymore!!"
+Quizzer: [19:00:25] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 44, Message: "Ow, that hurts!"
+Quizzer: [19:00:25] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 45, Message: "Seriously though..."
+Quizzer: [19:00:26] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 46, Message: "Don't poke the button anymore!!"
+Quizzer: [19:00:26] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 47, Message: "Don't poke the button anymore!!"
+Quizzer: [19:00:26] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 48, Message: "I already got the feedback, you can restart now."
+Quizzer: [19:00:26] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 49, Message: "Don't poke the button anymore!!"
+Quizzer: [19:00:27] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 50, Message: "Okay, one more poke and I'm calling HR."
+Quizzer: [19:00:27] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 51, Message: "I already got the feedback, you can restart now."
+Quizzer: [19:00:27] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 52, Message: "This button has feelings, you know."
+Quizzer: [19:00:27] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 53, Message: "Don't poke the button anymore!!"

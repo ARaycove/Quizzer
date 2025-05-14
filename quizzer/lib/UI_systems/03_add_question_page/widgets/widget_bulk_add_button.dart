@@ -1,13 +1,10 @@
 import 'dart:convert';
 import 'dart:io'; // For File operations (non-web)
-import 'package:flutter/foundation.dart' show kIsWeb; // For platform checks
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:quizzer/UI_systems/color_wheel.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
-
-// TODO Seperate add functions for each type (with built-in validation for each type)
 
 // switch statement handler inside main _handleBulkAdd function
 
@@ -199,12 +196,14 @@ class _BulkAddButtonState extends State<BulkAddButton> {
     QuizzerLogger.logMessage('Bulk Add: Process finished for $selectedFileName. Items processed: $itemsProcessed, Added: $itemsAdded, Skipped (invalid format/data): $itemsSkipped.');
 
     // Optional: Show completion SnackBar
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Bulk add finished for $selectedFileName. Added $itemsAdded, Skipped $itemsSkipped.'),
-        backgroundColor: itemsSkipped > 0 ? ColorWheel.buttonError : ColorWheel.buttonSuccess,
-      ),
-    );
+    if (mounted) { // Guard with mounted check
+      ScaffoldMessenger.of(this.context).showSnackBar(
+        SnackBar(
+          content: Text('Bulk add finished for $selectedFileName. Added $itemsAdded, Skipped $itemsSkipped.'),
+          backgroundColor: itemsSkipped > 0 ? ColorWheel.buttonError : ColorWheel.buttonSuccess,
+        ),
+      );
+    }
 
     setState(() => _isLoading = false); // Ensure loading state is turned off
   }

@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:sqflite/sqflite.dart'; // Added for Database type
-import 'package:quizzer/backend_systems/logger/quizzer_logging.dart'; // Added for logging
+// import 'package:quizzer/backend_systems/logger/quizzer_logging.dart'; // Added for logging
 
 // --- Universal Encoding/Decoding Helpers ---
 
@@ -8,7 +8,7 @@ import 'package:quizzer/backend_systems/logger/quizzer_logging.dart'; // Added f
 /// Handles Strings, ints, doubles, booleans, Lists, and Maps.
 /// Lists and Maps are encoded as JSON TEXT. Booleans are stored as INTEGER (1/0).
 /// Throws StateError for unsupported types.
-dynamic encodeValueForDB(dynamic value) {
+_encodeValueForDB(dynamic value) {
   if (value == null) {
     return null; // Store nulls directly
   } else if (value is String || value is int || value is double) {
@@ -29,7 +29,7 @@ dynamic encodeValueForDB(dynamic value) {
 /// Assumes that TEXT fields starting with '[' or '{' are JSON strings representing Lists/Maps.
 /// Other TEXT fields are returned as Strings. INTEGER, REAL, and NULL are returned directly.
 /// Does NOT automatically convert INTEGER back to boolean; callers must handle this based on context.
-dynamic decodeValueFromDB(dynamic dbValue) {
+_decodeValueFromDB(dynamic dbValue) {
   if (dbValue == null || dbValue is int || dbValue is double) {
     return dbValue; // Return nulls, integers, and doubles directly
   } else if (dbValue is String) {
@@ -76,7 +76,7 @@ Future<int> insertRawData(
   for (final entry in data.entries) {
     final key = entry.key;
     final rawValue = entry.value;
-    encodedData[key] = encodeValueForDB(rawValue);
+    encodedData[key] = _encodeValueForDB(rawValue);
   }
 
   // QuizzerLogger.logValue('Performing insert into $tableName with encoded data: ${encodedData.keys.join(', ')}');
@@ -101,6 +101,7 @@ Future<int> insertRawData(
 ///   whereArgs: Optional arguments for the WHERE clause.
 ///   orderBy: Optional ORDER BY clause.
 ///   limit: Optional LIMIT clause.
+///   customQuery: Optional custom query string.
 ///
 /// Returns:
 ///   A list of maps, where each map represents a row with decoded values.
@@ -113,18 +114,27 @@ Future<List<Map<String, dynamic>>> queryAndDecodeDatabase(
     String? where,
     List<dynamic>? whereArgs,
     String? orderBy,
-    int? limit, // Corrected type back to int?
+    int? limit,
+    String? customQuery, // Added customQuery parameter
   }
 ) async {
-  // QuizzerLogger.logValue('Querying table $tableName (where: $where, args: $whereArgs, limit: $limit)');
-  final List<Map<String, dynamic>> rawResults = await db.query(
-    tableName,
-    columns: columns,
-    where: where,
-    whereArgs: whereArgs,
-    orderBy: orderBy,
-    limit: limit,
-  );
+  // QuizzerLogger.logValue('Querying table $tableName (where: $where, args: $whereArgs, limit: $limit, customQuery: $customQuery)');
+  List<Map<String, dynamic>> rawResults;
+
+  if (customQuery != null && customQuery.isNotEmpty) {
+    // QuizzerLogger.logValue('Executing custom query: $customQuery with args: $whereArgs');
+    rawResults = await db.rawQuery(customQuery, whereArgs);
+  } else {
+    // QuizzerLogger.logValue('Executing standard query on table: $tableName');
+    rawResults = await db.query(
+      tableName,
+      columns: columns,
+      where: where,
+      whereArgs: whereArgs,
+      orderBy: orderBy,
+      limit: limit,
+    );
+  }
 
   if (rawResults.isEmpty) {
     // QuizzerLogger.logValue('Query on $tableName returned no results.');
@@ -136,7 +146,7 @@ Future<List<Map<String, dynamic>>> queryAndDecodeDatabase(
   for (final rawRow in rawResults) {
     final Map<String, dynamic> decodedRow = {};
     for (final entry in rawRow.entries) {
-      decodedRow[entry.key] = decodeValueFromDB(entry.value);
+      decodedRow[entry.key] = _decodeValueFromDB(entry.value);
     }
     decodedResults.add(decodedRow);
   }
@@ -173,7 +183,7 @@ Future<int> updateRawData(
   for (final entry in data.entries) {
     final key = entry.key;
     final rawValue = entry.value;
-    encodedData[key] = encodeValueForDB(rawValue);
+    encodedData[key] = _encodeValueForDB(rawValue);
   }
 
   // QuizzerLogger.logValue('Performing update on $tableName with encoded data: ${encodedData.keys.join(', ')}');

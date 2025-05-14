@@ -4,7 +4,7 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/question_answ
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'dart:convert';
 import 'package:quizzer/backend_systems/12_switch_board/switch_board.dart';
-import '00_table_helper.dart'; // Import the helper file
+import '../table_helper.dart'; // Import the helper file
 
 // TODO Enforce and introduce primary and secondary languages
 // This will be used to determine whether questions should be synced based on language
@@ -219,22 +219,6 @@ Future<Map<String, dynamic>> verifyNonDuplicateProfile(String email, String user
     QuizzerLogger.logError('Email already registered: $email');
     return {'isValid': false, 'message': 'This email address is already registered'};
   }
-  
-  // Check if username already exists
-  final List<Map<String, dynamic>> usernameCheck = await db.query(
-    'user_profile',
-    where: 'username = ?',
-    whereArgs: [username],
-  );
-  
-  // TODO Implement proper username uniqueness (maybe?)
-  // if (usernameCheck.isNotEmpty) {
-  //   QuizzerLogger.logError('Username already taken: $username');
-  //   return {
-  //     'isValid': false,
-  //     'message': 'This username is already taken'
-  //   };
-  // }
   
   // If we get here, both email and username are unique
   QuizzerLogger.logSuccess('Email and username are available');

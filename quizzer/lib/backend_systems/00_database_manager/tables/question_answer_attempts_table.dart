@@ -1,7 +1,7 @@
 import 'package:sqflite/sqflite.dart';
 import 'dart:async';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
-import '00_table_helper.dart'; // Import the helper file
+import 'table_helper.dart'; // Import the helper file
 import 'package:quizzer/backend_systems/12_switch_board/switch_board.dart'; // Import SwitchBoard
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_question_answer_pairs_table.dart'; // Use package import for user_question_answer_pairs_table
 

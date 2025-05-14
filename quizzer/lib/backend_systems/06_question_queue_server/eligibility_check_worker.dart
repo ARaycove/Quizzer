@@ -11,7 +11,7 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart'; // Needed for Database typ
 import 'due_date_worker.dart'; // ADDED: Import DueDateWorker
 // Table function imports
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pairs_table.dart' show getModuleNameForQuestionId;
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile_table.dart' as user_profile_table;
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_profile_table.dart' as user_profile_table;
 import 'package:quizzer/backend_systems/09_data_caches/past_due_cache.dart'; // Added
 
 /// Checks if a given user question record is eligible to be shown.

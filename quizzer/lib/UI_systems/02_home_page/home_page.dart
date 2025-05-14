@@ -8,14 +8,12 @@ import 'package:quizzer/UI_systems/question_widgets/widget_multiple_choice_quest
 import 'package:quizzer/UI_systems/question_widgets/widget_select_all_that_apply_question.dart'; 
 import 'package:quizzer/UI_systems/question_widgets/widget_true_false_question.dart'; 
 import 'package:quizzer/UI_systems/question_widgets/widget_sort_order_question.dart'; 
-// TODO: Add in Edit Question option next to Flag Icon, should give a pop-up dialog that allows the user to edit the currently active quesiton -> changing it in the DB and signalling a sync(handled at low level)
-
 
 // TODO: Import other actual question widgets as they are implemented. 6 left
 
 /// HomePage acts as the main container, displaying the appropriate question widget.
 class HomePage extends StatefulWidget { // Change to StatefulWidget
-  const HomePage({Key? key}) : super(key: key);
+  const HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePageState(); // Create state
@@ -71,7 +69,7 @@ class _HomePageState extends State<HomePage> { // State class
 
     // Determine data source: edited data if available, otherwise session
     final Map<String, dynamic>? dataSource = _editedQuestionData;
-    final String questionType = dataSource?['question_type'] as String? ?? session.currentQuestionType ?? 'error';
+    final String questionType = dataSource?['question_type'] as String? ?? session.currentQuestionType;
     final List<Map<String, dynamic>> questionElements = (dataSource?['question_elements'] as List<dynamic>? ?? session.currentQuestionElements).map((e) => Map<String, dynamic>.from(e as Map)).toList();
     final List<Map<String, dynamic>> answerElements = (dataSource?['answer_elements'] as List<dynamic>? ?? session.currentQuestionAnswerElements).map((e) => Map<String, dynamic>.from(e as Map)).toList();
     final List<Map<String, dynamic>> options = (dataSource?['options'] as List<dynamic>? ?? session.currentQuestionOptions).map((e) => Map<String, dynamic>.from(e as Map)).toList();
@@ -130,7 +128,7 @@ class _HomePageState extends State<HomePage> { // State class
 
       default:
         // Use session's type if dataSource is null, otherwise use the type from dataSource
-        final displayType = dataSource?['question_type'] as String? ?? session.currentQuestionType ?? 'unknown';
+        final displayType = dataSource?['question_type'] as String? ?? session.currentQuestionType;
         return _buildErrorWidget('Unsupported or missing question type ($displayType)', key);
     }
   }

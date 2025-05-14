@@ -1,8 +1,58 @@
+import 'dart:convert';
 import 'dart:math'; // For random selection
 import 'package:supabase/supabase.dart'; // Corrected Supabase import again
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/00_table_helper.dart'; // For encode/decode
+// ======================================================
+// duplicate private helper functions here, the AI is fucking dumb and tried to use them instead of the main function in table_helper
+// Like seriously, it doesn't matter how many times you tell this stupid assistant it will consistently try to rewrite existing functionality instead of just using whats already there 
+
+/// Encodes a Dart value into a type suitable for SQLite storage (TEXT, INTEGER, REAL, NULL).
+/// Handles Strings, ints, doubles, booleans, Lists, and Maps.
+/// Lists and Maps are encoded as JSON TEXT. Booleans are stored as INTEGER (1/0).
+/// Throws StateError for unsupported types.
+encodeValueForDB(dynamic value) {
+  if (value == null) {
+    return null; // Store nulls directly
+  } else if (value is String || value is int || value is double) {
+    return value; // Store primitives directly
+  } else if (value is bool) {
+    return value ? 1 : 0; // Store booleans as integers
+  } else if (value is List || value is Map) {
+    // Encode Lists and Maps as JSON strings
+    // json.encode itself can throw if objects are not encodable, which aligns with Fail Fast.
+    return json.encode(value);
+  } else {
+    // Fail Fast for any other type
+    throw StateError('Unsupported type for database encoding: ${value.runtimeType}');
+  }
+}
+
+/// Decodes a value retrieved from SQLite back into its likely Dart type.
+/// Assumes that TEXT fields starting with '[' or '{' are JSON strings representing Lists/Maps.
+/// Other TEXT fields are returned as Strings. INTEGER, REAL, and NULL are returned directly.
+/// Does NOT automatically convert INTEGER back to boolean; callers must handle this based on context.
+decodeValueFromDB(dynamic dbValue) {
+  if (dbValue == null || dbValue is int || dbValue is double) {
+    return dbValue; // Return nulls, integers, and doubles directly
+  } else if (dbValue is String) {
+    // Trim whitespace before checking brackets/braces
+    final trimmedValue = dbValue.trim();
+    if (trimmedValue.startsWith('[') || trimmedValue.startsWith('{')) {
+      // Attempt to decode potential JSON strings
+      // json.decode will throw FormatException on invalid JSON, aligning with Fail Fast.
+      return json.decode(trimmedValue);
+    } else {
+      // Assume it's a plain string if it doesn't look like JSON
+      return dbValue;
+    }
+  } else {
+    // Should not happen with standard SQLite types (TEXT, INTEGER, REAL, NULL, BLOB)
+    // BLOBs are not currently handled.
+    throw StateError('Unsupported type retrieved from database: ${dbValue.runtimeType}');
+  }
+}
+
 
 // ==========================================
 // Constants
@@ -143,6 +193,20 @@ Future<bool> approveQuestion(Map<String, dynamic> questionDetails, String source
   final supabase = getSessionManager().supabase;
   final String questionId = primaryKey['question_id'] as String; // Assume always present
   QuizzerLogger.logMessage('Approving question $questionId from $sourceTable...');
+
+  // Ensure qst_contrib is populated
+  if (questionDetails['qst_contrib'] == null || (questionDetails['qst_contrib'] as String).isEmpty) {
+    final String? currentUserId = getSessionManager().userId;
+    if (currentUserId != null && currentUserId.isNotEmpty) {
+      questionDetails['qst_contrib'] = currentUserId;
+      QuizzerLogger.logMessage('Populated missing qst_contrib with current userId: $currentUserId for question $questionId');
+    } else {
+      // This case should ideally not happen if a user is logged in to approve questions.
+      // Throw an error or handle as per application's error policy for critical missing data.
+      QuizzerLogger.logError('Critical: qst_contrib is missing and could not be populated with a valid userId for question $questionId. Aborting approval.');
+      throw StateError('Cannot approve question $questionId: qst_contrib is missing and no valid session userId found.');
+    }
+  }
 
   // 1. Encode the data for upsert into the main table
   final String approvalTimestamp = DateTime.now().toUtc().toIso8601String();

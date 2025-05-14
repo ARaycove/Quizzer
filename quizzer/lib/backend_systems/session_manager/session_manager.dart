@@ -1,4 +1,4 @@
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_profile_table.dart';
 import 'package:quizzer/backend_systems/06_question_queue_server/inactive_module_worker.dart';
 import 'package:quizzer/backend_systems/07_user_question_management/user_question_processes.dart' show validateAllModuleQuestions;
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pairs_table.dart' as q_pairs_table;
@@ -44,18 +44,6 @@ import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/in
 import 'package:quizzer/backend_systems/00_database_manager/tables/modules_table.dart' as modules_table;
 import 'package:quizzer/backend_systems/00_database_manager/review_system/get_send_postgre.dart';
 
-// TODO, sync worker interferes with smooth UI operations, need to ensure that when submitting answers UI is not awaiting a response from the session manager (otherwise user needs to wait for their turn at the db, but the user shouldn't need to wait for background operations to occur)
-
-/*
-TODO: Implement proper secure storage for the Hive encryption key.
-The current implementation regenerates the key on each launch, making
-persistent encrypted data inaccessible across sessions. This requires
-a platform-aware secure storage mechanism (like flutter_secure_storage)
-abstracted away from the SessionManager core logic to maintain backend
-isolation while providing necessary security in the production app.
-For now, offline persistence relies on unencrypted or obscure data.
-*/
-
 class SessionManager {
   // Singleton instance
   static final SessionManager _instance = SessionManager._internal();
@@ -95,8 +83,6 @@ class SessionManager {
               Map<String, dynamic>?           _currentQuestionRecord;         // userQuestionRecord
               Map<String, dynamic>?           _currentQuestionDetails;        // questionAnswerPairRecord
               String?                         _currentQuestionType;
-              bool                            _isAnswerDisplayed = false;
-              int?                            _multipleChoiceOptionSelected;  // would be null if no option is presently selected
               DateTime?                       _timeDisplayed;
               DateTime?                       _timeAnswerGiven;
               bool                            _isAnswerSubmitted = false; // Flag for preventing duplicate submissions
@@ -223,8 +209,6 @@ class SessionManager {
       // Decide how to handle critical init failure - maybe rethrow?
       // For now, just completing with error lets awaiters handle it.
     });
-
-    // TODO: Start other non-login-dependent workers here if any
   }
 
   // Initialize Hive storage (private)
@@ -296,8 +280,6 @@ class SessionManager {
     _currentQuestionRecord        = null;  // User-specific data
     _currentQuestionDetails       = null;  // Static data (QPair)
     _currentQuestionType          = null;
-    _isAnswerDisplayed            = false;
-    _multipleChoiceOptionSelected = null;
     _timeDisplayed                = null;
     _timeAnswerGiven              = null;
     _isAnswerSubmitted            = false; // Reset the flag
@@ -370,7 +352,9 @@ class SessionManager {
   //  --------------------------------------------------------------------------------
   /// Logs out the current user, stops workers, clears caches, and resets state.
   Future<void> logoutUser() async {
-    QuizzerLogger.printHeader("Starting User Logout Process...");
+    // assert(false, 'Simulated test error during logout'); // Intentionally throw error for testing
+    throw Exception('Simulated critical error during logout - testing general exception'); // Intentionally throw general exception for testing
+    // QuizzerLogger.printHeader("Starting User Logout Process..."); // This line and below will not be reached if the exception is thrown
 
     if (!userLoggedIn) {
       QuizzerLogger.logWarning("Logout called, but no user was logged in.");
@@ -414,7 +398,7 @@ class SessionManager {
     QuizzerLogger.logSuccess("Data caches cleared (Placeholder - Clear methods TBD).");
 
     QuizzerLogger.logMessage("Disposing SwitchBoard");
-    // TODO potential error here, when logging out ensure properly state reset of backend systems (_isRunning flags should terminate loops and force workers to reawait the start command)
+    // TODO potential error here, when logging out ensure properly state reset of backend systems (_isRunning flags should terminate loops and force workers to reawait the start command) Should do extensive testing, logging out user, logging them in, answering a butt ton of questions, logging out, logging in, and repeatedly doing this in an aggressive manner. This should reveal if there are issues in the login/logout process
     // _switchBoard.dispose();
 
     // Update total study time
@@ -563,7 +547,6 @@ class SessionManager {
   //  --------------------------------------------------------------------------------
   // API for updating a module's description
   Future<bool> updateModuleDescription(String moduleName, String newDescription) async {
-    // TODO Need to include this in the full_session_test
     assert(userId != null);
     
     return await handleUpdateModuleDescription({
@@ -578,7 +561,6 @@ class SessionManager {
   //  --------------------------------------------------------------------------------
   /// Retrieves the next question, updates state, and makes it available via getters.
   Future<void> requestNextQuestion() async {
-    // TODO Need to include this in the full_session_test
     if (userId == null) {
        throw StateError('User must be logged in to request a question.');
     }
@@ -679,7 +661,6 @@ class SessionManager {
            bool    isCorrect;
      final String  questionId    = currentQuestionId;     // Use getter
   
-      // TODO: Implement correctness logic for all question types
       switch (_currentQuestionType) {
         case 'multiple_choice':
           final int? correctIndex = currentCorrectOptionIndex;
@@ -792,12 +773,10 @@ class SessionManager {
     // --- 1. Pre-checks --- 
     assert(userId != null, 'User must be logged in to add a question.'); 
 
-    final String timeStamp = DateTime.now().toIso8601String();
     final String qstContrib = userId!; // Use current user ID as the question contributor
 
     // --- 2. Database Operation (Lock Acquisition) --- 
     Database? db;
-    int result = 0; // Initialize result
     Map<String, dynamic> response;
 
     // Acquire DB Lock (Fail Fast - throw if unavailable)

@@ -218,6 +218,9 @@ class _ReviewPanelWidgetState extends State<ReviewPanelWidget> {
                 options: (displayData['options'] as List<dynamic>? ?? []).map((e) => Map<String, dynamic>.from(e as Map)).toList(),
                 correctOptionIndexMC: displayData['correct_option_index'] as int?,
                 correctIndicesSATA: (displayData['index_options_that_apply'] as List<dynamic>? ?? []).map((e) => e as int).toList(),
+                isCorrectAnswerTrueTF: (displayData['question_type'] == 'true_false')
+                    ? (displayData['correct_option_index'] == 0)
+                    : null,
               ),
             ),
           ),

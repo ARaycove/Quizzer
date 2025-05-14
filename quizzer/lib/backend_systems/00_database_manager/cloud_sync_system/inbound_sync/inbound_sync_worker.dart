@@ -4,7 +4,7 @@ import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:supabase/supabase.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pairs_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_profile_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_question_answer_pairs_table.dart';
 
 /// Syncs question_answer_pairs from the cloud that are newer than last_login

@@ -1,6 +1,6 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
-import '00_table_helper.dart'; // Import the helper file
+import 'table_helper.dart'; // Import the helper file
 
 // Table name and field constants
 const String modulesTableName = 'modules';

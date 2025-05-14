@@ -2,7 +2,7 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/question_answ
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_question_answer_pairs_table.dart' as user_q_pairs_table;
 import 'package:quizzer/backend_systems/07_user_question_management/user_question_processes.dart' as user_question_processor;
 import 'package:quizzer/backend_systems/06_question_queue_server/eligibility_check_worker.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile_table.dart' as user_profile_table;
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_profile_table.dart' as user_profile_table;
 import 'package:quizzer/backend_systems/04_module_management/module_updates_process.dart' as module_processor;
 import 'package:quizzer/backend_systems/09_data_caches/non_circulating_questions_cache.dart';
 import 'package:quizzer/backend_systems/09_data_caches/due_date_beyond_24hrs_cache.dart';

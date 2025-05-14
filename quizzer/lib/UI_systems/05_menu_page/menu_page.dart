@@ -141,9 +141,9 @@ class _MenuPageState extends State<MenuPage> {
                 final navigator = Navigator.of(context);
                 session.logoutUser();
                 QuizzerLogger.logMessage('Session state reset for logout');
-                if (mounted) {
-                  session.addPageToHistory('/login');
-                  navigator.pushReplacementNamed('/login');
+                if (mounted) { // Ensure the widget is still in the tree
+                  // Clear navigation stack and go to login page
+                  navigator.pushNamedAndRemoveUntil('/login', (Route<dynamic> route) => false);
                 }
               },
             ),
