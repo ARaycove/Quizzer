@@ -53,4 +53,24 @@ class DatabaseMonitor {
       QuizzerLogger.logMessage('Database lock released');
     }
   }
+
+  /// !!! CRITICAL OVERRIDE !!!
+  /// Provides direct, UNLOCKED access to the database instance.
+  /// This method BYPASSES the entire locking mechanism (_isLocked, _accessQueue).
+  /// 
+  /// **WARNING:** This should ONLY be used by the critical error logging system
+  /// (`SessionManager.reportError`) to ensure errors can be logged even if the
+  /// database is otherwise locked (potentially by the operation that CAUSED the error).
+  /// 
+  /// Using this for any other purpose can lead to race conditions, data corruption,
+  /// or deadlocks.
+  /// 
+  /// Since this method does NOT acquire a lock, `releaseDatabaseAccess()` 
+  /// MUST NOT be called by the user of this method for the obtained Database instance.
+  /// PERMANENTLY LOCKS THE DB MONITOR, locking all other functionality from working.
+  Future<Database?> getDirectDatabaseAccessForCriticalLogging() async {
+    QuizzerLogger.logWarning('DATABASE_MONITOR: CRITICAL OVERRIDE - Providing direct, unlocked DB access for error logging.');
+    _isLocked = true;
+    return getDatabaseForMonitor();
+  }
 }

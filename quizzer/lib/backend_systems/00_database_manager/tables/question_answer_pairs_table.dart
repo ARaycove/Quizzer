@@ -448,24 +448,40 @@ Future<void> insertOrUpdateQuestionAnswerPair(Map<String, dynamic> record, Datab
   await verifyQuestionAnswerPairTable(db);
   final String? questionId = record['question_id'] as String?;
   if (questionId == null) {
-    QuizzerLogger.logError('insertOrUpdateQuestionAnswerPair: Missing question_id in record.');
+    QuizzerLogger.logError('insertOrUpdateQuestionAnswerPair: Missing question_id in record: $record');
     throw StateError('Cannot insert or update question-answer pair without question_id.');
   }
+  // Set sync flags to true
+  // Prepare a mutable copy of the record to set sync flags for local storage.
+  final Map<String, dynamic> localRecord = Map<String, dynamic>.from(record);
+
+  // When data comes from the server, mark it as synced locally.
+  localRecord['has_been_synced'] = 1;
+  localRecord['edits_are_synced'] = 1;
+  // Ensure last_modified_timestamp from the server record is used.
+  // If serverRecord doesn't have it, insertRawData/updateRawData might set it to null or a default,
+  // which is acceptable if the server is the source of truth and omits it.
+  // However, for synced tables, last_modified_timestamp should ideally always be present from the server.
+  localRecord['last_modified_timestamp'] = record['last_modified_timestamp'] ?? DateTime.now().toUtc().toIso8601String(); // Fallback, but server should provide this
+
+
   // Check if the record exists
   final List<Map<String, dynamic>> existing = await db.query(
     'question_answer_pairs',
+    columns: ['question_id'], // Only need to check existence, not fetch full data
     where: 'question_id = ?',
     whereArgs: [questionId],
     limit: 1,
   );
+
   if (existing.isEmpty) {
-    QuizzerLogger.logMessage('insertOrUpdateQuestionAnswerPair: Inserting new record for question_id $questionId');
-    await insertRawData('question_answer_pairs', record, db);
+    QuizzerLogger.logMessage('insertOrUpdateQuestionAnswerPair: Inserting new record for question_id $questionId from server.');
+    await insertRawData('question_answer_pairs', localRecord, db);
   } else {
-    QuizzerLogger.logMessage('insertOrUpdateQuestionAnswerPair: Updating existing record for question_id $questionId');
+    QuizzerLogger.logMessage('insertOrUpdateQuestionAnswerPair: Updating existing record for question_id $questionId from server.');
     await updateRawData(
       'question_answer_pairs',
-      record,
+      localRecord, // Pass the modified record with correct sync flags
       'question_id = ?',
       [questionId],
       db,

@@ -186,7 +186,8 @@ class QuizzerLogger {
     // Errors opening file will now crash (Fail Fast)
     _logFileSink = File(logFilePath).openWrite(mode: FileMode.write);
     print('Quizzer: Logging to file: $logFilePath');
-    // ----------------
+    
+    logMessage('QuizzerLogger initialized with level: ${level.name}. Logging to: $logFilePath'); 
   }
 
   // Logging functions using the standard logger

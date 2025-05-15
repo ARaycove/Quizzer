@@ -24,14 +24,12 @@ class ModuleCard extends StatefulWidget {
 
 class _ModuleCardState extends State<ModuleCard> {
   late bool _isActivated;
-  late String _description;
   final SessionManager session = SessionManager();
 
   @override
   void initState() {
     super.initState();
     _isActivated = widget.isActivated;
-    _description = widget.moduleData['description'] ?? '';
   }
 
   Future<Map<String, dynamic>> _fetchModuleData() async {
@@ -72,7 +70,6 @@ class _ModuleCardState extends State<ModuleCard> {
 
     if (mounted) {
       setState(() {
-        _description = newDescription;
       });
     }
   }

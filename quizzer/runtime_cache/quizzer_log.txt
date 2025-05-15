@@ -1,231 +1,120 @@
-Quizzer: [18:07:11] [33m[WARNING][0m [main.dart] _QuizzerAppState: BUILD CALLED. _criticalError is: null
-Quizzer: [18:07:29] [34m[INFO][0m [login_page.dart] Login attempt for: aacra0820@gmail.com
-Quizzer: [18:07:29] [34m[INFO][0m [session_manager.dart] Logging in user with email: aacra0820@gmail.com
-Quizzer: [18:07:29] [34m[INFO][0m [user_auth.dart] User authentication requested for aacra0820@gmail.com
-Quizzer: [18:07:29] [34m[INFO][0m [user_auth.dart] Attempting Supabase authentication for aacra0820@gmail.com
-Quizzer: [18:07:29] [34m[INFO][0m [user_auth.dart] Attempting Supabase authentication
-Quizzer: [18:07:30] [36m[DEBUG][0m Saving session
-Quizzer: [18:07:30] [34m[INFO][0m [user_auth.dart] SUCCESS: Supabase authentication successful for aacra0820@gmail.com
-Quizzer: [18:07:30] [36m[DEBUG][0m [session_helper.dart] Access Token: [REDACTED]
-Quizzer: [18:07:30] [36m[DEBUG][0m [session_helper.dart] Decoded JWT Token Payload (Redacted): {aal: aal1, amr: [{method: password, timestamp: 1747181250}], app_metadata: {provider: email, providers: [email]}, aud: authenticated, email: [REDACTED], exp: 1747184850, iat: 1747181250, is_anonymous: false, iss: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, phone: , role: authenticated, session_id: [REDACTED], sub: [REDACTED], user_metadata: [REDACTED], user_role: admin}
-Quizzer: [18:07:30] [36m[DEBUG][0m [session_helper.dart] User role determined from JWT: admin
-Quizzer: [18:07:30] [34m[INFO][0m [user_auth.dart] Handling successful Supabase login for aacra0820@gmail.com
-Quizzer: [18:07:30] [34m[INFO][0m [user_auth.dart] Stored last login (2025-05-14T00:07:30.504334722Z) and token for aacra0820@gmail.com
-Quizzer: [18:07:30] [34m[INFO][0m [user_auth.dart] Ensuring local profile exists for aacra0820@gmail.com
-Quizzer: [18:07:30] [34m[INFO][0m [database_native.dart] Using sqflite FFI factory (Desktop)
-Quizzer: [18:07:30] [34m[INFO][0m [database_native.dart] Desktop SQLite directory ensured: /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/runtime_cache/sqlite
-Quizzer: [18:07:30] [34m[INFO][0m [database_native.dart] Target Database path: /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/runtime_cache/sqlite/quizzer.db
-Quizzer: [18:07:30] [34m[INFO][0m [database_native.dart] Existing database found at /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/runtime_cache/sqlite/quizzer.db. Using it.
-Quizzer: [18:07:30] [34m[INFO][0m [database_native.dart] SUCCESS: Database initialized successfully at: /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/runtime_cache/sqlite/quizzer.db
-Quizzer: [18:07:31] [34m[INFO][0m [user_auth.dart] Is user in list -> true
-Quizzer: [18:07:31] [34m[INFO][0m [user_auth.dart] Is user in list -> true
-Quizzer: [18:07:31] [34m[INFO][0m [session_isolates.dart] Recorded email to log in. . .: aacra0820@gmail.com
-Quizzer: [18:07:31] [34m[INFO][0m [session_isolates.dart] Database access granted
-Quizzer: [18:07:31] [34m[INFO][0m [session_isolates.dart] SUCCESS: Session initialized with userId: 77647c42-c888-47e3-8296-6fc452815810
-Quizzer: [18:07:31] [34m[INFO][0m [session_manager.dart] Stored initial profile last_modified_timestamp: 2025-05-14T00:01:43.560154Z
-Quizzer: [18:07:31] [34m[INFO][0m [inbound_sync_worker.dart] Starting inbound sync aggregator...
-Quizzer: [18:07:31] [34m[INFO][0m [inbound_sync_worker.dart] Using effective last login timestamp: 2025-05-14T00:01:43.560154Z
-Quizzer: [18:07:31] [34m[INFO][0m [inbound_sync_worker.dart] Syncing inbound question_answer_pairs for user 77647c42-c888-47e3-8296-6fc452815810 since 2025-05-14T00:01:43.560154Z...
-Quizzer: [18:07:32] [34m[INFO][0m [inbound_sync_worker.dart] No new question_answer_pairs to sync.
-Quizzer: [18:07:32] [34m[INFO][0m [inbound_sync_worker.dart] Using effective initial timestamp: 2025-05-14T00:01:43.560154Z
-Quizzer: [18:07:32] [34m[INFO][0m [inbound_sync_worker.dart] Syncing inbound user_question_answer_pairs for user 77647c42-c888-47e3-8296-6fc452815810 since 2025-05-14T00:01:43.560154Z...
-Quizzer: [18:07:32] [34m[INFO][0m [inbound_sync_worker.dart] No new user_question_answer_pairs to sync.
-Quizzer: [18:07:32] [34m[INFO][0m [inbound_sync_worker.dart] Syncing inbound user profile for user 77647c42-c888-47e3-8296-6fc452815810 since 2025-05-14T00:01:43.560154Z...
-Quizzer: [18:07:32] [34m[INFO][0m [inbound_sync_worker.dart] No new user profile to sync.
-Quizzer: [18:07:32] [34m[INFO][0m [inbound_sync_worker.dart] SUCCESS: Inbound sync completed successfully.
-Quizzer: [18:07:34] [34m[INFO][0m [question_selection_worker.dart] PresentationSelectionWorker started.
-Quizzer: [18:07:34] [34m[INFO][0m [question_selection_worker.dart] PSW: Starting initial loop...
-Quizzer: [18:07:35] [34m[INFO][0m [question_queue_cache.dart] QuestionQueueCache: Added record 2025-05-04T16:55:43.933118_77647c42-c888-47e3-8296-6fc452815810 to empty queue.
-Quizzer: [18:07:35] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker initialized.
-Quizzer: [18:07:35] [34m[INFO][0m [outbound_sync_worker.dart] Entering OutboundSyncWorker start()...
-Quizzer: [18:07:35] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Subscribing to onOutboundSyncNeeded stream.
-Quizzer: [18:07:35] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Starting sync cycle.
-Quizzer: [18:07:35] [34m[INFO][0m [outbound_sync_worker.dart] Network check successful.
-Quizzer: [18:07:35] [34m[INFO][0m [outbound_sync_worker.dart] Entering OutboundSyncWorker _getDbAccess()...
-Quizzer: [18:07:35] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Database access granted.
-Quizzer: [18:07:35] [34m[INFO][0m [outbound_sync_functions.dart] Starting sync for QuestionAnswerPairs...
-Quizzer: [18:07:35] [34m[INFO][0m [outbound_sync_functions.dart] No unsynced QuestionAnswerPairs found.
-Quizzer: [18:07:35] [34m[INFO][0m [outbound_sync_worker.dart] Entering OutboundSyncWorker _getDbAccess()...
-Quizzer: [18:07:35] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Database access granted.
-Quizzer: [18:07:35] [34m[INFO][0m [outbound_sync_functions.dart] Starting sync for LoginAttempts...
-Quizzer: [18:07:35] [34m[INFO][0m [outbound_sync_functions.dart] Found 1 unsynced LoginAttempts.
-Quizzer: [18:07:35] [36m[DEBUG][0m [outbound_sync_functions.dart] Preparing to push LoginAttempt 2025-05-14T00:07:31.465255Z77647c42-c888-47e3-8296-6fc452815810 to login_attempts
-Quizzer: [18:07:35] [34m[INFO][0m [outbound_sync_functions.dart] SUCCESS: Supabase insert successful for LoginAttempt 2025-05-14T00:07:31.465255Z77647c42-c888-47e3-8296-6fc452815810.
-Quizzer: [18:07:35] [34m[INFO][0m [outbound_sync_functions.dart] Finished sync attempt for LoginAttempts.
-Quizzer: [18:07:35] [34m[INFO][0m [outbound_sync_worker.dart] Entering OutboundSyncWorker _getDbAccess()...
-Quizzer: [18:07:36] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Database access granted.
-Quizzer: [18:07:36] [34m[INFO][0m [outbound_sync_functions.dart] Starting sync for QuestionAnswerAttempts...
-Quizzer: [18:07:36] [34m[INFO][0m [question_answer_attempts_table.dart] Fetching unsynced question answer attempts...
-Quizzer: [18:07:36] [34m[INFO][0m [question_answer_attempts_table.dart] Verifying question_answer_attempts table...
-Quizzer: [18:07:36] [34m[INFO][0m [question_answer_attempts_table.dart] question_answer_attempts table already exists. Checking columns...
-Quizzer: [18:07:36] [34m[INFO][0m [question_answer_attempts_table.dart] Column check complete.
-Quizzer: [18:07:36] [34m[INFO][0m [question_answer_attempts_table.dart] SUCCESS: Fetched 0 unsynced question answer attempts.
-Quizzer: [18:07:36] [34m[INFO][0m [outbound_sync_functions.dart] No unsynced QuestionAnswerAttempts found.
-Quizzer: [18:07:36] [34m[INFO][0m [outbound_sync_worker.dart] Entering OutboundSyncWorker _getDbAccess()...
-Quizzer: [18:07:36] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Database access granted.
-Quizzer: [18:07:36] [34m[INFO][0m [outbound_sync_functions.dart] Starting sync for UserProfiles...
-Quizzer: [18:07:36] [34m[INFO][0m [outbound_sync_functions.dart] Found 1 unsynced UserProfiles for user 77647c42-c888-47e3-8296-6fc452815810.
-Quizzer: [18:07:36] [36m[DEBUG][0m [outbound_sync_functions.dart] Preparing to update UserProfile 77647c42-c888-47e3-8296-6fc452815810 in user_profile
-Quizzer: [18:07:36] [34m[INFO][0m [outbound_sync_functions.dart] Attempting Supabase update for ID 77647c42-c888-47e3-8296-6fc452815810 in table user_profile...
-Quizzer: [18:07:36] [34m[INFO][0m [outbound_sync_functions.dart] SUCCESS: Supabase update presumed successful for ID 77647c42-c888-47e3-8296-6fc452815810 in user_profile.
-Quizzer: [18:07:36] [34m[INFO][0m [outbound_sync_functions.dart] Update successful for UserProfile 77647c42-c888-47e3-8296-6fc452815810. Updating local flags...
-Quizzer: [18:07:36] [34m[INFO][0m [outbound_sync_functions.dart] Finished sync attempt for UserProfiles.
-Quizzer: [18:07:36] [34m[INFO][0m [outbound_sync_worker.dart] Entering OutboundSyncWorker _getDbAccess()...
-Quizzer: [18:07:36] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Database access granted.
-Quizzer: [18:07:36] [34m[INFO][0m [outbound_sync_functions.dart] Starting sync for UserQuestionAnswerPairs...
-Quizzer: [18:07:36] [34m[INFO][0m [outbound_sync_functions.dart] No unsynced UserQuestionAnswerPairs found for user Instance of 'SessionManager'.userId!.
-Quizzer: [18:07:36] [34m[INFO][0m [outbound_sync_worker.dart] Entering OutboundSyncWorker _runLoop()...
-Quizzer: [18:07:36] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Waiting for sync signal...
-Quizzer: [18:07:36] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker started and initial sync performed.
-Quizzer: [18:07:36] [36m[DEBUG][0m [session_manager.dart] SessionManager.requestNextQuestion: Fetched options type: List<dynamic>, value: [{type: text, content: Montesquieu}, {type: text, content: Machiavelli}, {type: text, content: Monteverdi}, {type: text, content: Michelet}, {type: text, content: Mendel}]
-Quizzer: [18:07:36] [34m[INFO][0m [login_page.dart] Login successful for: aacra0820@gmail.com. Navigating home.
-Quizzer: [18:07:36] [36m[DEBUG][0m [home_page.dart] HomePage building question type: multiple_choice with key: [<'2025-05-04T16:55:43.933118_77647c42-c888-47e3-8296-6fc452815810'>] (using session data)
-Quizzer: [18:07:36] [36m[DEBUG][0m [question_answer_element.dart] ElementRenderer: Found image in assets: images/question_answer_pair_assets/72d36000-b070-4473-9cb8-4443ba824bc2.png
-Quizzer: [18:07:38] [36m[DEBUG][0m [session_helper.dart] Access Token: [REDACTED]
-Quizzer: [18:07:38] [36m[DEBUG][0m [session_helper.dart] Decoded JWT Token Payload (Redacted): {aal: aal1, amr: [{method: password, timestamp: 1747181250}], app_metadata: {provider: email, providers: [email]}, aud: authenticated, email: [REDACTED], exp: 1747184850, iat: 1747181250, is_anonymous: false, iss: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, phone: , role: authenticated, session_id: [REDACTED], sub: [REDACTED], user_metadata: [REDACTED], user_role: admin}
-Quizzer: [18:07:38] [36m[DEBUG][0m [session_helper.dart] User role determined from JWT: admin
-Quizzer: [18:07:38] [36m[DEBUG][0m [menu_page.dart] Building MenuPage for user role: admin
-Quizzer: [18:07:39] [34m[INFO][0m [menu_page.dart] Session state reset for logout
-Quizzer: [18:07:39] [31m[ERROR][0m [global_error_handler.dart] CRITICAL ERROR REPORTED TO UI: Unhandled Flutter error caught by PlatformDispatcher
-Error: Exception: Simulated critical error during logout - testing general exception
-StackTrace: #0      SessionManager.logoutUser (package:quizzer/backend_systems/session_manager/session_manager.dart:356:5)
-#1      _MenuPageState.build.<anonymous closure> (package:quizzer/UI_systems/05_menu_page/menu_page.dart:142:25)
-#2      _InkResponseState.handleTap (package:flutter/src/material/ink_well.dart:1185:21)
-#3      GestureRecognizer.invokeCallback (package:flutter/src/gestures/recognizer.dart:357:24)
-#4      TapGestureRecognizer.handleTapUp (package:flutter/src/gestures/tap.dart:653:11)
-#5      BaseTapGestureRecognizer._checkUp (package:flutter/src/gestures/tap.dart:307:5)
-#6      BaseTapGestureRecognizer.handlePrimaryPointer (package:flutter/src/gestures/tap.dart:240:7)
-#7      PrimaryPointerGestureRecognizer.handleEvent (package:flutter/src/gestures/recognizer.dart:718:9)
-#8      PointerRouter._dispatch (package:flutter/src/gestures/pointer_router.dart:97:12)
-#9      PointerRouter._dispatchEventToRoutes.<anonymous closure> (package:flutter/src/gestures/pointer_router.dart:143:9)
-#10     _LinkedHashMapMixin.forEach (dart:_compact_hash:763:13)
-#11     PointerRouter._dispatchEventToRoutes (package:flutter/src/gestures/pointer_router.dart:141:18)
-#12     PointerRouter.route (package:flutter/src/gestures/pointer_router.dart:131:7)
-#13     GestureBinding.handleEvent (package:flutter/src/gestures/binding.dart:530:19)
-#14     GestureBinding.dispatchEvent (package:flutter/src/gestures/binding.dart:499:22)
-#15     RendererBinding.dispatchEvent (package:flutter/src/rendering/binding.dart:460:11)
-#16     GestureBinding._handlePointerEventImmediately (package:flutter/src/gestures/binding.dart:437:7)
-#17     GestureBinding.handlePointerEvent (package:flutter/src/gestures/binding.dart:394:5)
-#18     GestureBinding._flushPointerEventQueue (package:flutter/src/gestures/binding.dart:341:7)
-#19     GestureBinding._handlePointerDataPacket (package:flutter/src/gestures/binding.dart:308:9)
-#20     _invoke1 (dart:ui/hooks.dart:332:13)
-#21     PlatformDispatcher._dispatchPointerDataPacket (dart:ui/platform_dispatcher.dart:451:7)
-#22     _dispatchPointerDataPacket (dart:ui/hooks.dart:267:31)
-
-Quizzer: [18:07:39] [34m[INFO][0m [main.dart] _QuizzerAppState: Received critical error notification. Current error: null, New error: CriticalErrorDetails(message: Unhandled Flutter error caught by PlatformDispatcher, error: Exception: Simulated critical error during logout - testing general exception, stackTrace: #0      SessionManager.logoutUser (package:quizzer/backend_systems/session_manager/session_manager.dart:356:5)
-#1      _MenuPageState.build.<anonymous closure> (package:quizzer/UI_systems/05_menu_page/menu_page.dart:142:25)
-#2      _InkResponseState.handleTap (package:flutter/src/material/ink_well.dart:1185:21)
-#3      GestureRecognizer.invokeCallback (package:flutter/src/gestures/recognizer.dart:357:24)
-#4      TapGestureRecognizer.handleTapUp (package:flutter/src/gestures/tap.dart:653:11)
-#5      BaseTapGestureRecognizer._checkUp (package:flutter/src/gestures/tap.dart:307:5)
-#6      BaseTapGestureRecognizer.handlePrimaryPointer (package:flutter/src/gestures/tap.dart:240:7)
-#7      PrimaryPointerGestureRecognizer.handleEvent (package:flutter/src/gestures/recognizer.dart:718:9)
-#8      PointerRouter._dispatch (package:flutter/src/gestures/pointer_router.dart:97:12)
-#9      PointerRouter._dispatchEventToRoutes.<anonymous closure> (package:flutter/src/gestures/pointer_router.dart:143:9)
-#10     _LinkedHashMapMixin.forEach (dart:_compact_hash:763:13)
-#11     PointerRouter._dispatchEventToRoutes (package:flutter/src/gestures/pointer_router.dart:141:18)
-#12     PointerRouter.route (package:flutter/src/gestures/pointer_router.dart:131:7)
-#13     GestureBinding.handleEvent (package:flutter/src/gestures/binding.dart:530:19)
-#14     GestureBinding.dispatchEvent (package:flutter/src/gestures/binding.dart:499:22)
-#15     RendererBinding.dispatchEvent (package:flutter/src/rendering/binding.dart:460:11)
-#16     GestureBinding._handlePointerEventImmediately (package:flutter/src/gestures/binding.dart:437:7)
-#17     GestureBinding.handlePointerEvent (package:flutter/src/gestures/binding.dart:394:5)
-#18     GestureBinding._flushPointerEventQueue (package:flutter/src/gestures/binding.dart:341:7)
-#19     GestureBinding._handlePointerDataPacket (package:flutter/src/gestures/binding.dart:308:9)
-#20     _invoke1 (dart:ui/hooks.dart:332:13)
-#21     PlatformDispatcher._dispatchPointerDataPacket (dart:ui/platform_dispatcher.dart:451:7)
-#22     _dispatchPointerDataPacket (dart:ui/hooks.dart:267:31)
-)
-Quizzer: [18:07:39] [34m[INFO][0m [main.dart] _QuizzerAppState: setState completed. _criticalError is now: CriticalErrorDetails(message: Unhandled Flutter error caught by PlatformDispatcher, error: Exception: Simulated critical error during logout - testing general exception, stackTrace: #0      SessionManager.logoutUser (package:quizzer/backend_systems/session_manager/session_manager.dart:356:5)
-#1      _MenuPageState.build.<anonymous closure> (package:quizzer/UI_systems/05_menu_page/menu_page.dart:142:25)
-#2      _InkResponseState.handleTap (package:flutter/src/material/ink_well.dart:1185:21)
-#3      GestureRecognizer.invokeCallback (package:flutter/src/gestures/recognizer.dart:357:24)
-#4      TapGestureRecognizer.handleTapUp (package:flutter/src/gestures/tap.dart:653:11)
-#5      BaseTapGestureRecognizer._checkUp (package:flutter/src/gestures/tap.dart:307:5)
-#6      BaseTapGestureRecognizer.handlePrimaryPointer (package:flutter/src/gestures/tap.dart:240:7)
-#7      PrimaryPointerGestureRecognizer.handleEvent (package:flutter/src/gestures/recognizer.dart:718:9)
-#8      PointerRouter._dispatch (package:flutter/src/gestures/pointer_router.dart:97:12)
-#9      PointerRouter._dispatchEventToRoutes.<anonymous closure> (package:flutter/src/gestures/pointer_router.dart:143:9)
-#10     _LinkedHashMapMixin.forEach (dart:_compact_hash:763:13)
-#11     PointerRouter._dispatchEventToRoutes (package:flutter/src/gestures/pointer_router.dart:141:18)
-#12     PointerRouter.route (package:flutter/src/gestures/pointer_router.dart:131:7)
-#13     GestureBinding.handleEvent (package:flutter/src/gestures/binding.dart:530:19)
-#14     GestureBinding.dispatchEvent (package:flutter/src/gestures/binding.dart:499:22)
-#15     RendererBinding.dispatchEvent (package:flutter/src/rendering/binding.dart:460:11)
-#16     GestureBinding._handlePointerEventImmediately (package:flutter/src/gestures/binding.dart:437:7)
-#17     GestureBinding.handlePointerEvent (package:flutter/src/gestures/binding.dart:394:5)
-#18     GestureBinding._flushPointerEventQueue (package:flutter/src/gestures/binding.dart:341:7)
-#19     GestureBinding._handlePointerDataPacket (package:flutter/src/gestures/binding.dart:308:9)
-#20     _invoke1 (dart:ui/hooks.dart:332:13)
-#21     PlatformDispatcher._dispatchPointerDataPacket (dart:ui/platform_dispatcher.dart:451:7)
-#22     _dispatchPointerDataPacket (dart:ui/hooks.dart:267:31)
-)
-Quizzer: [18:07:39] [34m[INFO][0m [main.dart] _QuizzerAppState: Navigation to /critical_error attempted.
-Quizzer: [18:07:39] [33m[WARNING][0m [main.dart] _QuizzerAppState: BUILD CALLED. _criticalError is: Unhandled Flutter error caught by PlatformDispatcher
-Quizzer: [18:21:44] [33m[WARNING][0m [main.dart] _QuizzerAppState: BUILD CALLED. _criticalError is: Unhandled Flutter error caught by PlatformDispatcher
-Quizzer: [18:21:44] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Initialized. Placeholder: Attempting to send quizzer_log.txt to server.
-Quizzer: [18:26:34] [33m[WARNING][0m [main.dart] _QuizzerAppState: BUILD CALLED. _criticalError is: Unhandled Flutter error caught by PlatformDispatcher
-Quizzer: [18:28:20] [33m[WARNING][0m [main.dart] _QuizzerAppState: BUILD CALLED. _criticalError is: Unhandled Flutter error caught by PlatformDispatcher
-Quizzer: [18:48:17] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: User feedback submitted: ""
-Quizzer: [18:48:19] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: User feedback submitted: ""
-Quizzer: [18:48:19] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: User feedback submitted: ""
-Quizzer: [18:48:20] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: User feedback submitted: ""
-Quizzer: [18:48:20] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: User feedback submitted: ""
-Quizzer: [18:48:21] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: User feedback submitted: ""
-Quizzer: [18:50:29] [33m[WARNING][0m [main.dart] _QuizzerAppState: BUILD CALLED. _criticalError is: Unhandled Flutter error caught by PlatformDispatcher
-Quizzer: [18:50:41] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: User feedback submitted: "feeddddddbackkkkkk"
-Quizzer: [18:57:15] [33m[WARNING][0m [main.dart] _QuizzerAppState: BUILD CALLED. _criticalError is: Unhandled Flutter error caught by PlatformDispatcher
-Quizzer: [18:59:51] [33m[WARNING][0m [main.dart] _QuizzerAppState: BUILD CALLED. _criticalError is: Unhandled Flutter error caught by PlatformDispatcher
-Quizzer: [18:59:53] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 1, Message: "Okay, one more poke and I'm calling HR."
-Quizzer: [18:59:54] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 2, Message: "This button has feelings, you know."
-Quizzer: [18:59:55] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 3, Message: "This button has feelings, you know."
-Quizzer: [18:59:56] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 4, Message: "I already got the feedback, you can restart now."
-Quizzer: [18:59:57] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 5, Message: "Stop poking me!"
-Quizzer: [18:59:58] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 6, Message: "Do you always poke buttons this much?"
-Quizzer: [18:59:59] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 7, Message: "Seriously though..."
-Quizzer: [19:00:00] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 8, Message: "I already got the feedback, you can restart now."
-Quizzer: [19:00:05] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 9, Message: "Ow, that hurts!"
-Quizzer: [19:00:07] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 10, Message: "Stop poking me!"
-Quizzer: [19:00:16] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 11, Message: "Ow, that hurts!"
-Quizzer: [19:00:16] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 12, Message: "Stop poking me!"
-Quizzer: [19:00:16] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 13, Message: "Okay, one more poke and I'm calling HR."
-Quizzer: [19:00:16] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 14, Message: "Seriously though..."
-Quizzer: [19:00:17] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 15, Message: "Stop poking me!"
-Quizzer: [19:00:17] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 16, Message: "This button has feelings, you know."
-Quizzer: [19:00:17] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 17, Message: "Ow, that hurts!"
-Quizzer: [19:00:17] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 18, Message: "Do you always poke buttons this much?"
-Quizzer: [19:00:17] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 19, Message: "Stop poking me!"
-Quizzer: [19:00:17] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 20, Message: "Okay, one more poke and I'm calling HR."
-Quizzer: [19:00:18] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 21, Message: "Do you always poke buttons this much?"
-Quizzer: [19:00:18] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 22, Message: "Seriously though..."
-Quizzer: [19:00:18] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 23, Message: "This button has feelings, you know."
-Quizzer: [19:00:18] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 24, Message: "Don't poke the button anymore!!"
-Quizzer: [19:00:18] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 25, Message: "Do you always poke buttons this much?"
-Quizzer: [19:00:18] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 26, Message: "Are you not entertained?"
-Quizzer: [19:00:19] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 27, Message: "This button has feelings, you know."
-Quizzer: [19:00:19] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 28, Message: "I already got the feedback, you can restart now."
-Quizzer: [19:00:20] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 29, Message: "Stop poking me!"
-Quizzer: [19:00:20] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 30, Message: "Seriously though..."
-Quizzer: [19:00:20] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 31, Message: "Seriously though..."
-Quizzer: [19:00:20] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 32, Message: "Do you always poke buttons this much?"
-Quizzer: [19:00:22] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 33, Message: "Don't poke the button anymore!!"
-Quizzer: [19:00:22] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 34, Message: "Stop poking me!"
-Quizzer: [19:00:22] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 35, Message: "This button has feelings, you know."
-Quizzer: [19:00:22] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 36, Message: "This button has feelings, you know."
-Quizzer: [19:00:22] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 37, Message: "Okay, one more poke and I'm calling HR."
-Quizzer: [19:00:22] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 38, Message: "Don't poke the button anymore!!"
-Quizzer: [19:00:23] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 39, Message: "Stop poking me!"
-Quizzer: [19:00:23] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 40, Message: "Do you always poke buttons this much?"
-Quizzer: [19:00:23] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 41, Message: "Don't poke the button anymore!!"
-Quizzer: [19:00:25] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 42, Message: "Seriously though..."
-Quizzer: [19:00:25] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 43, Message: "Don't poke the button anymore!!"
-Quizzer: [19:00:25] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 44, Message: "Ow, that hurts!"
-Quizzer: [19:00:25] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 45, Message: "Seriously though..."
-Quizzer: [19:00:26] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 46, Message: "Don't poke the button anymore!!"
-Quizzer: [19:00:26] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 47, Message: "Don't poke the button anymore!!"
-Quizzer: [19:00:26] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 48, Message: "I already got the feedback, you can restart now."
-Quizzer: [19:00:26] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 49, Message: "Don't poke the button anymore!!"
-Quizzer: [19:00:27] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 50, Message: "Okay, one more poke and I'm calling HR."
-Quizzer: [19:00:27] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 51, Message: "I already got the feedback, you can restart now."
-Quizzer: [19:00:27] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 52, Message: "This button has feelings, you know."
-Quizzer: [19:00:27] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Button poked. Count: 53, Message: "Don't poke the button anymore!!"
+Quizzer: [14:44:15] [34m[INFO][0m [main.dart] QuizzerLogger initialized with level: FINE. Logging to: runtime_cache/quizzer_log.txt
+Quizzer: [14:44:15] [33m[WARNING][0m [main.dart] _QuizzerAppState: BUILD CALLED. _criticalError is: null
+Quizzer: [14:44:28] [34m[INFO][0m [login_page.dart] Login attempt for: aacra0820@gmail.com
+Quizzer: [14:44:28] [34m[INFO][0m [session_manager.dart] Logging in user with email: aacra0820@gmail.com
+Quizzer: [14:44:28] [34m[INFO][0m [user_auth.dart] User authentication requested for aacra0820@gmail.com
+Quizzer: [14:44:28] [34m[INFO][0m [user_auth.dart] Attempting Supabase authentication for aacra0820@gmail.com
+Quizzer: [14:44:28] [34m[INFO][0m [user_auth.dart] Attempting Supabase authentication
+Quizzer: [14:44:29] [36m[DEBUG][0m Saving session
+Quizzer: [14:44:29] [34m[INFO][0m [user_auth.dart] SUCCESS: Supabase authentication successful for aacra0820@gmail.com
+Quizzer: [14:44:29] [36m[DEBUG][0m [session_helper.dart] Access Token: [REDACTED]
+Quizzer: [14:44:29] [36m[DEBUG][0m [session_helper.dart] Decoded JWT Token Payload (Redacted): {aal: aal1, amr: [{method: password, timestamp: 1747255469}], app_metadata: {provider: email, providers: [email]}, aud: authenticated, email: [REDACTED], exp: 1747259069, iat: 1747255469, is_anonymous: false, iss: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, phone: , role: authenticated, session_id: [REDACTED], sub: [REDACTED], user_metadata: [REDACTED], user_role: admin}
+Quizzer: [14:44:29] [36m[DEBUG][0m [session_helper.dart] User role determined from JWT: admin
+Quizzer: [14:44:29] [34m[INFO][0m [user_auth.dart] Handling successful Supabase login for aacra0820@gmail.com
+Quizzer: [14:44:29] [34m[INFO][0m [user_auth.dart] Stored last login (2025-05-14T20:44:29.42490024Z) and token for aacra0820@gmail.com
+Quizzer: [14:44:29] [34m[INFO][0m [user_auth.dart] Ensuring local profile exists for aacra0820@gmail.com
+Quizzer: [14:44:29] [34m[INFO][0m [database_native.dart] Using sqflite FFI factory (Desktop)
+Quizzer: [14:44:29] [34m[INFO][0m [database_native.dart] Desktop SQLite directory ensured: /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/runtime_cache/sqlite
+Quizzer: [14:44:29] [34m[INFO][0m [database_native.dart] Target Database path: /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/runtime_cache/sqlite/quizzer.db
+Quizzer: [14:44:29] [34m[INFO][0m [database_native.dart] Existing database found at /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/runtime_cache/sqlite/quizzer.db. Using it.
+Quizzer: [14:44:29] [34m[INFO][0m [database_native.dart] SUCCESS: Database initialized successfully at: /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/runtime_cache/sqlite/quizzer.db
+Quizzer: [14:44:29] [34m[INFO][0m [user_auth.dart] Is user in list -> true
+Quizzer: [14:44:29] [34m[INFO][0m [user_auth.dart] Is user in list -> true
+Quizzer: [14:44:30] [34m[INFO][0m [session_isolates.dart] Recorded email to log in. . .: aacra0820@gmail.com
+Quizzer: [14:44:30] [34m[INFO][0m [session_isolates.dart] Database access granted
+Quizzer: [14:44:30] [34m[INFO][0m [session_isolates.dart] SUCCESS: Session initialized with userId: 77647c42-c888-47e3-8296-6fc452815810
+Quizzer: [14:44:30] [34m[INFO][0m [session_manager.dart] Stored initial profile last_modified_timestamp: 2025-05-14T19:49:58.505063Z
+Quizzer: [14:44:30] [34m[INFO][0m [inbound_sync_worker.dart] Starting inbound sync aggregator...
+Quizzer: [14:44:30] [34m[INFO][0m [inbound_sync_worker.dart] Using effective last login timestamp: 2025-05-14T19:49:58.505063Z
+Quizzer: [14:44:30] [34m[INFO][0m [inbound_sync_worker.dart] Syncing inbound question_answer_pairs for user 77647c42-c888-47e3-8296-6fc452815810 since 2025-05-14T19:49:58.505063Z...
+Quizzer: [14:44:30] [34m[INFO][0m [inbound_sync_worker.dart] No new question_answer_pairs to sync.
+Quizzer: [14:44:30] [34m[INFO][0m [inbound_sync_worker.dart] Using effective initial timestamp: 2025-05-14T19:49:58.505063Z
+Quizzer: [14:44:30] [34m[INFO][0m [inbound_sync_worker.dart] Syncing inbound user_question_answer_pairs for user 77647c42-c888-47e3-8296-6fc452815810 since 2025-05-14T19:49:58.505063Z...
+Quizzer: [14:44:30] [34m[INFO][0m [inbound_sync_worker.dart] No new user_question_answer_pairs to sync.
+Quizzer: [14:44:30] [34m[INFO][0m [inbound_sync_worker.dart] Syncing inbound user profile for user 77647c42-c888-47e3-8296-6fc452815810 since 2025-05-14T19:49:58.505063Z...
+Quizzer: [14:44:30] [34m[INFO][0m [inbound_sync_worker.dart] No new user profile to sync.
+Quizzer: [14:44:30] [34m[INFO][0m [inbound_sync_worker.dart] SUCCESS: Inbound sync completed successfully.
+Quizzer: [14:44:33] [34m[INFO][0m [question_selection_worker.dart] PresentationSelectionWorker started.
+Quizzer: [14:44:33] [34m[INFO][0m [question_selection_worker.dart] PSW: Starting initial loop...
+Quizzer: [14:44:33] [34m[INFO][0m [question_queue_cache.dart] QuestionQueueCache: Added record 2025-05-08T00:16:44.373975Z_77647c42-c888-47e3-8296-6fc452815810 to empty queue.
+Quizzer: [14:44:33] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker initialized.
+Quizzer: [14:44:33] [34m[INFO][0m [outbound_sync_worker.dart] Entering OutboundSyncWorker start()...
+Quizzer: [14:44:33] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Subscribing to onOutboundSyncNeeded stream.
+Quizzer: [14:44:33] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Starting sync cycle.
+Quizzer: [14:44:38] [34m[INFO][0m [outbound_sync_worker.dart] Network check successful.
+Quizzer: [14:44:38] [34m[INFO][0m [outbound_sync_worker.dart] Entering OutboundSyncWorker _getDbAccess()...
+Quizzer: [14:44:38] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Database access granted.
+Quizzer: [14:44:38] [34m[INFO][0m [outbound_sync_functions.dart] Starting sync for QuestionAnswerPairs...
+Quizzer: [14:44:38] [34m[INFO][0m [outbound_sync_functions.dart] No unsynced QuestionAnswerPairs found.
+Quizzer: [14:44:38] [34m[INFO][0m [outbound_sync_worker.dart] Entering OutboundSyncWorker _getDbAccess()...
+Quizzer: [14:44:38] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Database access granted.
+Quizzer: [14:44:38] [34m[INFO][0m [outbound_sync_functions.dart] Starting sync for LoginAttempts...
+Quizzer: [14:44:38] [34m[INFO][0m [outbound_sync_functions.dart] Found 1 unsynced LoginAttempts.
+Quizzer: [14:44:38] [36m[DEBUG][0m [outbound_sync_functions.dart] Preparing to push LoginAttempt 2025-05-14T20:44:30.291583Z77647c42-c888-47e3-8296-6fc452815810 to login_attempts
+Quizzer: [14:44:38] [34m[INFO][0m [outbound_sync_functions.dart] SUCCESS: Supabase insert successful for LoginAttempt 2025-05-14T20:44:30.291583Z77647c42-c888-47e3-8296-6fc452815810.
+Quizzer: [14:44:38] [34m[INFO][0m [outbound_sync_functions.dart] Finished sync attempt for LoginAttempts.
+Quizzer: [14:44:38] [34m[INFO][0m [outbound_sync_worker.dart] Entering OutboundSyncWorker _getDbAccess()...
+Quizzer: [14:44:38] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Database access granted.
+Quizzer: [14:44:38] [34m[INFO][0m [outbound_sync_functions.dart] Starting sync for QuestionAnswerAttempts...
+Quizzer: [14:44:38] [34m[INFO][0m [question_answer_attempts_table.dart] Fetching unsynced question answer attempts...
+Quizzer: [14:44:38] [34m[INFO][0m [question_answer_attempts_table.dart] Verifying question_answer_attempts table...
+Quizzer: [14:44:38] [34m[INFO][0m [question_answer_attempts_table.dart] question_answer_attempts table already exists. Checking columns...
+Quizzer: [14:44:38] [34m[INFO][0m [question_answer_attempts_table.dart] Column check complete.
+Quizzer: [14:44:38] [34m[INFO][0m [question_answer_attempts_table.dart] SUCCESS: Fetched 0 unsynced question answer attempts.
+Quizzer: [14:44:38] [34m[INFO][0m [outbound_sync_functions.dart] No unsynced QuestionAnswerAttempts found.
+Quizzer: [14:44:38] [34m[INFO][0m [outbound_sync_worker.dart] Entering OutboundSyncWorker _getDbAccess()...
+Quizzer: [14:44:38] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Database access granted.
+Quizzer: [14:44:38] [34m[INFO][0m [outbound_sync_functions.dart] Starting sync for UserProfiles...
+Quizzer: [14:44:38] [34m[INFO][0m [outbound_sync_functions.dart] Found 1 unsynced UserProfiles for user 77647c42-c888-47e3-8296-6fc452815810.
+Quizzer: [14:44:38] [36m[DEBUG][0m [outbound_sync_functions.dart] Preparing to update UserProfile 77647c42-c888-47e3-8296-6fc452815810 in user_profile
+Quizzer: [14:44:38] [34m[INFO][0m [outbound_sync_functions.dart] Attempting Supabase update for ID 77647c42-c888-47e3-8296-6fc452815810 in table user_profile...
+Quizzer: [14:44:38] [34m[INFO][0m [outbound_sync_functions.dart] SUCCESS: Supabase update presumed successful for ID 77647c42-c888-47e3-8296-6fc452815810 in user_profile.
+Quizzer: [14:44:38] [34m[INFO][0m [outbound_sync_functions.dart] Update successful for UserProfile 77647c42-c888-47e3-8296-6fc452815810. Updating local flags...
+Quizzer: [14:44:38] [34m[INFO][0m [outbound_sync_functions.dart] Finished sync attempt for UserProfiles.
+Quizzer: [14:44:38] [34m[INFO][0m [outbound_sync_worker.dart] Entering OutboundSyncWorker _getDbAccess()...
+Quizzer: [14:44:38] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Database access granted.
+Quizzer: [14:44:38] [34m[INFO][0m [outbound_sync_functions.dart] Starting sync for UserQuestionAnswerPairs...
+Quizzer: [14:44:38] [34m[INFO][0m [outbound_sync_functions.dart] No unsynced UserQuestionAnswerPairs found for user Instance of 'SessionManager'.userId!.
+Quizzer: [14:44:38] [34m[INFO][0m [outbound_sync_worker.dart] Entering OutboundSyncWorker _getDbAccess()...
+Quizzer: [14:44:38] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Database access granted.
+Quizzer: [14:44:38] [34m[INFO][0m [outbound_sync_functions.dart] Starting sync for ErrorLogs...
+Quizzer: [14:44:38] [34m[INFO][0m [error_logs_table.dart] Verifying error_logs table...
+Quizzer: [14:44:38] [34m[INFO][0m [error_logs_table.dart] error_logs table already exists. Checking columns...
+Quizzer: [14:44:38] [34m[INFO][0m [error_logs_table.dart] Column check complete for error_logs.
+Quizzer: [14:44:38] [34m[INFO][0m [error_logs_table.dart] Fetching unsynced error logs (older than 1 hour) from error_logs...
+Quizzer: [14:44:38] [34m[INFO][0m [error_logs_table.dart] SUCCESS: Fetched 4 total unsynced records. 3 are older than 1 hour.
+Quizzer: [14:44:38] [34m[INFO][0m [outbound_sync_functions.dart] Found 3 unsynced ErrorLogs to process.
+Quizzer: [14:44:38] [36m[DEBUG][0m [outbound_sync_functions.dart] Preparing to push ErrorLog 0f0a64c8-2927-4153-ae76-d8590ed5009a to error_logs
+Quizzer: [14:44:38] [34m[INFO][0m [outbound_sync_functions.dart] Attempting Supabase insert for record unknown_id to table error_logs...
+Quizzer: [14:44:38] [34m[INFO][0m [outbound_sync_functions.dart] SUCCESS: Supabase insert successful for record unknown_id to error_logs.
+Quizzer: [14:44:38] [34m[INFO][0m [outbound_sync_functions.dart] SUCCESS: Push successful for ErrorLog 0f0a64c8-2927-4153-ae76-d8590ed5009a. Deleting local record...
+Quizzer: [14:44:38] [34m[INFO][0m [error_logs_table.dart] Verifying error_logs table...
+Quizzer: [14:44:38] [34m[INFO][0m [error_logs_table.dart] error_logs table already exists. Checking columns...
+Quizzer: [14:44:38] [34m[INFO][0m [error_logs_table.dart] Column check complete for error_logs.
+Quizzer: [14:44:38] [34m[INFO][0m [error_logs_table.dart] Deleting local error log with id: 0f0a64c8-2927-4153-ae76-d8590ed5009a from error_logs
+Quizzer: [14:44:38] [34m[INFO][0m [error_logs_table.dart] SUCCESS: Deleted 1 local error log(s) with id: 0f0a64c8-2927-4153-ae76-d8590ed5009a.
+Quizzer: [14:44:38] [36m[DEBUG][0m [outbound_sync_functions.dart] Preparing to push ErrorLog 3304db56-2c5a-40e0-9b13-278c67207b01 to error_logs
+Quizzer: [14:44:38] [34m[INFO][0m [outbound_sync_functions.dart] Attempting Supabase insert for record unknown_id to table error_logs...
+Quizzer: [14:44:39] [34m[INFO][0m [outbound_sync_functions.dart] SUCCESS: Supabase insert successful for record unknown_id to error_logs.
+Quizzer: [14:44:39] [34m[INFO][0m [outbound_sync_functions.dart] SUCCESS: Push successful for ErrorLog 3304db56-2c5a-40e0-9b13-278c67207b01. Deleting local record...
+Quizzer: [14:44:39] [34m[INFO][0m [error_logs_table.dart] Verifying error_logs table...
+Quizzer: [14:44:39] [34m[INFO][0m [error_logs_table.dart] error_logs table already exists. Checking columns...
+Quizzer: [14:44:39] [34m[INFO][0m [error_logs_table.dart] Column check complete for error_logs.
+Quizzer: [14:44:39] [34m[INFO][0m [error_logs_table.dart] Deleting local error log with id: 3304db56-2c5a-40e0-9b13-278c67207b01 from error_logs
+Quizzer: [14:44:39] [34m[INFO][0m [error_logs_table.dart] SUCCESS: Deleted 1 local error log(s) with id: 3304db56-2c5a-40e0-9b13-278c67207b01.
+Quizzer: [14:44:39] [36m[DEBUG][0m [outbound_sync_functions.dart] Preparing to push ErrorLog 11c8551f-97da-465e-bdbc-bf438193f5c5 to error_logs
+Quizzer: [14:44:39] [34m[INFO][0m [outbound_sync_functions.dart] Attempting Supabase insert for record unknown_id to table error_logs...
+Quizzer: [14:44:39] [34m[INFO][0m [outbound_sync_functions.dart] SUCCESS: Supabase insert successful for record unknown_id to error_logs.
+Quizzer: [14:44:39] [34m[INFO][0m [outbound_sync_functions.dart] SUCCESS: Push successful for ErrorLog 11c8551f-97da-465e-bdbc-bf438193f5c5. Deleting local record...
+Quizzer: [14:44:39] [34m[INFO][0m [error_logs_table.dart] Verifying error_logs table...
+Quizzer: [14:44:39] [34m[INFO][0m [error_logs_table.dart] error_logs table already exists. Checking columns...
+Quizzer: [14:44:39] [34m[INFO][0m [error_logs_table.dart] Column check complete for error_logs.
+Quizzer: [14:44:39] [34m[INFO][0m [error_logs_table.dart] Deleting local error log with id: 11c8551f-97da-465e-bdbc-bf438193f5c5 from error_logs
+Quizzer: [14:44:39] [34m[INFO][0m [error_logs_table.dart] SUCCESS: Deleted 1 local error log(s) with id: 11c8551f-97da-465e-bdbc-bf438193f5c5.
+Quizzer: [14:44:39] [34m[INFO][0m [outbound_sync_functions.dart] Finished sync attempt for ErrorLogs.
+Quizzer: [14:44:39] [34m[INFO][0m [outbound_sync_worker.dart] Entering OutboundSyncWorker _runLoop()...
+Quizzer: [14:44:39] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker: Waiting for sync signal...
+Quizzer: [14:44:39] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWorker started and initial sync performed.
+Quizzer: [14:44:39] [36m[DEBUG][0m [session_manager.dart] SessionManager.requestNextQuestion: Fetched options type: List<dynamic>, value: [{type: text, content: Belgium}, {type: text, content: Britain}, {type: text, content: Prussia}, {type: text, content: Russia}, {type: text, content: Spain}]
+Quizzer: [14:44:39] [34m[INFO][0m [login_page.dart] Login successful for: aacra0820@gmail.com. Navigating home.
+Quizzer: [14:44:39] [36m[DEBUG][0m [home_page.dart] HomePage building question type: multiple_choice with key: [<'2025-05-08T00:16:44.373975Z_77647c42-c888-47e3-8296-6fc452815810'>] (using session data)

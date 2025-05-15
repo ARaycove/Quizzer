@@ -4,6 +4,8 @@ import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/UI_systems/color_wheel.dart';
 
 // TODO Let's make plans to implement a very fancy loading indicator.
+// TODO 1. Simple Progress Bar
+// We can setup progress indicators through a switchboard. When a specific process is complete it can report this signal. The UI can then pick up that signal and update the page to provide live feedback to the user.
 // I'm thinking some kind of loading bar
 // Make the logo expand to the whole screen
 // Make the logo turn into grayscale and pulsate between color and gray scale

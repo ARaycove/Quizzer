@@ -224,38 +224,3 @@ Future<List<Map<String, dynamic>>> getUnsyncedQuestionAnswerAttempts(Database db
   QuizzerLogger.logSuccess('Fetched ${results.length} unsynced question answer attempts.');
   return results;
 }
-
-// --- Update Sync Flags ---
-
-/// Updates the synchronization flags for a specific question answer attempt.
-/// Does NOT trigger a new sync signal.
-Future<void> updateQuestionAnswerAttemptSyncFlags({
-  required String participantId,
-  required String questionId,
-  required String timeStamp,
-  required bool hasBeenSynced,
-  required bool editsAreSynced, // Edits are unlikely for attempts, but included for consistency
-  required Database db,
-}) async {
-  QuizzerLogger.logMessage('Updating sync flags for Attempt (PID: $participantId, QID: $questionId, TS: $timeStamp) -> Synced: $hasBeenSynced, Edits Synced: $editsAreSynced');
-  await verifyQuestionAnswerAttemptTable(db); // Ensure table/columns exist
-
-  final Map<String, dynamic> updates = {
-    'has_been_synced': hasBeenSynced ? 1 : 0,
-    'edits_are_synced': editsAreSynced ? 1 : 0,
-  };
-
-  final int rowsAffected = await updateRawData(
-    'question_answer_attempts',
-    updates,
-    'participant_id = ? AND question_id = ? AND time_stamp = ?', // Where clause using composite PK
-    [participantId, questionId, timeStamp], // Where args
-    db,
-  );
-
-  if (rowsAffected == 0) {
-    QuizzerLogger.logWarning('updateQuestionAnswerAttemptSyncFlags affected 0 rows for Attempt (PID: $participantId, QID: $questionId, TS: $timeStamp). Record might not exist?');
-  } else {
-    QuizzerLogger.logSuccess('Successfully updated sync flags for Attempt (PID: $participantId, QID: $questionId, TS: $timeStamp).');
-  }
-}

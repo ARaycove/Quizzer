@@ -7,6 +7,7 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_question_answer_pairs_table.dart'; // Import for UserQuestionAnswerPairs table functions
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart'; // Import Logger
 import 'package:supabase/supabase.dart'; // Import for PostgrestException & SupabaseClient
+import 'package:quizzer/backend_systems/00_database_manager/tables/error_logs_table.dart'; // Added for syncErrorLogs
 
 // ==========================================
 // Outbound Sync - Generic Push Function
@@ -540,3 +541,43 @@ Future<void> syncUserQuestionAnswerPairs(Database db) async {
 }
 
 // Add functions for other tables (e.g., syncModules) here...
+
+/// Fetches unsynced error logs, pushes them to Supabase, and deletes them locally on success.
+Future<void> syncErrorLogs(Database db) async {
+  QuizzerLogger.logMessage('Starting sync for ErrorLogs...');
+
+  // Fetch records needing sync (already filters for older than 1 hour)
+  final List<Map<String, dynamic>> unsyncedRecords = await getUnsyncedErrorLogs(db);
+
+  if (unsyncedRecords.isEmpty) {
+    QuizzerLogger.logMessage('No unsynced ErrorLogs found to sync.');
+    return;
+  }
+
+  QuizzerLogger.logMessage('Found ${unsyncedRecords.length} unsynced ErrorLogs to process.');
+
+  const String tableName = 'error_logs';
+
+  for (final record in unsyncedRecords) {
+    final String? recordId = record['id'] as String?;
+
+    if (recordId == null) {
+      QuizzerLogger.logError('Skipping unsynced error log record due to missing ID: $record');
+      continue;
+    }
+
+    // Attempt to push the record to Supabase.
+    // The pushRecordToSupabase function already removes local-only fields like has_been_synced and edits_are_synced if they were present.
+    QuizzerLogger.logValue('Preparing to push ErrorLog $recordId to $tableName');
+    final bool pushSuccess = await pushRecordToSupabase(tableName, record);
+
+    if (pushSuccess) {
+      QuizzerLogger.logSuccess('Push successful for ErrorLog $recordId. Deleting local record...');
+      // If Supabase push succeeds, delete the local record.
+      await deleteLocalErrorLog(recordId, db);
+    } else {
+      QuizzerLogger.logWarning('Push FAILED for ErrorLog $recordId. Local record will remain for next sync attempt.');
+    }
+  }
+  QuizzerLogger.logMessage('Finished sync attempt for ErrorLogs.');
+}

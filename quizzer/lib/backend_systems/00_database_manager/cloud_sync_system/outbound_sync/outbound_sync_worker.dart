@@ -155,6 +155,13 @@ class OutboundSyncWorker {
 
     _dbMonitor.releaseDatabaseAccess();
     
+    // 7. Check and Sync Error Logs
+    db = await _getDbAccess();
+
+    await syncErrorLogs(db!);
+    
+    _dbMonitor.releaseDatabaseAccess();
+    
   }
   // ----------------------
 

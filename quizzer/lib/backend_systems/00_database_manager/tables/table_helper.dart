@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:sqflite/sqflite.dart'; // Added for Database type
-// import 'package:quizzer/backend_systems/logger/quizzer_logging.dart'; // Added for logging
+import 'dart:io';
+import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
+import 'package:package_info_plus/package_info_plus.dart'; // Import the plugin
 
 // --- Universal Encoding/Decoding Helpers ---
 
@@ -28,19 +30,22 @@ _encodeValueForDB(dynamic value) {
 /// Decodes a value retrieved from SQLite back into its likely Dart type.
 /// Assumes that TEXT fields starting with '[' or '{' are JSON strings representing Lists/Maps.
 /// Other TEXT fields are returned as Strings. INTEGER, REAL, and NULL are returned directly.
-/// Does NOT automatically convert INTEGER back to boolean; callers must handle this based on context.
+// TODO: Implement schema-aware boolean decoding. Currently, integers 0/1 are not automatically converted to booleans.
+// Callers must manually interpret integer fields intended as booleans.
 _decodeValueFromDB(dynamic dbValue) {
   if (dbValue == null || dbValue is int || dbValue is double) {
     return dbValue; // Return nulls, integers, and doubles directly
   } else if (dbValue is String) {
     // Trim whitespace before checking brackets/braces
     final trimmedValue = dbValue.trim();
-    if (trimmedValue.startsWith('[') || trimmedValue.startsWith('{')) {
+    // More robust check for potential JSON: must start AND end with corresponding brackets/braces
+    if ((trimmedValue.startsWith('[') && trimmedValue.endsWith(']')) ||
+        (trimmedValue.startsWith('{') && trimmedValue.endsWith('}'))) {
       // Attempt to decode potential JSON strings
       // json.decode will throw FormatException on invalid JSON, aligning with Fail Fast.
       return json.decode(trimmedValue);
     } else {
-      // Assume it's a plain string if it doesn't look like JSON
+      // Assume it's a plain string if it doesn't meet the stricter JSON structural check
       return dbValue;
     }
   } else {
@@ -199,4 +204,88 @@ Future<int> updateRawData(
   
   // QuizzerLogger.logValue('Update on $tableName affected $result rows.');
   return result;
+}
+
+Future<String> getDeviceInfo() async {
+  String deviceData = "";
+  
+  try {
+    // Use Dart's built-in Platform class to get basic platform info
+    // without relying on Flutter-specific packages
+    if (Platform.isAndroid) {
+      deviceData = 'Android ${Platform.operatingSystemVersion}';
+    } else if (Platform.isIOS) {
+      deviceData = 'iOS ${Platform.operatingSystemVersion}';
+    } else if (Platform.isWindows) {
+      deviceData = 'Windows ${Platform.operatingSystemVersion}';
+    } else if (Platform.isMacOS) {
+      deviceData = 'macOS ${Platform.operatingSystemVersion}';
+    } else if (Platform.isLinux) {
+      deviceData = 'Linux ${Platform.operatingSystemVersion}';
+    } else {
+      deviceData = 'Unknown device';
+    }
+    
+    // Add some additional system info that's available from dart:io
+    deviceData += ' (${Platform.localHostname})';
+  } catch (e) {
+    // Fallback if any error occurs
+    QuizzerLogger.logWarning('Error getting device info: $e');
+    deviceData = 'Unknown device';
+  }
+  
+  return deviceData;
+}
+
+Future<String> getUserIpAddress() async {
+  // FIXME: SECURITY - Disabled certificate validation (badCertificateCallback) makes this vulnerable to MitM attacks.
+  // FIXME: ROBUSTNESS - IP detection relies on screen scraping dnsleaktest.com, which is fragile and prone to break if the site's HTML changes.
+  try {
+    QuizzerLogger.logMessage('Attempting to get IP address from dnsleaktest.com');
+    
+    // Create a custom HttpClient that skips certificate verification
+    final httpClient = HttpClient()
+      ..badCertificateCallback = (cert, host, port) => true;
+    
+    final request = await httpClient.getUrl(Uri.parse('https://www.dnsleaktest.com/'));
+    final response = await request.close();
+    final responseBody = await response.transform(utf8.decoder).join();
+    
+    if (response.statusCode == 200) {
+      // Extract IP from the welcome message
+      final ipRegex = RegExp(r'Hello (\d+\.\d+\.\d+\.\d+)');
+      final match = ipRegex.firstMatch(responseBody);
+      
+      if (match != null) {
+        final ip = match.group(1)!;
+        QuizzerLogger.logSuccess('Successfully retrieved IP address: $ip');
+        return ip;
+      } else {
+        QuizzerLogger.logWarning('Could not find IP address in response');
+        return "offline_login";
+      }
+    } else {
+      QuizzerLogger.logWarning('Failed to get IP address, status code: ${response.statusCode}');
+      return "offline_login";
+    }
+  } catch (e) {
+    QuizzerLogger.logError('Error getting IP address: $e');
+    return "offline_login";
+  }
+}
+
+// --- Function to get App Version ---
+Future<String> getAppVersionInfo() async {
+  // This function now assumes package_info_plus is installed and configured.
+  // If PackageInfo.fromPlatform() fails (e.g. plugin not setup or platform issue),
+  // it will throw an exception, adhering to fail-fast.
+  QuizzerLogger.logMessage('Fetching app version using package_info_plus.');
+  
+  PackageInfo packageInfo = await PackageInfo.fromPlatform();
+  String version = packageInfo.version;      // e.g., "1.0.0"
+  String buildNumber = packageInfo.buildNumber; // e.g., "1"
+  
+  final String appVersionString = '$version+$buildNumber';
+  QuizzerLogger.logSuccess('App version fetched: $appVersionString');
+  return appVersionString;
 }

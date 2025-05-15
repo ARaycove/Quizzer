@@ -43,6 +43,8 @@ import 'package:quizzer/backend_systems/09_data_caches/temp_question_details.dar
 import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/inbound_sync/inbound_sync_worker.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/modules_table.dart' as modules_table;
 import 'package:quizzer/backend_systems/00_database_manager/review_system/get_send_postgre.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/error_logs_table.dart'; // Direct import
+// FIXME DO NOT USE ALIASING ON IMPORTS
 
 class SessionManager {
   // Singleton instance
@@ -352,10 +354,6 @@ class SessionManager {
   //  --------------------------------------------------------------------------------
   /// Logs out the current user, stops workers, clears caches, and resets state.
   Future<void> logoutUser() async {
-    // assert(false, 'Simulated test error during logout'); // Intentionally throw error for testing
-    throw Exception('Simulated critical error during logout - testing general exception'); // Intentionally throw general exception for testing
-    // QuizzerLogger.printHeader("Starting User Logout Process..."); // This line and below will not be reached if the exception is thrown
-
     if (!userLoggedIn) {
       QuizzerLogger.logWarning("Logout called, but no user was logged in.");
       return;
@@ -1027,6 +1025,62 @@ class SessionManager {
   }
 
   // --- End Review System Interface ---
+
+  // Modify/replace the existing reportError or add this as the primary error reporting API
+  // ================================================================================
+  // --- Error Reporting Functionality ---
+  // ================================================================================
+  // --------------------------------------------------------------------------------
+  /// Reports an error to the backend. This can be used for both new errors
+  /// and for adding feedback to existing errors.
+  ///
+  /// If an [id] is provided, it attempts to update the existing error log
+  /// primarily with [userFeedback].
+  /// If no [id] is provided, a new error log is created. [errorMessage] is
+  /// required in this case.
+  ///
+  /// **CRITICAL NOTE:** This method uses a direct, unlocked database connection via
+  /// `getDirectDatabaseAccessForCriticalLogging()` to ensure that error logging
+  /// has the highest chance of succeeding even if the main database access is locked
+  /// (e.g., due to the error being reported). This bypasses normal safety locks
+  /// and should ONLY be used here.
+  ///
+  /// Returns:
+  ///   The ID of the created or updated error log record.
+  Future<String> reportError({
+    String? id, 
+    String? errorMessage, 
+    String? userFeedback,
+  }) async {
+    await initializationComplete;
+
+    if (id == null && (errorMessage == null || errorMessage.isEmpty)) {
+      QuizzerLogger.logError('reportError: Attempted to create a new error log without an error message.');
+      throw ArgumentError('errorMessage must be provided when creating a new error log.');
+    }
+
+    // CRITICAL: Use direct, unlocked database access for error reporting.
+    // This bypasses the standard locking mechanism to ensure logs can be written
+    // even if the database monitor is locked up by the error that occurred.
+    final Database? db = await _dbMonitor.getDirectDatabaseAccessForCriticalLogging();
+    
+    // Assert db is not null, as direct access should always provide it or throw earlier.
+    assert(db != null, 'CRITICAL: Direct database access for error logging failed to return a DB instance.');
+
+    // Call the upsertErrorLog function from error_logs_table.dart
+    // this.userId can be null if no user is logged in, which is handled by upsertErrorLog.
+    final String resultId = await upsertErrorLog(
+      db: db!, // Safe to use ! due to assertion
+      id: id,
+      userId: userId,
+      errorMessage: errorMessage,
+      userFeedback: userFeedback,
+    );
+
+    // DO NOT call _dbMonitor.releaseDatabaseAccess() here because no lock was acquired.
+    QuizzerLogger.logSuccess('Error report processed using direct DB access. Log ID: $resultId');
+    return resultId;
+  }
 }
 
 // Global instance
