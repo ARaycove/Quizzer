@@ -177,7 +177,6 @@ class _SelectAllThatApplyQuestionWidgetState
   Widget build(BuildContext context) {
     // Use passed-in data
     final questionElements = widget.questionElements;
-    final answerElements = widget.answerElements;
     final Set<int> correctOriginalIndices = widget.correctIndices.toSet();
 
     if (questionElements.isEmpty && _shuffledOptions.isEmpty) {
@@ -296,7 +295,7 @@ class _SelectAllThatApplyQuestionWidgetState
                 padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
                 child: Container(
                    padding: ColorWheel.standardPadding,
-                   decoration: BoxDecoration(color: ColorWheel.secondaryBackground.withOpacity(0.5), borderRadius: ColorWheel.cardBorderRadius),
+                   decoration: BoxDecoration(color: ColorWheel.secondaryBackground.withAlpha(128), borderRadius: ColorWheel.cardBorderRadius),
                    child: ElementRenderer(elements: widget.answerElements),
                  ),
               ),

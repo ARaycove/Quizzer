@@ -90,6 +90,23 @@ class SwitchBoard {
   }
   // -------------------------------------
 
+  // --- Media Sync Status Processed Stream ---
+  final StreamController<void> _mediaSyncStatusProcessedController = StreamController<void>.broadcast();
+
+  /// Stream that fires after a media sync status has been processed (e.g., inserted/updated).
+  Stream<void> get onMediaSyncStatusProcessed => _mediaSyncStatusProcessedController.stream;
+
+  /// Signals that a media sync status has been processed.
+  void signalMediaSyncStatusProcessed() {
+    if (!_mediaSyncStatusProcessedController.isClosed) {
+      QuizzerLogger.logMessage('SwitchBoard: Signaling Media Sync Status Processed.');
+      _mediaSyncStatusProcessedController.add(null);
+    } else {
+      QuizzerLogger.logWarning('SwitchBoard: Attempted to signal on closed MediaSyncStatusProcessed stream.');
+    }
+  }
+  // -------------------------------------
+
   // --- Past Due Cache Stream (New) ---
   final StreamController<void> _pastDueCacheController = StreamController<void>.broadcast();
   // Single stream for low eligible cache conditions
@@ -130,6 +147,7 @@ class SwitchBoard {
     _pastDueCacheController.close();
     _eligibleCacheLowController.close();
     _outboundSyncNeededController.close();
+    _mediaSyncStatusProcessedController.close();
     QuizzerLogger.logMessage('SwitchBoard disposed.');
   }
   // --------------------

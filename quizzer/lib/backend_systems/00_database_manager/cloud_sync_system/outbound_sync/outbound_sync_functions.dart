@@ -171,9 +171,6 @@ Future<bool> updateRecordWithCompositeKeyInSupabase(
 // Outbound Sync - Table-Specific Functions
 // ==========================================
 
-// FIXME, if synced question answer pair has image elements, these need to be pushed to SupaBase as well without this extra logic a file name with no file will be sent out, need to also send the file that goes with the question answer pair
-// TODO Implement a separate service that handles the syncing of images based on the specific questions that a user has locally active (ensuring we only sync images that are relevant for questions currently in circulation)
-
 /// Fetches unsynced question-answer pairs and attempts to push them.
 Future<void> syncQuestionAnswerPairs(Database db) async {
   QuizzerLogger.logMessage('Starting sync for QuestionAnswerPairs...');

@@ -88,7 +88,6 @@ class _AdminPanelPageState extends State<AdminPanelPage> {
       case AdminPanel.categorize:
         return const CategorizationPanelWidget();
       case AdminPanel.none:
-      default:
         return const Center(
           child: Text('Select a panel above', style: ColorWheel.secondaryTextStyle),
         );

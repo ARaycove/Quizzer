@@ -3,6 +3,8 @@ import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'dart:convert';
 import 'table_helper.dart'; // Import the new helper file
 import 'package:quizzer/backend_systems/12_switch_board/switch_board.dart'; // Import SwitchBoard
+import 'package:quizzer/backend_systems/00_database_manager/tables/media_sync_status_table.dart'; // Added import
+import 'package:path/path.dart' as path; // Changed alias to path
 
 // Get SwitchBoard instance for signaling
 final SwitchBoard _switchBoard = SwitchBoard();
@@ -44,6 +46,7 @@ Future<void> verifyQuestionAnswerPairTable(Database db) async {
         has_been_synced INTEGER DEFAULT 0,  -- Added for outbound sync tracking
         edits_are_synced INTEGER DEFAULT 0, -- Added for outbound edit sync tracking
         last_modified_timestamp TEXT,       -- Store as ISO8601 UTC string
+        has_media INTEGER DEFAULT NULL,     
         PRIMARY KEY (time_stamp, qst_contrib)
       )
     ''');
@@ -110,12 +113,14 @@ Future<void> verifyQuestionAnswerPairTable(Database db) async {
     if (!hasLastModifiedCol) {
       QuizzerLogger.logMessage('Adding last_modified_timestamp column to question_answer_pairs table.');
       await db.execute('ALTER TABLE question_answer_pairs ADD COLUMN last_modified_timestamp TEXT');
-      // Optionally, backfill existing rows, e.g., with their time_stamp or current time
-      // For simplicity, new rows will get it, old rows will have NULL until next edit or a separate migration script.
-      // Or, update existing rows to use the 'time_stamp' as the initial last_modified_timestamp:
-      // await db.rawUpdate('UPDATE question_answer_pairs SET last_modified_timestamp = time_stamp WHERE last_modified_timestamp IS NULL');
     }
 
+    // Check for has_media column and add with DEFAULT NULL if missing
+    final bool hasMediaCol = columns.any((column) => column['name'] == 'has_media');
+    if (!hasMediaCol) {
+      QuizzerLogger.logMessage('Adding has_media column with DEFAULT NULL to question_answer_pairs table.');
+      await db.execute('ALTER TABLE question_answer_pairs ADD COLUMN has_media INTEGER DEFAULT NULL');
+    }
     // TODO: Add checks for columns needed by other future question types here
 
   }
@@ -123,6 +128,144 @@ Future<void> verifyQuestionAnswerPairTable(Database db) async {
 
 bool _checkCompletionStatus(String questionElements, String answerElements) {
   return questionElements.isNotEmpty && answerElements.isNotEmpty;
+}
+// =============================================================
+// Media Sync Helper functionality
+
+/// Processes a given question record to check for media, extract filenames if present,
+/// register those filenames in the media_sync_status table, and returns whether media was found.
+Future<bool> hasMediaCheck(Database db, Map<String, dynamic> questionRecord) async {
+  final String? recordQuestionId = questionRecord['question_id'] as String?;
+  final String loggingContextSuffix = recordQuestionId != null ? '(Question ID: $recordQuestionId)' : '(Question ID: unknown)';
+  QuizzerLogger.logMessage('Processing media for question record $loggingContextSuffix');
+
+  // Check for media using the existing internal helper
+  // It needs to check relevant fields from the record like question_elements, answer_elements, options etc.
+  // We assume the entire record might contain media, so we pass the whole record.
+  // If only specific fields contain media, _internalHasMediaCheck might need to be called on those specific fields.
+  // For now, passing the whole record to _internalHasMediaCheck which recursively searches.
+  final bool mediaFound = _internalHasMediaCheck(questionRecord);
+
+  if (mediaFound) {
+    QuizzerLogger.logMessage('Media found in record $loggingContextSuffix. Extracting filenames.');
+    // Extract filenames - again, pass the whole record or specific fields if known.
+    final Set<String> filenames = _extractMediaFilenames(questionRecord);
+
+    if (filenames.isNotEmpty) {
+      QuizzerLogger.logMessage('Extracted ${filenames.length} filenames for $loggingContextSuffix. Registering them.');
+      await registerMediaFiles(db, filenames, qidForLogging: recordQuestionId);
+    } else {
+      QuizzerLogger.logWarning('Media was indicated as found for $loggingContextSuffix, but no filenames were extracted. This might indicate an issue with _extractMediaFilenames or the data structure.');
+    }
+  } else {
+    QuizzerLogger.logMessage('No media found in record $loggingContextSuffix.');
+  }
+
+  return mediaFound;
+}
+
+
+bool _internalHasMediaCheck(dynamic data) {
+  if (data is Map<String, dynamic>) {
+    // Check for direct image specification: {'image': 'file_name.ext'}
+    if (data.containsKey('image') && data['image'] is String && (data['image'] as String).isNotEmpty) {
+      return true;
+    }
+    // Check for element style: {'type': 'image', 'content': 'file_name.ext'}
+    if (data['type'] == 'image' && data.containsKey('content') && data['content'] is String && (data['content'] as String).isNotEmpty) {
+      return true;
+    }
+    // Recursively check values in the map
+    for (var value in data.values) {
+      if (_internalHasMediaCheck(value)) {
+        return true;
+      }
+    }
+  } else if (data is List) {
+    // Recursively check items in the list
+    for (var item in data) {
+      if (_internalHasMediaCheck(item)) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+Set<String> _extractMediaFilenames(dynamic data) {
+  final Set<String> filenames = {};
+  _recursiveExtractFilenames(data, filenames);
+  return filenames;
+}
+
+void _recursiveExtractFilenames(dynamic data, Set<String> filenames) {
+  if (data is Map<String, dynamic>) {
+    if (data.containsKey('image') && data['image'] is String && (data['image'] as String).isNotEmpty) {
+      filenames.add(data['image'] as String);
+    } else if (data['type'] == 'image' && data.containsKey('content') && data['content'] is String && (data['content'] as String).isNotEmpty) {
+      filenames.add(data['content'] as String);
+    }
+    // Recursively check values in the map
+    for (var value in data.values) {
+      _recursiveExtractFilenames(value, filenames);
+    }
+  } else if (data is List) {
+    // Recursively check items in the list
+    for (var item in data) {
+      _recursiveExtractFilenames(item, filenames);
+    }
+  }
+}
+
+/// Takes a set of filenames and attempts to register each in the media_sync_status table.
+/// Includes specific error handling for unique constraint violations.
+Future<void> registerMediaFiles(Database db, Set<String> filenames, {String? qidForLogging}) async {
+  final String logCtx = qidForLogging != null ? '(Associated QID: $qidForLogging)' : '';
+  QuizzerLogger.logMessage('Attempting to register ${filenames.length} media files $logCtx');
+
+  if (filenames.isEmpty) {
+    QuizzerLogger.logMessage('No filenames provided to register $logCtx.');
+    return;
+  }
+
+  for (final filename in filenames) {
+    if (filename.trim().isEmpty) {
+      QuizzerLogger.logWarning('Skipping empty media filename during registration $logCtx.');
+      continue;
+    }
+    
+    String fileExtension = path.extension(filename);
+    if (fileExtension.startsWith('.')) {
+      fileExtension = fileExtension.substring(1);
+    }
+
+    QuizzerLogger.logMessage('Attempting to ensure media sync status for: $filename $logCtx');
+    try {
+      // Make sure insertMediaSyncStatus is available in this file's scope
+      // It is imported from 'package:quizzer/backend_systems/00_database_manager/tables/media_sync_status_table.dart'
+      await insertMediaSyncStatus(
+        db: db,
+        fileName: filename, 
+        fileExtension: fileExtension,
+      );
+      QuizzerLogger.logSuccess('Successfully ensured media sync status for: $filename $logCtx.');
+    } on DatabaseException catch (e) {
+      // Check for unique constraint violation codes or messages
+      if (e.isUniqueConstraintError() || 
+          (e.toString().toLowerCase().contains('unique constraint failed')) ||
+          (e.toString().contains('code 1555')) || // Common SQLite code for unique constraint
+          (e.toString().contains('code 2067'))) { // Another potential SQLite code for unique constraint
+        QuizzerLogger.logMessage('Media sync status for $filename $logCtx already exists or was concurrently inserted. Skipping.');
+      } else {
+        QuizzerLogger.logError('DatabaseException while ensuring media sync status for $filename $logCtx: $e');
+        rethrow; // Fail Fast for other database exceptions
+      }
+    } catch (e) {
+      QuizzerLogger.logError('Unexpected error while ensuring media sync status for $filename $logCtx: $e');
+      rethrow; // Fail Fast for non-database exceptions
+    }
+  }
+  QuizzerLogger.logMessage('Finished attempting to register media files $logCtx.');
 }
 
 Future<int> editQuestionAnswerPair({
@@ -183,6 +326,18 @@ Future<int> editQuestionAnswerPair({
   valuesToUpdate['edits_are_synced'] = 0;
   // Update the last_modified_timestamp to current time
   valuesToUpdate['last_modified_timestamp'] = DateTime.now().toUtc().toIso8601String();
+
+  // Construct the potential new state of the record to check for media
+  // Fetch the existing record first
+  final Map<String, dynamic> existingRecord = await getQuestionAnswerPairById(questionId, db);
+  // Create a mutable copy and apply updates to it
+  final Map<String, dynamic> potentialNewState = Map<String, dynamic>.from(existingRecord);
+  valuesToUpdate.forEach((key, value) {
+    potentialNewState[key] = value; // This will reflect the raw values before encoding
+  });
+
+  final bool recordHasMedia = await hasMediaCheck(db, potentialNewState);
+  valuesToUpdate['has_media'] = recordHasMedia ? 1 : 0;
 
   QuizzerLogger.logMessage('Updating question $questionId with fields: ${valuesToUpdate.keys.join(', ')}');
 
@@ -440,6 +595,7 @@ Future<List<Map<String, dynamic>>> getUnsyncedQuestionAnswerPairs(Database db) a
   return results;
 }
 
+
 /// Inserts a question-answer pair if it does not exist, or updates it if it does (by question_id).
 /// Used in inbound sync functionality, takes a full record with all details and inserts/updates it
 /// Not to be used outside of the inbound sync
@@ -455,7 +611,8 @@ Future<void> insertOrUpdateQuestionAnswerPair(Map<String, dynamic> record, Datab
   // Prepare a mutable copy of the record to set sync flags for local storage.
   final Map<String, dynamic> localRecord = Map<String, dynamic>.from(record);
 
-  // When data comes from the server, mark it as synced locally.
+  localRecord['has_media'] = await hasMediaCheck(db, localRecord);
+
   localRecord['has_been_synced'] = 1;
   localRecord['edits_are_synced'] = 1;
   // Ensure last_modified_timestamp from the server record is used.
@@ -537,6 +694,9 @@ Future<String> addQuestionMultipleChoice({
     'last_modified_timestamp': timeStamp, // Use creation timestamp
   };
 
+
+  data['has_media'] = await hasMediaCheck(db, data);
+
   // Use the universal insert helper
   await insertRawData('question_answer_pairs', data, db);
   _switchBoard.signalOutboundSyncNeeded(); // Signal after successful insert
@@ -588,6 +748,9 @@ Future<String> addQuestionSelectAllThatApply({
     'last_modified_timestamp': timeStamp, // Use creation timestamp
   };
 
+
+  data['has_media'] = await hasMediaCheck(db, data);
+
   // Use the universal insert helper
   await insertRawData('question_answer_pairs', data, db);
   _switchBoard.signalOutboundSyncNeeded(); // Signal after successful insert
@@ -637,6 +800,9 @@ Future<String> addQuestionTrueFalse({
     'last_modified_timestamp': timeStamp, // Use creation timestamp
     // 'options' column is intentionally left NULL/unspecified for true_false type
   };
+
+
+  data['has_media'] = await hasMediaCheck(db, data);
 
   // Use the universal insert helper
   await insertRawData('question_answer_pairs', data, db);
@@ -707,6 +873,9 @@ Future<String> addSortOrderQuestion({
     // Fields specific to other types are omitted (correct_option_index, index_options_that_apply, correct_order)
   };
 
+
+  rawData['has_media'] = await hasMediaCheck(db, rawData);
+
   QuizzerLogger.logMessage('Adding sort_order question with ID: $questionId for module $moduleId');
 
   // Use the universal insert helper (encoding happens inside)
@@ -732,3 +901,66 @@ Future<String> addSortOrderQuestion({
 
 // TODO math                      isValidationDone [ ]
 
+// =====================================================================================
+// Media Status Housekeeping Functions
+
+/// Fetches all question-answer pairs where the 'has_media' status is NULL.
+Future<List<Map<String, dynamic>>> getPairsWithNullMediaStatus(Database db) async {
+  QuizzerLogger.logMessage('Fetching question-answer pairs with NULL has_media status...');
+  await verifyQuestionAnswerPairTable(db); // Ensure table and columns exist
+
+  final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
+    'question_answer_pairs',
+    db,
+    where: 'has_media IS NULL',
+  );
+
+  QuizzerLogger.logSuccess('Fetched ${results.length} question-answer pairs with NULL has_media status.');
+  return results;
+}
+
+/// Processes question-answer pairs with NULL 'has_media' status.
+/// Fetches these records, runs a media check, and updates the 'has_media' flag directly in the database.
+/// This method does NOT signal for outbound sync.
+Future<void> processNullMediaStatusPairs(Database db) async {
+  QuizzerLogger.logMessage('Starting to process pairs with NULL has_media status for direct update.');
+  
+  // 1. Get records with NULL has_media status
+  final List<Map<String, dynamic>> pairsToProcess = await getPairsWithNullMediaStatus(db);
+
+  if (pairsToProcess.isEmpty) {
+    QuizzerLogger.logMessage('No pairs found with NULL has_media status to process.');
+    return;
+  }
+
+  QuizzerLogger.logValue('Found ${pairsToProcess.length} pairs to process for has_media flag.');
+
+  for (final record in pairsToProcess) {
+    final String? questionId = record['question_id'] as String?;
+    if (questionId == null || questionId.isEmpty) {
+      QuizzerLogger.logWarning('Skipping record with NULL or empty question_id during NULL media status processing: $record');
+      continue;
+    }
+
+    // 2. Run hasMediaCheck (this also handles registering files in media_sync_status table)
+    // The entire record is passed to hasMediaCheck as it contains all potential media fields.
+    final bool mediaFound = await hasMediaCheck(db, record);
+    QuizzerLogger.logValue('Processing QID $questionId for has_media flag update. Media found by hasMediaCheck: $mediaFound');
+
+    // 3. Directly update the has_media flag in the local DB using updateRawData
+    final int rowsAffected = await updateRawData(
+      'question_answer_pairs',
+      {'has_media': mediaFound ? 1 : 0},
+      'question_id = ?',
+      [questionId],
+      db,
+    );
+
+    if (rowsAffected > 0) {
+      QuizzerLogger.logMessage('Successfully updated has_media flag for QID $questionId to ${mediaFound ? 1 : 0}.');
+    } else {
+      QuizzerLogger.logWarning('Failed to update has_media flag for QID $questionId. Record might have been deleted or question_id changed.');
+    }
+  }
+  QuizzerLogger.logMessage('Finished processing pairs with NULL has_media status.');
+}

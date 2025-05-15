@@ -5,7 +5,6 @@ import 'package:logging/logging.dart';
 import 'test_helpers.dart'; // Import helper functions
 import 'dart:io';
 import 'dart:convert';
-import 'dart:math'; // Import for Random class
 import 'package:sqflite/sqflite.dart'; // Import for Database type
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart'; // Import for getDatabaseMonitor
 // ==========================================
@@ -133,7 +132,7 @@ void main() {
       QuizzerLogger.printHeader('Starting Add All Number Properties Questions Test...');
 
       // 1. Read the JSON file
-      final filePath = 'runtime_cache/number_properties_questions.json';
+      const filePath = 'runtime_cache/number_properties_questions.json';
       QuizzerLogger.logMessage('Reading questions from: $filePath');
       final file = File(filePath);
       assert(await file.exists(), "JSON file not found: $filePath. Run the generation script first.");
@@ -168,7 +167,7 @@ void main() {
               "Unexpected question type found in JSON: $questionType");
 
         // Call addNewQuestion
-        final response = await sessionManager.addNewQuestion(
+        await sessionManager.addNewQuestion(
           questionType: questionType,
           moduleName: moduleName,
           questionElements: questionElements,
@@ -197,7 +196,7 @@ void main() {
       // Monitor caches to see if questions were processed
       await monitorCaches(monitoringSeconds: 10);
     
-    }, timeout: Timeout(Duration(minutes: 3))); // Increased timeout for monitoring
+    }, timeout: const Timeout(Duration(minutes: 3))); // Increased timeout for monitoring
   //  Multiple choice
   test('Add Questions From JSON Test', () async {
   final sessionManager = getSessionManager();
@@ -257,7 +256,7 @@ void main() {
   QuizzerLogger.logSuccess('Finished adding questions. Success: $successCount, Failed: $failureCount');
   QuizzerLogger.printHeader('Finished Add Questions From JSON Test.');
 
-}, timeout: Timeout(Duration(minutes: 5))); // Increase timeout for file IO and looping
+}, timeout: const Timeout(Duration(minutes: 5))); // Increase timeout for file IO and looping
   // Sort Order Questions
   test('add generated periodic table sort_order questions', () async {
     final sessionManager = getSessionManager();
@@ -266,7 +265,7 @@ void main() {
 
     QuizzerLogger.printHeader('Starting Test: Add Periodic Table Sort Order Questions');
 
-    final jsonFilePath = 'runtime_cache/generated_periodic_table_sort_questions.json';
+    const jsonFilePath = 'runtime_cache/generated_periodic_table_sort_questions.json';
     final jsonFile = File(jsonFilePath);
 
     if (!await jsonFile.exists()) {

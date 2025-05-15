@@ -162,7 +162,7 @@ class _TrueFalseQuestionWidgetState extends State<TrueFalseQuestionWidget> {
                   child: Container(
                     padding: ColorWheel.standardPadding,
                     decoration: BoxDecoration(
-                      color: ColorWheel.secondaryBackground.withOpacity(0.5),
+                      color: ColorWheel.secondaryBackground.withAlpha(128),
                       borderRadius: ColorWheel.cardBorderRadius,
                     ),
                     child: ElementRenderer(elements: answerElements),
@@ -197,31 +197,30 @@ class _TrueFalseQuestionWidgetState extends State<TrueFalseQuestionWidget> {
     Color bgColor = ColorWheel.secondaryBackground; // Default background
     Color fgColor = ColorWheel.primaryText; // Default text/icon color
     Color borderColor = Colors.transparent;
-    double elevation = 0; // Use BoxShadow instead for InkWell/Container
     IconData? icon;
     
     // Determine visual feedback state
      if (_isAnswerSubmitted) {
        if (isSelected) {
-         bgColor = isCorrect ? ColorWheel.buttonSuccess.withOpacity(0.1) : ColorWheel.buttonError.withOpacity(0.1);
+         bgColor = isCorrect ? ColorWheel.buttonSuccess.withAlpha(26) : ColorWheel.buttonError.withAlpha(26);
          borderColor = isCorrect ? ColorWheel.buttonSuccess : ColorWheel.buttonError;
          icon = isCorrect ? Icons.check_circle : Icons.cancel;
          fgColor = isCorrect ? ColorWheel.buttonSuccess : ColorWheel.buttonError; // Icon color matches border
        } else if (isCorrect) {
          // Highlight the correct answer if it wasn't selected
-         bgColor = ColorWheel.buttonSuccess.withOpacity(0.05);
-         borderColor = ColorWheel.buttonSuccess.withOpacity(0.5);
+         bgColor = ColorWheel.buttonSuccess.withAlpha(13); // 0.05 opacity
+         borderColor = ColorWheel.buttonSuccess.withAlpha(128); // 0.5 opacity
          icon = Icons.check_circle_outline;
          fgColor = ColorWheel.buttonSuccess; // Icon color matches border
        } else {
          // Dim incorrect, unselected option
-          bgColor = ColorWheel.secondaryBackground.withOpacity(0.6);
+          bgColor = ColorWheel.secondaryBackground.withAlpha(153); // 0.6 opacity
           fgColor = ColorWheel.secondaryText;
           borderColor = Colors.transparent;
        }
      } else if (isSelected && !widget.isDisabled) { 
          // Highlight selection before submission (if enabled)
-         bgColor = ColorWheel.accent.withOpacity(0.1);
+         bgColor = ColorWheel.accent.withAlpha(26);
          borderColor = ColorWheel.accent;
          fgColor = ColorWheel.accent; // Icon/text color matches border
      } // Add hover effect potentially via MouseRegion later if needed

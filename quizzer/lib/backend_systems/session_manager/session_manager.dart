@@ -39,8 +39,9 @@ import 'package:quizzer/backend_systems/06_question_queue_server/circulation_wor
 import 'package:quizzer/backend_systems/06_question_queue_server/due_date_worker.dart';
 import 'package:quizzer/backend_systems/06_question_queue_server/eligibility_check_worker.dart';
 import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/outbound_sync/outbound_sync_worker.dart'; // Import the new worker
+import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/media_sync_worker.dart'; // Added import for MediaSyncWorker
 import 'package:quizzer/backend_systems/09_data_caches/temp_question_details.dart'; // Added import
-import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/inbound_sync/inbound_sync_worker.dart';
+import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/inbound_sync/inbound_sync_functions.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/modules_table.dart' as modules_table;
 import 'package:quizzer/backend_systems/00_database_manager/review_system/get_send_postgre.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/error_logs_table.dart'; // Direct import
@@ -251,6 +252,12 @@ class SessionManager {
     QuizzerLogger.logMessage('Stored initial profile last_modified_timestamp: $_initialProfileLastModified');
     _dbMonitor.releaseDatabaseAccess();
 
+    // Start MediaSyncWorker before inbound sync
+    QuizzerLogger.logMessage('SessionManager: Starting MediaSyncWorker...');
+    final mediaSyncWorker = MediaSyncWorker();
+    await mediaSyncWorker.start(); // Assuming start() is async and should be awaited if it performs critical setup
+    QuizzerLogger.logMessage('SessionManager: MediaSyncWorker started.');
+
     // Run inbound sync after we have userId but before starting background processes
     await runInboundSync(this);
       
@@ -369,6 +376,7 @@ class SessionManager {
     final preProcessWorker      = PreProcessWorker(); 
     final inactiveModuleWorker  = InactiveModuleWorker();
     final outboundSyncWorker    = OutboundSyncWorker(); // Get the outbound sync worker instance
+    final mediaSyncWorker       = MediaSyncWorker(); // Get MediaSyncWorker instance
     
     // Stop them (await completion)
     await psw.stop();
@@ -378,6 +386,7 @@ class SessionManager {
     await preProcessWorker.stop(); 
     await inactiveModuleWorker.stop();
     await outboundSyncWorker.stop(); // Stop the outbound sync worker
+    await mediaSyncWorker.stop(); // Stop the media sync worker
     QuizzerLogger.logSuccess("Background workers stopped.");
     
 
