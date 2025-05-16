@@ -6,6 +6,7 @@ import 'package:supabase/supabase.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pairs_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_profile_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_question_answer_pairs_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_settings_table.dart';
 
 /// Syncs question_answer_pairs from the cloud that are newer than last_login
 Future<void> syncQuestionAnswerPairsInbound(
@@ -147,8 +148,52 @@ Future<void> syncUserProfileInbound(
   QuizzerLogger.logSuccess('Synced user profile from cloud.');
 }
 
-Future<void> runInboundSync(SessionManager sessionManager) async {
-  QuizzerLogger.logMessage('Starting inbound sync aggregator...');
+/// Syncs user settings from the cloud that are newer than the initial profile timestamp for the user.
+Future<void> syncUserSettingsInbound(
+  String userId,
+  String? initialTimestamp, // This is the last_modified_timestamp of the user_profile at login
+  SupabaseClient supabaseClient,
+) async {
+  QuizzerLogger.logMessage('Syncing inbound user_settings for user $userId since $initialTimestamp...');
+
+  // Fetch records from 'user_settings' table in Supabase
+  // - belonging to the current userId
+  // - newer than the initialTimestamp (user_profile's last_modified_timestamp at login)
+  final List<dynamic> cloudRecords = await supabaseClient
+      .from('user_settings') // Target table
+      .select('*') // Select all columns
+      .eq('user_id', userId) // Filter by user_id
+      .gt('last_modified_timestamp', initialTimestamp ?? DateTime(1970).toIso8601String()); // Filter by timestamp
+
+  if (cloudRecords.isEmpty) {
+    QuizzerLogger.logMessage('No new user_settings to sync for user $userId.');
+    return;
+  }
+
+  QuizzerLogger.logMessage('Found ${cloudRecords.length} new/updated user_settings to sync for user $userId.');
+  
+  final DatabaseMonitor monitor = getDatabaseMonitor();
+  Database? db = await monitor.requestDatabaseAccess();
+  if (db == null) {
+    QuizzerLogger.logError('syncUserSettingsInbound: Failed to get database access.');
+    return; // Cannot proceed without DB
+  }
+
+  for (final record in cloudRecords) {
+    if (record is Map<String, dynamic>) {
+      // Use the new function from user_settings_table.dart
+      await upsertFromSupabase(record, db);
+    } else {
+      QuizzerLogger.logWarning('syncUserSettingsInbound: Encountered a record not of type Map<String, dynamic>. Record: $record');
+    }
+  }
+  monitor.releaseDatabaseAccess(); // Ensure DB access is released after the loop
+  
+  QuizzerLogger.logSuccess('Synced ${cloudRecords.length} user_settings from cloud for user $userId.');
+}
+
+Future<void> runInitialInboundSync(SessionManager sessionManager) async {
+  QuizzerLogger.logMessage('Starting initial inbound sync aggregator...');
   final String? userId = sessionManager.userId;
 
   final DatabaseMonitor monitor = getDatabaseMonitor();
@@ -185,7 +230,14 @@ Future<void> runInboundSync(SessionManager sessionManager) async {
     sessionManager.supabase,
   );
 
-  QuizzerLogger.logSuccess('Inbound sync completed successfully.');
+  // Sync user settings using the initial profile last_modified_timestamp
+  await syncUserSettingsInbound(
+    userId,
+    effectiveInitialTimestamp,
+    sessionManager.supabase,
+  );
+
+  QuizzerLogger.logSuccess('Initial inbound sync completed successfully.');
 }
 
 

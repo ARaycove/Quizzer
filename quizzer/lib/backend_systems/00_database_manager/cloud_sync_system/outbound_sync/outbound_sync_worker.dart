@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:sqflite/sqflite.dart'; // Likely needed for DB operations later
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
-import 'package:quizzer/backend_systems/12_switch_board/switch_board.dart'; // Import SwitchBoard
+import 'package:quizzer/backend_systems/10_switch_board/switch_board.dart'; // Import SwitchBoard
 import 'dart:io'; // Import for InternetAddress lookup
 import 'outbound_sync_functions.dart'; // Import the abstracted sync functions
 
@@ -121,47 +121,41 @@ class OutboundSyncWorker {
 
     // 2. Check and Sync Question Answer Pairs
     db = await _getDbAccess();
-
     await syncQuestionAnswerPairs(db!); // Call the abstracted function
-
     _dbMonitor.releaseDatabaseAccess();
 
     // 3. Check and sync Login Attempt Data
     db = await _getDbAccess();
-
     await syncLoginAttempts(db!);
-
     _dbMonitor.releaseDatabaseAccess();
 
     // 4. Check and sync Question Answer Attempt Data
     db = await _getDbAccess();
-
     await syncQuestionAnswerAttempts(db!);
-
     _dbMonitor.releaseDatabaseAccess();
 
 
     // 5. Check and sync User Profile Data
     db = await _getDbAccess();
-
     await syncUserProfiles(db!);
-    
     _dbMonitor.releaseDatabaseAccess();
     
     // 6. Check and Sync UserQuestionAnswerPairs
     db = await _getDbAccess(); 
-
     await syncUserQuestionAnswerPairs(db!);
-
     _dbMonitor.releaseDatabaseAccess();
     
     // 7. Check and Sync Error Logs
     db = await _getDbAccess();
-
     await syncErrorLogs(db!);
-    
     _dbMonitor.releaseDatabaseAccess();
     
+    // 8. Check and Sync User Settings
+    db = await _getDbAccess();
+    await syncUserSettings(db!);
+    _dbMonitor.releaseDatabaseAccess();
+    
+    QuizzerLogger.logMessage('All outbound sync functions completed.');
   }
   // ----------------------
 

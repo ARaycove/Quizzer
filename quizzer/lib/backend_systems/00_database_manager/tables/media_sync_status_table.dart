@@ -5,7 +5,7 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/table_helper.
 import 'package:path/path.dart' as path; // Changed alias to path
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart'; // For Supabase client
 import 'package:supabase/supabase.dart'; // Changed to base supabase package for FileObject and SearchOptions
-import 'package:quizzer/backend_systems/12_switch_board/switch_board.dart'; // Added import for SwitchBoard
+import 'package:quizzer/backend_systems/10_switch_board/switch_board.dart'; // Added import for SwitchBoard
 
 // ==========================================
 // Media Sync Status Table

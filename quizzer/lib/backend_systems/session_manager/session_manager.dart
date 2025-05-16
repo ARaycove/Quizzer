@@ -32,7 +32,7 @@ import 'package:quizzer/backend_systems/09_data_caches/question_queue_cache.dart
 import 'package:quizzer/backend_systems/09_data_caches/answer_history_cache.dart';
 import 'package:quizzer/backend_systems/06_question_queue_server/question_selection_worker.dart';
 import 'session_toggle_scheduler.dart'; // Import the new scheduler
-import 'package:quizzer/backend_systems/12_switch_board/switch_board.dart'; // Import SwitchBoard
+import 'package:quizzer/backend_systems/10_switch_board/switch_board.dart'; // Import SwitchBoard
 import 'package:quizzer/backend_systems/session_manager/session_helper.dart';
 import 'package:quizzer/backend_systems/session_manager/session_answer_validation.dart' as answer_validator;
 import 'package:quizzer/backend_systems/06_question_queue_server/circulation_worker.dart';
@@ -40,11 +40,12 @@ import 'package:quizzer/backend_systems/06_question_queue_server/due_date_worker
 import 'package:quizzer/backend_systems/06_question_queue_server/eligibility_check_worker.dart';
 import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/outbound_sync/outbound_sync_worker.dart'; // Import the new worker
 import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/media_sync_worker.dart'; // Added import for MediaSyncWorker
+import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/inbound_sync/inbound_sync_worker.dart'; // Import for InboundSyncWorker (NEW)
 import 'package:quizzer/backend_systems/09_data_caches/temp_question_details.dart'; // Added import
-import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/inbound_sync/inbound_sync_functions.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/modules_table.dart' as modules_table;
 import 'package:quizzer/backend_systems/00_database_manager/review_system/get_send_postgre.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/error_logs_table.dart'; // Direct import
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_settings_table.dart' as user_settings_table;
 // FIXME DO NOT USE ALIASING ON IMPORTS
 
 class SessionManager {
@@ -258,8 +259,11 @@ class SessionManager {
     await mediaSyncWorker.start(); // Assuming start() is async and should be awaited if it performs critical setup
     QuizzerLogger.logMessage('SessionManager: MediaSyncWorker started.');
 
-    // Run inbound sync after we have userId but before starting background processes
-    await runInboundSync(this);
+    // Start InboundSyncWorker (which runs initial sync internally)
+    QuizzerLogger.logMessage('SessionManager: Starting InboundSyncWorker...');
+    final inboundSyncWorker = InboundSyncWorker();
+    await inboundSyncWorker.start();
+    QuizzerLogger.logMessage('SessionManager: InboundSyncWorker started and initial sync completed.');
       
     // --- Start new background processing pipeline --- 
     final PreProcessWorker preProcessWorker = PreProcessWorker();
@@ -983,6 +987,114 @@ class SessionManager {
     _dbMonitor.releaseDatabaseAccess();
     return module!;
   }
+
+  // =====================================================================
+  // --- User Settings API ---
+  // =====================================================================
+
+  /// Updates a specific user setting in the local database.
+  /// Triggers outbound sync.
+  Future<void> updateUserSetting(String settingName, dynamic newValue) async {
+    assert(userId != null, 'User must be logged in to update a setting.');
+    Database? db;
+    
+    db = await _dbMonitor.requestDatabaseAccess();
+
+    await user_settings_table.updateUserSetting(userId!, settingName, newValue, db!);
+    QuizzerLogger.logSuccess('SessionManager: User setting \"$settingName\" updated locally.');
+    
+    // Release database access directly after operations
+    _dbMonitor.releaseDatabaseAccess();
+  }
+
+  /// Fetches user settings from the local database.
+  ///
+  /// Can fetch a single setting by [settingName], a list of settings by [settingNames],
+  /// or all settings if [getAll] is true.
+  /// Throws an ArgumentError if more than one mode is specified or if no mode is specified.
+  Future<dynamic> getUserSettings({
+    String? settingName,
+    List<String>? settingNames,
+    bool getAll = false,
+  }) async {
+    assert(userId != null, 'User must be logged in to get settings.');
+
+    final int modesSpecified = (settingName != null ? 1 : 0) +
+                               (settingNames != null ? 1 : 0) +
+                               (getAll ? 1 : 0);
+    if (modesSpecified == 0) {
+      throw ArgumentError('No mode specified for getUserSettings. Provide settingName, settingNames, or set getAll to true.');
+    }
+    if (modesSpecified > 1) {
+      throw ArgumentError('Multiple modes specified for getUserSettings. Only one of settingName, settingNames, or getAll can be used.');
+    }
+
+    Database? db;
+    db = await _dbMonitor.requestDatabaseAccess();
+    assert(db != null, 'Failed to acquire database access to get user settings.');
+
+    final String currentUserRole = userRole; // Get current user's role
+    dynamic resultToReturn;
+
+    String operationMode;
+    if (getAll) {
+      operationMode = "all";
+    } else if (settingName != null) {
+      operationMode = "single";
+    } else { 
+      operationMode = "list";
+    }
+
+    switch (operationMode) {
+      case "all":
+        QuizzerLogger.logMessage('SessionManager: Getting all user settings for user $userId (Role: $currentUserRole).');
+        final Map<String, Map<String, dynamic>> allSettingsWithFlags = await user_settings_table.getAllUserSettings(userId!, db!);
+        final Map<String, dynamic> filteredSettings = {};
+        allSettingsWithFlags.forEach((key, settingDetails) {
+          final bool isAdminSetting = (settingDetails['is_admin_setting'] as int? ?? 0) == 1;
+          if (!isAdminSetting || currentUserRole == 'admin' || currentUserRole == 'contributor') {
+            filteredSettings[key] = settingDetails['value'];
+          }
+        });
+        resultToReturn = filteredSettings;
+        break;
+      case "single":
+        QuizzerLogger.logMessage('SessionManager: Getting setting \"$settingName\" for user $userId (Role: $currentUserRole).');
+        final Map<String, dynamic>? settingDetails = await user_settings_table.getSettingValue(userId!, settingName!, db!);
+        if (settingDetails != null) {
+          final bool isAdminSetting = (settingDetails['is_admin_setting'] as int? ?? 0) == 1;
+          if (!isAdminSetting || currentUserRole == 'admin' || currentUserRole == 'contributor') {
+            resultToReturn = settingDetails['value'];
+          } else {
+            resultToReturn = null; // Admin setting, non-admin/contributor user
+            QuizzerLogger.logWarning('SessionManager: Access denied for user $userId (Role: $currentUserRole) to admin/contributor setting \"$settingName\".');
+          }
+        } else {
+          resultToReturn = null; // Setting not found
+        }
+        break;
+      case "list":
+        QuizzerLogger.logMessage('SessionManager: Getting specific settings for user $userId (Role: $currentUserRole): ${settingNames!.join(", ")}.');
+        final Map<String, dynamic> listedResults = {};
+        for (final name in settingNames) {
+          final Map<String, dynamic>? settingDetails = await user_settings_table.getSettingValue(userId!, name, db!);
+          if (settingDetails != null) {
+            final bool isAdminSetting = (settingDetails['is_admin_setting'] as int? ?? 0) == 1;
+            if (!isAdminSetting || currentUserRole == 'admin' || currentUserRole == 'contributor') {
+              listedResults[name] = settingDetails['value'];
+            }
+            // If it's an admin setting and user is not admin/contributor, we simply don't add it to the map for listedResults.
+          }
+          // If settingDetails is null (not found), it's also not added.
+        }
+        resultToReturn = listedResults;
+        break;
+    }
+
+    _dbMonitor.releaseDatabaseAccess();
+    return resultToReturn;
+  }
+
   // =====================================================================
   // --- Review System Interface ---
 

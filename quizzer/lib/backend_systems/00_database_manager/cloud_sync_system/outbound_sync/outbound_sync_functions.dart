@@ -8,6 +8,7 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/user_question
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart'; // Import Logger
 import 'package:supabase/supabase.dart'; // Import for PostgrestException & SupabaseClient
 import 'package:quizzer/backend_systems/00_database_manager/tables/error_logs_table.dart'; // Added for syncErrorLogs
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_settings_table.dart'; // Added for user settings table
 
 // ==========================================
 // Outbound Sync - Generic Push Function
@@ -577,4 +578,96 @@ Future<void> syncErrorLogs(Database db) async {
     }
   }
   QuizzerLogger.logMessage('Finished sync attempt for ErrorLogs.');
+}
+
+// ==========================================
+// Outbound Sync - User Settings
+// ==========================================
+
+/// Fetches unsynced user settings for the current user, pushes new ones or updates existing ones,
+/// and updates local sync flags on success.
+Future<void> syncUserSettings(Database db) async {
+  QuizzerLogger.logMessage('Starting sync for UserSettings...');
+
+  final SessionManager sessionManager = getSessionManager();
+  final String? currentUserId = sessionManager.userId;
+
+  if (currentUserId == null) {
+    QuizzerLogger.logWarning('syncUserSettings: No current user logged in. Cannot proceed.');
+    return;
+  }
+
+  // Fetch records needing sync for the current user
+  // Assuming user_settings_table.dart is imported as user_settings_table
+  // For now, let's assume the import alias or direct import makes getUnsyncedUserSettings available.
+  // If not, this will need an import: import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_settings_table.dart' as user_settings_tbl;
+  // Then call: user_settings_tbl.getUnsyncedUserSettings(currentUserId, db);
+  // For this edit, I'll assume direct availability. It will be caught if not.
+  final List<Map<String, dynamic>> unsyncedRecords = await getUnsyncedUserSettings(currentUserId, db); // from user_settings_table.dart
+
+  if (unsyncedRecords.isEmpty) {
+    QuizzerLogger.logMessage('No unsynced UserSettings found for user $currentUserId.');
+    return;
+  }
+
+  QuizzerLogger.logMessage('Found ${unsyncedRecords.length} unsynced UserSettings for user $currentUserId.');
+
+  const String tableName = 'user_settings'; // Supabase table name
+
+  for (final record in unsyncedRecords) {
+    final String? userId = record['user_id'] as String?;
+    final String? settingName = record['setting_name'] as String?;
+    final int hasBeenSynced = record['has_been_synced'] as int? ?? 0;
+
+    assert(userId != null, 'syncUserSettings: Unsynced user setting record encountered with null user_id. Record: $record');
+    assert(settingName != null, 'syncUserSettings: Unsynced user setting record encountered with null setting_name. Record: $record');
+
+    // Ensure the record belongs to the current user (should be guaranteed by getUnsynced...)
+    if (userId! != currentUserId) {
+        QuizzerLogger.logWarning('syncUserSettings: Skipping record not belonging to current user. User in record: $userId, Current User: $currentUserId');
+        continue;
+    }
+
+    // Ensure last_modified_timestamp is present before push/update
+    Map<String, dynamic> mutableRecord = Map<String, dynamic>.from(record);
+    if (mutableRecord['last_modified_timestamp'] == null || 
+        (mutableRecord['last_modified_timestamp'] is String && (mutableRecord['last_modified_timestamp'] as String).isEmpty)) {
+      QuizzerLogger.logWarning('syncUserSettings: Record (User: $userId, Setting: $settingName) missing last_modified_timestamp. Assigning current time.');
+      mutableRecord['last_modified_timestamp'] = DateTime.now().toUtc().toIso8601String();
+    }
+
+    bool operationSuccess = false;
+
+    if (hasBeenSynced == 0) {
+      // This is a new record, use insert
+      QuizzerLogger.logValue('Preparing to insert UserSetting (User: $userId, Setting: $settingName) into $tableName');
+      operationSuccess = await pushRecordToSupabase(tableName, mutableRecord);
+    } else {
+      // This is an existing record with edits, use update
+      QuizzerLogger.logValue('Preparing to update UserSetting (User: $userId, Setting: $settingName) in $tableName');
+      operationSuccess = await updateRecordWithCompositeKeyInSupabase(
+        tableName,
+        mutableRecord,
+        compositeKeyFilters: {'user_id': userId, 'setting_name': settingName!},
+      );
+    }
+
+    if (operationSuccess) {
+      final operation = (hasBeenSynced == 0) ? 'Insert' : 'Update';
+      QuizzerLogger.logMessage('$operation successful for UserSetting (User: $userId, Setting: $settingName). Updating local flags...');
+      // Call the function from user_settings_table.dart (assuming direct import or alias)
+      await updateUserSettingSyncFlags(
+        userId: userId,
+        settingName: settingName!,
+        hasBeenSynced: true, 
+        editsAreSynced: true, 
+        db: db,
+      );
+    } else {
+      final operation = (hasBeenSynced == 0) ? 'Insert' : 'Update';
+      QuizzerLogger.logWarning('$operation FAILED for UserSetting (User: $userId, Setting: $settingName). Local flags remain unchanged.');
+    }
+  }
+
+  QuizzerLogger.logMessage('Finished sync attempt for UserSettings.');
 }

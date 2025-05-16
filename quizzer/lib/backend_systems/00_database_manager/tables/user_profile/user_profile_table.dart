@@ -3,7 +3,7 @@ import 'package:uuid/uuid.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pairs_table.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'dart:convert';
-import 'package:quizzer/backend_systems/12_switch_board/switch_board.dart';
+import 'package:quizzer/backend_systems/10_switch_board/switch_board.dart';
 import '../table_helper.dart'; // Import the helper file
 
 // TODO Enforce and introduce primary and secondary languages

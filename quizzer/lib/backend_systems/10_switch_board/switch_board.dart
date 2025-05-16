@@ -107,6 +107,23 @@ class SwitchBoard {
   }
   // -------------------------------------
 
+  // --- Inbound Sync Needed Stream (NEW) ---
+  final StreamController<void> _inboundSyncNeededController = StreamController<void>.broadcast();
+
+  /// Stream that fires when an inbound sync is needed (e.g., after a push notification or periodic check).
+  Stream<void> get onInboundSyncNeeded => _inboundSyncNeededController.stream;
+
+  /// Signals that an inbound data sync should be triggered.
+  void signalInboundSyncNeeded() {
+    if (!_inboundSyncNeededController.isClosed) {
+      // QuizzerLogger.logMessage('SwitchBoard: Signaling Inbound Sync Needed.'); // Keep commented for less noise
+      _inboundSyncNeededController.add(null);
+    } else {
+      QuizzerLogger.logWarning('SwitchBoard: Attempted to signal on closed InboundSyncNeeded stream.');
+    }
+  }
+  // -------------------------------------
+
   // --- Past Due Cache Stream (New) ---
   final StreamController<void> _pastDueCacheController = StreamController<void>.broadcast();
   // Single stream for low eligible cache conditions
@@ -148,6 +165,7 @@ class SwitchBoard {
     _eligibleCacheLowController.close();
     _outboundSyncNeededController.close();
     _mediaSyncStatusProcessedController.close();
+    _inboundSyncNeededController.close();
     QuizzerLogger.logMessage('SwitchBoard disposed.');
   }
   // --------------------

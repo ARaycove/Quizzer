@@ -105,7 +105,8 @@ class _MenuPageState extends State<MenuPage> {
               label: 'Settings',
               onPressed: () {
                 QuizzerLogger.logMessage('Settings button pressed');
-                developer.log('Settings page not implemented yet');
+                session.addPageToHistory('/settings_page');
+                Navigator.pushNamed(context, '/settings_page');
               },
             ),
             const SizedBox(height: ColorWheel.standardPaddingValue),

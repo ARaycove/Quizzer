@@ -1,7 +1,7 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/table_helper.dart';
-import 'package:quizzer/backend_systems/12_switch_board/switch_board.dart';
+import 'package:quizzer/backend_systems/10_switch_board/switch_board.dart';
 
 // TODO need to update outbound sync to sync these records
 

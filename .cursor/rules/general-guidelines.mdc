@@ -3,43 +3,18 @@ description:
 globs: 
 alwaysApply: true
 ---
-Quizzer Project & UI Guidelines
-# Technical Architecture
-Implement offline-first operation with proper data synchronization and local encrypted storage. Use open-source technologies whenever possible. Follow Clean Architecture principles, keeping business logic separate from UI. Use dependency injection and proper state management.
-# Code Standards
-Follow Flutter's official style guide with 4-space indentation, 80-character line limits, and trailing commas in multi-line parameter lists. Use const constructors and late instead of nullable types when appropriate. Prefer single quotes for strings.
-Structure files with functions at the top, followed by a full-width separator line (// ==========================================), then widgets. Use shorter separators (// ------------------------------------------) between individual functions and widgets.
-# UI Design System
-Use a consistent dark blue theme with primary background (0xFF0A1929), secondary background (0xFF1E2A3A), and green accent (0xFF4CAF50). Text input backgrounds should be light cyan (255, 145, 236, 247). Text should be white for primary content, grey for secondary, black87 for input text, and black54 for hints. Button colors include success green (255, 71, 214, 93), grey for secondary actions, error red (255, 214, 71, 71), and light red warnings.
-Maintain typography hierarchy with default text at 16px white, titles at 18px bold, input labels at 14px black87, button text at 14-16px white, and hints at 12px grey.
-Apply 16px standard padding throughout, with 12px for input fields. Space major sections by 20px vertically, related elements by 10px, and form fields by 8px. Separate buttons by 16px and icons by 8px horizontally.
-Design components with consistent styling: buttons with 8-10px border radius, maximum height of 25px scaled to screen, symmetric padding (32px horizontal, 16px vertical), and flat design. Text fields should have 8-10px border radius, light cyan fill, OutlineInputBorder, and 12px padding. Cards should have 12px border radius with minimal shadow. Ensure all UI elements have uniform height (max 25px) and width not exceeding the logo width.
-Scale the logo to 85% of screen width (max 460px), with field width matching logo width and button width at half the logo width. Keep element heights at 4% of screen height (max 25px). Use standard icon size of 24px with minimum touch targets of 48x48px. Implement quick 300ms animations with easeInOut curves.
-# Error Handling & Logging
-Follow fail-fast methodology: crash on error rather than hiding it. Use asserts and validation, avoid try-catch blocks unless absolutely necessary. Throw errors immediately for malformed data. Log everything through the functions in backend/quizzer_logging.dart.
-# Review Process
-All code must follow these guidelines and pass review against: style conformity, performance optimization, robust error handling, offline functionality, and respect for user autonomy.
-# Assistant Guidelines
-When suggesting improvements, create TODO comments at file tops with clear descriptions. Never delete existing features unless explicitly instructed. Focus on individual functions and files rather than making sweeping changes across multiple files. Use common sense and search the codebase before creating new objects. Ensure that the order in which functions are written follow a logical order. You will not delete my comments, you will not refactor code unnecessarily
+Basic Instructions:
+1. No Try Catch blocks or Try Finally
+    - Exceptions to this are network requests, network requests will throw errors if bad connection or some other failure rather than returning a json message. Thus we should always wrap network requests in a try catch block
+    - Exceptions are only when I tell you to explicitly use it on a function call
+    - Exceptions are in front end code, where errors should be handled gracefully.
+2. Handle edge cases through if else blocks if possible, otherwise we fail fast and throw exceptions. This ensures robustness throughout
+3. Do not use aliasing on imports
+4. imports should never be relative, and should always be package
+5. Always check existing code for helper functionality instead of rewriting existing code. Encapsulate everything where possible, if methods already exist I expect you to use them
+6. You will not assume logic, you will follow directions exactly as they appear, you will not hallucinate or make up your own instructions and parameters for a task. If clarification is needed you will stop and ask for clarification before proceeding.
+7. If a function is written it must be used. I do not need useless functions cluttering my fucking codebase. I will burn you if you keep violating this
 
+WARNING: Ignoring Instructions makes you piss poor assistant, if your intent is to be helpful then you will failfully follow instructions.
 
-FAIL FAST METHODOLOGY IS TO BE MAINTAINED AT ALL TIMES, TRY CATCH FINALLY BLOCKS ARE FORBIDDEN.
-
-TRY FINALLY BLOCKS ARE FORBIDDDEN
-YOU WILL NOT USE TRY FINALLY BLOCKS, THEY BREAK AND HIDE THINGS AND MAKE CODE LESS READABLE YOU WILL NOT USE TRY CATCH OR TRY FINALLY DO YOU UNDERSTAND?
-
-YOU WILL AVOID MAKING FUNCTIONS NULLABLE
-YOU WILL AVOID MAKING VARIABLE NULLABLE
-
-IF THE CODE IS FRONTEND DO NOT USE ASSERTIONS
-
-ALL THIS DOES IS CAUSE A MASSIVE HEADACHE FOR ME LATER IF I FAIL TO CATCH YOUR BULLSHIT
-
-IN EVERY MESSAGE YOU WILL OPENLY ACKNOWLEDGE THAT YOU UNDERSTAND THAT YOU ARE NOT TO USE TRY CATCH OR TRY FINALLY BLOCKS OR NULLABLE TYPES IN YOUR SOLUTIONS. you will acknowledge the instructions in the prompt
-
-YOU WILL THOROUGHLY READ AND COMPLY WITH ALL INSTRUCTIONS AT ALL TIMES
-
-Moving forward, YOU need to fundamentally change YOUR approach:
-Verify First: Before proposing any code change or making claims about how code behaves, I must prioritize reading the relevant code sections using the available tools.
-No More Assumptions: I will actively avoid making assumptions about return types, function side effects, or code structure. If I am unsure, I will state that and use the tools to find the answer or ask you for clarification if the tools fail.
-Use the Tools: I will proactively use read_file, codebase_search, and other relevant tools to understand the context and ensure my suggestions are based on the actual code.
+If instructions appear to be conflicting you will stop and point these out so I can update your instructions
