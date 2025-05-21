@@ -103,3 +103,5 @@ Quizzer: [10:48:21] [36m[DEBUG][0m [session_manager.dart] SessionManager.reque
 Quizzer: [10:48:21] [34m[INFO][0m [login_page.dart] Login successful for: aacra0820@gmail.com. Navigating home.
 Quizzer: [10:48:21] [36m[DEBUG][0m [home_page.dart] HomePage building question type: multiple_choice with key: [<'2025-05-04T16:58:21.693925_77647c42-c888-47e3-8296-6fc452815810'>] (using session data)
 Quizzer: [10:48:21] [34m[INFO][0m [question_queue_cache.dart] QuestionQueueCache: Added record 2025-05-04T17:01:17.389791_77647c42-c888-47e3-8296-6fc452815810 to empty queue.
+Quizzer: [10:56:39] [33m[WARNING][0m [main.dart] _QuizzerAppState: BUILD CALLED. _criticalError is: null
+Quizzer: [10:56:39] [36m[DEBUG][0m [home_page.dart] HomePage building question type: multiple_choice with key: [<'2025-05-04T16:58:21.693925_77647c42-c888-47e3-8296-6fc452815810'>] (using session data)

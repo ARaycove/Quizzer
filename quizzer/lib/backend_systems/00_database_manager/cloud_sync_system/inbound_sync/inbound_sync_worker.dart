@@ -4,6 +4,7 @@ import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
 import 'package:quizzer/backend_systems/10_switch_board/switch_board.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart'; // Needed for runInitialInboundSync
+import 'package:quizzer/backend_systems/04_module_management/module_updates_process.dart'; // For buildModuleRecords
 import 'inbound_sync_functions.dart'; // For runInitialInboundSync
 import 'dart:io'; // For InternetAddress lookup
 
@@ -124,6 +125,10 @@ class InboundSyncWorker {
     // For now, subsequent syncs will also run the full initial sync logic.
     // This can be optimized later to fetch only deltas if needed.
     await runInitialInboundSync(_sessionManager);
+
+    // Build module records after inbound sync completes
+    QuizzerLogger.logMessage('InboundSyncWorker: Building module records after sync...');
+    await buildModuleRecords();
 
     QuizzerLogger.logMessage('InboundSyncWorker: Periodic inbound sync functions completed.');
   }
