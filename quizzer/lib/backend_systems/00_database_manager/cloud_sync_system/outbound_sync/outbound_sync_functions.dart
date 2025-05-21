@@ -9,6 +9,7 @@ import 'package:quizzer/backend_systems/logger/quizzer_logging.dart'; // Import 
 import 'package:supabase/supabase.dart'; // Import for PostgrestException & SupabaseClient
 import 'package:quizzer/backend_systems/00_database_manager/tables/error_logs_table.dart'; // Added for syncErrorLogs
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_settings_table.dart'; // Added for user settings table
+import 'package:quizzer/backend_systems/00_database_manager/tables/modules_table.dart';
 
 // ==========================================
 // Outbound Sync - Generic Push Function
@@ -538,7 +539,79 @@ Future<void> syncUserQuestionAnswerPairs(Database db) async {
   QuizzerLogger.logMessage('Finished sync attempt for UserQuestionAnswerPairs.');
 }
 
-// Add functions for other tables (e.g., syncModules) here...
+/// Fetches unsynced modules, pushes them to Supabase, and updates local flags on success.
+Future<void> syncModules(Database db) async {
+  QuizzerLogger.logMessage('Starting sync for Modules...');
+
+  // Fetch records needing sync
+  final List<Map<String, dynamic>> unsyncedRecords = await getUnsyncedModules(db);
+
+  if (unsyncedRecords.isEmpty) {
+    QuizzerLogger.logMessage('No unsynced Modules found.');
+    return;
+  }
+
+  QuizzerLogger.logMessage('Found ${unsyncedRecords.length} unsynced Modules.');
+
+  const String tableName = 'modules';
+  const String primaryKey = 'module_name';
+
+  for (final record in unsyncedRecords) {
+    final String? moduleName = record[primaryKey] as String?;
+    final int hasBeenSynced = record['has_been_synced'] as int? ?? 0;
+
+    if (moduleName == null) {
+      QuizzerLogger.logError('Skipping unsynced module record due to missing module_name: $record');
+      continue;
+    }
+
+    // Ensure creation_date is a UTC ISO8601 string
+    dynamic creationDate = record['creation_date'];
+    if (creationDate is int) {
+      creationDate = DateTime.fromMillisecondsSinceEpoch(creationDate).toUtc().toIso8601String();
+    }
+    final Map<String, dynamic> syncPayload = {
+      'module_name': record['module_name'],
+      'description': record['description'],
+      'creation_date': creationDate,
+      'creator_id': record['creator_id'],
+      'last_modified_timestamp': record['last_modified_timestamp'] ?? DateTime.now().toUtc().toIso8601String()
+    };
+
+    bool operationSuccess = false;
+
+    if (hasBeenSynced == 0) {
+      // New record, use insert
+      QuizzerLogger.logValue('Preparing to insert Module $moduleName into $tableName');
+      operationSuccess = await pushRecordToSupabase(tableName, syncPayload);
+    } else {
+      // Existing record with edits, use update
+      QuizzerLogger.logValue('Preparing to update Module $moduleName in $tableName');
+      operationSuccess = await updateRecordInSupabase(
+        tableName,
+        syncPayload,
+        primaryKeyColumn: primaryKey,
+        primaryKeyValue: moduleName,
+      );
+    }
+
+    if (operationSuccess) {
+      final operation = (hasBeenSynced == 0) ? 'Insert' : 'Update';
+      QuizzerLogger.logMessage('$operation successful for Module $moduleName. Updating local flags...');
+      await updateModuleSyncFlags(
+        moduleName: moduleName,
+        hasBeenSynced: true,
+        editsAreSynced: true,
+        db: db,
+      );
+    } else {
+      final operation = (hasBeenSynced == 0) ? 'Insert' : 'Update';
+      QuizzerLogger.logWarning('$operation FAILED for Module $moduleName. Local flags remain unchanged.');
+    }
+  }
+
+  QuizzerLogger.logMessage('Finished sync attempt for Modules.');
+}
 
 /// Fetches unsynced error logs, pushes them to Supabase, and deletes them locally on success.
 Future<void> syncErrorLogs(Database db) async {

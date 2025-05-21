@@ -5,6 +5,12 @@ import 'package:quizzer/backend_systems/10_switch_board/switch_board.dart';
 
 // TODO need to update outbound sync to sync these records
 
+// TODO Need to update inbound sync to pull these records
+
+// TODO Need to create a user_profile page to display these
+
+// TODO Need to update edit question widget to allow for adding/removing of languages (using same list of unique languages from this table )
+
 // ==========================================
 //          User Languages Table
 // ==========================================

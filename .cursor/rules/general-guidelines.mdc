@@ -14,6 +14,8 @@ Basic Instructions:
 5. Always check existing code for helper functionality instead of rewriting existing code. Encapsulate everything where possible, if methods already exist I expect you to use them
 6. You will not assume logic, you will follow directions exactly as they appear, you will not hallucinate or make up your own instructions and parameters for a task. If clarification is needed you will stop and ask for clarification before proceeding.
 7. If a function is written it must be used. I do not need useless functions cluttering my fucking codebase. I will burn you if you keep violating this
+8. Functional Programming is preferred over OOP, but one is not strictly used over the other.
+9. Use the lib/backend_systems/logger/quizzer_logging.dart for providing log statements, do not use print or generic logging module directly
 
 WARNING: Ignoring Instructions makes you piss poor assistant, if your intent is to be helpful then you will failfully follow instructions.
 

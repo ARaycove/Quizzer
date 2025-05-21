@@ -11,6 +11,14 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/question_answ
 // duplicate private helper functions here, the AI is fucking dumb and tried to use them instead of the main function in table_helper
 // Like seriously, it doesn't matter how many times you tell this stupid assistant it will consistently try to rewrite existing functionality instead of just using whats already there 
 
+// TODO Need to update the approved questions with the reviewer user_id. When a reviewer clicks approve question the question record will be deleted from the review table(s) and then added to the main question answer pairs table. Currently the qst_reviewer field is not filled at this step. Please update the approve function so that it inserts the currently logged in user_id as the qst_reviewer.
+
+// TODO subscribe to user question functionality
+
+// TODO badge and acheivement system needs to be built out, track question contributors and contribution by subject matter 
+// - Question performance badges
+// - Contribution badges
+
 /// Encodes a Dart value into a type suitable for SQLite storage (TEXT, INTEGER, REAL, NULL).
 /// Handles Strings, ints, doubles, booleans, Lists, and Maps.
 /// Lists and Maps are encoded as JSON TEXT. Booleans are stored as INTEGER (1/0).
@@ -217,11 +225,20 @@ Future<bool> approveQuestion(Map<String, dynamic> questionDetails, String source
       questionDetails['qst_contrib'] = currentUserId;
       QuizzerLogger.logMessage('Populated missing qst_contrib with current userId: $currentUserId for question $questionId');
     } else {
-      // This case should ideally not happen if a user is logged in to approve questions.
-      // Throw an error or handle as per application's error policy for critical missing data.
       QuizzerLogger.logError('Critical: qst_contrib is missing and could not be populated with a valid userId for question $questionId. Aborting approval.');
       throw StateError('Cannot approve question $questionId: qst_contrib is missing and no valid session userId found.');
     }
+  }
+
+  // Set qst_reviewer to current user ID
+  final String? currentUserId = getSessionManager().userId;
+  if (currentUserId != null && currentUserId.isNotEmpty) {
+    questionDetails['qst_reviewer'] = currentUserId;
+    questionDetails['has_been_reviewed'] = 1; // Set review flag
+    QuizzerLogger.logMessage('Set qst_reviewer to current userId: $currentUserId for question $questionId');
+  } else {
+    QuizzerLogger.logError('Critical: Could not set qst_reviewer - no valid session userId found for question $questionId. Aborting approval.');
+    throw StateError('Cannot approve question $questionId: No valid session userId found for reviewer.');
   }
 
   // 1. Encode the data for upsert into the main table

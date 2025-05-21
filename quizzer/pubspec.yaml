@@ -75,8 +75,13 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - images/quizzer_assets/quizzer_logo.png
+    - images/quizzer_assets/
+    - images/question_answer_pair_assets/
+    - images/input_staging/
+    - runtime_cache/models/
     - runtime_cache/sqlite/
+    - runtime_cache/subject_data/
+    # Excluding runtime_cache/hive/ as it's generated per client
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

@@ -2,6 +2,12 @@ import 'package:sqflite/sqflite.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'table_helper.dart'; // Import the helper file
 
+// TODO setup outbound sync of description field and module names
+
+// TODO setup inbound sync of description fields
+
+// TODO Setup and plan the module completion status of the module card
+
 // Table name and field constants
 const String modulesTableName = 'modules';
 const String moduleNameField = 'module_name';
@@ -12,10 +18,7 @@ const String relatedConceptsField = 'related_concepts';
 const String questionIdsField = 'question_ids';
 const String creationDateField = 'creation_date';
 const String creatorIdField = 'creator_id';
-const String lastModifiedField = 'last_modified';
 const String totalQuestionsField = 'total_questions';
-const String hasBeenSyncedField = 'has_been_synced_with_central_db';
-const String lastSyncField = 'last_sync_with_central_db';
 
 // Create table SQL
 const String createModulesTableSQL = '''
@@ -26,12 +29,12 @@ const String createModulesTableSQL = '''
     $subjectsField TEXT,
     $relatedConceptsField TEXT,
     $questionIdsField TEXT,
-    $creationDateField INTEGER,
+    $creationDateField TEXT,
     $creatorIdField TEXT,
-    $lastModifiedField INTEGER,
     $totalQuestionsField INTEGER,
-    $hasBeenSyncedField INTEGER DEFAULT 0,
-    $lastSyncField INTEGER
+    has_been_synced INTEGER DEFAULT 0,
+    edits_are_synced INTEGER DEFAULT 0,
+    last_modified_timestamp TEXT
   )
 ''';
 
@@ -50,7 +53,42 @@ Future<void> verifyModulesTable(Database db) async {
     QuizzerLogger.logMessage('Building initial modules from question-answer pairs');
     QuizzerLogger.logSuccess('Initial modules built successfully');
   } else {
-    QuizzerLogger.logMessage('Modules table already exists');
+    QuizzerLogger.logMessage('Modules table exists, checking for old fields');
+    
+    // Get current table info
+    final List<Map<String, dynamic>> columns = await db.rawQuery(
+      "PRAGMA table_info($modulesTableName)"
+    );
+    
+    // Check for old fields to remove
+    final oldFields = [
+      'last_modified',
+      'has_been_synced_with_central_db',
+      'last_sync_with_central_db'
+    ];
+    
+    for (final field in oldFields) {
+      if (columns.any((col) => col['name'] == field)) {
+        QuizzerLogger.logMessage('Removing old field: $field');
+        await db.execute('ALTER TABLE $modulesTableName DROP COLUMN $field');
+      }
+    }
+
+    // Add new sync fields if they don't exist
+    final newFields = {
+      'has_been_synced': 'INTEGER DEFAULT 0',
+      'edits_are_synced': 'INTEGER DEFAULT 0',
+      'last_modified_timestamp': 'TEXT'
+    };
+
+    for (final entry in newFields.entries) {
+      if (!columns.any((col) => col['name'] == entry.key)) {
+        QuizzerLogger.logMessage('Adding new field: ${entry.key}');
+        await db.execute('ALTER TABLE $modulesTableName ADD COLUMN ${entry.key} ${entry.value}');
+      }
+    }
+    
+    QuizzerLogger.logSuccess('Modules table structure verified and cleaned');
   }
 }
 
@@ -67,7 +105,7 @@ Future<void> insertModule({
 }) async {
   QuizzerLogger.logMessage('Inserting new module: $name');
   await verifyModulesTable(db);
-  final now = DateTime.now().millisecondsSinceEpoch;
+  final now = DateTime.now().toUtc().toIso8601String();
   
   // Prepare the raw data map - join lists into strings as needed by schema
   final Map<String, dynamic> data = {
@@ -79,10 +117,10 @@ Future<void> insertModule({
     questionIdsField: questionIds, // Pass raw list for JSON encoding
     creationDateField: now,
     creatorIdField: creatorId,
-    lastModifiedField: now,
     totalQuestionsField: questionIds.length,
-    hasBeenSyncedField: 0,
-    lastSyncField: null, // Helper will handle null
+    'has_been_synced': 0,
+    'edits_are_synced': 0,
+    'last_modified_timestamp': DateTime.now().toUtc().toIso8601String()
   };
 
   // Use the universal insert helper with ConflictAlgorithm.replace
@@ -117,7 +155,10 @@ Future<void> updateModule({
   final updates = <String, dynamic>{};
   
   // Prepare map with raw data - lists will be handled by encodeValueForDB in the helper
-  if (description != null) updates[descriptionField] = description;
+  if (description != null) {
+    updates[descriptionField] = description;
+    updates['edits_are_synced'] = 0; // Mark as needing sync when description changes
+  }
   if (primarySubject != null) updates[primarySubjectField] = primarySubject;
   if (subjects != null) updates[subjectsField] = subjects; // Pass raw list
   if (relatedConcepts != null) updates[relatedConceptsField] = relatedConcepts; // Pass raw list
@@ -127,8 +168,7 @@ Future<void> updateModule({
   }
   
   // Add fields that are always updated
-  updates[lastModifiedField] = DateTime.now().millisecondsSinceEpoch;
-  updates[hasBeenSyncedField] = 0; // Mark as needing sync after update
+  updates['last_modified_timestamp'] = DateTime.now().toUtc().toIso8601String();
 
   // Use the universal update helper (encoding happens inside)
   final int result = await updateRawData(
@@ -184,12 +224,7 @@ Future<Map<String, dynamic>?> getModule(String name, Database db) async {
     questionIdsField: decodedModule[questionIdsField], // Already decoded
     creationDateField: DateTime.fromMillisecondsSinceEpoch(decodedModule[creationDateField] as int),
     creatorIdField: decodedModule[creatorIdField],
-    lastModifiedField: DateTime.fromMillisecondsSinceEpoch(decodedModule[lastModifiedField] as int),
     totalQuestionsField: decodedModule[totalQuestionsField],
-    hasBeenSyncedField: decodedModule[hasBeenSyncedField] == 1, // Convert int (0/1) to bool
-    lastSyncField: decodedModule[lastSyncField] != null 
-        ? DateTime.fromMillisecondsSinceEpoch(decodedModule[lastSyncField] as int)
-        : null,
   };
   
   QuizzerLogger.logValue('Retrieved and processed module: $finalResult');
@@ -213,10 +248,9 @@ Future<List<Map<String, dynamic>>> getAllModules(Database db) async {
   for (final decodedModule in decodedModules) {
       // Basic check for essential fields
       if (decodedModule[moduleNameField] == null || 
-          decodedModule[creationDateField] == null || 
-          decodedModule[lastModifiedField] == null) {
+          decodedModule[creationDateField] == null) {
         QuizzerLogger.logWarning('Skipping module due to missing essential fields: ${decodedModule[moduleNameField] ?? 'Unknown'}');
-        continue; // Skip this potentially malformed module
+        continue;
       }
 
       // Perform the same type conversions as in getModule
@@ -224,21 +258,91 @@ Future<List<Map<String, dynamic>>> getAllModules(Database db) async {
         moduleNameField: decodedModule[moduleNameField],
         descriptionField: decodedModule[descriptionField],
         primarySubjectField: decodedModule[primarySubjectField],
-        subjectsField: decodedModule[subjectsField], // Already List<dynamic>? or null
-        relatedConceptsField: decodedModule[relatedConceptsField], // Already List<dynamic>? or null
-        questionIdsField: decodedModule[questionIdsField], // Already List<dynamic>? or null
+        subjectsField: decodedModule[subjectsField],
+        relatedConceptsField: decodedModule[relatedConceptsField],
+        questionIdsField: decodedModule[questionIdsField],
         creationDateField: DateTime.fromMillisecondsSinceEpoch(decodedModule[creationDateField] as int),
         creatorIdField: decodedModule[creatorIdField],
-        lastModifiedField: DateTime.fromMillisecondsSinceEpoch(decodedModule[lastModifiedField] as int),
         totalQuestionsField: decodedModule[totalQuestionsField],
-        hasBeenSyncedField: (decodedModule[hasBeenSyncedField] == 1 || decodedModule[hasBeenSyncedField] == true), // Handle int or bool
-        lastSyncField: decodedModule[lastSyncField] != null 
-            ? DateTime.fromMillisecondsSinceEpoch(decodedModule[lastSyncField] as int)
-            : null,
       };
       finalResults.add(processedModule);
   }
 
   QuizzerLogger.logValue('Retrieved and processed ${finalResults.length} modules');
   return finalResults;
+}
+
+// Get unsynced modules
+Future<List<Map<String, dynamic>>> getUnsyncedModules(Database db) async {
+  QuizzerLogger.logMessage('Fetching unsynced modules');
+  await verifyModulesTable(db);
+  
+  // Use the universal query helper to get modules that need syncing
+  final List<Map<String, dynamic>> unsyncedModules = await queryAndDecodeDatabase(
+    modulesTableName,
+    db,
+    where: 'edits_are_synced = ?',
+    whereArgs: [0],
+  );
+
+  QuizzerLogger.logValue('Found ${unsyncedModules.length} unsynced modules');
+  return unsyncedModules;
+}
+
+// Update module sync flags
+Future<void> updateModuleSyncFlags({
+  required String moduleName,
+  required bool hasBeenSynced,
+  required bool editsAreSynced,
+  required Database db,
+}) async {
+  QuizzerLogger.logMessage('Updating sync flags for module: $moduleName');
+  await verifyModulesTable(db);
+  
+  final updates = {
+    'has_been_synced': hasBeenSynced ? 1 : 0,
+    'edits_are_synced': editsAreSynced ? 1 : 0,
+  };
+
+  final int result = await updateRawData(
+    modulesTableName,
+    updates,
+    '$moduleNameField = ?',
+    [moduleName],
+    db,
+  );
+  
+  if (result > 0) {
+    QuizzerLogger.logSuccess('Sync flags updated for module $moduleName');
+  } else {
+    QuizzerLogger.logWarning('No rows affected when updating sync flags for module $moduleName');
+  }
+}
+
+/// Upserts a module from inbound sync and sets sync flags to 1.
+/// This function is specifically for handling inbound sync operations.
+Future<void> upsertModuleFromInboundSync({
+  required String moduleName,
+  required String description,
+  required Database db,
+}) async {
+  QuizzerLogger.logMessage('Upserting module $moduleName from inbound sync...');
+
+  // Prepare the data map with only the fields we store in Supabase
+  final Map<String, dynamic> data = {
+    'module_name': moduleName,
+    'description': description,
+    'has_been_synced': 1,
+    'edits_are_synced': 1,
+    'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
+  };
+
+  // Use upsert to handle both insert and update cases
+  await db.insert(
+    'modules',
+    data,
+    conflictAlgorithm: ConflictAlgorithm.replace,
+  );
+
+  QuizzerLogger.logSuccess('Successfully upserted module $moduleName from inbound sync.');
 }

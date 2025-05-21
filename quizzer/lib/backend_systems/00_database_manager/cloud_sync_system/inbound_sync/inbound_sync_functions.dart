@@ -7,6 +7,7 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/question_answ
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_profile_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_question_answer_pairs_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_settings_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/modules_table.dart';
 
 /// Syncs question_answer_pairs from the cloud that are newer than last_login
 Future<void> syncQuestionAnswerPairsInbound(
@@ -192,6 +193,51 @@ Future<void> syncUserSettingsInbound(
   QuizzerLogger.logSuccess('Synced ${cloudRecords.length} user_settings from cloud for user $userId.');
 }
 
+/// Syncs modules from the cloud that are newer than the initial profile timestamp
+Future<void> syncModulesInbound(
+  String? initialTimestamp,
+  SupabaseClient supabaseClient,
+) async {
+  QuizzerLogger.logMessage('Syncing inbound modules since $initialTimestamp...');
+  
+  // Fetch records from 'modules' table in Supabase
+  // - newer than the initialTimestamp
+  final List<dynamic> cloudRecords = await supabaseClient
+      .from('modules')
+      .select('*')
+      .gt('last_modified_timestamp', initialTimestamp ?? DateTime(1970).toIso8601String());
+
+  if (cloudRecords.isEmpty) {
+    QuizzerLogger.logMessage('No new modules to sync.');
+    return;
+  }
+
+  QuizzerLogger.logMessage('Found ${cloudRecords.length} new/updated modules to sync.');
+  
+  final DatabaseMonitor monitor = getDatabaseMonitor();
+  Database? db = await monitor.requestDatabaseAccess();
+  if (db == null) {
+    QuizzerLogger.logError('syncModulesInbound: Failed to get database access.');
+    return;
+  }
+
+  for (final record in cloudRecords) {
+    if (record is Map<String, dynamic>) {
+      // Only sync the fields we store in Supabase
+      await upsertModuleFromInboundSync(
+        moduleName: record['module_name'],
+        description: record['description'],
+        db: db,
+      );
+    } else {
+      QuizzerLogger.logWarning('syncModulesInbound: Encountered a record not of type Map<String, dynamic>. Record: $record');
+    }
+  }
+  monitor.releaseDatabaseAccess();
+  
+  QuizzerLogger.logSuccess('Synced ${cloudRecords.length} modules from cloud.');
+}
+
 Future<void> runInitialInboundSync(SessionManager sessionManager) async {
   QuizzerLogger.logMessage('Starting initial inbound sync aggregator...');
   final String? userId = sessionManager.userId;
@@ -200,7 +246,6 @@ Future<void> runInitialInboundSync(SessionManager sessionManager) async {
   Database? db = await monitor.requestDatabaseAccess();
 
   // Get last_login timestamp using the imported helper
-  // lastLogin is used in the query, inbound sync will fetch all records newer than the last time this device logged in.
   final String? lastLogin = await getLastLoginForUser(userId!, db!);
   monitor.releaseDatabaseAccess();
   db = null;
@@ -233,6 +278,12 @@ Future<void> runInitialInboundSync(SessionManager sessionManager) async {
   // Sync user settings using the initial profile last_modified_timestamp
   await syncUserSettingsInbound(
     userId,
+    effectiveInitialTimestamp,
+    sessionManager.supabase,
+  );
+
+  // Sync modules using the initial profile last_modified_timestamp
+  await syncModulesInbound(
     effectiveInitialTimestamp,
     sessionManager.supabase,
   );
