@@ -32,20 +32,21 @@ class QuestionQueueCache {
   /// with the same question_id does not already exist in this cache.
   /// Asserts that the record contains a 'question_id'.
   /// Ensures thread safety using a lock.
-  Future<void> addRecord(Map<String, dynamic> record) async {
+  Future<bool> addRecord(Map<String, dynamic> record) async {
     // Assert required key exists
     assert(record.containsKey('question_id'), 'Record added to QuestionQueueCache must contain question_id');
 
-    await _lock.synchronized(() async {
-      
+    return await _lock.synchronized(() async {
       final bool wasEmpty = _cache.isEmpty;
-      _cache.add(record); // Directly add the record
-      
-      // Signal only when adding to an empty queue.
-      if (wasEmpty && _cache.isNotEmpty) { 
-         QuizzerLogger.logMessage("QuestionQueueCache: Added record ${record['question_id']} to empty queue.");
-         _removeController.add(null); 
+      final String questionId = record['question_id'];
+      final bool alreadyExists = _cache.any((r) => r['question_id'] == questionId);
+      if (alreadyExists) return false;
+      _cache.add(record);
+      if (wasEmpty && _cache.isNotEmpty) {
+        QuizzerLogger.logMessage("QuestionQueueCache: Added record $questionId to empty queue.");
+        _removeController.add(null);
       }
+      return true;
     });
   }
 

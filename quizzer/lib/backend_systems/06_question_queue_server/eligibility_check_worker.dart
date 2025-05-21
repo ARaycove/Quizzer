@@ -150,7 +150,6 @@ class EligibilityCheckWorker {
      QuizzerLogger.logMessage('EligibilityCheckWorker: Starting initial loop...');
      final Set<String> processedInCycle = {}; // Track IDs processed during initial loop
 
-     // Exhaust PastDueCache (CHANGED)
      QuizzerLogger.logMessage('Initial Loop: Processing PastDueCache...');
      Map<String, dynamic> record;
      do {

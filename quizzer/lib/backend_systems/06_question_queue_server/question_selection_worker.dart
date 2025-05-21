@@ -75,16 +75,27 @@ class PresentationSelectionWorker {
   // --- Initial Loop ---
   Future<void> _performInitialLoop() async {
     QuizzerLogger.logMessage('PSW: Starting initial loop...');
-    await _selectAndQueueQuestion(); // Attempt one selection/queue. Errors will propagate.
-    // QuizzerLogger.logMessage('PSW: Initial loop processing complete. Signaling completion.');
-    // Signal SessionManager (or other listeners) that initial loop is done.
-    if (!_initialLoopCompleteController.isClosed) {
-        _initialLoopCompleteController.add(null);
-    } else {
-        // QuizzerLogger.logWarning("PSW: Tried to signal initial loop complete, but controller was closed.");
+    final startTime = DateTime.now();
+    bool addedToQueue = false;
+    bool signaled = false;
+    do {
+      final bool added = await _selectAndQueueQuestion();
+      if (added) addedToQueue = true;
+      final elapsed = DateTime.now().difference(startTime).inMilliseconds;
+      if (!signaled && (addedToQueue || elapsed > 5000)) {
+        if (!_initialLoopCompleteController.isClosed) {
+          _initialLoopCompleteController.add(null);
+        }
+        signaled = true;
+      }
+      // If eligible cache is empty, break
+      final bool eligibleIsEmpty = await _eligibleCache.isEmpty();
+      if (eligibleIsEmpty) break;
+    } while (!signaled);
+    // If not signaled yet (e.g., eligible cache was empty from the start), signal now
+    if (!signaled && !_initialLoopCompleteController.isClosed) {
+      _initialLoopCompleteController.add(null);
     }
-    // If an error occurred in _selectAndQueueQuestion, this point might not be reached,
-    // and the stream event/error won't be sent, correctly adhering to Fail Fast.
   }
 
   // --- Subsequent Loop ---
@@ -164,15 +175,15 @@ class PresentationSelectionWorker {
   }
 
   // --- Core Selection and Queuing Logic ---
-  Future<void> _selectAndQueueQuestion() async {
+  Future<bool> _selectAndQueueQuestion() async {
     // QuizzerLogger.logMessage('PSW: Entering _selectAndQueueQuestion.');
-    if (!_isRunning) return;
+    if (!_isRunning) return false;
 
     final List<Map<String, dynamic>> eligibleQuestions = await _eligibleCache.peekAllRecords();
     // QuizzerLogger.logValue('PSW Select: Found ${eligibleQuestions.length} eligible questions.');
     if (eligibleQuestions.isEmpty) {
       // QuizzerLogger.logMessage('PSW Select: Eligible cache empty, returning.');
-      return; // Nothing to do
+      return false; // Nothing to do
     }
 
     // Call the adapted selection logic
@@ -188,7 +199,7 @@ class PresentationSelectionWorker {
       // This means the record was removed from EligibleCache between selection and this fetch.
       // Could be due to module deactivation flush, concurrent processing, etc.
       QuizzerLogger.logWarning('PSW Select: Record $questionId was not found in EligibleCache during get/remove (likely removed concurrently).');
-      return; // Cannot queue a record we couldn't fetch.
+      return false; // Cannot queue a record we couldn't fetch.
     }
     // QuizzerLogger.logSuccess('PSW Select: Successfully got and removed $questionId from EligibleCache.');
 
@@ -205,7 +216,7 @@ class PresentationSelectionWorker {
       _dbMonitor.releaseDatabaseAccess(); // Release lock before returning
       // If static details are missing, we probably shouldn't queue the user record either.
       // Returning to avoid putting potentially orphaned user record in queue without its details.
-      return;
+      return false;
     }
     
     // QuizzerLogger.logMessage('PSW Select: Adding static details for $questionId to TempQuestionDetailsCache...');
@@ -218,9 +229,9 @@ class PresentationSelectionWorker {
 
     // 3. Place it in queue
     // QuizzerLogger.logMessage('PSW Select: Adding fetched record $questionId to QueueCache...');
-    await _queueCache.addRecord(recordToQueue);
+    final bool added = await _queueCache.addRecord(recordToQueue);
     // QuizzerLogger.logSuccess('PSW Select: Successfully added $questionId to QueueCache.');
-
+    return added;
   }
 
   // --- Adapted Selection Logic (Database Access) ---

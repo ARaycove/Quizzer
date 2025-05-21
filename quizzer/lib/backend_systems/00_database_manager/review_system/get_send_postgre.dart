@@ -45,8 +45,8 @@ encodeValueForDB(dynamic value) {
 /// Other TEXT fields are returned as Strings. INTEGER, REAL, and NULL are returned directly.
 /// Does NOT automatically convert INTEGER back to boolean; callers must handle this based on context.
 decodeValueFromDB(dynamic dbValue) {
-  if (dbValue == null || dbValue is int || dbValue is double) {
-    return dbValue; // Return nulls, integers, and doubles directly
+  if (dbValue == null || dbValue is int || dbValue is double || dbValue is bool) {
+    return dbValue; // Return nulls, integers, doubles, and booleans directly
   } else if (dbValue is String) {
     // Trim whitespace before checking brackets/braces
     final trimmedValue = dbValue.trim();

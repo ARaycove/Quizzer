@@ -10,6 +10,7 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/question_answ
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart'; // For Supabase client
 import 'package:supabase/supabase.dart'; // For Supabase storage operations
 import 'package:sqflite/sqflite.dart'; // Added for Database type
+import 'package:path_provider/path_provider.dart'; // Add this import
 
 // ==========================================
 // Media Sync Worker (Image Sync)
@@ -35,7 +36,6 @@ class MediaSyncWorker {
   final DatabaseMonitor _dbMonitor = getDatabaseMonitor();
   final SwitchBoard _switchBoard = SwitchBoard();
   final String _supabaseBucketName = 'question-answer-pair-assets';
-  final String _localAssetBasePath = path.join('images', 'question_answer_pair_assets');
   // --------------------
 
   // --- Control Methods ---
@@ -133,13 +133,56 @@ class MediaSyncWorker {
   // --- Core Sync Logic --- 
   Future<void> _performSync() async {
     QuizzerLogger.logMessage('MediaSyncWorker: _performSync() called.');
-    // No try-catch here. Errors from _processUploads and _processDownloads will propagate.
-    
+    // Brute-force download all Supabase media files before selective sync
+    await _bruteForceDownloadAllSupabaseMedia();
     await _processUploads();
     if (!_isRunning) return; // Check if worker was stopped during uploads
     await _processDownloads();
     
     QuizzerLogger.logMessage('MediaSyncWorker: _performSync() finished.');
+  }
+
+  // Helper to get the writable asset base path
+  Future<String> _getLocalAssetBasePath() async {
+    final dir = await getApplicationDocumentsDirectory();
+    return path.join(dir.path, 'question_answer_pair_assets');
+  }
+
+  /// Brute-force download: Download every file in the Supabase bucket if not present locally
+  Future<void> _bruteForceDownloadAllSupabaseMedia() async {
+    QuizzerLogger.logMessage('MediaSyncWorker: Starting brute-force download of all Supabase media files.');
+    final supabase = getSessionManager().supabase;
+    const String bucketName = 'question-answer-pair-assets';
+    final String localAssetBasePath = await _getLocalAssetBasePath();
+
+    List<FileObject> files = [];
+    try {
+      files = await supabase.storage.from(bucketName).list();
+    } catch (e) {
+      QuizzerLogger.logError('MediaSyncWorker: Failed to list files in Supabase bucket: $e');
+      return;
+    }
+
+    for (final fileObj in files) {
+      final String fileName = fileObj.name;
+      final String localFilePath = path.join(localAssetBasePath, fileName);
+      final File localFile = File(localFilePath);
+
+      if (!await localFile.exists()) {
+        try {
+          QuizzerLogger.logMessage('MediaSyncWorker: Downloading $fileName from Supabase.');
+          final Uint8List bytes = await supabase.storage.from(bucketName).download(fileName);
+          await Directory(path.dirname(localFilePath)).create(recursive: true);
+          await localFile.writeAsBytes(bytes);
+          QuizzerLogger.logSuccess('MediaSyncWorker: Downloaded and saved $fileName.');
+        } catch (e) {
+          QuizzerLogger.logError('MediaSyncWorker: Failed to download $fileName: $e');
+        }
+      } else {
+        QuizzerLogger.logMessage('MediaSyncWorker: $fileName already exists locally, skipping.');
+      }
+    }
+    QuizzerLogger.logMessage('MediaSyncWorker: Brute-force download complete.');
   }
 
   Future<void> _processUploads() async {
@@ -163,7 +206,8 @@ class MediaSyncWorker {
     for (final record in filesToUpload) {
       if (!_isRunning) break;
       final String fileName = record['file_name'] as String;
-      final String localFilePath = path.join(_localAssetBasePath, fileName);
+      final String localAssetBasePath = await _getLocalAssetBasePath();
+      final String localFilePath = path.join(localAssetBasePath, fileName);
 
       try {
         final File localFile = File(localFilePath);
@@ -214,14 +258,15 @@ class MediaSyncWorker {
       QuizzerLogger.logMessage('MediaSyncWorker: No files found to download.');
       return;
     }
-    QuizzerLogger.logValue('MediaSyncWorker: Found ${filesToDownload.length} files to download.');
+    QuizzerLogger.logValue('MediaSyncWorker: Found \u001b[1m[0m[1m[0m[1m${filesToDownload.length}\u001b[0m files to download.');
 
     final supabase = getSessionManager().supabase;
+    final String localAssetBasePath = await _getLocalAssetBasePath();
 
     for (final record in filesToDownload) {
       if (!_isRunning) break;
       final String fileName = record['file_name'] as String;
-      final String localFilePath = path.join(_localAssetBasePath, fileName);
+      final String localFilePath = path.join(localAssetBasePath, fileName);
 
       try {
         QuizzerLogger.logMessage('MediaSyncWorker: Downloading $fileName from Supabase bucket $_supabaseBucketName.');

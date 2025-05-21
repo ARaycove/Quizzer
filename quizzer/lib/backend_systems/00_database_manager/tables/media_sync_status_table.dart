@@ -58,20 +58,26 @@ Future<bool> _checkFileExistsInSupabase(String fileNameWithExtension) async {
   final supabase = getSessionManager().supabase;
   const String bucketName = 'question-answer-pair-assets';
 
-
-  // Assuming files are at the root of the bucket for now.
+  // List the root of the bucket, not the file itself
   final List<FileObject> files = await supabase.storage
       .from(bucketName)
-      .list(path: fileNameWithExtension); // Use path parameter
+      .list(); // List all files at the root
 
-  // Check if the list is not empty AND if the name of the first found file matches exactly.
-  // This handles cases where `list(path: ...)` might return directory contents if `fileNameWithExtension` accidentally names a directory,
-  // or if it lists multiple items when only an exact file match is intended.
-  if (files.isNotEmpty && files.first.name == fileNameWithExtension) {
-    QuizzerLogger.logSuccess('File $fileNameWithExtension FOUND in Supabase bucket $bucketName (exact match).');
+  // Log all file names returned by the list operation
+  if (files.isNotEmpty) {
+    QuizzerLogger.logMessage('Supabase list() returned the following files: '
+      '${files.map((f) => f.name).join(', ')}');
+  } else {
+    QuizzerLogger.logMessage('Supabase list() returned no files in the bucket root');
+  }
+
+  // Search for an exact match in the returned files
+  final found = files.any((f) => f.name == fileNameWithExtension);
+  if (found) {
+    QuizzerLogger.logSuccess('File $fileNameWithExtension FOUND in Supabase bucket $bucketName (exact match in list).');
     return true;
   } else {
-    QuizzerLogger.logMessage('File $fileNameWithExtension NOT FOUND in Supabase bucket $bucketName (list did not return an exact match).');
+    QuizzerLogger.logMessage('File $fileNameWithExtension NOT FOUND in Supabase bucket $bucketName (not present in list).');
     return false;
   }
 }

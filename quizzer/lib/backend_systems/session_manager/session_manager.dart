@@ -352,9 +352,24 @@ class SessionManager {
     );
 
     if (response['success'] == true) {
-      await _initializeLogin(email); // initialize function spins up necessary background processes
-      // Once that's complete, request the first question
+      // Start initialization but do not await
+      _initializeLogin(email);
+      // Listen for the PresentationSelectionWorker initial loop complete signal
+      final psw = PresentationSelectionWorker();
+      await psw.onInitialLoopComplete.first;
+
       await requestNextQuestion();
+      // Wait up to 3 seconds for a real question (not dummy_no_questions)
+      final start = DateTime.now();
+      while (
+        (currentQuestionStaticData == null || currentQuestionId == 'dummy_no_questions') &&
+        DateTime.now().difference(start).inMilliseconds < 3000
+      ) {
+        await Future.delayed(const Duration(milliseconds: 50));
+        if (currentQuestionId == 'dummy_no_questions') {
+          await requestNextQuestion();
+        }
+      }
     }
 
     // Response information is for front-end UI, not necessary for backend

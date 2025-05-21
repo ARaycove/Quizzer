@@ -5,6 +5,10 @@ import 'table_helper.dart'; // Import the new helper file
 import 'package:quizzer/backend_systems/10_switch_board/switch_board.dart'; // Import SwitchBoard
 import 'package:quizzer/backend_systems/00_database_manager/tables/media_sync_status_table.dart'; // Added import
 import 'package:path/path.dart' as path; // Changed alias to path
+import 'package:quizzer/backend_systems/session_manager/session_manager.dart'; // For Supabase client
+import 'dart:typed_data';
+import 'dart:io';
+import 'package:path_provider/path_provider.dart'; // Add this import
 
 // Get SwitchBoard instance for signaling
 final SwitchBoard _switchBoard = SwitchBoard();
@@ -132,6 +136,33 @@ bool _checkCompletionStatus(String questionElements, String answerElements) {
 // =============================================================
 // Media Sync Helper functionality
 
+Future<String> _getLocalAssetBasePath() async {
+  final dir = await getApplicationDocumentsDirectory();
+  return path.join(dir.path, 'question_answer_pair_assets');
+}
+
+/// Helper to immediately fetch and download a media file from Supabase if not present locally
+Future<void> fetchAndDownloadMediaIfMissing(String fileName) async {
+  final String localAssetBasePath = await _getLocalAssetBasePath();
+  final String localPath = path.join(localAssetBasePath, fileName);
+  final File file = File(localPath);
+  if (await file.exists()) {
+    QuizzerLogger.logMessage('Media file already exists locally: $localPath');
+    return;
+  }
+  QuizzerLogger.logMessage('Media file missing locally, attempting to download: $fileName');
+  final supabase = getSessionManager().supabase;
+  const String bucketName = 'question-answer-pair-assets';
+  try {
+    final Uint8List bytes = await supabase.storage.from(bucketName).download(fileName);
+    await Directory(path.dirname(localPath)).create(recursive: true);
+    await file.writeAsBytes(bytes);
+    QuizzerLogger.logSuccess('Successfully downloaded and saved media file: $fileName');
+  } catch (e) {
+    QuizzerLogger.logError('Failed to download media file $fileName from Supabase: $e');
+  }
+}
+
 /// Processes a given question record to check for media, extract filenames if present,
 /// register those filenames in the media_sync_status table, and returns whether media was found.
 Future<bool> hasMediaCheck(Database db, Map<String, dynamic> questionRecord) async {
@@ -140,21 +171,21 @@ Future<bool> hasMediaCheck(Database db, Map<String, dynamic> questionRecord) asy
   QuizzerLogger.logMessage('Processing media for question record $loggingContextSuffix');
 
   // Check for media using the existing internal helper
-  // It needs to check relevant fields from the record like question_elements, answer_elements, options etc.
-  // We assume the entire record might contain media, so we pass the whole record.
-  // If only specific fields contain media, _internalHasMediaCheck might need to be called on those specific fields.
-  // For now, passing the whole record to _internalHasMediaCheck which recursively searches.
   final bool mediaFound = _internalHasMediaCheck(questionRecord);
 
   if (mediaFound) {
     QuizzerLogger.logMessage('Media found in record $loggingContextSuffix. Extracting filenames.');
-    // Extract filenames - again, pass the whole record or specific fields if known.
     final Set<String> filenames = _extractMediaFilenames(questionRecord);
 
     if (filenames.isNotEmpty) {
-      QuizzerLogger.logMessage('Extracted ${filenames.length} filenames for $loggingContextSuffix. Registering them.');
-      await registerMediaFiles(db, filenames, qidForLogging: recordQuestionId);
+      QuizzerLogger.logMessage('Extracted [1m${filenames.length}[0m filenames for $loggingContextSuffix. Downloading if missing.');
+      for (final filename in filenames) {
+        await fetchAndDownloadMediaIfMissing(filename);
+      }
+      // Signal the MediaSyncWorker after downloads
+      _switchBoard.signalMediaSyncStatusProcessed();
     } else {
+      _switchBoard.signalMediaSyncStatusProcessed();
       QuizzerLogger.logWarning('Media was indicated as found for $loggingContextSuffix, but no filenames were extracted. This might indicate an issue with _extractMediaFilenames or the data structure.');
     }
   } else {

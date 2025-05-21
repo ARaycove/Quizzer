@@ -156,32 +156,36 @@ class PreProcessWorker {
     QuizzerLogger.logMessage('Initial Loop: Processing records from UnprocessedCache...');
 
     Map<String, dynamic> recordToProcess;
+    int processedCount = 0;
+    bool startedWorkers = false;
+    bool processedPastDue = false;
     do {
-       if (!_isRunning) break; // Check running status within the loop
-       recordToProcess = await _unprocessedCache.getAndRemoveOldestRecord();
-       if (recordToProcess.isNotEmpty) {
-         await _processRecord(recordToProcess);
-       }
+      if (!_isRunning) break;
+      recordToProcess = await _unprocessedCache.getAndRemoveOldestRecord();
+      if (recordToProcess.isNotEmpty) {
+        final String cacheName = await _processRecord(recordToProcess);
+        processedCount++;
+        if (cacheName == 'PastDueCache') processedPastDue = true;
+        if (!startedWorkers && (processedCount >= 100 || processedPastDue)) {
+          QuizzerLogger.logMessage('PreProcessWorker: Early start of downstream workers after $processedCount records or PastDueCache.');
+          final inactiveWorker = InactiveModuleWorker();
+          inactiveWorker.start();
+          final eligibilityWorker = EligibilityCheckWorker();
+          eligibilityWorker.start();
+          startedWorkers = true;
+        }
+      }
     } while (recordToProcess.isNotEmpty);
     QuizzerLogger.logSuccess('Initial Loop: Finished processing initial records.');
 
-    // --- Start Inactive Module Worker ---
-    QuizzerLogger.logMessage('PreProcessWorker: Starting Inactive Module Worker...');
-    final inactiveWorker = InactiveModuleWorker(); // Get singleton instance
-    inactiveWorker.start();
-
-    // --- Start Queue Cache Removal Worker (REMOVED) ---
-    /*
-    QuizzerLogger.logMessage('PreProcessWorker: Starting Queue Cache Removal Worker...');
-    final queueRemovalWorker = QueueCacheRemovalWorker(); // Get singleton instance
-    queueRemovalWorker.start();
-    */
-
-    // --- Start Eligibility Worker --- 
-    QuizzerLogger.logMessage('PreProcessWorker: Starting Eligibility Check Worker...');
-    final eligibilityWorker = EligibilityCheckWorker(); // Get singleton instance
-    eligibilityWorker.start(); // Start the next worker
-
+    if (!startedWorkers) {
+      QuizzerLogger.logMessage('PreProcessWorker: Starting Inactive Module Worker (end of initial loop)...');
+      final inactiveWorker = InactiveModuleWorker();
+      inactiveWorker.start();
+      QuizzerLogger.logMessage('PreProcessWorker: Starting Eligibility Check Worker (end of initial loop)...');
+      final eligibilityWorker = EligibilityCheckWorker();
+      eligibilityWorker.start();
+    }
     QuizzerLogger.logSuccess('PreProcessWorker: Initial loop completed and Eligibility Worker started.');
   }
 
@@ -217,11 +221,11 @@ class PreProcessWorker {
   }
 
   // --- Record Processing Logic ---
-  Future<void> _processRecord(Map<String, dynamic> record) async {
+  Future<String> _processRecord(Map<String, dynamic> record) async {
     // Check if stopped right at the beginning
     if (!_isRunning) {
       await _unprocessedCache.addRecord(record);
-      return;
+      return 'UnprocessedCache';
     }
 
     assert(_sessionManager.userId != null, "Current User ID cannot be null for processing.");
@@ -241,10 +245,9 @@ class PreProcessWorker {
 
     // Check if stopped during DB access OR if DB access failed
     if (!_isRunning || db == null) {
-      // Log removed
       _dbMonitor.releaseDatabaseAccess(); 
       await _unprocessedCache.addRecord(record);
-      return;
+      return 'UnprocessedCache';
     }
 
     // Use try-catch ONLY around the specific call that might fail due to missing static data
@@ -256,7 +259,7 @@ class PreProcessWorker {
           'PreProcessWorker: Failed to get module name for QID $questionId (likely missing static data in question_answer_pairs). Discarding user record. Error: $e\nStackTrace: $s');
       // Release the lock and discard the record by returning
       _dbMonitor.releaseDatabaseAccess(); 
-      return; // Exit processing for this record
+      return 'UnprocessedCache';
     }
 
     // If getModuleNameForQuestionId succeeded, proceed to get activation status
@@ -270,7 +273,7 @@ class PreProcessWorker {
     // Check if stopped AFTER DB operations but BEFORE routing
     if (!_isRunning) {
       await _unprocessedCache.addRecord(record);
-      return;
+      return 'UnprocessedCache';
     }
 
     // --- Routing Logic ---
@@ -296,7 +299,7 @@ class PreProcessWorker {
       // Check stop signal again *after* adding ID but *before* adding full record
       if (!_isRunning) {
           await _unprocessedCache.addRecord(record);
-          return;
+          return 'UnprocessedCache';
       }
       // Now determine final destination (updated logic)
       final now = DateTime.now(); // Need current time for past due check
@@ -315,7 +318,7 @@ class PreProcessWorker {
     // Check if stopped right before the final add operation
     if (!_isRunning) {
         await _unprocessedCache.addRecord(record);
-        return;
+        return 'UnprocessedCache';
     }
 
     // Log the routing decision just before the operation
@@ -323,6 +326,7 @@ class PreProcessWorker {
     
     // Perform the actual add to the destination cache
     await routeToAdd; 
+    return destinationCacheName;
   }
 
   // --- Helper for DB Access ---

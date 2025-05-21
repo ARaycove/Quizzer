@@ -214,7 +214,7 @@ Future<Map<String, dynamic>?> getModule(String name, Database db) async {
   final decodedModule = results.first;
 
   // Manually handle type conversions not covered by the generic decoder
-  // Specifically: Convert integer timestamps to DateTime
+  // Specifically: Handle creation_date as string (UTC ISO8601)
   final Map<String, dynamic> finalResult = {
     moduleNameField: decodedModule[moduleNameField],
     descriptionField: decodedModule[descriptionField],
@@ -222,7 +222,7 @@ Future<Map<String, dynamic>?> getModule(String name, Database db) async {
     subjectsField: decodedModule[subjectsField], // Already decoded to List<String> or similar by helper
     relatedConceptsField: decodedModule[relatedConceptsField], // Already decoded
     questionIdsField: decodedModule[questionIdsField], // Already decoded
-    creationDateField: DateTime.fromMillisecondsSinceEpoch(decodedModule[creationDateField] as int),
+    creationDateField: decodedModule[creationDateField], // Keep as string, no conversion needed
     creatorIdField: decodedModule[creatorIdField],
     totalQuestionsField: decodedModule[totalQuestionsField],
   };
@@ -243,7 +243,7 @@ Future<List<Map<String, dynamic>>> getAllModules(Database db) async {
     // No WHERE clause needed to get all
   );
 
-  // Process the decoded results to perform final type conversions (like int timestamps to DateTime)
+  // Process the decoded results to perform final type conversions
   final List<Map<String, dynamic>> finalResults = [];
   for (final decodedModule in decodedModules) {
       // Basic check for essential fields
@@ -261,7 +261,7 @@ Future<List<Map<String, dynamic>>> getAllModules(Database db) async {
         subjectsField: decodedModule[subjectsField],
         relatedConceptsField: decodedModule[relatedConceptsField],
         questionIdsField: decodedModule[questionIdsField],
-        creationDateField: DateTime.fromMillisecondsSinceEpoch(decodedModule[creationDateField] as int),
+        creationDateField: decodedModule[creationDateField], // Keep as string, no conversion needed
         creatorIdField: decodedModule[creatorIdField],
         totalQuestionsField: decodedModule[totalQuestionsField],
       };

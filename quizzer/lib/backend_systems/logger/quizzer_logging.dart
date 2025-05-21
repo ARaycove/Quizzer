@@ -17,6 +17,7 @@
 import 'dart:io';
 import 'package:logging/logging.dart';
 import 'package:path/path.dart' as p; // Import path package for basename
+import 'package:path_provider/path_provider.dart'; // Add this import
 
 // Log levels enum for type safety
 enum LogLevel {
@@ -122,9 +123,18 @@ class QuizzerLogger {
   }
   // -------------------------------------
 
+  // --- Helper to Get App Directory ---
+  static Future<String> _getAppDirectory() async {
+    if (Platform.isAndroid) {
+      final appDir = await getApplicationDocumentsDirectory();
+      return appDir.path;
+    }
+    return _logDir;
+  }
+
   // Configure the root logger (call this from main.dart)
-  static void setupLogging({Level level = Level.INFO}) {
-    Logger.root.level = level; // Set desired log level
+  static Future<void> setupLogging({Level level = Level.INFO}) async {
+    Logger.root.level = level;
     Logger.root.onRecord.listen((record) {
       // Custom formatting matching the old style
       String levelColor;
@@ -175,19 +185,21 @@ class QuizzerLogger {
     logMessage('QuizzerLogger initialized with level: ${level.name}'); 
 
     // --- File Setup --- 
-    final String logFilePath = p.join(_logDir, _logFileName);
+    final String baseDir = await _getAppDirectory();
+    final String logFilePath = p.join(baseDir, _logFileName);
+    
     // Ensure directory exists
-    final Directory dir = Directory(_logDir);
+    final Directory dir = Directory(baseDir);
     if (!dir.existsSync()) {
-      print('Quizzer: Creating log directory: $_logDir'); // Use print before logger is fully ready
+      print('Quizzer: Creating log directory: $baseDir');
       dir.createSync(recursive: true);
     }
-    // Open file sink in write mode (overwrites existing file)
-    // Errors opening file will now crash (Fail Fast)
+    
+    // Open file sink in write mode
     _logFileSink = File(logFilePath).openWrite(mode: FileMode.write);
     print('Quizzer: Logging to file: $logFilePath');
     
-    logMessage('QuizzerLogger initialized with level: ${level.name}. Logging to: $logFilePath'); 
+    logMessage('QuizzerLogger initialized with level: ${level.name}. Logging to: $logFilePath');
   }
 
   // Logging functions using the standard logger
