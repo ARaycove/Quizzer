@@ -77,7 +77,6 @@ flutter:
   assets:
     - images/quizzer_assets/
     - images/question_answer_pair_assets/
-    - images/input_staging/
     - runtime_cache/models/
     - runtime_cache/sqlite/
     - runtime_cache/subject_data/
