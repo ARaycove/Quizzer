@@ -264,6 +264,10 @@ class SessionManager {
     final inboundSyncWorker = InboundSyncWorker();
     await inboundSyncWorker.start();
     QuizzerLogger.logMessage('SessionManager: InboundSyncWorker started and initial sync completed.');
+    
+    // Build module records after inbound sync completes
+    await buildModuleRecords();
+    QuizzerLogger.logMessage('SessionManager: Module records built after inbound sync.');
       
     // --- Start new background processing pipeline --- 
     final PreProcessWorker preProcessWorker = PreProcessWorker();
