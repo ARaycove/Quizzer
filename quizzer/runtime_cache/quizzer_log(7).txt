@@ -1,0 +1,154 @@
+Quizzer: [12:42:17] [34m[INFO][0m [<asynchronous suspension>] QuizzerLogger successfully set up file logging to: C:\Users\Aaron\AppData\Roaming\com.example\quizzer\QuizzerAppLogs\quizzer_log.txt
+Quizzer: [12:42:29] [34m[INFO][0m [login_page.dart] Login attempt for: aacra0820@gmail.com
+Quizzer: [12:42:29] [34m[INFO][0m [session_manager.dart] Logging in user with email: aacra0820@gmail.com
+Quizzer: [12:42:29] [34m[INFO][0m [user_auth.dart] User authentication requested for aacra0820@gmail.com
+Quizzer: [12:42:29] [34m[INFO][0m [user_auth.dart] Attempting Supabase authentication for aacra0820@gmail.com
+Quizzer: [12:42:29] [34m[INFO][0m [user_auth.dart] Attempting Supabase authentication
+Quizzer: [12:42:30] [36m[DEBUG][0m Saving session
+Quizzer: [12:42:30] [34m[INFO][0m [user_auth.dart] SUCCESS: Supabase authentication successful for aacra0820@gmail.com
+Quizzer: [12:42:30] [36m[DEBUG][0m [session_helper.dart] Access Token: [REDACTED]
+Quizzer: [12:42:30] [36m[DEBUG][0m [session_helper.dart] Decoded JWT Token Payload (Redacted): {aal: aal1, amr: [{method: password, timestamp: 1747939342}], app_metadata: {provider: email, providers: [email]}, aud: authenticated, email: [REDACTED], exp: 1747942942, iat: 1747939342, is_anonymous: false, iss: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, phone: , role: authenticated, session_id: [REDACTED], sub: [REDACTED], user_metadata: [REDACTED], user_role: admin}
+Quizzer: [12:42:30] [36m[DEBUG][0m [session_helper.dart] User role determined from JWT: admin
+Quizzer: [12:42:30] [34m[INFO][0m [user_auth.dart] Handling successful Supabase login for aacra0820@gmail.com
+Quizzer: [12:42:30] [34m[INFO][0m [user_auth.dart] Stored last login (2025-05-22T18:42:22.795301548Z) and token for aacra0820@gmail.com
+Quizzer: [12:42:30] [34m[INFO][0m [user_auth.dart] Ensuring local profile exists for aacra0820@gmail.com
+Quizzer: [12:42:30] [34m[INFO][0m [database_native.dart] Using sqflite FFI factory (Desktop)
+Quizzer: [12:42:30] [34m[INFO][0m [database_native.dart] Desktop SQLite directory ensured: C:\Users\Aaron\AppData\Roaming\com.example\quizzer\QuizzerApp\sqlite
+Quizzer: [12:42:30] [34m[INFO][0m [database_native.dart] Target Database path: C:\Users\Aaron\AppData\Roaming\com.example\quizzer\QuizzerApp\sqlite\quizzer.db
+Quizzer: [12:42:30] [34m[INFO][0m [database_native.dart] Database not found at target path. Copying from assets...
+Quizzer: [12:42:30] [31m[ERROR][0m [database_native.dart] Error copying database from assets: Unable to load asset: "runtime_cache/sqlite/quizzer.db".
+The asset does not exist or has empty data.
+Quizzer: [12:42:30] [31m[ERROR][0m [global_error_handler.dart] CRITICAL ERROR REPORTED TO UI: Unhandled Flutter error caught by PlatformDispatcher
+Error: Unable to load asset: "runtime_cache/sqlite/quizzer.db".
+The asset does not exist or has empty data.
+StackTrace: #0      PlatformAssetBundle.load.<anonymous closure> (package:flutter/src/services/asset_bundle.dart:333:13)
+<asynchronous suspension>
+#1      initializeDatabase (package:quizzer/backend_systems/00_database_manager/platform/database_native.dart:52:23)
+<asynchronous suspension>
+#2      initDb (package:quizzer/backend_systems/00_database_manager/quizzer_database.dart:20:15)
+<asynchronous suspension>
+#3      getDatabaseForMonitor (package:quizzer/backend_systems/00_database_manager/quizzer_database.dart:27:17)
+<asynchronous suspension>
+#4      _ensureLocalProfileExists (package:quizzer/backend_systems/02_login_authentication/user_auth.dart:112:10)
+<asynchronous suspension>
+#5      userAuth (package:quizzer/backend_systems/02_login_authentication/user_auth.dart:163:5)
+<asynchronous suspension>
+#6      SessionManager.attemptLogin (package:quizzer/backend_systems/session_manager/session_manager.dart:350:22)
+<asynchronous suspension>
+#7      _LoginPageState.submitLogin (package:quizzer/UI_systems/00_login_page/login_page.dart:63:36)
+<asynchronous suspension>
+
+Quizzer: [12:42:30] [34m[INFO][0m [main.dart] _QuizzerAppState: Received critical error notification. Current error: null, New error: CriticalErrorDetails(message: Unhandled Flutter error caught by PlatformDispatcher, error: Unable to load asset: "runtime_cache/sqlite/quizzer.db".
+The asset does not exist or has empty data., stackTrace: #0      PlatformAssetBundle.load.<anonymous closure> (package:flutter/src/services/asset_bundle.dart:333:13)
+<asynchronous suspension>
+#1      initializeDatabase (package:quizzer/backend_systems/00_database_manager/platform/database_native.dart:52:23)
+<asynchronous suspension>
+#2      initDb (package:quizzer/backend_systems/00_database_manager/quizzer_database.dart:20:15)
+<asynchronous suspension>
+#3      getDatabaseForMonitor (package:quizzer/backend_systems/00_database_manager/quizzer_database.dart:27:17)
+<asynchronous suspension>
+#4      _ensureLocalProfileExists (package:quizzer/backend_systems/02_login_authentication/user_auth.dart:112:10)
+<asynchronous suspension>
+#5      userAuth (package:quizzer/backend_systems/02_login_authentication/user_auth.dart:163:5)
+<asynchronous suspension>
+#6      SessionManager.attemptLogin (package:quizzer/backend_systems/session_manager/session_manager.dart:350:22)
+<asynchronous suspension>
+#7      _LoginPageState.submitLogin (package:quizzer/UI_systems/00_login_page/login_page.dart:63:36)
+<asynchronous suspension>
+)
+Quizzer: [12:42:30] [34m[INFO][0m [main.dart] _QuizzerAppState: setState completed. _criticalError is now: CriticalErrorDetails(message: Unhandled Flutter error caught by PlatformDispatcher, error: Unable to load asset: "runtime_cache/sqlite/quizzer.db".
+The asset does not exist or has empty data., stackTrace: #0      PlatformAssetBundle.load.<anonymous closure> (package:flutter/src/services/asset_bundle.dart:333:13)
+<asynchronous suspension>
+#1      initializeDatabase (package:quizzer/backend_systems/00_database_manager/platform/database_native.dart:52:23)
+<asynchronous suspension>
+#2      initDb (package:quizzer/backend_systems/00_database_manager/quizzer_database.dart:20:15)
+<asynchronous suspension>
+#3      getDatabaseForMonitor (package:quizzer/backend_systems/00_database_manager/quizzer_database.dart:27:17)
+<asynchronous suspension>
+#4      _ensureLocalProfileExists (package:quizzer/backend_systems/02_login_authentication/user_auth.dart:112:10)
+<asynchronous suspension>
+#5      userAuth (package:quizzer/backend_systems/02_login_authentication/user_auth.dart:163:5)
+<asynchronous suspension>
+#6      SessionManager.attemptLogin (package:quizzer/backend_systems/session_manager/session_manager.dart:350:22)
+<asynchronous suspension>
+#7      _LoginPageState.submitLogin (package:quizzer/UI_systems/00_login_page/login_page.dart:63:36)
+<asynchronous suspension>
+)
+Quizzer: [12:42:30] [34m[INFO][0m [main.dart] _QuizzerAppState: Navigation to /critical_error attempted.
+Quizzer: [12:42:30] [33m[WARNING][0m [main.dart] _QuizzerAppState: BUILD CALLED. _criticalError is: Unhandled Flutter error caught by PlatformDispatcher
+Quizzer: [12:42:30] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Auto-reporting initial error.
+Quizzer: [12:42:30] [34m[INFO][0m [database_native.dart] Using sqflite FFI factory (Desktop)
+Quizzer: [12:42:30] [34m[INFO][0m [database_native.dart] Desktop SQLite directory ensured: C:\Users\Aaron\AppData\Roaming\com.example\quizzer\QuizzerApp\sqlite
+Quizzer: [12:42:30] [34m[INFO][0m [database_native.dart] Target Database path: C:\Users\Aaron\AppData\Roaming\com.example\quizzer\QuizzerApp\sqlite\quizzer.db
+Quizzer: [12:42:30] [34m[INFO][0m [database_native.dart] Database not found at target path. Copying from assets...
+Quizzer: [12:42:30] [31m[ERROR][0m [database_native.dart] Error copying database from assets: Unable to load asset: "runtime_cache/sqlite/quizzer.db".
+The asset does not exist or has empty data.
+Quizzer: [12:42:30] [31m[ERROR][0m [global_error_handler.dart] CRITICAL ERROR REPORTED TO UI: Unhandled error caught by runZonedGuarded
+Error: Unable to load asset: "runtime_cache/sqlite/quizzer.db".
+The asset does not exist or has empty data.
+StackTrace: #0      PlatformAssetBundle.load.<anonymous closure> (package:flutter/src/services/asset_bundle.dart:333:13)
+#1      _rootRunUnary (dart:async/zone.dart:1538:47)
+#2      _CustomZone.runUnary (dart:async/zone.dart:1429:19)
+<asynchronous suspension>
+#3      initializeDatabase (package:quizzer/backend_systems/00_database_manager/platform/database_native.dart:52:23)
+<asynchronous suspension>
+#4      initDb (package:quizzer/backend_systems/00_database_manager/quizzer_database.dart:20:15)
+<asynchronous suspension>
+#5      getDatabaseForMonitor (package:quizzer/backend_systems/00_database_manager/quizzer_database.dart:27:17)
+<asynchronous suspension>
+#6      SessionManager.reportError (package:quizzer/backend_systems/session_manager/session_manager.dart:1204:26)
+<asynchronous suspension>
+#7      _CriticalErrorScreenState._autoReportInitialError (package:quizzer/UI_systems/07_critical_error_page/critical_error_screen.dart:69:15)
+<asynchronous suspension>
+
+Quizzer: [12:42:30] [34m[INFO][0m [main.dart] _QuizzerAppState: Received critical error notification. Current error: CriticalErrorDetails(message: Unhandled Flutter error caught by PlatformDispatcher, error: Unable to load asset: "runtime_cache/sqlite/quizzer.db".
+The asset does not exist or has empty data., stackTrace: #0      PlatformAssetBundle.load.<anonymous closure> (package:flutter/src/services/asset_bundle.dart:333:13)
+<asynchronous suspension>
+#1      initializeDatabase (package:quizzer/backend_systems/00_database_manager/platform/database_native.dart:52:23)
+<asynchronous suspension>
+#2      initDb (package:quizzer/backend_systems/00_database_manager/quizzer_database.dart:20:15)
+<asynchronous suspension>
+#3      getDatabaseForMonitor (package:quizzer/backend_systems/00_database_manager/quizzer_database.dart:27:17)
+<asynchronous suspension>
+#4      _ensureLocalProfileExists (package:quizzer/backend_systems/02_login_authentication/user_auth.dart:112:10)
+<asynchronous suspension>
+#5      userAuth (package:quizzer/backend_systems/02_login_authentication/user_auth.dart:163:5)
+<asynchronous suspension>
+#6      SessionManager.attemptLogin (package:quizzer/backend_systems/session_manager/session_manager.dart:350:22)
+<asynchronous suspension>
+#7      _LoginPageState.submitLogin (package:quizzer/UI_systems/00_login_page/login_page.dart:63:36)
+<asynchronous suspension>
+), New error: CriticalErrorDetails(message: Unhandled error caught by runZonedGuarded, error: Unable to load asset: "runtime_cache/sqlite/quizzer.db".
+The asset does not exist or has empty data., stackTrace: #0      PlatformAssetBundle.load.<anonymous closure> (package:flutter/src/services/asset_bundle.dart:333:13)
+#1      _rootRunUnary (dart:async/zone.dart:1538:47)
+#2      _CustomZone.runUnary (dart:async/zone.dart:1429:19)
+<asynchronous suspension>
+#3      initializeDatabase (package:quizzer/backend_systems/00_database_manager/platform/database_native.dart:52:23)
+<asynchronous suspension>
+#4      initDb (package:quizzer/backend_systems/00_database_manager/quizzer_database.dart:20:15)
+<asynchronous suspension>
+#5      getDatabaseForMonitor (package:quizzer/backend_systems/00_database_manager/quizzer_database.dart:27:17)
+<asynchronous suspension>
+#6      SessionManager.reportError (package:quizzer/backend_systems/session_manager/session_manager.dart:1204:26)
+<asynchronous suspension>
+#7      _CriticalErrorScreenState._autoReportInitialError (package:quizzer/UI_systems/07_critical_error_page/critical_error_screen.dart:69:15)
+<asynchronous suspension>
+)
+Quizzer: [12:42:30] [34m[INFO][0m [main.dart] _QuizzerAppState: setState completed. _criticalError is now: CriticalErrorDetails(message: Unhandled error caught by runZonedGuarded, error: Unable to load asset: "runtime_cache/sqlite/quizzer.db".
+The asset does not exist or has empty data., stackTrace: #0      PlatformAssetBundle.load.<anonymous closure> (package:flutter/src/services/asset_bundle.dart:333:13)
+#1      _rootRunUnary (dart:async/zone.dart:1538:47)
+#2      _CustomZone.runUnary (dart:async/zone.dart:1429:19)
+<asynchronous suspension>
+#3      initializeDatabase (package:quizzer/backend_systems/00_database_manager/platform/database_native.dart:52:23)
+<asynchronous suspension>
+#4      initDb (package:quizzer/backend_systems/00_database_manager/quizzer_database.dart:20:15)
+<asynchronous suspension>
+#5      getDatabaseForMonitor (package:quizzer/backend_systems/00_database_manager/quizzer_database.dart:27:17)
+<asynchronous suspension>
+#6      SessionManager.reportError (package:quizzer/backend_systems/session_manager/session_manager.dart:1204:26)
+<asynchronous suspension>
+#7      _CriticalErrorScreenState._autoReportInitialError (package:quizzer/UI_systems/07_critical_error_page/critical_error_screen.dart:69:15)
+<asynchronous suspension>
+)
+Quizzer: [12:42:30] [34m[INFO][0m [main.dart] _QuizzerAppState: Navigation to /critical_error attempted.
+Quizzer: [12:42:30] [33m[WARNING][0m [main.dart] _QuizzerAppState: BUILD CALLED. _criticalError is: Unhandled error caught by runZonedGuarded

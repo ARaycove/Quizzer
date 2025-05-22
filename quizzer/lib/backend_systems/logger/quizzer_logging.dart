@@ -151,7 +151,7 @@ class QuizzerLogger {
   // Configure the root logger (call this from main.dart)
   static Future<void> setupLogging({Level level = Level.INFO}) async {
     Logger.root.level = level;
-    Logger.root.onRecord.listen((record) async {
+    Logger.root.onRecord.listen((record) { // No longer async
       // Custom formatting matching the old style
       String levelColor;
       String levelName = record.level.name;
@@ -217,6 +217,11 @@ class QuizzerLogger {
       // Add a success log specifically for sink opening, which will also go to console via print.
       print('Quizzer: Successfully opened log file sink for: $logFilePath');
       logMessage('QuizzerLogger successfully set up file logging to: $logFilePath');
+
+      // Test with a second immediate log message
+      if (_logFileSink != null) { 
+        logMessage('QuizzerLogger: Attempting a SECOND test log message to file.'); 
+      }
 
     } catch (e, s) {
       // If any error occurs during file setup, print to console and ensure _logFileSink is null.
