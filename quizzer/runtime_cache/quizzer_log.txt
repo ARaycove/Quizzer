@@ -537,3 +537,32 @@ Quizzer: [09:34:50] [34m[INFO][0m [menu_page.dart] Feedback & Bug Reports butt
 Quizzer: [09:34:50] [34m[INFO][0m [menu_page.dart] Feedback & Bug Reports button pressed
 Quizzer: [09:34:50] [34m[INFO][0m [menu_page.dart] Feedback & Bug Reports button pressed
 Quizzer: [09:37:46] [34m[INFO][0m [display_modules_page.dart] Initializing Display Modules Page
+Quizzer: [10:19:06] [36m[DEBUG][0m [home_page.dart] HomePage building question type: multiple_choice with key: [<'dummy_no_questions'>] (using session data)
+Quizzer: [10:19:07] [36m[DEBUG][0m [session_helper.dart] Access Token: [REDACTED]
+Quizzer: [10:19:07] [36m[DEBUG][0m [session_helper.dart] Decoded JWT Token Payload (Redacted): {aal: aal1, amr: [{method: password, timestamp: 1747846096}], app_metadata: {provider: email, providers: [email]}, aud: authenticated, email: [REDACTED], exp: 1747931666, iat: 1747928066, is_anonymous: false, iss: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, phone: , role: authenticated, session_id: [REDACTED], sub: [REDACTED], user_metadata: [REDACTED], user_role: admin}
+Quizzer: [10:19:07] [36m[DEBUG][0m [session_helper.dart] User role determined from JWT: admin
+Quizzer: [10:19:07] [36m[DEBUG][0m [menu_page.dart] Building MenuPage for user role: admin
+Quizzer: [10:19:08] [34m[INFO][0m [session_manager.dart] Stopping background workers...
+Quizzer: [10:19:08] [34m[INFO][0m [question_selection_worker.dart] PresentationSelectionWorker stopping...
+Quizzer: [10:19:08] [34m[INFO][0m [question_selection_worker.dart] PresentationSelectionWorker stopped.
+Quizzer: [10:19:08] [34m[INFO][0m [menu_page.dart] Session state reset for logout
+Quizzer: [10:19:08] [34m[INFO][0m [media_sync_worker.dart] Entering MediaSyncWorker stop()...
+Quizzer: [10:19:08] [34m[INFO][0m [media_sync_worker.dart] MediaSyncWorker: Unsubscribing from onMediaSyncStatusProcessed stream.
+Quizzer: [10:19:08] [34m[INFO][0m [media_sync_worker.dart] MediaSyncWorker: Stop signal sent. Waiting for loop to finish...
+Quizzer: [10:19:08] [34m[INFO][0m [switch_board.dart] SwitchBoard: Signaling Media Sync Status Processed.
+Quizzer: [10:19:08] [34m[INFO][0m [media_sync_worker.dart] MediaSyncWorker loop finished.
+Quizzer: [10:19:08] [34m[INFO][0m [media_sync_worker.dart] MediaSyncWorker stopped and loop finished.
+Quizzer: [10:19:08] [34m[INFO][0m [session_manager.dart] SUCCESS: Background workers stopped.
+Quizzer: [10:19:08] [34m[INFO][0m [session_manager.dart] Clearing data caches...
+Quizzer: [10:19:08] [34m[INFO][0m [session_manager.dart] SUCCESS: Data caches cleared (Placeholder - Clear methods TBD).
+Quizzer: [10:19:08] [34m[INFO][0m [session_manager.dart] Disposing SwitchBoard
+Quizzer: [10:19:08] [34m[INFO][0m [session_manager.dart] Updating total study time for user 77647c42-c888-47e3-8296-6fc452815810...
+Quizzer: [10:19:09] [34m[INFO][0m [session_manager.dart] SUCCESS: Total study time updated.
+Quizzer: [10:19:09] [34m[INFO][0m [session_manager.dart] Signing out from Supabase...
+Quizzer: [10:19:09] [34m[INFO][0m Signing out user with scope: SignOutScope.local
+Quizzer: [10:19:09] [36m[DEBUG][0m Removing session
+Quizzer: [10:19:09] [34m[INFO][0m [session_manager.dart] SUCCESS: Supabase sign out successful.
+Quizzer: [10:19:09] [34m[INFO][0m [session_manager.dart] Clearing local session token...
+Quizzer: [10:19:09] [34m[INFO][0m [session_manager.dart] SUCCESS: Local session token cleared.
+Quizzer: [10:19:09] [34m[INFO][0m [session_manager.dart] Clearing session state...
+Quizzer: [10:19:09] [34m[INFO][0m [session_manager.dart] SUCCESS: Session state cleared.

@@ -4,6 +4,7 @@ import 'package:sqflite/sqflite.dart';
 import 'dart:io';
 import 'package:flutter/services.dart' show ByteData, rootBundle;
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
+import 'package:path_provider/path_provider.dart';
 
 /// Initializes the database for native platforms (mobile and desktop)
 Future<Database> initializeDatabase() async {
@@ -17,13 +18,15 @@ Future<Database> initializeDatabase() async {
     factory = ffi.databaseFactoryFfi;
     QuizzerLogger.logMessage("Using sqflite FFI factory (Desktop)");
     
-    // Define *target* path within runtime_cache for desktop
-    String dbDirectoryPath = join(Directory.current.path, 'runtime_cache', 'sqlite');
+    // Get the application support directory
+    final Directory appSupportDir = await getApplicationSupportDirectory();
+    // Define *target* path within the application support directory
+    String dbDirectoryPath = join(appSupportDir.path, 'QuizzerApp', 'sqlite');
     targetPath = join(dbDirectoryPath, 'quizzer.db');
     
     // Ensure the *target* database directory exists (needed for both copy and direct open)
     // If this fails, the app should crash (Fail Fast)
-    Directory(dbDirectoryPath).createSync(recursive: true);
+    await Directory(dbDirectoryPath).create(recursive: true);
     QuizzerLogger.logMessage('Desktop SQLite directory ensured: $dbDirectoryPath');
 
   } else {
