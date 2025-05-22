@@ -9,6 +9,64 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/user_question
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_settings_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/modules_table.dart';
 import 'dart:io'; // For SocketException
+import 'dart:async'; // For Future.delayed
+
+Future<T> executeSupabaseCallWithRetry<T>(
+  Future<T> Function() supabaseCall, {
+  int maxRetries = 3,
+  Duration initialDelay = const Duration(seconds: 2), // Increased initial delay
+  String? logContext,
+}) async {
+  int attempt = 0;
+  Duration delay = initialDelay;
+
+  while (attempt < maxRetries) {
+    try {
+      return await supabaseCall();
+    } on SocketException catch (e, s) {
+      attempt++;
+      String context = logContext ?? 'Supabase call';
+      QuizzerLogger.logWarning('$context: SocketException (Attempt $attempt/$maxRetries). Retrying in ${delay.inSeconds}s... Error: $e');
+      if (attempt >= maxRetries) {
+        QuizzerLogger.logError('$context: SocketException after $maxRetries attempts. Error: $e, Stack: $s');
+        rethrow;
+      }
+      await Future.delayed(delay);
+      delay *= 2; // Exponential backoff
+    } on PostgrestException catch (e, s) {
+      attempt++;
+      String context = logContext ?? 'Supabase call';
+      // Only retry on network-related or server-side issues (e.g., 5xx errors or connection errors)
+      // Do not retry on 4xx client errors like RLS violations, not found, bad request etc.
+      bool isRetriable = e.code == null || // Some connection errors might not have a code
+                         (e.code != null && e.code!.startsWith('5')) || // Server errors
+                         e.message.toLowerCase().contains('failed host lookup') ||
+                         e.message.toLowerCase().contains('connection timed out') ||
+                         e.message.toLowerCase().contains('connection closed') ||
+                         e.message.toLowerCase().contains('network is unreachable');
+
+      if (isRetriable) {
+        QuizzerLogger.logWarning('$context: Retriable PostgrestException (Attempt $attempt/$maxRetries). Code: ${e.code}, Message: ${e.message}. Retrying in ${delay.inSeconds}s...');
+        if (attempt >= maxRetries) {
+          QuizzerLogger.logError('$context: PostgrestException after $maxRetries attempts. Error: ${e.message}, Code: ${e.code}, Stack: $s');
+          rethrow;
+        }
+        await Future.delayed(delay);
+        delay *= 2;
+      } else {
+        QuizzerLogger.logError('$context: Non-retriable PostgrestException. Code: ${e.code}, Message: ${e.message}, Stack: $s');
+        rethrow; // Do not retry for non-retriable errors
+      }
+    } catch (e, s) {
+      // For other unexpected errors, log and rethrow immediately without retrying.
+      String context = logContext ?? 'Supabase call';
+      QuizzerLogger.logError('$context: Unexpected error during Supabase call. Error: $e, Stack: $s');
+      rethrow;
+    }
+  }
+  // This should be unreachable if maxRetries > 0
+  throw StateError('${logContext ?? "executeSupabaseCallWithRetry"}: Max retries reached, but no error was rethrown.');
+}
 
 /// Syncs question_answer_pairs from the cloud that are newer than last_login
 Future<void> syncQuestionAnswerPairsInbound(
@@ -182,15 +240,16 @@ Future<void> syncUserSettingsInbound(
 ) async {
   QuizzerLogger.logMessage('Syncing inbound user_settings for user $userId since $initialTimestamp...');
 
-  // Fetch records from 'user_settings' table in Supabase
-  // - belonging to the current userId
-  // - newer than the initialTimestamp (user_profile's last_modified_timestamp at login)
   try {
-    final List<dynamic> cloudRecords = await supabaseClient
-        .from('user_settings') // Target table
-        .select('*') // Select all columns
-        .eq('user_id', userId) // Filter by user_id
-        .gt('last_modified_timestamp', initialTimestamp ?? DateTime(1970).toIso8601String()); // Filter by timestamp
+    final List<dynamic> cloudRecords = await executeSupabaseCallWithRetry(
+      () => supabaseClient
+          .from('user_settings') // Target table
+          .select('*') // Select all columns
+          .eq('user_id', userId) // Filter by user_id
+          .gt('last_modified_timestamp', initialTimestamp ?? DateTime(1970).toIso8601String()) // Filter by timestamp
+          .then((response) => List<dynamic>.from(response as List)),
+      logContext: 'syncUserSettingsInbound: Fetching for user $userId',
+    );
 
     if (cloudRecords.isEmpty) {
       QuizzerLogger.logMessage('No new user_settings to sync for user $userId.');
@@ -218,9 +277,9 @@ Future<void> syncUserSettingsInbound(
   
     QuizzerLogger.logSuccess('Synced ${cloudRecords.length} user_settings from cloud for user $userId.');
   } on PostgrestException catch (e, s) {
-    QuizzerLogger.logError('syncUserSettingsInbound: PostgrestException for user $userId. Error: ${e.message}, Stack: $s');
+    QuizzerLogger.logError('syncUserSettingsInbound: PostgrestException (potentially non-retriable or after retries) for user $userId. Error: ${e.message}, Stack: $s');
   } on SocketException catch (e, s) {
-    QuizzerLogger.logError('syncUserSettingsInbound: SocketException for user $userId. Error: $e, Stack: $s');
+    QuizzerLogger.logError('syncUserSettingsInbound: SocketException (after retries) for user $userId. Error: $e, Stack: $s');
   } catch (e, s) {
     QuizzerLogger.logError('syncUserSettingsInbound: Unexpected error for user $userId. Error: $e, Stack: $s');
   }
@@ -233,13 +292,15 @@ Future<void> syncModulesInbound(
 ) async {
   QuizzerLogger.logMessage('Syncing inbound modules since $initialTimestamp...');
   
-  // Fetch records from 'modules' table in Supabase
-  // - newer than the initialTimestamp
   try {
-    final List<dynamic> cloudRecords = await supabaseClient
-        .from('modules')
-        .select('*')
-        .gt('last_modified_timestamp', initialTimestamp ?? DateTime(1970).toIso8601String());
+    final List<dynamic> cloudRecords = await executeSupabaseCallWithRetry(
+      () => supabaseClient
+          .from('modules')
+          .select('*')
+          .gt('last_modified_timestamp', initialTimestamp ?? DateTime(1970).toIso8601String())
+          .then((response) => List<dynamic>.from(response as List)),
+      logContext: 'syncModulesInbound: Fetching modules',
+    );
 
     if (cloudRecords.isEmpty) {
       QuizzerLogger.logMessage('No new modules to sync.');
@@ -271,9 +332,9 @@ Future<void> syncModulesInbound(
   
     QuizzerLogger.logSuccess('Synced ${cloudRecords.length} modules from cloud.');
   } on PostgrestException catch (e, s) {
-    QuizzerLogger.logError('syncModulesInbound: PostgrestException. Error: ${e.message}, Stack: $s');
+    QuizzerLogger.logError('syncModulesInbound: PostgrestException (potentially non-retriable or after retries). Error: ${e.message}, Stack: $s');
   } on SocketException catch (e, s) {
-    QuizzerLogger.logError('syncModulesInbound: SocketException. Error: $e, Stack: $s');
+    QuizzerLogger.logError('syncModulesInbound: SocketException (after retries). Error: $e, Stack: $s');
   } catch (e, s) {
     QuizzerLogger.logError('syncModulesInbound: Unexpected error. Error: $e, Stack: $s');
   }
