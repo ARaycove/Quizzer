@@ -105,3 +105,66 @@ Quizzer: [10:48:21] [36m[DEBUG][0m [home_page.dart] HomePage building question
 Quizzer: [10:48:21] [34m[INFO][0m [question_queue_cache.dart] QuestionQueueCache: Added record 2025-05-04T17:01:17.389791_77647c42-c888-47e3-8296-6fc452815810 to empty queue.
 Quizzer: [10:56:39] [33m[WARNING][0m [main.dart] _QuizzerAppState: BUILD CALLED. _criticalError is: null
 Quizzer: [10:56:39] [36m[DEBUG][0m [home_page.dart] HomePage building question type: multiple_choice with key: [<'2025-05-04T16:58:21.693925_77647c42-c888-47e3-8296-6fc452815810'>] (using session data)
+Quizzer: [11:47:45] [36m[DEBUG][0m Refresh access token
+Quizzer: [11:47:45] [36m[DEBUG][0m Attempt 1 to refresh token
+Quizzer: [11:47:46] [36m[DEBUG][0m Saving session
+Quizzer: [12:47:05] [36m[DEBUG][0m Refresh access token
+Quizzer: [12:47:05] [36m[DEBUG][0m Attempt 1 to refresh token
+Quizzer: [12:47:05] [36m[DEBUG][0m Saving session
+Quizzer: [13:46:25] [36m[DEBUG][0m Refresh access token
+Quizzer: [13:46:25] [36m[DEBUG][0m Attempt 1 to refresh token
+Quizzer: [13:46:26] [36m[DEBUG][0m Saving session
+Quizzer: [14:45:45] [36m[DEBUG][0m Refresh access token
+Quizzer: [14:45:45] [36m[DEBUG][0m Attempt 1 to refresh token
+Quizzer: [14:45:46] [36m[DEBUG][0m Saving session
+Quizzer: [15:45:15] [36m[DEBUG][0m Refresh access token
+Quizzer: [15:45:15] [36m[DEBUG][0m Attempt 1 to refresh token
+Quizzer: [15:45:16] [36m[DEBUG][0m Saving session
+Quizzer: [16:44:35] [36m[DEBUG][0m Refresh access token
+Quizzer: [16:44:35] [36m[DEBUG][0m Attempt 1 to refresh token
+Quizzer: [16:44:36] [36m[DEBUG][0m Saving session
+Quizzer: [17:44:05] [36m[DEBUG][0m Refresh access token
+Quizzer: [17:44:05] [36m[DEBUG][0m Attempt 1 to refresh token
+Quizzer: [17:44:06] [36m[DEBUG][0m Saving session
+Quizzer: [18:43:35] [36m[DEBUG][0m Refresh access token
+Quizzer: [18:43:35] [36m[DEBUG][0m Attempt 1 to refresh token
+Quizzer: [18:43:36] [36m[DEBUG][0m Saving session
+Quizzer: [19:42:55] [36m[DEBUG][0m Refresh access token
+Quizzer: [19:42:55] [36m[DEBUG][0m Attempt 1 to refresh token
+Quizzer: [19:42:56] [36m[DEBUG][0m Saving session
+Quizzer: [20:42:15] [36m[DEBUG][0m Refresh access token
+Quizzer: [20:42:15] [36m[DEBUG][0m Attempt 1 to refresh token
+Quizzer: [20:42:15] [36m[DEBUG][0m Saving session
+Quizzer: [21:41:35] [36m[DEBUG][0m Refresh access token
+Quizzer: [21:41:35] [36m[DEBUG][0m Attempt 1 to refresh token
+Quizzer: [21:41:36] [36m[DEBUG][0m Saving session
+Quizzer: [22:41:05] [36m[DEBUG][0m Refresh access token
+Quizzer: [22:41:05] [36m[DEBUG][0m Attempt 1 to refresh token
+Quizzer: [22:41:06] [36m[DEBUG][0m Saving session
+Quizzer: [23:40:25] [36m[DEBUG][0m Refresh access token
+Quizzer: [23:40:25] [36m[DEBUG][0m Attempt 1 to refresh token
+Quizzer: [23:40:26] [36m[DEBUG][0m Saving session
+Quizzer: [00:39:55] [36m[DEBUG][0m Refresh access token
+Quizzer: [00:39:55] [36m[DEBUG][0m Attempt 1 to refresh token
+Quizzer: [00:39:56] [36m[DEBUG][0m Saving session
+Quizzer: [01:39:15] [36m[DEBUG][0m Refresh access token
+Quizzer: [01:39:15] [36m[DEBUG][0m Attempt 1 to refresh token
+Quizzer: [01:39:16] [36m[DEBUG][0m Saving session
+Quizzer: [02:38:45] [36m[DEBUG][0m Refresh access token
+Quizzer: [02:38:45] [36m[DEBUG][0m Attempt 1 to refresh token
+Quizzer: [02:38:46] [36m[DEBUG][0m Saving session
+Quizzer: [03:38:05] [36m[DEBUG][0m Refresh access token
+Quizzer: [03:38:05] [36m[DEBUG][0m Attempt 1 to refresh token
+Quizzer: [03:38:06] [36m[DEBUG][0m Saving session
+Quizzer: [04:37:25] [36m[DEBUG][0m Refresh access token
+Quizzer: [04:37:25] [36m[DEBUG][0m Attempt 1 to refresh token
+Quizzer: [04:37:26] [36m[DEBUG][0m Saving session
+Quizzer: [05:36:55] [36m[DEBUG][0m Refresh access token
+Quizzer: [05:36:55] [36m[DEBUG][0m Attempt 1 to refresh token
+Quizzer: [05:36:55] [36m[DEBUG][0m Saving session
+Quizzer: [06:36:15] [36m[DEBUG][0m Refresh access token
+Quizzer: [06:36:15] [36m[DEBUG][0m Attempt 1 to refresh token
+Quizzer: [06:36:16] [36m[DEBUG][0m Saving session
+Quizzer: [07:35:35] [36m[DEBUG][0m Refresh access token
+Quizzer: [07:35:35] [36m[DEBUG][0m Attempt 1 to refresh token
+Quizzer: [07:35:36] [36m[DEBUG][0m Saving session

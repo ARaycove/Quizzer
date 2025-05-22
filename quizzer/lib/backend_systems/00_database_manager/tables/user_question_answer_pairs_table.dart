@@ -111,7 +111,8 @@ Future<int> addUserQuestionAnswerPair({
     final SwitchBoard switchBoard = getSwitchBoard();
     switchBoard.signalOutboundSyncNeeded();
   } else {
-    QuizzerLogger.logWarning('Insert operation for user_question_answer_pair (User: $userUuid, Q: $questionAnswerReference) returned $result.');
+    QuizzerLogger.logError('Insert operation for user_question_answer_pair (User: $userUuid, Q: $questionAnswerReference) returned $result.');
+    throw StateError('Failed to insert user_question_answer_pair for User: $userUuid, Q: $questionAnswerReference');
   }
   return result; 
 }
@@ -171,7 +172,8 @@ Future<int> editUserQuestionAnswerPair({
     final SwitchBoard switchBoard = getSwitchBoard();
     switchBoard.signalOutboundSyncNeeded();
   } else {
-    QuizzerLogger.logWarning('Update operation for user_question_answer_pair (User: $userUuid, Q: $questionId) affected 0 rows. Record might not exist.');
+    QuizzerLogger.logError('Update operation for user_question_answer_pair (User: $userUuid, Q: $questionId) affected 0 rows. Record might not exist.');
+    throw StateError('Failed to update user_question_answer_pair for User: $userUuid, Q: $questionId');
   }
   return result;
 }

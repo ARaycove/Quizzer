@@ -129,15 +129,14 @@ class OutboundSyncWorker {
     await syncLoginAttempts(db!);
     _dbMonitor.releaseDatabaseAccess();
 
-    // 4. Check and sync Question Answer Attempt Data
-    db = await _getDbAccess();
-    await syncQuestionAnswerAttempts(db!);
-    _dbMonitor.releaseDatabaseAccess();
-
-
-    // 5. Check and sync User Profile Data
+    // 4. Check and sync User Profile Data
     db = await _getDbAccess();
     await syncUserProfiles(db!);
+    _dbMonitor.releaseDatabaseAccess();
+
+    // 5. Check and sync Question Answer Attempt Data
+    db = await _getDbAccess();
+    await syncQuestionAnswerAttempts(db!);
     _dbMonitor.releaseDatabaseAccess();
     
     // 6. Check and Sync UserQuestionAnswerPairs

@@ -46,7 +46,7 @@ class QuizzerLogger {
     "outbound_sync_worker.dart",
     "widget_multiple_choice_question.dart",
     "database_monitor.dart",
-    "question_answer_pairs_table.dart",
+    // "question_answer_pairs_table.dart",
     "login_attempts_table.dart",
     "login_attempts_record.dart",
     // "session_manager.dart",

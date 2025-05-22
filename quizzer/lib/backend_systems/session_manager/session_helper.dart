@@ -193,20 +193,18 @@ Map<String, dynamic> updateUserQuestionRecordOnAnswer({
   return updatedRecord;
 }
 
-// --- Helper to Determine User Role from Supabase Session Object ---
 /// Extracts the 'user_role' claim from the Supabase session object by decoding the JWT.
 ///
 /// Returns 'public_user_unverified' if the session or access token is null/empty,
 /// or if the role claim is null/empty after successful JWT decoding.
-/// Throws an error if JWT decoding itself fails.
-String determineUserRoleFromSupabaseSession(Session? supabaseSession) {
-  if (supabaseSession == null || supabaseSession.accessToken.isEmpty) {
-    QuizzerLogger.logWarning('Supabase session or access token is null/empty, defaulting role to "public_user_unverified".');
-    return 'public_user_unverified'; 
+String determineUserRoleFromSupabaseSession(Session? session) {
+  if (session == null || session.accessToken.isEmpty) {
+    QuizzerLogger.logWarning('No valid session or access token found, defaulting to "public_user_unverified".');
+    return 'public_user_unverified';
   }
 
   // Directly attempt to decode. Errors during parsing will propagate.
-  Map<String, dynamic> decodedToken = Jwt.parseJwt(supabaseSession.accessToken);
+  Map<String, dynamic> decodedToken = Jwt.parseJwt(session.accessToken);
   
   // --- LOG REDACTED TOKEN PAYLOAD FOR DEBUGGING ---
   // QuizzerLogger.logValue("$supabaseSession"); // Avoid logging entire session object

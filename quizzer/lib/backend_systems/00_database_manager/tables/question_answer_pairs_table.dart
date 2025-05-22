@@ -178,7 +178,7 @@ Future<bool> hasMediaCheck(Database db, Map<String, dynamic> questionRecord) asy
     final Set<String> filenames = _extractMediaFilenames(questionRecord);
 
     if (filenames.isNotEmpty) {
-      QuizzerLogger.logMessage('Extracted [1m${filenames.length}[0m filenames for $loggingContextSuffix. Downloading if missing.');
+      QuizzerLogger.logMessage('Extracted ${filenames.length} filenames for $loggingContextSuffix. Downloading if missing.');
       for (final filename in filenames) {
         await fetchAndDownloadMediaIfMissing(filename);
       }

@@ -6,6 +6,7 @@ import 'package:path/path.dart' as path; // Changed alias to path
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart'; // For Supabase client
 import 'package:supabase/supabase.dart'; // Changed to base supabase package for FileObject and SearchOptions
 import 'package:quizzer/backend_systems/10_switch_board/switch_board.dart'; // Added import for SwitchBoard
+import 'package:path_provider/path_provider.dart'; // Added for getApplicationDocumentsDirectory
 
 // ==========================================
 // Media Sync Status Table
@@ -44,8 +45,8 @@ Future<void> verifyMediaSyncStatusTable(Database db) async {
 
 // Helper function to check if a file exists locally in the designated path
 Future<bool> _checkFileExistsLocally(String fileNameWithExtension) async {
-  // Construct the relative path platform-agnostically
-  final String localPath = path.join('images', 'question_answer_pair_assets', fileNameWithExtension);
+  final dir = await getApplicationDocumentsDirectory();
+  final String localPath = path.join(dir.path, 'question_answer_pair_assets', fileNameWithExtension);
   final File file = File(localPath);
   final bool exists = await file.exists();
   QuizzerLogger.logMessage('Local file check for $localPath: ${exists ? "Exists" : "Does not exist"}');
