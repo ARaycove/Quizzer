@@ -8,6 +8,7 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_question_answer_pairs_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_settings_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/modules_table.dart';
+import 'dart:io'; // For SocketException
 
 /// Syncs question_answer_pairs from the cloud that are newer than last_login
 Future<void> syncQuestionAnswerPairsInbound(
@@ -16,25 +17,33 @@ Future<void> syncQuestionAnswerPairsInbound(
   SupabaseClient supabaseClient,
 ) async {
   QuizzerLogger.logMessage('Syncing inbound question_answer_pairs for user $userId since $lastLogin...');
-  final List<dynamic> cloudRecords = await supabaseClient
-      .from('question_answer_pairs')
-      .select('*')
-      .gt('last_modified_timestamp', lastLogin);
+  try {
+    final List<dynamic> cloudRecords = await supabaseClient
+        .from('question_answer_pairs')
+        .select('*')
+        .gt('last_modified_timestamp', lastLogin);
 
-  if (cloudRecords.isEmpty) {
-    QuizzerLogger.logMessage('No new question_answer_pairs to sync.');
-    return;
-  }
+    if (cloudRecords.isEmpty) {
+      QuizzerLogger.logMessage('No new question_answer_pairs to sync.');
+      return;
+    }
 
-  QuizzerLogger.logMessage('Found ${cloudRecords.length} new/updated question_answer_pairs to sync.');
-  final DatabaseMonitor monitor = getDatabaseMonitor();
-  Database? db = await monitor.requestDatabaseAccess();
-  for (final record in cloudRecords) {
-    // Insert or update each record
-    await insertOrUpdateQuestionAnswerPair(record, db!);
+    QuizzerLogger.logMessage('Found ${cloudRecords.length} new/updated question_answer_pairs to sync.');
+    final DatabaseMonitor monitor = getDatabaseMonitor();
+    Database? db = await monitor.requestDatabaseAccess();
+    for (final record in cloudRecords) {
+      // Insert or update each record
+      await insertOrUpdateQuestionAnswerPair(record, db!);
+    }
+    monitor.releaseDatabaseAccess();
+    QuizzerLogger.logSuccess('Synced ${cloudRecords.length} question_answer_pairs from cloud.');
+  } on PostgrestException catch (e, s) {
+    QuizzerLogger.logError('syncQuestionAnswerPairsInbound: PostgrestException for user $userId. Error: ${e.message}, Stack: $s');
+  } on SocketException catch (e, s) {
+    QuizzerLogger.logError('syncQuestionAnswerPairsInbound: SocketException for user $userId. Error: $e, Stack: $s');
+  } catch (e, s) {
+    QuizzerLogger.logError('syncQuestionAnswerPairsInbound: Unexpected error for user $userId. Error: $e, Stack: $s');
   }
-  monitor.releaseDatabaseAccess();
-  QuizzerLogger.logSuccess('Synced ${cloudRecords.length} question_answer_pairs from cloud.');
 }
 
 /// Syncs user_question_answer_pairs from the cloud that are newer than the initial profile timestamp
@@ -46,36 +55,44 @@ Future<void> syncUserQuestionAnswerPairsInbound(
   QuizzerLogger.logMessage('Syncing inbound user_question_answer_pairs for user $userId since $initialTimestamp...');
   
   // If no initial timestamp, fetch all records for this user
-  final List<dynamic> cloudRecords = await supabaseClient
-      .from('user_question_answer_pairs')
-      .select('*')
-      .eq('user_uuid', userId)
-      .gt('last_modified_timestamp', initialTimestamp ?? '');
+  try {
+    final List<dynamic> cloudRecords = await supabaseClient
+        .from('user_question_answer_pairs')
+        .select('*')
+        .eq('user_uuid', userId)
+        .gt('last_modified_timestamp', initialTimestamp ?? '');
 
-  if (cloudRecords.isEmpty) {
-    QuizzerLogger.logMessage('No new user_question_answer_pairs to sync.');
-    return;
-  }
+    if (cloudRecords.isEmpty) {
+      QuizzerLogger.logMessage('No new user_question_answer_pairs to sync.');
+      return;
+    }
 
-  QuizzerLogger.logMessage('Found ${cloudRecords.length} new/updated user_question_answer_pairs to sync.');
-  final DatabaseMonitor monitor = getDatabaseMonitor();
-  Database? db = await monitor.requestDatabaseAccess();
-  for (final record in cloudRecords) {
-    // Insert or update each record, explicitly converting numeric values to doubles
-    await insertOrUpdateUserQuestionAnswerPair(
-      userUuid: userId,
-      questionId: record['question_id'],
-      revisionStreak: record['revision_streak'],
-      lastRevised: record['last_revised'],
-      predictedRevisionDueHistory: record['predicted_revision_due_history'],
-      nextRevisionDue: record['next_revision_due'],
-      timeBetweenRevisions: (record['time_between_revisions'] as num).toDouble(),
-      averageTimesShownPerDay: (record['average_times_shown_per_day'] as num).toDouble(),
-      db: db!,
-    );
+    QuizzerLogger.logMessage('Found ${cloudRecords.length} new/updated user_question_answer_pairs to sync.');
+    final DatabaseMonitor monitor = getDatabaseMonitor();
+    Database? db = await monitor.requestDatabaseAccess();
+    for (final record in cloudRecords) {
+      // Insert or update each record, explicitly converting numeric values to doubles
+      await insertOrUpdateUserQuestionAnswerPair(
+        userUuid: userId,
+        questionId: record['question_id'],
+        revisionStreak: record['revision_streak'],
+        lastRevised: record['last_revised'],
+        predictedRevisionDueHistory: record['predicted_revision_due_history'],
+        nextRevisionDue: record['next_revision_due'],
+        timeBetweenRevisions: (record['time_between_revisions'] as num).toDouble(),
+        averageTimesShownPerDay: (record['average_times_shown_per_day'] as num).toDouble(),
+        db: db!,
+      );
+    }
+    monitor.releaseDatabaseAccess();
+    QuizzerLogger.logSuccess('Synced ${cloudRecords.length} user_question_answer_pairs from cloud.');
+  } on PostgrestException catch (e, s) {
+    QuizzerLogger.logError('syncUserQuestionAnswerPairsInbound: PostgrestException for user $userId. Error: ${e.message}, Stack: $s');
+  } on SocketException catch (e, s) {
+    QuizzerLogger.logError('syncUserQuestionAnswerPairsInbound: SocketException for user $userId. Error: $e, Stack: $s');
+  } catch (e, s) {
+    QuizzerLogger.logError('syncUserQuestionAnswerPairsInbound: Unexpected error for user $userId. Error: $e, Stack: $s');
   }
-  monitor.releaseDatabaseAccess();
-  QuizzerLogger.logSuccess('Synced ${cloudRecords.length} user_question_answer_pairs from cloud.');
 }
 
 /// Syncs user profile from the cloud that is newer than the initial profile timestamp
@@ -87,66 +104,74 @@ Future<void> syncUserProfileInbound(
   QuizzerLogger.logMessage('Syncing inbound user profile for user $userId since $initialTimestamp...');
   
   // If no initial timestamp, fetch the profile
-  final List<dynamic> cloudRecords = await supabaseClient
-      .from('user_profile')
-      .select('*')
-      .eq('uuid', userId)
-      .gt('last_modified_timestamp', initialTimestamp ?? '');
+  try {
+    final List<dynamic> cloudRecords = await supabaseClient
+        .from('user_profile')
+        .select('*')
+        .eq('uuid', userId)
+        .gt('last_modified_timestamp', initialTimestamp ?? '');
 
-  if (cloudRecords.isEmpty) {
-    QuizzerLogger.logMessage('No new user profile to sync.');
-    return;
+    if (cloudRecords.isEmpty) {
+      QuizzerLogger.logMessage('No new user profile to sync.');
+      return;
+    }
+
+    QuizzerLogger.logMessage('Found updated user profile to sync.');
+    final record = cloudRecords.first; // Should only be one record per user
+
+    final DatabaseMonitor monitor = getDatabaseMonitor();
+    Database? db = await monitor.requestDatabaseAccess();
+    // Update the local profile (no encoding)
+    await db!.update(
+      'user_profile',
+      {
+        'email': record['email'],
+        'username': record['username'],
+        'role': record['role'],
+        'account_status': record['account_status'],
+        'profile_picture': record['profile_picture'],
+        'birth_date': record['birth_date'],
+        'address': record['address'],
+        'job_title': record['job_title'],
+        'education_level': record['education_level'],
+        'specialization': record['specialization'],
+        'teaching_experience': record['teaching_experience'],
+        'primary_language': record['primary_language'],
+        'secondary_languages': record['secondary_languages'],
+        'study_schedule': record['study_schedule'],
+        'social_links': record['social_links'],
+        'achievement_sharing': record['achievement_sharing'],
+        'interest_data': record['interest_data'],
+        'settings': record['settings'],
+        'notification_preferences': record['notification_preferences'],
+        'learning_streak': record['learning_streak'],
+        'total_study_time': record['total_study_time'],
+        'total_questions_answered': record['total_questions_answered'],
+        'average_session_length': record['average_session_length'],
+        'peak_cognitive_hours': record['peak_cognitive_hours'],
+        'health_data': record['health_data'],
+        'recall_accuracy_trends': record['recall_accuracy_trends'],
+        'content_portfolio': record['content_portfolio'],
+        'activation_status_of_modules': record['activation_status_of_modules'],
+        'completion_status_of_modules': record['completion_status_of_modules'],
+        'tutorial_progress': record['tutorial_progress'],
+        'has_been_synced': 1,
+        'edits_are_synced': 1,
+        'last_modified_timestamp': record['last_modified_timestamp'],
+      },
+      where: 'uuid = ?',
+      whereArgs: [userId],
+    );
+    monitor.releaseDatabaseAccess();
+
+    QuizzerLogger.logSuccess('Synced user profile from cloud.');
+  } on PostgrestException catch (e, s) {
+    QuizzerLogger.logError('syncUserProfileInbound: PostgrestException while fetching user profile for $userId. Error: ${e.message}, Stack: $s');
+  } on SocketException catch (e, s) {
+    QuizzerLogger.logError('syncUserProfileInbound: SocketException while fetching user profile for $userId. Error: $e, Stack: $s');
+  } catch (e, s) {
+    QuizzerLogger.logError('syncUserProfileInbound: Unexpected error while fetching user profile for $userId. Error: $e, Stack: $s');
   }
-
-  QuizzerLogger.logMessage('Found updated user profile to sync.');
-  final record = cloudRecords.first; // Should only be one record per user
-
-  final DatabaseMonitor monitor = getDatabaseMonitor();
-  Database? db = await monitor.requestDatabaseAccess();
-  // Update the local profile (no encoding)
-  await db!.update(
-    'user_profile',
-    {
-      'email': record['email'],
-      'username': record['username'],
-      'role': record['role'],
-      'account_status': record['account_status'],
-      'profile_picture': record['profile_picture'],
-      'birth_date': record['birth_date'],
-      'address': record['address'],
-      'job_title': record['job_title'],
-      'education_level': record['education_level'],
-      'specialization': record['specialization'],
-      'teaching_experience': record['teaching_experience'],
-      'primary_language': record['primary_language'],
-      'secondary_languages': record['secondary_languages'],
-      'study_schedule': record['study_schedule'],
-      'social_links': record['social_links'],
-      'achievement_sharing': record['achievement_sharing'],
-      'interest_data': record['interest_data'],
-      'settings': record['settings'],
-      'notification_preferences': record['notification_preferences'],
-      'learning_streak': record['learning_streak'],
-      'total_study_time': record['total_study_time'],
-      'total_questions_answered': record['total_questions_answered'],
-      'average_session_length': record['average_session_length'],
-      'peak_cognitive_hours': record['peak_cognitive_hours'],
-      'health_data': record['health_data'],
-      'recall_accuracy_trends': record['recall_accuracy_trends'],
-      'content_portfolio': record['content_portfolio'],
-      'activation_status_of_modules': record['activation_status_of_modules'],
-      'completion_status_of_modules': record['completion_status_of_modules'],
-      'tutorial_progress': record['tutorial_progress'],
-      'has_been_synced': 1,
-      'edits_are_synced': 1,
-      'last_modified_timestamp': record['last_modified_timestamp'],
-    },
-    where: 'uuid = ?',
-    whereArgs: [userId],
-  );
-  monitor.releaseDatabaseAccess();
-
-  QuizzerLogger.logSuccess('Synced user profile from cloud.');
 }
 
 /// Syncs user settings from the cloud that are newer than the initial profile timestamp for the user.
@@ -160,37 +185,45 @@ Future<void> syncUserSettingsInbound(
   // Fetch records from 'user_settings' table in Supabase
   // - belonging to the current userId
   // - newer than the initialTimestamp (user_profile's last_modified_timestamp at login)
-  final List<dynamic> cloudRecords = await supabaseClient
-      .from('user_settings') // Target table
-      .select('*') // Select all columns
-      .eq('user_id', userId) // Filter by user_id
-      .gt('last_modified_timestamp', initialTimestamp ?? DateTime(1970).toIso8601String()); // Filter by timestamp
+  try {
+    final List<dynamic> cloudRecords = await supabaseClient
+        .from('user_settings') // Target table
+        .select('*') // Select all columns
+        .eq('user_id', userId) // Filter by user_id
+        .gt('last_modified_timestamp', initialTimestamp ?? DateTime(1970).toIso8601String()); // Filter by timestamp
 
-  if (cloudRecords.isEmpty) {
-    QuizzerLogger.logMessage('No new user_settings to sync for user $userId.');
-    return;
-  }
-
-  QuizzerLogger.logMessage('Found ${cloudRecords.length} new/updated user_settings to sync for user $userId.');
-  
-  final DatabaseMonitor monitor = getDatabaseMonitor();
-  Database? db = await monitor.requestDatabaseAccess();
-  if (db == null) {
-    QuizzerLogger.logError('syncUserSettingsInbound: Failed to get database access.');
-    return; // Cannot proceed without DB
-  }
-
-  for (final record in cloudRecords) {
-    if (record is Map<String, dynamic>) {
-      // Use the new function from user_settings_table.dart
-      await upsertFromSupabase(record, db);
-    } else {
-      QuizzerLogger.logWarning('syncUserSettingsInbound: Encountered a record not of type Map<String, dynamic>. Record: $record');
+    if (cloudRecords.isEmpty) {
+      QuizzerLogger.logMessage('No new user_settings to sync for user $userId.');
+      return;
     }
-  }
-  monitor.releaseDatabaseAccess(); // Ensure DB access is released after the loop
+
+    QuizzerLogger.logMessage('Found ${cloudRecords.length} new/updated user_settings to sync for user $userId.');
   
-  QuizzerLogger.logSuccess('Synced ${cloudRecords.length} user_settings from cloud for user $userId.');
+    final DatabaseMonitor monitor = getDatabaseMonitor();
+    Database? db = await monitor.requestDatabaseAccess();
+    if (db == null) {
+      QuizzerLogger.logError('syncUserSettingsInbound: Failed to get database access.');
+      return; // Cannot proceed without DB
+    }
+
+    for (final record in cloudRecords) {
+      if (record is Map<String, dynamic>) {
+        // Use the new function from user_settings_table.dart
+        await upsertFromSupabase(record, db);
+      } else {
+        QuizzerLogger.logWarning('syncUserSettingsInbound: Encountered a record not of type Map<String, dynamic>. Record: $record');
+      }
+    }
+    monitor.releaseDatabaseAccess(); // Ensure DB access is released after the loop
+  
+    QuizzerLogger.logSuccess('Synced ${cloudRecords.length} user_settings from cloud for user $userId.');
+  } on PostgrestException catch (e, s) {
+    QuizzerLogger.logError('syncUserSettingsInbound: PostgrestException for user $userId. Error: ${e.message}, Stack: $s');
+  } on SocketException catch (e, s) {
+    QuizzerLogger.logError('syncUserSettingsInbound: SocketException for user $userId. Error: $e, Stack: $s');
+  } catch (e, s) {
+    QuizzerLogger.logError('syncUserSettingsInbound: Unexpected error for user $userId. Error: $e, Stack: $s');
+  }
 }
 
 /// Syncs modules from the cloud that are newer than the initial profile timestamp
@@ -202,40 +235,48 @@ Future<void> syncModulesInbound(
   
   // Fetch records from 'modules' table in Supabase
   // - newer than the initialTimestamp
-  final List<dynamic> cloudRecords = await supabaseClient
-      .from('modules')
-      .select('*')
-      .gt('last_modified_timestamp', initialTimestamp ?? DateTime(1970).toIso8601String());
+  try {
+    final List<dynamic> cloudRecords = await supabaseClient
+        .from('modules')
+        .select('*')
+        .gt('last_modified_timestamp', initialTimestamp ?? DateTime(1970).toIso8601String());
 
-  if (cloudRecords.isEmpty) {
-    QuizzerLogger.logMessage('No new modules to sync.');
-    return;
-  }
-
-  QuizzerLogger.logMessage('Found ${cloudRecords.length} new/updated modules to sync.');
-  
-  final DatabaseMonitor monitor = getDatabaseMonitor();
-  Database? db = await monitor.requestDatabaseAccess();
-  if (db == null) {
-    QuizzerLogger.logError('syncModulesInbound: Failed to get database access.');
-    return;
-  }
-
-  for (final record in cloudRecords) {
-    if (record is Map<String, dynamic>) {
-      // Only sync the fields we store in Supabase
-      await upsertModuleFromInboundSync(
-        moduleName: record['module_name'],
-        description: record['description'],
-        db: db,
-      );
-    } else {
-      QuizzerLogger.logWarning('syncModulesInbound: Encountered a record not of type Map<String, dynamic>. Record: $record');
+    if (cloudRecords.isEmpty) {
+      QuizzerLogger.logMessage('No new modules to sync.');
+      return;
     }
-  }
-  monitor.releaseDatabaseAccess();
+
+    QuizzerLogger.logMessage('Found ${cloudRecords.length} new/updated modules to sync.');
   
-  QuizzerLogger.logSuccess('Synced ${cloudRecords.length} modules from cloud.');
+    final DatabaseMonitor monitor = getDatabaseMonitor();
+    Database? db = await monitor.requestDatabaseAccess();
+    if (db == null) {
+      QuizzerLogger.logError('syncModulesInbound: Failed to get database access.');
+      return;
+    }
+
+    for (final record in cloudRecords) {
+      if (record is Map<String, dynamic>) {
+        // Only sync the fields we store in Supabase
+        await upsertModuleFromInboundSync(
+          moduleName: record['module_name'],
+          description: record['description'],
+          db: db,
+        );
+      } else {
+        QuizzerLogger.logWarning('syncModulesInbound: Encountered a record not of type Map<String, dynamic>. Record: $record');
+      }
+    }
+    monitor.releaseDatabaseAccess();
+  
+    QuizzerLogger.logSuccess('Synced ${cloudRecords.length} modules from cloud.');
+  } on PostgrestException catch (e, s) {
+    QuizzerLogger.logError('syncModulesInbound: PostgrestException. Error: ${e.message}, Stack: $s');
+  } on SocketException catch (e, s) {
+    QuizzerLogger.logError('syncModulesInbound: SocketException. Error: $e, Stack: $s');
+  } catch (e, s) {
+    QuizzerLogger.logError('syncModulesInbound: Unexpected error. Error: $e, Stack: $s');
+  }
 }
 
 Future<void> runInitialInboundSync(SessionManager sessionManager) async {

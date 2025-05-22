@@ -60,6 +60,12 @@ Future<bool> pushRecordToSupabase(String tableName, Map<String, dynamic> recordD
       }
     });
 
+    // --- BEGIN NEW LOGGING FOR USER_SETTINGS PAYLOAD ---
+    if (tableName == 'user_settings') {
+      QuizzerLogger.logValue('Pushing to user_settings. Payload: $payload');
+    }
+    // --- END NEW LOGGING FOR USER_SETTINGS PAYLOAD ---
+
     // 3. Perform Insert
     await supabase
       .from(tableName)
@@ -71,10 +77,20 @@ Future<bool> pushRecordToSupabase(String tableName, Map<String, dynamic> recordD
   } on PostgrestException catch (e) {
      // Catch specific Supabase errors
      QuizzerLogger.logError('Supabase PostgrestException during push for record $recordIdForLog to $tableName: ${e.message} (Code: ${e.code})');
+     // --- BEGIN NEW LOGGING ON FAILURE ---
+     final SessionManager sessionManager = getSessionManager();
+     QuizzerLogger.logValue('Failed Push Context: SessionManager User ID: ${sessionManager.userId}');
+     QuizzerLogger.logValue('Failed Push Context: Session Token: ${sessionManager.supabase.auth.currentSession?.accessToken}');
+     // --- END NEW LOGGING ON FAILURE ---
      return false;
   } catch (e) {
     // Catch potential network errors or other client errors
     QuizzerLogger.logError('Supabase insert FAILED for record $recordIdForLog to $tableName: $e');
+    // --- BEGIN NEW LOGGING ON FAILURE ---
+    final SessionManager sessionManager = getSessionManager();
+    QuizzerLogger.logValue('Failed Push Context: SessionManager User ID: ${sessionManager.userId}');
+    QuizzerLogger.logValue('Failed Push Context: Session Token: ${sessionManager.supabase.auth.currentSession?.accessToken}');
+    // --- END NEW LOGGING ON FAILURE ---
     return false; // Indicate failure
   }
 }
