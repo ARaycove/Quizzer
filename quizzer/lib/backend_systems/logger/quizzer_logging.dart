@@ -125,11 +125,23 @@ class QuizzerLogger {
 
   // --- Helper to Get App Directory ---
   static Future<String> _getAppDirectory() async {
-    if (Platform.isAndroid) {
-      final appDir = await getApplicationDocumentsDirectory();
+    if (Platform.isAndroid || Platform.isIOS) { // Added iOS for completeness
+      final appDir = await getApplicationDocumentsDirectory(); // Or getApplicationSupportDirectory() for internal files
       return appDir.path;
+    } else if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+      final appDir = await getApplicationSupportDirectory();
+      // It's good practice to put app-specific data in a subdirectory
+      final String logPath = p.join(appDir.path, 'QuizzerAppLogs');
+      // Ensure the directory exists before returning the path for the file itself
+      final Directory dir = Directory(logPath);
+      if (!await dir.exists()) {
+        await dir.create(recursive: true);
+      }
+      return logPath; // Return the path to the 'QuizzerAppLogs' directory
     }
-    return _logDir;
+    // Fallback for other platforms or if none of the above (should not happen for supported platforms)
+    QuizzerLogger.logWarning('_getAppDirectory: Unsupported platform or environment, defaulting to local ' + _logDir);
+    return _logDir; 
   }
 
   // Configure the root logger (call this from main.dart)

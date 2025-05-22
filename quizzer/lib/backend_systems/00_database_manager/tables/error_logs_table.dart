@@ -6,6 +6,7 @@ import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'table_helper.dart';
 import 'package:quizzer/backend_systems/10_switch_board/switch_board.dart';
 import 'package:path/path.dart' as path; // Import path package
+import 'package:path_provider/path_provider.dart'; // Added path_provider
 
 // ==========================================
 //          error_logs Table Helper
@@ -15,8 +16,20 @@ const String _errorLogsTableName = 'error_logs';
 
 // --- Private Helper Function to Read Log File ---
 Future<String> _readLogFileContent() async {
-  // Construct path platform-agnostically using path.join
-  final String logFilePath = path.join('runtime_cache', 'quizzer_log.txt');
+  // --- Determine the correct log file path --- 
+  String logFilePath;
+  if (Platform.isAndroid || Platform.isIOS) {
+    final appDir = await getApplicationDocumentsDirectory();
+    logFilePath = path.join(appDir.path, 'quizzer_log.txt');
+  } else if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+    final appDir = await getApplicationSupportDirectory();
+    logFilePath = path.join(appDir.path, 'QuizzerAppLogs', 'quizzer_log.txt');
+  } else {
+    // Fallback for unsupported platforms (should match QuizzerLogger's fallback)
+    logFilePath = path.join('runtime_cache', 'quizzer_log.txt'); 
+    QuizzerLogger.logWarning('_readLogFileContent: Unsupported platform, attempting to read from default relative path: $logFilePath');
+  }
+  // --- End Determine Path --- 
   
   final file = File(logFilePath);
   String content;
