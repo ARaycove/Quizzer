@@ -144,8 +144,17 @@ class MediaSyncWorker {
 
   // Helper to get the writable asset base path
   Future<String> _getLocalAssetBasePath() async {
-    final dir = await getApplicationDocumentsDirectory();
-    return path.join(dir.path, 'question_answer_pair_assets');
+    Directory dir;
+    if (Platform.isIOS || Platform.isAndroid) {
+      dir = await getApplicationDocumentsDirectory();
+      QuizzerLogger.logMessage('MediaSyncWorker: Using Documents directory for media assets (Mobile).');
+    } else { // Desktop platforms (Windows, Linux, macOS)
+      dir = await getApplicationSupportDirectory();
+      QuizzerLogger.logMessage('MediaSyncWorker: Using Application Support directory for media assets (Desktop).');
+    }
+    final String fullPath = path.join(dir.path, 'QuizzerAppMedia', 'question_answer_pair_assets');
+    QuizzerLogger.logMessage('MediaSyncWorker: Local media asset base path set to: $fullPath');
+    return fullPath;
   }
 
   /// Brute-force download: Download every file in the Supabase bucket if not present locally
