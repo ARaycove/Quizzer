@@ -20,9 +20,18 @@ Future<bool> pushRecordToSupabase(String tableName, Map<String, dynamic> recordD
   // USE SESSION MANAGER FOR ACCESS TO SUPABASE
   // Try to get a meaningful ID for logging, without making it a hard requirement for the function's logic.
   String recordIdForLog = "unknown_id";
+
+  // --- BEGIN NEW DIAGNOSTIC LOGGING ---
+  if (tableName == 'user_settings') {
+    QuizzerLogger.logValue('pushRecordToSupabase (user_settings) received recordData with keys: ${recordData.keys.toList()}');
+    QuizzerLogger.logValue('pushRecordToSupabase (user_settings) user_id value: ${recordData['user_id']}');
+    QuizzerLogger.logValue('pushRecordToSupabase (user_settings) setting_name value: ${recordData['setting_name']}');
+  }
+  // --- END NEW DIAGNOSTIC LOGGING ---
+
   if (recordData.containsKey('question_id')) {
     recordIdForLog = recordData['question_id'] as String? ?? recordIdForLog;
-  } else if (recordData.containsKey('uuid')) {
+  } else if (recordData.containsKey('uuid')) { // Often a primary user or record ID
     recordIdForLog = recordData['uuid'] as String? ?? recordIdForLog;
   } else if (recordData.containsKey('login_attempt_id')) {
     recordIdForLog = recordData['login_attempt_id'] as String? ?? recordIdForLog;
@@ -381,6 +390,15 @@ Future<void> syncUserProfiles(Database db) async {
 
     if (userId == null) {
       QuizzerLogger.logError('Skipping unsynced user profile record due to missing uuid: $record');
+      continue;
+    }
+
+    // Defensive check: Ensure the record's userId matches the current session's userId.
+    // This should be guaranteed by getUnsyncedUserProfiles, but an explicit check adds safety.
+    if (userId != currentUserId) {
+      QuizzerLogger.logError(
+        'CRITICAL: syncUserProfiles: Record user ID $userId MISMATCHES session user ID $currentUserId. Skipping sync for this record. This may indicate an issue with getUnsyncedUserProfiles.'
+      );
       continue;
     }
 

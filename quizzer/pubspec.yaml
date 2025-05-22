@@ -78,7 +78,6 @@ flutter:
     - images/quizzer_assets/
     - images/question_answer_pair_assets/
     - runtime_cache/models/
-    - runtime_cache/sqlite/
     - runtime_cache/subject_data/
     # Excluding runtime_cache/hive/ as it's generated per client
 
