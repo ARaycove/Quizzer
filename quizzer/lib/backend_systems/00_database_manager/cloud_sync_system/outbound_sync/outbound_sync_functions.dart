@@ -360,6 +360,7 @@ Future<void> syncUserProfiles(Database db) async {
     QuizzerLogger.logWarning('syncUserProfiles: No current user logged in. Cannot proceed.');
     return; // Cannot sync if no user is logged in
   }
+  QuizzerLogger.logMessage('Outbound Sync: Checking for unsynced UserProfiles for user $currentUserId.');
 
   // Fetch records needing sync for the current user
   final List<Map<String, dynamic>> unsyncedRecords = await getUnsyncedUserProfiles(db, currentUserId);

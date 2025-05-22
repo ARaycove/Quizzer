@@ -68,10 +68,26 @@ Future<bool> addLoginAttemptRecord({
   required String statusCode,
   required Database db
 }) async {
-  // First get the userId by email
-  String? userId = await getUserIdByEmail(email, db);
+  String? userId;
+  try {
+    userId = await getUserIdByEmail(email, db);
+  } on StateError catch (e) {
+    if (e.message == "INVALID, NO USERID WITH THAT EMAIL. . .") {
+      QuizzerLogger.logWarning('Failed to record login attempt for email "$email": User email not found in local user_profile table. No login attempt will be recorded.');
+      return false; // Indicate failure to record, do not proceed to insert.
+    } else {
+      // For any other StateError, rethrow as it's unexpected.
+      QuizzerLogger.logError('Unexpected StateError while getting user ID for login attempt: $e');
+      rethrow;
+    }
+  } catch (e) {
+    // Catch any other unexpected error during getUserIdByEmail
+    QuizzerLogger.logError('Unexpected error while getting user ID for login attempt: $e');
+    rethrow; // Fail fast for other errors
+  }
 
-  await verifyLoginAttemptsTableFields(db); // Call the new verification function
+  // If we reach here, userId was successfully retrieved.
+  await verifyLoginAttemptsTableFields(db); 
   
   String ipAddress = await getUserIpAddress();
   String deviceInfo = await getDeviceInfo();
@@ -105,7 +121,7 @@ Future<bool> addLoginAttemptRecord({
     return true;
   } else {
     // Log a warning if insert returned 0 (should not happen without conflict algorithm)
-    QuizzerLogger.logWarning('Insert operation for login attempt $loginAttemptId returned 0.');
+    QuizzerLogger.logWarning('Insert operation for login attempt $loginAttemptId returned 0. This is unexpected.');
     return false; // Indicate potential failure
   }
 }

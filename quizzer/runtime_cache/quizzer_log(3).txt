@@ -1,118 +1,72 @@
-Quizzer: [21:59:02] [34m[INFO][0m [<asynchronous suspension>] QuizzerLogger initialized with level: FINE. Logging to: runtime_cache\quizzer_log.txt
-Quizzer: [21:59:02] [33m[WARNING][0m [main.dart] _QuizzerAppState: BUILD CALLED. _criticalError is: null
-Quizzer: [21:59:16] [34m[INFO][0m [login_page.dart] Login attempt for: msaad.aidevisor@gmail.com
-Quizzer: [21:59:16] [34m[INFO][0m [session_manager.dart] Logging in user with email: msaad.aidevisor@gmail.com
-Quizzer: [21:59:16] [34m[INFO][0m [user_auth.dart] User authentication requested for msaad.aidevisor@gmail.com
-Quizzer: [21:59:16] [34m[INFO][0m [user_auth.dart] Attempting Supabase authentication for msaad.aidevisor@gmail.com
-Quizzer: [21:59:16] [34m[INFO][0m [user_auth.dart] Attempting Supabase authentication
-Quizzer: [21:59:17] [36m[DEBUG][0m Saving session
-Quizzer: [21:59:17] [34m[INFO][0m [user_auth.dart] SUCCESS: Supabase authentication successful for msaad.aidevisor@gmail.com
-Quizzer: [21:59:17] [36m[DEBUG][0m [session_helper.dart] Access Token: [REDACTED]
-Quizzer: [21:59:17] [36m[DEBUG][0m [session_helper.dart] Decoded JWT Token Payload (Redacted): {aal: aal1, amr: [{method: password, timestamp: 1747846756}], app_metadata: {provider: email, providers: [email]}, aud: [authenticated], email: [REDACTED], exp: 1747850356, iat: 1747846756, is_anonymous: false, iss: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, phone: , role: authenticated, session_id: [REDACTED], sub: [REDACTED], user_metadata: [REDACTED], user_role: null}
-Quizzer: [21:59:17] [33m[WARNING][0m [session_helper.dart] 'user_role' claim not found or empty in decoded JWT, defaulting to "public_user_unverified".
-Quizzer: [21:59:17] [34m[INFO][0m [user_auth.dart] Handling successful Supabase login for msaad.aidevisor@gmail.com
-Quizzer: [21:59:17] [34m[INFO][0m [user_auth.dart] Stored last login (2025-05-21T16:59:16.218748175Z) and token for msaad.aidevisor@gmail.com
-Quizzer: [21:59:17] [34m[INFO][0m [user_auth.dart] Ensuring local profile exists for msaad.aidevisor@gmail.com
-Quizzer: [21:59:18] [34m[INFO][0m [database_native.dart] Using sqflite FFI factory (Desktop)
-Quizzer: [21:59:18] [34m[INFO][0m [database_native.dart] Desktop SQLite directory ensured: C:\Quizzer\quizzer\runtime_cache\sqlite
-Quizzer: [21:59:18] [34m[INFO][0m [database_native.dart] Target Database path: C:\Quizzer\quizzer\runtime_cache\sqlite\quizzer.db
-Quizzer: [21:59:18] [34m[INFO][0m [database_native.dart] Existing database found at C:\Quizzer\quizzer\runtime_cache\sqlite\quizzer.db. Using it.
-Quizzer: [21:59:18] [34m[INFO][0m [database_native.dart] SUCCESS: Database initialized successfully at: C:\Quizzer\quizzer\runtime_cache\sqlite\quizzer.db
-Quizzer: [21:59:18] [34m[INFO][0m [user_auth.dart] Is user in list -> false
-Quizzer: [21:59:18] [34m[INFO][0m [user_auth.dart] Is user in list -> true
-Quizzer: [21:59:18] [34m[INFO][0m [table_helper.dart] Attempting to get IP address from dnsleaktest.com
-Quizzer: [21:59:19] [34m[INFO][0m [table_helper.dart] SUCCESS: Successfully retrieved IP address: 111.68.103.90
-Quizzer: [21:59:19] [34m[INFO][0m [session_isolates.dart] Recorded email to log in. . .: msaad.aidevisor@gmail.com
-Quizzer: [21:59:19] [34m[INFO][0m [session_isolates.dart] Database access granted
-Quizzer: [21:59:19] [34m[INFO][0m [session_isolates.dart] SUCCESS: Session initialized with userId: 5d67fa42-43f8-466e-b4b3-1c4afcbc2165
-Quizzer: [21:59:19] [34m[INFO][0m [session_manager.dart] Stored initial profile last_modified_timestamp: null
-Quizzer: [21:59:19] [34m[INFO][0m [session_manager.dart] SessionManager: Starting MediaSyncWorker...
-Quizzer: [21:59:19] [34m[INFO][0m [media_sync_worker.dart] MediaSyncWorker initialized.
-Quizzer: [21:59:19] [34m[INFO][0m [media_sync_worker.dart] Entering MediaSyncWorker start()...
-Quizzer: [21:59:19] [34m[INFO][0m [media_sync_worker.dart] MediaSyncWorker: Subscribing to onMediaSyncStatusProcessed stream.
-Quizzer: [21:59:19] [34m[INFO][0m [media_sync_worker.dart] Entering MediaSyncWorker _runLoop()...
-Quizzer: [21:59:19] [34m[INFO][0m [media_sync_worker.dart] MediaSyncWorker: Checking for question pairs with NULL has_media status.
-Quizzer: [21:59:19] [34m[INFO][0m [media_sync_worker.dart] MediaSyncWorker started and initial sync performed.
-Quizzer: [21:59:19] [34m[INFO][0m [session_manager.dart] SessionManager: MediaSyncWorker started.
-Quizzer: [21:59:19] [34m[INFO][0m [session_manager.dart] SessionManager: Starting InboundSyncWorker...
-Quizzer: [21:59:19] [34m[INFO][0m [inbound_sync_worker.dart] InboundSyncWorker initialized.
-Quizzer: [21:59:19] [34m[INFO][0m [inbound_sync_worker.dart] Entering InboundSyncWorker start()...
-Quizzer: [21:59:19] [34m[INFO][0m [inbound_sync_worker.dart] InboundSyncWorker: Subscribing to onInboundSyncNeeded stream.
-Quizzer: [21:59:19] [34m[INFO][0m [inbound_sync_worker.dart] InboundSyncWorker: Performing initial inbound sync...
-Quizzer: [21:59:19] [34m[INFO][0m [inbound_sync_functions.dart] Starting initial inbound sync aggregator...
-Quizzer: [21:59:19] [34m[INFO][0m [media_sync_worker.dart] MediaSyncWorker: Database access released after processing NULL has_media records.
-Quizzer: [21:59:19] [34m[INFO][0m [media_sync_worker.dart] MediaSyncWorker: Signal received, performing sync actions...
-Quizzer: [21:59:19] [34m[INFO][0m [media_sync_worker.dart] MediaSyncWorker: _performSync() called.
-Quizzer: [21:59:19] [34m[INFO][0m [media_sync_worker.dart] MediaSyncWorker: Starting brute-force download of all Supabase media files.
-Quizzer: [21:59:19] [34m[INFO][0m [inbound_sync_functions.dart] Using effective last login timestamp: 2005-05-26T16:59:19.877700Z
-Quizzer: [21:59:19] [34m[INFO][0m [inbound_sync_functions.dart] Syncing inbound question_answer_pairs for user 5d67fa42-43f8-466e-b4b3-1c4afcbc2165 since 2005-05-26T16:59:19.877700Z...
-Quizzer: [21:59:21] [34m[INFO][0m [inbound_sync_functions.dart] Found 328 new/updated question_answer_pairs to sync.
-Quizzer: [21:59:21] [34m[INFO][0m [media_sync_worker.dart] MediaSyncWorker: 05e488d5-8cc0-4c65-975c-91e7eedf573a.png already exists locally, skipping.
-Quizzer: [21:59:21] [34m[INFO][0m [media_sync_worker.dart] MediaSyncWorker: 2983959b-7d32-4ca2-ba9c-e189dbced7c4.png already exists locally, skipping.
-Quizzer: [21:59:21] [34m[INFO][0m [media_sync_worker.dart] MediaSyncWorker: 72d36000-b070-4473-9cb8-4443ba824bc2.png already exists locally, skipping.
-Quizzer: [21:59:21] [34m[INFO][0m [media_sync_worker.dart] MediaSyncWorker: 7f8d20f6-a84b-4f13-9bdb-4463e3a6609c.png already exists locally, skipping.
-Quizzer: [21:59:21] [34m[INFO][0m [media_sync_worker.dart] MediaSyncWorker: ca915d21-115a-49cd-a34e-af26aa9af4a8.png already exists locally, skipping.
-Quizzer: [21:59:21] [34m[INFO][0m [media_sync_worker.dart] MediaSyncWorker: d950d02c-cb75-4157-9a13-297db25d9add.png already exists locally, skipping.
-Quizzer: [21:59:21] [34m[INFO][0m [media_sync_worker.dart] MediaSyncWorker: e577584b-f035-4721-99d3-fefb86b5fbb7.png already exists locally, skipping.
-Quizzer: [21:59:21] [34m[INFO][0m [media_sync_worker.dart] MediaSyncWorker: e7bab391-8ff4-4b74-af73-8fb2d4bc6e2f.png already exists locally, skipping.
-Quizzer: [21:59:21] [34m[INFO][0m [media_sync_worker.dart] MediaSyncWorker: f257fecf-0834-42e9-b8a0-9f86d50267c3.png already exists locally, skipping.
-Quizzer: [21:59:21] [34m[INFO][0m [media_sync_worker.dart] MediaSyncWorker: Brute-force download complete.
-Quizzer: [21:59:21] [34m[INFO][0m [media_sync_worker.dart] MediaSyncWorker: Starting _processUploads.
-Quizzer: [21:59:24] [34m[INFO][0m [inbound_sync_functions.dart] SUCCESS: Synced 328 question_answer_pairs from cloud.
-Quizzer: [21:59:24] [34m[INFO][0m [inbound_sync_functions.dart] Using effective initial timestamp: 2005-05-26T16:59:24.967428Z
-Quizzer: [21:59:24] [34m[INFO][0m [inbound_sync_functions.dart] Syncing inbound user_question_answer_pairs for user 5d67fa42-43f8-466e-b4b3-1c4afcbc2165 since 2005-05-26T16:59:24.967428Z...
-Quizzer: [21:59:24] [34m[INFO][0m [media_sync_status_table.dart] media_sync_status table already exists.
-Quizzer: [21:59:24] [34m[INFO][0m [media_sync_status_table.dart] Fetching records from media_sync_status where exists_locally = 1 AND exists_externally = 0.
-Quizzer: [21:59:24] [34m[INFO][0m [media_sync_status_table.dart] SUCCESS: Fetched 0 records from media_sync_status that exist locally but not externally.
-Quizzer: [21:59:24] [34m[INFO][0m [media_sync_worker.dart] MediaSyncWorker (_processUploads): Database access released after reading files to upload.
-Quizzer: [21:59:24] [34m[INFO][0m [media_sync_worker.dart] MediaSyncWorker: No files found to upload.
-Quizzer: [21:59:24] [34m[INFO][0m [media_sync_worker.dart] MediaSyncWorker: Starting _processDownloads.
-Quizzer: [21:59:24] [34m[INFO][0m [media_sync_status_table.dart] media_sync_status table already exists.
-Quizzer: [21:59:24] [34m[INFO][0m [media_sync_status_table.dart] Fetching records from media_sync_status where exists_externally = 1 AND (exists_locally = 0 OR exists_locally IS NULL).
-Quizzer: [21:59:24] [34m[INFO][0m [media_sync_status_table.dart] SUCCESS: Fetched 0 records from media_sync_status that exist externally but not locally (or local status unknown).
-Quizzer: [21:59:24] [34m[INFO][0m [media_sync_worker.dart] MediaSyncWorker (_processDownloads): Database access released after reading files to download.
-Quizzer: [21:59:24] [34m[INFO][0m [media_sync_worker.dart] MediaSyncWorker: No files found to download.
-Quizzer: [21:59:24] [34m[INFO][0m [media_sync_worker.dart] MediaSyncWorker: _performSync() finished.
-Quizzer: [21:59:24] [34m[INFO][0m [media_sync_worker.dart] MediaSyncWorker: Waiting for media sync status processed signal...
-Quizzer: [21:59:25] [34m[INFO][0m [inbound_sync_functions.dart] No new user_question_answer_pairs to sync.
-Quizzer: [21:59:25] [34m[INFO][0m [inbound_sync_functions.dart] Syncing inbound user profile for user 5d67fa42-43f8-466e-b4b3-1c4afcbc2165 since 2005-05-26T16:59:24.967428Z...
-Quizzer: [21:59:26] [34m[INFO][0m [inbound_sync_functions.dart] No new user profile to sync.
-Quizzer: [21:59:26] [34m[INFO][0m [inbound_sync_functions.dart] Syncing inbound user_settings for user 5d67fa42-43f8-466e-b4b3-1c4afcbc2165 since 2005-05-26T16:59:24.967428Z...
-Quizzer: [21:59:26] [34m[INFO][0m [inbound_sync_functions.dart] No new user_settings to sync for user 5d67fa42-43f8-466e-b4b3-1c4afcbc2165.
-Quizzer: [21:59:26] [34m[INFO][0m [inbound_sync_functions.dart] Syncing inbound modules since 2005-05-26T16:59:24.967428Z...
-Quizzer: [21:59:26] [34m[INFO][0m [inbound_sync_functions.dart] Found 7 new/updated modules to sync.
-Quizzer: [21:59:26] [34m[INFO][0m [inbound_sync_functions.dart] SUCCESS: Synced 7 modules from cloud.
-Quizzer: [21:59:26] [34m[INFO][0m [inbound_sync_functions.dart] SUCCESS: Initial inbound sync completed successfully.
-Quizzer: [21:59:26] [34m[INFO][0m [inbound_sync_worker.dart] Entering InboundSyncWorker _runLoop()...
-Quizzer: [21:59:26] [34m[INFO][0m [inbound_sync_worker.dart] InboundSyncWorker: Waiting for sync signal...
-Quizzer: [21:59:26] [34m[INFO][0m [inbound_sync_worker.dart] InboundSyncWorker started and initial sync performed.
-Quizzer: [21:59:26] [34m[INFO][0m [session_manager.dart] SessionManager: InboundSyncWorker started and initial sync completed.
-Quizzer: [21:59:27] [34m[INFO][0m [session_manager.dart] SessionManager: Module records built after inbound sync.
-Quizzer: [21:59:27] [34m[INFO][0m [question_selection_worker.dart] PresentationSelectionWorker started.
-Quizzer: [21:59:27] [34m[INFO][0m [question_selection_worker.dart] PSW: Starting initial loop...
-Quizzer: [21:59:27] [34m[INFO][0m [question_answer_attempts_table.dart] Fetching unsynced question answer attempts...
-Quizzer: [21:59:27] [34m[INFO][0m [question_answer_attempts_table.dart] Verifying question_answer_attempts table...
-Quizzer: [21:59:27] [34m[INFO][0m [question_answer_attempts_table.dart] question_answer_attempts table already exists. Checking columns...
-Quizzer: [21:59:27] [34m[INFO][0m [question_answer_attempts_table.dart] Column check complete.
-Quizzer: [21:59:27] [34m[INFO][0m [question_answer_attempts_table.dart] SUCCESS: Fetched 0 unsynced question answer attempts.
-Quizzer: [21:59:27] [36m[DEBUG][0m PostgrestException(message: new row violates row-level security policy for table "user_profile", code: 42501, details: Forbidden, hint: null) from request
-Quizzer: [21:59:28] [34m[INFO][0m [error_logs_table.dart] Verifying error_logs table...
-Quizzer: [21:59:28] [34m[INFO][0m [error_logs_table.dart] error_logs table already exists. Checking columns...
-Quizzer: [21:59:28] [34m[INFO][0m [error_logs_table.dart] Column check complete for error_logs.
-Quizzer: [21:59:28] [34m[INFO][0m [error_logs_table.dart] Fetching unsynced error logs (older than 1 hour) from error_logs...
-Quizzer: [21:59:28] [34m[INFO][0m [error_logs_table.dart] SUCCESS: Fetched 0 total unsynced records. 0 are older than 1 hour.
-Quizzer: [21:59:28] [34m[INFO][0m [user_settings_table.dart] Initialized new setting "geminiApiKey" for user 5d67fa42-43f8-466e-b4b3-1c4afcbc2165.
-Quizzer: [21:59:28] [34m[INFO][0m [user_settings_table.dart] SUCCESS: Fetched 1 unsynced settings for user 5d67fa42-43f8-466e-b4b3-1c4afcbc2165.
-Quizzer: [21:59:28] [36m[DEBUG][0m PostgrestException(message: new row violates row-level security policy for table "user_settings", code: 42501, details: Forbidden, hint: null) from request
-Quizzer: [21:59:30] [34m[INFO][0m [login_page.dart] Login successful for: msaad.aidevisor@gmail.com. Navigating home.
-Quizzer: [21:59:30] [36m[DEBUG][0m [home_page.dart] HomePage building question type: multiple_choice with key: [<'dummy_no_questions'>] (using session data)
-Quizzer: [21:59:34] [36m[DEBUG][0m [session_helper.dart] Access Token: [REDACTED]
-Quizzer: [21:59:34] [36m[DEBUG][0m [session_helper.dart] Decoded JWT Token Payload (Redacted): {aal: aal1, amr: [{method: password, timestamp: 1747846756}], app_metadata: {provider: email, providers: [email]}, aud: [authenticated], email: [REDACTED], exp: 1747850356, iat: 1747846756, is_anonymous: false, iss: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, phone: , role: authenticated, session_id: [REDACTED], sub: [REDACTED], user_metadata: [REDACTED], user_role: null}
-Quizzer: [21:59:34] [33m[WARNING][0m [session_helper.dart] 'user_role' claim not found or empty in decoded JWT, defaulting to "public_user_unverified".
-Quizzer: [21:59:34] [36m[DEBUG][0m [menu_page.dart] Building MenuPage for user role: public_user_unverified
-Quizzer: [21:59:35] [34m[INFO][0m [display_modules_page.dart] Initializing Display Modules Page
-Quizzer: [21:59:48] [36m[DEBUG][0m [session_helper.dart] Access Token: [REDACTED]
-Quizzer: [21:59:48] [36m[DEBUG][0m [session_helper.dart] Decoded JWT Token Payload (Redacted): {aal: aal1, amr: [{method: password, timestamp: 1747846756}], app_metadata: {provider: email, providers: [email]}, aud: [authenticated], email: [REDACTED], exp: 1747850356, iat: 1747846756, is_anonymous: false, iss: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, phone: , role: authenticated, session_id: [REDACTED], sub: [REDACTED], user_metadata: [REDACTED], user_role: null}
-Quizzer: [21:59:48] [33m[WARNING][0m [session_helper.dart] 'user_role' claim not found or empty in decoded JWT, defaulting to "public_user_unverified".
-Quizzer: [21:59:48] [36m[DEBUG][0m [menu_page.dart] Building MenuPage for user role: public_user_unverified
-Quizzer: [21:59:54] [34m[INFO][0m [display_modules_page.dart] Initializing Display Modules Page
+Quizzer: [20:46:11] [34m[INFO][0m [<asynchronous suspension>] QuizzerLogger initialized with level: FINE. Logging to: runtime_cache\quizzer_log.txt
+Quizzer: [20:46:11] [33m[WARNING][0m [main.dart] _QuizzerAppState: BUILD CALLED. _criticalError is: null
+Quizzer: [20:47:51] [34m[INFO][0m [login_page.dart] Login attempt for: msaad.aidevisor@gmail.com
+Quizzer: [20:47:51] [34m[INFO][0m [session_manager.dart] Logging in user with email: msaad.aidevisor@gmail.com
+Quizzer: [20:47:51] [34m[INFO][0m [user_auth.dart] User authentication requested for msaad.aidevisor@gmail.com
+Quizzer: [20:47:51] [34m[INFO][0m [user_auth.dart] Attempting Supabase authentication for msaad.aidevisor@gmail.com
+Quizzer: [20:47:51] [34m[INFO][0m [user_auth.dart] Attempting Supabase authentication
+Quizzer: [20:47:53] [33m[WARNING][0m [user_auth.dart] Supabase authentication failed: Invalid login credentials
+Quizzer: [20:47:53] [34m[INFO][0m [user_auth.dart] Checking for offline login data for msaad.aidevisor@gmail.com
+Quizzer: [20:47:53] [34m[INFO][0m [user_auth.dart] No valid offline login data found for msaad.aidevisor@gmail.com
+Quizzer: [20:47:53] [34m[INFO][0m [database_native.dart] Using sqflite FFI factory (Desktop)
+Quizzer: [20:47:53] [34m[INFO][0m [database_native.dart] Desktop SQLite directory ensured: C:\Quizzer\quizzer\runtime_cache\sqlite
+Quizzer: [20:47:53] [34m[INFO][0m [database_native.dart] Target Database path: C:\Quizzer\quizzer\runtime_cache\sqlite\quizzer.db
+Quizzer: [20:47:53] [34m[INFO][0m [database_native.dart] Existing database found at C:\Quizzer\quizzer\runtime_cache\sqlite\quizzer.db. Using it.
+Quizzer: [20:47:53] [34m[INFO][0m [database_native.dart] SUCCESS: Database initialized successfully at: C:\Quizzer\quizzer\runtime_cache\sqlite\quizzer.db
+Quizzer: [20:47:53] [31m[ERROR][0m [global_error_handler.dart] CRITICAL ERROR REPORTED TO UI: Unhandled Flutter error caught by PlatformDispatcher
+Error: Bad state: INVALID, NO USERID WITH THAT EMAIL. . .
+StackTrace: #0      getUserIdByEmail (package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_profile_table.dart:35:9)
+<asynchronous suspension>
+#1      addLoginAttemptRecord (package:quizzer/backend_systems/00_database_manager/tables/login_attempts_table.dart:72:20)
+<asynchronous suspension>
+#2      recordLoginAttempt (package:quizzer/backend_systems/02_login_authentication/login_attempts_record.dart:33:3)
+<asynchronous suspension>
+#3      userAuth (package:quizzer/backend_systems/02_login_authentication/user_auth.dart:167:3)
+<asynchronous suspension>
+#4      SessionManager.attemptLogin (package:quizzer/backend_systems/session_manager/session_manager.dart:351:22)
+<asynchronous suspension>
+#5      _LoginPageState.submitLogin (package:quizzer/UI_systems/00_login_page/login_page.dart:63:36)
+<asynchronous suspension>
+
+Quizzer: [20:47:53] [34m[INFO][0m [main.dart] _QuizzerAppState: Received critical error notification. Current error: null, New error: CriticalErrorDetails(message: Unhandled Flutter error caught by PlatformDispatcher, error: Bad state: INVALID, NO USERID WITH THAT EMAIL. . ., stackTrace: #0      getUserIdByEmail (package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_profile_table.dart:35:9)
+<asynchronous suspension>
+#1      addLoginAttemptRecord (package:quizzer/backend_systems/00_database_manager/tables/login_attempts_table.dart:72:20)
+<asynchronous suspension>
+#2      recordLoginAttempt (package:quizzer/backend_systems/02_login_authentication/login_attempts_record.dart:33:3)
+<asynchronous suspension>
+#3      userAuth (package:quizzer/backend_systems/02_login_authentication/user_auth.dart:167:3)
+<asynchronous suspension>
+#4      SessionManager.attemptLogin (package:quizzer/backend_systems/session_manager/session_manager.dart:351:22)
+<asynchronous suspension>
+#5      _LoginPageState.submitLogin (package:quizzer/UI_systems/00_login_page/login_page.dart:63:36)
+<asynchronous suspension>
+)
+Quizzer: [20:47:53] [34m[INFO][0m [main.dart] _QuizzerAppState: setState completed. _criticalError is now: CriticalErrorDetails(message: Unhandled Flutter error caught by PlatformDispatcher, error: Bad state: INVALID, NO USERID WITH THAT EMAIL. . ., stackTrace: #0      getUserIdByEmail (package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_profile_table.dart:35:9)
+<asynchronous suspension>
+#1      addLoginAttemptRecord (package:quizzer/backend_systems/00_database_manager/tables/login_attempts_table.dart:72:20)
+<asynchronous suspension>
+#2      recordLoginAttempt (package:quizzer/backend_systems/02_login_authentication/login_attempts_record.dart:33:3)
+<asynchronous suspension>
+#3      userAuth (package:quizzer/backend_systems/02_login_authentication/user_auth.dart:167:3)
+<asynchronous suspension>
+#4      SessionManager.attemptLogin (package:quizzer/backend_systems/session_manager/session_manager.dart:351:22)
+<asynchronous suspension>
+#5      _LoginPageState.submitLogin (package:quizzer/UI_systems/00_login_page/login_page.dart:63:36)
+<asynchronous suspension>
+)
+Quizzer: [20:47:53] [34m[INFO][0m [main.dart] _QuizzerAppState: Navigation to /critical_error attempted.
+Quizzer: [20:47:53] [33m[WARNING][0m [main.dart] _QuizzerAppState: BUILD CALLED. _criticalError is: Unhandled Flutter error caught by PlatformDispatcher
+Quizzer: [20:47:53] [34m[INFO][0m [critical_error_screen.dart] CriticalErrorScreen: Auto-reporting initial error.
+Quizzer: [20:47:54] [34m[INFO][0m [error_logs_table.dart] Verifying error_logs table...
+Quizzer: [20:47:54] [34m[INFO][0m [error_logs_table.dart] error_logs table already exists. Checking columns...
+Quizzer: [20:47:54] [34m[INFO][0m [error_logs_table.dart] Column check complete for error_logs.
+Quizzer: [20:47:54] [34m[INFO][0m [error_logs_table.dart] upsertErrorLog: Adding new error log. Provided ID (if any): null
+Quizzer: [20:47:54] [34m[INFO][0m [error_logs_table.dart] Verifying error_logs table...
+Quizzer: [20:47:54] [34m[INFO][0m [error_logs_table.dart] error_logs table already exists. Checking columns...
+Quizzer: [20:47:54] [34m[INFO][0m [error_logs_table.dart] Column check complete for error_logs.
+Quizzer: [20:47:54] [34m[INFO][0m [table_helper.dart] Fetching app version using package_info_plus.
+Quizzer: [20:47:54] [34m[INFO][0m [table_helper.dart] SUCCESS: App version fetched: 05.02.001+1
+Quizzer: [20:47:54] [34m[INFO][0m [error_logs_table.dart] Successfully read content from runtime_cache\quizzer_log.txt.
+Quizzer: [20:47:54] [34m[INFO][0m [error_logs_table.dart] SUCCESS: Successfully added error log with id: 29fa7365-c9b6-4adb-8278-c8b9934dbf02. Log file content included.
+Quizzer: [20:47:54] [34m[INFO][0m [session_manager.dart] SUCCESS: Error report processed using direct DB access. Log ID: 29fa7365-c9b6-4adb-8278-c8b9934dbf02
+Quizzer: [20:47:54] [34m[INFO][0m [critical_error_screen.dart] SUCCESS: CriticalErrorScreen: Initial error auto-reported. ID: 29fa7365-c9b6-4adb-8278-c8b9934dbf02
