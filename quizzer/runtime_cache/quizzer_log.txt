@@ -4490,3 +4490,6 @@ Quizzer: [10:49:39] [34m[INFO][0m [question_answer_pairs_table.dart] Fetching 
 Quizzer: [10:49:39] [34m[INFO][0m [question_answer_pairs_table.dart] SUCCESS: Retrieved 0 unique subjects from CSV data
 Quizzer: [10:49:39] [34m[INFO][0m [user_profile_table.dart] Unique subjects from questions table: {misc}
 Quizzer: [10:49:39] [34m[INFO][0m [user_profile_table.dart] SUCCESS: Returning final subject interests for user 77647c42-c888-47e3-8296-6fc452815810: {misc: 1}
+Quizzer: [11:48:16] [36m[DEBUG][0m Refresh access token
+Quizzer: [11:48:16] [36m[DEBUG][0m Attempt 1 to refresh token
+Quizzer: [11:48:16] [36m[DEBUG][0m Saving session

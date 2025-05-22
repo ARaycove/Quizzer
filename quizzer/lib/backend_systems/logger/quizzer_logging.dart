@@ -127,12 +127,16 @@ class QuizzerLogger {
   static Future<String> _getAppDirectory() async {
     if (Platform.isAndroid || Platform.isIOS) { // Added iOS for completeness
       final appDir = await getApplicationDocumentsDirectory(); // Or getApplicationSupportDirectory() for internal files
+      // Log this path using the logger; it will go to console via the listener's print.
+      QuizzerLogger.logMessage('QuizzerLogger: Using mobile documents directory: ${appDir.path}');
+      print('QuizzerLogger: Using mobile documents directory: ${appDir.path}');
       return appDir.path;
     } else if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
       final appDir = await getApplicationSupportDirectory();
-      // It's good practice to put app-specific data in a subdirectory
+      // Log this path using the logger.
+      QuizzerLogger.logMessage('QuizzerLogger: Raw application support directory for desktop: ${appDir.path}'); 
+      print('QuizzerLogger: Raw application support directory for desktop: ${appDir.path}');
       final String logPath = p.join(appDir.path, 'QuizzerAppLogs');
-      // Ensure the directory exists before returning the path for the file itself
       final Directory dir = Directory(logPath);
       if (!await dir.exists()) {
         await dir.create(recursive: true);
@@ -147,7 +151,7 @@ class QuizzerLogger {
   // Configure the root logger (call this from main.dart)
   static Future<void> setupLogging({Level level = Level.INFO}) async {
     Logger.root.level = level;
-    Logger.root.onRecord.listen((record) {
+    Logger.root.onRecord.listen((record) async {
       // Custom formatting matching the old style
       String levelColor;
       String levelName = record.level.name;
@@ -197,21 +201,29 @@ class QuizzerLogger {
     logMessage('QuizzerLogger initialized with level: ${level.name}'); 
 
     // --- File Setup --- 
-    final String baseDir = await _getAppDirectory();
-    final String logFilePath = p.join(baseDir, _logFileName);
-    
-    // Ensure directory exists
-    final Directory dir = Directory(baseDir);
-    if (!dir.existsSync()) {
-      print('Quizzer: Creating log directory: $baseDir');
-      dir.createSync(recursive: true);
+    try {
+      final String baseDir = await _getAppDirectory();
+      final String logFilePath = p.join(baseDir, _logFileName);
+      
+      // Ensure baseDir (e.g., QuizzerAppLogs) exists. _getAppDirectory should handle this, but as a safeguard:
+      final Directory dir = Directory(baseDir);
+      if (!await dir.exists()) { // Use await for exists()
+        print('Quizzer: Safeguard: Log directory $baseDir not found, attempting to create it.');
+        await dir.create(recursive: true); // Use await for create()
+      }
+      
+      // Open file sink in write mode
+      _logFileSink = File(logFilePath).openWrite(mode: FileMode.write);
+      // Add a success log specifically for sink opening, which will also go to console via print.
+      print('Quizzer: Successfully opened log file sink for: $logFilePath');
+      logMessage('QuizzerLogger successfully set up file logging to: $logFilePath');
+
+    } catch (e, s) {
+      // If any error occurs during file setup, print to console and ensure _logFileSink is null.
+      print('Quizzer: CRITICAL ERROR setting up log file: $e\nStackTrace: $s');
+      _logFileSink = null; // Ensure sink is null if setup failed
+      // Optionally, rethrow or handle as a critical app failure if file logging is essential.
     }
-    
-    // Open file sink in write mode
-    _logFileSink = File(logFilePath).openWrite(mode: FileMode.write);
-    print('Quizzer: Logging to file: $logFilePath');
-    
-    logMessage('QuizzerLogger initialized with level: ${level.name}. Logging to: $logFilePath');
   }
 
   // Logging functions using the standard logger

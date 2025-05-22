@@ -218,18 +218,21 @@ class SessionManager {
   // Initialize Hive storage (private)
   Future<void> _initializeStorage() async {
     String hivePath;
-    // Determine path based on platform (like original main_native)
     if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-      // Desktop / Test environment: Use runtime_cache/hive
-      hivePath = p.join(Directory.current.path, 'runtime_cache', 'hive');
+      final appSupportDir = await getApplicationSupportDirectory();
+      hivePath = p.join(appSupportDir.path, 'QuizzerAppHive'); // Store in a dedicated subdirectory
     } else {
       // Mobile: Use standard application documents directory
-      // Assert that path_provider is available if this branch is hit
       final appDocumentsDir = await getApplicationDocumentsDirectory();
-      hivePath = appDocumentsDir.path;
+      hivePath = appDocumentsDir.path; // Hive typically creates its own box files directly in this path
     }
+    // Log the determined path before initializing Hive
+    QuizzerLogger.logMessage('SessionManager: Initializing Hive at path: $hivePath');
+
     // Ensure the directory exists
-    Directory(hivePath).createSync(recursive: true);
+    // For mobile, getApplicationDocumentsDirectory usually exists.
+    // For desktop, we are creating a subdirectory, so ensure it.
+    await Directory(hivePath).create(recursive: true); // Use async create
     Hive.init(hivePath);
 
     _storage = await Hive.openBox('async_prefs');
@@ -264,10 +267,6 @@ class SessionManager {
     final inboundSyncWorker = InboundSyncWorker();
     await inboundSyncWorker.start();
     QuizzerLogger.logMessage('SessionManager: InboundSyncWorker started and initial sync completed.');
-    
-    // Build module records after inbound sync completes
-    await buildModuleRecords();
-    QuizzerLogger.logMessage('SessionManager: Module records built after inbound sync.');
       
     // --- Start new background processing pipeline --- 
     final PreProcessWorker preProcessWorker = PreProcessWorker();
