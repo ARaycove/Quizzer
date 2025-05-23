@@ -41,12 +41,12 @@ class QuizzerLogger {
 
   // --- Source Filtering --- 
   static List<String> _excludedSources = [
-    // "user_question_processes.dart",
-    // "outbound_sync_functions.dart",
+    "user_question_processes.dart",
+    "outbound_sync_functions.dart",
     // "outbound_sync_worker.dart",
     "widget_multiple_choice_question.dart",
     "database_monitor.dart",
-    // "question_answer_pairs_table.dart",
+    "question_answer_pairs_table.dart",
     "login_attempts_table.dart",
     "login_attempts_record.dart",
     // "session_manager.dart",
@@ -56,7 +56,7 @@ class QuizzerLogger {
     "modules_table.dart",
     "module_isolates.dart",
     "answered_history_monitor.dart",
-    // "user_question_answer_pairs_table.dart",
+    "user_question_answer_pairs_table.dart",
     "module_inactive_cache.dart",
     "session_toggle_scheduler.dart",
     "unprocessed_cache.dart",
@@ -65,7 +65,7 @@ class QuizzerLogger {
     "due_date_worker.dart",
     "pre_process_worker.dart",
     "inactive_module_worker.dart",
-    // "user_profile_table.dart"
+    "user_profile_table.dart"
   ]; // List of source filenames to exclude
 
   /// Sets the list of source filenames (e.g., 'my_table.dart') to exclude from logging.
@@ -129,13 +129,13 @@ class QuizzerLogger {
       final appDir = await getApplicationDocumentsDirectory(); // Or getApplicationSupportDirectory() for internal files
       // Log this path using the logger; it will go to console via the listener's print.
       QuizzerLogger.logMessage('QuizzerLogger: Using mobile documents directory: ${appDir.path}');
-      print('QuizzerLogger: Using mobile documents directory: ${appDir.path}');
+      // print('QuizzerLogger: Using mobile documents directory: ${appDir.path}');
       return appDir.path;
     } else if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
       final appDir = await getApplicationSupportDirectory();
       // Log this path using the logger.
       QuizzerLogger.logMessage('QuizzerLogger: Raw application support directory for desktop: ${appDir.path}'); 
-      print('QuizzerLogger: Raw application support directory for desktop: ${appDir.path}');
+      // print('QuizzerLogger: Raw application support directory for desktop: ${appDir.path}');
       final String logPath = p.join(appDir.path, 'QuizzerAppLogs');
       final Directory dir = Directory(logPath);
       if (!await dir.exists()) {
@@ -144,7 +144,7 @@ class QuizzerLogger {
       return logPath; // Return the path to the 'QuizzerAppLogs' directory
     }
     // Fallback for other platforms or if none of the above (should not happen for supported platforms)
-    QuizzerLogger.logWarning('_getAppDirectory: Unsupported platform or environment, defaulting to local ' + _logDir);
+    QuizzerLogger.logWarning('_getAppDirectory: Unsupported platform or environment, defaulting to local $_logDir');
     return _logDir; 
   }
 
@@ -189,7 +189,7 @@ class QuizzerLogger {
       final coreFormattedMessage = '$timestamp $levelColor[$levelName]$_reset ${record.message}';
 
       // Prepend "Quizzer:" before printing
-      print("Quizzer: $coreFormattedMessage"); // print allows logs to be shown when testing on Android
+      // print("Quizzer: $coreFormattedMessage"); // print allows logs to be shown when testing on Android
 
       // --- Log to File --- 
       if (_logFileSink != null) {
@@ -208,14 +208,14 @@ class QuizzerLogger {
       // Ensure baseDir (e.g., QuizzerAppLogs) exists. _getAppDirectory should handle this, but as a safeguard:
       final Directory dir = Directory(baseDir);
       if (!await dir.exists()) { // Use await for exists()
-        print('Quizzer: Safeguard: Log directory $baseDir not found, attempting to create it.');
+        // print('Quizzer: Safeguard: Log directory $baseDir not found, attempting to create it.');
         await dir.create(recursive: true); // Use await for create()
       }
       
       // Open file sink in write mode
       _logFileSink = File(logFilePath).openWrite(mode: FileMode.write);
       // Add a success log specifically for sink opening, which will also go to console via print.
-      print('Quizzer: Successfully opened log file sink for: $logFilePath');
+      // print('Quizzer: Successfully opened log file sink for: $logFilePath');
       logMessage('QuizzerLogger successfully set up file logging to: $logFilePath');
 
       // Test with a second immediate log message
@@ -225,7 +225,7 @@ class QuizzerLogger {
 
     } catch (e, s) {
       // If any error occurs during file setup, print to console and ensure _logFileSink is null.
-      print('Quizzer: CRITICAL ERROR setting up log file: $e\nStackTrace: $s');
+      // print('Quizzer: CRITICAL ERROR setting up log file: $e\nStackTrace: $s');
       _logFileSink = null; // Ensure sink is null if setup failed
       // Optionally, rethrow or handle as a critical app failure if file logging is essential.
     }
@@ -279,7 +279,7 @@ class QuizzerLogger {
     if (_logFileSink != null) {
       await _logFileSink!.flush();
       await _logFileSink!.close();
-      print('Quizzer: Log file sink closed.');
+      // print('Quizzer: Log file sink closed.');
       _logFileSink = null;
     }
   }

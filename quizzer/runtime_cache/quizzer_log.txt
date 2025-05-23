@@ -4953,3 +4953,15 @@ Quizzer: [12:02:03] [34m[INFO][0m [outbound_sync_worker.dart] OutboundSyncWork
 Quizzer: [12:47:36] [36m[DEBUG][0m Refresh access token
 Quizzer: [12:47:36] [36m[DEBUG][0m Attempt 1 to refresh token
 Quizzer: [12:47:36] [36m[DEBUG][0m Saving session
+Quizzer: [13:46:56] [36m[DEBUG][0m Refresh access token
+Quizzer: [13:46:56] [36m[DEBUG][0m Attempt 1 to refresh token
+Quizzer: [13:46:56] [36m[DEBUG][0m Saving session
+Quizzer: [13:47:26] [36m[DEBUG][0m [session_helper.dart] Access Token: [REDACTED]
+Quizzer: [13:47:26] [36m[DEBUG][0m [session_helper.dart] Decoded JWT Token Payload (Redacted): {aal: aal1, amr: [{method: password, timestamp: 1747932527}], app_metadata: {provider: email, providers: [email]}, aud: authenticated, email: [REDACTED], exp: 1747946816, iat: 1747943216, is_anonymous: false, iss: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, phone: , role: authenticated, session_id: [REDACTED], sub: [REDACTED], user_metadata: [REDACTED], user_role: admin}
+Quizzer: [13:47:26] [36m[DEBUG][0m [session_helper.dart] User role determined from JWT: admin
+Quizzer: [13:47:26] [36m[DEBUG][0m [menu_page.dart] Building MenuPage for user role: admin
+Quizzer: [13:47:28] [36m[DEBUG][0m [home_page.dart] HomePage building question type: multiple_choice with key: [<'2025-05-04T17:32:37.716421_77647c42-c888-47e3-8296-6fc452815810'>] (using session data)
+Quizzer: [13:47:30] [36m[DEBUG][0m [session_helper.dart] Access Token: [REDACTED]
+Quizzer: [13:47:30] [36m[DEBUG][0m [session_helper.dart] Decoded JWT Token Payload (Redacted): {aal: aal1, amr: [{method: password, timestamp: 1747932527}], app_metadata: {provider: email, providers: [email]}, aud: authenticated, email: [REDACTED], exp: 1747946816, iat: 1747943216, is_anonymous: false, iss: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, phone: , role: authenticated, session_id: [REDACTED], sub: [REDACTED], user_metadata: [REDACTED], user_role: admin}
+Quizzer: [13:47:30] [36m[DEBUG][0m [session_helper.dart] User role determined from JWT: admin
+Quizzer: [13:47:30] [36m[DEBUG][0m [menu_page.dart] Building MenuPage for user role: admin
