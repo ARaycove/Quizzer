@@ -148,13 +148,23 @@ Future<Widget> _buildAsyncWidgetFuture(String? type, String? content) async {
     }
     try {
       final String filename = content;
-      // 1. Get the app's documents directory
-      final docsDir = await getApplicationDocumentsDirectory();
-      final String assetsPath = p.join(docsDir.path, 'question_answer_pair_assets', filename);
-      // 2. Check if the file exists in the documents directory
+      Directory baseDir;
+      // Determine base directory based on platform
+      if (Platform.isAndroid || Platform.isIOS) {
+        baseDir = await getApplicationDocumentsDirectory();
+      } else if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+        baseDir = await getApplicationSupportDirectory();
+      } else {
+        // Fallback or throw error for unsupported platforms if necessary
+        QuizzerLogger.logError('ElementRenderer: Unsupported platform for media path construction.');
+        return _buildErrorIconRow('Unsupported platform', isWarning: true);
+      }
+
+      final String assetsPath = p.join(baseDir.path, 'QuizzerAppMedia', 'question_answer_pair_assets', filename);
+      
       File fileToCheck = File(assetsPath);
       if (await fileToCheck.exists()) {
-        QuizzerLogger.logValue("ElementRenderer: Found image in app docs dir: $assetsPath");
+        QuizzerLogger.logValue("ElementRenderer: Found image at platform-specific path: $assetsPath");
         return Image.file(File(assetsPath), fit: BoxFit.contain, 
           errorBuilder: (c, e, s) {
             QuizzerLogger.logError("ElementRenderer: Error loading image file $assetsPath: $e");
@@ -162,8 +172,8 @@ Future<Widget> _buildAsyncWidgetFuture(String? type, String? content) async {
           }
         );
       }
-      // 3. (Optional) Fallback: check in staging or other locations if needed
-      QuizzerLogger.logWarning("ElementRenderer: Image file '$filename' not found in app docs dir");
+      
+      QuizzerLogger.logWarning("ElementRenderer: Image file '$filename' not found at $assetsPath");
       return _buildErrorIconRow('Image not found', isWarning: false);
     } catch (e) {
       QuizzerLogger.logError("ElementRenderer: Error accessing image '$content' (filename): $e");

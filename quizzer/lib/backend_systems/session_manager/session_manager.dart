@@ -1267,11 +1267,4 @@ final SessionManager _globalSessionManager = SessionManager();
 SessionManager getSessionManager() => _globalSessionManager;
 
 
-// Setup user feedback system
-// TODO 
-// 1. build local table for user feedback, define fields, and (DONE)
-// 2. build identical table in SUPABASE (DONE)
-// 3. setup RLS policies for SUPABASE table (DONE)
-// 5. update SessionManager with API call to sumbit a feedback record.
-// 6. connect new API call to feedback page
-// 6. update outbound sync worker to send then delete feedback records after successfully sending them 
+// TODO Android device not fetching media properly (no media found on media questions)
