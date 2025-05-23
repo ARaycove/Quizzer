@@ -67,12 +67,13 @@ Future<bool> pushRecordToSupabase(String tableName, Map<String, dynamic> recordD
     }
     // --- END NEW LOGGING FOR USER_SETTINGS PAYLOAD ---
 
-    // 3. Perform Insert
+    // 3. Perform Upsert instead of Insert
+    // This will insert if the record is new, or update if it already exists based on PK.
     await supabase
       .from(tableName)
-      .insert(payload);
+      .upsert(payload);
 
-    QuizzerLogger.logSuccess('Supabase insert successful for record $recordIdForLog to $tableName.');
+    QuizzerLogger.logSuccess('Supabase upsert successful for record $recordIdForLog to $tableName.');
     return true; // Assume success if no exception is thrown
 
   } on PostgrestException catch (e) {

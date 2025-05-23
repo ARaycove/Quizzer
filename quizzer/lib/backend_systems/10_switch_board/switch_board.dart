@@ -124,6 +124,23 @@ class SwitchBoard {
   }
   // -------------------------------------
 
+  // --- Initial Inbound Sync Complete Stream (NEW) ---
+  final StreamController<void> _initialInboundSyncCompleteController = StreamController<void>.broadcast();
+
+  /// Stream that fires when the InboundSyncWorker has completed its initial critical sync.
+  Stream<void> get onInitialInboundSyncComplete => _initialInboundSyncCompleteController.stream;
+
+  /// Signals that the InboundSyncWorker has completed its initial critical sync.
+  void signalInitialInboundSyncComplete() {
+    if (!_initialInboundSyncCompleteController.isClosed) {
+      QuizzerLogger.logMessage('SwitchBoard: Signaling Initial Inbound Sync COMPLETE.');
+      _initialInboundSyncCompleteController.add(null);
+    } else {
+      QuizzerLogger.logWarning('SwitchBoard: Attempted to signal on closed InitialInboundSyncComplete stream.');
+    }
+  }
+  // -------------------------------------
+
   // --- Past Due Cache Stream (New) ---
   final StreamController<void> _pastDueCacheController = StreamController<void>.broadcast();
   // Single stream for low eligible cache conditions
@@ -166,6 +183,7 @@ class SwitchBoard {
     _outboundSyncNeededController.close();
     _mediaSyncStatusProcessedController.close();
     _inboundSyncNeededController.close();
+    _initialInboundSyncCompleteController.close();
     QuizzerLogger.logMessage('SwitchBoard disposed.');
   }
   // --------------------

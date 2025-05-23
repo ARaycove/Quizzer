@@ -74,6 +74,7 @@ Future<void> syncQuestionAnswerPairsInbound(
   String lastLogin,
   SupabaseClient supabaseClient,
 ) async {
+  SessionManager sessionManager = getSessionManager();
   QuizzerLogger.logMessage('Syncing inbound question_answer_pairs for user $userId since $lastLogin...');
   try {
     final List<dynamic> cloudRecords = await supabaseClient
@@ -81,26 +82,38 @@ Future<void> syncQuestionAnswerPairsInbound(
         .select('*')
         .gt('last_modified_timestamp', lastLogin);
 
-    if (cloudRecords.isEmpty) {
+    final int totalToSync = cloudRecords.length;
+
+    if (totalToSync == 0) {
       QuizzerLogger.logMessage('No new question_answer_pairs to sync.');
+      sessionManager.addLoginProgress('Question sync: No new questions.');
       return;
     }
 
-    QuizzerLogger.logMessage('Found ${cloudRecords.length} new/updated question_answer_pairs to sync.');
+    QuizzerLogger.logMessage('Found $totalToSync new/updated question_answer_pairs to sync.');
+    sessionManager.addLoginProgress('Question sync: Found $totalToSync questions.');
     final DatabaseMonitor monitor = getDatabaseMonitor();
     Database? db = await monitor.requestDatabaseAccess();
+    int syncedCount = 0;
     for (final record in cloudRecords) {
+      syncedCount++;
       // Insert or update each record
       await insertOrUpdateQuestionAnswerPair(record, db!);
+      // Report progress for every item
+      sessionManager.addLoginProgress('Syncing Question $syncedCount/$totalToSync');
     }
     monitor.releaseDatabaseAccess();
-    QuizzerLogger.logSuccess('Synced ${cloudRecords.length} question_answer_pairs from cloud.');
+    QuizzerLogger.logSuccess('Synced $totalToSync question_answer_pairs from cloud.');
+    sessionManager.addLoginProgress('Question sync: Complete.');
   } on PostgrestException catch (e, s) {
     QuizzerLogger.logError('syncQuestionAnswerPairsInbound: PostgrestException for user $userId. Error: ${e.message}, Stack: $s');
+    sessionManager.addLoginProgress('Question sync: Error.');
   } on SocketException catch (e, s) {
     QuizzerLogger.logError('syncQuestionAnswerPairsInbound: SocketException for user $userId. Error: $e, Stack: $s');
+    sessionManager.addLoginProgress('Question sync: Network error.');
   } catch (e, s) {
     QuizzerLogger.logError('syncQuestionAnswerPairsInbound: Unexpected error for user $userId. Error: $e, Stack: $s');
+    sessionManager.addLoginProgress('Question sync: Unexpected error.');
   }
 }
 

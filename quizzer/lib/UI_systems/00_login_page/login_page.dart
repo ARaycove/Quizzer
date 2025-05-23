@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/UI_systems/color_wheel.dart';
+import 'dart:async'; // Import for StreamSubscription
 
 // TODO Let's make plans to implement a very fancy loading indicator.
 // TODO 1. Simple Progress Bar
@@ -26,11 +27,38 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _passwordController = TextEditingController();
   SessionManager session = getSessionManager();
   bool _isLoading = false; // Add loading state variable
+  String _loginProgressMessage = "Login"; // To hold progress messages
+  StreamSubscription? _progressSubscription; // To manage the stream subscription
+
+  @override
+  void initState() {
+    super.initState();
+    _progressSubscription = session.loginProgressStream.listen((message) {
+      if (mounted) {
+        setState(() {
+          _loginProgressMessage = message;
+          // If the message is "Login Complete!" or an error state, 
+          // we might want to stop showing it as button text after a delay
+          // or once navigation happens. For now, it just updates.
+        });
+      }
+    }, onError: (error) {
+      // Handle any errors from the stream if necessary
+      if (mounted) {
+        setState(() {
+          _loginProgressMessage = "Error during login";
+          _isLoading = false; // Stop loading on stream error
+        });
+      }
+      QuizzerLogger.logError("Error on loginProgressStream: $error");
+    });
+  }
 
   Future<void> submitLogin() async {
     // Set loading state to true
     setState(() {
       _isLoading = true;
+      _loginProgressMessage = "Connecting..."; // Initial message when button pressed
     });
 
     // define the email and password submission
@@ -53,6 +81,7 @@ class _LoginPageState extends State<LoginPage> {
       // Reset loading state on validation error
       setState(() {
         _isLoading = false;
+        _loginProgressMessage = "Login"; // Reset button text
       });
       return;
     }
@@ -67,6 +96,9 @@ class _LoginPageState extends State<LoginPage> {
       QuizzerLogger.logMessage('Login successful for: $email. Navigating home.');
       if (!mounted) return;
       session.addPageToHistory('/home');
+      // _loginProgressMessage will be updated by the stream, culminating in "Login Complete!"
+      // Potentially, could set a final success message here if desired before navigation
+      // setState(() { _loginProgressMessage = "Success!"; }); 
       Navigator.pushReplacementNamed(context, '/home');
       // Don't reset loading state here, it disappears on navigation
     } else {
@@ -81,6 +113,7 @@ class _LoginPageState extends State<LoginPage> {
       // Reset loading state on login failure
       setState(() {
         _isLoading = false;
+        _loginProgressMessage = "Login"; // Reset button text
       });
       return;
     }
@@ -91,6 +124,7 @@ class _LoginPageState extends State<LoginPage> {
     if (mounted && _isLoading) { // Check mounted and isLoading before setting state
       setState(() {
           _isLoading = false;
+          _loginProgressMessage = "Login"; // Reset button text
       });
     }
   }
@@ -108,6 +142,7 @@ class _LoginPageState extends State<LoginPage> {
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _progressSubscription?.cancel(); // Cancel the stream subscription
     super.dispose();
   }
 
@@ -181,7 +216,7 @@ class _LoginPageState extends State<LoginPage> {
               
               // Submit Button
               SizedBox(
-                width: buttonWidth,
+                width: _isLoading ? fieldWidth : buttonWidth,
                 height: elementHeight25px,
                 child: ElevatedButton(
                   onPressed: _isLoading ? null : submitLogin,
@@ -194,16 +229,31 @@ class _LoginPageState extends State<LoginPage> {
                     disabledBackgroundColor: ColorWheel.buttonSecondary,
                   ),
                   child: _isLoading 
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            color: ColorWheel.primaryText,
-                            strokeWidth: 3,
-                          ),
+                      ? Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                color: ColorWheel.primaryText,
+                                strokeWidth: 2,
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                _loginProgressMessage, 
+                                style: ColorWheel.buttonTextBold,
+                                textAlign: TextAlign.center,
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 2,
+                              ),
+                            )
+                          ],
                         ) 
                       : const Text(
-                          "Login",
+                          "Login", // Or _loginProgressMessage if you want it to persist last known state
                           style: ColorWheel.buttonTextBold,
                         ),
                 ),

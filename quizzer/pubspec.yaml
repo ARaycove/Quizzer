@@ -81,7 +81,7 @@ flutter:
     - images/question_answer_pair_assets/
     - runtime_cache/models/
     - runtime_cache/subject_data/
-    - runtime_cache/sqlite/quizzer.db
+    # Excluding runtime_cache/sqlite/quizzer.db
     # Excluding runtime_cache/hive/ as it's generated per client
 
   # An image asset can refer to one or more resolution-specific "variants", see

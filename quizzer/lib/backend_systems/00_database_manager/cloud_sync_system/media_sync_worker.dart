@@ -30,6 +30,9 @@ class MediaSyncWorker {
   bool _isRunning = false;
   Completer<void>? _stopCompleter;
   StreamSubscription? _processingSubscription; // Subscription to SwitchBoard stream
+  late Completer<void> _initialSyncCompleter; 
+
+  Future<void> get onInitialSyncComplete => _initialSyncCompleter.future;
   // --------------------
 
   // --- Dependencies ---
@@ -42,10 +45,16 @@ class MediaSyncWorker {
   /// Starts the worker loop.
   Future<void> start() async {
     QuizzerLogger.logMessage('Entering MediaSyncWorker start()...');
+    _initialSyncCompleter = Completer<void>(); // Always create a new completer
+
     if (_isRunning) {
-      QuizzerLogger.logMessage('MediaSyncWorker already running.');
-      return;
+      QuizzerLogger.logWarning('MediaSyncWorker start() called but _isRunning is already true. Proceeding with re-initialization.');
     }
+
+    // Unlike InboundSyncWorker, MediaSyncWorker might not strictly need a userId to perform some initial tasks (e.g. setup local paths)
+    // However, most of its useful work (_performSync) will likely depend on SessionManager.supabase being ready.
+    // For now, we don't add a userId check here but rely on downstream checks or SessionManager readiness.
+
     _isRunning = true;
     _stopCompleter = Completer<void>();
 
@@ -63,26 +72,45 @@ class MediaSyncWorker {
   /// Stops the worker loop.
   Future<void> stop() async {
     QuizzerLogger.logMessage('Entering MediaSyncWorker stop()...');
-    if (!_isRunning || _stopCompleter == null) {
-      QuizzerLogger.logMessage('MediaSyncWorker already stopped or stopCompleter is null.');
+    if (!_isRunning) {
+      QuizzerLogger.logMessage('MediaSyncWorker: stop() called but worker is not running (or already stopped).');
+      // If start() was never fully completed or stop() was already called,
+      // _initialSyncCompleter might be null or already completed.
+      // Attempt to complete it only if it exists and is not yet completed.
+      if (_initialSyncCompleter != null && !_initialSyncCompleter!.isCompleted) {
+        // Changed from completeError to complete to avoid unhandled exceptions if not caught by caller.
+        _initialSyncCompleter!.complete(); 
+        QuizzerLogger.logMessage('MediaSyncWorker: _initialSyncCompleter force-completed (normally) as worker was stopped before fully running.');
+      }
       return;
     }
-    _isRunning = false;
+
+    _isRunning = false; // Signal loop to stop FIRST
 
     QuizzerLogger.logMessage('MediaSyncWorker: Unsubscribing from onMediaSyncStatusProcessed stream.');
     await _processingSubscription?.cancel();
     _processingSubscription = null;
 
-    // Signal the loop to stop and wait for it to complete.
-    // The loop itself will complete the _stopCompleter.
-    if (!_stopCompleter!.isCompleted) {
-        // The loop will complete this when it exits.
-        QuizzerLogger.logMessage('MediaSyncWorker: Stop signal sent. Waiting for loop to finish...');
-    }
-     // To ensure the loop wakes up if it's currently awaiting .first
+    // To ensure the loop wakes up if it's currently awaiting .first, and then sees _isRunning = false
     _switchBoard.signalMediaSyncStatusProcessed(); 
-    await _stopCompleter!.future; // Wait for the loop to fully exit
-    QuizzerLogger.logMessage('MediaSyncWorker stopped and loop finished.');
+    
+    // Wait for the loop to fully exit by awaiting the _stopCompleter that _runLoop completes.
+    if (_stopCompleter != null && !_stopCompleter!.isCompleted) {
+        QuizzerLogger.logMessage('MediaSyncWorker: stop() waiting for _runLoop to complete _stopCompleter...');
+        await _stopCompleter!.future; 
+    }
+
+    // At this point, the loop has exited.
+    // _initialSyncCompleter is guaranteed to be non-null here because _isRunning was true when stop() was entered.
+    // If the initial sync (or any part of it that _initialSyncCompleter represents) was ongoing 
+    // and not completed, signal that it was gracefully concluded due to worker stop.
+    if (!_initialSyncCompleter!.isCompleted) {
+        // Changed from completeError to complete.
+        _initialSyncCompleter!.complete(); 
+        QuizzerLogger.logMessage('MediaSyncWorker: _initialSyncCompleter force-completed (normally) because worker was stopped.');
+    }
+    
+    QuizzerLogger.logMessage('MediaSyncWorker: stop() processing complete, loop finished.');
   }
   // ----------------------
 
@@ -160,6 +188,10 @@ class MediaSyncWorker {
   /// Brute-force download: Download every file in the Supabase bucket if not present locally
   Future<void> _bruteForceDownloadAllSupabaseMedia() async {
     QuizzerLogger.logMessage('MediaSyncWorker: Starting brute-force download of all Supabase media files.');
+    if (!_isRunning) {
+      QuizzerLogger.logMessage('MediaSyncWorker (_bruteForceDownloadAllSupabaseMedia): Worker stopped before starting.');
+      return;
+    }
     final supabase = getSessionManager().supabase;
     const String bucketName = 'question-answer-pair-assets';
     final String localAssetBasePath = await _getLocalAssetBasePath();
@@ -173,6 +205,10 @@ class MediaSyncWorker {
     }
 
     for (final fileObj in files) {
+      if (!_isRunning) {
+        QuizzerLogger.logMessage('MediaSyncWorker (_bruteForceDownloadAllSupabaseMedia): Worker stopped during file loop.');
+        break; 
+      }
       final String fileName = fileObj.name;
       final String localFilePath = path.join(localAssetBasePath, fileName);
       final File localFile = File(localFilePath);

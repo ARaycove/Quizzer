@@ -16,7 +16,7 @@ import 'package:hive/hive.dart';
 import 'package:supabase/supabase.dart';
 import 'package:quizzer/backend_systems/06_question_queue_server/pre_process_worker.dart';
 import 'package:path/path.dart' as p; // Use alias to avoid conflicts
-import 'dart:async'; // For Completer
+import 'dart:async'; // For Completer and StreamController
 import 'dart:io'; // For Directory
 
 import 'package:path_provider/path_provider.dart'; // For mobile path
@@ -78,6 +78,17 @@ class SessionManager {
   final       SwitchBoard                     _switchBoard; // Add SwitchBoard instance
   final       PastDueCache                    _pastDueCache = PastDueCache();
   final       TempQuestionDetailsCache        _tempDetailsCache = TempQuestionDetailsCache();
+
+  // Login Progress Stream Controller
+  final StreamController<String> _loginProgressController = StreamController<String>.broadcast();
+  Stream<String> get loginProgressStream => _loginProgressController.stream;
+
+  /// Adds a message to the login progress stream.
+  void addLoginProgress(String message) {
+    if (!_loginProgressController.isClosed) {
+      _loginProgressController.add(message);
+    }
+  }
 
   // user State
               bool                            userLoggedIn = false;
@@ -241,6 +252,7 @@ class SessionManager {
 
   /// Initialize the SessionManager and its dependencies
   Future<void> _initializeLogin(String email) async {
+    _loginProgressController.add("Initializing Session...");
     userLoggedIn = true;
     userEmail = email;
     userId = await initializeSession({'email': email});
@@ -249,6 +261,7 @@ class SessionManager {
 
 
     // Fetch and store initial last_modified_timestamp before any sync operations
+    _loginProgressController.add("Fetching Profile...");
     Database? db = await _dbMonitor.requestDatabaseAccess();
     if (db == null) {
       throw StateError('Failed to acquire database access during login initialization');
@@ -258,18 +271,24 @@ class SessionManager {
     _dbMonitor.releaseDatabaseAccess();
 
     // Start MediaSyncWorker before inbound sync
+    _loginProgressController.add("Syncing Media Assets...");
     QuizzerLogger.logMessage('SessionManager: Starting MediaSyncWorker...');
     final mediaSyncWorker = MediaSyncWorker();
-    await mediaSyncWorker.start(); // Assuming start() is async and should be awaited if it performs critical setup
+    mediaSyncWorker.start(); // Assuming start() is async and should be awaited if it performs critical setup
     QuizzerLogger.logMessage('SessionManager: MediaSyncWorker started.');
 
     // Start InboundSyncWorker (which runs initial sync internally)
+    _loginProgressController.add("Syncing Local Data...");
     QuizzerLogger.logMessage('SessionManager: Starting InboundSyncWorker...');
     final inboundSyncWorker = InboundSyncWorker();
-    await inboundSyncWorker.start();
+    inboundSyncWorker.start();
     QuizzerLogger.logMessage('SessionManager: InboundSyncWorker started and initial sync completed.');
+    final SwitchBoard switchBoard = getSwitchBoard();
+    await switchBoard.onInitialInboundSyncComplete.first;
+    QuizzerLogger.logMessage('SessionManager: InitialInboundSyncComplete signal received, proceeding with PreProcessWorker.');
       
     // --- Start new background processing pipeline --- 
+    _loginProgressController.add("Preparing Questions...");
     final PreProcessWorker preProcessWorker = PreProcessWorker();
     preProcessWorker.start(); // Worker now fetches userId internally
     // -------------------------------------------------
@@ -277,9 +296,11 @@ class SessionManager {
     // --- Wait for Presentation Selection Worker initial loop completion --- 
     final psw = PresentationSelectionWorker();
     await psw.onInitialLoopComplete.first; // Waits for the signal
+    QuizzerLogger.logMessage('SessionManager: PresentationSelectionWorker initial loop complete.'); // Added log
     // ----------------------------------------------------------------------
 
     // --- Update last_login at the very end ---
+    _loginProgressController.add("Finalizing Login...");
     db = await _dbMonitor.requestDatabaseAccess();
     await updateLastLogin(userId!, db!);
     _dbMonitor.releaseDatabaseAccess();
@@ -287,6 +308,7 @@ class SessionManager {
     // Start OutboundSyncWorker after all initialization is complete
     final outboundSyncWorker = OutboundSyncWorker();
     await outboundSyncWorker.start();
+    _loginProgressController.add("Login Complete!");
   }
   
   // =================================================================================
@@ -344,6 +366,7 @@ class SessionManager {
   // This initializing spins up sub-system processes that rely on the user profile information
   Future<Map<String, dynamic>> attemptLogin(String email, String password) async {
     // Ensure async initialization is complete before proceeding
+    _loginProgressController.add("Securing Connection..."); // Signal before auth attempt
     QuizzerLogger.logMessage("Logging in user with email: $email");
     await initializationComplete;
 
@@ -356,11 +379,9 @@ class SessionManager {
     );
 
     if (response['success'] == true) {
+      _loginProgressController.add("Authenticating..."); // Signal after successful auth
       // Start initialization but do not await
-      _initializeLogin(email);
-      // Listen for the PresentationSelectionWorker initial loop complete signal
-      final psw = PresentationSelectionWorker();
-      await psw.onInitialLoopComplete.first;
+      await _initializeLogin(email);
 
       await requestNextQuestion();
       // Wait up to 3 seconds for a real question (not dummy_no_questions)
@@ -437,8 +458,6 @@ class SessionManager {
     QuizzerLogger.logSuccess("Data caches cleared (Placeholder - Clear methods TBD).");
 
     QuizzerLogger.logMessage("Disposing SwitchBoard");
-    // TODO potential error here, when logging out ensure properly state reset of backend systems (_isRunning flags should terminate loops and force workers to reawait the start command) Should do extensive testing, logging out user, logging them in, answering a butt ton of questions, logging out, logging in, and repeatedly doing this in an aggressive manner. This should reveal if there are issues in the login/logout process
-    // _switchBoard.dispose();
 
     // Update total study time
     if (sessionStartTime != null && currentUserIdForLogoutOps != null) { // MODIFIED: Use stored userId
@@ -1258,6 +1277,12 @@ class SessionManager {
     QuizzerLogger.logSuccess('User feedback submitted locally. Feedback ID: $feedbackId');
     return feedbackId;
   }
+
+  // Method to close streams, useful for testing or if the app has a complex lifecycle
+  void disposeLoginProgressStream() {
+    _loginProgressController.close();
+    QuizzerLogger.logMessage("SessionManager: Login progress stream disposed.");
+  }
 }
 
 // Global instance
@@ -1267,7 +1292,4 @@ final SessionManager _globalSessionManager = SessionManager();
 SessionManager getSessionManager() => _globalSessionManager;
 
 
-// TODO Android device not fetching media properly (no media found on media questions)
-// TODO Fix app logo in OS (currently showing default flutter logo for app)
-// TODO Fix issue where existing db is overwritten if user updates application. . .
 // TODO Fix flag question dialogue to actually work

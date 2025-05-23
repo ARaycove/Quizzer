@@ -25,6 +25,9 @@ class InboundSyncWorker {
   bool _isRunning = false;
   Completer<void>? _stopCompleter;
   StreamSubscription? _syncSubscription; // Subscription to the SwitchBoard stream
+  late Completer<void> _initialSyncCompleter;
+
+  Future<void> get onInitialSyncComplete => _initialSyncCompleter.future;
   // --------------------
 
   // --- Dependencies ---
@@ -37,18 +40,23 @@ class InboundSyncWorker {
   /// Starts the worker loop.
   Future<void> start() async {
     QuizzerLogger.logMessage('Entering InboundSyncWorker start()...');
+    // Always create a new completer for this start() call.
+    _initialSyncCompleter = Completer<void>();
+
     if (_isRunning) {
-      QuizzerLogger.logMessage('InboundSyncWorker already running.');
-      return; // Already running
+      QuizzerLogger.logWarning('InboundSyncWorker start() called but _isRunning is already true. Proceeding with re-initialization.');
     }
+
     if (_sessionManager.userId == null) {
       QuizzerLogger.logWarning('InboundSyncWorker: Cannot start, no user logged in.');
+      if (!_initialSyncCompleter.isCompleted) {
+        _initialSyncCompleter.completeError(StateError('InboundSyncWorker cannot start: No user logged in.'));
+      }
       return;
     }
-    _isRunning = true;
+    _isRunning = true; 
     _stopCompleter = Completer<void>();
 
-    // Subscribe to the inbound sync needed stream
     QuizzerLogger.logMessage('InboundSyncWorker: Subscribing to onInboundSyncNeeded stream.');
     _syncSubscription = _switchBoard.onInboundSyncNeeded.listen((_) {
       // Listener body intentionally empty - loop handles the wake-up.
@@ -60,6 +68,12 @@ class InboundSyncWorker {
     // Perform an initial sync on startup
     QuizzerLogger.logMessage('InboundSyncWorker: Performing initial inbound sync...');
     await runInitialInboundSync(_sessionManager); // Call the renamed function
+    QuizzerLogger.logMessage('InboundSyncWorker: Initial inbound sync process completed.');
+
+    // Signal completion of initial sync
+    QuizzerLogger.logMessage('InboundSyncWorker: Attempting to signal InitialInboundSyncComplete.');
+    _switchBoard.signalInitialInboundSyncComplete();
+    QuizzerLogger.logMessage('InboundSyncWorker: Signal InitialInboundSyncComplete SENT.');
 
     // Start the main loop
     _runLoop();
@@ -69,20 +83,46 @@ class InboundSyncWorker {
   /// Stops the worker loop.
   Future<void> stop() async {
     QuizzerLogger.logMessage('Entering InboundSyncWorker stop()...');
-    if (!_isRunning || _stopCompleter == null) {
-      QuizzerLogger.logMessage('InboundSyncWorker already stopped.');
-      return; // Already stopped
+
+    if (!_isRunning) {
+      QuizzerLogger.logMessage('InboundSyncWorker: stop() called but worker is not running (or already stopped).');
+      // It's possible start() was called, initialized _initialSyncCompleter, but didn't set _isRunning (e.g., returned early).
+      // Try to complete _initialSyncCompleter if it exists and isn't done, to prevent deadlocks.
+      try {
+        if (!_initialSyncCompleter.isCompleted) {
+          _initialSyncCompleter.completeError(StateError('InboundSyncWorker stopped before it was fully running.'));
+        }
+      } catch (e) { 
+        // Catches LateInitializationError if _initialSyncCompleter was never assigned.
+        QuizzerLogger.logWarning('InboundSyncWorker: _initialSyncCompleter not available in stop() for non-running worker: $e');
+      }
+      return; 
     }
-    _isRunning = false;
+
+    _isRunning = false; // Signal loops to stop FIRST
 
     QuizzerLogger.logMessage('InboundSyncWorker: Unsubscribing from onInboundSyncNeeded stream.');
     await _syncSubscription?.cancel();
     _syncSubscription = null;
 
+    // Complete the _stopCompleter to allow the _runLoop to exit if it's waiting on it (it usually isn't for this worker)
     if (_stopCompleter != null && !_stopCompleter!.isCompleted) {
-      // Loop exit handles completion
+       _stopCompleter!.complete();
     }
-    QuizzerLogger.logMessage('InboundSyncWorker stop signal sent.');
+
+    // If the initial sync was in progress and hadn't completed, signal an error to unblock SessionManager.
+    try {
+        if (!_initialSyncCompleter.isCompleted) {
+            _initialSyncCompleter.completeError(StateError('InboundSyncWorker stopped during initial sync process.'));
+            QuizzerLogger.logMessage('InboundSyncWorker: _initialSyncCompleter force-completed with error because worker was stopped.');
+        }
+    } catch (e) {
+        // This primarily catches LateInitializationError if start() didn't assign _initialSyncCompleter, 
+        // which is unlikely if _isRunning was true, but acts as a safeguard.
+        QuizzerLogger.logWarning('InboundSyncWorker: Error accessing/completing _initialSyncCompleter in stop(): $e');
+    }
+    
+    QuizzerLogger.logMessage('InboundSyncWorker: stop() processing complete.');
   }
   // ----------------------
 
