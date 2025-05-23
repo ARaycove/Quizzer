@@ -246,12 +246,24 @@ Future<List<Map<String, dynamic>>> getAllModules(Database db) async {
   // Process the decoded results to perform final type conversions
   final List<Map<String, dynamic>> finalResults = [];
   for (final decodedModule in decodedModules) {
-      // Basic check for essential fields
-      if (decodedModule[moduleNameField] == null || 
-          decodedModule[creationDateField] == null) {
-        QuizzerLogger.logWarning('Skipping module due to missing essential fields: ${decodedModule[moduleNameField] ?? 'Unknown'}');
+      // Check if module_name is missing (essential)
+      if (decodedModule[moduleNameField] == null) {
+        QuizzerLogger.logError(
+          'Skipping module due to missing essential field: $moduleNameField. Module data: $decodedModule'
+        );
         continue;
       }
+
+      // Check if creation_date is missing (non-critical for loading, but log it)
+      if (decodedModule[creationDateField] == null) {
+        QuizzerLogger.logWarning(
+          'Module \'${decodedModule[moduleNameField]}\' has a null $creationDateField. Proceeding to load.'
+        );
+      }
+      
+      // No other fields are currently checked as critical for skipping in getAllModules.
+      // If other fields were previously part of a critical check that caused skipping, 
+      // that logic is now removed in favor of only moduleNameField being critical.
 
       // Perform the same type conversions as in getModule
       final Map<String, dynamic> processedModule = {

@@ -1,3 +1,4 @@
+import 'dart:async'; // Added for Timer
 import 'package:flutter/material.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/UI_systems/color_wheel.dart';
@@ -22,6 +23,48 @@ class HomePage extends StatefulWidget { // Change to StatefulWidget
 class _HomePageState extends State<HomePage> { // State class
   final SessionManager session = SessionManager(); // Get session instance once
   Map<String, dynamic>? _editedQuestionData; // <-- ADDED State variable for callback data
+  Timer? _retryTimer; // Added for retry mechanism
+  static const String _dummyQuestionId = "dummy_no_questions"; // Corrected ID for the dummy/placeholder question
+
+  @override
+  void initState() {
+    super.initState();
+    // Initial check and start retry if needed
+    // Call _checkAndRetryFetchingQuestion after the first frame to ensure session is ready
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkAndRetryFetchingQuestion();
+    });
+  }
+
+  @override
+  void dispose() {
+    _retryTimer?.cancel();
+    super.dispose();
+  }
+
+  void _checkAndRetryFetchingQuestion() {
+    if (!mounted) return; // Don't do anything if the widget is disposed
+
+    if (session.currentQuestionId == _dummyQuestionId) {
+      QuizzerLogger.logMessage('HomePage: Current question is dummy ($_dummyQuestionId). Starting/Continuing retry timer.');
+      if (_retryTimer == null || !_retryTimer!.isActive) {
+        _retryTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+          QuizzerLogger.logMessage('HomePage: Retry timer triggered. Requesting next question.');
+          if (session.currentQuestionId != _dummyQuestionId) { // Double check before requesting, in case it changed
+            timer.cancel();
+            QuizzerLogger.logMessage('HomePage: Dummy question resolved before request. Timer cancelled.');
+            _checkAndRetryFetchingQuestion(); // Final check to ensure timer is truly stopped if condition met
+          } else {
+            _requestNextQuestion(); // This will call _checkAndRetryFetchingQuestion again after fetch
+          }
+        });
+      }
+    } else {
+      QuizzerLogger.logMessage('HomePage: Current question is NOT dummy. Stopping retry timer. ID: ${session.currentQuestionId}');
+      _retryTimer?.cancel();
+      _retryTimer = null; // Clear the timer instance
+    }
+  }
 
   // Method to handle requesting the next question and triggering rebuild
   Future<void> _requestNextQuestion() async {
@@ -30,6 +73,7 @@ class _HomePageState extends State<HomePage> { // State class
     // Ensure widget is still mounted before calling setState
     if (mounted) { 
       setState(() {}); // Trigger rebuild to show the new question
+      _checkAndRetryFetchingQuestion(); // Check and manage retry timer after fetching
     }
   }
 

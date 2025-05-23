@@ -388,6 +388,15 @@ class SessionManager {
       return;
     }
 
+    // Store essential user info for operations within this logout function,
+    // then immediately mark the user as logged out for the rest of the system.
+    final String? currentUserIdForLogoutOps = userId; 
+    final String? currentUserEmailForLogoutOps = userEmail;
+    userLoggedIn = false; // Set userLoggedIn to false IMMEDIATELY.
+    QuizzerLogger.logMessage("SessionManager: userLoggedIn flag set to false at the beginning of logoutUser.");
+    QuizzerLogger.logMessage("Starting user logout process for user: $currentUserEmailForLogoutOps, Current UserID for final ops: $currentUserIdForLogoutOps");
+
+
     // 1. Stop Workers (Order might matter depending on dependencies, stop consumers first?)
     QuizzerLogger.logMessage("Stopping background workers...");
     // Get worker instances (assuming they are singletons accessed via factory)
@@ -431,13 +440,13 @@ class SessionManager {
     // _switchBoard.dispose();
 
     // Update total study time
-    if (sessionStartTime != null && userId != null) {
+    if (sessionStartTime != null && currentUserIdForLogoutOps != null) { // MODIFIED: Use stored userId
       final Duration elapsedDuration = DateTime.now().difference(sessionStartTime!); // Use non-null assertion
       final double hoursToAdd = elapsedDuration.inMilliseconds / (1000.0 * 60 * 60);
       Database? db;
       db = await _dbMonitor.requestDatabaseAccess();
-      QuizzerLogger.logMessage("Updating total study time for user $userId...");
-      await updateTotalStudyTime(userId!, hoursToAdd, db!); // Let it throw if it fails
+      QuizzerLogger.logMessage("Updating total study time for user $currentUserIdForLogoutOps..."); // MODIFIED: Use stored userId for logging
+      await updateTotalStudyTime(currentUserIdForLogoutOps, hoursToAdd, db!); // MODIFIED: Use stored userId
       QuizzerLogger.logSuccess("Total study time updated.");
       _dbMonitor.releaseDatabaseAccess(); // Release lock AFTER successful update
     }
