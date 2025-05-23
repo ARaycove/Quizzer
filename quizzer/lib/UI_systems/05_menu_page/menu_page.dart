@@ -128,7 +128,8 @@ class _MenuPageState extends State<MenuPage> {
               label: 'Feedback & Bug Reports',
               onPressed: () {
                 QuizzerLogger.logMessage('Feedback & Bug Reports button pressed');
-                developer.log('Feedback & Bug Reports page not implemented yet');
+                session.addPageToHistory('/feedback');
+                Navigator.pushNamed(context, '/feedback');
               },
             ),
             const SizedBox(height: ColorWheel.standardPaddingValue),

@@ -10,6 +10,7 @@ import 'package:supabase/supabase.dart'; // Import for PostgrestException & Supa
 import 'package:quizzer/backend_systems/00_database_manager/tables/error_logs_table.dart'; // Added for syncErrorLogs
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_settings_table.dart'; // Added for user settings table
 import 'package:quizzer/backend_systems/00_database_manager/tables/modules_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_feedback_table.dart'; // Added for user feedback
 
 // ==========================================
 // Outbound Sync - Generic Push Function
@@ -778,4 +779,54 @@ Future<void> syncUserSettings(Database db) async {
   }
 
   QuizzerLogger.logMessage('Finished sync attempt for UserSettings.');
+}
+
+// ==========================================
+// Outbound Sync - User Feedback
+// ==========================================
+
+/// Fetches unsynced user feedback, pushes them to Supabase, and deletes them locally on success.
+Future<void> syncUserFeedback(Database db) async {
+  QuizzerLogger.logMessage('Starting sync for UserFeedback...');
+
+  // Fetch records needing sync
+  final List<Map<String, dynamic>> unsyncedRecords = await getUnsyncedUserFeedback(db);
+
+  if (unsyncedRecords.isEmpty) {
+    QuizzerLogger.logMessage('No unsynced UserFeedback found to sync.');
+    return;
+  }
+
+  QuizzerLogger.logMessage('Found ${unsyncedRecords.length} unsynced UserFeedback records to process.');
+
+  const String tableName = 'user_feedback'; // Supabase table name
+  List<String> successfullySyncedIds = [];
+
+  for (final record in unsyncedRecords) {
+    final String? recordId = record['id'] as String?;
+
+    if (recordId == null) {
+      QuizzerLogger.logError('Skipping unsynced user feedback record due to missing ID: $record');
+      continue;
+    }
+
+    // Attempt to push the record to Supabase.
+    QuizzerLogger.logValue('Preparing to push UserFeedback $recordId to $tableName');
+    final bool pushSuccess = await pushRecordToSupabase(tableName, record);
+
+    if (pushSuccess) {
+      QuizzerLogger.logSuccess('Push successful for UserFeedback $recordId.');
+      successfullySyncedIds.add(recordId);
+    } else {
+      QuizzerLogger.logWarning('Push FAILED for UserFeedback $recordId. Record will remain for next sync attempt.');
+    }
+  }
+
+  // Delete all successfully synced records locally in a batch
+  if (successfullySyncedIds.isNotEmpty) {
+    QuizzerLogger.logMessage('Deleting ${successfullySyncedIds.length} successfully synced UserFeedback records locally...');
+    await deleteLocalUserFeedback(successfullySyncedIds, db);
+  }
+
+  QuizzerLogger.logMessage('Finished sync attempt for UserFeedback.');
 }

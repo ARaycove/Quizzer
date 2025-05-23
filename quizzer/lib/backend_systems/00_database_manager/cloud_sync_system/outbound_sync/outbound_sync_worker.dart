@@ -158,6 +158,11 @@ class OutboundSyncWorker {
     db = await _getDbAccess();
     await syncModules(db!);
     _dbMonitor.releaseDatabaseAccess();
+
+    // 10. Check and Sync User Feedback (New)
+    db = await _getDbAccess();
+    await syncUserFeedback(db!); // Call the new sync function
+    _dbMonitor.releaseDatabaseAccess();
     
     QuizzerLogger.logMessage('All outbound sync functions completed.');
   }

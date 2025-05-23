@@ -17,7 +17,10 @@ class ColorWheel {
   static const Color buttonSuccess = Color.fromRGBO(71, 214, 93, 1.0); // Green
   static const Color buttonSecondary = Colors.grey;
   static const Color buttonError = Color.fromRGBO(214, 71, 71, 1.0);   // Red
+  static const Color buttonDisabled = Color(0xFF616161); // Added: Colors.grey.shade700
   static const Color warning = Color(0xFFFFCDD2); // Light Red (Using Material's red[100])
+  static const Color primaryBorder = Color(0xFF757575); // Added: Colors.grey.shade600
+  static const Color accentColor = Color(0xFF4CAF50); // Added: Same as accent
 
   static const Color previewDefaultBackground = Color(0xFF232B36); // Dark gray/blue
   static const Color previewAlternateBackground = Color(0xFF1B3A4B); // Dark cyan/blue
@@ -77,6 +80,7 @@ class ColorWheel {
   static const double buttonRadiusValue = 10.0; // Max of 8-10px range
   static const double textFieldRadiusValue = 10.0; // Max of 8-10px range
   static const double cardRadiusValue = 12.0;
+  static const double defaultRadius = 10.0; // Added defaultRadius
 
   static final BorderRadius buttonBorderRadius = BorderRadius.circular(buttonRadiusValue);
   static final BorderRadius textFieldBorderRadius = BorderRadius.circular(textFieldRadiusValue);

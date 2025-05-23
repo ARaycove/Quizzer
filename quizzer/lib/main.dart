@@ -9,6 +9,7 @@ import 'package:quizzer/UI_systems/02_home_page/home_page.dart';
 import 'package:quizzer/UI_systems/05_menu_page/menu_page.dart';
 import 'package:quizzer/UI_systems/06_admin_panel/admin_panel.dart';
 import 'package:quizzer/UI_systems/08_settings_page/settings_page.dart';
+import 'package:quizzer/UI_systems/09_feedback_page/feedback_page.dart';
 import 'package:quizzer/backend_systems/logger/global_error_handler.dart';
 import 'package:quizzer/UI_systems/07_critical_error_page/critical_error_screen.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
@@ -261,6 +262,7 @@ class _QuizzerAppState extends State<QuizzerApp> {
         '/signup':          (context) => const NewUserPage(),
         '/admin_panel':     (context) => const AdminPanelPage(),
         '/settings_page':   (context) => SettingsPage(),
+        '/feedback':        (context) => const FeedbackPage(),
         '/critical_error': (context) {
           final args = ModalRoute.of(context)?.settings.arguments;
           if (args is CriticalErrorDetails) {

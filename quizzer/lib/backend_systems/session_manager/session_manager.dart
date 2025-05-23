@@ -45,6 +45,7 @@ import 'package:quizzer/backend_systems/09_data_caches/temp_question_details.dar
 import 'package:quizzer/backend_systems/00_database_manager/tables/modules_table.dart' as modules_table;
 import 'package:quizzer/backend_systems/00_database_manager/review_system/get_send_postgre.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/error_logs_table.dart'; // Direct import
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_feedback_table.dart'; // Removed alias
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_settings_table.dart' as user_settings_table;
 // FIXME DO NOT USE ALIASING ON IMPORTS
 
@@ -1229,6 +1230,34 @@ class SessionManager {
     QuizzerLogger.logSuccess('Error report processed using direct DB access. Log ID: $resultId');
     return resultId;
   }
+
+  // ================================================================================
+  // --- User Feedback Functionality ---
+  // ================================================================================
+  /// Submits user feedback to the local database.
+  ///
+  /// Returns the ID of the created feedback record.
+  Future<String> submitUserFeedback({
+    required String feedbackType,
+    required String feedbackContent,
+  }) async {
+    await initializationComplete;
+    // userId can be null if the user is not logged in, which is fine for feedback.
+
+    final Database? db = await _dbMonitor.requestDatabaseAccess();
+    assert(db != null, 'CRITICAL: Failed to acquire database access for submitting feedback.');
+
+    final String feedbackId = await addUserFeedback( // Corrected: no alias
+      db: db!,
+      userId: userId, // Pass current userId, can be null
+      feedbackType: feedbackType,
+      feedbackContent: feedbackContent,
+    );
+
+    _dbMonitor.releaseDatabaseAccess();
+    QuizzerLogger.logSuccess('User feedback submitted locally. Feedback ID: $feedbackId');
+    return feedbackId;
+  }
 }
 
 // Global instance
@@ -1236,3 +1265,13 @@ final SessionManager _globalSessionManager = SessionManager();
 
 /// Gets the global session manager instance
 SessionManager getSessionManager() => _globalSessionManager;
+
+
+// Setup user feedback system
+// TODO 
+// 1. build local table for user feedback, define fields, and (DONE)
+// 2. build identical table in SUPABASE (DONE)
+// 3. setup RLS policies for SUPABASE table (DONE)
+// 5. update SessionManager with API call to sumbit a feedback record.
+// 6. connect new API call to feedback page
+// 6. update outbound sync worker to send then delete feedback records after successfully sending them 
