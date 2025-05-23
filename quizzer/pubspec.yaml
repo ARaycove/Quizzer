@@ -55,6 +55,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: "^0.13.1"
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -108,3 +109,11 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "images/quizzer_assets/quizzer_logo.png"
+  # Optional: For adaptive icons on Android (Android 8.0+)
+  # adaptive_icon_background: "#FFFFFF" # or your desired background color
+  # adaptive_icon_foreground: "images/quizzer_assets/quizzer_logo_foreground.png" # A version of your logo suitable for the foreground

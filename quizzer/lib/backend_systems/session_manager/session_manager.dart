@@ -1268,3 +1268,6 @@ SessionManager getSessionManager() => _globalSessionManager;
 
 
 // TODO Android device not fetching media properly (no media found on media questions)
+// TODO Fix app logo in OS (currently showing default flutter logo for app)
+// TODO Fix issue where existing db is overwritten if user updates application. . .
+// TODO Fix flag question dialogue to actually work
