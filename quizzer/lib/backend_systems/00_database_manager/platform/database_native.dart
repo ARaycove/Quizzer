@@ -9,15 +9,20 @@ import 'package:path_provider/path_provider.dart';
 /// Returns the full path to the Quizzer SQLite database, creating directories as needed.
 Future<String> getQuizzerDatabasePath() async {
   Directory baseDir;
-  if (Platform.isIOS || Platform.isAndroid) {
+  if (Platform.isAndroid || Platform.isIOS) {
     baseDir = await getApplicationDocumentsDirectory();
-    QuizzerLogger.logMessage('[PATH] Using Documents directory for QuizzerApp (Mobile).');
-  } else {
+    QuizzerLogger.logMessage('[PATH] Using mobile documents directory: ${baseDir.path}');
+  } else if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
     baseDir = await getApplicationSupportDirectory();
-    QuizzerLogger.logMessage('[PATH] Using Application Support directory for QuizzerApp (Desktop).');
+    QuizzerLogger.logMessage('[PATH] Using application support directory for desktop: ${baseDir.path}');
+  } else {
+    QuizzerLogger.logWarning('[PATH] Unsupported platform or environment, defaulting to current directory.');
+    baseDir = Directory('.');
   }
   final Directory appDir = Directory(join(baseDir.path, 'QuizzerApp', 'sqlite'));
-  await appDir.create(recursive: true);
+  if (!await appDir.exists()) {
+    await appDir.create(recursive: true);
+  }
   final String dbPath = join(appDir.path, 'quizzer.db');
   QuizzerLogger.logMessage('[PATH] Quizzer database path: $dbPath');
   return dbPath;

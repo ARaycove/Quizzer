@@ -49,6 +49,8 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_question_answer_pairs_table.dart'; // Added for direct access
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/stat_update_aggregator.dart'; // do not use aliases in the import statements
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_eligible_questions_table.dart'; // Added import for user_stats_eligible_questions_table
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_non_circulating_questions_table.dart'; // Added import for user_stats_non_circulating_questions_table
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_in_circulation_questions_table.dart'; // Added import for user_stats_in_circulation_questions_table
 // FIXME DO NOT USE ALIASING ON IMPORTS
 
 class SessionManager {
@@ -261,7 +263,6 @@ class SessionManager {
     assert(userId != null, "Failed to retrieve userId during login initialization.");
     sessionStartTime = DateTime.now();
 
-
     // Fetch and store initial last_modified_timestamp before any sync operations
     _loginProgressController.add("Fetching Profile...");
     Database? db = await _dbMonitor.requestDatabaseAccess();
@@ -270,6 +271,7 @@ class SessionManager {
     }
     _initialProfileLastModified = await getLastModifiedTimestampForUser(userId!, db);
     QuizzerLogger.logMessage('Stored initial profile last_modified_timestamp: $_initialProfileLastModified');
+    // --- Perform stat update on login (do not await) ---
     _dbMonitor.releaseDatabaseAccess();
 
     // Start MediaSyncWorker before inbound sync
@@ -305,6 +307,7 @@ class SessionManager {
     _loginProgressController.add("Finalizing Login...");
     db = await _dbMonitor.requestDatabaseAccess();
     await updateLastLogin(userId!, db!);
+    await updateAllUserDailyStats(userId!, db);
     _dbMonitor.releaseDatabaseAccess();
 
     // Start OutboundSyncWorker after all initialization is complete
@@ -1317,6 +1320,48 @@ class SessionManager {
 
     final String dateString = (date ?? DateTime.now().toUtc()).toIso8601String().substring(0, 10);
     final record = await getUserStatsEligibleQuestionsRecordByDate(userId!, dateString, db!);
+    _dbMonitor.releaseDatabaseAccess();
+    return record;
+  }
+
+  /// Fetches non-circulating questions stats for the current user.
+  /// - If [date] is provided, returns the stat for that date (or null if not found).
+  /// - If [getAll] is true, returns the full history as a List.
+  /// - If neither is provided, returns today's stat.
+  /// Only one mode can be used at a time.
+  Future<dynamic> getNonCirculatingQuestionsStats({DateTime? date, bool getAll = false}) async {
+    assert(userId != null, 'User must be logged in to get stats.');
+    final db = await _dbMonitor.requestDatabaseAccess();
+
+    if (getAll) {
+      final records = await getUserStatsNonCirculatingQuestionsRecordsByUser(userId!, db!);
+      _dbMonitor.releaseDatabaseAccess();
+      return records;
+    }
+
+    final String dateString = (date ?? DateTime.now().toUtc()).toIso8601String().substring(0, 10);
+    final record = await getUserStatsNonCirculatingQuestionsRecordByDate(userId!, dateString, db!);
+    _dbMonitor.releaseDatabaseAccess();
+    return record;
+  }
+
+  /// Fetches in-circulating questions stats for the current user.
+  /// - If [date] is provided, returns the stat for that date (or null if not found).
+  /// - If [getAll] is true, returns the full history as a List.
+  /// - If neither is provided, returns today's stat.
+  /// Only one mode can be used at a time.
+  Future<dynamic> getInCirculationQuestionsStats({DateTime? date, bool getAll = false}) async {
+    assert(userId != null, 'User must be logged in to get stats.');
+    final db = await _dbMonitor.requestDatabaseAccess();
+
+    if (getAll) {
+      final records = await getUserStatsInCirculationQuestionsRecordsByUser(userId!, db!);
+      _dbMonitor.releaseDatabaseAccess();
+      return records;
+    }
+
+    final String dateString = (date ?? DateTime.now().toUtc()).toIso8601String().substring(0, 10);
+    final record = await getUserStatsInCirculationQuestionsRecordByDate(userId!, dateString, db!);
     _dbMonitor.releaseDatabaseAccess();
     return record;
   }

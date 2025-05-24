@@ -9,6 +9,8 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/user_question
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_settings_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/modules_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_eligible_questions_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_non_circulating_questions_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_in_circulation_questions_table.dart';
 import 'dart:io'; // For SocketException
 import 'dart:async'; // For Future.delayed
 
@@ -450,6 +452,134 @@ Future<void> syncUserStatsEligibleQuestionsInbound(
   QuizzerLogger.logMessage('Database Released');
 }
 
+Future<void> syncUserStatsNonCirculatingQuestionsInbound(
+  String userId,
+  String? initialTimestamp,
+  SupabaseClient supabaseClient,
+) async {
+  QuizzerLogger.logMessage('Syncing inbound user_stats_non_circulating_questions for user $userId since $initialTimestamp...');
+
+  final DatabaseMonitor monitor = getDatabaseMonitor();
+  Database? db = await monitor.requestDatabaseAccess();
+  if (db == null) {
+    QuizzerLogger.logError('syncUserStatsNonCirculatingQuestionsInbound: Failed to get database access.');
+    return;
+  }
+
+  List<dynamic> cloudRecords;
+  try {
+    cloudRecords = await executeSupabaseCallWithRetry(
+      () => supabaseClient
+          .from('user_stats_non_circulating_questions')
+          .select('*')
+          .eq('user_id', userId)
+          .gt('last_modified_timestamp', initialTimestamp ?? DateTime(1970).toIso8601String())
+          .then((response) => List<dynamic>.from(response as List)),
+      logContext: 'syncUserStatsNonCirculatingQuestionsInbound: Fetching for user $userId',
+    );
+  } on PostgrestException catch (e, s) {
+    QuizzerLogger.logError('syncUserStatsNonCirculatingQuestionsInbound: PostgrestException (potentially non-retriable or after retries) for user $userId. Error: ${e.message}, Stack: $s');
+    monitor.releaseDatabaseAccess();
+    QuizzerLogger.logMessage('Database Released');
+    return;
+  } on SocketException catch (e, s) {
+    QuizzerLogger.logError('syncUserStatsNonCirculatingQuestionsInbound: SocketException (after retries) for user $userId. Error: $e, Stack: $s');
+    monitor.releaseDatabaseAccess();
+    QuizzerLogger.logMessage('Database Released');
+    return;
+  } catch (e, s) {
+    QuizzerLogger.logError('syncUserStatsNonCirculatingQuestionsInbound: Unexpected error for user $userId. Error: $e, Stack: $s');
+    monitor.releaseDatabaseAccess();
+    QuizzerLogger.logMessage('Database Released');
+    return;
+  }
+
+  if (cloudRecords.isEmpty) {
+    QuizzerLogger.logMessage('No new user_stats_non_circulating_questions to sync for user $userId.');
+    monitor.releaseDatabaseAccess();
+    QuizzerLogger.logMessage('Database Released');
+    return;
+  }
+
+  QuizzerLogger.logMessage('Found ${cloudRecords.length} new/updated user_stats_non_circulating_questions to sync for user $userId.');
+
+  for (final record in cloudRecords) {
+    if (record is Map<String, dynamic>) {
+      await upsertUserStatsNonCirculatingQuestionsFromInboundSync(record, db);
+    } else {
+      QuizzerLogger.logWarning('syncUserStatsNonCirculatingQuestionsInbound: Encountered a record not of type Map<String, dynamic>. Record: $record');
+    }
+  }
+
+  QuizzerLogger.logSuccess('Synced ${cloudRecords.length} user_stats_non_circulating_questions from cloud for user $userId.');
+  monitor.releaseDatabaseAccess();
+  QuizzerLogger.logMessage('Database Released');
+}
+
+Future<void> syncUserStatsInCirculationQuestionsInbound(
+  String userId,
+  String? initialTimestamp,
+  SupabaseClient supabaseClient,
+) async {
+  QuizzerLogger.logMessage('Syncing inbound user_stats_in_circulation_questions for user $userId since $initialTimestamp...');
+
+  final DatabaseMonitor monitor = getDatabaseMonitor();
+  Database? db = await monitor.requestDatabaseAccess();
+  if (db == null) {
+    QuizzerLogger.logError('syncUserStatsInCirculationQuestionsInbound: Failed to get database access.');
+    return;
+  }
+
+  List<dynamic> cloudRecords;
+  try {
+    cloudRecords = await executeSupabaseCallWithRetry(
+      () => supabaseClient
+          .from('user_stats_in_circulation_questions')
+          .select('*')
+          .eq('user_id', userId)
+          .gt('last_modified_timestamp', initialTimestamp ?? DateTime(1970).toIso8601String())
+          .then((response) => List<dynamic>.from(response as List)),
+      logContext: 'syncUserStatsInCirculationQuestionsInbound: Fetching for user $userId',
+    );
+  } on PostgrestException catch (e, s) {
+    QuizzerLogger.logError('syncUserStatsInCirculationQuestionsInbound: PostgrestException (potentially non-retriable or after retries) for user $userId. Error: ${e.message}, Stack: $s');
+    monitor.releaseDatabaseAccess();
+    QuizzerLogger.logMessage('Database Released');
+    return;
+  } on SocketException catch (e, s) {
+    QuizzerLogger.logError('syncUserStatsInCirculationQuestionsInbound: SocketException (after retries) for user $userId. Error: $e, Stack: $s');
+    monitor.releaseDatabaseAccess();
+    QuizzerLogger.logMessage('Database Released');
+    return;
+  } catch (e, s) {
+    QuizzerLogger.logError('syncUserStatsInCirculationQuestionsInbound: Unexpected error for user $userId. Error: $e, Stack: $s');
+    monitor.releaseDatabaseAccess();
+    QuizzerLogger.logMessage('Database Released');
+    return;
+  }
+
+  if (cloudRecords.isEmpty) {
+    QuizzerLogger.logMessage('No new user_stats_in_circulation_questions to sync for user $userId.');
+    monitor.releaseDatabaseAccess();
+    QuizzerLogger.logMessage('Database Released');
+    return;
+  }
+
+  QuizzerLogger.logMessage('Found ${cloudRecords.length} new/updated user_stats_in_circulation_questions to sync for user $userId.');
+
+  for (final record in cloudRecords) {
+    if (record is Map<String, dynamic>) {
+      await upsertUserStatsInCirculationQuestionsFromInboundSync(record, db);
+    } else {
+      QuizzerLogger.logWarning('syncUserStatsInCirculationQuestionsInbound: Encountered a record not of type Map<String, dynamic>. Record: $record');
+    }
+  }
+
+  QuizzerLogger.logSuccess('Synced ${cloudRecords.length} user_stats_in_circulation_questions from cloud for user $userId.');
+  monitor.releaseDatabaseAccess();
+  QuizzerLogger.logMessage('Database Released');
+}
+
 Future<void> runInitialInboundSync(SessionManager sessionManager) async {
   QuizzerLogger.logMessage('Starting initial inbound sync aggregator...');
   final String? userId = sessionManager.userId;
@@ -504,6 +634,20 @@ Future<void> runInitialInboundSync(SessionManager sessionManager) async {
 
   // Sync user_stats_eligible_questions using the initial profile last_modified_timestamp
   await syncUserStatsEligibleQuestionsInbound(
+    userId,
+    effectiveInitialTimestamp,
+    sessionManager.supabase,
+  );
+
+  // Sync user_stats_non_circulating_questions using the initial profile last_modified_timestamp
+  await syncUserStatsNonCirculatingQuestionsInbound(
+    userId,
+    effectiveInitialTimestamp,
+    sessionManager.supabase,
+  );
+
+  // Sync user_stats_in_circulation_questions using the initial profile last_modified_timestamp
+  await syncUserStatsInCirculationQuestionsInbound(
     userId,
     effectiveInitialTimestamp,
     sessionManager.supabase,

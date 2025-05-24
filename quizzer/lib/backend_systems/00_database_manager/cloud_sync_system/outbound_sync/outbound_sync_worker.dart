@@ -168,6 +168,16 @@ class OutboundSyncWorker {
     db = await _getDbAccess();
     await syncUserStatsEligibleQuestions(db!);
     _dbMonitor.releaseDatabaseAccess();
+
+    // 12. Check and Sync User Stats Non-Circulating Questions
+    db = await _getDbAccess();
+    await syncUserStatsNonCirculatingQuestions(db!);
+    _dbMonitor.releaseDatabaseAccess();
+
+    // 13. Check and Sync User Stats In Circulation Questions
+    db = await _getDbAccess();
+    await syncUserStatsInCirculationQuestions(db!);
+    _dbMonitor.releaseDatabaseAccess();
     
     QuizzerLogger.logMessage('All outbound sync functions completed.');
   }

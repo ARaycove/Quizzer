@@ -1,7 +1,7 @@
 import 'package:sqflite/sqflite.dart';
 
 // Import platform-specific database initialization
-import 'platform/database_native.dart' if (dart.library.html) 'platform/database_web.dart' as platform_db;
+import 'platform/database_native.dart';
 
 // The database
 // Every write operation or complex operation should be ran as an isolated process
@@ -17,7 +17,7 @@ Database? _database;
 /// Creates all necessary tables during initialization
 Future<Database> initDb() async {
   // Delegate to platform-specific implementation
-  _database = await platform_db.initializeDatabase();
+  _database = await initializeDatabase();
   return _database!;
 }
 
