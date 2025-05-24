@@ -17,7 +17,7 @@ final SwitchBoard _switchBoard = SwitchBoard();
 
 // --- Universal Encoding/Decoding Helpers --- Removed, moved to 00_table_helper.dart ---
 
-Future<void> verifyQuestionAnswerPairTable(Database db) async {
+Future<void> verifyQuestionAnswerPairTable(dynamic db) async {
   
   // Check if the table exists
   final List<Map<String, dynamic>> tables = await db.rawQuery(
@@ -165,7 +165,7 @@ Future<void> fetchAndDownloadMediaIfMissing(String fileName) async {
 
 /// Processes a given question record to check for media, extract filenames if present,
 /// register those filenames in the media_sync_status table, and returns whether media was found.
-Future<bool> hasMediaCheck(Database db, Map<String, dynamic> questionRecord) async {
+Future<bool> hasMediaCheck(dynamic db, Map<String, dynamic> questionRecord) async {
   final String? recordQuestionId = questionRecord['question_id'] as String?;
   final String loggingContextSuffix = recordQuestionId != null ? '(Question ID: $recordQuestionId)' : '(Question ID: unknown)';
   QuizzerLogger.logMessage('Processing media for question record $loggingContextSuffix');
@@ -250,7 +250,7 @@ void _recursiveExtractFilenames(dynamic data, Set<String> filenames) {
 
 /// Takes a set of filenames and attempts to register each in the media_sync_status table.
 /// Includes specific error handling for unique constraint violations.
-Future<void> registerMediaFiles(Database db, Set<String> filenames, {String? qidForLogging}) async {
+Future<void> registerMediaFiles(dynamic db, Set<String> filenames, {String? qidForLogging}) async {
   final String logCtx = qidForLogging != null ? '(Associated QID: $qidForLogging)' : '';
   QuizzerLogger.logMessage('Attempting to register ${filenames.length} media files $logCtx');
 
@@ -301,7 +301,7 @@ Future<void> registerMediaFiles(Database db, Set<String> filenames, {String? qid
 
 Future<int> editQuestionAnswerPair({
   required String questionId,
-  required Database db,
+  required dynamic db,
   String? citation,
   List<Map<String, dynamic>>? questionElements,
   List<Map<String, dynamic>>? answerElements,
@@ -386,7 +386,7 @@ Future<int> editQuestionAnswerPair({
 
 /// Fetches a single question-answer pair by its composite ID.
 /// The questionId format is expected to be 'timestamp_qstContrib'.
-Future<Map<String, dynamic>> getQuestionAnswerPairById(String questionId, Database db) async {
+Future<Map<String, dynamic>> getQuestionAnswerPairById(String questionId, dynamic db) async {
   // First verify that the table exists
   await verifyQuestionAnswerPairTable(db);
   // Use the single helper function
@@ -411,7 +411,7 @@ Future<Map<String, dynamic>> getQuestionAnswerPairById(String questionId, Databa
   return results.first;
 }
 
-Future<List<Map<String, dynamic>>>  getQuestionAnswerPairsBySubject(String subject, Database db) async {
+Future<List<Map<String, dynamic>>>  getQuestionAnswerPairsBySubject(String subject, dynamic db) async {
   // First verify that the table exists
   await verifyQuestionAnswerPairTable(db);
   // Use the helper function to query and decode the list of rows
@@ -423,7 +423,7 @@ Future<List<Map<String, dynamic>>>  getQuestionAnswerPairsBySubject(String subje
   );
 }
 
-Future<List<Map<String, dynamic>>>  getQuestionAnswerPairsByConcept(String concept, Database db) async {
+Future<List<Map<String, dynamic>>>  getQuestionAnswerPairsByConcept(String concept, dynamic db) async {
   // First verify that the table exists
   await verifyQuestionAnswerPairTable(db);
   // Use the helper function to query and decode the list of rows
@@ -435,7 +435,7 @@ Future<List<Map<String, dynamic>>>  getQuestionAnswerPairsByConcept(String conce
   );
 }
 
-Future<List<Map<String, dynamic>>>  getQuestionAnswerPairsBySubjectAndConcept(String subject, String concept, Database db) async {
+Future<List<Map<String, dynamic>>>  getQuestionAnswerPairsBySubjectAndConcept(String subject, String concept, dynamic db) async {
   // First verify that the table exists
   await verifyQuestionAnswerPairTable(db);
   // Use the helper function to query and decode the list of rows
@@ -447,7 +447,7 @@ Future<List<Map<String, dynamic>>>  getQuestionAnswerPairsBySubjectAndConcept(St
   );
 }
 
-Future<Map<String, dynamic>?> getRandomQuestionAnswerPair(Database db) async {
+Future<Map<String, dynamic>?> getRandomQuestionAnswerPair(dynamic db) async {
   // First verify that the table exists
   await verifyQuestionAnswerPairTable(db);
 
@@ -464,14 +464,14 @@ Future<Map<String, dynamic>?> getRandomQuestionAnswerPair(Database db) async {
   return results.first; // queryAndDecodeDatabase now handles the decoding
 }
 
-Future<List<Map<String, dynamic>>>  getAllQuestionAnswerPairs(Database db) async {
+Future<List<Map<String, dynamic>>>  getAllQuestionAnswerPairs(dynamic db) async {
   // First verify that the table exists
   await verifyQuestionAnswerPairTable(db);
   // Use the helper function to query and decode all rows
   return await queryAndDecodeDatabase('question_answer_pairs', db);
 }
 
-Future<int> removeQuestionAnswerPair(String timeStamp, String qstContrib, Database db) async {
+Future<int> removeQuestionAnswerPair(String timeStamp, String qstContrib, dynamic db) async {
   // First verify that the table exists
   await verifyQuestionAnswerPairTable(db);
 
@@ -484,33 +484,29 @@ Future<int> removeQuestionAnswerPair(String timeStamp, String qstContrib, Databa
 
 /// Fetches the module name for a specific question ID.
 /// Throws an error if the question ID is not found (Fail Fast).
-Future<String> getModuleNameForQuestionId(String questionId, Database db) async {
-  await verifyQuestionAnswerPairTable(db); // Ensure table/columns exist
-
-  QuizzerLogger.logMessage('Fetching module_name for question ID: $questionId');
+Future<String> getModuleNameForQuestionId(String questionId, dynamic db) async {
+  await verifyQuestionAnswerPairTable(db);
   
-  final List<Map<String, dynamic>> result = await db.query(
+  final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
     'question_answer_pairs',
-    columns: ['module_name'], // Select only the module_name column
+    db,
+    columns: ['module_name'],
     where: 'question_id = ?',
     whereArgs: [questionId],
-    limit: 1, // We expect only one result
   );
-
-  // Fail fast if no record is found
-  assert(result.isNotEmpty, 'No question found with ID: $questionId');
-  // Fail fast if module_name is somehow null in the DB (shouldn't happen if added correctly)
-  assert(result.first['module_name'] != null, 'Module name is null for question ID: $questionId');
-
-  final moduleName = result.first['module_name'] as String;
-  QuizzerLogger.logValue('Found module_name: $moduleName for question ID: $questionId');
-  return moduleName;
+  
+  if (results.isEmpty) {
+    QuizzerLogger.logError('No module name found for question ID: $questionId');
+    throw StateError('No module name found for question ID: $questionId');
+  }
+  
+  return results.first['module_name'] as String;
 }
 
 /// Returns a set of all unique subjects present in the question_answer_pairs table
 /// Subjects are expected to be stored as comma-separated strings in the 'subjects' column.
 /// This is useful for populating subject filters in the UI
-Future<Set<String>> getUniqueSubjects(Database db) async {
+Future<Set<String>> getUniqueSubjects(dynamic db) async {
   QuizzerLogger.logMessage('Fetching unique subjects from question_answer_pairs table');
   // First verify that the table exists
   await verifyQuestionAnswerPairTable(db);
@@ -544,7 +540,7 @@ Future<Set<String>> getUniqueSubjects(Database db) async {
 
 /// Returns a set of all unique concepts present in the question_answer_pairs table
 /// This is useful for populating concept filters in the UI
-Future<Set<String>> getUniqueConcepts(Database db) async {
+Future<Set<String>> getUniqueConcepts(dynamic db) async {
   QuizzerLogger.logMessage('Fetching unique concepts from question_answer_pairs table');
   // First verify that the table exists
   await verifyQuestionAnswerPairTable(db);
@@ -575,7 +571,7 @@ Future<void> updateQuestionSyncFlags({
   required String questionId,
   required bool hasBeenSynced,
   required bool editsAreSynced,
-  required Database db,
+  required dynamic db,
 }) async {
   QuizzerLogger.logMessage('Updating sync flags for QID: $questionId (Synced: $hasBeenSynced, Edits Synced: $editsAreSynced)');
   // Ensure table exists (though likely already verified by caller)
@@ -609,7 +605,7 @@ Future<void> updateQuestionSyncFlags({
 /// DOES NOT, decode the records
 /// This includes records that have never been synced (`has_been_synced = 0`)
 /// or records that have local edits pending sync (`edits_are_synced = 0`).
-Future<List<Map<String, dynamic>>> getUnsyncedQuestionAnswerPairs(Database db) async {
+Future<List<Map<String, dynamic>>> getUnsyncedQuestionAnswerPairs(dynamic db) async {
   QuizzerLogger.logMessage('Fetching unsynced question-answer pairs...');
   // Ensure table and sync columns exist
   await verifyQuestionAnswerPairTable(db);
@@ -631,7 +627,7 @@ Future<List<Map<String, dynamic>>> getUnsyncedQuestionAnswerPairs(Database db) a
 /// Used in inbound sync functionality, takes a full record with all details and inserts/updates it
 /// Not to be used outside of the inbound sync
 /// May only be used with fully formed records
-Future<void> insertOrUpdateQuestionAnswerPair(Map<String, dynamic> record, Database db) async {
+Future<void> insertOrUpdateQuestionAnswerPair(Map<String, dynamic> record, dynamic db) async {
   await verifyQuestionAnswerPairTable(db);
   final String? questionId = record['question_id'] as String?;
   if (questionId == null) {
@@ -687,7 +683,7 @@ Future<String> addQuestionMultipleChoice({
   required List<Map<String, dynamic>> options,
   required int correctOptionIndex,
   required String qstContrib, // Added contributor ID
-  required Database db,
+  required dynamic db,
   String? citation,
   String? concepts,
   String? subjects,
@@ -742,7 +738,7 @@ Future<String> addQuestionSelectAllThatApply({
   required List<Map<String, dynamic>> options,
   required List<int> indexOptionsThatApply, // Use List<int>
   required String qstContrib,
-  required Database db,
+  required dynamic db,
   String? citation,
   String? concepts,
   String? subjects,
@@ -795,7 +791,7 @@ Future<String> addQuestionTrueFalse({
   required List<Map<String, dynamic>> answerElements,
   required int correctOptionIndex, // 0 for True, 1 for False
   required String qstContrib,
-  required Database db,
+  required dynamic db,
   String? citation,
   String? concepts,
   String? subjects,
@@ -863,7 +859,7 @@ Future<String> addSortOrderQuestion({
   required List<Map<String, dynamic>> answerElements,
   required List<Map<String, dynamic>> options, // Items in the correct sorted order
   required String qstContrib, // Added contributor ID to match pattern
-  required Database db,
+  required dynamic db,
   String? citation,
   String? concepts,
   String? subjects,
@@ -936,7 +932,7 @@ Future<String> addSortOrderQuestion({
 // Media Status Housekeeping Functions
 
 /// Fetches all question-answer pairs where the 'has_media' status is NULL.
-Future<List<Map<String, dynamic>>> getPairsWithNullMediaStatus(Database db) async {
+Future<List<Map<String, dynamic>>> getPairsWithNullMediaStatus(dynamic db) async {
   QuizzerLogger.logMessage('Fetching question-answer pairs with NULL has_media status...');
   await verifyQuestionAnswerPairTable(db); // Ensure table and columns exist
 
@@ -953,7 +949,7 @@ Future<List<Map<String, dynamic>>> getPairsWithNullMediaStatus(Database db) asyn
 /// Processes question-answer pairs with NULL 'has_media' status.
 /// Fetches these records, runs a media check, and updates the 'has_media' flag directly in the database.
 /// This method does NOT signal for outbound sync.
-Future<void> processNullMediaStatusPairs(Database db) async {
+Future<void> processNullMediaStatusPairs(dynamic db) async {
   QuizzerLogger.logMessage('Starting to process pairs with NULL has_media status for direct update.');
   
   // 1. Get records with NULL has_media status
@@ -994,4 +990,66 @@ Future<void> processNullMediaStatusPairs(Database db) async {
     }
   }
   QuizzerLogger.logMessage('Finished processing pairs with NULL has_media status.');
+}
+
+/// True batch upsert for question_answer_pairs using a single SQL statement
+Future<void> batchUpsertQuestionAnswerPairs({
+  required List<Map<String, dynamic>> records,
+  required dynamic db,
+  int chunkSize = 500,
+}) async {
+  if (records.isEmpty) return;
+  QuizzerLogger.logMessage('Starting TRUE batch upsert for question_answer_pairs: \\${records.length} records');
+  await verifyQuestionAnswerPairTable(db);
+
+  // List of all columns in the table
+  final columns = [
+    'time_stamp',
+    'citation',
+    'question_elements',
+    'answer_elements',
+    'ans_flagged',
+    'ans_contrib',
+    'concepts',
+    'subjects',
+    'qst_contrib',
+    'qst_reviewer',
+    'has_been_reviewed',
+    'flag_for_removal',
+    'completed',
+    'module_name',
+    'question_type',
+    'options',
+    'correct_option_index',
+    'question_id',
+    'correct_order',
+    'index_options_that_apply',
+    'has_been_synced',
+    'edits_are_synced',
+    'last_modified_timestamp',
+    'has_media',
+  ];
+
+  // Helper to get value or null/default
+  dynamic getVal(Map<String, dynamic> r, String k, dynamic def) => r[k] ?? def;
+
+  for (int i = 0; i < records.length; i += chunkSize) {
+    final batch = records.sublist(i, i + chunkSize > records.length ? records.length : i + chunkSize);
+    final values = <dynamic>[];
+    final valuePlaceholders = batch.map((r) {
+      for (final col in columns) {
+        values.add(getVal(r, col, null));
+      }
+      return '(${List.filled(columns.length, '?').join(',')})';
+    }).join(', ');
+
+    // Use question_id as the upsert key if present, else (time_stamp, qst_contrib)
+    // We'll use question_id for ON CONFLICT if available in all records, else fallback
+    // For now, use question_id if present, else fallback to (time_stamp, qst_contrib)
+    // But for compatibility, use question_id as the upsert key
+    final updateSet = columns.where((c) => c != 'time_stamp' && c != 'qst_contrib').map((c) => '$c=excluded.$c').join(', ');
+    final sql = 'INSERT INTO question_answer_pairs (${columns.join(',')}) VALUES $valuePlaceholders ON CONFLICT(time_stamp, qst_contrib) DO UPDATE SET $updateSet;';
+    await db.rawInsert(sql, values);
+  }
+  QuizzerLogger.logSuccess('TRUE batch upsert for question_answer_pairs complete.');
 }

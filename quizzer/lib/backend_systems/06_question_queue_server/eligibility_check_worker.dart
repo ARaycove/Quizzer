@@ -16,7 +16,7 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/user_question
 import 'package:quizzer/backend_systems/09_data_caches/past_due_cache.dart'; // Added
 
 /// Checks if a given user question record is eligible to be shown.
-Future<bool> isUserRecordEligible(Map<String, dynamic> record, Database db) async {
+Future<bool> isUserRecordEligible(Map<String, dynamic> record, dynamic db) async {
   SessionManager sessionManager = getSessionManager();
   final AnswerHistoryCache historyCache = AnswerHistoryCache();
   assert(sessionManager.userId != null, 'Eligibility check requires a logged-in user ID.');

@@ -113,7 +113,7 @@ Future<Map<String, dynamic>> getUserStatsEligibleQuestionsRecordByDate(String us
     limit: 2,
   );
   if (results.isEmpty) {
-    QuizzerLogger.logError('No eligible questions record found for userId: $userId and date: $recordDate.');
+    QuizzerLogger.logMessage('No eligible questions record found for userId: $userId and date: $recordDate.');
     throw StateError('No record found for user $userId, date $recordDate');
   } else if (results.length > 1) {
     QuizzerLogger.logError('Multiple records found for userId: $userId and date: $recordDate. PK constraint violation?');

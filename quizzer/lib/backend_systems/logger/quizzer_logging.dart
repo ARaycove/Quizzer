@@ -52,11 +52,11 @@ class QuizzerLogger {
     // "session_manager.dart",
     "circulation_worker.dart",
     "question_queue_monitor.dart",
-    "module_updates_process.dart",
-    "modules_table.dart",
-    "module_isolates.dart",
+    // "module_updates_process.dart",
+    // "modules_table.dart",
+    // "module_isolates.dart",
     "answered_history_monitor.dart",
-    // "user_question_answer_pairs_table.dart",
+    "user_question_answer_pairs_table.dart",
     "module_inactive_cache.dart",
     "session_toggle_scheduler.dart",
     "unprocessed_cache.dart",
@@ -65,7 +65,8 @@ class QuizzerLogger {
     "due_date_worker.dart",
     "pre_process_worker.dart",
     "inactive_module_worker.dart",
-    "user_profile_table.dart"
+    "user_profile_table.dart",
+    "home_page.dart"
   ]; // List of source filenames to exclude
 
   /// Sets the list of source filenames (e.g., 'my_table.dart') to exclude from logging.

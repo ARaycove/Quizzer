@@ -71,7 +71,7 @@ _decodeValueFromDB(dynamic dbValue) {
 Future<int> insertRawData(
   String tableName,
   Map<String, dynamic> data,
-  Database db,
+  dynamic db, // Accept either Database or Transaction
   {ConflictAlgorithm? conflictAlgorithm} // Added optional conflictAlgorithm
 ) async {
   // QuizzerLogger.logValue('Encoding data for insertion into table: $tableName');
@@ -113,7 +113,7 @@ Future<int> insertRawData(
 ///   Returns an empty list if no rows match.
 Future<List<Map<String, dynamic>>> queryAndDecodeDatabase(
   String tableName,
-  Database db,
+  dynamic db, // Accept either Database or Transaction
   {
     List<String>? columns,
     String? where,
@@ -178,7 +178,7 @@ Future<int> updateRawData(
   Map<String, dynamic> data,
   String? where, // WHERE clause is required for updates usually, but make optional just in case?
   List<dynamic>? whereArgs,
-  Database db,
+  dynamic db, // Accept either Database or Transaction
   {ConflictAlgorithm? conflictAlgorithm}
 ) async {
   // QuizzerLogger.logValue('Encoding data for update on table: $tableName (where: $where, args: $whereArgs)');

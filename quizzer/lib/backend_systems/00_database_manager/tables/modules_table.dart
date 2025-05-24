@@ -39,7 +39,7 @@ const String createModulesTableSQL = '''
 ''';
 
 // Verify table exists and create if needed
-Future<void> verifyModulesTable(Database db) async {
+Future<void> verifyModulesTable(dynamic db) async {
   QuizzerLogger.logMessage('Verifying modules table existence');
   final List<Map<String, dynamic>> tables = await db.rawQuery(
     "SELECT name FROM sqlite_master WHERE type='table' AND name='$modulesTableName'"
@@ -339,6 +339,8 @@ Future<void> upsertModuleFromInboundSync({
   required Database db,
 }) async {
   QuizzerLogger.logMessage('Upserting module $moduleName from inbound sync...');
+
+  await verifyModulesTable(db);
 
   // Prepare the data map with only the fields we store in Supabase
   final Map<String, dynamic> data = {

@@ -8,7 +8,7 @@ import 'package:quizzer/backend_systems/09_data_caches/unprocessed_cache.dart';
 
 /// Checks if a module is active for a specific user
 /// Returns true if the module is active, false otherwise
-Future<bool> isModuleActiveForUser(String userId, String moduleName, Database db) async {
+Future<bool> isModuleActiveForUser(String userId, String moduleName, dynamic db) async {
   QuizzerLogger.logMessage('Checking if module $moduleName is active for user $userId');
   
   // Get the module activation status from the user profile
@@ -23,7 +23,7 @@ Future<bool> isModuleActiveForUser(String userId, String moduleName, Database db
 
 /// Ensures all questions from a module are present in the user's question-answer pairs table
 /// If the module is not active, this function will skip validation
-Future<void> validateModuleQuestionsInUserProfile(String moduleName, Database db, String userId) async {
+Future<void> validateModuleQuestionsInUserProfile(String moduleName, dynamic db, String userId) async {
   QuizzerLogger.logMessage('Ensuring questions from module $moduleName are in user profile');
   
   // Check if the module is active for this user
@@ -82,7 +82,7 @@ Future<void> validateModuleQuestionsInUserProfile(String moduleName, Database db
 
 /// Validates questions for all modules in the user profile
 /// This function will check both active and inactive modules
-Future<void> validateAllModuleQuestions(Database db, String userId) async {
+Future<void> validateAllModuleQuestions(dynamic db, String userId) async {
   QuizzerLogger.logMessage('Starting validation of all module questions');
   
   // Get the module activation status map from the user's profile

@@ -2,7 +2,6 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/
 import 'package:quizzer/backend_systems/06_question_queue_server/inactive_module_worker.dart';
 import 'package:quizzer/backend_systems/07_user_question_management/user_question_processes.dart' show validateAllModuleQuestions;
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pairs_table.dart' as q_pairs_table;
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_question_answer_pairs_table.dart' as uqap_table;
 import 'package:quizzer/backend_systems/03_account_creation/new_user_signup.dart' as account_creation;
 import 'package:quizzer/backend_systems/04_module_management/module_updates_process.dart';
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';

@@ -362,10 +362,10 @@ class CirculationWorker {
       await _unprocessedCache.addRecord(mutableRecord); 
   }
 
-   // Helper to get DB access (copied from EligibilityCheckWorker, could be utility)
+   // Helper to get DB access
    Future<Database?> _getDbAccess() async {
       QuizzerLogger.logMessage('Entering CirculationWorker _getDbAccess()...');
-      Database? db;
-      return db!;
+      final DatabaseMonitor dbMonitor = getDatabaseMonitor();
+      return await dbMonitor.requestDatabaseAccess();
    }
 }

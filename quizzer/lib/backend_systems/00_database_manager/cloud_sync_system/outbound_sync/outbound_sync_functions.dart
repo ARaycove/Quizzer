@@ -268,7 +268,7 @@ Future<bool> updateRecordWithCompositeKeyInSupabase(
 // ==========================================
 
 /// Fetches unsynced question-answer pairs and attempts to push them.
-Future<void> syncQuestionAnswerPairs(Database db) async {
+Future<void> syncQuestionAnswerPairs(dynamic db) async {
   QuizzerLogger.logMessage('Starting sync for QuestionAnswerPairs...');
 
   // Fetch records needing sync
@@ -310,7 +310,7 @@ Future<void> syncQuestionAnswerPairs(Database db) async {
 }
 
 /// Fetches unsynced login attempts, pushes them to Supabase, and deletes locally on success.
-Future<void> syncLoginAttempts(Database db) async {
+Future<void> syncLoginAttempts(dynamic db) async {
   QuizzerLogger.logMessage('Starting sync for LoginAttempts...');
 
   // Fetch records needing sync - Remove try-catch, let DB errors propagate
@@ -363,7 +363,7 @@ Future<void> syncLoginAttempts(Database db) async {
 }
 
 /// Fetches unsynced question answer attempts, pushes them to Supabase, and updates local flags on success.
-Future<void> syncQuestionAnswerAttempts(Database database) async {
+Future<void> syncQuestionAnswerAttempts(dynamic database) async {
   QuizzerLogger.logMessage('Starting sync for QuestionAnswerAttempts...');
 
   // Fetch records needing sync
@@ -418,7 +418,7 @@ Future<void> syncQuestionAnswerAttempts(Database database) async {
 }
 
 /// Fetches unsynced user profiles, pushes new ones or updates existing ones, and updates local flags on success.
-Future<void> syncUserProfiles(Database db) async {
+Future<void> syncUserProfiles(dynamic db) async {
   QuizzerLogger.logMessage('Starting sync for UserProfiles...');
 
   // Get the current user's ID from SessionManager
@@ -504,7 +504,7 @@ Future<void> syncUserProfiles(Database db) async {
 /// Fetches unsynced user_question_answer_pairs for the current user,
 /// pushes new ones or updates existing ones (with server version check),
 /// and updates local sync flags.
-Future<void> syncUserQuestionAnswerPairs(Database db) async {
+Future<void> syncUserQuestionAnswerPairs(dynamic db) async {
   QuizzerLogger.logMessage('Starting sync for UserQuestionAnswerPairs...');
 
   final SessionManager sessionManager = getSessionManager();
@@ -555,7 +555,7 @@ Future<void> syncUserQuestionAnswerPairs(Database db) async {
 }
 
 /// Fetches unsynced modules, pushes them to Supabase, and updates local flags on success.
-Future<void> syncModules(Database db) async {
+Future<void> syncModules(dynamic db) async {
   QuizzerLogger.logMessage('Starting sync for Modules...');
 
   // Fetch records needing sync
@@ -605,7 +605,7 @@ Future<void> syncModules(Database db) async {
 }
 
 /// Fetches unsynced error logs, pushes them to Supabase, and deletes them locally on success.
-Future<void> syncErrorLogs(Database db) async {
+Future<void> syncErrorLogs(dynamic db) async {
   QuizzerLogger.logMessage('Starting sync for ErrorLogs...');
 
   // Fetch records needing sync (already filters for older than 1 hour)
@@ -650,7 +650,7 @@ Future<void> syncErrorLogs(Database db) async {
 
 /// Fetches unsynced user settings for the current user, pushes new ones or updates existing ones,
 /// and updates local sync flags on success.
-Future<void> syncUserSettings(Database db) async {
+Future<void> syncUserSettings(dynamic db) async {
   QuizzerLogger.logMessage('Starting sync for UserSettings...');
 
   final SessionManager sessionManager = getSessionManager();
@@ -741,7 +741,7 @@ Future<void> syncUserSettings(Database db) async {
 // ==========================================
 
 /// Fetches unsynced user feedback, pushes them to Supabase, and deletes them locally on success.
-Future<void> syncUserFeedback(Database db) async {
+Future<void> syncUserFeedback(dynamic db) async {
   QuizzerLogger.logMessage('Starting sync for UserFeedback...');
 
   // Fetch records needing sync
@@ -786,7 +786,7 @@ Future<void> syncUserFeedback(Database db) async {
   QuizzerLogger.logMessage('Finished sync attempt for UserFeedback.');
 }
 
-Future<void> syncUserStatsEligibleQuestions(Database db) async {
+Future<void> syncUserStatsEligibleQuestions(dynamic db) async {
   QuizzerLogger.logMessage('Starting sync for UserStatsEligibleQuestions...');
 
   final SessionManager sessionManager = getSessionManager();

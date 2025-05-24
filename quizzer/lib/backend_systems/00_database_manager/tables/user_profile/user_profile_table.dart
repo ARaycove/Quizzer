@@ -12,7 +12,7 @@ import '../table_helper.dart'; // Import the helper file
 
 /// Gets the user ID for a given email address.
 /// Throws a StateError if no user is found.
-Future<String> getUserIdByEmail(String emailAddress, Database db) async {
+Future<String> getUserIdByEmail(String emailAddress, dynamic db) async {
     QuizzerLogger.logMessage('Getting user ID for email: $emailAddress');
     // First verify the table exists
     await verifyUserProfileTable(db);
@@ -36,7 +36,7 @@ Future<String> getUserIdByEmail(String emailAddress, Database db) async {
     }
 }
 
-Future<bool> createNewUserProfile(String email, String username, Database db) async {
+Future<bool> createNewUserProfile(String email, String username, dynamic db) async {
   QuizzerLogger.logMessage('Creating new user profile for email: $email, username: $username');
   
   // First verify that the User Profile Table exists
@@ -95,7 +95,7 @@ String generateUserUUID() {
 
 /// Verifies that the User Profile Table exists in the database
 /// Creates the table if it doesn't exist based on the schema in documentation
-Future<void> verifyUserProfileTable(Database db) async {
+Future<void> verifyUserProfileTable(dynamic db) async {
   QuizzerLogger.logMessage('Verifying user profile table existence');
   
   // Check if the table exists
@@ -177,7 +177,7 @@ Future<void> verifyUserProfileTable(Database db) async {
 
 /// Verifies that the tutorial_progress column exists in the user_profile table
 /// Adds the column if it doesn't exist
-Future<void> verifyTutorialProgressColumn(Database db) async {
+Future<void> verifyTutorialProgressColumn(dynamic db) async {
   QuizzerLogger.logMessage('Verifying tutorial_progress column existence');
   
   // Check if the column exists in the table
@@ -198,14 +198,14 @@ Future<void> verifyTutorialProgressColumn(Database db) async {
     await db.execute('ALTER TABLE user_profile ADD COLUMN tutorial_progress INTEGER DEFAULT 0');
     QuizzerLogger.logSuccess('Added tutorial_progress column to user_profile table');
   } else {
-    QuizzerLogger.logMessage('tutorial_progress column already exists');
+    QuizzerLogger.logMessage('tutorial_progress column already exists in user_profile table');
   }
 }
 
 /// Verifies that the email and username don't already exist in the user profile table
 /// Returns a map with 'isValid' (bool) indicating if the profile is non-duplicate
 /// and 'message' (String) containing any error message if there's a duplicate
-Future<Map<String, dynamic>> verifyNonDuplicateProfile(String email, String username, Database db) async {
+Future<Map<String, dynamic>> verifyNonDuplicateProfile(String email, String username, dynamic db) async {
   QuizzerLogger.logMessage('Verifying non-duplicate profile for email: $email, username: $username');
   verifyUserProfileTable(db);
   // Check if email already exists
@@ -228,7 +228,7 @@ Future<Map<String, dynamic>> verifyNonDuplicateProfile(String email, String user
   };
 }
 
-Future<bool> updateLastLogin(String userId, Database db) async {
+Future<bool> updateLastLogin(String userId, dynamic db) async {
   QuizzerLogger.logMessage('Updating last login for userId: $userId');
   await verifyUserProfileTable(db);
   final String nowTimestamp = DateTime.now().toUtc().toIso8601String();
@@ -253,7 +253,7 @@ Future<bool> updateLastLogin(String userId, Database db) async {
 
 /// Gets the tutorial progress for a user
 /// Returns the current tutorial question number (0-5)
-Future<int> getTutorialProgress(String userId, Database db) async {
+Future<int> getTutorialProgress(String userId, dynamic db) async {
   QuizzerLogger.logMessage('Getting tutorial progress for user: $userId');
   // First verify the table structure
   await verifyUserProfileTable(db);
@@ -277,7 +277,7 @@ Future<int> getTutorialProgress(String userId, Database db) async {
 
 /// Updates the tutorial progress for a user
 /// Returns true if the update was successful, false otherwise
-Future<bool> updateTutorialProgress(String userId, int progress, Database db) async {
+Future<bool> updateTutorialProgress(String userId, int progress, dynamic db) async {
   QuizzerLogger.logMessage('Updating tutorial progress for user: $userId to $progress');
   await verifyUserProfileTable(db);
   await verifyTutorialProgressColumn(db);
@@ -300,33 +300,50 @@ Future<bool> updateTutorialProgress(String userId, int progress, Database db) as
 
 /// Gets the activation status of modules for a user
 /// Returns a Map<String, bool> where keys are module names and values are activation status
-Future<Map<String, bool>> getModuleActivationStatus(String userId, Database db) async {
-  QuizzerLogger.logMessage('Getting module activation status for user: $userId');
+Future<Map<String, bool>> getModuleActivationStatus(String userId, dynamic db) async {
   await verifyUserProfileTable(db);
   
-  final List<Map<String, dynamic>> result = await db.query(
+  final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
     'user_profile',
+    db,
     columns: ['activation_status_of_modules'],
     where: 'uuid = ?',
     whereArgs: [userId],
   );
   
-  if (result.isEmpty || result.first['activation_status_of_modules'] == null) {
-    QuizzerLogger.logMessage('No module activation status found for user: $userId, returning empty map');
+  if (results.isEmpty) {
+    QuizzerLogger.logError('No activation status found for user ID: $userId');
     return {};
   }
   
-  final String statusJson = result.first['activation_status_of_modules'] as String;
-  final Map<String, dynamic> statusMap = Map<String, dynamic>.from(json.decode(statusJson));
-  final Map<String, bool> activationStatus = statusMap.map(
-    (key, value) => MapEntry(key, value as bool)
-  );
-  return activationStatus;
+  final dynamic activationStatus = results.first['activation_status_of_modules'];
+  if (activationStatus == null) {
+    return {};
+  }
+  
+  // If it's already a Map, convert it to the correct type
+  if (activationStatus is Map) {
+    return activationStatus.map((key, value) => MapEntry(key.toString(), value as bool));
+  }
+  
+  // If it's a String, try to decode it
+  if (activationStatus is String) {
+    try {
+      final Map<String, dynamic> decoded = json.decode(activationStatus);
+      return decoded.map((key, value) => MapEntry(key, value as bool));
+    } catch (e) {
+      QuizzerLogger.logError('Failed to decode activation status for user ID: $userId');
+      return {};
+    }
+  }
+  
+  QuizzerLogger.logError('Unexpected type for activation_status_of_modules: ${activationStatus.runtimeType}');
+  return {};
 }
 
 /// Updates the activation status of a specific module for a user
 /// Takes a module name and boolean value to set its activation status
-Future<bool> updateModuleActivationStatus(String userId, String moduleName, bool isActive, Database db) async {
+Future<bool> updateModuleActivationStatus(String userId, String moduleName, bool isActive, dynamic db) async {
   QuizzerLogger.logMessage('Updating activation status for module: $moduleName, user: $userId, status: $isActive');
   await verifyUserProfileTable(db);
   
@@ -360,7 +377,7 @@ Future<bool> updateModuleActivationStatus(String userId, String moduleName, bool
 /// Gets the subject interest data for a user
 /// If new subjects are found in the question database that aren't in the user profile,
 /// they will be added with a default interest value of 10
-Future<Map<String, int>> getUserSubjectInterests(String userId, Database db) async {
+Future<Map<String, int>> getUserSubjectInterests(String userId, dynamic db) async {
   // QuizzerLogger.logMessage('Getting subject interests for user: $userId');
   await verifyUserProfileTable(db);
   
@@ -454,7 +471,7 @@ Future<Map<String, int>> getUserSubjectInterests(String userId, Database db) asy
 /// [userUuid]: The UUID of the user whose study time needs updating.
 /// [hoursToAdd]: The duration in hours (double) to add to the total study time.
 /// [db]: The database instance.
-Future<void> updateTotalStudyTime(String userUuid, double hoursToAdd, Database db) async {
+Future<void> updateTotalStudyTime(String userUuid, double hoursToAdd, dynamic db) async {
   QuizzerLogger.logMessage('Updating total_study_time for User: $userUuid, adding: $hoursToAdd hours');
 
   // Convert hours to days for storage
@@ -481,7 +498,7 @@ Future<void> updateTotalStudyTime(String userUuid, double hoursToAdd, Database d
 }
 
 /// Increments the total_questions_answered count for a specific user.
-Future<void> incrementTotalQuestionsAnswered(String userUuid, Database db) async {
+Future<void> incrementTotalQuestionsAnswered(String userUuid, dynamic db) async {
   QuizzerLogger.logMessage('Incrementing total_questions_answered for User: $userUuid');
   
   // Ensure the table and column exist (verification happens elsewhere, but good practice)
@@ -504,7 +521,7 @@ Future<void> incrementTotalQuestionsAnswered(String userUuid, Database db) async
 }
 
 /// Retrieves a list of all email addresses from the user_profile table.
-Future<List<String>> getAllUserEmails(Database db) async {
+Future<List<String>> getAllUserEmails(dynamic db) async {
   QuizzerLogger.logMessage('Fetching all emails from user_profile table.');
   // Ensure table exists (Fail Fast if verifyUserProfileTable fails)
   await verifyUserProfileTable(db);
@@ -534,7 +551,7 @@ Future<List<String>> getAllUserEmails(Database db) async {
 /// This includes records that have never been synced (`has_been_synced = 0`)
 /// or records that have local edits pending sync (`edits_are_synced = 0`).
 /// Does NOT decode the records.
-Future<List<Map<String, dynamic>>> getUnsyncedUserProfiles(Database db, String userId) async {
+Future<List<Map<String, dynamic>>> getUnsyncedUserProfiles(dynamic db, String userId) async {
   QuizzerLogger.logMessage('Fetching unsynced user profile for user ID: $userId...');
   await verifyUserProfileTable(db); // Ensure table and sync columns exist
 
@@ -556,7 +573,7 @@ Future<void> updateUserProfileSyncFlags({
   required String userId,
   required bool hasBeenSynced,
   required bool editsAreSynced,
-  required Database db,
+  required dynamic db,
 }) async {
   QuizzerLogger.logMessage('Updating sync flags for User Profile: $userId -> Synced: $hasBeenSynced, Edits Synced: $editsAreSynced');
   await verifyUserProfileTable(db); // Ensure table/columns exist
@@ -582,7 +599,7 @@ Future<void> updateUserProfileSyncFlags({
 }
 
 /// Gets the last_login timestamp for a user by userId. Returns null if not found.
-Future<String?> getLastLoginForUser(String userId, Database db) async {
+Future<String?> getLastLoginForUser(String userId, dynamic db) async {
   final List<Map<String, dynamic>> result = await db.query(
     'user_profile',
     columns: ['last_login'],
@@ -594,7 +611,7 @@ Future<String?> getLastLoginForUser(String userId, Database db) async {
 }
 
 /// Gets just the last_modified_timestamp for a user by userId. Returns null if not found.
-Future<String?> getLastModifiedTimestampForUser(String userId, Database db) async {
+Future<String?> getLastModifiedTimestampForUser(String userId, dynamic db) async {
   final List<Map<String, dynamic>> result = await db.query(
     'user_profile',
     columns: ['last_modified_timestamp'],

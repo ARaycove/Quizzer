@@ -85,19 +85,19 @@ Future<int> addUserQuestionAnswerPair({
   // Prepare raw data map
   final Map<String, dynamic> data = {
     'user_uuid': userUuid,
-    'question_id': questionAnswerReference, // Use the parameter name
+    'question_id': questionAnswerReference,
     'revision_streak': revisionStreak,
     'last_revised': lastRevised,
     'predicted_revision_due_history': predictedRevisionDueHistory,
     'next_revision_due': nextRevisionDue,
     'time_between_revisions': timeBetweenRevisions,
     'average_times_shown_per_day': averageTimesShownPerDay,
-    'in_circulation': false, // Default to false, pass bool directly
-    'total_attempts': 0, // Initialize total_attempts on creation
+    'in_circulation': false,
+    'total_attempts': 0,
     // Sync Fields
     'has_been_synced': 0,
     'edits_are_synced': 0,
-    'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(), // Use current time
+    'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
   };
 
   QuizzerLogger.logMessage('Prepared data map for insert...');
@@ -214,7 +214,7 @@ Future<Map<String, dynamic>> getUserQuestionAnswerPairById(String userUuid, Stri
   return results.first;
 }
 
-Future<List<Map<String, dynamic>>> getUserQuestionAnswerPairsByUser(String userUuid, Database db) async {
+Future<List<Map<String, dynamic>>> getUserQuestionAnswerPairsByUser(String userUuid, dynamic db) async {
   await verifyUserQuestionAnswerPairTable(db);
   // Use universal query helper
   return await queryAndDecodeDatabase(
@@ -225,7 +225,7 @@ Future<List<Map<String, dynamic>>> getUserQuestionAnswerPairsByUser(String userU
   );
 }
 
-Future<List<Map<String, dynamic>>> getQuestionsInCirculation(String userUuid, Database db) async {
+Future<List<Map<String, dynamic>>> getQuestionsInCirculation(String userUuid, dynamic db) async {
   await verifyUserQuestionAnswerPairTable(db);
   // Use universal query helper
   return await queryAndDecodeDatabase(
@@ -236,7 +236,7 @@ Future<List<Map<String, dynamic>>> getQuestionsInCirculation(String userUuid, Da
   );
 }
 
-Future<List<Map<String, dynamic>>> getAllUserQuestionAnswerPairs(Database db, String userUuid) async {
+Future<List<Map<String, dynamic>>> getAllUserQuestionAnswerPairs(dynamic db, String userUuid) async {
   await verifyUserQuestionAnswerPairTable(db);
   // Use universal query helper
   return await queryAndDecodeDatabase(
@@ -247,7 +247,7 @@ Future<List<Map<String, dynamic>>> getAllUserQuestionAnswerPairs(Database db, St
   );
 }
 
-Future<int> removeUserQuestionAnswerPair(String userUuid, String questionAnswerReference, Database db) async {
+Future<int> removeUserQuestionAnswerPair(String userUuid, String questionAnswerReference, dynamic db) async {
   await verifyUserQuestionAnswerPairTable(db);
 
   return await db.delete(
@@ -257,10 +257,8 @@ Future<int> removeUserQuestionAnswerPair(String userUuid, String questionAnswerR
   );
 }
 
-// --- Helper Functions ---
-
 /// Increments the total_attempts count for a specific user-question pair.
-Future<void> incrementTotalAttempts(String userUuid, String questionId, Database db) async {
+Future<void> incrementTotalAttempts(String userUuid, String questionId, dynamic db) async {
   QuizzerLogger.logMessage('Incrementing total attempts for User: $userUuid, Question: $questionId');
   
   // Ensure the table and column exist before attempting update
@@ -283,13 +281,11 @@ Future<void> incrementTotalAttempts(String userUuid, String questionId, Database
   }
 }
 
-// --- Set Circulation Status --- 
-
 /// Updates the user-specific record for a question's circulation status.
 /// Takes a boolean [isInCirculation] to set the status accordingly.
 /// Throws an Exception if the record is not found, adhering to fail-fast.
 Future<void> setCirculationStatus(
-    String userUuid, String questionId, bool isInCirculation, Database db) async {
+    String userUuid, String questionId, bool isInCirculation, dynamic db) async {
   final String statusString = isInCirculation ? 'IN' : 'OUT OF';
   QuizzerLogger.logMessage(
       'DB Table: Setting question $questionId $statusString circulation for user $userUuid');
@@ -332,7 +328,7 @@ Future<void> setCirculationStatus(
 /// Takes a boolean [isEligible] to set the status accordingly.
 /// Throws an Exception if the record is not found, adhering to fail-fast.
 Future<void> setEligibilityStatus(
-    String userUuid, String questionId, bool isEligible, Database db) async {
+    String userUuid, String questionId, bool isEligible, dynamic db) async {
   final String statusString = isEligible ? 'ELIGIBLE' : 'INELIGIBLE';
   QuizzerLogger.logMessage(
       'DB Table: Setting question $questionId to $statusString for user $userUuid');
@@ -365,16 +361,11 @@ Future<void> setEligibilityStatus(
       'Successfully set eligibility status ($statusString) for question $questionId. Rows affected: $rowsAffected');
 }
 
-// Optional: Add a similar function to set inCirculation to false if needed later.
-// Future<void> removeQuestionFromCirculation(...) async { ... inCirculation: false ... } // This comment is now redundant
-
-// --- Get Unsynced Records ---
-
 /// Fetches all user-question-answer pairs for a specific user that need outbound synchronization.
 /// This includes records that have never been synced (`has_been_synced = 0`)
 /// or records that have local edits pending sync (`edits_are_synced = 0`).
 /// Does NOT decode the records.
-Future<List<Map<String, dynamic>>> getUnsyncedUserQuestionAnswerPairs(Database db, String userId) async {
+Future<List<Map<String, dynamic>>> getUnsyncedUserQuestionAnswerPairs(dynamic db, String userId) async {
   QuizzerLogger.logMessage('Fetching unsynced user-question-answer pairs for user: $userId...');
   await verifyUserQuestionAnswerPairTable(db);
 
@@ -388,8 +379,6 @@ Future<List<Map<String, dynamic>>> getUnsyncedUserQuestionAnswerPairs(Database d
   return results;
 }
 
-// --- Update Sync Flags (NEW FUNCTION) ---
-
 /// Updates the synchronization flags for a specific user_question_answer_pair.
 /// Does NOT trigger a new sync signal.
 Future<void> updateUserQuestionAnswerPairSyncFlags({
@@ -397,7 +386,7 @@ Future<void> updateUserQuestionAnswerPairSyncFlags({
   required String questionId,
   required bool hasBeenSynced,
   required bool editsAreSynced,
-  required Database db,
+  required dynamic db,
 }) async {
   QuizzerLogger.logMessage('Updating sync flags for UserQuestionAnswerPair (User: $userUuid, QID: $questionId) -> Synced: $hasBeenSynced, Edits Synced: $editsAreSynced');
   await verifyUserQuestionAnswerPairTable(db); // Ensure table/columns exist
@@ -476,4 +465,52 @@ Future<int> insertOrUpdateUserQuestionAnswerPair({
       db: db,
     );
   }
+}
+
+/// True batch upsert for user_question_answer_pairs using a single SQL statement
+Future<void> batchUpsertUserQuestionAnswerPairs({
+  required List<Map<String, dynamic>> records,
+  required dynamic db,
+  int chunkSize = 500,
+}) async {
+  if (records.isEmpty) return;
+  QuizzerLogger.logMessage('Starting TRUE batch upsert for user_question_answer_pairs: ${records.length} records');
+  await verifyUserQuestionAnswerPairTable(db);
+
+  // List of all columns in the table
+  final columns = [
+    'user_uuid',
+    'question_id',
+    'revision_streak',
+    'last_revised',
+    'predicted_revision_due_history',
+    'next_revision_due',
+    'time_between_revisions',
+    'average_times_shown_per_day',
+    'is_eligible',
+    'in_circulation',
+    'total_attempts',
+    'has_been_synced',
+    'edits_are_synced',
+    'last_modified_timestamp',
+  ];
+
+  // Helper to get value or null/default
+  dynamic getVal(Map<String, dynamic> r, String k, dynamic def) => r[k] ?? def;
+
+  for (int i = 0; i < records.length; i += chunkSize) {
+    final batch = records.sublist(i, i + chunkSize > records.length ? records.length : i + chunkSize);
+    final values = <dynamic>[];
+    final valuePlaceholders = batch.map((r) {
+      for (final col in columns) {
+        values.add(getVal(r, col, null));
+      }
+      return '(${List.filled(columns.length, '?').join(',')})';
+    }).join(', ');
+
+    final updateSet = columns.where((c) => c != 'user_uuid' && c != 'question_id').map((c) => '$c=excluded.$c').join(', ');
+    final sql = 'INSERT INTO user_question_answer_pairs (${columns.join(',')}) VALUES $valuePlaceholders ON CONFLICT(user_uuid, question_id) DO UPDATE SET $updateSet;';
+    await db.rawInsert(sql, values);
+  }
+  QuizzerLogger.logSuccess('TRUE batch upsert for user_question_answer_pairs complete.');
 }
