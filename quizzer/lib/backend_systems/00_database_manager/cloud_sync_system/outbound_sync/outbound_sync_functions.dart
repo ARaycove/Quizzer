@@ -101,7 +101,7 @@ Future<bool> pushRecordToSupabase(String tableName, Map<String, dynamic> recordD
     QuizzerLogger.logSuccess('Supabase upsert successful for record $recordIdForLog to $tableName.');
     return true;
   } catch (e) {
-    QuizzerLogger.logError('Supabase upsert FAILED for record $recordIdForLog to $tableName: $e');
+    QuizzerLogger.logWarning('Supabase upsert FAILED for record $recordIdForLog to $tableName: $e');
     QuizzerLogger.logMessage('Attempting Supabase insert for record $recordIdForLog to table $tableName as fallback...');
     try {
       final supabase = getSessionManager().supabase;

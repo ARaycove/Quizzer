@@ -97,7 +97,6 @@ class StatLineGraph extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: Theme.of(context).textTheme.titleLarge),
         SizedBox(
           height: 220,
           child: Padding(
@@ -114,13 +113,13 @@ class StatLineGraph extends StatelessWidget {
                         if (value % 1 != 0) return const SizedBox.shrink();
                         return Text(
                           value.toInt().toString(),
-                          style: const TextStyle(color: Colors.white, fontSize: 10),
+                          style: ColorWheel.defaultText.copyWith(fontSize: 10),
                         );
                       },
                     ),
                     axisNameWidget: Padding(
                       padding: const EdgeInsets.only(right: 8.0),
-                      child: Text(yAxisLabel, style: const TextStyle(color: Colors.white, fontSize: 12)),
+                      child: Text(yAxisLabel, style: ColorWheel.defaultText.copyWith(fontSize: 12)),
                     ),
                     axisNameSize: 24,
                   ),
@@ -134,7 +133,7 @@ class StatLineGraph extends StatelessWidget {
                           if (idx == 0) {
                             return Transform.rotate(
                               angle: -0.7,
-                              child: Text(xLabels[0], style: const TextStyle(fontSize: 10, color: Colors.white)),
+                              child: Text(xLabels[0], style: ColorWheel.defaultText.copyWith(fontSize: 10)),
                             );
                           } else {
                             return const SizedBox.shrink();
@@ -143,13 +142,13 @@ class StatLineGraph extends StatelessWidget {
                         if (xLabels.length == 1) {
                           return Transform.rotate(
                             angle: -0.7,
-                            child: Text(xLabels[0], style: const TextStyle(fontSize: 10, color: Colors.white)),
+                            child: Text(xLabels[0], style: ColorWheel.defaultText.copyWith(fontSize: 10)),
                           );
                         }
                         if (idx == 0 || idx == xLabels.length - 1) {
                           return Transform.rotate(
                             angle: -0.7,
-                            child: Text(xLabels[idx], style: const TextStyle(fontSize: 10, color: Colors.white)),
+                            child: Text(xLabels[idx], style: ColorWheel.defaultText.copyWith(fontSize: 10)),
                           );
                         }
                         if (xLabels.length > 2) {
@@ -162,7 +161,7 @@ class StatLineGraph extends StatelessWidget {
                             if (shown <= 5) {
                               return Transform.rotate(
                                 angle: -0.7,
-                                child: Text(xLabels[idx], style: const TextStyle(fontSize: 10, color: Colors.white)),
+                                child: Text(xLabels[idx], style: ColorWheel.defaultText.copyWith(fontSize: 10)),
                               );
                             }
                           }
@@ -173,11 +172,19 @@ class StatLineGraph extends StatelessWidget {
                     ),
                     axisNameWidget: Padding(
                       padding: const EdgeInsets.only(top: 8.0),
-                      child: Text(xAxisLabel, style: const TextStyle(color: Colors.white, fontSize: 12)),
+                      child: Text(xAxisLabel, style: ColorWheel.defaultText.copyWith(fontSize: 12)),
                     ),
                     axisNameSize: 24,
                   ),
-                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  topTitles: AxisTitles(
+                    axisNameWidget: Text(
+                      chartName,
+                      style: ColorWheel.titleText.copyWith(fontSize: 16),
+                      textAlign: TextAlign.center,
+                    ),
+                    axisNameSize: 32,
+                    sideTitles: const SideTitles(showTitles: false),
+                  ),
                   rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                 ),
                 gridData: const FlGridData(show: true),
@@ -202,14 +209,13 @@ class StatLineGraph extends StatelessWidget {
                       const SizedBox(width: 8),
                       Text(
                         s.legendLabel,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        style: ColorWheel.defaultText.copyWith(
                           color: ColorWheel.primaryText,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ],
                   ),
-                Text(chartName, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey)),
               ],
             ),
           ),

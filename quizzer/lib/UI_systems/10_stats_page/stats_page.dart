@@ -83,7 +83,11 @@ class _StatsPageState extends State<StatsPage> {
                   children: [
                     Text(
                       'Current Eligible Questions: $currentEligible',
-                      style: ColorWheel.titleText,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 8),
                     // Graph for Eligible Questions
@@ -161,12 +165,20 @@ class _StatsPageState extends State<StatsPage> {
                       children: [
                         Text(
                           'Current Non-Circulating Questions: $currentNonCirc',
-                          style: ColorWheel.titleText,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 18.0,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           'Current In Circulation Questions: $currentInCirc',
-                          style: ColorWheel.titleText,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 18.0,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         const SizedBox(height: 8),
                         StatLineGraph.multi(
