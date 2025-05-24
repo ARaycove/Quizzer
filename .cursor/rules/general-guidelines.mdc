@@ -16,7 +16,10 @@ Basic Instructions:
 7. If a function is written it must be used. I do not need useless functions cluttering my fucking codebase. I will burn you if you keep violating this
 8. Functional Programming is preferred over OOP, but one is not strictly used over the other.
 9. Use the lib/backend_systems/logger/quizzer_logging.dart for providing log statements, do not use print or generic logging module directly
+10. DO NOT ALIAS MY FUCKING IMPORTS
 
 WARNING: Ignoring Instructions makes you piss poor assistant, if your intent is to be helpful then you will failfully follow instructions.
 
 If instructions appear to be conflicting you will stop and point these out so I can update your instructions
+
+DO NOT FUCKING USE TRY EXCEPT BLOCKS, YOU ARE FAR TOO RELIANT ON THIS SHIT, DO NOT USE TRY EXCEPT BLOCKS

@@ -50,6 +50,7 @@ dependencies:
   file_picker: ^8.0.6
   package_info_plus: ^8.3.0
   url_launcher: ^6.3.0
+  fl_chart: ^0.66.2
 
 
 dev_dependencies:

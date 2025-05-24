@@ -11,7 +11,12 @@ class UnprocessedCache {
   UnprocessedCache._internal(); // Private constructor
 
   final Lock _lock = Lock();
-  final List<Map<String, dynamic>> _cache = [];
+  // Three separate queues for prioritization
+  final List<Map<String, dynamic>> _eligiblePriorityQueue = [];
+  final List<Map<String, dynamic>> _circulatingPriorityQueue = [];
+  final List<Map<String, dynamic>> _otherRecordsQueue = [];
+  // Set to track all unique question IDs currently in any queue
+  final Set<String> _allKnownIdsInCache = {};
 
   // --- Notification Stream ---
   // Used to notify listeners (like PreProcessWorker) when a record is added to an empty cache.
@@ -21,146 +26,176 @@ class UnprocessedCache {
   Stream<void> get onRecordAdded => _addController.stream;
   // -------------------------
 
-  // --- Add Record (with duplicate check) ---
-
-  /// Adds a single user question record to the cache.
-  /// Ensures thread safety using a lock.
-  /// Notifies listeners via [onRecordAdded] if the cache was empty.
+  // --- Add Record (with duplicate check and prioritization) ---
   Future<void> addRecord(Map<String, dynamic> record) async {
     final String? questionId = record['question_id'] as String?;
     if (questionId == null) {
-       QuizzerLogger.logError('UnprocessedCache: Attempted to add record missing question_id.');
-       throw StateError("Can't do that");
+      QuizzerLogger.logError('UnprocessedCache: Attempted to add record missing question_id.');
+      throw StateError("Record must have a question_id to be added to UnprocessedCache.");
     }
+
     await _lock.synchronized(() {
-        QuizzerLogger.logValue('[UnprocessedCache.addRecord START] QID: $questionId, Cache Size Before: ${_cache.length}');
-        final bool wasEmpty = _cache.isEmpty;
-        _cache.add(record);
-        if (wasEmpty) {
-          QuizzerLogger.logMessage('[UnprocessedCache.addRecord] Added to empty cache, signaling addController.');
-          _addController.add(null);
-        }
-        QuizzerLogger.logValue('[UnprocessedCache.addRecord END] QID: $questionId, Added: true, Cache Size After: ${_cache.length}');
+      if (_allKnownIdsInCache.contains(questionId)) {
+        QuizzerLogger.logValue('[UnprocessedCache.addRecord] QID: $questionId already in cache, skipping.');
+        return;
+      }
+
+      final bool wasOverallEmpty = _eligiblePriorityQueue.isEmpty &&
+                                 _circulatingPriorityQueue.isEmpty &&
+                                 _otherRecordsQueue.isEmpty;
+
+      bool isEligible = (record['is_eligible'] as int? ?? 0) == 1;
+      bool inCirculation = (record['in_circulation'] as int? ?? 0) == 1;
+
+      if (isEligible) {
+        _eligiblePriorityQueue.add(record);
+        QuizzerLogger.logValue('[UnprocessedCache.addRecord] QID: $questionId added to _eligiblePriorityQueue.');
+      } else if (inCirculation) {
+        _circulatingPriorityQueue.add(record);
+        QuizzerLogger.logValue('[UnprocessedCache.addRecord] QID: $questionId added to _circulatingPriorityQueue.');
+      } else {
+        _otherRecordsQueue.add(record);
+        QuizzerLogger.logValue('[UnprocessedCache.addRecord] QID: $questionId added to _otherRecordsQueue.');
+      }
+      _allKnownIdsInCache.add(questionId);
+
+      if (wasOverallEmpty) {
+        QuizzerLogger.logMessage('[UnprocessedCache.addRecord] Added to overall empty cache, signaling addController.');
+        _addController.add(null);
+      }
     });
   }
 
-  // --- Add Multiple Records ---
-
-  /// Adds a list of user question records to the cache.
-  /// Ensures thread safety using a lock.
-  /// Notifies listeners via [onRecordAdded] if the cache was empty before adding.
+  // --- Add Multiple Records (with duplicate check and prioritization) ---
   Future<void> addRecords(List<Map<String, dynamic>> records) async {
-    if (records.isEmpty) return; // Avoid processing empty lists
+    if (records.isEmpty) return;
 
-    List<Map<String, dynamic>> recordsToAdd = [];
     await _lock.synchronized(() {
-      final int sizeBefore = _cache.length;
-      QuizzerLogger.logValue('[UnprocessedCache.addRecords START] Input Count: ${records.length}, Cache Size Before: $sizeBefore');
-      final bool wasEmpty = _cache.isEmpty;
-      // Create a set of existing IDs for efficient lookup
-      final Set<String> existingIds = _cache.map((r) => r['question_id'] as String).toSet();
+      final bool wasOverallEmpty = _eligiblePriorityQueue.isEmpty &&
+                                 _circulatingPriorityQueue.isEmpty &&
+                                 _otherRecordsQueue.isEmpty;
+      int addedCount = 0;
 
       for (final record in records) {
         final String? questionId = record['question_id'] as String?;
-        // Only add if ID exists and is not already in the cache
-        if (questionId != null && !existingIds.contains(questionId)) {
-          recordsToAdd.add(record);
-          existingIds.add(questionId); // Add to set immediately to handle duplicates within the input list
+        if (questionId == null) {
+          QuizzerLogger.logWarning('UnprocessedCache: Record missing question_id during bulk add, skipped.');
+          continue;
         }
-         else if (questionId != null && existingIds.contains(questionId)) {
-           QuizzerLogger.logMessage('UnprocessedCache: Duplicate record skipped during bulk add (QID: $questionId)'); // Optional log
-         }
-         else {
-            QuizzerLogger.logWarning('UnprocessedCache: Record missing question_id during bulk add, skipped.');
-         }
+
+        if (_allKnownIdsInCache.contains(questionId)) {
+          QuizzerLogger.logMessage('UnprocessedCache: Duplicate record skipped during bulk add (QID: $questionId)');
+          continue;
+        }
+
+        bool isEligible = (record['is_eligible'] as int? ?? 0) == 1;
+        bool inCirculation = (record['in_circulation'] as int? ?? 0) == 1;
+
+        if (isEligible) {
+          _eligiblePriorityQueue.add(record);
+        } else if (inCirculation) {
+          _circulatingPriorityQueue.add(record);
+        } else {
+          _otherRecordsQueue.add(record);
+        }
+        _allKnownIdsInCache.add(questionId);
+        addedCount++;
       }
 
-      if (recordsToAdd.isNotEmpty) {
-        QuizzerLogger.logValue('[UnprocessedCache.addRecords] Adding ${recordsToAdd.length} new records.');
-        _cache.addAll(recordsToAdd);
-        if (wasEmpty) {
-          QuizzerLogger.logMessage('[UnprocessedCache.addRecords] Added to empty cache, signaling addController.');
-          _addController.add(null);
-        }
+      if (addedCount > 0 && wasOverallEmpty) {
+        QuizzerLogger.logMessage('[UnprocessedCache.addRecords] Added records to overall empty cache, signaling addController.');
+        _addController.add(null);
       }
-      QuizzerLogger.logValue('[UnprocessedCache.addRecords END] Added: ${recordsToAdd.length}, Cache Size After: ${_cache.length}');
+      QuizzerLogger.logValue('[UnprocessedCache.addRecords END] Processed: ${records.length}, Newly Added: $addedCount');
     });
   }
-
-  // --- Get and Remove Record ---
-  /// Retrieves and removes a single record based on userUuid and questionId.
-  /// Ensures thread safety using a lock.
-  /// Returns the found record, or an empty Map `{}` if no matching record is found.
+  
+  // --- Get and Remove Record by ID (Mainly for specific removal if needed, not prioritization) ---
   Future<Map<String, dynamic>> getAndRemoveRecord(String userUuid, String questionId) async {
      return await _lock.synchronized(() {
-       final int sizeBefore = _cache.length;
-       QuizzerLogger.logValue('[UnprocessedCache.getAndRemoveRecord START] User: $userUuid, QID: $questionId, Cache Size Before: $sizeBefore');
-       int foundIndex = -1;
-       for (int i = 0; i < _cache.length; i++) {
-         final record = _cache[i];
-         if (record['user_uuid'] == userUuid && record['question_id'] == questionId) {
-           foundIndex = i;
-           break;
-         }
+       Map<String, dynamic>? foundRecord;
+       List<Map<String, dynamic>>? sourceQueue;
+
+       if (_eligiblePriorityQueue.any((r) => r['question_id'] == questionId && r['user_uuid'] == userUuid)) {
+         sourceQueue = _eligiblePriorityQueue;
+       } else if (_circulatingPriorityQueue.any((r) => r['question_id'] == questionId && r['user_uuid'] == userUuid)) {
+         sourceQueue = _circulatingPriorityQueue;
+       } else if (_otherRecordsQueue.any((r) => r['question_id'] == questionId && r['user_uuid'] == userUuid)) {
+         sourceQueue = _otherRecordsQueue;
        }
 
-       if (foundIndex != -1) {
-         final removedRecord = _cache.removeAt(foundIndex);
-         QuizzerLogger.logValue('[UnprocessedCache.getAndRemoveRecord END] Found & Removed QID: $questionId, Cache Size After: ${_cache.length}');
-         return removedRecord;
-       } else {
-         QuizzerLogger.logValue('[UnprocessedCache.getAndRemoveRecord END] QID: $questionId Not Found, Cache Size After: ${_cache.length}');
-         return <String, dynamic>{};
+       if (sourceQueue != null) {
+         int foundIndex = sourceQueue.indexWhere((r) => r['question_id'] == questionId && r['user_uuid'] == userUuid);
+         if (foundIndex != -1) {
+           foundRecord = sourceQueue.removeAt(foundIndex);
+           _allKnownIdsInCache.remove(questionId);
+           QuizzerLogger.logValue('[UnprocessedCache.getAndRemoveRecord END] Found & Removed QID: $questionId.');
+           return foundRecord!;
+         }
        }
+       
+       QuizzerLogger.logValue('[UnprocessedCache.getAndRemoveRecord END] QID: $questionId Not Found.');
+       return <String, dynamic>{};
      });
   }
 
-  // --- Get and Remove Oldest Record (FIFO) ---
-
-  /// Removes and returns the oldest record added to the cache (FIFO).
-  /// Used by workers processing records in the order they arrived.
-  /// Ensures thread safety using a lock.
-  /// Returns an empty Map `{}` if the cache is empty.
+  // --- Get and Remove Oldest Record (now with prioritization logic) ---
   Future<Map<String, dynamic>> getAndRemoveOldestRecord() async {
-     return await _lock.synchronized(() {
-       final int sizeBefore = _cache.length;
-       QuizzerLogger.logValue('[UnprocessedCache.getAndRemoveOldestRecord START] Cache Size Before: $sizeBefore');
-       if (_cache.isNotEmpty) {
-         final removedRecord = _cache.removeAt(0);
-         final String removedQid = removedRecord['question_id'] ?? 'UNKNOWN_ID';
-         QuizzerLogger.logValue('[UnprocessedCache.getAndRemoveOldestRecord END] Removed QID: $removedQid, Cache Size After: ${_cache.length}');
-         return removedRecord; 
-       } else {
-         QuizzerLogger.logValue('[UnprocessedCache.getAndRemoveOldestRecord END] Cache Empty, Cache Size After: ${_cache.length}');
-         return <String, dynamic>{};
-       }
-     });
+    return await _lock.synchronized(() {
+      Map<String, dynamic>? removedRecord;
+      String? removedQid;
+
+      if (_eligiblePriorityQueue.isNotEmpty) {
+        removedRecord = _eligiblePriorityQueue.removeAt(0);
+        removedQid = removedRecord['question_id'] as String?;
+        QuizzerLogger.logValue('[UnprocessedCache.getAndRemoveOldestRecord] Removed QID: $removedQid from Eligible Queue.');
+      } else if (_circulatingPriorityQueue.isNotEmpty) {
+        removedRecord = _circulatingPriorityQueue.removeAt(0);
+        removedQid = removedRecord['question_id'] as String?;
+        QuizzerLogger.logValue('[UnprocessedCache.getAndRemoveOldestRecord] Removed QID: $removedQid from Circulating Queue.');
+      } else if (_otherRecordsQueue.isNotEmpty) {
+        removedRecord = _otherRecordsQueue.removeAt(0);
+        removedQid = removedRecord['question_id'] as String?;
+        QuizzerLogger.logValue('[UnprocessedCache.getAndRemoveOldestRecord] Removed QID: $removedQid from Other Records Queue.');
+      }
+
+      if (removedRecord != null && removedQid != null) {
+        _allKnownIdsInCache.remove(removedQid);
+        return removedRecord;
+      } else {
+        QuizzerLogger.logValue('[UnprocessedCache.getAndRemoveOldestRecord] All queues empty.');
+        return <String, dynamic>{};
+      }
+    });
   }
 
   // --- Check if Empty ---
-  /// Checks if the cache is currently empty.
   Future<bool> isEmpty() async {
     return await _lock.synchronized(() {
-      return _cache.isEmpty;
+      return _eligiblePriorityQueue.isEmpty &&
+             _circulatingPriorityQueue.isEmpty &&
+             _otherRecordsQueue.isEmpty;
     });
   }
 
-  // --- Peek All Records (Read-Only) ---
-  /// Returns a read-only copy of all records currently in the cache.
-  /// Ensures thread safety using a lock.
+  // --- Peek All Records (Read-Only, in priority order) ---
   Future<List<Map<String, dynamic>>> peekAllRecords() async {
     return await _lock.synchronized(() {
-      // Return a copy to prevent external modification
-      return List<Map<String, dynamic>>.from(_cache);
+      return [
+        ..._eligiblePriorityQueue,
+        ..._circulatingPriorityQueue,
+        ..._otherRecordsQueue
+      ];
     });
   }
 
   Future<void> clear() async {
     await _lock.synchronized(() {
-      if (_cache.isNotEmpty) {
-        _cache.clear();
-        // QuizzerLogger.logMessage('AnswerHistoryCache cleared.'); // Optional log
-      }
+      _eligiblePriorityQueue.clear();
+      _circulatingPriorityQueue.clear();
+      _otherRecordsQueue.clear();
+      _allKnownIdsInCache.clear();
+      QuizzerLogger.logMessage('UnprocessedCache all queues cleared.');
     });
   }
 

@@ -10,9 +10,9 @@ import 'package:quizzer/backend_systems/09_data_caches/non_circulating_questions
 import 'package:quizzer/backend_systems/09_data_caches/unprocessed_cache.dart';
 import 'package:quizzer/backend_systems/09_data_caches/circulating_questions_cache.dart';
 // Table Access
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_question_answer_pairs_table.dart' as uq_pairs_table;
-import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pairs_table.dart' as q_pairs_table;
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_profile_table.dart' as user_profile_table;
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_question_answer_pairs_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pairs_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_profile_table.dart';
 // Workers
 import 'package:quizzer/backend_systems/06_question_queue_server/question_selection_worker.dart';
 import '../10_switch_board/switch_board.dart'; // Import SwitchBoard
@@ -198,7 +198,7 @@ class CirculationWorker {
     db = await _getDbAccess();
     if(db == null) return; // Failed to get DB
 
-    interestData = await user_profile_table.getUserSubjectInterests(userId, db);
+    interestData = await getUserSubjectInterests(userId, db);
     
     // Release DB AFTER successful reads
     _dbMonitor.releaseDatabaseAccess();
@@ -238,7 +238,7 @@ class CirculationWorker {
 
     // Loop will proceed. If getQuestionAnswerPairById fails, it will throw (Fail Fast).
     for (var questionId in circulatingQuestionIds) {
-      final questionDetails = await q_pairs_table.getQuestionAnswerPairById(questionId, db);
+      final questionDetails = await getQuestionAnswerPairById(questionId, db);
       // Handle case where question might be in cache but removed from DB? Unlikely but possible.
       if (questionDetails.isNotEmpty) {
         final subjects = (questionDetails['subjects'] as String? ?? '').split(',');
@@ -337,7 +337,6 @@ class CirculationWorker {
   Future<void> _addQuestionToCirculation(String userId, Map<String, dynamic> recordToAdd) async {
      QuizzerLogger.logMessage('Entering CirculationWorker _addQuestionToCirculation()...');
      final questionId = recordToAdd['question_id'] as String;
-     Database? db;
      
      // Remove from NonCirculating Cache first
      final removedRecord = await _nonCirculatingCache.getAndRemoveRecordByQuestionId(questionId);
@@ -348,42 +347,25 @@ class CirculationWorker {
      Map<String, dynamic> mutableRecord = Map<String, dynamic>.from(removedRecord);
      mutableRecord['in_circulation'] = 1;
      
-     // REMOVED try-finally
-     db = await _getDbAccess();
-     if (db == null) {
-          QuizzerLogger.logError('CirculationWorker: Failed to get DB lock to set QID $questionId in circulation.');
-          await _unprocessedCache.addRecord(removedRecord);
-          return;
-     }
+      Database? db = await _getDbAccess();
 
-     // Set 'inCirculation' to true in the database
-     await uq_pairs_table.setCirculationStatus(userId, questionId, true, db);
-     
-     // Release DB lock AFTER successful write
-     _dbMonitor.releaseDatabaseAccess();
+      await _unprocessedCache.addRecord(removedRecord);
 
-     // Add the record (already modified by caller) back to the UnprocessedCache
-     await _unprocessedCache.addRecord(mutableRecord); 
+
+      // Set 'inCirculation' to true in the database
+      await setCirculationStatus(userId, questionId, true, db!);
+
+      // Release DB lock AFTER successful write
+      _dbMonitor.releaseDatabaseAccess();
+
+      // Add the record (already modified by caller) back to the UnprocessedCache
+      await _unprocessedCache.addRecord(mutableRecord); 
   }
 
    // Helper to get DB access (copied from EligibilityCheckWorker, could be utility)
    Future<Database?> _getDbAccess() async {
       QuizzerLogger.logMessage('Entering CirculationWorker _getDbAccess()...');
       Database? db;
-      int retries       = 0;
-      const maxRetries  = 5;
-      // Cannot use _isRunning here if this worker isn't looping
-      // Assume if called, it should try to get DB
-      while (db == null && retries < maxRetries) {
-        db = await _dbMonitor.requestDatabaseAccess();
-        if (db == null) {
-          await Future.delayed(const Duration(milliseconds: 100));
-          retries++;
-        }
-      }
-      if (db == null) {
-         QuizzerLogger.logError('CirculationWorker: Failed to acquire DB access after $maxRetries retries.');
-      }
-      return db;
+      return db!;
    }
 }

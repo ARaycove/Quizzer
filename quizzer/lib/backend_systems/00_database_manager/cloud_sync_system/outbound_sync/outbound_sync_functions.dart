@@ -11,9 +11,76 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/error_logs_ta
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_settings_table.dart'; // Added for user settings table
 import 'package:quizzer/backend_systems/00_database_manager/tables/modules_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_feedback_table.dart'; // Added for user feedback
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_eligible_questions_table.dart';
 
 // ==========================================
 // Outbound Sync - Generic Push Function
+
+/// Attempts to push a batch of records to a specified Supabase table using upsert.
+/// Automatically splits large lists into batches of 500 records.
+/// Returns true if all batches complete successfully, false if any batch fails.
+Future<bool> pushBatchToSupabase(String tableName, List<Map<String, dynamic>> records) async {
+  if (records.isEmpty) {
+    QuizzerLogger.logMessage('pushBatchToSupabase: Empty batch received for table $tableName. Skipping.');
+    return true;
+  }
+
+  QuizzerLogger.logMessage('Attempting Supabase batch upsert of ${records.length} records to table $tableName...');
+
+  // Process in batches of 500
+  const int batchSize = 500;
+  int successCount = 0;
+  int failureCount = 0;
+
+  for (int i = 0; i < records.length; i += batchSize) {
+    final end = (i + batchSize < records.length) ? i + batchSize : records.length;
+    final batch = records.sublist(i, end);
+    
+    try {
+      // 1. Get Supabase client
+      final supabase = getSessionManager().supabase;
+
+      // 2. Prepare payload (remove local-only fields, ensure type compatibility)
+      final List<Map<String, dynamic>> payload = batch.map((record) {
+        final Map<String, dynamic> cleanRecord = Map.from(record);
+        cleanRecord.remove('has_been_synced');
+        cleanRecord.remove('edits_are_synced');
+
+        // Check for Infinity values and replace with 1
+        cleanRecord.forEach((key, value) {
+          if (value is double && value.isInfinite) {
+            cleanRecord[key] = 1.0;
+          }
+        });
+
+        return cleanRecord;
+      }).toList();
+
+      // 3. Perform Batch Upsert
+      await supabase
+        .from(tableName)
+        .upsert(payload);
+
+      QuizzerLogger.logSuccess('Supabase batch upsert successful for batch ${i ~/ batchSize + 1} (${batch.length} records) to $tableName.');
+      successCount += batch.length;
+
+    } on PostgrestException catch (e) {
+      QuizzerLogger.logError('Supabase PostgrestException during batch push to $tableName (batch ${i ~/ batchSize + 1}): ${e.message} (Code: ${e.code})');
+      failureCount += batch.length;
+    } catch (e) {
+      QuizzerLogger.logError('Supabase batch upsert FAILED for $tableName (batch ${i ~/ batchSize + 1}): $e');
+      failureCount += batch.length;
+    }
+  }
+
+  if (failureCount > 0) {
+    QuizzerLogger.logWarning('Batch push completed with failures. Success: $successCount, Failures: $failureCount');
+    return false;
+  }
+
+  QuizzerLogger.logSuccess('All batches pushed successfully. Total records: $successCount');
+  return true;
+}
 
 /// Attempts to push a single record to a specified Supabase table using upsert.
 /// Returns true if the upsert operation completes without error, false otherwise.
@@ -214,51 +281,29 @@ Future<void> syncQuestionAnswerPairs(Database db) async {
 
   QuizzerLogger.logMessage('Found ${unsyncedRecords.length} unsynced QuestionAnswerPairs.');
 
-  // Process each record
+  // Ensure all records have last_modified_timestamp
   for (final record in unsyncedRecords) {
-    final questionId = record['question_id'] as String; // Assume non-null
-    final hasBeenSynced = record['has_been_synced'] as int;
-
-    // Ensure last_modified_timestamp is populated (UTC ISO8601)
     if (record['last_modified_timestamp'] == null || (record['last_modified_timestamp'] is String && (record['last_modified_timestamp'] as String).isEmpty)) {
-      QuizzerLogger.logMessage('QID $questionId is missing last_modified_timestamp. Setting to current UTC time.');
       record['last_modified_timestamp'] = DateTime.now().toUtc().toIso8601String();
     }
+  }
 
-    String targetTable;
-    bool newHasBeenSynced = false;
-    bool newEditsAreSynced = false;
+  // Push all records to the appropriate table
+  final bool pushSuccess = await pushBatchToSupabase('question_answer_pairs', unsyncedRecords);
 
-    // Determine target table and target flag states
-    if (hasBeenSynced == 0) {
-      targetTable = 'question_answer_pair_new_review';
-      // If push succeeds, both flags will become true (1)
-      newHasBeenSynced = true;
-      newEditsAreSynced = true;
-    } else {
-      targetTable = 'question_answer_pair_edits_review';
-      // If push succeeds, has_been_synced stays true (1), only edits_are_synced becomes true (1)
-      newHasBeenSynced = true; // Stays true
-      newEditsAreSynced = true;
-    }
-
-    QuizzerLogger.logValue('Preparing to push QID $questionId to $targetTable');
-
-    // Attempt to push the record
-    final bool pushSuccess = await pushRecordToSupabase(targetTable, record);
-
-    // If push was successful, update local flags
-    if (pushSuccess) {
-      QuizzerLogger.logMessage('Push successful for QID $questionId. Updating local flags...');
+  if (pushSuccess) {
+    // Update sync flags for all records
+    for (final record in unsyncedRecords) {
       await updateQuestionSyncFlags(
-        questionId: questionId,
-        hasBeenSynced: newHasBeenSynced,
-        editsAreSynced: newEditsAreSynced,
+        questionId: record['question_id'],
+        hasBeenSynced: true,
+        editsAreSynced: true,
         db: db,
       );
-    } else {
-      QuizzerLogger.logWarning('Push FAILED for QID $questionId. Local flags remain unchanged.');
     }
+    QuizzerLogger.logSuccess('Successfully synced ${unsyncedRecords.length} question answer pairs.');
+  } else {
+    QuizzerLogger.logWarning('Failed to sync question answer pairs. Local flags remain unchanged.');
   }
 
   QuizzerLogger.logMessage('Finished sync attempt for QuestionAnswerPairs.');
@@ -331,45 +376,42 @@ Future<void> syncQuestionAnswerAttempts(Database database) async {
 
   QuizzerLogger.logMessage('Found ${unsyncedRecords.length} unsynced QuestionAnswerAttempts.');
 
-  final supabaseClient = getSessionManager().supabase;
-  const String tableName = 'question_answer_attempts';
-
+  // Validate all records have required fields
+  final List<Map<String, dynamic>> validRecords = [];
   for (final record in unsyncedRecords) {
-    // Extract primary key components
-    final String participantId = record['participant_id'] as String;
-    final String questionId = record['question_id'] as String;
-    final String timeStamp = record['time_stamp'] as String;
+    final String participantId = record['participant_id'] as String? ?? '';
+    final String questionId = record['question_id'] as String? ?? '';
+    final String timeStamp = record['time_stamp'] as String? ?? '';
 
-    // Basic validation of primary key components
     if (participantId.isEmpty || questionId.isEmpty || timeStamp.isEmpty) {
       QuizzerLogger.logError('Skipping unsynced attempt record due to missing primary key components: $record');
       continue;
     }
+    validRecords.add(record);
+  }
 
-    // Prepare payload (remove local-only flags)
-    Map<String, dynamic> payload = Map.from(record);
-    payload.remove('has_been_synced');
-    payload.remove('edits_are_synced');
+  if (validRecords.isEmpty) {
+    QuizzerLogger.logMessage('No valid QuestionAnswerAttempts to sync after validation.');
+    return;
+  }
 
-    QuizzerLogger.logValue('Preparing to push Attempt (participant_id: $participantId, question_id: $questionId, time_stamp: $timeStamp) to $tableName');
+  // Push all valid records in a single batch
+  const String tableName = 'question_answer_attempts';
+  final bool pushSuccess = await pushBatchToSupabase(tableName, validRecords);
 
-    // Use try-catch ONLY for the Supabase call
-    try {
-      // Attempt to insert the record into Supabase
-      await supabaseClient.from(tableName).insert(payload);
-
-      QuizzerLogger.logSuccess('Supabase insert successful for Attempt (participant_id: $participantId, question_id: $questionId, time_stamp: $timeStamp).');
-
-      // If Supabase insert succeeds, delete the local record
-      await deleteQuestionAnswerAttemptRecord(participantId, questionId, timeStamp, database);
-
-    } on PostgrestException catch (exception) {
-      QuizzerLogger.logError('Supabase PostgrestException during insert for Attempt (participant_id: $participantId, question_id: $questionId, time_stamp: $timeStamp): ${exception.message} (Code: ${exception.code})');
-      // Do not delete local record if push failed
-    } catch (exception) {
-      QuizzerLogger.logError('Supabase insert FAILED for Attempt (participant_id: $participantId, question_id: $questionId, time_stamp: $timeStamp): $exception');
-      // Do not delete local record if push failed
+  if (pushSuccess) {
+    // Delete all successfully synced records locally
+    for (final record in validRecords) {
+      await deleteQuestionAnswerAttemptRecord(
+        record['participant_id'] as String,
+        record['question_id'] as String,
+        record['time_stamp'] as String,
+        database
+      );
     }
+    QuizzerLogger.logSuccess('Successfully synced ${validRecords.length} question answer attempts.');
+  } else {
+    QuizzerLogger.logWarning('Failed to sync question answer attempts. Local records remain unchanged.');
   }
 
   QuizzerLogger.logMessage('Finished sync attempt for QuestionAnswerAttempts.');
@@ -470,19 +512,18 @@ Future<void> syncUserQuestionAnswerPairs(Database db) async {
   final List<Map<String, dynamic>> unsyncedRecords = await getUnsyncedUserQuestionAnswerPairs(db, sessionManager.userId!);
 
   if (unsyncedRecords.isEmpty) {
-    QuizzerLogger.logMessage('No unsynced UserQuestionAnswerPairs found for user $sessionManager.userId!.');
+    QuizzerLogger.logMessage('No unsynced UserQuestionAnswerPairs found for user ${sessionManager.userId}.');
     return;
   }
 
-  QuizzerLogger.logMessage('Found ${unsyncedRecords.length} unsynced UserQuestionAnswerPairs for user $sessionManager.userId!.');
+  QuizzerLogger.logMessage('Found ${unsyncedRecords.length} unsynced UserQuestionAnswerPairs for user ${sessionManager.userId}.');
 
-  const String tableName = 'user_question_answer_pairs';
-  // Define composite key fields for this table
-  const String pkUserUuid = 'user_uuid';
-  const String pkQuestionId = 'question_id';
-
-  // --- Utility: Sanitize Infinity values in a record ---
-  void sanitizeInfinityValues(Map<String, dynamic> record) {
+  // Ensure all records have last_modified_timestamp and sanitize Infinity values
+  for (final record in unsyncedRecords) {
+    if (record['last_modified_timestamp'] == null || (record['last_modified_timestamp'] is String && (record['last_modified_timestamp'] as String).isEmpty)) {
+      record['last_modified_timestamp'] = DateTime.now().toUtc().toIso8601String();
+    }
+    // Sanitize Infinity values
     record.forEach((key, value) {
       if (value is double && value.isInfinite) {
         record[key] = 1.0;
@@ -490,89 +531,26 @@ Future<void> syncUserQuestionAnswerPairs(Database db) async {
     });
   }
 
-  for (final localRecordImmutable in unsyncedRecords) { // Renamed to indicate it's immutable initially
-    // Create a mutable copy
-    final Map<String, dynamic> localRecord = Map<String, dynamic>.from(localRecordImmutable);
+  // Push all records in a single batch
+  const String tableName = 'user_question_answer_pairs';
+  final bool pushSuccess = await pushBatchToSupabase(tableName, unsyncedRecords);
 
-    // Sanitize Infinity values before any push/update
-    sanitizeInfinityValues(localRecord);
-
-    // Now use 'localRecord' for all subsequent operations in the loop
-    final String userUuidFromRecord = localRecord[pkUserUuid] as String;
-    final String questionIdFromRecord = localRecord[pkQuestionId] as String;
-    
-    // Ensure the record actually belongs to the current user (should be guaranteed by getUnsynced... but double check)
-    if (userUuidFromRecord != sessionManager.userId!) {
-        QuizzerLogger.logWarning('syncUserQuestionAnswerPairs: Skipping record not belonging to current user. User in record: $userUuidFromRecord, Current User: ${sessionManager.userId}');
-        continue;
-    }
-
-    // Ensure last_modified_timestamp exists in the record map before push
-    if (localRecord['last_modified_timestamp'] == null || (localRecord['last_modified_timestamp'] is String && (localRecord['last_modified_timestamp'] as String).isEmpty)) {
-      QuizzerLogger.logWarning('syncUserQuestionAnswerPairs: Local record (User: $userUuidFromRecord, QID: $questionIdFromRecord) missing last_modified_timestamp. Assigning current time for push.');
-      localRecord['last_modified_timestamp'] = DateTime.now().toUtc().toIso8601String(); // Update in-memory mutable map for the push
-    }
-    // Re-parse localLastModified for comparison logic if it was potentially updated, or ensure it was parsed initially
-    final DateTime localLastModified = DateTime.parse(localRecord['last_modified_timestamp'] as String);
-
-    bool operationSuccess = false;
-    Map<String, dynamic> compositeKey = {pkUserUuid: userUuidFromRecord, pkQuestionId: questionIdFromRecord};
-
-    if (localRecord['has_been_synced'] == 0) {
-      // New record, attempt to insert
-      QuizzerLogger.logMessage('syncUserQuestionAnswerPairs: Preparing to insert (User: $userUuidFromRecord, QID: $questionIdFromRecord)');
-      operationSuccess = await pushRecordToSupabase(tableName, localRecord);
-    } else {
-      // Existing record with local edits, check server version before updating
-      QuizzerLogger.logMessage('syncUserQuestionAnswerPairs: Checking server version for (User: $userUuidFromRecord, QID: $questionIdFromRecord) before updating...');
-      try {
-        final serverResponse = await sessionManager.supabase
-            .from(tableName)
-            .select('last_modified_timestamp') // Only need this field for comparison
-            .eq(pkUserUuid, userUuidFromRecord)      // Filter by user_uuid
-            .eq(pkQuestionId, questionIdFromRecord) // Filter by question_id
-            .maybeSingle();
-
-        if (serverResponse == null) {
-          QuizzerLogger.logWarning('syncUserQuestionAnswerPairs: Record (User: $userUuidFromRecord, QID: $questionIdFromRecord) not found on server (maybe deleted). Re-inserting.');
-          operationSuccess = await pushRecordToSupabase(tableName, localRecord);
-        } else {
-          final serverRecordMap = serverResponse;
-          final String? serverLastModifiedStr = serverRecordMap['last_modified_timestamp'] as String?;
-
-          if (serverLastModifiedStr == null) {
-            QuizzerLogger.logWarning('syncUserQuestionAnswerPairs: Server record (User: $userUuidFromRecord, QID: $questionIdFromRecord) missing last_modified_timestamp. Overwriting.');
-            operationSuccess = await updateRecordWithCompositeKeyInSupabase(tableName, localRecord, compositeKeyFilters: compositeKey);
-          } else {
-            final DateTime serverLastModified = DateTime.parse(serverLastModifiedStr);
-            if (localLastModified.isAfter(serverLastModified)) {
-              QuizzerLogger.logMessage('syncUserQuestionAnswerPairs: Local (User: $userUuidFromRecord, QID: $questionIdFromRecord) is newer. Proceeding with update.');
-              operationSuccess = await updateRecordWithCompositeKeyInSupabase(tableName, localRecord, compositeKeyFilters: compositeKey);
-            } else {
-              QuizzerLogger.logMessage('syncUserQuestionAnswerPairs: Server version of (User: $userUuidFromRecord, QID: $questionIdFromRecord) is newer or same. Local changes will be overwritten by next inbound sync. Skipping push.');
-              operationSuccess = true; // Mark as success for this item's sync cycle (intentionally skipped)
-            }
-          }
-        }
-      } catch (e) {
-        QuizzerLogger.logError('syncUserQuestionAnswerPairs: Error fetching/comparing server record (User: $userUuidFromRecord, QID: $questionIdFromRecord): $e');
-        operationSuccess = false;
-      }
-    }
-
-    if (operationSuccess) {
-      QuizzerLogger.logMessage('syncUserQuestionAnswerPairs: Operation successful for (User: $userUuidFromRecord, QID: $questionIdFromRecord). Updating local flags...');
+  if (pushSuccess) {
+    // Update sync flags for all records
+    for (final record in unsyncedRecords) {
       await updateUserQuestionAnswerPairSyncFlags(
-        userUuid:   userUuidFromRecord,
-        questionId: questionIdFromRecord,
+        userUuid: record['user_uuid'] as String,
+        questionId: record['question_id'] as String,
         hasBeenSynced: true,
-        editsAreSynced: true, // Both true after a successful push/update or intentional skip
+        editsAreSynced: true,
         db: db,
       );
-    } else {
-      QuizzerLogger.logWarning('syncUserQuestionAnswerPairs: Operation FAILED for (User: $userUuidFromRecord, QID: $questionIdFromRecord). Local flags remain unchanged.');
     }
+    QuizzerLogger.logSuccess('Successfully synced ${unsyncedRecords.length} user question answer pairs.');
+  } else {
+    QuizzerLogger.logWarning('Failed to sync user question answer pairs. Local flags remain unchanged.');
   }
+
   QuizzerLogger.logMessage('Finished sync attempt for UserQuestionAnswerPairs.');
 }
 
@@ -590,61 +568,37 @@ Future<void> syncModules(Database db) async {
 
   QuizzerLogger.logMessage('Found ${unsyncedRecords.length} unsynced Modules.');
 
-  const String tableName = 'modules';
-  const String primaryKey = 'module_name';
-
+  // Ensure all records have proper creation_date and last_modified_timestamp
   for (final record in unsyncedRecords) {
-    final String? moduleName = record[primaryKey] as String?;
-    final int hasBeenSynced = record['has_been_synced'] as int? ?? 0;
-
-    if (moduleName == null) {
-      QuizzerLogger.logError('Skipping unsynced module record due to missing module_name: $record');
-      continue;
-    }
-
-    // Ensure creation_date is a UTC ISO8601 string
+    // Convert creation_date to UTC ISO8601 string if it's an integer
     dynamic creationDate = record['creation_date'];
     if (creationDate is int) {
-      creationDate = DateTime.fromMillisecondsSinceEpoch(creationDate).toUtc().toIso8601String();
-    }
-    final Map<String, dynamic> syncPayload = {
-      'module_name': record['module_name'],
-      'description': record['description'],
-      'creation_date': creationDate,
-      'creator_id': record['creator_id'],
-      'last_modified_timestamp': record['last_modified_timestamp'] ?? DateTime.now().toUtc().toIso8601String()
-    };
-
-    bool operationSuccess = false;
-
-    if (hasBeenSynced == 0) {
-      // New record, use insert
-      QuizzerLogger.logValue('Preparing to insert Module $moduleName into $tableName');
-      operationSuccess = await pushRecordToSupabase(tableName, syncPayload);
-    } else {
-      // Existing record with edits, use update
-      QuizzerLogger.logValue('Preparing to update Module $moduleName in $tableName');
-      operationSuccess = await updateRecordInSupabase(
-        tableName,
-        syncPayload,
-        primaryKeyColumn: primaryKey,
-        primaryKeyValue: moduleName,
-      );
+      record['creation_date'] = DateTime.fromMillisecondsSinceEpoch(creationDate).toUtc().toIso8601String();
     }
 
-    if (operationSuccess) {
-      final operation = (hasBeenSynced == 0) ? 'Insert' : 'Update';
-      QuizzerLogger.logMessage('$operation successful for Module $moduleName. Updating local flags...');
+    // Ensure last_modified_timestamp exists
+    if (record['last_modified_timestamp'] == null || (record['last_modified_timestamp'] is String && (record['last_modified_timestamp'] as String).isEmpty)) {
+      record['last_modified_timestamp'] = DateTime.now().toUtc().toIso8601String();
+    }
+  }
+
+  // Push all records in a single batch
+  const String tableName = 'modules';
+  final bool pushSuccess = await pushBatchToSupabase(tableName, unsyncedRecords);
+
+  if (pushSuccess) {
+    // Update sync flags for all records
+    for (final record in unsyncedRecords) {
       await updateModuleSyncFlags(
-        moduleName: moduleName,
+        moduleName: record['module_name'] as String,
         hasBeenSynced: true,
         editsAreSynced: true,
         db: db,
       );
-    } else {
-      final operation = (hasBeenSynced == 0) ? 'Insert' : 'Update';
-      QuizzerLogger.logWarning('$operation FAILED for Module $moduleName. Local flags remain unchanged.');
     }
+    QuizzerLogger.logSuccess('Successfully synced ${unsyncedRecords.length} modules.');
+  } else {
+    QuizzerLogger.logWarning('Failed to sync modules. Local flags remain unchanged.');
   }
 
   QuizzerLogger.logMessage('Finished sync attempt for Modules.');
@@ -830,4 +784,47 @@ Future<void> syncUserFeedback(Database db) async {
   }
 
   QuizzerLogger.logMessage('Finished sync attempt for UserFeedback.');
+}
+
+Future<void> syncUserStatsEligibleQuestions(Database db) async {
+  QuizzerLogger.logMessage('Starting sync for UserStatsEligibleQuestions...');
+
+  final SessionManager sessionManager = getSessionManager();
+  final String? currentUserId = sessionManager.userId;
+  if (currentUserId == null) {
+    QuizzerLogger.logWarning('syncUserStatsEligibleQuestions: No current user logged in. Cannot proceed.');
+    return;
+  }
+
+  final List<Map<String, dynamic>> unsyncedRecords = await getUnsyncedUserStatsEligibleQuestionsRecords(db, currentUserId);
+  if (unsyncedRecords.isEmpty) {
+    QuizzerLogger.logMessage('No unsynced UserStatsEligibleQuestions found for user $currentUserId.');
+    return;
+  }
+
+  QuizzerLogger.logMessage('Found ${unsyncedRecords.length} unsynced UserStatsEligibleQuestions for user $currentUserId.');
+
+  const String tableName = 'user_stats_eligible_questions';
+  for (final record in unsyncedRecords) {
+    final String? userId = record['user_id'] as String?;
+    final String? recordDate = record['record_date'] as String?;
+    if (userId == null || recordDate == null) {
+      QuizzerLogger.logWarning('Skipping unsynced user stats eligible questions record due to missing PK: $record');
+      continue;
+    }
+    final bool pushSuccess = await pushRecordToSupabase(tableName, record);
+    if (pushSuccess) {
+      QuizzerLogger.logSuccess('Push successful for UserStatsEligibleQuestions (User: $userId, Date: $recordDate). Updating local flags...');
+      await updateUserStatsEligibleQuestionsSyncFlags(
+        userId: userId,
+        recordDate: recordDate,
+        hasBeenSynced: true,
+        editsAreSynced: true,
+        db: db,
+      );
+    } else {
+      QuizzerLogger.logWarning('Push FAILED for UserStatsEligibleQuestions (User: $userId, Date: $recordDate). Local flags remain unchanged.');
+    }
+  }
+  QuizzerLogger.logMessage('Finished sync attempt for UserStatsEligibleQuestions.');
 }

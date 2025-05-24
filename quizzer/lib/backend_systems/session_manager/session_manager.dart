@@ -47,6 +47,9 @@ import 'package:quizzer/backend_systems/00_database_manager/review_system/get_se
 import 'package:quizzer/backend_systems/00_database_manager/tables/error_logs_table.dart'; // Direct import
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_feedback_table.dart'; // Removed alias
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_settings_table.dart' as user_settings_table;
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_question_answer_pairs_table.dart'; // Added for direct access
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/stat_update_aggregator.dart'; // do not use aliases in the import statements
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_eligible_questions_table.dart'; // Added import for user_stats_eligible_questions_table
 // FIXME DO NOT USE ALIASING ON IMPORTS
 
 class SessionManager {
@@ -307,7 +310,7 @@ class SessionManager {
 
     // Start OutboundSyncWorker after all initialization is complete
     final outboundSyncWorker = OutboundSyncWorker();
-    await outboundSyncWorker.start();
+    outboundSyncWorker.start();
     _loginProgressController.add("Login Complete!");
   }
   
@@ -762,7 +765,7 @@ class SessionManager {
     // --- 4. Calculate Updated User Record ---
     // Keep a copy of the record *before* updates for the attempt log
     final Map<String, dynamic> recordBeforeUpdate = Map<String, dynamic>.from(_currentQuestionRecord!); 
-    final Map<String, dynamic> updatedUserRecord = updateUserQuestionRecordOnAnswer( //TODO Check me
+    final Map<String, dynamic> updatedUserRecord = updateUserQuestionRecordOnAnswer(
        currentUserRecord:  _currentQuestionRecord!,
        isCorrect:          isCorrect,
     );
@@ -784,7 +787,18 @@ class SessionManager {
     if (db == null) {
       throw StateError('Database unavailable during answer submission.');
     }
-     await uqap_table.editUserQuestionAnswerPair(
+
+    // ADDED: Increment total questions answered in user_profile table
+     // Explicitly increment total_attempts using the dedicated function -> for the questionObject
+     // Do stat increment on individual pairs before sending update.
+     await incrementTotalAttempts(userId!, questionId, db);
+     await incrementTotalQuestionsAnswered(userId!, db); // User profile total 
+     // TODO Replace this block of stat updates with a signal call to a stat update worker
+
+     // Call the aggregator to update all daily stats
+     await updateAllUserDailyStats(userId!, db);
+
+     await editUserQuestionAnswerPair(
        userUuid: userId!,
        questionId: questionId,
        db: db,
@@ -793,11 +807,10 @@ class SessionManager {
        nextRevisionDue: updatedUserRecord['next_revision_due'] as String,
        timeBetweenRevisions: updatedUserRecord['time_between_revisions'] as double,
        averageTimesShownPerDay: updatedUserRecord['average_times_shown_per_day'] as double,
+       isEligible: (updatedUserRecord['is_eligible'] as int? ?? 0) == 1,
+       inCirculation: (updatedUserRecord['in_circulation'] as int? ?? 0) == 1,
      );
-    // ADDED: Increment total questions answered in user_profile table
-     // Explicitly increment total_attempts using the dedicated function -> for the questionObject
-     await uqap_table.incrementTotalAttempts(userId!, questionId, db);
-     await incrementTotalQuestionsAnswered(userId!, db);
+
 
     // Release lock AFTER successful operations
     _dbMonitor.releaseDatabaseAccess();
@@ -1282,6 +1295,31 @@ class SessionManager {
   void disposeLoginProgressStream() {
     _loginProgressController.close();
     QuizzerLogger.logMessage("SessionManager: Login progress stream disposed.");
+  }
+
+  // =====================================================================
+  // --- User Stats API (Eligible Questions) ---
+  // =====================================================================
+
+  /// Fetches eligible questions stats for the current user.
+  /// - If [date] is provided, returns the stat for that date (or null if not found).
+  /// - If [getAll] is true, returns the full history as a List.
+  /// - If neither is provided, returns today's stat.
+  /// Only one mode can be used at a time.
+  Future<dynamic> getEligibleQuestionsStats({DateTime? date, bool getAll = false}) async {
+    assert(userId != null, 'User must be logged in to get stats.');
+    final db = await _dbMonitor.requestDatabaseAccess();
+
+    if (getAll) {
+      final records = await getUserStatsEligibleQuestionsRecordsByUser(userId!, db!);
+      _dbMonitor.releaseDatabaseAccess();
+      return records;
+    }
+
+    final String dateString = (date ?? DateTime.now().toUtc()).toIso8601String().substring(0, 10);
+    final record = await getUserStatsEligibleQuestionsRecordByDate(userId!, dateString, db!);
+    _dbMonitor.releaseDatabaseAccess();
+    return record;
   }
 }
 

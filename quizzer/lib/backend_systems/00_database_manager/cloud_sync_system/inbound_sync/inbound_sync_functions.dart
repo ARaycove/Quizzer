@@ -8,6 +8,7 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_question_answer_pairs_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_settings_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/modules_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_eligible_questions_table.dart';
 import 'dart:io'; // For SocketException
 import 'dart:async'; // For Future.delayed
 
@@ -94,6 +95,7 @@ Future<void> syncQuestionAnswerPairsInbound(
     sessionManager.addLoginProgress('Question sync: Found $totalToSync questions.');
     final DatabaseMonitor monitor = getDatabaseMonitor();
     Database? db = await monitor.requestDatabaseAccess();
+    QuizzerLogger.logMessage('Database Access Granted');
     int syncedCount = 0;
     for (final record in cloudRecords) {
       syncedCount++;
@@ -103,6 +105,7 @@ Future<void> syncQuestionAnswerPairsInbound(
       sessionManager.addLoginProgress('Syncing Question $syncedCount/$totalToSync');
     }
     monitor.releaseDatabaseAccess();
+    QuizzerLogger.logMessage('Database Released');
     QuizzerLogger.logSuccess('Synced $totalToSync question_answer_pairs from cloud.');
     sessionManager.addLoginProgress('Question sync: Complete.');
   } on PostgrestException catch (e, s) {
@@ -124,6 +127,7 @@ Future<void> syncUserQuestionAnswerPairsInbound(
   SupabaseClient supabaseClient,
 ) async {
   QuizzerLogger.logMessage('Syncing inbound user_question_answer_pairs for user $userId since $initialTimestamp...');
+  final SessionManager sessionManager = getSessionManager();
   
   // If no initial timestamp, fetch all records for this user
   try {
@@ -135,34 +139,60 @@ Future<void> syncUserQuestionAnswerPairsInbound(
 
     if (cloudRecords.isEmpty) {
       QuizzerLogger.logMessage('No new user_question_answer_pairs to sync.');
+      sessionManager.addLoginProgress('User progress sync: No new records.');
       return;
     }
 
-    QuizzerLogger.logMessage('Found ${cloudRecords.length} new/updated user_question_answer_pairs to sync.');
+    final int totalToSync = cloudRecords.length;
+    QuizzerLogger.logMessage('Found $totalToSync new/updated user_question_answer_pairs to sync.');
+    sessionManager.addLoginProgress('User progress sync: Found $totalToSync records.');
+
     final DatabaseMonitor monitor = getDatabaseMonitor();
     Database? db = await monitor.requestDatabaseAccess();
-    for (final record in cloudRecords) {
-      // Insert or update each record, explicitly converting numeric values to doubles
-      await insertOrUpdateUserQuestionAnswerPair(
-        userUuid: userId,
-        questionId: record['question_id'],
-        revisionStreak: record['revision_streak'],
-        lastRevised: record['last_revised'],
-        predictedRevisionDueHistory: record['predicted_revision_due_history'],
-        nextRevisionDue: record['next_revision_due'],
-        timeBetweenRevisions: (record['time_between_revisions'] as num).toDouble(),
-        averageTimesShownPerDay: (record['average_times_shown_per_day'] as num).toDouble(),
-        db: db!,
-      );
+    QuizzerLogger.logMessage('Database Access Granted');
+
+    // Process in batches of 50
+    const int batchSize = 50;
+    int processedCount = 0;
+    
+    for (int i = 0; i < cloudRecords.length; i += batchSize) {
+      final end = (i + batchSize < cloudRecords.length) ? i + batchSize : cloudRecords.length;
+      final batch = cloudRecords.sublist(i, end);
+      
+      // Start a transaction for this batch
+      await db!.transaction((txn) async {
+        for (final record in batch) {
+          await insertOrUpdateUserQuestionAnswerPair(
+            userUuid: userId,
+            questionId: record['question_id'],
+            revisionStreak: record['revision_streak'],
+            lastRevised: record['last_revised'],
+            predictedRevisionDueHistory: record['predicted_revision_due_history'],
+            nextRevisionDue: record['next_revision_due'],
+            timeBetweenRevisions: (record['time_between_revisions'] as num).toDouble(),
+            averageTimesShownPerDay: (record['average_times_shown_per_day'] as num).toDouble(),
+            db: txn,
+          );
+        }
+      });
+      
+      processedCount += batch.length;
+      sessionManager.addLoginProgress('Syncing User Progress $processedCount/$totalToSync');
     }
+
     monitor.releaseDatabaseAccess();
-    QuizzerLogger.logSuccess('Synced ${cloudRecords.length} user_question_answer_pairs from cloud.');
+    QuizzerLogger.logMessage('Database Released');
+    QuizzerLogger.logSuccess('Synced $totalToSync user_question_answer_pairs from cloud.');
+    sessionManager.addLoginProgress('User progress sync: Complete.');
   } on PostgrestException catch (e, s) {
     QuizzerLogger.logError('syncUserQuestionAnswerPairsInbound: PostgrestException for user $userId. Error: ${e.message}, Stack: $s');
+    sessionManager.addLoginProgress('User progress sync: Error.');
   } on SocketException catch (e, s) {
     QuizzerLogger.logError('syncUserQuestionAnswerPairsInbound: SocketException for user $userId. Error: $e, Stack: $s');
+    sessionManager.addLoginProgress('User progress sync: Network error.');
   } catch (e, s) {
     QuizzerLogger.logError('syncUserQuestionAnswerPairsInbound: Unexpected error for user $userId. Error: $e, Stack: $s');
+    sessionManager.addLoginProgress('User progress sync: Unexpected error.');
   }
 }
 
@@ -173,6 +203,7 @@ Future<void> syncUserProfileInbound(
   SupabaseClient supabaseClient,
 ) async {
   QuizzerLogger.logMessage('Syncing inbound user profile for user $userId since $initialTimestamp...');
+  final SessionManager sessionManager = getSessionManager();
   
   // If no initial timestamp, fetch the profile
   try {
@@ -192,6 +223,7 @@ Future<void> syncUserProfileInbound(
 
     final DatabaseMonitor monitor = getDatabaseMonitor();
     Database? db = await monitor.requestDatabaseAccess();
+    QuizzerLogger.logMessage('Database Access Granted');
     // Update the local profile (no encoding)
     await db!.update(
       'user_profile',
@@ -234,6 +266,7 @@ Future<void> syncUserProfileInbound(
       whereArgs: [userId],
     );
     monitor.releaseDatabaseAccess();
+    QuizzerLogger.logMessage('Database Released');
 
     QuizzerLogger.logSuccess('Synced user profile from cloud.');
   } on PostgrestException catch (e, s) {
@@ -287,6 +320,7 @@ Future<void> syncUserSettingsInbound(
       }
     }
     monitor.releaseDatabaseAccess(); // Ensure DB access is released after the loop
+    QuizzerLogger.logMessage('Database Released');
   
     QuizzerLogger.logSuccess('Synced ${cloudRecords.length} user_settings from cloud for user $userId.');
   } on PostgrestException catch (e, s) {
@@ -342,6 +376,7 @@ Future<void> syncModulesInbound(
       }
     }
     monitor.releaseDatabaseAccess();
+    QuizzerLogger.logMessage('Database Released');
   
     QuizzerLogger.logSuccess('Synced ${cloudRecords.length} modules from cloud.');
   } on PostgrestException catch (e, s) {
@@ -353,16 +388,73 @@ Future<void> syncModulesInbound(
   }
 }
 
+Future<void> syncUserStatsEligibleQuestionsInbound(
+  String userId,
+  String? initialTimestamp,
+  SupabaseClient supabaseClient,
+) async {
+  QuizzerLogger.logMessage('Syncing inbound user_stats_eligible_questions for user $userId since $initialTimestamp...');
+
+  final DatabaseMonitor monitor = getDatabaseMonitor();
+  Database? db = await monitor.requestDatabaseAccess();
+  if (db == null) {
+    QuizzerLogger.logError('syncUserStatsEligibleQuestionsInbound: Failed to get database access.');
+    return;
+  }
+
+  try {
+    final List<dynamic> cloudRecords = await executeSupabaseCallWithRetry(
+      () => supabaseClient
+          .from('user_stats_eligible_questions')
+          .select('*')
+          .eq('user_id', userId)
+          .gt('last_modified_timestamp', initialTimestamp ?? DateTime(1970).toIso8601String())
+          .then((response) => List<dynamic>.from(response as List)),
+      logContext: 'syncUserStatsEligibleQuestionsInbound: Fetching for user $userId',
+    );
+
+    if (cloudRecords.isEmpty) {
+      QuizzerLogger.logMessage('No new user_stats_eligible_questions to sync for user $userId.');
+      monitor.releaseDatabaseAccess();
+      QuizzerLogger.logMessage('Database Released');
+      return;
+    }
+
+    QuizzerLogger.logMessage('Found ${cloudRecords.length} new/updated user_stats_eligible_questions to sync for user $userId.');
+
+    for (final record in cloudRecords) {
+      if (record is Map<String, dynamic>) {
+        await upsertUserStatsEligibleQuestionsFromInboundSync(record, db);
+      } else {
+        QuizzerLogger.logWarning('syncUserStatsEligibleQuestionsInbound: Encountered a record not of type Map<String, dynamic>. Record: $record');
+      }
+    }
+
+    QuizzerLogger.logSuccess('Synced ${cloudRecords.length} user_stats_eligible_questions from cloud for user $userId.');
+  } on PostgrestException catch (e, s) {
+    QuizzerLogger.logError('syncUserStatsEligibleQuestionsInbound: PostgrestException (potentially non-retriable or after retries) for user $userId. Error: ${e.message}, Stack: $s');
+  } on SocketException catch (e, s) {
+    QuizzerLogger.logError('syncUserStatsEligibleQuestionsInbound: SocketException (after retries) for user $userId. Error: $e, Stack: $s');
+  } catch (e, s) {
+    QuizzerLogger.logError('syncUserStatsEligibleQuestionsInbound: Unexpected error for user $userId. Error: $e, Stack: $s');
+  } finally {
+    monitor.releaseDatabaseAccess();
+    QuizzerLogger.logMessage('Database Released');
+  }
+}
+
 Future<void> runInitialInboundSync(SessionManager sessionManager) async {
   QuizzerLogger.logMessage('Starting initial inbound sync aggregator...');
   final String? userId = sessionManager.userId;
 
   final DatabaseMonitor monitor = getDatabaseMonitor();
   Database? db = await monitor.requestDatabaseAccess();
+  QuizzerLogger.logMessage('Database Access Granted');
 
   // Get last_login timestamp using the imported helper
   final String? lastLogin = await getLastLoginForUser(userId!, db!);
   monitor.releaseDatabaseAccess();
+  QuizzerLogger.logMessage('Database Released');
   db = null;
   // If lastLogin is null, set it to 20 years ago to ensure we get all records
   final String effectiveLastLogin = lastLogin ?? DateTime.now().subtract(const Duration(days: 365 * 20)).toUtc().toIso8601String();
@@ -399,6 +491,13 @@ Future<void> runInitialInboundSync(SessionManager sessionManager) async {
 
   // Sync modules using the initial profile last_modified_timestamp
   await syncModulesInbound(
+    effectiveInitialTimestamp,
+    sessionManager.supabase,
+  );
+
+  // Sync user_stats_eligible_questions using the initial profile last_modified_timestamp
+  await syncUserStatsEligibleQuestionsInbound(
+    userId,
     effectiveInitialTimestamp,
     sessionManager.supabase,
   );

@@ -4,8 +4,9 @@ import 'dart:async';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'table_helper.dart'; // Import the helper file
 import 'package:quizzer/backend_systems/10_switch_board/switch_board.dart'; // Import SwitchBoard
+import 'package:quizzer/backend_systems/06_question_queue_server/eligibility_check_worker.dart'; // Import for isUserRecordEligible
 
-Future<void> verifyUserQuestionAnswerPairTable(Database db) async {
+Future<void> verifyUserQuestionAnswerPairTable(dynamic db) async {
   
   // Check if the table exists
   final List<Map<String, dynamic>> tables = await db.rawQuery(
@@ -69,15 +70,16 @@ Future<void> verifyUserQuestionAnswerPairTable(Database db) async {
 /// questionAnswerReference is question_id field
 Future<int> addUserQuestionAnswerPair({
   required String userUuid,
-  required String questionAnswerReference, // Renamed to questionId for consistency?
+  required String questionAnswerReference,
   required int revisionStreak,
   required String? lastRevised,
   required String predictedRevisionDueHistory,
   required String nextRevisionDue,
   required double timeBetweenRevisions,
   required double averageTimesShownPerDay,
-  required Database db,
+  required dynamic db, // Accept either Database or Transaction
 }) async {
+  QuizzerLogger.logMessage('Starting addUserQuestionAnswerPair for User: $userUuid, Q: $questionAnswerReference');
   await verifyUserQuestionAnswerPairTable(db);
 
   // Prepare raw data map
@@ -98,6 +100,7 @@ Future<int> addUserQuestionAnswerPair({
     'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(), // Use current time
   };
 
+  QuizzerLogger.logMessage('Prepared data map for insert...');
   // Use universal insert helper
   final int result = await insertRawData(
       'user_question_answer_pairs',
@@ -120,7 +123,7 @@ Future<int> addUserQuestionAnswerPair({
 Future<int> editUserQuestionAnswerPair({
   required String userUuid,
   required String questionId,
-  required Database db,
+  required dynamic db, // Accept either Database or Transaction
   int? revisionStreak,
   String? lastRevised,
   String? predictedRevisionDueHistory,
@@ -129,48 +132,55 @@ Future<int> editUserQuestionAnswerPair({
   double? averageTimesShownPerDay,
   bool? isEligible,
   bool? inCirculation,
+  bool disableOutboundSync = false,
 }) async {
+  QuizzerLogger.logMessage('Starting editUserQuestionAnswerPair for User: $userUuid, Q: $questionId');
   await verifyUserQuestionAnswerPairTable(db);
 
-  // Prepare raw data map
+  // Fetch the current record from the DB to build the full record for eligibility check
+  QuizzerLogger.logMessage('Fetching current record for eligibility check...');
+  final Map<String, dynamic> currentRecord = await getUserQuestionAnswerPairById(userUuid, questionId, db);
+  // Build the new record with updated values
+  final Map<String, dynamic> newRecord = Map<String, dynamic>.from(currentRecord);
+  if (revisionStreak != null) newRecord['revision_streak'] = revisionStreak;
+  if (lastRevised != null) newRecord['last_revised'] = lastRevised;
+  if (predictedRevisionDueHistory != null) newRecord['predicted_revision_due_history'] = predictedRevisionDueHistory;
+  if (nextRevisionDue != null) newRecord['next_revision_due'] = nextRevisionDue;
+  if (timeBetweenRevisions != null) newRecord['time_between_revisions'] = timeBetweenRevisions;
+  if (averageTimesShownPerDay != null) newRecord['average_times_shown_per_day'] = averageTimesShownPerDay;
+  if (inCirculation != null) newRecord['in_circulation'] = inCirculation ? 1 : 0;
+
+  final bool eligible = await isUserRecordEligible(newRecord, db);
+  newRecord['is_eligible'] = eligible ? 1 : 0;
+
   Map<String, dynamic> values = {};
-  
   if (revisionStreak != null) values['revision_streak'] = revisionStreak;
   if (lastRevised != null) values['last_revised'] = lastRevised;
   if (predictedRevisionDueHistory != null) values['predicted_revision_due_history'] = predictedRevisionDueHistory;
   if (nextRevisionDue != null) values['next_revision_due'] = nextRevisionDue;
   if (timeBetweenRevisions != null) values['time_between_revisions'] = timeBetweenRevisions;
   if (averageTimesShownPerDay != null) values['average_times_shown_per_day'] = averageTimesShownPerDay;
-  if (isEligible != null) values['is_eligible'] = isEligible; // Pass bool directly
-  if (inCirculation != null) values['in_circulation'] = inCirculation; // Pass bool directly
-  
-  // Add sync fields for edit
+  if (inCirculation != null) values['in_circulation'] = inCirculation;
+  values['is_eligible'] = eligible ? 1 : 0;
   values['edits_are_synced'] = 0;
   values['last_modified_timestamp'] = DateTime.now().toUtc().toIso8601String();
 
-  // If only last_updated was set (e.g. from setCirculationStatus without other changes),
-  // the map might still be empty excluding that. Check if other keys exist.
-  if (values.keys.where((k) => k != 'edits_are_synced' && k != 'last_modified_timestamp').isEmpty) {
-     QuizzerLogger.logWarning('editUserQuestionAnswerPair called for User: $userUuid, Q: $questionId with no fields to update besides sync/timestamp fields.');
-     // Optionally return 0 if only sync/timestamp fields were updated implicitly?
-     // For now, let the update proceed.
-  }
-
-  // Use universal update helper
   final int result = await updateRawData(
     'user_question_answer_pairs',
     values,
-    'user_uuid = ? AND question_id = ?', // where clause
-    [userUuid, questionId],             // whereArgs
+    'user_uuid = ? AND question_id = ?',
+    [userUuid, questionId],
     db,
   );
 
   // Log based on result
   if (result > 0) {
     QuizzerLogger.logSuccess('Edited user_question_answer_pair for User: $userUuid, Q: $questionId ($result row affected).');
-    // Signal SwitchBoard
-    final SwitchBoard switchBoard = getSwitchBoard();
-    switchBoard.signalOutboundSyncNeeded();
+    // Signal SwitchBoard conditionally
+    if (!disableOutboundSync) {
+      final SwitchBoard switchBoard = getSwitchBoard();
+      switchBoard.signalOutboundSyncNeeded();
+    }
   } else {
     QuizzerLogger.logError('Update operation for user_question_answer_pair (User: $userUuid, Q: $questionId) affected 0 rows. Record might not exist.');
     throw StateError('Failed to update user_question_answer_pair for User: $userUuid, Q: $questionId');
@@ -178,7 +188,7 @@ Future<int> editUserQuestionAnswerPair({
   return result;
 }
 
-Future<Map<String, dynamic>> getUserQuestionAnswerPairById(String userUuid, String questionId, Database db) async {
+Future<Map<String, dynamic>> getUserQuestionAnswerPairById(String userUuid, String questionId, dynamic db) async {
   await verifyUserQuestionAnswerPairTable(db);
   
   // Use the universal query helper
@@ -318,6 +328,43 @@ Future<void> setCirculationStatus(
   switchBoard.signalOutboundSyncNeeded();
 }
 
+/// Updates the eligibility status for a specific user-question pair.
+/// Takes a boolean [isEligible] to set the status accordingly.
+/// Throws an Exception if the record is not found, adhering to fail-fast.
+Future<void> setEligibilityStatus(
+    String userUuid, String questionId, bool isEligible, Database db) async {
+  final String statusString = isEligible ? 'ELIGIBLE' : 'INELIGIBLE';
+  QuizzerLogger.logMessage(
+      'DB Table: Setting question $questionId to $statusString for user $userUuid');
+
+  // Ensure table exists before update
+  await verifyUserQuestionAnswerPairTable(db);
+
+  // Perform the update using the universal update helper directly
+  final Map<String, dynamic> updateData = {
+    'is_eligible': isEligible ? 1 : 0,
+  };
+  
+  final int rowsAffected = await updateRawData(
+    'user_question_answer_pairs',
+    updateData,
+    'user_uuid = ? AND question_id = ?', // where
+    [userUuid, questionId],             // whereArgs
+    db,
+  );
+
+  if (rowsAffected == 0) {
+    // Fail fast if the specific record wasn't found for update
+    QuizzerLogger.logError(
+        'Update eligibility status failed: No record found for user $userUuid and question $questionId');
+    throw StateError(
+        'Record not found for user $userUuid and question $questionId during eligibility update.');
+  }
+
+  QuizzerLogger.logSuccess(
+      'Successfully set eligibility status ($statusString) for question $questionId. Rows affected: $rowsAffected');
+}
+
 // Optional: Add a similar function to set inCirculation to false if needed later.
 // Future<void> removeQuestionFromCirculation(...) async { ... inCirculation: false ... } // This comment is now redundant
 
@@ -386,11 +433,13 @@ Future<int> insertOrUpdateUserQuestionAnswerPair({
   required String nextRevisionDue,
   required double timeBetweenRevisions,
   required double averageTimesShownPerDay,
-  required Database db,
+  required dynamic db, // Accept either Database or Transaction
 }) async {
+  QuizzerLogger.logMessage('Starting insertOrUpdateUserQuestionAnswerPair for User: $userUuid, Q: $questionId');
   await verifyUserQuestionAnswerPairTable(db);
 
   // First try to get existing record
+  QuizzerLogger.logMessage('Checking for existing record...');
   final List<Map<String, dynamic>> existing = await queryAndDecodeDatabase(
     'user_question_answer_pairs',
     db,
@@ -400,6 +449,7 @@ Future<int> insertOrUpdateUserQuestionAnswerPair({
 
   if (existing.isEmpty) {
     // No existing record, use add
+    QuizzerLogger.logMessage('No existing record found, using addUserQuestionAnswerPair...');
     return await addUserQuestionAnswerPair(
       userUuid: userUuid,
       questionAnswerReference: questionId,
@@ -413,6 +463,7 @@ Future<int> insertOrUpdateUserQuestionAnswerPair({
     );
   } else {
     // Record exists, use edit
+    QuizzerLogger.logMessage('Existing record found, using editUserQuestionAnswerPair...');
     return await editUserQuestionAnswerPair(
       userUuid: userUuid,
       questionId: questionId,

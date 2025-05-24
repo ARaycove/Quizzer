@@ -15,6 +15,7 @@ import 'package:quizzer/UI_systems/07_critical_error_page/critical_error_screen.
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:logging/logging.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart'; // Import logging package
+import 'package:quizzer/UI_systems/10_stats_page/stats_page.dart';
 
 // Global Key for NavigatorState - MOVED HERE
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -263,6 +264,7 @@ class _QuizzerAppState extends State<QuizzerApp> {
         '/admin_panel':     (context) => const AdminPanelPage(),
         '/settings_page':   (context) => SettingsPage(),
         '/feedback':        (context) => const FeedbackPage(),
+        '/stats':           (context) => const StatsPage(),
         '/critical_error': (context) {
           final args = ModalRoute.of(context)?.settings.arguments;
           if (args is CriticalErrorDetails) {
