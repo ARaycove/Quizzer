@@ -51,6 +51,9 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/st
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_eligible_questions_table.dart'; // Added import for user_stats_eligible_questions_table
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_non_circulating_questions_table.dart'; // Added import for user_stats_non_circulating_questions_table
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_in_circulation_questions_table.dart'; // Added import for user_stats_in_circulation_questions_table
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_revision_streak_sum_table.dart'; // Added import for user_stats_revision_streak_sum_table
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_total_user_question_answer_pairs_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_average_questions_shown_per_day_table.dart';
 // FIXME DO NOT USE ALIASING ON IMPORTS
 
 class SessionManager {
@@ -307,8 +310,8 @@ class SessionManager {
     _loginProgressController.add("Finalizing Login...");
     db = await _dbMonitor.requestDatabaseAccess();
     await updateLastLogin(userId!, db!);
-    await updateAllUserDailyStats(userId!, db);
     _dbMonitor.releaseDatabaseAccess();
+    await updateAllUserDailyStats(userId!);
 
     // Start OutboundSyncWorker after all initialization is complete
     final outboundSyncWorker = OutboundSyncWorker();
@@ -784,6 +787,7 @@ class SessionManager {
     );
 
     // --- 6. Update User-Question Pair in DB (Moved After Attempt Record) ---
+    updateAllUserDailyStats(userId!);
     Database? db;
     db = await _dbMonitor.requestDatabaseAccess(); // Re-acquire lock
     if (db == null) {
@@ -793,12 +797,13 @@ class SessionManager {
     // ADDED: Increment total questions answered in user_profile table
      // Explicitly increment total_attempts using the dedicated function -> for the questionObject
      // Do stat increment on individual pairs before sending update.
+
      await incrementTotalAttempts(userId!, questionId, db);
      await incrementTotalQuestionsAnswered(userId!, db); // User profile total 
      // TODO Replace this block of stat updates with a signal call to a stat update worker
 
      // Call the aggregator to update all daily stats
-     await updateAllUserDailyStats(userId!, db);
+     
 
      await editUserQuestionAnswerPair(
        userUuid: userId!,
@@ -1364,6 +1369,90 @@ class SessionManager {
     final record = await getUserStatsInCirculationQuestionsRecordByDate(userId!, dateString, db!);
     _dbMonitor.releaseDatabaseAccess();
     return record;
+  }
+
+  /// Fetches the current day's revision streak sum records for the logged-in user.
+  Future<List<Map<String, dynamic>>> getCurrentRevisionStreakSumStats() async {
+    if (userId == null) {
+      QuizzerLogger.logWarning('SessionManager.getCurrentRevisionStreakSumStats: User ID is null.');
+      return [];
+    }
+    final db = await _dbMonitor.requestDatabaseAccess();
+    final List<Map<String, dynamic>> result = await getTodayUserStatsRevisionStreakSumRecords(userId!, db!);
+    _dbMonitor.releaseDatabaseAccess();
+    return result;
+  }
+
+  /// Fetches all historical revision streak sum records for the logged-in user.
+  Future<List<Map<String, dynamic>>> getHistoricalRevisionStreakSumStats() async {
+    if (userId == null) {
+      QuizzerLogger.logWarning('SessionManager.getHistoricalRevisionStreakSumStats: User ID is null.');
+      return [];
+    }
+    final db = await _dbMonitor.requestDatabaseAccess();
+    final List<Map<String, dynamic>> result = await getUserStatsRevisionStreakSumRecordsByUser(userId!, db!);
+    _dbMonitor.releaseDatabaseAccess();
+    return result;
+  }
+
+  /// Fetches the current day's total user question answer pairs count for the logged-in user.
+  Future<int> getCurrentTotalUserQuestionAnswerPairsCount() async {
+    if (userId == null) {
+      QuizzerLogger.logWarning('SessionManager.getCurrentTotalUserQuestionAnswerPairsCount: User ID is null.');
+      return 0;
+    }
+    final db = await _dbMonitor.requestDatabaseAccess();
+    final Map<String, dynamic> record = await getTodayUserStatsTotalUserQuestionAnswerPairsRecord(userId!, db!);
+    _dbMonitor.releaseDatabaseAccess();
+    return record['total_question_answer_pairs'] as int? ?? 0;
+  }
+
+  /// Fetches all historical total user question answer pairs records for the logged-in user.
+  Future<List<Map<String, dynamic>>> getHistoricalTotalUserQuestionAnswerPairsStats() async {
+    if (userId == null) {
+      QuizzerLogger.logWarning('SessionManager.getHistoricalTotalUserQuestionAnswerPairsStats: User ID is null.');
+      return [];
+    }
+    final db = await _dbMonitor.requestDatabaseAccess();
+    final List<Map<String, dynamic>> result = await getUserStatsTotalUserQuestionAnswerPairsRecordsByUser(userId!, db!);
+    _dbMonitor.releaseDatabaseAccess();
+    return result;
+  }
+
+  /// Fetches the current day's average questions shown per day stat for the logged-in user.
+  Future<Map<String, dynamic>?> getCurrentAverageQuestionsShownPerDayStat() async {
+    if (userId == null) {
+      QuizzerLogger.logWarning('SessionManager.getCurrentAverageQuestionsShownPerDayStat: User ID is null.');
+      return null;
+    }
+    final db = await _dbMonitor.requestDatabaseAccess();
+    try {
+      final Map<String, dynamic> record = await getTodayUserStatsAverageQuestionsShownPerDayRecord(userId!, db!);
+      return record;
+    } catch (e) {
+      QuizzerLogger.logWarning('SessionManager.getCurrentAverageQuestionsShownPerDayStat: $e');
+      return null;
+    } finally {
+      _dbMonitor.releaseDatabaseAccess();
+    }
+  }
+
+  /// Fetches all historical average questions shown per day records for the logged-in user.
+  Future<List<Map<String, dynamic>>> getHistoricalAverageQuestionsShownPerDayStats() async {
+    if (userId == null) {
+      QuizzerLogger.logWarning('SessionManager.getHistoricalAverageQuestionsShownPerDayStats: User ID is null.');
+      return [];
+    }
+    final db = await _dbMonitor.requestDatabaseAccess();
+    try {
+      final List<Map<String, dynamic>> result = await getUserStatsAverageQuestionsShownPerDayRecordsByUser(userId!, db!);
+      return result;
+    } catch (e) {
+      QuizzerLogger.logWarning('SessionManager.getHistoricalAverageQuestionsShownPerDayStats: $e');
+      return [];
+    } finally {
+      _dbMonitor.releaseDatabaseAccess();
+    }
   }
 }
 

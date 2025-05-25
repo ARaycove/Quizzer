@@ -13,9 +13,8 @@ Key features:
 
 // 3. 
 // Multi-day Stats
-// 4. revision_streak_stats (Records by date, the total number of questions categorized by revision_streak_score)
-// 5. total_questions_in_database (by date, get the total number of user_question_answer_pairs that have at least one attempt on them)
-// 6. average_questions_shown_per_day (by date, average number of questions being shown daily)
+
+
 // 7. total_questions_answered (by date, the running the total of questions the users has answered)
 // 8. questions_answered_by_date (by date, the number of questions the user answered on a given day)
 // 9. reserve_questions_exhaust_in_x_days (single stat)
@@ -29,6 +28,7 @@ import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'widget_graph_template.dart';
 import 'package:quizzer/UI_systems/color_wheel.dart';
 import 'package:quizzer/UI_systems/global_widgets/widget_global_app_bar.dart';
+import 'widget_bar_chart_template.dart';
 
 class StatsPage extends StatefulWidget {
   const StatsPage({super.key});
@@ -44,6 +44,12 @@ class _StatsPageState extends State<StatsPage> {
   late Future<Map<String, dynamic>?> currentNonCirculatingQuestionsFuture;
   late Future<List<Map<String, dynamic>>> inCirculationQuestionsHistoryFuture;
   late Future<Map<String, dynamic>?> currentInCirculationQuestionsFuture;
+  late Future<List<Map<String, dynamic>>> currentRevisionStreakStatsFuture;
+  late Future<List<Map<String, dynamic>>> historicalRevisionStreakStatsFuture;
+  late Future<int> currentTotalUserQuestionAnswerPairsFuture;
+  late Future<List<Map<String, dynamic>>> historicalTotalUserQuestionAnswerPairsFuture;
+  late Future<Map<String, dynamic>?> currentAverageQuestionsShownPerDayFuture;
+  late Future<List<Map<String, dynamic>>> historicalAverageQuestionsShownPerDayFuture;
 
   @override
   void initState() {
@@ -55,6 +61,12 @@ class _StatsPageState extends State<StatsPage> {
     currentNonCirculatingQuestionsFuture = session.getNonCirculatingQuestionsStats().then((value) => value as Map<String, dynamic>?);
     inCirculationQuestionsHistoryFuture = session.getInCirculationQuestionsStats(getAll: true).then((data) => List<Map<String, dynamic>>.from(data));
     currentInCirculationQuestionsFuture = session.getInCirculationQuestionsStats().then((value) => value as Map<String, dynamic>?);
+    currentRevisionStreakStatsFuture = session.getCurrentRevisionStreakSumStats();
+    historicalRevisionStreakStatsFuture = session.getHistoricalRevisionStreakSumStats();
+    currentTotalUserQuestionAnswerPairsFuture = session.getCurrentTotalUserQuestionAnswerPairsCount();
+    historicalTotalUserQuestionAnswerPairsFuture = session.getHistoricalTotalUserQuestionAnswerPairsStats();
+    currentAverageQuestionsShownPerDayFuture = session.getCurrentAverageQuestionsShownPerDayStat();
+    historicalAverageQuestionsShownPerDayFuture = session.getHistoricalAverageQuestionsShownPerDayStats();
   }
 
   @override
@@ -196,7 +208,218 @@ class _StatsPageState extends State<StatsPage> {
                 );
               },
             ),
-            // Placeholder for other stats
+            // Current Revision Streak Stats Bar Chart
+            FutureBuilder<List<Map<String, dynamic>>>(
+              future: currentRevisionStreakStatsFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (snapshot.hasError || snapshot.data == null || snapshot.data!.isEmpty) {
+                  return const Center(child: Text('No current revision streak data available.', style: ColorWheel.defaultText));
+                }
+                final stats = snapshot.data!;
+                // Transform data for the bar chart
+                final barChartData = stats.map((stat) {
+                  return {
+                    'x_label': 'Score ${stat['revision_streak_score']}',
+                    'y_value': (stat['question_count'] as int).toDouble(),
+                  };
+                }).toList();
+
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                     StatBarChart(
+                      data: barChartData,
+                      chartName: 'Current Question Distribution by Revision Score',
+                      xAxisLabel: 'Revision Score',
+                      yAxisLabel: 'Number of Questions',
+                      barColor: Colors.teal, // Example color
+                    ),
+                    const SizedBox(height: 32),
+                  ],
+                );
+              },
+            ),
+
+            // Historical Revision Streak Stats Line Graph
+            FutureBuilder<List<Map<String, dynamic>>>(
+              future: historicalRevisionStreakStatsFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (snapshot.hasError || snapshot.data == null || snapshot.data!.isEmpty) {
+                  return const Center(child: Text('No historical revision streak data available.', style: ColorWheel.defaultText));
+                }
+                final history = snapshot.data!;
+                
+                // Group data by revision_streak_score, then by date
+                Map<int, List<Map<String, dynamic>>> groupedByStreak = {};
+                for (var record in history) {
+                  int streak = record['revision_streak_score'] as int;
+                  if (!groupedByStreak.containsKey(streak)) {
+                    groupedByStreak[streak] = [];
+                  }
+                  groupedByStreak[streak]!.add({
+                    'date': record['record_date'] ?? '',
+                    'value': (record['question_count'] as int).toDouble(),
+                  });
+                }
+
+                // Sort each streak's data by date
+                groupedByStreak.forEach((streak, records) {
+                  records.sort((a, b) => (a['date'] as String).compareTo(b['date'] as String));
+                });
+
+                List<StatLineSeries> seriesList = [];
+                // Define a list of colors for different streaks
+                List<Color> streakColors = [
+                  Colors.red,
+                  Colors.orange,
+                  Colors.yellow.shade700,
+                  Colors.lightGreen,
+                  Colors.green,
+                  Colors.teal,
+                  Colors.cyan,
+                  Colors.lightBlue,
+                  Colors.blue,
+                  Colors.indigo,
+                  Colors.purple,
+                  Colors.pink,
+                  // Add more colors if you expect more than 12 unique streak scores often
+                ];
+
+                int colorIndex = 0;
+                final streakEntries = groupedByStreak.entries.toList();
+                streakEntries.sort((a, b) => a.key.compareTo(b.key)); // Sort streaks by score for consistent legend order
+                for (final entry in streakEntries) {
+                  seriesList.add(StatLineSeries(
+                    legendLabel: 'Score ${entry.key}',
+                    data: entry.value,
+                    lineColor: streakColors[colorIndex % streakColors.length],
+                  ));
+                  colorIndex++;
+                }
+
+                if (seriesList.isEmpty) {
+                   return const Center(child: Text('Not enough data to display historical streak graph.', style: ColorWheel.defaultText));
+                }
+
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    StatLineGraph.multi(
+                      title: 'Historical Question Count by Revision Score',
+                      seriesList: seriesList,
+                      chartName: 'Historical Question Count by Revision Score',
+                      xAxisLabel: 'Date',
+                      yAxisLabel: 'Number of Questions',
+                      showLegend: true,
+                    ),
+                     const SizedBox(height: 32),
+                  ],
+                );
+              },
+            ),
+
+            // Total User Question Answer Pairs Stat
+            FutureBuilder<int>(
+              future: currentTotalUserQuestionAnswerPairsFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                final int total = snapshot.data ?? 0;
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Total User Question Answer Pairs: $total',
+                      style: ColorWheel.titleText,
+                    ),
+                    const SizedBox(height: 8),
+                  ],
+                );
+              },
+            ),
+
+            // Historical Total User Question Answer Pairs Line Graph
+            FutureBuilder<List<Map<String, dynamic>>>(
+              future: historicalTotalUserQuestionAnswerPairsFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (snapshot.hasError || snapshot.data == null || snapshot.data!.isEmpty) {
+                  return const Center(child: Text('No historical total user question answer pairs data available.', style: ColorWheel.defaultText));
+                }
+                final history = snapshot.data!;
+                final graphData = history.map((e) => {
+                  'date': e['record_date'] ?? '',
+                  'value': (e['total_question_answer_pairs'] as int?)?.toDouble() ?? 0.0,
+                }).toList();
+                return StatLineGraph(
+                  data: graphData,
+                  title: 'Total User Question Answer Pairs Over Time',
+                  legendLabel: 'Total User Questions',
+                  yAxisLabel: 'Total User Questions',
+                  xAxisLabel: 'Date',
+                  lineColor: Colors.deepPurple,
+                  chartName: 'Total User Question Answer Pairs Over Time',
+                );
+              },
+            ),
+            // Average Questions Shown Per Day Stat (text only)
+            FutureBuilder<Map<String, dynamic>?>(
+              future: currentAverageQuestionsShownPerDayFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                final stat = snapshot.data;
+                final double avgShown = stat != null ? (stat['average_questions_shown_per_day'] as double? ?? 0.0) : 0.0;
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Current Average Questions Shown Per Day: ${avgShown.toStringAsFixed(2)}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                  ],
+                );
+              },
+            ),
+            // Average Questions Shown Per Day Graph
+            FutureBuilder<List<Map<String, dynamic>>>(
+              future: historicalAverageQuestionsShownPerDayFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                final history = snapshot.data ?? [];
+                final graphData = history.map((e) => {
+                  'date': e['record_date'] ?? '',
+                  'value': e['average_questions_shown_per_day'] ?? 0.0,
+                }).toList();
+                return StatLineGraph(
+                  data: graphData,
+                  title: 'Average Questions Shown Per Day Over Time',
+                  legendLabel: 'Avg Questions/Day',
+                  yAxisLabel: 'Avg Questions/Day',
+                  xAxisLabel: 'Date',
+                  lineColor: Colors.green,
+                  chartName: 'Average Questions Shown Per Day Over Time',
+                );
+              },
+            ),
+
             const Text(
               'Other stats coming soon...',
               style: ColorWheel.defaultText,

@@ -178,7 +178,22 @@ class OutboundSyncWorker {
     db = await _getDbAccess();
     await syncUserStatsInCirculationQuestions(db!);
     _dbMonitor.releaseDatabaseAccess();
+
+    // 14. Check and Sync User Stats Revision Streak Sum
+    db = await _getDbAccess();
+    await syncUserStatsRevisionStreakSum(db!);
+    _dbMonitor.releaseDatabaseAccess();
     
+    // 15. Check and Sync User Stats Total User Question Answer Pairs
+    db = await _getDbAccess();
+    await syncUserStatsTotalUserQuestionAnswerPairs(db!);
+    _dbMonitor.releaseDatabaseAccess();
+
+    // 16. Check and Sync User Stats Average Questions Shown Per Day
+    db = await _getDbAccess();
+    await syncUserStatsAverageQuestionsShownPerDay(db!);
+    _dbMonitor.releaseDatabaseAccess();
+
     QuizzerLogger.logMessage('All outbound sync functions completed.');
   }
   // ----------------------
