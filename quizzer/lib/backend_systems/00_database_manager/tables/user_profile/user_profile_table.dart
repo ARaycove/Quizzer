@@ -1,4 +1,3 @@
-import 'package:sqflite/sqflite.dart';
 import 'package:uuid/uuid.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pairs_table.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
@@ -491,29 +490,6 @@ Future<void> updateTotalStudyTime(String userUuid, double hoursToAdd, dynamic db
     // Consider if this should throw an error if the user *must* exist. For now, just a warning.
   } else {
     QuizzerLogger.logSuccess('Successfully updated total_study_time for User: $userUuid (added $daysToAdd days)');
-    // Signal SwitchBoard
-    final SwitchBoard switchBoard = getSwitchBoard();
-    switchBoard.signalOutboundSyncNeeded();
-  }
-}
-
-/// Increments the total_questions_answered count for a specific user.
-Future<void> incrementTotalQuestionsAnswered(String userUuid, dynamic db) async {
-  QuizzerLogger.logMessage('Incrementing total_questions_answered for User: $userUuid');
-  
-  // Ensure the table and column exist (verification happens elsewhere, but good practice)
-  // We assume verifyUserProfileTable is called prior to DB operations usually.
-
-  final int rowsAffected = await db.rawUpdate(
-    'UPDATE user_profile SET total_questions_answered = total_questions_answered + 1, edits_are_synced = 0, last_modified_timestamp = ? WHERE uuid = ?',
-    [DateTime.now().toUtc().toIso8601String(), userUuid]
-  );
-
-  if (rowsAffected == 0) {
-    QuizzerLogger.logWarning('Failed to increment total_questions_answered: No matching record found for User: $userUuid');
-    // Consider if this should throw an error if the user *must* exist at this point.
-  } else {
-    QuizzerLogger.logSuccess('Successfully incremented total_questions_answered for User: $userUuid');
     // Signal SwitchBoard
     final SwitchBoard switchBoard = getSwitchBoard();
     switchBoard.signalOutboundSyncNeeded();

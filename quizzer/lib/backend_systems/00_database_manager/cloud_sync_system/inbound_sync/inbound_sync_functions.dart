@@ -14,6 +14,10 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/us
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_revision_streak_sum_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_total_user_question_answer_pairs_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_average_questions_shown_per_day_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_total_questions_answered_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_daily_questions_answered_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_days_left_until_questions_exhaust_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_average_daily_questions_learned_table.dart';
 import 'dart:io'; // For SocketException
 import 'dart:async'; // For Future.delayed
 
@@ -737,7 +741,7 @@ Future<void> syncUserStatsAverageQuestionsShownPerDayInbound(
       logContext: 'syncUserStatsAverageQuestionsShownPerDayInbound: Fetching for user $userId',
     );
   } on PostgrestException catch (e, s) {
-    QuizzerLogger.logError('syncUserStatsAverageQuestionsShownPerDayInbound: PostgrestException (potentially non-retriable or after retries) for user $userId. Error: [38;5;9m${e.message}[0m, Stack: $s');
+    QuizzerLogger.logError('syncUserStatsAverageQuestionsShownPerDayInbound: PostgrestException (potentially non-retriable or after retries) for user $userId. Error: \u001b[38;5;9m${e.message}[0m, Stack: $s');
     monitor.releaseDatabaseAccess();
     QuizzerLogger.logMessage('Database Released');
     return;
@@ -760,7 +764,7 @@ Future<void> syncUserStatsAverageQuestionsShownPerDayInbound(
     return;
   }
 
-  QuizzerLogger.logMessage('Found [38;5;10m${cloudRecords.length}[0m new/updated user_stats_average_questions_shown_per_day to sync for user $userId.');
+  QuizzerLogger.logMessage('Found \u001b[38;5;10m${cloudRecords.length}[0m new/updated user_stats_average_questions_shown_per_day to sync for user $userId.');
 
   for (final record in cloudRecords) {
     if (record is Map<String, dynamic>) {
@@ -771,6 +775,262 @@ Future<void> syncUserStatsAverageQuestionsShownPerDayInbound(
   }
 
   QuizzerLogger.logSuccess('Synced ${cloudRecords.length} user_stats_average_questions_shown_per_day from cloud for user $userId.');
+  monitor.releaseDatabaseAccess();
+  QuizzerLogger.logMessage('Database Released');
+}
+
+Future<void> syncUserStatsTotalQuestionsAnsweredInbound(
+  String userId,
+  String? initialTimestamp,
+  SupabaseClient supabaseClient,
+) async {
+  QuizzerLogger.logMessage('Syncing inbound user_stats_total_questions_answered for user $userId since $initialTimestamp...');
+
+  final DatabaseMonitor monitor = getDatabaseMonitor();
+  Database? db = await monitor.requestDatabaseAccess();
+  if (db == null) {
+    QuizzerLogger.logError('syncUserStatsTotalQuestionsAnsweredInbound: Failed to get database access.');
+    return;
+  }
+
+  List<dynamic> cloudRecords;
+  try {
+    cloudRecords = await executeSupabaseCallWithRetry(
+      () => supabaseClient
+          .from('user_stats_total_questions_answered')
+          .select('*')
+          .eq('user_id', userId)
+          .gt('last_modified_timestamp', initialTimestamp ?? DateTime(1970).toIso8601String())
+          .then((response) => List<dynamic>.from(response as List)),
+      logContext: 'syncUserStatsTotalQuestionsAnsweredInbound: Fetching for user $userId',
+    );
+  } on PostgrestException catch (e, s) {
+    QuizzerLogger.logError('syncUserStatsTotalQuestionsAnsweredInbound: PostgrestException (potentially non-retriable or after retries) for user $userId. Error: \u001b[38;5;9m${e.message}[0m, Stack: $s');
+    monitor.releaseDatabaseAccess();
+    QuizzerLogger.logMessage('Database Released');
+    return;
+  } on SocketException catch (e, s) {
+    QuizzerLogger.logError('syncUserStatsTotalQuestionsAnsweredInbound: SocketException (after retries) for user $userId. Error: $e, Stack: $s');
+    monitor.releaseDatabaseAccess();
+    QuizzerLogger.logMessage('Database Released');
+    return;
+  } catch (e, s) {
+    QuizzerLogger.logError('syncUserStatsTotalQuestionsAnsweredInbound: Unexpected error for user $userId. Error: $e, Stack: $s');
+    monitor.releaseDatabaseAccess();
+    QuizzerLogger.logMessage('Database Released');
+    return;
+  }
+
+  if (cloudRecords.isEmpty) {
+    QuizzerLogger.logMessage('No new user_stats_total_questions_answered to sync for user $userId.');
+    monitor.releaseDatabaseAccess();
+    QuizzerLogger.logMessage('Database Released');
+    return;
+  }
+
+  QuizzerLogger.logMessage('Found \u001b[38;5;10m${cloudRecords.length}\u001b[0m new/updated user_stats_total_questions_answered to sync for user $userId.');
+
+  for (final record in cloudRecords) {
+    if (record is Map<String, dynamic>) {
+      await upsertUserStatsTotalQuestionsAnsweredFromInboundSync(record, db);
+    } else {
+      QuizzerLogger.logWarning('syncUserStatsTotalQuestionsAnsweredInbound: Encountered a record not of type Map<String, dynamic>. Record: $record');
+    }
+  }
+
+  QuizzerLogger.logSuccess('Synced ${cloudRecords.length} user_stats_total_questions_answered from cloud for user $userId.');
+  monitor.releaseDatabaseAccess();
+  QuizzerLogger.logMessage('Database Released');
+}
+
+Future<void> syncUserStatsDailyQuestionsAnsweredInbound(
+  String userId,
+  String? initialTimestamp,
+  SupabaseClient supabaseClient,
+) async {
+  QuizzerLogger.logMessage('Syncing inbound user_stats_daily_questions_answered for user $userId since $initialTimestamp...');
+
+  final DatabaseMonitor monitor = getDatabaseMonitor();
+  Database? db = await monitor.requestDatabaseAccess();
+  if (db == null) {
+    QuizzerLogger.logError('syncUserStatsDailyQuestionsAnsweredInbound: Failed to get database access.');
+    return;
+  }
+
+  List<dynamic> cloudRecords;
+  try {
+    cloudRecords = await executeSupabaseCallWithRetry(
+      () => supabaseClient
+          .from('user_stats_daily_questions_answered')
+          .select('*')
+          .eq('user_id', userId)
+          .gt('last_modified_timestamp', initialTimestamp ?? DateTime(1970).toIso8601String())
+          .then((response) => List<dynamic>.from(response as List)),
+      logContext: 'syncUserStatsDailyQuestionsAnsweredInbound: Fetching for user $userId',
+    );
+  } on PostgrestException catch (e, s) {
+    QuizzerLogger.logError('syncUserStatsDailyQuestionsAnsweredInbound: PostgrestException (potentially non-retriable or after retries) for user $userId. Error: \u001b[38;5;9m${e.message}[0m, Stack: $s');
+    monitor.releaseDatabaseAccess();
+    QuizzerLogger.logMessage('Database Released');
+    return;
+  } on SocketException catch (e, s) {
+    QuizzerLogger.logError('syncUserStatsDailyQuestionsAnsweredInbound: SocketException (after retries) for user $userId. Error: $e, Stack: $s');
+    monitor.releaseDatabaseAccess();
+    QuizzerLogger.logMessage('Database Released');
+    return;
+  } catch (e, s) {
+    QuizzerLogger.logError('syncUserStatsDailyQuestionsAnsweredInbound: Unexpected error for user $userId. Error: $e, Stack: $s');
+    monitor.releaseDatabaseAccess();
+    QuizzerLogger.logMessage('Database Released');
+    return;
+  }
+
+  if (cloudRecords.isEmpty) {
+    QuizzerLogger.logMessage('No new user_stats_daily_questions_answered to sync for user $userId.');
+    monitor.releaseDatabaseAccess();
+    QuizzerLogger.logMessage('Database Released');
+    return;
+  }
+
+  QuizzerLogger.logMessage('Found \u001b[38;5;10m${cloudRecords.length}[0m new/updated user_stats_daily_questions_answered to sync for user $userId.');
+
+  for (final record in cloudRecords) {
+    if (record is Map<String, dynamic>) {
+      await upsertUserStatsDailyQuestionsAnsweredFromInboundSync(record, db);
+    } else {
+      QuizzerLogger.logWarning('syncUserStatsDailyQuestionsAnsweredInbound: Encountered a record not of type Map<String, dynamic>. Record: $record');
+    }
+  }
+
+  QuizzerLogger.logSuccess('Synced ${cloudRecords.length} user_stats_daily_questions_answered from cloud for user $userId.');
+  monitor.releaseDatabaseAccess();
+  QuizzerLogger.logMessage('Database Released');
+}
+
+Future<void> syncUserStatsDaysLeftUntilQuestionsExhaustInbound(
+  String userId,
+  String? initialTimestamp,
+  SupabaseClient supabaseClient,
+) async {
+  QuizzerLogger.logMessage('Syncing inbound user_stats_days_left_until_questions_exhaust for user $userId since $initialTimestamp...');
+
+  final DatabaseMonitor monitor = getDatabaseMonitor();
+  Database? db = await monitor.requestDatabaseAccess();
+  if (db == null) {
+    QuizzerLogger.logError('syncUserStatsDaysLeftUntilQuestionsExhaustInbound: Failed to get database access.');
+    return;
+  }
+
+  List<dynamic> cloudRecords;
+  try {
+    cloudRecords = await executeSupabaseCallWithRetry(
+      () => supabaseClient
+          .from('user_stats_days_left_until_questions_exhaust')
+          .select('*')
+          .eq('user_id', userId)
+          .gt('last_modified_timestamp', initialTimestamp ?? DateTime(1970).toIso8601String())
+          .then((response) => List<dynamic>.from(response as List)),
+      logContext: 'syncUserStatsDaysLeftUntilQuestionsExhaustInbound: Fetching for user $userId',
+    );
+  } on PostgrestException catch (e, s) {
+    QuizzerLogger.logError('syncUserStatsDaysLeftUntilQuestionsExhaustInbound: PostgrestException (potentially non-retriable or after retries) for user $userId. Error: \u001b[38;5;9m\u001b[0m${e.message}, Stack: $s');
+    monitor.releaseDatabaseAccess();
+    QuizzerLogger.logMessage('Database Released');
+    return;
+  } on SocketException catch (e, s) {
+    QuizzerLogger.logError('syncUserStatsDaysLeftUntilQuestionsExhaustInbound: SocketException (after retries) for user $userId. Error: $e, Stack: $s');
+    monitor.releaseDatabaseAccess();
+    QuizzerLogger.logMessage('Database Released');
+    return;
+  } catch (e, s) {
+    QuizzerLogger.logError('syncUserStatsDaysLeftUntilQuestionsExhaustInbound: Unexpected error for user $userId. Error: $e, Stack: $s');
+    monitor.releaseDatabaseAccess();
+    QuizzerLogger.logMessage('Database Released');
+    return;
+  }
+
+  if (cloudRecords.isEmpty) {
+    QuizzerLogger.logMessage('No new user_stats_days_left_until_questions_exhaust to sync for user $userId.');
+    monitor.releaseDatabaseAccess();
+    QuizzerLogger.logMessage('Database Released');
+    return;
+  }
+
+  QuizzerLogger.logMessage('Found [38;5;10m${cloudRecords.length}[0m new/updated user_stats_days_left_until_questions_exhaust to sync for user $userId.');
+
+  for (final record in cloudRecords) {
+    if (record is Map<String, dynamic>) {
+      await upsertUserStatsDaysLeftUntilQuestionsExhaustFromInboundSync(record, db);
+    } else {
+      QuizzerLogger.logWarning('syncUserStatsDaysLeftUntilQuestionsExhaustInbound: Encountered a record not of type Map<String, dynamic>. Record: $record');
+    }
+  }
+
+  QuizzerLogger.logSuccess('Synced ${cloudRecords.length} user_stats_days_left_until_questions_exhaust from cloud for user $userId.');
+  monitor.releaseDatabaseAccess();
+  QuizzerLogger.logMessage('Database Released');
+}
+
+Future<void> syncUserStatsAverageDailyQuestionsLearnedInbound(
+  String userId,
+  String? initialTimestamp,
+  SupabaseClient supabaseClient,
+) async {
+  QuizzerLogger.logMessage('Syncing inbound user_stats_average_daily_questions_learned for user $userId since $initialTimestamp...');
+
+  final DatabaseMonitor monitor = getDatabaseMonitor();
+  Database? db = await monitor.requestDatabaseAccess();
+  if (db == null) {
+    QuizzerLogger.logError('syncUserStatsAverageDailyQuestionsLearnedInbound: Failed to get database access.');
+    return;
+  }
+
+  List<dynamic> cloudRecords;
+  try {
+    cloudRecords = await executeSupabaseCallWithRetry(
+      () => supabaseClient
+          .from('user_stats_average_daily_questions_learned')
+          .select('*')
+          .eq('user_id', userId)
+          .gt('last_modified_timestamp', initialTimestamp ?? DateTime(1970).toIso8601String())
+          .then((response) => List<dynamic>.from(response as List)),
+      logContext: 'syncUserStatsAverageDailyQuestionsLearnedInbound: Fetching for user $userId',
+    );
+  } on PostgrestException catch (e, s) {
+    QuizzerLogger.logError('syncUserStatsAverageDailyQuestionsLearnedInbound: PostgrestException (potentially non-retriable or after retries) for user $userId. Error: \u001b[38;5;9m\u001b[0m${e.message}, Stack: $s');
+    monitor.releaseDatabaseAccess();
+    QuizzerLogger.logMessage('Database Released');
+    return;
+  } on SocketException catch (e, s) {
+    QuizzerLogger.logError('syncUserStatsAverageDailyQuestionsLearnedInbound: SocketException (after retries) for user $userId. Error: $e, Stack: $s');
+    monitor.releaseDatabaseAccess();
+    QuizzerLogger.logMessage('Database Released');
+    return;
+  } catch (e, s) {
+    QuizzerLogger.logError('syncUserStatsAverageDailyQuestionsLearnedInbound: Unexpected error for user $userId. Error: $e, Stack: $s');
+    monitor.releaseDatabaseAccess();
+    QuizzerLogger.logMessage('Database Released');
+    return;
+  }
+
+  if (cloudRecords.isEmpty) {
+    QuizzerLogger.logMessage('No new user_stats_average_daily_questions_learned to sync for user $userId.');
+    monitor.releaseDatabaseAccess();
+    QuizzerLogger.logMessage('Database Released');
+    return;
+  }
+
+  QuizzerLogger.logMessage('Found \u001b[38;5;10m${cloudRecords.length}\u001b[0m new/updated user_stats_average_daily_questions_learned to sync for user $userId.');
+
+  for (final record in cloudRecords) {
+    if (record is Map<String, dynamic>) {
+      await upsertUserStatsAverageDailyQuestionsLearnedFromInboundSync(record, db);
+    } else {
+      QuizzerLogger.logWarning('syncUserStatsAverageDailyQuestionsLearnedInbound: Encountered a record not of type Map<String, dynamic>. Record: $record');
+    }
+  }
+
+  QuizzerLogger.logSuccess('Synced ${cloudRecords.length} user_stats_average_daily_questions_learned from cloud for user $userId.');
   monitor.releaseDatabaseAccess();
   QuizzerLogger.logMessage('Database Released');
 }
@@ -867,6 +1127,34 @@ Future<void> runInitialInboundSync(SessionManager sessionManager) async {
     userId,
     effectiveInitialTimestamp,
     sessionManager.supabase,
+  );
+
+  // Sync user_stats_total_questions_answered using the initial profile last_modified_timestamp
+  await syncUserStatsTotalQuestionsAnsweredInbound(
+    userId,
+    effectiveInitialTimestamp,
+    sessionManager.supabase,
+  );
+
+  // Sync user_stats_daily_questions_answered using the initial profile last_modified_timestamp
+  await syncUserStatsDailyQuestionsAnsweredInbound(
+    userId,
+    effectiveInitialTimestamp,
+    sessionManager.supabase,
+  );
+
+  // Sync user_stats_days_left_until_questions_exhaust using the initial profile last_modified_timestamp
+  await syncUserStatsDaysLeftUntilQuestionsExhaustInbound(
+    userId,
+    effectiveInitialTimestamp,
+    sessionManager.supabase
+  );
+
+  // Sync user_stats_average_daily_questions_learned using the initial profile last_modified_timestamp
+  await syncUserStatsAverageDailyQuestionsLearnedInbound(
+    userId,
+    effectiveInitialTimestamp,
+    sessionManager.supabase
   );
 
   QuizzerLogger.logSuccess('Initial inbound sync completed successfully.');

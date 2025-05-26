@@ -194,6 +194,26 @@ class OutboundSyncWorker {
     await syncUserStatsAverageQuestionsShownPerDay(db!);
     _dbMonitor.releaseDatabaseAccess();
 
+    // 17. Check and Sync User Stats Total Questions Answered
+    db = await _getDbAccess();
+    await syncUserStatsTotalQuestionsAnswered(db!);
+    _dbMonitor.releaseDatabaseAccess();
+
+    // 18. Check and Sync User Stats Daily Questions Answered
+    db = await _getDbAccess();
+    await syncUserStatsDailyQuestionsAnswered(db!);
+    _dbMonitor.releaseDatabaseAccess();
+
+    // 19. Check and Sync User Stats Days Left Until Questions Exhaust
+    db = await _getDbAccess();
+    await syncUserStatsDaysLeftUntilQuestionsExhaust(db!);
+    _dbMonitor.releaseDatabaseAccess();
+
+    // 20. Check and Sync User Stats Average Daily Questions Learned
+    db = await _getDbAccess();
+    await syncUserStatsAverageDailyQuestionsLearned(db!);
+    _dbMonitor.releaseDatabaseAccess();
+
     QuizzerLogger.logMessage('All outbound sync functions completed.');
   }
   // ----------------------

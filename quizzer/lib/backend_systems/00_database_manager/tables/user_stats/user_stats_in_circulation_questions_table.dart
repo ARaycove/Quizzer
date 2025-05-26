@@ -12,6 +12,8 @@ import 'package:sqflite/sqflite.dart';
 import 'dart:async';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/table_helper.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_profile_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pairs_table.dart';
 
 Future<void> verifyUserStatsInCirculationQuestionsTable(Database db) async {
   final List<Map<String, dynamic>> tables = await db.rawQuery(
@@ -54,11 +56,25 @@ Future<void> verifyUserStatsInCirculationQuestionsTable(Database db) async {
 /// Updates the in-circulation questions stat for a user for today (YYYY-MM-DD).
 Future<void> updateInCirculationQuestionsStat(String userId, Database db) async {
   final String today = DateTime.now().toUtc().toIso8601String().substring(0, 10);
+  // Get the user's module activation status
+  final Map<String, bool> moduleActivationStatus = await getModuleActivationStatus(userId, db);
+
+  // Query all user_question_answer_pairs for this user where in_circulation = 1
   final List<Map<String, dynamic>> result = await db.rawQuery(
-    'SELECT COUNT(*) as count FROM user_question_answer_pairs WHERE user_uuid = ? AND in_circulation = 1',
+    'SELECT question_id FROM user_question_answer_pairs WHERE user_uuid = ? AND in_circulation = 1',
     [userId],
   );
-  final int inCirculationCount = result.isNotEmpty ? (result.first['count'] as int) : 0;
+
+  int inCirculationCount = 0;
+  for (final row in result) {
+    final String? questionId = row['question_id'] as String?;
+    if (questionId == null) continue;
+    final String moduleName = await getModuleNameForQuestionId(questionId, db);
+    if (moduleActivationStatus[moduleName] == true) {
+      inCirculationCount++;
+    }
+  }
+
   await verifyUserStatsInCirculationQuestionsTable(db);
   final List<Map<String, dynamic>> existing = await queryAndDecodeDatabase(
     'user_stats_in_circulation_questions',

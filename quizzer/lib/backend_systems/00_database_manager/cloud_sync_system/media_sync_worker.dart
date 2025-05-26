@@ -77,11 +77,10 @@ class MediaSyncWorker {
       // If start() was never fully completed or stop() was already called,
       // _initialSyncCompleter might be null or already completed.
       // Attempt to complete it only if it exists and is not yet completed.
-      if (_initialSyncCompleter != null && !_initialSyncCompleter!.isCompleted) {
-        // Changed from completeError to complete to avoid unhandled exceptions if not caught by caller.
-        _initialSyncCompleter!.complete(); 
-        QuizzerLogger.logMessage('MediaSyncWorker: _initialSyncCompleter force-completed (normally) as worker was stopped before fully running.');
-      }
+
+      _initialSyncCompleter.complete(); 
+      QuizzerLogger.logMessage('MediaSyncWorker: _initialSyncCompleter force-completed (normally) as worker was stopped before fully running.');
+
       return;
     }
 
@@ -104,9 +103,9 @@ class MediaSyncWorker {
     // _initialSyncCompleter is guaranteed to be non-null here because _isRunning was true when stop() was entered.
     // If the initial sync (or any part of it that _initialSyncCompleter represents) was ongoing 
     // and not completed, signal that it was gracefully concluded due to worker stop.
-    if (!_initialSyncCompleter!.isCompleted) {
+    if (!_initialSyncCompleter.isCompleted) {
         // Changed from completeError to complete.
-        _initialSyncCompleter!.complete(); 
+        _initialSyncCompleter.complete(); 
         QuizzerLogger.logMessage('MediaSyncWorker: _initialSyncCompleter force-completed (normally) because worker was stopped.');
     }
     

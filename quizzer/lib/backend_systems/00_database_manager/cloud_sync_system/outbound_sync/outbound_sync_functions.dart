@@ -17,6 +17,10 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/us
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_revision_streak_sum_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_total_user_question_answer_pairs_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_average_questions_shown_per_day_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_total_questions_answered_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_daily_questions_answered_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_days_left_until_questions_exhaust_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_average_daily_questions_learned_table.dart';
 
 // ==========================================
 // Outbound Sync - Generic Push Function
@@ -1081,4 +1085,170 @@ Future<void> syncUserStatsAverageQuestionsShownPerDay(dynamic db) async {
     }
   }
   QuizzerLogger.logMessage('Finished sync attempt for UserStatsAverageQuestionsShownPerDay.');
+}
+
+Future<void> syncUserStatsTotalQuestionsAnswered(dynamic db) async {
+  QuizzerLogger.logMessage('Starting sync for UserStatsTotalQuestionsAnswered...');
+
+  final SessionManager sessionManager = getSessionManager();
+  final String? currentUserId = sessionManager.userId;
+  if (currentUserId == null) {
+    QuizzerLogger.logWarning('syncUserStatsTotalQuestionsAnswered: No current user logged in. Cannot proceed.');
+    return;
+  }
+
+  final List<Map<String, dynamic>> unsyncedRecords = await getUnsyncedUserStatsTotalQuestionsAnsweredRecords(db, currentUserId);
+  if (unsyncedRecords.isEmpty) {
+    QuizzerLogger.logMessage('No unsynced UserStatsTotalQuestionsAnswered found for user $currentUserId.');
+    return;
+  }
+
+  QuizzerLogger.logMessage('Found ${unsyncedRecords.length} unsynced UserStatsTotalQuestionsAnswered for user $currentUserId.');
+
+  const String tableName = 'user_stats_total_questions_answered';
+  for (final record in unsyncedRecords) {
+    final String? userId = record['user_id'] as String?;
+    final String? recordDate = record['record_date'] as String?;
+    if (userId == null || recordDate == null) {
+      QuizzerLogger.logWarning('Skipping unsynced user_stats_total_questions_answered record due to missing PK: $record');
+      continue;
+    }
+    final bool pushSuccess = await pushRecordToSupabase(tableName, record);
+    if (pushSuccess) {
+      QuizzerLogger.logSuccess('Push successful for UserStatsTotalQuestionsAnswered (User: $userId, Date: $recordDate). Updating local flags...');
+      await updateUserStatsTotalQuestionsAnsweredSyncFlags(
+        userId: userId,
+        recordDate: recordDate,
+        hasBeenSynced: true,
+        editsAreSynced: true,
+        db: db,
+      );
+    } else {
+      QuizzerLogger.logWarning('Push FAILED for UserStatsTotalQuestionsAnswered (User: $userId, Date: $recordDate). Local flags remain unchanged.');
+    }
+  }
+  QuizzerLogger.logMessage('Finished sync attempt for UserStatsTotalQuestionsAnswered.');
+}
+
+Future<void> syncUserStatsDailyQuestionsAnswered(dynamic db) async {
+  QuizzerLogger.logMessage('Starting sync for UserStatsDailyQuestionsAnswered...');
+
+  final SessionManager sessionManager = getSessionManager();
+  final String? currentUserId = sessionManager.userId;
+  if (currentUserId == null) {
+    QuizzerLogger.logWarning('syncUserStatsDailyQuestionsAnswered: No current user logged in. Cannot proceed.');
+    return;
+  }
+
+  final List<Map<String, dynamic>> unsyncedRecords = await getUnsyncedUserStatsDailyQuestionsAnsweredRecords(db, currentUserId);
+  if (unsyncedRecords.isEmpty) {
+    QuizzerLogger.logMessage('No unsynced UserStatsDailyQuestionsAnswered found for user $currentUserId.');
+    return;
+  }
+
+  QuizzerLogger.logMessage('Found ${unsyncedRecords.length} unsynced UserStatsDailyQuestionsAnswered for user $currentUserId.');
+
+  const String tableName = 'user_stats_daily_questions_answered';
+  for (final record in unsyncedRecords) {
+    final String? userId = record['user_id'] as String?;
+    final String? recordDate = record['record_date'] as String?;
+    if (userId == null || recordDate == null) {
+      QuizzerLogger.logWarning('Skipping unsynced user_stats_daily_questions_answered record due to missing PK: $record');
+      continue;
+    }
+    final bool pushSuccess = await pushRecordToSupabase(tableName, record);
+    if (pushSuccess) {
+      QuizzerLogger.logSuccess('Push successful for UserStatsDailyQuestionsAnswered (User: $userId, Date: $recordDate). Updating local flags...');
+      await updateUserStatsDailyQuestionsAnsweredSyncFlags(
+        userId: userId,
+        recordDate: recordDate,
+        hasBeenSynced: true,
+        editsAreSynced: true,
+        db: db,
+      );
+    } else {
+      QuizzerLogger.logWarning('Push FAILED for UserStatsDailyQuestionsAnswered (User: $userId, Date: $recordDate). Local flags remain unchanged.');
+    }
+  }
+  QuizzerLogger.logMessage('Finished sync attempt for UserStatsDailyQuestionsAnswered.');
+}
+
+Future<void> syncUserStatsDaysLeftUntilQuestionsExhaust(Database db) async {
+  final sessionManager = getSessionManager();
+  final String? userId = sessionManager.userId;
+  if (userId == null) {
+    QuizzerLogger.logWarning('syncUserStatsDaysLeftUntilQuestionsExhaust: No current user logged in. Cannot proceed.');
+    return;
+  }
+  final unsyncedRecords = await getUnsyncedUserStatsDaysLeftUntilQuestionsExhaustRecords(db, userId);
+  if (unsyncedRecords.isEmpty) {
+    QuizzerLogger.logMessage('No unsynced days_left_until_questions_exhaust records for user $userId.');
+    return;
+  }
+
+  QuizzerLogger.logMessage('Found ${unsyncedRecords.length} unsynced days_left_until_questions_exhaust records for user $userId.');
+
+  const String tableName = 'user_stats_days_left_until_questions_exhaust';
+  for (final record in unsyncedRecords) {
+    final String? recordUserId = record['user_id'] as String?;
+    final String? recordDate = record['record_date'] as String?;
+    if (recordUserId == null || recordDate == null) {
+      QuizzerLogger.logWarning('Skipping unsynced days_left_until_questions_exhaust record due to missing PK: $record');
+      continue;
+    }
+    final bool pushSuccess = await pushRecordToSupabase(tableName, record);
+    if (pushSuccess) {
+      QuizzerLogger.logSuccess('Push successful for days_left_until_questions_exhaust (User: $recordUserId, Date: $recordDate). Updating local flags...');
+      await updateUserStatsDaysLeftUntilQuestionsExhaustSyncFlags(
+        userId: recordUserId,
+        recordDate: recordDate,
+        hasBeenSynced: true,
+        editsAreSynced: true,
+        db: db,
+      );
+    } else {
+      QuizzerLogger.logWarning('Push FAILED for days_left_until_questions_exhaust (User: $recordUserId, Date: $recordDate). Local flags remain unchanged.');
+    }
+  }
+  QuizzerLogger.logMessage('Finished sync attempt for days_left_until_questions_exhaust.');
+}
+
+Future<void> syncUserStatsAverageDailyQuestionsLearned(Database db) async {
+  final sessionManager = getSessionManager();
+  final String? userId = sessionManager.userId;
+  if (userId == null) {
+    QuizzerLogger.logWarning('syncUserStatsAverageDailyQuestionsLearned: No current user logged in. Cannot proceed.');
+    return;
+  }
+  final unsyncedRecords = await getUnsyncedUserStatsAverageDailyQuestionsLearnedRecords(db, userId);
+  if (unsyncedRecords.isEmpty) {
+    QuizzerLogger.logMessage('No unsynced average_daily_questions_learned records for user $userId.');
+    return;
+  }
+
+  QuizzerLogger.logMessage('Found ${unsyncedRecords.length} unsynced average_daily_questions_learned records for user $userId.');
+
+  const String tableName = 'user_stats_average_daily_questions_learned';
+  for (final record in unsyncedRecords) {
+    final String? recordUserId = record['user_id'] as String?;
+    final String? recordDate = record['record_date'] as String?;
+    if (recordUserId == null || recordDate == null) {
+      QuizzerLogger.logWarning('Skipping unsynced average_daily_questions_learned record due to missing PK: $record');
+      continue;
+    }
+    final bool pushSuccess = await pushRecordToSupabase(tableName, record);
+    if (pushSuccess) {
+      QuizzerLogger.logSuccess('Push successful for average_daily_questions_learned (User: $recordUserId, Date: $recordDate). Updating local flags...');
+      await updateUserStatsAverageDailyQuestionsLearnedSyncFlags(
+        userId: recordUserId,
+        recordDate: recordDate,
+        hasBeenSynced: true,
+        editsAreSynced: true,
+        db: db,
+      );
+    } else {
+      QuizzerLogger.logWarning('Push FAILED for average_daily_questions_learned (User: $recordUserId, Date: $recordDate). Local flags remain unchanged.');
+    }
+  }
+  QuizzerLogger.logMessage('Finished sync attempt for average_daily_questions_learned.');
 }

@@ -11,6 +11,8 @@ import 'package:sqflite/sqflite.dart';
 import 'dart:async';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/table_helper.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_profile_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pairs_table.dart';
 
 Future<void> verifyUserStatsNonCirculatingQuestionsTable(Database db) async {
   final List<Map<String, dynamic>> tables = await db.rawQuery(
@@ -55,12 +57,24 @@ Future<void> updateNonCirculatingQuestionsStat(String userId, Database db) async
   // Get today's date in YYYY-MM-DD format
   final String today = DateTime.now().toUtc().toIso8601String().substring(0, 10);
 
-  // Query the count of non-circulating questions for this user
+  // Get the user's module activation status
+  final Map<String, bool> moduleActivationStatus = await getModuleActivationStatus(userId, db);
+
+  // Query all user_question_answer_pairs for this user where in_circulation = 0
   final List<Map<String, dynamic>> result = await db.rawQuery(
-    'SELECT COUNT(*) as count FROM user_question_answer_pairs WHERE user_uuid = ? AND in_circulation = 0',
+    'SELECT question_id FROM user_question_answer_pairs WHERE user_uuid = ? AND in_circulation = 0',
     [userId],
   );
-  final int nonCirculatingCount = result.isNotEmpty ? (result.first['count'] as int) : 0;
+
+  int nonCirculatingCount = 0;
+  for (final row in result) {
+    final String? questionId = row['question_id'] as String?;
+    if (questionId == null) continue;
+    final String moduleName = await getModuleNameForQuestionId(questionId, db);
+    if (moduleActivationStatus[moduleName] == true) {
+      nonCirculatingCount++;
+    }
+  }
 
   // Verify only the stats table before writing
   await verifyUserStatsNonCirculatingQuestionsTable(db);

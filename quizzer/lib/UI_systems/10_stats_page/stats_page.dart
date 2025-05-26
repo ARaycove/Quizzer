@@ -15,13 +15,9 @@ Key features:
 // Multi-day Stats
 
 
-// 7. total_questions_answered (by date, the running the total of questions the users has answered)
-// 8. questions_answered_by_date (by date, the number of questions the user answered on a given day)
-// 9. reserve_questions_exhaust_in_x_days (single stat)
-// - calculated by taking current non_circulating_questions (whose modules are active) and the average_num_questions_entering_circulation_daily
-// - divide current non_circulating_questions / average_num_questions_entering_circulation_daily
-// 10. average_num_questions_entering_circulation_daily
-// - Need to analyze the historical record of total_in_circulation_questions and look at average increase over a one year cycle
+
+
+
 
 import 'package:flutter/material.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
@@ -29,6 +25,7 @@ import 'widget_graph_template.dart';
 import 'package:quizzer/UI_systems/color_wheel.dart';
 import 'package:quizzer/UI_systems/global_widgets/widget_global_app_bar.dart';
 import 'widget_bar_chart_template.dart';
+import 'widget_combined_bar_line_template.dart';
 
 class StatsPage extends StatefulWidget {
   const StatsPage({super.key});
@@ -50,6 +47,13 @@ class _StatsPageState extends State<StatsPage> {
   late Future<List<Map<String, dynamic>>> historicalTotalUserQuestionAnswerPairsFuture;
   late Future<Map<String, dynamic>?> currentAverageQuestionsShownPerDayFuture;
   late Future<List<Map<String, dynamic>>> historicalAverageQuestionsShownPerDayFuture;
+  late Future<int> currentTotalQuestionsAnsweredFuture;
+  late Future<List<Map<String, dynamic>>> historicalTotalQuestionsAnsweredFuture;
+  late Future<List<Map<String, dynamic>>> historicalDailyQuestionsAnsweredFuture;
+  late Future<Map<String, dynamic>?> currentAverageDailyQuestionsLearnedFuture;
+  late Future<List<Map<String, dynamic>>> historicalAverageDailyQuestionsLearnedFuture;
+  late Future<Map<String, dynamic>?> currentDaysLeftUntilQuestionsExhaustFuture;
+  late Future<List<Map<String, dynamic>>> historicalDaysLeftUntilQuestionsExhaustFuture;
 
   @override
   void initState() {
@@ -67,6 +71,13 @@ class _StatsPageState extends State<StatsPage> {
     historicalTotalUserQuestionAnswerPairsFuture = session.getHistoricalTotalUserQuestionAnswerPairsStats();
     currentAverageQuestionsShownPerDayFuture = session.getCurrentAverageQuestionsShownPerDayStat();
     historicalAverageQuestionsShownPerDayFuture = session.getHistoricalAverageQuestionsShownPerDayStats();
+    currentTotalQuestionsAnsweredFuture = session.getCurrentTotalQuestionsAnsweredCount();
+    historicalTotalQuestionsAnsweredFuture = session.getHistoricalTotalQuestionsAnsweredStats();
+    historicalDailyQuestionsAnsweredFuture = session.getHistoricalDailyQuestionsAnsweredStats();
+    currentAverageDailyQuestionsLearnedFuture = session.getCurrentAverageDailyQuestionsLearnedStat();
+    historicalAverageDailyQuestionsLearnedFuture = session.getHistoricalAverageDailyQuestionsLearnedStats();
+    currentDaysLeftUntilQuestionsExhaustFuture = session.getCurrentDaysLeftUntilQuestionsExhaustStat();
+    historicalDaysLeftUntilQuestionsExhaustFuture = session.getHistoricalDaysLeftUntilQuestionsExhaustStats();
   }
 
   @override
@@ -416,6 +427,190 @@ class _StatsPageState extends State<StatsPage> {
                   xAxisLabel: 'Date',
                   lineColor: Colors.green,
                   chartName: 'Average Questions Shown Per Day Over Time',
+                );
+              },
+            ),
+            // Total Questions Answered Stat
+            FutureBuilder<int>(
+              future: currentTotalQuestionsAnsweredFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                final int total = snapshot.data ?? 0;
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Total Questions Answered: $total',
+                      style: ColorWheel.titleText,
+                    ),
+                    const SizedBox(height: 8),
+                  ],
+                );
+              },
+            ),
+
+            // Daily Questions Answered Stat
+            FutureBuilder<List<Map<String, dynamic>>>(
+              future: historicalDailyQuestionsAnsweredFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                final history = snapshot.data ?? [];
+                if (history.isEmpty) {
+                  return const Center(child: Text('No daily questions answered data available.', style: ColorWheel.defaultText));
+                }
+                final latest = history.last;
+                final int correct = latest['correct_questions_answered'] ?? 0;
+                final int incorrect = latest['incorrect_questions_answered'] ?? 0;
+                final int total = latest['daily_questions_answered'] ?? 0;
+                final chartData = history.map((e) => CombinedBarLineData(
+                  date: e['record_date'] ?? '',
+                  correct: e['correct_questions_answered'] ?? 0,
+                  incorrect: e['incorrect_questions_answered'] ?? 0,
+                  total: e['daily_questions_answered'] ?? 0,
+                )).toList();
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Today: $total answered (Correct: $correct, Incorrect: $incorrect)',
+                      style: ColorWheel.titleText,
+                    ),
+                    const SizedBox(height: 8),
+                    CombinedBarLineChart(
+                      data: chartData,
+                      chartName: 'Daily Questions Answered (Correct/Incorrect/Total)',
+                      xAxisLabel: 'Date',
+                      yAxisLabel: 'Questions',
+                    ),
+                    const SizedBox(height: 32),
+                  ],
+                );
+              },
+            ),
+
+            // Historical Total Questions Answered Combined Chart
+            FutureBuilder<List<Map<String, dynamic>>>(
+              future: historicalTotalQuestionsAnsweredFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                final history = snapshot.data ?? [];
+                if (history.isEmpty) {
+                  return const Center(child: Text('No historical total questions answered data available.', style: ColorWheel.defaultText));
+                }
+                final chartData = history.map((e) => CombinedBarLineData(
+                  date: e['record_date'] ?? '',
+                  correct: e['correct_questions_answered'] ?? 0,
+                  incorrect: e['incorrect_questions_answered'] ?? 0,
+                  total: e['total_questions_answered'] ?? 0,
+                )).toList();
+                return CombinedBarLineChart(
+                  data: chartData,
+                  chartName: 'Total Questions Answered Over Time (Correct/Incorrect/Total)',
+                  xAxisLabel: 'Date',
+                  yAxisLabel: 'Total',
+                );
+              },
+            ),
+
+            // Average Daily Questions Learned Stat (text only)
+            FutureBuilder<Map<String, dynamic>?>(
+              future: currentAverageDailyQuestionsLearnedFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                final stat = snapshot.data;
+                final double avgLearned = stat != null ? (stat['average_daily_questions_learned'] as double? ?? 0.0) : 0.0;
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Current Average Daily Questions Learned: ${avgLearned.toStringAsFixed(2)}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                  ],
+                );
+              },
+            ),
+            // Average Daily Questions Learned Graph
+            FutureBuilder<List<Map<String, dynamic>>>(
+              future: historicalAverageDailyQuestionsLearnedFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                final history = snapshot.data ?? [];
+                final graphData = history.map((e) => {
+                  'date': e['record_date'] ?? '',
+                  'value': e['average_daily_questions_learned'] ?? 0.0,
+                }).toList();
+                return StatLineGraph(
+                  data: graphData,
+                  title: 'Average Daily Questions Learned Over Time',
+                  legendLabel: 'Avg Questions Learned/Day',
+                  yAxisLabel: 'Avg Questions Learned/Day',
+                  xAxisLabel: 'Date',
+                  lineColor: Colors.purple,
+                  chartName: 'Average Daily Questions Learned Over Time',
+                );
+              },
+            ),
+            // Days Left Until Questions Exhaust Stat (text only)
+            FutureBuilder<Map<String, dynamic>?>(
+              future: currentDaysLeftUntilQuestionsExhaustFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                final stat = snapshot.data;
+                final double daysLeft = stat != null ? (stat['days_left_until_questions_exhaust'] as double? ?? 0.0) : 0.0;
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Current Days Left Until Questions Exhaust: ${daysLeft.toStringAsFixed(2)}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                  ],
+                );
+              },
+            ),
+            // Days Left Until Questions Exhaust Graph
+            FutureBuilder<List<Map<String, dynamic>>>(
+              future: historicalDaysLeftUntilQuestionsExhaustFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                final history = snapshot.data ?? [];
+                final graphData = history.map((e) => {
+                  'date': e['record_date'] ?? '',
+                  'value': e['days_left_until_questions_exhaust'] ?? 0.0,
+                }).toList();
+                return StatLineGraph(
+                  data: graphData,
+                  title: 'Days Left Until Questions Exhaust Over Time',
+                  legendLabel: 'Days Left',
+                  yAxisLabel: 'Days Left',
+                  xAxisLabel: 'Date',
+                  lineColor: Colors.red,
+                  chartName: 'Days Left Until Questions Exhaust Over Time',
                 );
               },
             ),

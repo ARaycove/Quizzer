@@ -502,6 +502,10 @@ Future<void> batchUpsertUserQuestionAnswerPairs({
     final batch = records.sublist(i, i + chunkSize > records.length ? records.length : i + chunkSize);
     final values = <dynamic>[];
     final valuePlaceholders = batch.map((r) {
+      // Ensure sync flags are set to 1 for inbound sync
+      r = Map<String, dynamic>.from(r);
+      r['has_been_synced'] = 1;
+      r['edits_are_synced'] = 1;
       for (final col in columns) {
         values.add(getVal(r, col, null));
       }

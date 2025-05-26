@@ -7,9 +7,15 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/us
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_average_questions_shown_per_day_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_total_questions_answered_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_daily_questions_answered_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_days_left_until_questions_exhaust_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_average_daily_questions_learned_table.dart';
+
+
 
 /// Updates all relevant daily user statistics for the given user.
-Future<void> updateAllUserDailyStats(String userId) async {
+Future<void> updateAllUserDailyStats(String userId, {bool? isCorrect}) async {
   QuizzerLogger.logMessage('StatUpdateAggregator: Beginning daily stat updates for user: $userId');
 
   // Update eligible questions stat
@@ -53,6 +59,36 @@ Future<void> updateAllUserDailyStats(String userId) async {
   await updateAverageQuestionsShownPerDayStat(userId, db!);
   getDatabaseMonitor().releaseDatabaseAccess();
   QuizzerLogger.logSuccess('StatUpdateAggregator: Successfully triggered average questions shown per day stat update for user: $userId');
+
+  // Update total questions answered stat (only if isCorrect is provided)
+  if (isCorrect != null) {
+    QuizzerLogger.logMessage('StatUpdateAggregator: Incrementing total questions answered stat for user: $userId with isCorrect: $isCorrect');
+    db = await getDatabaseMonitor().requestDatabaseAccess();
+    await incrementTotalQuestionsAnsweredStat(userId, db!, isCorrect);
+    getDatabaseMonitor().releaseDatabaseAccess();
+    QuizzerLogger.logSuccess('StatUpdateAggregator: Successfully incremented total questions answered stat for user: $userId');
+
+    // Update daily questions answered stat
+    QuizzerLogger.logMessage('StatUpdateAggregator: Incrementing daily questions answered stat for user: $userId with isCorrect: $isCorrect');
+    db = await getDatabaseMonitor().requestDatabaseAccess();
+    await incrementDailyQuestionsAnsweredStat(userId, db!, isCorrect);
+    getDatabaseMonitor().releaseDatabaseAccess();
+    QuizzerLogger.logSuccess('StatUpdateAggregator: Successfully incremented daily questions answered stat for user: $userId');
+  }
+
+  // Update days left until questions exhaust stat
+  QuizzerLogger.logMessage('StatUpdateAggregator: Updating days left until questions exhaust stat for user: $userId');
+  db = await getDatabaseMonitor().requestDatabaseAccess();
+  await updateDaysLeftUntilQuestionsExhaustStat(userId, db!);
+  getDatabaseMonitor().releaseDatabaseAccess();
+  QuizzerLogger.logSuccess('StatUpdateAggregator: Successfully triggered days left until questions exhaust stat update for user: $userId');
+
+  // Update average daily questions learned stat
+  QuizzerLogger.logMessage('StatUpdateAggregator: Updating average daily questions learned stat for user: $userId');
+  db = await getDatabaseMonitor().requestDatabaseAccess();
+  await updateAverageDailyQuestionsLearnedStat(userId, db!);
+  getDatabaseMonitor().releaseDatabaseAccess();
+  QuizzerLogger.logSuccess('StatUpdateAggregator: Successfully triggered average daily questions learned stat update for user: $userId');
 
   // TODO: Add calls to other daily stat update functions here as they are created.
   // For example:
