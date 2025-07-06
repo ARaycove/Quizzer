@@ -2,11 +2,12 @@ import 'package:sqflite/sqflite.dart';
 import 'dart:async';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'table_helper.dart'; // Import the helper file
-import 'package:quizzer/backend_systems/10_switch_board/switch_board.dart'; // Import SwitchBoard
+import 'package:quizzer/backend_systems/10_switch_board/sb_sync_worker_signals.dart'; // Import sync signals
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_question_answer_pairs_table.dart'; // Use package import for user_question_answer_pairs_table
+import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
 
 /// Verifies the existence and schema of the question_answer_attempts table.
-Future<void> verifyQuestionAnswerAttemptTable(Database db) async {
+Future<void> _verifyQuestionAnswerAttemptTable(Database db) async {
   QuizzerLogger.logMessage('Verifying question_answer_attempts table...');
   final List<Map<String, dynamic>> tables = await db.rawQuery(
     "SELECT name FROM sqlite_master WHERE type='table' AND name='question_answer_attempts'"
@@ -86,10 +87,10 @@ Future<void> verifyQuestionAnswerAttemptTable(Database db) async {
 // --- Private Helper Functions ---
 
 /// Checks if this is the first attempt for a given user and question.
-Future<bool> _checkWasFirstAttempt(String questionId, String userId, Database db) async {
+Future<bool> _checkWasFirstAttempt(String questionId, String userId) async {
   QuizzerLogger.logMessage('Checking if first attempt for Q: $questionId, User: $userId');
   // Get the user-question pair record to check total_attempts
-  final Map<String, dynamic> pairRecord = await getUserQuestionAnswerPairById(userId, questionId, db);
+  final Map<String, dynamic> pairRecord = await getUserQuestionAnswerPairById(userId, questionId);
   final int totalAttempts = pairRecord['total_attempts'] as int;
   final bool isFirst = totalAttempts == 0;
   QuizzerLogger.logMessage('Is first attempt? $isFirst (total_attempts: $totalAttempts)');
@@ -112,98 +113,139 @@ Future<int> addQuestionAnswerAttempt({
   String? lastRevisedDate,           // Nullable timestamp of last revision
   double? daysSinceLastRevision,   // New: Nullable calculated days
   double? knowledgeBase,             
-  required Database db,
 }) async {
-  await verifyQuestionAnswerAttemptTable(db);
+  try {
+    final bool wasFirstAttempt = await _checkWasFirstAttempt(questionId, participantId);
+    final db = await getDatabaseMonitor().requestDatabaseAccess();
+    if (db == null) {
+      throw Exception('Failed to acquire database access');
+    }
+    await _verifyQuestionAnswerAttemptTable(db);
 
-  final bool wasFirstAttempt = await _checkWasFirstAttempt(questionId, participantId, db);
+    QuizzerLogger.logMessage('Adding question attempt for Q: $questionId, User: $participantId');
+    
+    // Prepare the raw data map
+    final Map<String, dynamic> attemptData = {
+      'time_stamp': timeStamp,
+      'question_id': questionId,
+      'participant_id': participantId,
+      'response_time': responseTime,
+      'response_result': responseResult, 
+      'was_first_attempt': wasFirstAttempt, // Pass bool, helper encodes to 1/0
+      'knowledge_base': knowledgeBase,
+      'question_context_csv': questionContextCsv, // Expecting String/JSON based on schema comment
+      'last_revised_date': lastRevisedDate, 
+      'days_since_last_revision': daysSinceLastRevision,
+      'total_attempts': totalAttempts,
+      'revision_streak': revisionStreak,
+      // Add sync fields
+      'has_been_synced': 0,
+      'edits_are_synced': 0,
+      'last_modified_timestamp': timeStamp, // Use creation timestamp for initial last_modified
+    };
 
-  QuizzerLogger.logMessage('Adding question attempt for Q: $questionId, User: $participantId');
-  
-  // Prepare the raw data map
-  final Map<String, dynamic> attemptData = {
-    'time_stamp': timeStamp,
-    'question_id': questionId,
-    'participant_id': participantId,
-    'response_time': responseTime,
-    'response_result': responseResult, 
-    'was_first_attempt': wasFirstAttempt, // Pass bool, helper encodes to 1/0
-    'knowledge_base': knowledgeBase,
-    'question_context_csv': questionContextCsv, // Expecting String/JSON based on schema comment
-    'last_revised_date': lastRevisedDate, 
-    'days_since_last_revision': daysSinceLastRevision,
-    'total_attempts': totalAttempts,
-    'revision_streak': revisionStreak,
-    // Add sync fields
-    'has_been_synced': 0,
-    'edits_are_synced': 0,
-    'last_modified_timestamp': timeStamp, // Use creation timestamp for initial last_modified
-  };
+    // Use the universal insert helper
+    final int resultId = await insertRawData(
+      'question_answer_attempts',
+      attemptData,
+      db,
+      conflictAlgorithm: ConflictAlgorithm.ignore, // Or .fail if duplicates are critical errors
+    );
 
-  // Use the universal insert helper
-  final int resultId = await insertRawData(
-    'question_answer_attempts',
-    attemptData,
-    db,
-    conflictAlgorithm: ConflictAlgorithm.ignore, // Or .fail if duplicates are critical errors
-  );
-
-  if (resultId > 0) {
-    QuizzerLogger.logSuccess('Successfully added question attempt record with result ID: $resultId. Data: $attemptData');
-    // Signal the SwitchBoard that new data might need syncing
-    final SwitchBoard switchBoard = getSwitchBoard(); // Get SwitchBoard instance
-    switchBoard.signalOutboundSyncNeeded();
-  } else {
-    QuizzerLogger.logWarning('Insert operation for attempt (Q: $questionId, User: $participantId, Time: $timeStamp) returned $resultId. Might be ignored duplicate.');
+    if (resultId > 0) {
+      QuizzerLogger.logSuccess('Successfully added question attempt record with result ID: $resultId. Data: $attemptData');
+      // Signal the SwitchBoard that new data might need syncing
+      signalOutboundSyncNeeded();
+    } else {
+      QuizzerLogger.logWarning('Insert operation for attempt (Q: $questionId, User: $participantId, Time: $timeStamp) returned $resultId. Might be ignored duplicate.');
+    }
+    return resultId;
+  } catch (e) {
+    QuizzerLogger.logError('Error adding question answer attempt - $e');
+    rethrow;
+  } finally {
+    getDatabaseMonitor().releaseDatabaseAccess();
   }
-  return resultId;
 }
 
 /// Deletes a question answer attempt record by its composite primary key.
-Future<int> deleteQuestionAnswerAttemptRecord(String participantId, String questionId, String timeStamp, Database db) async {
-  QuizzerLogger.logMessage('Deleting question answer attempt (PID: $participantId, QID: $questionId, TS: $timeStamp)');
-  await verifyQuestionAnswerAttemptTable(db);
-  final int rowsDeleted = await db.delete(
-    'question_answer_attempts',
-    where: 'participant_id = ? AND question_id = ? AND time_stamp = ?',
-    whereArgs: [participantId, questionId, timeStamp],
-  );
-  if (rowsDeleted == 0) {
-    QuizzerLogger.logWarning('No question answer attempt found to delete for (PID: $participantId, QID: $questionId, TS: $timeStamp)');
-  } else {
-    QuizzerLogger.logSuccess('Deleted $rowsDeleted question answer attempt(s) for (PID: $participantId, QID: $questionId, TS: $timeStamp)');
+Future<int> deleteQuestionAnswerAttemptRecord(String participantId, String questionId, String timeStamp) async {
+  try {
+    final db = await getDatabaseMonitor().requestDatabaseAccess();
+    if (db == null) {
+      throw Exception('Failed to acquire database access');
+    }
+    QuizzerLogger.logMessage('Deleting question answer attempt (PID: $participantId, QID: $questionId, TS: $timeStamp)');
+    await _verifyQuestionAnswerAttemptTable(db);
+    final int rowsDeleted = await db.delete(
+      'question_answer_attempts',
+      where: 'participant_id = ? AND question_id = ? AND time_stamp = ?',
+      whereArgs: [participantId, questionId, timeStamp],
+    );
+    if (rowsDeleted == 0) {
+      QuizzerLogger.logWarning('No question answer attempt found to delete for (PID: $participantId, QID: $questionId, TS: $timeStamp)');
+    } else {
+      QuizzerLogger.logSuccess('Deleted $rowsDeleted question answer attempt(s) for (PID: $participantId, QID: $questionId, TS: $timeStamp)');
+    }
+    return rowsDeleted;
+  } catch (e) {
+    QuizzerLogger.logError('Error deleting question answer attempt record - $e');
+    rethrow;
+  } finally {
+    getDatabaseMonitor().releaseDatabaseAccess();
   }
-  return rowsDeleted;
 }
 
 // --- Optional Getter Functions ---
 
 /// Retrieves all attempts for a specific question by a specific user.
-Future<List<Map<String, dynamic>>> getAttemptsByQuestionAndUser(String questionId, String userId, Database db) async {
-  await verifyQuestionAnswerAttemptTable(db);
-  QuizzerLogger.logMessage('Fetching attempts for Q: $questionId, User: $userId');
-  // Use the universal query helper
-  return await queryAndDecodeDatabase(
-    'question_answer_attempts',
-    db,
-    where: 'participant_id = ? AND question_id = ?',
-    whereArgs: [userId, questionId],
-    orderBy: 'time_stamp DESC', // Order by most recent first
-  );
+Future<List<Map<String, dynamic>>> getAttemptsByQuestionAndUser(String questionId, String userId) async {
+  try {
+    final db = await getDatabaseMonitor().requestDatabaseAccess();
+    if (db == null) {
+      throw Exception('Failed to acquire database access');
+    }
+    await _verifyQuestionAnswerAttemptTable(db);
+    QuizzerLogger.logMessage('Fetching attempts for Q: $questionId, User: $userId');
+    // Use the universal query helper
+    return await queryAndDecodeDatabase(
+      'question_answer_attempts',
+      db,
+      where: 'participant_id = ? AND question_id = ?',
+      whereArgs: [userId, questionId],
+      orderBy: 'time_stamp DESC', // Order by most recent first
+    );
+  } catch (e) {
+    QuizzerLogger.logError('Error getting attempts by question and user - $e');
+    rethrow;
+  } finally {
+    getDatabaseMonitor().releaseDatabaseAccess();
+  }
 }
 
 /// Retrieves all attempts made by a specific user.
-Future<List<Map<String, dynamic>>> getAttemptsByUser(String userId, Database db) async {
-  await verifyQuestionAnswerAttemptTable(db);
-  QuizzerLogger.logMessage('Fetching all attempts for User: $userId');
-  // Use the universal query helper
-  return await queryAndDecodeDatabase(
-    'question_answer_attempts',
-    db,
-    where: 'participant_id = ?',
-    whereArgs: [userId],
-    orderBy: 'time_stamp DESC', // Order by most recent first
-  );
+Future<List<Map<String, dynamic>>> getAttemptsByUser(String userId) async {
+  try {
+    final db = await getDatabaseMonitor().requestDatabaseAccess();
+    if (db == null) {
+      throw Exception('Failed to acquire database access');
+    }
+    await _verifyQuestionAnswerAttemptTable(db);
+    QuizzerLogger.logMessage('Fetching all attempts for User: $userId');
+    // Use the universal query helper
+    return await queryAndDecodeDatabase(
+      'question_answer_attempts',
+      db,
+      where: 'participant_id = ?',
+      whereArgs: [userId],
+      orderBy: 'time_stamp DESC', // Order by most recent first
+    );
+  } catch (e) {
+    QuizzerLogger.logError('Error getting attempts by user - $e');
+    rethrow;
+  } finally {
+    getDatabaseMonitor().releaseDatabaseAccess();
+  }
 }
 
 // --- Get Unsynced Records ---
@@ -212,15 +254,26 @@ Future<List<Map<String, dynamic>>> getAttemptsByUser(String userId, Database db)
 /// This includes records that have never been synced (`has_been_synced = 0`)
 /// or records that have local edits pending sync (`edits_are_synced = 0`).
 /// Does NOT decode the records.
-Future<List<Map<String, dynamic>>> getUnsyncedQuestionAnswerAttempts(Database db) async {
-  QuizzerLogger.logMessage('Fetching unsynced question answer attempts...');
-  await verifyQuestionAnswerAttemptTable(db); // Ensure table and sync columns exist
+Future<List<Map<String, dynamic>>> getUnsyncedQuestionAnswerAttempts() async {
+  try {
+    final db = await getDatabaseMonitor().requestDatabaseAccess();
+    if (db == null) {
+      throw Exception('Failed to acquire database access');
+    }
+    QuizzerLogger.logMessage('Fetching unsynced question answer attempts...');
+    await _verifyQuestionAnswerAttemptTable(db); // Ensure table and sync columns exist
 
-  final List<Map<String, dynamic>> results = await db.query(
-    'question_answer_attempts',
-    where: 'has_been_synced = 0 OR edits_are_synced = 0',
-  );
+    final List<Map<String, dynamic>> results = await db.query(
+      'question_answer_attempts',
+      where: 'has_been_synced = 0 OR edits_are_synced = 0',
+    );
 
-  QuizzerLogger.logSuccess('Fetched ${results.length} unsynced question answer attempts.');
-  return results;
+    QuizzerLogger.logSuccess('Fetched ${results.length} unsynced question answer attempts.');
+    return results;
+  } catch (e) {
+    QuizzerLogger.logError('Error getting unsynced question answer attempts - $e');
+    rethrow;
+  } finally {
+    getDatabaseMonitor().releaseDatabaseAccess();
+  }
 }

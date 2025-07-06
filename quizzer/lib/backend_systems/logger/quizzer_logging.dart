@@ -17,7 +17,7 @@
 import 'dart:io';
 import 'package:logging/logging.dart';
 import 'package:path/path.dart' as p; // Import path package for basename
-import 'package:path_provider/path_provider.dart'; // Add this import
+import 'package:quizzer/backend_systems/00_helper_utils/file_locations.dart';
 
 // Log levels enum for type safety
 enum LogLevel {
@@ -41,32 +41,32 @@ class QuizzerLogger {
 
   // --- Source Filtering --- 
   static List<String> _excludedSources = [
-    "user_question_processes.dart",
-    // "outbound_sync_functions.dart",
-    // "outbound_sync_worker.dart",
-    "widget_multiple_choice_question.dart",
-    "database_monitor.dart",
-    "question_answer_pairs_table.dart",
-    "login_attempts_table.dart",
-    "login_attempts_record.dart",
-    // "session_manager.dart",
-    "circulation_worker.dart",
-    "question_queue_monitor.dart",
-    "module_updates_process.dart",
-    "modules_table.dart",
-    "module_isolates.dart",
-    "answered_history_monitor.dart",
-    "user_question_answer_pairs_table.dart",
-    "module_inactive_cache.dart",
-    "session_toggle_scheduler.dart",
-    "unprocessed_cache.dart",
-    "past_due_cache.dart",
-    "eligibility_check_worker.dart",
-    "due_date_worker.dart",
-    "pre_process_worker.dart",
-    "inactive_module_worker.dart",
-    "user_profile_table.dart",
-    "home_page.dart"
+    // "user_question_processes.dart",
+    // // "outbound_sync_functions.dart",
+    // // "outbound_sync_worker.dart",
+    // "widget_multiple_choice_question.dart",
+    // "database_monitor.dart",
+    // "question_answer_pairs_table.dart",
+    // "login_attempts_table.dart",
+    // "login_attempts_record.dart",
+    // // "session_manager.dart",
+    // "circulation_worker.dart",
+    // "question_queue_monitor.dart",
+    // "module_updates_process.dart",
+    // "modules_table.dart",
+    // "module_isolates.dart",
+    // "answered_history_monitor.dart",
+    // "user_question_answer_pairs_table.dart",
+    // "module_inactive_cache.dart",
+    // "session_toggle_scheduler.dart",
+    // "unprocessed_cache.dart",
+    // "past_due_cache.dart",
+    // "eligibility_check_worker.dart",
+    // "due_date_worker.dart",
+    // "pre_process_worker.dart",
+    // "inactive_module_worker.dart",
+    // "user_profile_table.dart",
+    // "home_page.dart"
   ]; // List of source filenames to exclude
 
   /// Sets the list of source filenames (e.g., 'my_table.dart') to exclude from logging.
@@ -127,22 +127,17 @@ class QuizzerLogger {
   // --- Helper to Get App Directory ---
   static Future<String> _getAppDirectory() async {
     if (Platform.isAndroid || Platform.isIOS) { // Added iOS for completeness
-      final appDir = await getApplicationDocumentsDirectory(); // Or getApplicationSupportDirectory() for internal files
+      final logsDir = await getQuizzerLogsPath();
       // Log this path using the logger; it will go to console via the listener's print.
-      QuizzerLogger.logMessage('QuizzerLogger: Using mobile documents directory: ${appDir.path}');
-      print('QuizzerLogger: Using mobile documents directory: ${appDir.path}');
-      return appDir.path;
+      QuizzerLogger.logMessage('QuizzerLogger: Using centralized logs directory: $logsDir');
+      print('QuizzerLogger: Using centralized logs directory: $logsDir');
+      return logsDir;
     } else if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-      final appDir = await getApplicationSupportDirectory();
+      final logsDir = await getQuizzerLogsPath();
       // Log this path using the logger.
-      QuizzerLogger.logMessage('QuizzerLogger: Raw application support directory for desktop: ${appDir.path}'); 
-      print('QuizzerLogger: Raw application support directory for desktop: ${appDir.path}');
-      final String logPath = p.join(appDir.path, 'QuizzerAppLogs');
-      final Directory dir = Directory(logPath);
-      if (!await dir.exists()) {
-        await dir.create(recursive: true);
-      }
-      return logPath; // Return the path to the 'QuizzerAppLogs' directory
+      QuizzerLogger.logMessage('QuizzerLogger: Using centralized logs directory: $logsDir'); 
+      print('QuizzerLogger: Using centralized logs directory: $logsDir');
+      return logsDir; // Return the path to the 'QuizzerAppLogs' directory
     }
     // Fallback for other platforms or if none of the above (should not happen for supported platforms)
     QuizzerLogger.logWarning('_getAppDirectory: Unsupported platform or environment, defaulting to local $_logDir');

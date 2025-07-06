@@ -1,22 +1,15 @@
 // 10. average_num_questions_entering_circulation_daily
 // - Need to analyze the historical record of total_in_circulation_questions and look at average increase over a one year cycle
-// TODO Make this table
-// TODO update aggregator
-// TODO SUPABASE table created
-// TODO SUPABASE RLS 
-// TODO UPdate outbound sync
-// TODO update inbound sync
-// TODO connect stat to stats page
-// TODO update this to accomodate correct/incorrect answers
 
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/table_helper.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_in_circulation_questions_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
 
 /// Verifies the user_stats_average_daily_questions_learned table exists, creates if not.
-Future<void> verifyUserStatsAverageDailyQuestionsLearnedTable(Database db) async {
+Future<void> _verifyUserStatsAverageDailyQuestionsLearnedTable(Database db) async {
   final List<Map<String, dynamic>> tables = await db.rawQuery(
     "SELECT name FROM sqlite_master WHERE type='table' AND name='user_stats_average_daily_questions_learned'"
   );
@@ -57,114 +50,152 @@ Future<void> verifyUserStatsAverageDailyQuestionsLearnedTable(Database db) async
 /// Updates the average_daily_questions_learned stat for a user for today (YYYY-MM-DD).
 /// This is calculated as:
 ///   (most recent in_circulation_questions_count) / (number of days between first and last in_circulation stat, inclusive)
-Future<void> updateAverageDailyQuestionsLearnedStat(String userId, Database db) async {
-  final String today = DateTime.now().toUtc().toIso8601String().substring(0, 10);
-  await verifyUserStatsAverageDailyQuestionsLearnedTable(db);
+Future<void> updateAverageDailyQuestionsLearnedStat(String userId) async {
+  try {
+    final List<Map<String, dynamic>> inCircHistory = await getUserStatsInCirculationQuestionsRecordsByUser(userId);
+    final db = await getDatabaseMonitor().requestDatabaseAccess();
+    final String today = DateTime.now().toUtc().toIso8601String().substring(0, 10);
+    await _verifyUserStatsAverageDailyQuestionsLearnedTable(db!);
 
-  // Get all in_circulation stat records for this user, sorted by date asc
-  final List<Map<String, dynamic>> inCircHistory = await getUserStatsInCirculationQuestionsRecordsByUser(userId, db);
-  if (inCircHistory.length < 2) {
-    // Not enough data to calculate
-    final Map<String, dynamic> data = {
-      'user_id': userId,
-      'record_date': today,
-      'average_daily_questions_learned': 0.0,
-      'has_been_synced': 0,
-      'edits_are_synced': 0,
-      'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
-    };
-    await insertRawData('user_stats_average_daily_questions_learned', data, db);
-    QuizzerLogger.logSuccess('Updated average_daily_questions_learned stat for user $userId on $today: 0.0 (not enough data)');
-    return;
-  }
-  inCircHistory.sort((a, b) => (a['record_date'] as String).compareTo(b['record_date'] as String));
-  final String firstDate = inCircHistory.first['record_date'] as String;
-  final String lastDate = inCircHistory.last['record_date'] as String;
-  final int firstCount = inCircHistory.first['in_circulation_questions_count'] as int? ?? 0;
-  final int lastCount = inCircHistory.last['in_circulation_questions_count'] as int? ?? 0;
-  final int days = DateTime.parse(lastDate).difference(DateTime.parse(firstDate)).inDays + 1;
-  final double avgLearned = days > 0 ? (lastCount / days) : 0.0;
+    // Get all in_circulation stat records for this user, sorted by date asc
+    
+    if (inCircHistory.length < 2) {
+      // Not enough data to calculate
+      final Map<String, dynamic> data = {
+        'user_id': userId,
+        'record_date': today,
+        'average_daily_questions_learned': 0.0,
+        'has_been_synced': 0,
+        'edits_are_synced': 0,
+        'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
+      };
+      await insertRawData('user_stats_average_daily_questions_learned', data, db);
+      QuizzerLogger.logSuccess('Updated average_daily_questions_learned stat for user $userId on $today: 0.0 (not enough data)');
+      return;
+    }
+    inCircHistory.sort((a, b) => (a['record_date'] as String).compareTo(b['record_date'] as String));
+    final String firstDate = inCircHistory.first['record_date'] as String;
+    final String lastDate = inCircHistory.last['record_date'] as String;
+    // final int firstCount = inCircHistory.first['in_circulation_questions_count'] as int? ?? 0;
+    final int lastCount = inCircHistory.last['in_circulation_questions_count'] as int? ?? 0;
+    final int days = DateTime.parse(lastDate).difference(DateTime.parse(firstDate)).inDays + 1;
+    final double avgLearned = days > 0 ? (lastCount / days) : 0.0;
 
-  // Overwrite (insert or update) the record for today
-  final List<Map<String, dynamic>> existing = await queryAndDecodeDatabase(
-    'user_stats_average_daily_questions_learned',
-    db,
-    where: 'user_id = ? AND record_date = ?',
-    whereArgs: [userId, today],
-  );
-  if (existing.isEmpty) {
-    final Map<String, dynamic> data = {
-      'user_id': userId,
-      'record_date': today,
-      'average_daily_questions_learned': avgLearned,
-      'has_been_synced': 0,
-      'edits_are_synced': 0,
-      'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
-    };
-    await insertRawData('user_stats_average_daily_questions_learned', data, db);
-  } else {
-    final Map<String, dynamic> values = {
-      'average_daily_questions_learned': avgLearned,
-      'has_been_synced': 0,
-      'edits_are_synced': 0,
-      'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
-    };
-    await updateRawData(
+    // Overwrite (insert or update) the record for today
+    final List<Map<String, dynamic>> existing = await queryAndDecodeDatabase(
       'user_stats_average_daily_questions_learned',
-      values,
-      'user_id = ? AND record_date = ?',
-      [userId, today],
       db,
+      where: 'user_id = ? AND record_date = ?',
+      whereArgs: [userId, today],
     );
+    if (existing.isEmpty) {
+      final Map<String, dynamic> data = {
+        'user_id': userId,
+        'record_date': today,
+        'average_daily_questions_learned': avgLearned,
+        'has_been_synced': 0,
+        'edits_are_synced': 0,
+        'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
+      };
+      await insertRawData('user_stats_average_daily_questions_learned', data, db);
+    } else {
+      final Map<String, dynamic> values = {
+        'average_daily_questions_learned': avgLearned,
+        'has_been_synced': 0,
+        'edits_are_synced': 0,
+        'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
+      };
+      await updateRawData(
+        'user_stats_average_daily_questions_learned',
+        values,
+        'user_id = ? AND record_date = ?',
+        [userId, today],
+        db,
+      );
+    }
+    QuizzerLogger.logSuccess('Updated average_daily_questions_learned stat for user $userId on $today: $avgLearned');
+  } catch (e) {
+    QuizzerLogger.logError('Error updating average daily questions learned stat for user ID: $userId - $e');
+    rethrow;
+  } finally {
+    getDatabaseMonitor().releaseDatabaseAccess();
   }
-  QuizzerLogger.logSuccess('Updated average_daily_questions_learned stat for user $userId on $today: $avgLearned');
 }
 
-Future<List<Map<String, dynamic>>> getUserStatsAverageDailyQuestionsLearnedRecordsByUser(String userId, Database db) async {
-  await verifyUserStatsAverageDailyQuestionsLearnedTable(db);
-  return await queryAndDecodeDatabase(
-    'user_stats_average_daily_questions_learned',
-    db,
-    where: 'user_id = ?',
-    whereArgs: [userId],
-  );
-}
-
-Future<Map<String, dynamic>> getUserStatsAverageDailyQuestionsLearnedRecordByDate(String userId, String recordDate, Database db) async {
-  await verifyUserStatsAverageDailyQuestionsLearnedTable(db);
-  final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
-    'user_stats_average_daily_questions_learned',
-    db,
-    where: 'user_id = ? AND record_date = ?',
-    whereArgs: [userId, recordDate],
-    limit: 2,
-  );
-  if (results.isEmpty) {
-    QuizzerLogger.logMessage('No average_daily_questions_learned record found for userId: $userId and date: $recordDate.');
-    throw StateError('No record found for user $userId, date $recordDate');
-  } else if (results.length > 1) {
-    QuizzerLogger.logError('Multiple records found for userId: $userId and date: $recordDate. PK constraint violation?');
-    throw StateError('Multiple records for PK user $userId, date $recordDate');
+Future<List<Map<String, dynamic>>> getUserStatsAverageDailyQuestionsLearnedRecordsByUser(String userId) async {
+  try {
+    final db = await getDatabaseMonitor().requestDatabaseAccess();
+    await _verifyUserStatsAverageDailyQuestionsLearnedTable(db!);
+    return await queryAndDecodeDatabase(
+      'user_stats_average_daily_questions_learned',
+      db,
+      where: 'user_id = ?',
+      whereArgs: [userId],
+    );
+  } catch (e) {
+    QuizzerLogger.logError('Error getting average daily questions learned records for user ID: $userId - $e');
+    rethrow;
+  } finally {
+    getDatabaseMonitor().releaseDatabaseAccess();
   }
-  QuizzerLogger.logSuccess('Fetched average_daily_questions_learned record for User: $userId, Date: $recordDate');
-  return results.first;
 }
 
-Future<Map<String, dynamic>> getTodayUserStatsAverageDailyQuestionsLearnedRecord(String userId, Database db) async {
-  final String today = DateTime.now().toUtc().toIso8601String().substring(0, 10);
-  return await getUserStatsAverageDailyQuestionsLearnedRecordByDate(userId, today, db);
+Future<Map<String, dynamic>> getUserStatsAverageDailyQuestionsLearnedRecordByDate(String userId, String recordDate) async {
+  try {
+    final db = await getDatabaseMonitor().requestDatabaseAccess();
+    await _verifyUserStatsAverageDailyQuestionsLearnedTable(db!);
+    final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
+      'user_stats_average_daily_questions_learned',
+      db,
+      where: 'user_id = ? AND record_date = ?',
+      whereArgs: [userId, recordDate],
+      limit: 2,
+    );
+    if (results.isEmpty) {
+      QuizzerLogger.logMessage('No average_daily_questions_learned record found for userId: $userId and date: $recordDate.');
+      throw StateError('No record found for user $userId, date $recordDate');
+    } else if (results.length > 1) {
+      QuizzerLogger.logError('Multiple records found for userId: $userId and date: $recordDate. PK constraint violation?');
+      throw StateError('Multiple records for PK user $userId, date $recordDate');
+    }
+    QuizzerLogger.logSuccess('Fetched average_daily_questions_learned record for User: $userId, Date: $recordDate');
+    return results.first;
+  } catch (e) {
+    QuizzerLogger.logError('Error getting average daily questions learned record for user ID: $userId, date: $recordDate - $e');
+    rethrow;
+  } finally {
+    getDatabaseMonitor().releaseDatabaseAccess();
+  }
 }
 
-Future<List<Map<String, dynamic>>> getUnsyncedUserStatsAverageDailyQuestionsLearnedRecords(Database db, String userId) async {
-  QuizzerLogger.logMessage('Fetching unsynced average_daily_questions_learned records for user: $userId...');
-  await verifyUserStatsAverageDailyQuestionsLearnedTable(db);
-  final List<Map<String, dynamic>> results = await db.query(
-    'user_stats_average_daily_questions_learned',
-    where: '(has_been_synced = 0 OR edits_are_synced = 0) AND user_id = ?',
-    whereArgs: [userId],
-  );
-  QuizzerLogger.logSuccess('Fetched [38;5;10m${results.length}[0m unsynced average_daily_questions_learned records for user $userId.');
-  return results;
+Future<Map<String, dynamic>> getTodayUserStatsAverageDailyQuestionsLearnedRecord(String userId) async {
+  try {
+    final String today = DateTime.now().toUtc().toIso8601String().substring(0, 10);
+    return await getUserStatsAverageDailyQuestionsLearnedRecordByDate(userId, today);
+  } catch (e) {
+    QuizzerLogger.logError('Error getting today\'s average daily questions learned record for user ID: $userId - $e');
+    rethrow;
+  }
+}
+
+Future<List<Map<String, dynamic>>> getUnsyncedUserStatsAverageDailyQuestionsLearnedRecords(String userId) async {
+  try {
+    final db = await getDatabaseMonitor().requestDatabaseAccess();
+    QuizzerLogger.logMessage('Fetching unsynced average_daily_questions_learned records for user: $userId...');
+    await _verifyUserStatsAverageDailyQuestionsLearnedTable(db!);
+    final List<Map<String, dynamic>> results = await db.query(
+      'user_stats_average_daily_questions_learned',
+      where: '(has_been_synced = 0 OR edits_are_synced = 0) AND user_id = ?',
+      whereArgs: [userId],
+    );
+    QuizzerLogger.logSuccess('Fetched [38;5;10m${results.length}[0m unsynced average_daily_questions_learned records for user $userId.');
+    return results;
+  } catch (e) {
+    QuizzerLogger.logError('Error getting unsynced average daily questions learned records for user ID: $userId - $e');
+    rethrow;
+  } finally {
+    getDatabaseMonitor().releaseDatabaseAccess();
+  }
 }
 
 Future<void> updateUserStatsAverageDailyQuestionsLearnedSyncFlags({
@@ -172,64 +203,79 @@ Future<void> updateUserStatsAverageDailyQuestionsLearnedSyncFlags({
   required String recordDate,
   required bool hasBeenSynced,
   required bool editsAreSynced,
-  required Database db,
 }) async {
-  QuizzerLogger.logMessage('Updating sync flags for average_daily_questions_learned record (User: $userId, Date: $recordDate) -> Synced: $hasBeenSynced, Edits Synced: $editsAreSynced');
-  await verifyUserStatsAverageDailyQuestionsLearnedTable(db);
-  final Map<String, dynamic> updates = {
-    'has_been_synced': hasBeenSynced ? 1 : 0,
-    'edits_are_synced': editsAreSynced ? 1 : 0,
-    'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
-  };
-  final int rowsAffected = await updateRawData(
-    'user_stats_average_daily_questions_learned',
-    updates,
-    'user_id = ? AND record_date = ?',
-    [userId, recordDate],
-    db,
-  );
-  if (rowsAffected == 0) {
-    QuizzerLogger.logWarning('updateUserStatsAverageDailyQuestionsLearnedSyncFlags affected 0 rows for average_daily_questions_learned record (User: $userId, Date: $recordDate). Record might not exist?');
-  } else {
-    QuizzerLogger.logSuccess('Successfully updated sync flags for average_daily_questions_learned record (User: $userId, Date: $recordDate).');
+  try {
+    final db = await getDatabaseMonitor().requestDatabaseAccess();
+    QuizzerLogger.logMessage('Updating sync flags for average_daily_questions_learned record (User: $userId, Date: $recordDate) -> Synced: $hasBeenSynced, Edits Synced: $editsAreSynced');
+    await _verifyUserStatsAverageDailyQuestionsLearnedTable(db!);
+    final Map<String, dynamic> updates = {
+      'has_been_synced': hasBeenSynced ? 1 : 0,
+      'edits_are_synced': editsAreSynced ? 1 : 0,
+      'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
+    };
+    final int rowsAffected = await updateRawData(
+      'user_stats_average_daily_questions_learned',
+      updates,
+      'user_id = ? AND record_date = ?',
+      [userId, recordDate],
+      db,
+    );
+    if (rowsAffected == 0) {
+      QuizzerLogger.logWarning('updateUserStatsAverageDailyQuestionsLearnedSyncFlags affected 0 rows for average_daily_questions_learned record (User: $userId, Date: $recordDate). Record might not exist?');
+    } else {
+      QuizzerLogger.logSuccess('Successfully updated sync flags for average_daily_questions_learned record (User: $userId, Date: $recordDate).');
+    }
+  } catch (e) {
+    QuizzerLogger.logError('Error updating sync flags for average daily questions learned record (User: $userId, Date: $recordDate) - $e');
+    rethrow;
+  } finally {
+    getDatabaseMonitor().releaseDatabaseAccess();
   }
 }
 
-Future<void> upsertUserStatsAverageDailyQuestionsLearnedFromInboundSync(Map<String, dynamic> record, Database db) async {
-  final String? userId = record['user_id'] as String?;
-  final String? recordDate = record['record_date'] as String?;
-  final double? avgLearned = record['average_daily_questions_learned'] is int
-      ? (record['average_daily_questions_learned'] as int).toDouble()
-      : record['average_daily_questions_learned'] as double?;
-  final String? lastModifiedTimestamp = record['last_modified_timestamp'] as String?;
+Future<void> upsertUserStatsAverageDailyQuestionsLearnedFromInboundSync(Map<String, dynamic> record) async {
+  try {
+    final db = await getDatabaseMonitor().requestDatabaseAccess();
+    final String? userId = record['user_id'] as String?;
+    final String? recordDate = record['record_date'] as String?;
+    final double? avgLearned = record['average_daily_questions_learned'] is int
+        ? (record['average_daily_questions_learned'] as int).toDouble()
+        : record['average_daily_questions_learned'] as double?;
+    final String? lastModifiedTimestamp = record['last_modified_timestamp'] as String?;
 
-  assert(userId != null, 'upsertUserStatsAverageDailyQuestionsLearnedFromInboundSync: user_id cannot be null. Data: $record');
-  assert(recordDate != null, 'upsertUserStatsAverageDailyQuestionsLearnedFromInboundSync: record_date cannot be null. Data: $record');
-  assert(avgLearned != null, 'upsertUserStatsAverageDailyQuestionsLearnedFromInboundSync: average_daily_questions_learned cannot be null. Data: $record');
-  assert(lastModifiedTimestamp != null, 'upsertUserStatsAverageDailyQuestionsLearnedFromInboundSync: last_modified_timestamp cannot be null. Data: $record');
+    assert(userId != null, 'upsertUserStatsAverageDailyQuestionsLearnedFromInboundSync: user_id cannot be null. Data: $record');
+    assert(recordDate != null, 'upsertUserStatsAverageDailyQuestionsLearnedFromInboundSync: record_date cannot be null. Data: $record');
+    assert(avgLearned != null, 'upsertUserStatsAverageDailyQuestionsLearnedFromInboundSync: average_daily_questions_learned cannot be null. Data: $record');
+    assert(lastModifiedTimestamp != null, 'upsertUserStatsAverageDailyQuestionsLearnedFromInboundSync: last_modified_timestamp cannot be null. Data: $record');
 
-  await verifyUserStatsAverageDailyQuestionsLearnedTable(db);
+    await _verifyUserStatsAverageDailyQuestionsLearnedTable(db!);
 
-  final Map<String, dynamic> dataToInsertOrUpdate = {
-    'user_id': userId,
-    'record_date': recordDate,
-    'average_daily_questions_learned': avgLearned,
-    'has_been_synced': 1,
-    'edits_are_synced': 1,
-    'last_modified_timestamp': lastModifiedTimestamp,
-  };
+    final Map<String, dynamic> dataToInsertOrUpdate = {
+      'user_id': userId,
+      'record_date': recordDate,
+      'average_daily_questions_learned': avgLearned,
+      'has_been_synced': 1,
+      'edits_are_synced': 1,
+      'last_modified_timestamp': lastModifiedTimestamp,
+    };
 
-  final int rowId = await insertRawData(
-    'user_stats_average_daily_questions_learned',
-    dataToInsertOrUpdate,
-    db,
-    conflictAlgorithm: ConflictAlgorithm.replace,
-  );
+    final int rowId = await insertRawData(
+      'user_stats_average_daily_questions_learned',
+      dataToInsertOrUpdate,
+      db,
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
 
-  if (rowId > 0) {
-    QuizzerLogger.logSuccess('Successfully upserted user_stats_average_daily_questions_learned for user $userId, date $recordDate from inbound sync.');
-  } else {
-    QuizzerLogger.logWarning('upsertUserStatsAverageDailyQuestionsLearnedFromInboundSync: insertRawData with replace returned 0 for user $userId, date $recordDate. Data: $dataToInsertOrUpdate');
+    if (rowId > 0) {
+      QuizzerLogger.logSuccess('Successfully upserted user_stats_average_daily_questions_learned for user $userId, date $recordDate from inbound sync.');
+    } else {
+      QuizzerLogger.logWarning('upsertUserStatsAverageDailyQuestionsLearnedFromInboundSync: insertRawData with replace returned 0 for user $userId, date $recordDate. Data: $dataToInsertOrUpdate');
+    }
+  } catch (e) {
+    QuizzerLogger.logError('Error upserting average daily questions learned record from inbound sync - $e');
+    rethrow;
+  } finally {
+    getDatabaseMonitor().releaseDatabaseAccess();
   }
 }
 

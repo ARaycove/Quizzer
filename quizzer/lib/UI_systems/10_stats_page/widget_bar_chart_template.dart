@@ -39,7 +39,6 @@ class StatBarChart extends StatelessWidget {
     // Add some padding to the max Y, ensure it's at least a small value if all data is 0
     maxY = maxY == 0 ? 10 : (maxY * 1.2);
 
-
     List<BarChartGroupData> barGroups = [];
     for (int i = 0; i < data.length; i++) {
       final item = data[i];
@@ -61,110 +60,94 @@ class StatBarChart extends StatelessWidget {
       );
     }
 
-    return AspectRatio(
-      aspectRatio: 1.7,
-      child: Card(
-        elevation: 4,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(ColorWheel.cardRadiusValue)),
-        color: ColorWheel.secondaryBackground,
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: BarChart(
-            BarChartData(
-              alignment: BarChartAlignment.spaceAround,
-              maxY: maxY,
-              barTouchData: BarTouchData(
-                enabled: true,
-                touchTooltipData: BarTouchTooltipData(
-                  tooltipBgColor: ColorWheel.primaryBackground,
-                  getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                    final item = data[group.x];
-                    return BarTooltipItem(
-                      '${item['x_label']}: ${rod.toY.toStringAsFixed(1)}',
-                      ColorWheel.defaultText.copyWith(color: Colors.white),
+    return SizedBox(
+      height: 220,
+      child: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(right: 60, left: 12, top: 0, bottom: 0),
+            child: BarChart(
+              BarChartData(
+                alignment: BarChartAlignment.spaceAround,
+                maxY: maxY,
+                barTouchData: BarTouchData(
+                  enabled: true,
+                  touchTooltipData: BarTouchTooltipData(
+                    getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                      final item = data[group.x];
+                      return BarTooltipItem(
+                        '${item['x_label']}: ${rod.toY.toStringAsFixed(1)}',
+                        ColorWheel.defaultText.copyWith(color: Colors.white),
+                      );
+                    },
+                  ),
+                ),
+                titlesData: FlTitlesData(
+                  show: true,
+                  topTitles: AxisTitles(
+                    sideTitles: const SideTitles(showTitles: false),
+                    axisNameWidget: chartName.isNotEmpty ? Text(chartName, style: ColorWheel.titleText.copyWith(color: Colors.white)) : null,
+                    axisNameSize: 40,
+                  ),
+                  bottomTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      getTitlesWidget: (double value, TitleMeta meta) {
+                        final index = value.toInt();
+                        if (index >= 0 && index < data.length) {
+                          return Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: Text(
+                              data[index]['x_label'] as String,
+                              style: ColorWheel.secondaryTextStyle.copyWith(fontSize: 10),
+                            ),
+                          );
+                        }
+                        return const Text('');
+                      },
+                      reservedSize: 30,
+                    ),
+                    axisNameWidget: Padding(
+                      padding: const EdgeInsets.only(top: 10.0),
+                      child: Text(xAxisLabel, style: ColorWheel.secondaryTextStyle.copyWith(fontSize: 12)),
+                    ),
+                     axisNameSize: 30,
+                  ),
+                  leftTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      reservedSize: 40,
+                      getTitlesWidget: (double value, TitleMeta meta) {
+                         if (value % 1 == 0) { // Only show integer values
+                            return Text(value.toInt().toString(), style: ColorWheel.secondaryTextStyle.copyWith(fontSize: 10));
+                         }
+                         return const Text('');
+                      },
+                    ),
+                    axisNameWidget: Text(yAxisLabel, style: ColorWheel.secondaryTextStyle.copyWith(fontSize: 12)),
+                    axisNameSize: 40,
+                  ),
+                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                ),
+                borderData: FlBorderData(
+                  show: true,
+                  border: Border.all(color: ColorWheel.primaryBorder, width: 1),
+                ),
+                gridData: FlGridData(
+                  show: true,
+                  drawVerticalLine: false,
+                  getDrawingHorizontalLine: (value) {
+                    return FlLine(
+                      color: ColorWheel.primaryBorder.withValues(alpha: 0.5),
+                      strokeWidth: 0.5,
                     );
                   },
                 ),
+                barGroups: barGroups,
               ),
-              titlesData: FlTitlesData(
-                show: true,
-                topTitles: AxisTitles(
-                  sideTitles: SideTitles(showTitles: false),
-                  axisNameWidget: Text(chartName, style: ColorWheel.titleText.copyWith(color: Colors.white)),
-                  axisNameSize: 40,
-                ),
-                bottomTitles: AxisTitles(
-                  sideTitles: SideTitles(
-                    showTitles: true,
-                    getTitlesWidget: (double value, TitleMeta meta) {
-                      final index = value.toInt();
-                      if (index >= 0 && index < data.length) {
-                        return Padding(
-                          padding: const EdgeInsets.only(top: 8.0),
-                          child: Text(
-                            data[index]['x_label'] as String,
-                            style: ColorWheel.secondaryTextStyle.copyWith(fontSize: 10),
-                          ),
-                        );
-                      }
-                      return const Text('');
-                    },
-                    reservedSize: 30,
-                  ),
-                  axisNameWidget: Padding(
-                    padding: const EdgeInsets.only(top: 10.0),
-                    child: Text(xAxisLabel, style: ColorWheel.secondaryTextStyle.copyWith(fontSize: 12)),
-                  ),
-                   axisNameSize: 30,
-                ),
-                leftTitles: AxisTitles(
-                  sideTitles: SideTitles(
-                    showTitles: true,
-                    reservedSize: 40,
-                    getTitlesWidget: (double value, TitleMeta meta) {
-                       // Show fewer labels if maxY is large
-                      if (maxY > 20 && value % (maxY / 5).ceil() != 0 && value != maxY.floor() && value !=0) {
-                        if (value == meta.max) { // Ensure max value is shown
-                           //return Text(value.toInt().toString(), style: ColorWheel.secondaryTextStyle.copyWith(fontSize: 10));
-                        } else {
-                          //return const Text('');
-                        }
-                      }
-                       if (value == meta.max && maxY <=20 ) { // Ensure max value is shown for smaller ranges too
-                           //return Text(value.toInt().toString(), style: ColorWheel.secondaryTextStyle.copyWith(fontSize: 10));
-                        }
-
-
-                      // Default behavior for other cases or if you want all labels
-                      if (value % 1 == 0) { // Only show integer values
-                         return Text(value.toInt().toString(), style: ColorWheel.secondaryTextStyle.copyWith(fontSize: 10));
-                      }
-                      return const Text('');
-                    },
-                  ),
-                  axisNameWidget: Text(yAxisLabel, style: ColorWheel.secondaryTextStyle.copyWith(fontSize: 12)),
-                  axisNameSize: 40,
-                ),
-                rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-              ),
-              borderData: FlBorderData(
-                show: true,
-                border: Border.all(color: ColorWheel.primaryBorder, width: 1),
-              ),
-              gridData: FlGridData(
-                show: true,
-                drawVerticalLine: false,
-                getDrawingHorizontalLine: (value) {
-                  return FlLine(
-                    color: ColorWheel.primaryBorder.withOpacity(0.5),
-                    strokeWidth: 0.5,
-                  );
-                },
-              ),
-              barGroups: barGroups,
             ),
           ),
-        ),
+        ],
       ),
     );
   }

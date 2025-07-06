@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/UI_systems/color_wheel.dart';
 import 'package:path/path.dart' as p;
-import 'package:path_provider/path_provider.dart';
+import 'package:quizzer/backend_systems/00_helper_utils/file_locations.dart';
 
 // ==========================================
 //        Element Renderer Widget
@@ -110,9 +110,9 @@ class _ElementRendererState extends State<ElementRenderer> {
              return Padding(padding: elementPadding, child: widget);
           } else {
              // Otherwise, show the loading indicator
-             return Padding(
+             return const Padding(
                padding: elementPadding, 
-               child: const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: ColorWheel.accent)),
+               child: SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: ColorWheel.accent)),
              );
           }
       }),
@@ -148,19 +148,7 @@ Future<Widget> _buildAsyncWidgetFuture(String? type, String? content) async {
     }
     try {
       final String filename = content;
-      Directory baseDir;
-      // Determine base directory based on platform
-      if (Platform.isAndroid || Platform.isIOS) {
-        baseDir = await getApplicationDocumentsDirectory();
-      } else if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-        baseDir = await getApplicationSupportDirectory();
-      } else {
-        // Fallback or throw error for unsupported platforms if necessary
-        QuizzerLogger.logError('ElementRenderer: Unsupported platform for media path construction.');
-        return _buildErrorIconRow('Unsupported platform', isWarning: true);
-      }
-
-      final String assetsPath = p.join(baseDir.path, 'QuizzerAppMedia', 'question_answer_pair_assets', filename);
+      final String assetsPath = p.join(await getQuizzerMediaPath(), filename);
       
       File fileToCheck = File(assetsPath);
       if (await fileToCheck.exists()) {

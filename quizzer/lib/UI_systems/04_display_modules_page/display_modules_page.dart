@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quizzer/UI_systems/global_widgets/widget_global_app_bar.dart';
-import 'package:quizzer/UI_systems/04_display_modules_page/widget_module_card.dart';
+import 'package:quizzer/UI_systems/04_display_modules_page/module_card/widget_module_card.dart';
 import 'package:quizzer/UI_systems/04_display_modules_page/widget_scroll_to_top_button.dart';
 import 'package:quizzer/UI_systems/04_display_modules_page/widget_module_filter_button.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
@@ -62,91 +62,99 @@ class _DisplayModulesPageState extends State<DisplayModulesPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ColorWheel.primaryBackground,
-      appBar: GlobalAppBar(
+      appBar: const GlobalAppBar(
         title: 'Modules',
         showHomeButton: true,
       ),
-      body: FutureBuilder<Map<String, dynamic>>(
-        future: _modulesFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(
-                color: ColorWheel.primaryText,
-              ),
-            );
-          } else if (snapshot.hasError) {
-            QuizzerLogger.logError('Error loading modules: ${snapshot.error}');
-            return const Center(
-              child: Text(
-                'Error loading modules. Please try again.',
-                style: ColorWheel.secondaryTextStyle,
-              ),
-            );
-          } else if (!snapshot.hasData || (snapshot.data!['modules'] as List).isEmpty) {
-            return const Center(
-              child: Text(
-                'No modules found',
-                style: ColorWheel.secondaryTextStyle,
-              ),
-            );
-          }
-
-          final modules = snapshot.data!['modules'] as List<Map<String, dynamic>>;
-          final moduleActivationStatus = snapshot.data!['activationStatus'] as Map<String, bool>;
-
-          return Stack(
-            children: [
-              // Main content
-              SingleChildScrollView(
-                controller: _scrollController,
-                child: Padding(
-                  padding: const EdgeInsets.all(ColorWheel.standardPaddingValue),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Add space for floating buttons
-                      const SizedBox(
-                        height: 48.0, 
-                      ),
-                      ...modules
-                          .where((module) => (module['total_questions'] ?? 0) > 0)
-                          .map((module) => ModuleCard(
-                                moduleData: module,
-                                isActivated: moduleActivationStatus[module['module_name']] ?? false,
-                                onModuleUpdated: _refreshModules,
-                              )),
-                    ],
+      body: Stack(
+        children: [
+          // Main content (loading, error, empty, or module cards)
+          Positioned.fill(
+            child: FutureBuilder<Map<String, dynamic>>(
+              future: _modulesFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(
+                    child: CircularProgressIndicator(
+                      color: ColorWheel.primaryText,
+                    ),
+                  );
+                } else if (snapshot.hasError) {
+                  QuizzerLogger.logError('Error loading modules: \\${snapshot.error}');
+                  return const Center(
+                    child: Text(
+                      'Error loading modules. Please try again.',
+                      style: ColorWheel.secondaryTextStyle,
+                    ),
+                  );
+                } else if (!snapshot.hasData) {
+                  return const Center(
+                    child: Text(
+                      'No data received',
+                      style: ColorWheel.secondaryTextStyle,
+                    ),
+                  );
+                }
+                final modules = snapshot.data!['modules'] as List<Map<String, dynamic>>;
+                final moduleActivationStatus = snapshot.data!['activationStatus'] as Map<String, bool>;
+                final modulesWithQuestions = modules.where((module) => (module['total_questions'] ?? 0) > 0).toList();
+                if (modulesWithQuestions.isEmpty) {
+                  return const Center(
+                    child: Text(
+                      'No modules with questions found',
+                      style: ColorWheel.secondaryTextStyle,
+                    ),
+                  );
+                }
+                return SingleChildScrollView(
+                  controller: _scrollController,
+                  child: Padding(
+                    padding: const EdgeInsets.all(ColorWheel.standardPaddingValue),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Add space for floating buttons
+                        const SizedBox(
+                          height: 48.0,
+                        ),
+                        ...modulesWithQuestions
+                            .map((module) => ModuleCard(
+                                  moduleData: module,
+                                  isActivated: moduleActivationStatus[module['module_name']] ?? false,
+                                  onModuleUpdated: _refreshModules,
+                                )),
+                      ],
+                    ),
                   ),
+                );
+              },
+            ),
+          ),
+          // Top action buttons (always visible)
+          Positioned(
+            top: ColorWheel.standardPaddingValue,
+            right: ColorWheel.standardPaddingValue,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ValueListenableBuilder<bool>(
+                  valueListenable: _showScrollToTopNotifier,
+                  builder: (context, showScrollToTop, child) {
+                    return ScrollToTopButton(
+                      scrollController: _scrollController,
+                      showScrollToTop: showScrollToTop,
+                    );
+                  },
                 ),
-              ),
-              // Top action buttons
-              Positioned(
-                top: ColorWheel.standardPaddingValue,
-                right: ColorWheel.standardPaddingValue,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    ValueListenableBuilder<bool>(
-                      valueListenable: _showScrollToTopNotifier,
-                      builder: (context, showScrollToTop, child) {
-                        return ScrollToTopButton(
-                          scrollController: _scrollController,
-                          showScrollToTop: showScrollToTop,
-                        );
-                      },
-                    ),
-                    const SizedBox(width: ColorWheel.formFieldSpacing),
-                    ModuleFilterButton(
-                      onFilterPressed: _handleFilter,
-                    ),
-                  ],
+                const SizedBox(width: ColorWheel.formFieldSpacing),
+                ModuleFilterButton(
+                  onFilterPressed: _handleFilter,
                 ),
-              ),
-            ],
-          );
-        },
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
-} 
+}

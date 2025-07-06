@@ -1,0 +1,1 @@
+// TODO: This file will be used to define the signals that are sent from the database to the switchboard. Other functions can then listen to these signals and act accordingly. For example the circulation worker will listen to the signals that are emitted when a question's circulation status changes. Currently this is done by the caches.

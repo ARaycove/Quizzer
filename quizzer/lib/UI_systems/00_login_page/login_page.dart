@@ -4,16 +4,6 @@ import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/UI_systems/color_wheel.dart';
 import 'dart:async'; // Import for StreamSubscription
 
-// TODO Let's make plans to implement a very fancy loading indicator.
-// TODO 1. Simple Progress Bar
-// We can setup progress indicators through a switchboard. When a specific process is complete it can report this signal. The UI can then pick up that signal and update the page to provide live feedback to the user.
-// I'm thinking some kind of loading bar
-// Make the logo expand to the whole screen
-// Make the logo turn into grayscale and pulsate between color and gray scale
-// Make the buttons collapse into circles
-// Those circles should then multiply and bounce around the screen.
-// A loading bar would be overlayed over the top of the screen.
-
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -64,27 +54,6 @@ class _LoginPageState extends State<LoginPage> {
     // define the email and password submission
     final email = _emailController.text.trim();
     final password = _passwordController.text;
-    
-    // Basic validation
-    if (email.isEmpty) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(email.isEmpty && password.isEmpty 
-                        ? 'Please enter both email and password'
-                        : email.isEmpty 
-                          ? 'Please enter your email address'
-                          : 'Please enter your password'), // More specific messages
-          backgroundColor: ColorWheel.buttonError,
-        ),
-      );
-      // Reset loading state on validation error
-      setState(() {
-        _isLoading = false;
-        _loginProgressMessage = "Login"; // Reset button text
-      });
-      return;
-    }
 
     // Attempt to log in using credentials
     QuizzerLogger.logMessage('Login attempt for: $email');
@@ -95,7 +64,6 @@ class _LoginPageState extends State<LoginPage> {
       // Login successful, keep loading state true until navigation completes
       QuizzerLogger.logMessage('Login successful for: $email. Navigating home.');
       if (!mounted) return;
-      session.addPageToHistory('/home');
       // _loginProgressMessage will be updated by the stream, culminating in "Login Complete!"
       // Potentially, could set a final success message here if desired before navigation
       // setState(() { _loginProgressMessage = "Success!"; }); 
@@ -134,7 +102,6 @@ class _LoginPageState extends State<LoginPage> {
     // Prevent navigation if already loading
     if (_isLoading) return; 
     QuizzerLogger.logMessage('Navigating to new user page');
-    session.addPageToHistory('/signup');
     Navigator.pushNamed(context, '/signup');
   }
 

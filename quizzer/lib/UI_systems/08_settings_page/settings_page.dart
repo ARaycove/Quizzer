@@ -16,7 +16,7 @@ class SettingsPage extends StatelessWidget {
     final bool isAdminOrContributor = userRole == 'admin' || userRole == 'contributor';
 
     return Scaffold(
-      appBar: GlobalAppBar(
+      appBar: const GlobalAppBar(
         title: 'Settings',
       ),
       backgroundColor: ColorWheel.primaryBackground,
@@ -26,10 +26,10 @@ class SettingsPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             if (isAdminOrContributor) ...[
-              WidgetAdminSettings(),
+              const WidgetAdminSettings(),
               const SizedBox(height: 24),
             ],
-            WidgetUserSettings(),
+            const WidgetUserSettings(),
           ],
         ),
       ),

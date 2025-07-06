@@ -17,11 +17,6 @@ It contains buttons that redirect to:
 The menu is purely a navigation element with no direct functionality beyond page redirection.
 */
 
-
-
-// TODO: Implement proper error handling for all navigation actions
-// TODO: Add proper validation for all user inputs
-
 // ==========================================
 // Widgets
 class MenuPage extends StatefulWidget {
@@ -42,7 +37,7 @@ class _MenuPageState extends State<MenuPage> {
 
     return Scaffold(
       backgroundColor: ColorWheel.primaryBackground,
-      appBar: GlobalAppBar(
+      appBar: const GlobalAppBar(
         title: 'Quizzer Menu',
         showHomeButton: true,
       ),
@@ -57,8 +52,6 @@ class _MenuPageState extends State<MenuPage> {
                 label: 'Admin Panel',
                 onPressed: () {
                   QuizzerLogger.logMessage('Admin Panel button pressed by $userRole');
-                  session.addPageToHistory('/admin_panel');
-                  // TODO: Implement Admin Panel Page and navigation
                   Navigator.pushNamed(context, '/admin_panel'); 
                 },
               ),
@@ -71,7 +64,6 @@ class _MenuPageState extends State<MenuPage> {
               icon: Icons.add_circle_outline,
               label: 'Add Question',
               onPressed: () {
-                session.addPageToHistory('/add_question');
                 Navigator.pushNamed(context, '/add_question');
               },
             ),
@@ -82,7 +74,6 @@ class _MenuPageState extends State<MenuPage> {
               icon: Icons.view_module,
               label: 'Display Modules',
               onPressed: () {
-                session.addPageToHistory('/display_modules');
                 Navigator.pushNamed(context, '/display_modules');
               },
             ),
@@ -105,7 +96,6 @@ class _MenuPageState extends State<MenuPage> {
               label: 'Settings',
               onPressed: () {
                 QuizzerLogger.logMessage('Settings button pressed');
-                session.addPageToHistory('/settings_page');
                 Navigator.pushNamed(context, '/settings_page');
               },
             ),
@@ -117,7 +107,6 @@ class _MenuPageState extends State<MenuPage> {
               label: 'Stats',
               onPressed: () {
                 QuizzerLogger.logMessage('Stats button pressed');
-                session.addPageToHistory('/stats');
                 Navigator.pushNamed(context, '/stats');
               },
             ),
@@ -129,7 +118,6 @@ class _MenuPageState extends State<MenuPage> {
               label: 'Feedback & Bug Reports',
               onPressed: () {
                 QuizzerLogger.logMessage('Feedback & Bug Reports button pressed');
-                session.addPageToHistory('/feedback');
                 Navigator.pushNamed(context, '/feedback');
               },
             ),

@@ -19,6 +19,11 @@ class MultipleChoiceQuestionWidget extends StatefulWidget {
   final int? correctOptionIndex; // Original correct index
   final bool isDisabled;
   
+  // New optional parameters for state control
+  final List<int>? customOrderIndices; // If provided, use this order instead of shuffling
+  final bool autoSubmitAnswer; // If true, automatically submit answer
+  final int? selectedIndex; // Must be provided if autoSubmitAnswer is true
+  
   // Callback
   final VoidCallback onNextQuestion; 
 
@@ -30,6 +35,9 @@ class MultipleChoiceQuestionWidget extends StatefulWidget {
     required this.correctOptionIndex,
     required this.onNextQuestion,
     this.isDisabled = false, // Default to false
+    this.customOrderIndices, // Optional custom order
+    this.autoSubmitAnswer = false, // Default to false
+    this.selectedIndex, // Optional selected index
   });
 
   @override
@@ -65,7 +73,11 @@ class _MultipleChoiceQuestionWidgetState
     // Check if the core data has actually changed before resetting state
     // Basic check: if options list instance changes, reload.
     // More robust checks might compare question content if needed.
-    if (widget.options != oldWidget.options || widget.correctOptionIndex != oldWidget.correctOptionIndex) {
+    if (widget.options != oldWidget.options || 
+        widget.correctOptionIndex != oldWidget.correctOptionIndex ||
+        widget.customOrderIndices != oldWidget.customOrderIndices ||
+        widget.autoSubmitAnswer != oldWidget.autoSubmitAnswer ||
+        widget.selectedIndex != oldWidget.selectedIndex) {
         QuizzerLogger.logMessage("MultipleChoiceQuestionWidget didUpdateWidget: Data changed, shuffling.");
         _loadAndShuffleOptions();
     } else {
@@ -93,7 +105,25 @@ class _MultipleChoiceQuestionWidgetState
     List<Map<String, dynamic>> newShuffledOptions;
     List<int> newOriginalIndices;
 
-    if (widget.isDisabled) {
+    // Check if we should use SessionManager data for answered state
+    if (widget.autoSubmitAnswer && _session.lastSubmittedUserAnswer != null) {
+      // Use the custom order from SessionManager if available
+      if (_session.lastSubmittedCustomOrderIndices != null) {
+        QuizzerLogger.logMessage("MultipleChoiceQuestionWidget: Using SessionManager custom order indices: ${_session.lastSubmittedCustomOrderIndices}");
+        newOriginalIndices = List<int>.from(_session.lastSubmittedCustomOrderIndices!);
+        newShuffledOptions = newOriginalIndices.map((i) => originalOptions[i]).toList();
+      } else {
+        // Fallback to original order if no custom order stored
+        QuizzerLogger.logMessage("MultipleChoiceQuestionWidget: No custom order in SessionManager, using original order.");
+        newShuffledOptions = List<Map<String, dynamic>>.from(originalOptions);
+        newOriginalIndices = List<int>.generate(originalOptions.length, (i) => i);
+      }
+    } else if (widget.customOrderIndices != null) {
+      // Use custom order if provided
+      QuizzerLogger.logMessage("MultipleChoiceQuestionWidget: Using custom order indices: ${widget.customOrderIndices}");
+      newOriginalIndices = List<int>.from(widget.customOrderIndices!);
+      newShuffledOptions = newOriginalIndices.map((i) => originalOptions[i]).toList();
+    } else if (widget.isDisabled) {
       // If disabled, do not shuffle. Use the original order.
       QuizzerLogger.logMessage("MultipleChoiceQuestionWidget: Disabled state, not shuffling options.");
       newShuffledOptions = List<Map<String, dynamic>>.from(originalOptions); // Create a copy
@@ -108,13 +138,35 @@ class _MultipleChoiceQuestionWidgetState
     }
     
     // Reset internal state
-    bool shouldAutoSubmit = widget.isDisabled;
-    // Determine default selected index for disabled preview (use correct index if available, else 0)
-    int? defaultSelectedIndex = shouldAutoSubmit 
-                                ? (widget.correctOptionIndex != null 
-                                    ? newOriginalIndices.indexOf(widget.correctOptionIndex!) 
-                                    : 0) 
-                                : null;
+    bool shouldAutoSubmit = widget.isDisabled || widget.autoSubmitAnswer;
+    // Determine default selected index for disabled preview or auto submit
+    int? defaultSelectedIndex;
+    if (shouldAutoSubmit) {
+      if (widget.autoSubmitAnswer && _session.lastSubmittedUserAnswer != null) {
+        // Use the submitted answer from SessionManager
+        final submittedAnswer = _session.lastSubmittedUserAnswer as int;
+        defaultSelectedIndex = newOriginalIndices.indexOf(submittedAnswer);
+        if (defaultSelectedIndex == -1) {
+          defaultSelectedIndex = 0;
+        }
+      } else if (widget.selectedIndex != null) {
+        // Use the provided selected index (find its position in the current order)
+        defaultSelectedIndex = newOriginalIndices.indexOf(widget.selectedIndex!);
+        if (defaultSelectedIndex == -1) {
+          // If the selected index is not found in the current order, default to 0
+          defaultSelectedIndex = 0;
+        }
+      } else if (widget.correctOptionIndex != null) {
+        // Fallback to correct index if no selected index provided
+        defaultSelectedIndex = newOriginalIndices.indexOf(widget.correctOptionIndex!);
+        if (defaultSelectedIndex == -1) {
+          defaultSelectedIndex = 0;
+        }
+      } else {
+        defaultSelectedIndex = 0;
+      }
+      QuizzerLogger.logMessage("MCQ: Auto-submit state, auto-setting submitted=true, selectedIndex=$defaultSelectedIndex for preview.");
+    }
                                 
     if (mounted) {
         setState(() {
@@ -122,9 +174,6 @@ class _MultipleChoiceQuestionWidgetState
           _originalIndices = newOriginalIndices; 
           _selectedOptionIndex = defaultSelectedIndex; // Set selection for disabled view
           _isAnswerSubmitted = shouldAutoSubmit; // Set submitted if disabled 
-          if (shouldAutoSubmit) {
-            QuizzerLogger.logMessage("MCQ: Disabled state, auto-setting submitted=true, selectedIndex=$defaultSelectedIndex for preview.");
-          }
         });
     } else {
          _shuffledOptions = newShuffledOptions;
@@ -148,7 +197,15 @@ class _MultipleChoiceQuestionWidgetState
     });
 
     try {
-      // Still use session manager to submit the answer
+      // Set all submission data in SessionManager BEFORE calling submitAnswer
+      _session.setCurrentQuestionCustomOrderIndices(_originalIndices);
+      _session.setCurrentQuestionUserAnswer(originalIndex);
+      
+      // Determine correctness and set it
+      final bool isCorrect = originalIndex == widget.correctOptionIndex;
+      _session.setCurrentQuestionIsCorrect(isCorrect);
+      
+      // Now call submitAnswer
       _session.submitAnswer(userAnswer: originalIndex); 
       QuizzerLogger.logSuccess('Answer submission initiated to SessionManager.'); 
     } catch (e) {
@@ -238,18 +295,18 @@ class _MultipleChoiceQuestionWidgetState
                 if (_isAnswerSubmitted) {
                   if (isSelected) {
                     borderColor = isCorrect ? correctColor : incorrectColor;
-                    optionBgColor = isCorrect ? correctColor.withOpacity(0.1) : incorrectColor.withOpacity(0.1);
+                    optionBgColor = isCorrect ? correctColor.withValues(alpha: 0.1) : incorrectColor.withValues(alpha: 0.1);
                     trailingIcon = isCorrect ? Icons.check_circle : Icons.cancel;
                     if(isCorrect) showAnswerForThisOption = true; 
                   } else if (isCorrect) {
-                     optionBgColor = correctColor.withOpacity(0.1);
+                     optionBgColor = correctColor.withValues(alpha: 0.1);
                      trailingIcon = Icons.check_circle_outline;
                      showAnswerForThisOption = true; 
                   }
                 } else if (isSelected && !widget.isDisabled) {
                   // Only show selection border if enabled and not submitted
                   borderColor = selectedOptionBorderColor;
-                  optionBgColor = selectedOptionBorderColor.withOpacity(0.1);
+                  optionBgColor = selectedOptionBorderColor.withValues(alpha: 0.1);
                 }
 
                 return Padding(

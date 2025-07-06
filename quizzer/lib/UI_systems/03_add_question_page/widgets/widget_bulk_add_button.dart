@@ -54,8 +54,9 @@ class _BulkAddButtonState extends State<BulkAddButton> {
 
     if (path == null) {
        QuizzerLogger.logError('Bulk Add: File path is null. This method currently only supports non-web platforms.');
+        if (!context.mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-         SnackBar(content: Text('Error: File path not available (Web platform not fully supported by this method yet).'), backgroundColor: ColorWheel.buttonError),
+         const SnackBar(content: Text('Error: File path not available (Web platform not fully supported by this method yet).'), backgroundColor: ColorWheel.buttonError),
         );
         setState(() => _isLoading = false);
         return;
@@ -337,9 +338,9 @@ class _BulkAddButtonState extends State<BulkAddButton> {
   Widget build(BuildContext context) {
     return ElevatedButton.icon(
             icon: _isLoading 
-                  ? Container( // Replace icon with progress indicator
+                  ? const SizedBox( // Replace icon with progress indicator
                       width: 18, height: 18, // Smaller size for button
-                      child: const CircularProgressIndicator(
+                      child: CircularProgressIndicator(
                         color: ColorWheel.primaryText, // Text color for contrast
                         strokeWidth: 2.0,
                       )

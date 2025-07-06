@@ -80,8 +80,8 @@ class _HomePageTopBarState extends State<HomePageTopBar> {
           child: InkWell( // Use InkWell for tap effect, though onPressed is on IconButton
             onTap: () async {
               // Get current question ID
-              final String? currentQuestionId = _session.currentQuestionId;
-              if (currentQuestionId == null || currentQuestionId == "dummy_no_questions") {
+              final String currentQuestionId = _session.currentQuestionId;
+              if (currentQuestionId.isEmpty || currentQuestionId == "dummy_no_questions") {
                  QuizzerLogger.logWarning("Edit button pressed but no valid question is active.");
                  // Optionally show a message to the user
                  if (mounted) {
@@ -100,6 +100,7 @@ class _HomePageTopBarState extends State<HomePageTopBar> {
                  if (!mounted) return; // Check if widget is still mounted after async call
 
                  // Show the edit dialog and wait for result
+                 if (!context.mounted) return;
                  final result = await showDialog(
                     context: context,
                     builder: (dialogContext) => EditQuestionDialog(initialQuestionData: details),
@@ -111,7 +112,7 @@ class _HomePageTopBarState extends State<HomePageTopBar> {
                  }
                } catch (e) {
                   QuizzerLogger.logError("Error fetching details or showing edit dialog: $e");
-                  if (mounted) {
+                  if (context.mounted) {
                        ScaffoldMessenger.of(context).showSnackBar(
                          SnackBar(content: Text('Error opening edit dialog: $e'), backgroundColor: ColorWheel.buttonError),
                        );

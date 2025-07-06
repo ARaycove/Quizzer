@@ -9,9 +9,6 @@ import 'package:quizzer/UI_systems/question_widgets/widget_multiple_choice_quest
 import 'package:quizzer/UI_systems/question_widgets/widget_select_all_that_apply_question.dart'; 
 import 'package:quizzer/UI_systems/question_widgets/widget_true_false_question.dart'; 
 import 'package:quizzer/UI_systems/question_widgets/widget_sort_order_question.dart'; 
-
-// TODO: Import other actual question widgets as they are implemented. 6 left
-
 /// HomePage acts as the main container, displaying the appropriate question widget.
 class HomePage extends StatefulWidget { // Change to StatefulWidget
   const HomePage({super.key});
@@ -69,6 +66,11 @@ class _HomePageState extends State<HomePage> { // State class
   // Method to handle requesting the next question and triggering rebuild
   Future<void> _requestNextQuestion() async {
     _editedQuestionData = null; // Clear any edited data when requesting next
+    
+    // Clear submission data when requesting next question
+    // This ensures the new question starts in unsubmitted state
+    session.clearCurrentQuestionSubmissionData();
+    
     await session.requestNextQuestion();
     // Ensure widget is still mounted before calling setState
     if (mounted) { 
@@ -94,7 +96,6 @@ class _HomePageState extends State<HomePage> { // State class
       backgroundColor: ColorWheel.primaryBackground,
       appBar: HomePageTopBar( 
         onMenuPressed: () {
-          session.addPageToHistory('/menu'); 
           Navigator.pushNamed(context, '/menu');
         },
         onQuestionEdited: _handleQuestionEdited,
@@ -120,9 +121,17 @@ class _HomePageState extends State<HomePage> { // State class
     final int? correctOptionIndex = dataSource?['correct_option_index'] as int? ?? session.currentCorrectOptionIndex;
     final List<int> correctIndices = (dataSource?['index_options_that_apply'] as List<dynamic>? ?? session.currentCorrectIndices).map((e) => e as int).toList();
 
+    // Check if we have submission data for answered state reconstruction
+    final bool hasSubmissionData = session.lastSubmittedUserAnswer != null;
+    final bool shouldAutoSubmit = hasSubmissionData;
+
+    // Extract submission data for passing to widgets
+    final List<int>? customOrderIndices = session.lastSubmittedCustomOrderIndices;
+    final dynamic submittedUserAnswer = session.lastSubmittedUserAnswer;
+
     // IMPORTANT: No longer clearing _editedQuestionData here. It's cleared in _requestNextQuestion.
 
-    QuizzerLogger.logValue("HomePage building question type: $questionType with key: $key (using ${dataSource != null ? 'edited data' : 'session data'})");
+    QuizzerLogger.logValue("HomePage building question type: $questionType with key: $key (using ${dataSource != null ? 'edited data' : 'session data'}) - AutoSubmit: $shouldAutoSubmit");
 
     switch (questionType) {
       case 'multiple_choice':
@@ -133,6 +142,9 @@ class _HomePageState extends State<HomePage> { // State class
           answerElements: answerElements, // Use local variable
           options: options, // Use local variable
           correctOptionIndex: correctOptionIndex ?? -1, // Handle null, though validation should prevent it
+          autoSubmitAnswer: shouldAutoSubmit, // Pass auto-submit flag
+          customOrderIndices: customOrderIndices, // Pass custom order indices
+          selectedIndex: submittedUserAnswer as int?, // Pass selected index
         );
 
       case 'select_all_that_apply': 
@@ -143,6 +155,9 @@ class _HomePageState extends State<HomePage> { // State class
           answerElements: answerElements, // Use local variable
           options: options, // Use local variable
           correctIndices: correctIndices, // Use local variable
+          autoSubmitAnswer: shouldAutoSubmit, // Pass auto-submit flag
+          customOrderIndices: customOrderIndices, // Pass custom order indices
+          selectedIndices: submittedUserAnswer as List<int>?, // Pass selected indices
         );
 
       case 'true_false': 
@@ -155,6 +170,9 @@ class _HomePageState extends State<HomePage> { // State class
           questionElements: questionElements, // Use local variable
           answerElements: answerElements, // Use local variable
           isCorrectAnswerTrue: correctOptionIndex == 0, // 0 is convention for True
+          autoSubmitAnswer: shouldAutoSubmit, // Pass auto-submit flag
+          customOrderIndices: customOrderIndices, // Pass custom order indices (for True/False order)
+          selectedAnswer: submittedUserAnswer as bool?, // Pass selected answer
         );
         
       case 'sort_order': 
@@ -164,6 +182,9 @@ class _HomePageState extends State<HomePage> { // State class
           questionElements: questionElements, // Use local variable
           answerElements: answerElements, // Use local variable
           options: options, // Use the correctly ordered options from edited data or session
+          autoSubmitAnswer: shouldAutoSubmit, // Pass auto-submit flag
+          customOrderIndices: customOrderIndices, // Pass custom order indices
+          customUserOrder: submittedUserAnswer as List<Map<String, dynamic>>?, // Pass custom user order
         );
 
       // --- Add placeholders for other known types ---

@@ -3,9 +3,6 @@ import 'dart:math'; // For random selection
 import 'package:supabase/supabase.dart'; // Corrected Supabase import again
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
-// Added imports for local DB and hasMediaCheck
-import 'package:sqflite/sqflite.dart';
-import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pairs_table.dart'; 
 // ======================================================
 // duplicate private helper functions here, the AI is fucking dumb and tried to use them instead of the main function in table_helper
@@ -179,13 +176,11 @@ Future<Map<String, dynamic>> getRandomQuestionToBeReviewed() async {
 
   // --- Perform local hasMediaCheck to trigger media sync --- 
   QuizzerLogger.logMessage('Performing hasMediaCheck for reviewed Question ID: $questionId');
-  Database? db = await getDatabaseMonitor().requestDatabaseAccess();
   // Use db! directly to adhere to Fail Fast if db is unexpectedly null.
   // The hasMediaCheck function from question_answer_pairs_table will determine if media exists,
   // extract filenames, and call registerMediaFiles which in turn calls insertMediaSyncStatus.
   // insertMediaSyncStatus will then trigger the MediaSyncWorker if needed.
-  await hasMediaCheck(db!, decodedData);
-  getDatabaseMonitor().releaseDatabaseAccess();
+  await hasMediaCheck(decodedData);
   QuizzerLogger.logMessage('hasMediaCheck completed for Question ID: $questionId. DB access released.');
   // --- End hasMediaCheck --- 
 

@@ -1,12 +1,13 @@
 import 'dart:io';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
+import 'package:quizzer/backend_systems/00_helper_utils/file_locations.dart';
 
 /// Moves an image from the staging directory to the final assets directory
 /// Returns just the filename for storage in the database
 Future<String> moveImageToFinalLocation(String sourcePath) async {
   try {
     // Create final directory if it doesn't exist
-    final finalDir = Directory('images/question_answer_pair_assets');
+    final finalDir = Directory(await getQuizzerMediaPath());
     if (!await finalDir.exists()) {
       await finalDir.create(recursive: true);
     }

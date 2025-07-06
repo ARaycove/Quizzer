@@ -37,7 +37,7 @@ class StatLineGraph extends StatelessWidget {
   ];
 
   // Multi-series constructor
-  StatLineGraph.multi({
+  const StatLineGraph.multi({
     super.key,
     required this.seriesList,
     required this.title,
@@ -94,13 +94,12 @@ class StatLineGraph extends StatelessWidget {
     }).toList();
     final uniqueXLabels = xLabels.toSet().toList();
     final double yMax = maxValue == 0 ? 1 : (maxValue * 1.02);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(
-          height: 220,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12.0),
+    return SizedBox(
+      height: 220,
+      child: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(right: 60, left: 12, top: 0, bottom: 0),
             child: LineChart(
               LineChartData(
                 lineBarsData: lines,
@@ -190,36 +189,37 @@ class StatLineGraph extends StatelessWidget {
                 gridData: const FlGridData(show: true),
                 borderData: FlBorderData(show: true),
                 minY: 0,
-                maxY: yMax,
+                maxY: yMax
               ),
             ),
           ),
-        ),
-        if (showLegend)
-          Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: Wrap(
-              spacing: 16,
-              children: [
-                for (final s in seriesList)
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(width: 16, height: 4, color: s.lineColor),
-                      const SizedBox(width: 8),
-                      Text(
-                        s.legendLabel,
-                        style: ColorWheel.defaultText.copyWith(
-                          color: ColorWheel.primaryText,
-                          fontWeight: FontWeight.bold,
+          if (showLegend)
+            Positioned(
+              top: 0,
+              right: 0,
+              child: Wrap(
+                spacing: 16,
+                children: [
+                  for (final s in seriesList)
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(width: 16, height: 4, color: s.lineColor),
+                        const SizedBox(width: 8),
+                        Text(
+                          s.legendLabel,
+                          style: ColorWheel.defaultText.copyWith(
+                            color: ColorWheel.primaryText,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-              ],
+                      ],
+                    ),
+                ],
+              ),
             ),
-          ),
-      ],
+        ],
+      ),
     );
   }
 }

@@ -152,32 +152,24 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
   // //   [ ] Generate Test Data (`test/util/`)
   // //   [ ] Write Unit/Widget Tests
 
-
-// Items that can wait for right before launch
-// TODO Windows Test
-// TODO MacOs Test
-// TODO IOS Test
-// - (can be implemented right before launch)
-
-
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  SessionManager session = getSessionManager(); // Force initialization of session at startup
-  session.userId; // Just here to get rid of the warning message. . .
-  QuizzerLogger.setupLogging(level: Level.FINE);
-
-  // Global error handler for Flutter framework errors
-  PlatformDispatcher.instance.onError = (error, stack) {
-    reportCriticalError(
-      'Unhandled Flutter error caught by PlatformDispatcher',
-      error: error,
-      stackTrace: stack,
-    );
-    return true; // Mark as handled
-  };
-
   // Zone-based error handler
   runZonedGuarded(() {
+    WidgetsFlutterBinding.ensureInitialized();
+    SessionManager session = getSessionManager(); // Force initialization of session at startup
+    session.userId; // Just here to get rid of the warning message. . .
+    QuizzerLogger.setupLogging(level: Level.FINE);
+
+    // Global error handler for Flutter framework errors
+    PlatformDispatcher.instance.onError = (error, stack) {
+      reportCriticalError(
+        'Unhandled Flutter error caught by PlatformDispatcher',
+        error: error,
+        stackTrace: stack,
+      );
+      return true; // Mark as handled
+    };
+
     runApp(QuizzerApp(navigatorKey: navigatorKey));
   }, (error, stackTrace) {
     reportCriticalError(

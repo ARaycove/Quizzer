@@ -263,7 +263,7 @@ class _EditQuestionDialogState extends State<EditQuestionDialog> {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      border: Border.all(color: ColorWheel.secondaryText.withOpacity(0.5)),
+                      border: Border.all(color: ColorWheel.secondaryText.withValues(alpha: 0.5)),
                       borderRadius: ColorWheel.cardBorderRadius,
                     ),
                     child: LivePreviewWidget(

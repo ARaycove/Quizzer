@@ -27,7 +27,7 @@ class AddQuestionWidget extends StatefulWidget {
   final Function(int index, Map<String, dynamic> updatedOption) onEditOption;
   final Function(int index) onSetCorrectOptionIndex; // For MC/TF
   final Function(int index) onToggleCorrectOptionSATA;
-  final Function(List<Map<String, dynamic>> reorderedElements, String category) onReorderElements; // TODO: Implement reorder
+  final Function(List<Map<String, dynamic>> reorderedElements, String category) onReorderElements;
   final Function(List<Map<String, dynamic>> reorderedOptions) onReorderOptions;
 
   const AddQuestionWidget({
@@ -620,7 +620,7 @@ class _AddQuestionWidgetState extends State<AddQuestionWidget> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: ColorWheel.cardBorderRadius,
-          borderSide: BorderSide(color: ColorWheel.accent, width: 1.5), // Slightly thicker focus border
+          borderSide: const BorderSide(color: ColorWheel.accent, width: 1.5), // Slightly thicker focus border
         ),
         contentPadding: ColorWheel.inputFieldPadding, 
         isDense: true,

@@ -234,7 +234,6 @@ Future<void> logCurrentUserRecordFromDB(SessionManager manager) async {
   final Map<String, dynamic> record = await uqap_table.getUserQuestionAnswerPairById(
     userId,      // Positional argument 1
     questionId,  // Positional argument 2
-    db,          // Positional argument 3
   );
 
   // Release lock IMMEDIATELY after the DB operation completes or throws

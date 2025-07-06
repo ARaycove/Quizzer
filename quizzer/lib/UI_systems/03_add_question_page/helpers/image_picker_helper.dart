@@ -4,12 +4,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:path/path.dart' as p; // Use alias
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:uuid/uuid.dart'; // To generate unique filenames
-
-// --- Staging and Asset Directories ---
-// Note: Assumes these directories exist relative to the project root.
-// Consider creating them programmatically if they might not exist.
-const String _stagingDirRelative = 'images/input_staging';
-const String _assetsDirRelative = 'images/question_answer_pair_assets';
+import 'package:quizzer/backend_systems/00_helper_utils/file_locations.dart';
 
 /// Allows the user to pick an image, copies it to the staging directory
 /// with a unique name, and returns the relative path within the staging directory.
@@ -36,7 +31,7 @@ Future<String?> pickAndStageImage() async {
   final String uniqueFileName = '${const Uuid().v4()}$fileExtension';
 
   // 3. Define Paths
-  final String stagingDirPath = p.join(Directory.current.path, _stagingDirRelative);
+  final String stagingDirPath = await getInputStagingPath();
   final String destinationStagedPath = p.join(stagingDirPath, uniqueFileName);
 
   // Ensure staging directory exists
@@ -97,12 +92,8 @@ Future<void> finalizeStagedImages(
   final List<Map<String, dynamic>> allElements = [...questionElements, ...answerElements];
   int movedCount = 0;
 
-  // Use constants for directory names
-  // final String stagingDirPath = p.join(Directory.current.path, _stagingDirRelative);
-  // final String assetsDirPath = p.join(Directory.current.path, _assetsDirRelative);
-
   // Ensure assets directory exists
-  await Directory(p.join(Directory.current.path, _assetsDirRelative)).create(recursive: true);
+  await Directory(await getQuizzerMediaPath()).create(recursive: true);
 
   for (final element in allElements) {
     if (element['type'] == 'image' && element['content'] is String) {
@@ -110,8 +101,8 @@ Future<void> finalizeStagedImages(
       final String filename = element['content'] as String;
 
       // Construct full paths based on filename and known directories
-      final String sourcePath = p.join(Directory.current.path, _stagingDirRelative, filename);
-      final String destinationPath = p.join(Directory.current.path, _assetsDirRelative, filename);
+      final String sourcePath = p.join(await getInputStagingPath(), filename);
+      final String destinationPath = p.join(await getQuizzerMediaPath(), filename);
 
       // Check if the source file actually exists in staging
       final sourceFile = File(sourcePath);
@@ -149,7 +140,7 @@ Future<void> finalizeStagedImages(
 Future<void> cleanupStagingDirectory(Set<String> usedFilenames) async {
   QuizzerLogger.logMessage("Cleaning up staging directory. Keeping: ${usedFilenames.join(', ')}");
   int deletedCount = 0;
-  final String stagingDirPath = p.join(Directory.current.path, _stagingDirRelative);
+  final String stagingDirPath = await getInputStagingPath();
   final stagingDir = Directory(stagingDirPath);
 
   try {

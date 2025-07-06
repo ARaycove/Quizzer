@@ -25,7 +25,7 @@ class _AdminPanelPageState extends State<AdminPanelPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ColorWheel.primaryBackground,
-      appBar: GlobalAppBar(
+      appBar: const GlobalAppBar(
         title: 'Admin Panel',
         showHomeButton: true,
       ),

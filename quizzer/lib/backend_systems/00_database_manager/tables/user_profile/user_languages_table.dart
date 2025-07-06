@@ -1,7 +1,8 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/table_helper.dart';
-import 'package:quizzer/backend_systems/10_switch_board/switch_board.dart';
+import 'package:quizzer/backend_systems/10_switch_board/sb_sync_worker_signals.dart';
+import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
 
 // TODO need to update outbound sync to sync these records
 
@@ -48,20 +49,26 @@ const String colUserLanguagesEditsAreSynced = 'edits_are_synced'; // INTEGER (0 
 // const List<int> validProficiencyLevels = [1, 2, 3, 4]; // 1:Native, 2:Fluent, 3:Conversational, 4:Basic // No longer used
 
 // --- Table Creation SQL ---
-Future<void> createUserLanguagesTable(DatabaseExecutor db) async {
-  await db.execute('''
-    CREATE TABLE IF NOT EXISTS $userLanguagesTable (
-      $colUserLanguagesUserUuid TEXT NOT NULL,
-      $colUserLanguagesLanguage TEXT NOT NULL,
-      $colUserLanguagesProficiency TEXT NOT NULL,
-      $colUserLanguagesLastModifiedTimestamp TEXT NOT NULL,
-      $colUserLanguagesHasBeenSynced INTEGER NOT NULL DEFAULT 0,
-      $colUserLanguagesEditsAreSynced INTEGER NOT NULL DEFAULT 0,
-      PRIMARY KEY ($colUserLanguagesUserUuid, $colUserLanguagesLanguage),
-      FOREIGN KEY ($colUserLanguagesUserUuid) REFERENCES user_profile ($colUserLanguagesUserUuid) ON DELETE CASCADE
-    )
-  ''');
-  QuizzerLogger.logMessage('$userLanguagesTable table created or already exists.');
+Future<void> createUserLanguagesTable() async {
+  final dbMonitor = getDatabaseMonitor();
+  final db = await dbMonitor.requestDatabaseAccess();
+  try {
+    await db!.execute('''
+      CREATE TABLE IF NOT EXISTS $userLanguagesTable (
+        $colUserLanguagesUserUuid TEXT NOT NULL,
+        $colUserLanguagesLanguage TEXT NOT NULL,
+        $colUserLanguagesProficiency TEXT NOT NULL,
+        $colUserLanguagesLastModifiedTimestamp TEXT NOT NULL,
+        $colUserLanguagesHasBeenSynced INTEGER NOT NULL DEFAULT 0,
+        $colUserLanguagesEditsAreSynced INTEGER NOT NULL DEFAULT 0,
+        PRIMARY KEY ($colUserLanguagesUserUuid, $colUserLanguagesLanguage),
+        FOREIGN KEY ($colUserLanguagesUserUuid) REFERENCES user_profile ($colUserLanguagesUserUuid) ON DELETE CASCADE
+      )
+    ''');
+    QuizzerLogger.logMessage('$userLanguagesTable table created or already exists.');
+  } finally {
+    dbMonitor.releaseDatabaseAccess();
+  }
 }
 
 // --- Add a User Language ---
@@ -73,39 +80,45 @@ Future<void> createUserLanguagesTable(DatabaseExecutor db) async {
 /// - 3: Conversational
 /// - 4: Basic
 /// The proficiency is stored as a descriptive string in the database.
-Future<void> addUserLanguage(Database db, {
+Future<void> addUserLanguage({
   required String userId,
   required String language,
   required int proficiencyLevel,
 }) async {
-  await createUserLanguagesTable(db); // Ensure table exists
+  final dbMonitor = getDatabaseMonitor();
+  final db = await dbMonitor.requestDatabaseAccess();
+  try {
+    await createUserLanguagesTable(); // Ensure table exists
 
-  if (!(proficiencyLevel >= 1 && proficiencyLevel <= 4)) {
-    final String errorMsg = 'Invalid proficiencyLevel: $proficiencyLevel for language "$language" for user $userId. Must be an integer between 1 and 4.';
-    QuizzerLogger.logError(errorMsg);
-    throw ArgumentError(errorMsg);
+    if (!(proficiencyLevel >= 1 && proficiencyLevel <= 4)) {
+      final String errorMsg = 'Invalid proficiencyLevel: $proficiencyLevel for language "$language" for user $userId. Must be an integer between 1 and 4.';
+      QuizzerLogger.logError(errorMsg);
+      throw ArgumentError(errorMsg);
+    }
+
+    final String currentTimestamp = DateTime.now().toUtc().toIso8601String();
+    final String proficiencyString = _getProficiencyString(proficiencyLevel);
+
+    final Map<String, dynamic> languageData = {
+      colUserLanguagesUserUuid: userId,
+      colUserLanguagesLanguage: language,
+      colUserLanguagesProficiency: proficiencyString, // Store as string
+      colUserLanguagesLastModifiedTimestamp: currentTimestamp,
+      colUserLanguagesHasBeenSynced: 0,
+      colUserLanguagesEditsAreSynced: 0,
+    };
+
+    await insertRawData(
+      userLanguagesTable,
+      languageData,
+      db,
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+    QuizzerLogger.logMessage('Added/Updated language "$language" (Proficiency: $proficiencyLevel) for user $userId.');
+    signalOutboundSyncNeeded();
+  } finally {
+    dbMonitor.releaseDatabaseAccess();
   }
-
-  final String currentTimestamp = DateTime.now().toUtc().toIso8601String();
-  final String proficiencyString = _getProficiencyString(proficiencyLevel);
-
-  final Map<String, dynamic> languageData = {
-    colUserLanguagesUserUuid: userId,
-    colUserLanguagesLanguage: language,
-    colUserLanguagesProficiency: proficiencyString, // Store as string
-    colUserLanguagesLastModifiedTimestamp: currentTimestamp,
-    colUserLanguagesHasBeenSynced: 0,
-    colUserLanguagesEditsAreSynced: 0,
-  };
-
-  await insertRawData(
-    userLanguagesTable,
-    languageData,
-    db,
-    conflictAlgorithm: ConflictAlgorithm.replace,
-  );
-  QuizzerLogger.logMessage('Added/Updated language "$language" (Proficiency: $proficiencyLevel) for user $userId.');
-  getSwitchBoard().signalOutboundSyncNeeded();
 }
 
 // --- Update User Language Proficiency ---
@@ -117,77 +130,101 @@ Future<void> addUserLanguage(Database db, {
 /// - 3: Conversational
 /// - 4: Basic
 /// The proficiency is stored as a descriptive string in the database.
-Future<void> updateUserLanguageProficiency(Database db, {
+Future<void> updateUserLanguageProficiency({
   required String userId,
   required String language,
   required int newProficiencyLevel,
 }) async {
-  await createUserLanguagesTable(db); // Ensure table exists
+  final dbMonitor = getDatabaseMonitor();
+  final db = await dbMonitor.requestDatabaseAccess();
+  try {
+    await createUserLanguagesTable(); // Ensure table exists
 
-  if (!(newProficiencyLevel >= 1 && newProficiencyLevel <= 4)) {
-    final String errorMsg = 'Invalid newProficiencyLevel: $newProficiencyLevel for language "$language" for user $userId. Must be an integer between 1 and 4.';
-    QuizzerLogger.logError(errorMsg);
-    throw ArgumentError(errorMsg);
-  }
+    if (!(newProficiencyLevel >= 1 && newProficiencyLevel <= 4)) {
+      final String errorMsg = 'Invalid newProficiencyLevel: $newProficiencyLevel for language "$language" for user $userId. Must be an integer between 1 and 4.';
+      QuizzerLogger.logError(errorMsg);
+      throw ArgumentError(errorMsg);
+    }
 
-  final String currentTimestamp = DateTime.now().toUtc().toIso8601String();
-  final String proficiencyString = _getProficiencyString(newProficiencyLevel);
+    final String currentTimestamp = DateTime.now().toUtc().toIso8601String();
+    final String proficiencyString = _getProficiencyString(newProficiencyLevel);
 
-  final Map<String, dynamic> updateData = {
-    colUserLanguagesProficiency: proficiencyString, // Store as string
-    colUserLanguagesLastModifiedTimestamp: currentTimestamp,
-    colUserLanguagesEditsAreSynced: 0,
-  };
+    final Map<String, dynamic> updateData = {
+      colUserLanguagesProficiency: proficiencyString, // Store as string
+      colUserLanguagesLastModifiedTimestamp: currentTimestamp,
+      colUserLanguagesEditsAreSynced: 0,
+    };
 
-  final int rowsAffected = await updateRawData(
-    userLanguagesTable,
-    updateData,
-    '$colUserLanguagesUserUuid = ? AND $colUserLanguagesLanguage = ?',
-    [userId, language], // Raw language for whereArg
-    db,
-  );
+    final int rowsAffected = await updateRawData(
+      userLanguagesTable,
+      updateData,
+      '$colUserLanguagesUserUuid = ? AND $colUserLanguagesLanguage = ?',
+      [userId, language], // Raw language for whereArg
+      db,
+    );
 
-  if (rowsAffected > 0) {
-    QuizzerLogger.logMessage('Updated proficiency for language "$language" to level $newProficiencyLevel for user $userId.');
-    getSwitchBoard().signalOutboundSyncNeeded();
-  } else {
-    QuizzerLogger.logWarning('Attempted to update proficiency for non-existent language "$language" for user $userId.');
+    if (rowsAffected > 0) {
+      QuizzerLogger.logMessage('Updated proficiency for language "$language" to level $newProficiencyLevel for user $userId.');
+      signalOutboundSyncNeeded();
+    } else {
+      QuizzerLogger.logWarning('Attempted to update proficiency for non-existent language "$language" for user $userId.');
+    }
+  } finally {
+    dbMonitor.releaseDatabaseAccess();
   }
 }
 
 // --- Remove a User Language ---
-Future<void> removeUserLanguage(Database db, {
+Future<void> removeUserLanguage({
   required String userId,
   required String language,
 }) async {
-  await createUserLanguagesTable(db); // Ensure table exists
-  await db.delete(
-    userLanguagesTable,
-    where: '$colUserLanguagesUserUuid = ? AND $colUserLanguagesLanguage = ?',
-    whereArgs: [userId, language], // Raw language for whereArg
-  );
-  QuizzerLogger.logMessage('Removed language "$language" for user $userId.');
-  // Note: Consider SwitchBoard signal if deletions need to be synced for RLS/other reasons.
+  final dbMonitor = getDatabaseMonitor();
+  final db = await dbMonitor.requestDatabaseAccess();
+  try {
+    await createUserLanguagesTable(); // Ensure table exists
+    await db!.delete(
+      userLanguagesTable,
+      where: '$colUserLanguagesUserUuid = ? AND $colUserLanguagesLanguage = ?',
+      whereArgs: [userId, language], // Raw language for whereArg
+    );
+    QuizzerLogger.logMessage('Removed language "$language" for user $userId.');
+    // Note: Consider SwitchBoard signal if deletions need to be synced for RLS/other reasons.
+  } finally {
+    dbMonitor.releaseDatabaseAccess();
+  }
 }
 
 // --- Get All Languages for a User ---
-Future<List<Map<String, dynamic>>> getUserLanguages(Database db, String userId) async {
-  await createUserLanguagesTable(db); // Ensure table exists
-  return await queryAndDecodeDatabase(
-    userLanguagesTable,
-    db,
-    where: '$colUserLanguagesUserUuid = ?',
-    whereArgs: [userId],
-  );
+Future<List<Map<String, dynamic>>> getUserLanguages(String userId) async {
+  final dbMonitor = getDatabaseMonitor();
+  final db = await dbMonitor.requestDatabaseAccess();
+  try {
+    await createUserLanguagesTable(); // Ensure table exists
+    return await queryAndDecodeDatabase(
+      userLanguagesTable,
+      db,
+      where: '$colUserLanguagesUserUuid = ?',
+      whereArgs: [userId],
+    );
+  } finally {
+    dbMonitor.releaseDatabaseAccess();
+  }
 }
 
 // --- Get Unsynced User Languages ---
-Future<List<Map<String, dynamic>>> getUnsyncedUserLanguages(Database db, String userId) async {
-  await createUserLanguagesTable(db); // Ensure table exists
-  return await queryAndDecodeDatabase(
-    userLanguagesTable,
-    db,
-    where: '$colUserLanguagesUserUuid = ? AND ($colUserLanguagesHasBeenSynced = 0 OR $colUserLanguagesEditsAreSynced = 0)',
-    whereArgs: [userId],
-  );
+Future<List<Map<String, dynamic>>> getUnsyncedUserLanguages(String userId) async {
+  final dbMonitor = getDatabaseMonitor();
+  final db = await dbMonitor.requestDatabaseAccess();
+  try {
+    await createUserLanguagesTable(); // Ensure table exists
+    return await queryAndDecodeDatabase(
+      userLanguagesTable,
+      db,
+      where: '$colUserLanguagesUserUuid = ? AND ($colUserLanguagesHasBeenSynced = 0 OR $colUserLanguagesEditsAreSynced = 0)',
+      whereArgs: [userId],
+    );
+  } finally {
+    dbMonitor.releaseDatabaseAccess();
+  }
 }

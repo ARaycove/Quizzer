@@ -74,7 +74,6 @@ class _NewUserPageState extends State<NewUserPage> {
             return;
         }
         if (!mounted) return;
-        session.addPageToHistory('/login');
         Navigator.pushReplacementNamed(context, '/login');
     }
 
@@ -196,7 +195,6 @@ class _NewUserPageState extends State<NewUserPage> {
                                         height: elementHeight25px,
                                         child: ElevatedButton(
                                             onPressed: () {
-                                              session.addPageToHistory('/login');
                                               Navigator.pushReplacementNamed(context, '/login');
                                             },
                                             style: ElevatedButton.styleFrom(

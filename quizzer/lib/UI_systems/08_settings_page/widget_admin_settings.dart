@@ -21,7 +21,7 @@ class WidgetAdminSettings extends StatelessWidget {
             color: ColorWheel.secondaryBackground,
             borderRadius: BorderRadius.circular(8.0),
           ),
-          child: Column(
+          child: const Column(
             children: <Widget>[
               GeminiApiKeySetting(),
               // Add other admin settings here in the future

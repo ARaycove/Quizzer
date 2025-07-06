@@ -11,12 +11,14 @@
             "id": "d47008925d227bd1",
             "type": "leaf",
             "state": {
-              "type": "excalidraw",
+              "type": "markdown",
               "state": {
-                "file": "Diagrams/Quizzer_Flow_Chart.md"
+                "file": "temp_notes.md",
+                "mode": "source",
+                "source": false
               },
-              "icon": "excalidraw-icon",
-              "title": "Quizzer_Flow_Chart"
+              "icon": "lucide-file",
+              "title": "temp_notes"
             }
           },
           {
@@ -116,8 +118,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 281.5,
-    "collapsed": true
+    "width": 281.5
   },
   "right": {
     "id": "1361b1d659fdf502",
@@ -208,9 +209,10 @@
       "obsidian-excalidraw-plugin:New drawing": false
     }
   },
-  "active": "461be212664fde00",
+  "active": "d47008925d227bd1",
   "lastOpenFiles": [
     "Diagrams/Quizzer_Flow_Chart.md",
+    "temp_notes.md",
     "Diagrams/Question_Answer_Pair_Generation.md",
     "Diagrams/NewUserSignUp-LoginPage.png",
     "Diagrams/LoginPage.png",
@@ -237,7 +239,6 @@
     "Core Documentation/Chapter 03 - Research Methodology/03_05_Task_02_Question_Answer_Pair_Generation.md",
     "Core Documentation/Chapter 03 - Research Methodology/03_04_Task_01_Source_Material_Generation_and_Classification.md",
     "Core Documentation/Chapter 03 - Research Methodology/03_03_breakdown_of_behavioral_tasks.md",
-    "Core Documentation/Chapter 03 - Research Methodology/03_02_Other_Considerations.md",
     "Untitled.canvas",
     "Core Documentation/Chapter 00 - Project Overview and Guidelines/general-guidelines.mdc",
     "Core Documentation/Chapter 00 - Project Overview and Guidelines",

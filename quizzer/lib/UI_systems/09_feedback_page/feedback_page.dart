@@ -108,7 +108,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ColorWheel.primaryBackground,
-      appBar: GlobalAppBar(
+      appBar: const GlobalAppBar(
         title: 'Give Feedback!',
         showHomeButton: true,
       ),

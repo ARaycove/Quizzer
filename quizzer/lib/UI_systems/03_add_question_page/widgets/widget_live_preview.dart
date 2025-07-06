@@ -48,15 +48,15 @@ class LivePreviewWidget extends StatelessWidget {
          questionType == 'select_all_that_apply' || 
          questionType == 'sort_order') 
         && options.isEmpty) {
-       return _buildPreviewError('Preview requires at least one option for type "$questionType".');
+       return _buildPreviewError('Preview requires at least one option for type $questionType.');
     } 
     // TODO: Add validation for correct index requirements if needed
 
     // --- Original Build Logic ---
     // Dummy callback for disabled widgets
-    final VoidCallback dummyOnNext = () {
+    void dummyOnNext() {
       QuizzerLogger.logWarning("onNextQuestion called on disabled preview widget.");
-    };
+    }
 
     // Key to potentially help Flutter update when data changes significantly
     // Include relevant data points that define the current preview state.
@@ -69,7 +69,7 @@ class LivePreviewWidget extends StatelessWidget {
       '${options.hashCode}_'
       '${correctOptionIndexMC}_'
       '${correctIndicesSATA.hashCode}_'
-      '${isCorrectAnswerTrueTF}'
+      '$isCorrectAnswerTrueTF'
     );
 
 
@@ -123,7 +123,7 @@ class LivePreviewWidget extends StatelessWidget {
         return Container(
           padding: ColorWheel.standardPadding,
           decoration: BoxDecoration(
-            color: ColorWheel.warning.withOpacity(0.1),
+            color: ColorWheel.warning.withValues(alpha: 0.1),
             border: Border.all(color: ColorWheel.warning),
             borderRadius: ColorWheel.cardBorderRadius,
           ),
@@ -144,8 +144,8 @@ class LivePreviewWidget extends StatelessWidget {
        padding: const EdgeInsets.all(16.0),
        alignment: Alignment.center,
        decoration: BoxDecoration(
-         color: ColorWheel.secondaryBackground.withOpacity(0.5),
-         border: Border.all(color: ColorWheel.warning.withOpacity(0.5)),
+         color: ColorWheel.secondaryBackground.withValues(alpha: 0.5),
+         border: Border.all(color: ColorWheel.warning.withValues(alpha: 0.5)),
          borderRadius: ColorWheel.cardBorderRadius,
        ),
        child: Text(

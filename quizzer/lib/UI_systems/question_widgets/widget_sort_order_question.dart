@@ -17,6 +17,11 @@ class SortOrderQuestionWidget extends StatefulWidget {
   final List<Map<String, dynamic>> options; // Correctly ordered options
   final bool isDisabled;
 
+  // New optional parameters for state control
+  final List<int>? customOrderIndices; // If provided, use this order instead of shuffling
+  final bool autoSubmitAnswer; // If true, automatically submit answer
+  final List<Map<String, dynamic>>? customUserOrder; // Must be provided if autoSubmitAnswer is true
+  
   // Callback
   final VoidCallback onNextQuestion;
 
@@ -27,6 +32,9 @@ class SortOrderQuestionWidget extends StatefulWidget {
     required this.options, // Assume these are the CORRECTLY ordered options
     required this.onNextQuestion,
     this.isDisabled = false,
+    this.customOrderIndices, // Optional custom order
+    this.autoSubmitAnswer = false, // Default to false
+    this.customUserOrder, // Optional custom user order
   });
 
   @override
@@ -55,7 +63,10 @@ class _SortOrderQuestionWidgetState extends State<SortOrderQuestionWidget> {
     super.didUpdateWidget(oldWidget);
     // Check if core data has changed
     if (!const ListEquality().equals(widget.options, oldWidget.options) ||
-        !const ListEquality().equals(widget.questionElements, oldWidget.questionElements)) {
+        !const ListEquality().equals(widget.questionElements, oldWidget.questionElements) ||
+        widget.customOrderIndices != oldWidget.customOrderIndices ||
+        widget.autoSubmitAnswer != oldWidget.autoSubmitAnswer ||
+        widget.customUserOrder != oldWidget.customUserOrder) {
       QuizzerLogger.logMessage(
           "SortOrderQuestionWidget didUpdateWidget: Data changed, resetting.");
       _loadAndPrepareOptions();
@@ -78,7 +89,25 @@ class _SortOrderQuestionWidgetState extends State<SortOrderQuestionWidget> {
         List<int>.generate(correctOrderOptions.length, (i) => i);
     List<Map<String, dynamic>> initialDisplayOptions;
 
-    if (widget.isDisabled) {
+    // Check if we should use SessionManager data for answered state
+    if (widget.autoSubmitAnswer && _session.lastSubmittedUserAnswer != null) {
+      // For sort order, the submitted answer is the custom user order
+      final submittedOrder = _session.lastSubmittedUserAnswer as List<Map<String, dynamic>>;
+      QuizzerLogger.logMessage("SortOrderWidget: Using SessionManager submitted order for auto-submit.");
+      initialDisplayOptions = List<Map<String, dynamic>>.from(submittedOrder);
+      // For sort order, we need to determine the index mapping from the submitted order
+      initialIndices = [];
+      for (var submittedItem in submittedOrder) {
+        int originalIndex = correctOrderOptions.indexWhere((option) => 
+          const MapEquality().equals(option, submittedItem));
+        initialIndices.add(originalIndex != -1 ? originalIndex : 0);
+      }
+    } else if (widget.customOrderIndices != null) {
+      // Use custom order if provided
+      QuizzerLogger.logMessage("SortOrderWidget: Using custom order indices: ${widget.customOrderIndices}");
+      initialIndices = List<int>.from(widget.customOrderIndices!);
+      initialDisplayOptions = initialIndices.map((i) => correctOrderOptions[i]).toList();
+    } else if (widget.isDisabled) {
       QuizzerLogger.logMessage("SortOrderWidget: Disabled, not shuffling.");
       initialDisplayOptions = List<Map<String, dynamic>>.from(correctOrderOptions);
       // Indices remain [0, 1, 2...]
@@ -94,24 +123,56 @@ class _SortOrderQuestionWidgetState extends State<SortOrderQuestionWidget> {
   }
 
   void _resetState(List<Map<String, dynamic>> initialOptions, List<int> initialIndexMapping) {
-     bool shouldAutoSubmit = widget.isDisabled;
+     bool shouldAutoSubmit = widget.isDisabled || widget.autoSubmitAnswer;
+     
+     // Determine initial state based on parameters
+     List<Map<String, dynamic>> finalOptions;
+     List<int> finalIndexMapping;
+     bool? finalCorrectness;
+     
+     if (shouldAutoSubmit && widget.autoSubmitAnswer && _session.lastSubmittedUserAnswer != null) {
+       // Use the submitted answer from SessionManager
+       final submittedOrder = _session.lastSubmittedUserAnswer as List<Map<String, dynamic>>;
+       finalOptions = List<Map<String, dynamic>>.from(submittedOrder);
+       finalIndexMapping = List<int>.from(initialIndexMapping);
+       finalCorrectness = _session.lastSubmittedIsCorrect;
+     } else if (shouldAutoSubmit && widget.customUserOrder != null) {
+       // Use the custom user order if provided
+       finalOptions = List<Map<String, dynamic>>.from(widget.customUserOrder!);
+       // For custom user order, we need to determine the index mapping
+       // This assumes the customUserOrder contains the same items as the original options
+       finalIndexMapping = [];
+       for (var customItem in finalOptions) {
+         int originalIndex = widget.options.indexWhere((option) => 
+           const MapEquality().equals(option, customItem));
+         finalIndexMapping.add(originalIndex != -1 ? originalIndex : 0);
+       }
+       // Determine correctness based on the custom order
+       final List<int> correctOrderOriginalIndices = List<int>.generate(widget.options.length, (i) => i);
+       finalCorrectness = const ListEquality().equals(finalIndexMapping, correctOrderOriginalIndices);
+     } else {
+       // Use the initial options and mapping
+       finalOptions = List<Map<String, dynamic>>.from(initialOptions);
+       finalIndexMapping = List<int>.from(initialIndexMapping);
+       finalCorrectness = shouldAutoSubmit ? true : null; // Assume correct for disabled preview
+     }
+     
      if (mounted) {
       setState(() {
-         _currentUserOrderedOptions = List<Map<String, dynamic>>.from(initialOptions); 
-         _originalIndices = List<int>.from(initialIndexMapping);
+         _currentUserOrderedOptions = finalOptions; 
+         _originalIndices = finalIndexMapping;
          _isAnswerSubmitted = shouldAutoSubmit; // Set submitted if disabled
-         // Assume correct for disabled preview, null otherwise
-         _isOverallCorrect = shouldAutoSubmit ? true : null; 
+         _isOverallCorrect = finalCorrectness; 
          _hoveredIndex = null;
          if (shouldAutoSubmit) {
-             QuizzerLogger.logMessage("SortOrderWidget: Disabled state, auto-setting submitted=true, correct=true for preview.");
+             QuizzerLogger.logMessage("SortOrderWidget: Auto-submit state, auto-setting submitted=true, correctness=$finalCorrectness for preview.");
          }
       });
     } else {
-        _currentUserOrderedOptions = List<Map<String, dynamic>>.from(initialOptions);
-        _originalIndices = List<int>.from(initialIndexMapping);
+        _currentUserOrderedOptions = finalOptions;
+        _originalIndices = finalIndexMapping;
         _isAnswerSubmitted = shouldAutoSubmit;
-        _isOverallCorrect = shouldAutoSubmit ? true : null;
+        _isOverallCorrect = finalCorrectness;
         _hoveredIndex = null;
     }
   }
@@ -152,7 +213,12 @@ class _SortOrderQuestionWidgetState extends State<SortOrderQuestionWidget> {
     });
 
     try {
-      // Submit the user's order (represented by the list of original indices)
+      // Set all submission data in SessionManager BEFORE calling submitAnswer
+      _session.setCurrentQuestionCustomOrderIndices(_originalIndices);
+      _session.setCurrentQuestionUserAnswer(_currentUserOrderedOptions);
+      _session.setCurrentQuestionIsCorrect(isCorrect);
+      
+      // Now call submitAnswer
       _session.submitAnswer(userAnswer: _currentUserOrderedOptions); 
       QuizzerLogger.logSuccess('Answer submission initiated (Sort Order).');
     } catch (e) {

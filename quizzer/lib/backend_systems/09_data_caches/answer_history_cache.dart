@@ -1,7 +1,8 @@
 import 'dart:async';
 import 'dart:math'; // For min function
 import 'package:synchronized/synchronized.dart';
-// import 'package:quizzer/backend_systems/logger/quizzer_logging.dart'; // Optional: if logging needed
+import 'package:quizzer/backend_systems/10_switch_board/sb_cache_signals.dart'; // Import cache signals
+import 'package:quizzer/backend_systems/logger/quizzer_logging.dart'; // Added for error handling
 
 // ==========================================
 /// Cache storing an ordered history of recently answered question IDs.
@@ -22,20 +23,34 @@ class AnswerHistoryCache {
   /// If the ID already exists, it is moved to the front.
   /// Asserts that the questionId is not empty.
   /// Ensures thread safety using a lock.
+  /// Signals the SwitchBoard when a question is added.
   Future<void> addRecord(String questionId) async {
-    // Assert required key exists and is not empty
-    assert(questionId.isNotEmpty, 'questionId added to AnswerHistoryCache cannot be empty');
+    try {
+      QuizzerLogger.logMessage('Entering AnswerHistoryCache addRecord()...');
+      // Assert required key exists and is not empty
+      assert(questionId.isNotEmpty, 'questionId added to AnswerHistoryCache cannot be empty');
 
-    await _lock.synchronized(() {
-      // Remove if already exists to ensure it moves to the front (most recent)
-      _history.remove(questionId);
-      // Add to the front of the list
-      _history.insert(0, questionId);
-      // Optional: Trim the list if it grows too large, e.g.:
-      // if (_history.length > 1000) { // Example limit
-      //   _history.removeRange(1000, _history.length);
-      // }
-    });
+      await _lock.synchronized(() {
+        // Remove if already exists to ensure it moves to the front (most recent)
+        final bool wasRemoved = _history.remove(questionId);
+        if (wasRemoved) {
+          // Signal that the question was removed from its previous position
+          signalAnswerHistoryRemoved();
+        }
+        // Add to the front of the list
+        _history.insert(0, questionId);
+        // Optional: Trim the list if it grows too large, e.g.:
+        // if (_history.length > 1000) { // Example limit
+        //   _history.removeRange(1000, _history.length);
+        // }
+      });
+      
+      // Signal that a question has been added to history
+      signalAnswerHistoryAdded();
+    } catch (e) {
+      QuizzerLogger.logError('Error in AnswerHistoryCache addRecord - $e');
+      rethrow;
+    }
   }
 
   // --- Check Recent History ---
@@ -44,31 +59,37 @@ class AnswerHistoryCache {
   /// Asserts that the questionId is not empty.
   /// Ensures thread safety using a lock.
   Future<bool> isInRecentHistory(String questionId) async {
-     // Assert questionId is not empty
-     assert(questionId.isNotEmpty, 'questionId checked in AnswerHistoryCache cannot be empty');
+     try {
+       QuizzerLogger.logMessage('Entering AnswerHistoryCache isInRecentHistory()...');
+       // Assert questionId is not empty
+       assert(questionId.isNotEmpty, 'questionId checked in AnswerHistoryCache cannot be empty');
 
-     return await _lock.synchronized(() {
-       final int historyLength = _history.length;
-       // Determine the range to check (first 5 or fewer if history is shorter)
-       final int checkDepth = min(5, historyLength);
+       return await _lock.synchronized(() {
+         final int historyLength = _history.length;
+         // Determine the range to check (first 5 or fewer if history is shorter)
+         final int checkDepth = min(5, historyLength);
 
-       if (checkDepth == 0) {
-         return false; // History is empty
-       }
+         if (checkDepth == 0) {
+           return false; // History is empty
+         }
 
-       // Get the sublist representing the first 'checkDepth' items (most recent)
-       final List<String> recentSublist = _history.sublist(0, checkDepth);
-       final bool found = recentSublist.contains(questionId);
+         // Get the sublist representing the first 'checkDepth' items (most recent)
+         final List<String> recentSublist = _history.sublist(0, checkDepth);
+         final bool found = recentSublist.contains(questionId);
 
-       // Optional logging
-       // if (found) {
-       //     QuizzerLogger.logMessage('Checked last $checkDepth answered: $questionId IS present.');
-       // } else {
-       //    QuizzerLogger.logMessage('Checked last $checkDepth answered: $questionId is NOT present.');
-       // }
+         // Optional logging
+         // if (found) {
+         //     QuizzerLogger.logMessage('Checked last $checkDepth answered: $questionId IS present.');
+         // } else {
+         //    QuizzerLogger.logMessage('Checked last $checkDepth answered: $questionId is NOT present.');
+         // }
 
-       return found;
-     });
+         return found;
+       });
+     } catch (e) {
+       QuizzerLogger.logError('Error in AnswerHistoryCache isInRecentHistory - $e');
+       rethrow;
+     }
   }
 
   // --- Clear Cache ---
@@ -76,18 +97,32 @@ class AnswerHistoryCache {
   /// Clears all entries from the answer history cache.
   /// Ensures thread safety using a lock.
   Future<void> clear() async {
-    await _lock.synchronized(() {
-      if (_history.isNotEmpty) {
-        _history.clear();
-        // QuizzerLogger.logMessage('AnswerHistoryCache cleared.'); // Optional log
-      }
-    });
+    try {
+      QuizzerLogger.logMessage('Entering AnswerHistoryCache clear()...');
+      await _lock.synchronized(() {
+        if (_history.isNotEmpty) {
+          // Signal that records were removed (single signal for clear operation)
+          signalAnswerHistoryRemoved();
+          _history.clear();
+          // QuizzerLogger.logMessage('AnswerHistoryCache cleared.'); // Optional log
+        }
+      });
+    } catch (e) {
+      QuizzerLogger.logError('Error in AnswerHistoryCache clear - $e');
+      rethrow;
+    }
   }
 
   // Optional: Method to peek at the history if needed for debugging/inspection
   Future<List<String>> peekHistory() async {
-    return await _lock.synchronized(() {
-      return List<String>.from(_history);
-    });
+    try {
+      QuizzerLogger.logMessage('Entering AnswerHistoryCache peekHistory()...');
+      return await _lock.synchronized(() {
+        return List<String>.from(_history);
+      });
+    } catch (e) {
+      QuizzerLogger.logError('Error in AnswerHistoryCache peekHistory - $e');
+      rethrow;
+    }
   }
 }

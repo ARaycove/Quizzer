@@ -16,6 +16,11 @@ class TrueFalseQuestionWidget extends StatefulWidget {
   final bool isCorrectAnswerTrue; // True if the correct answer is 'True'
   final bool isDisabled;
 
+  // New optional parameters for state control
+  final List<int>? customOrderIndices; // If provided, use this order instead of shuffling (for True/False, this controls which comes first)
+  final bool autoSubmitAnswer; // If true, automatically submit answer
+  final bool? selectedAnswer; // Must be provided if autoSubmitAnswer is true
+  
   // Callback
   final VoidCallback onNextQuestion;
 
@@ -26,6 +31,9 @@ class TrueFalseQuestionWidget extends StatefulWidget {
     required this.isCorrectAnswerTrue,
     required this.onNextQuestion,
     this.isDisabled = false,
+    this.customOrderIndices, // Optional custom order
+    this.autoSubmitAnswer = false, // Default to false
+    this.selectedAnswer, // Optional selected answer
   });
 
   @override
@@ -51,7 +59,10 @@ class _TrueFalseQuestionWidgetState extends State<TrueFalseQuestionWidget> {
   void didUpdateWidget(covariant TrueFalseQuestionWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.questionElements != oldWidget.questionElements ||
-        widget.isCorrectAnswerTrue != oldWidget.isCorrectAnswerTrue) {
+        widget.isCorrectAnswerTrue != oldWidget.isCorrectAnswerTrue ||
+        widget.customOrderIndices != oldWidget.customOrderIndices ||
+        widget.autoSubmitAnswer != oldWidget.autoSubmitAnswer ||
+        widget.selectedAnswer != oldWidget.selectedAnswer) {
        QuizzerLogger.logMessage("TrueFalseQuestionWidget didUpdateWidget: Data changed, resetting.");
       _shuffleOrderAndResetState();
     } else {
@@ -60,22 +71,50 @@ class _TrueFalseQuestionWidgetState extends State<TrueFalseQuestionWidget> {
   }
 
   void _shuffleOrderAndResetState() {
-    bool shouldShuffle = !widget.isDisabled;
-    bool shouldAutoSubmit = widget.isDisabled;
-    // Set selected state for disabled preview
-    bool? defaultSelectedAnswer = shouldAutoSubmit ? widget.isCorrectAnswerTrue : null;
+    bool shouldShuffle = !widget.isDisabled && widget.customOrderIndices == null;
+    bool shouldAutoSubmit = widget.isDisabled || widget.autoSubmitAnswer;
+    
+    // Determine the order of True/False buttons
+    bool isTrueFirst;
+    if (widget.autoSubmitAnswer && _session.lastSubmittedUserAnswer != null) {
+      // For True/False, we don't need custom order indices, just use default order
+      isTrueFirst = true; // Default order for answered state
+      QuizzerLogger.logMessage("TrueFalseWidget: Using SessionManager data for auto-submit.");
+    } else if (widget.customOrderIndices != null) {
+      // Use custom order if provided (for True/False, this determines which comes first)
+      // customOrderIndices[0] == 0 means True first, customOrderIndices[0] == 1 means False first
+      isTrueFirst = widget.customOrderIndices![0] == 0;
+      QuizzerLogger.logMessage("TrueFalseWidget: Using custom order indices: ${widget.customOrderIndices}");
+    } else if (widget.isDisabled) {
+      isTrueFirst = true; // Default order for disabled state
+    } else {
+      isTrueFirst = Random().nextBool(); // Random order for enabled state
+    }
+    
+    // Set selected state for disabled preview or auto submit
+    bool? defaultSelectedAnswer;
+    if (shouldAutoSubmit) {
+      if (widget.autoSubmitAnswer && _session.lastSubmittedUserAnswer != null) {
+        // Use the submitted answer from SessionManager
+        defaultSelectedAnswer = _session.lastSubmittedUserAnswer as bool;
+      } else if (widget.selectedAnswer != null) {
+        defaultSelectedAnswer = widget.selectedAnswer;
+      } else {
+        defaultSelectedAnswer = widget.isCorrectAnswerTrue; // Fallback to correct answer
+      }
+    }
     
     if (mounted) {
        setState(() {
          _selectedAnswer = defaultSelectedAnswer;
          _isAnswerSubmitted = shouldAutoSubmit; // Set submitted if disabled
-         _isTrueFirst = widget.isDisabled ? true : Random().nextBool(); 
+         _isTrueFirst = isTrueFirst; 
          QuizzerLogger.logValue("TF Widget Reset. ShouldShuffle: $shouldShuffle, IsTrueFirst: $_isTrueFirst, AutoSubmit: $shouldAutoSubmit");
        });
     } else {
          _selectedAnswer = defaultSelectedAnswer;
          _isAnswerSubmitted = shouldAutoSubmit;
-         _isTrueFirst = widget.isDisabled ? true : Random().nextBool(); 
+         _isTrueFirst = isTrueFirst; 
          QuizzerLogger.logValue("TF Widget Init. ShouldShuffle: $shouldShuffle, IsTrueFirst: $_isTrueFirst, AutoSubmit: $shouldAutoSubmit");
     }
   }
@@ -90,7 +129,16 @@ class _TrueFalseQuestionWidgetState extends State<TrueFalseQuestionWidget> {
     });
 
     try {
-      // Pass boolean directly to session manager
+      // Set all submission data in SessionManager BEFORE calling submitAnswer
+      // For True/False, we don't need custom order indices, but set empty list for consistency
+      _session.setCurrentQuestionCustomOrderIndices([]);
+      _session.setCurrentQuestionUserAnswer(selectedValue);
+      
+      // Determine correctness and set it
+      final bool isCorrect = selectedValue == widget.isCorrectAnswerTrue;
+      _session.setCurrentQuestionIsCorrect(isCorrect);
+      
+      // Now call submitAnswer
       _session.submitAnswer(userAnswer: selectedValue); 
       QuizzerLogger.logSuccess('Answer submission initiated (True/False).');
     } catch (e) {

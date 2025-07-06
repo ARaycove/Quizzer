@@ -1,3 +1,5 @@
+import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
+
 /// Validates a user's answer for a multiple-choice question.
 /// 
 /// Args:
@@ -10,9 +12,15 @@ bool validateMultipleChoiceAnswer({
   required dynamic userAnswer,
   required int? correctIndex,
 }) {
-  // Check if user answer is the correct type and value
-  final bool isCorrect = (userAnswer is int && userAnswer == correctIndex);
-  return isCorrect;
+  try {
+    QuizzerLogger.logMessage('Entering validateMultipleChoiceAnswer()...');
+    // Check if user answer is the correct type and value
+    final bool isCorrect = (userAnswer is int && userAnswer == correctIndex);
+    return isCorrect;
+  } catch (e) {
+    QuizzerLogger.logError('Error in validateMultipleChoiceAnswer - $e');
+    rethrow;
+  }
 }
 
 /// Validates a user's answer for a select-all-that-apply question.
@@ -27,24 +35,30 @@ bool validateSelectAllThatApplyAnswer({
   required dynamic userAnswer,
   required List<int> correctIndices,
 }) {
-  // 1. Check if userAnswer is a List<int>
-  if (userAnswer is! List<int>) {
-    return false; // Incorrect type
+  try {
+    QuizzerLogger.logMessage('Entering validateSelectAllThatApplyAnswer()...');
+    // 1. Check if userAnswer is a List<int>
+    if (userAnswer is! List<int>) {
+      return false; // Incorrect type
+    }
+
+    // 2. Check if the lists have the same length
+    if (userAnswer.length != correctIndices.length) {
+      return false; // Different number of selections
+    }
+
+    // 3. Check if both lists contain the same elements (order doesn't matter)
+    // Convert both to Sets for efficient comparison
+    final Set<int> userAnswerSet = Set<int>.from(userAnswer);
+    final Set<int> correctIndicesSet = Set<int>.from(correctIndices);
+
+    // Check if the sets are equal (contain the same elements)
+    return userAnswerSet.length == correctIndicesSet.length && // Ensure no duplicates affected length check
+           userAnswerSet.containsAll(correctIndicesSet);
+  } catch (e) {
+    QuizzerLogger.logError('Error in validateSelectAllThatApplyAnswer - $e');
+    rethrow;
   }
-
-  // 2. Check if the lists have the same length
-  if (userAnswer.length != correctIndices.length) {
-    return false; // Different number of selections
-  }
-
-  // 3. Check if both lists contain the same elements (order doesn't matter)
-  // Convert both to Sets for efficient comparison
-  final Set<int> userAnswerSet = Set<int>.from(userAnswer);
-  final Set<int> correctIndicesSet = Set<int>.from(correctIndices);
-
-  // Check if the sets are equal (contain the same elements)
-  return userAnswerSet.length == correctIndicesSet.length && // Ensure no duplicates affected length check
-         userAnswerSet.containsAll(correctIndicesSet);
 }
 
 /// Validates a user's answer for a true/false question.
@@ -59,13 +73,19 @@ bool validateTrueFalseAnswer({
   required dynamic userAnswer,
   required int correctIndex,
 }) {
-  // Basic validation: correctIndex must be 0 or 1 for true/false
-  assert(correctIndex == 0 || correctIndex == 1, 
-         'Invalid correctIndex ($correctIndex) for true/false validation.');
+  try {
+    QuizzerLogger.logMessage('Entering validateTrueFalseAnswer()...');
+    // Basic validation: correctIndex must be 0 or 1 for true/false
+    assert(correctIndex == 0 || correctIndex == 1, 
+           'Invalid correctIndex ($correctIndex) for true/false validation.');
 
-  // Check if user answer is the correct type (int) and value (0 or 1) and matches the correct index
-  final bool isCorrect = (userAnswer is int && userAnswer == correctIndex);
-  return isCorrect;
+    // Check if user answer is the correct type (int) and value (0 or 1) and matches the correct index
+    final bool isCorrect = (userAnswer is int && userAnswer == correctIndex);
+    return isCorrect;
+  } catch (e) {
+    QuizzerLogger.logError('Error in validateTrueFalseAnswer - $e');
+    rethrow;
+  }
 }
 
 // --- Sort Order Validation ---
@@ -82,32 +102,38 @@ bool validateSortOrderAnswer({
   required List<Map<String, dynamic>> userAnswer,
   required List<Map<String, dynamic>> correctOrder,
 }) {
-  // 1. Check if lists have the same length
-  //    (Type check List<Map<String, dynamic>> is handled by the function signature)
-  if (userAnswer.length != correctOrder.length) {
-    return false; // Different number of items
-  }
-
-  // 2. Compare elements element by element based on 'content' field
-  for (int i = 0; i < correctOrder.length; i++) {
-    final userMap = userAnswer[i];
-    final correctMap = correctOrder[i];
-
-    // Basic check: ensure both are maps and contain 'content'
-    // Using `containsKey` for safety, though `[]` access would throw on missing key (Fail Fast)
-    if (!userMap.containsKey('content') || !correctMap.containsKey('content')) {
-        // Or log error and return false if missing keys are invalid states
-        throw StateError('Sort order element map missing \'content\' key at index $i');
+  try {
+    QuizzerLogger.logMessage('Entering validateSortOrderAnswer()...');
+    // 1. Check if lists have the same length
+    //    (Type check List<Map<String, dynamic>> is handled by the function signature)
+    if (userAnswer.length != correctOrder.length) {
+      return false; // Different number of items
     }
 
-    // Compare the content fields
-    if (userMap['content'] != correctMap['content']) {
-      return false; // Mismatch found at this position
-    }
-  }
+    // 2. Compare elements element by element based on 'content' field
+    for (int i = 0; i < correctOrder.length; i++) {
+      final userMap = userAnswer[i];
+      final correctMap = correctOrder[i];
 
-  // If all elements matched in order based on content, the answer is correct
-  return true;
+      // Basic check: ensure both are maps and contain 'content'
+      // Using `containsKey` for safety, though `[]` access would throw on missing key (Fail Fast)
+      if (!userMap.containsKey('content') || !correctMap.containsKey('content')) {
+          // Or log error and return false if missing keys are invalid states
+          throw StateError('Sort order element map missing \'content\' key at index $i');
+      }
+
+      // Compare the content fields
+      if (userMap['content'] != correctMap['content']) {
+        return false; // Mismatch found at this position
+      }
+    }
+
+    // If all elements matched in order based on content, the answer is correct
+    return true;
+  } catch (e) {
+    QuizzerLogger.logError('Error in validateSortOrderAnswer - $e');
+    rethrow;
+  }
 }
 
 

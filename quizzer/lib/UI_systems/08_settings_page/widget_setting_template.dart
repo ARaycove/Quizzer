@@ -22,6 +22,7 @@ class WidgetSettingTemplate extends StatefulWidget {
 class _WidgetSettingTemplateState extends State<WidgetSettingTemplate> {
   late TextEditingController _textController;
   bool _isEditing = false;
+  bool _isLoading = false;
   late String _currentValue;
   final FocusNode _focusNode = FocusNode();
 
@@ -56,12 +57,15 @@ class _WidgetSettingTemplateState extends State<WidgetSettingTemplate> {
       _focusNode.unfocus();
       return;
     }
-    // TODO: Add loading indicator while saving
+    setState(() {
+      _isLoading = true;
+    });
     try {
       await widget.onSave(_textController.text);
       setState(() {
         _currentValue = _textController.text;
         _isEditing = false;
+        _isLoading = false;
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -69,6 +73,9 @@ class _WidgetSettingTemplateState extends State<WidgetSettingTemplate> {
         );
       }
     } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to update ${widget.settingName}: $e')),
@@ -127,20 +134,26 @@ class _WidgetSettingTemplateState extends State<WidgetSettingTemplate> {
             Row(
               children: [
                 ElevatedButton(
-                  onPressed: _handleSave,
+                  onPressed: _isLoading ? null : _handleSave,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: ColorWheel.buttonSuccess,
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8), // Adjusted padding
                     shape: RoundedRectangleBorder(borderRadius: ColorWheel.buttonBorderRadius),
                   ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.check, color: ColorWheel.primaryText, size: 18),
-                      const SizedBox(height: 1),
-                      Text('Submit', style: ColorWheel.buttonText.copyWith(fontSize: 9)),
-                    ],
-                  ),
+                  child: _isLoading 
+                    ? const SizedBox(
+                        width: 18, 
+                        height: 18, 
+                        child: CircularProgressIndicator(color: ColorWheel.primaryText, strokeWidth: 2)
+                      )
+                    : Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.check, color: ColorWheel.primaryText, size: 18),
+                          const SizedBox(height: 1),
+                          Text('Submit', style: ColorWheel.buttonText.copyWith(fontSize: 9)),
+                        ],
+                      ),
                 ),
                 const SizedBox(width: 8),
                 ElevatedButton(

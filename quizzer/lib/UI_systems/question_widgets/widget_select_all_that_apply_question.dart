@@ -4,6 +4,7 @@ import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/UI_systems/color_wheel.dart';
 import 'dart:math';
 import 'package:quizzer/UI_systems/global_widgets/question_answer_element.dart';
+import 'package:collection/collection.dart';
 
 // ==========================================
 //  Select All That Apply Question Widget
@@ -17,6 +18,11 @@ class SelectAllThatApplyQuestionWidget extends StatefulWidget {
   final List<int> correctIndices; // Original correct indices
   final bool isDisabled;
   
+  // New optional parameters for state control
+  final List<int>? customOrderIndices; // If provided, use this order instead of shuffling
+  final bool autoSubmitAnswer; // If true, automatically submit answer
+  final List<int>? selectedIndices; // Must be provided if autoSubmitAnswer is true
+  
   // Callback
   final VoidCallback onNextQuestion;
 
@@ -28,6 +34,9 @@ class SelectAllThatApplyQuestionWidget extends StatefulWidget {
     required this.correctIndices,
     required this.onNextQuestion,
     this.isDisabled = false,
+    this.customOrderIndices, // Optional custom order
+    this.autoSubmitAnswer = false, // Default to false
+    this.selectedIndices, // Optional selected indices
   });
 
   @override
@@ -56,7 +65,11 @@ class _SelectAllThatApplyQuestionWidgetState
   @override
   void didUpdateWidget(covariant SelectAllThatApplyQuestionWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.options != oldWidget.options || widget.correctIndices != oldWidget.correctIndices) {
+    if (widget.options != oldWidget.options || 
+        widget.correctIndices != oldWidget.correctIndices ||
+        widget.customOrderIndices != oldWidget.customOrderIndices ||
+        widget.autoSubmitAnswer != oldWidget.autoSubmitAnswer ||
+        widget.selectedIndices != oldWidget.selectedIndices) {
         QuizzerLogger.logMessage("SelectAllThatApplyQuestionWidget didUpdateWidget: Data changed, shuffling.");
         _loadAndShuffleOptions();
     } else {
@@ -84,7 +97,25 @@ class _SelectAllThatApplyQuestionWidgetState
     List<Map<String, dynamic>> newShuffledOptions;
     List<int> newOriginalIndices;
 
-    if (widget.isDisabled) {
+    // Check if we should use SessionManager data for answered state
+    if (widget.autoSubmitAnswer && _session.lastSubmittedUserAnswer != null) {
+      // Use the custom order from SessionManager if available
+      if (_session.lastSubmittedCustomOrderIndices != null) {
+        QuizzerLogger.logMessage("SelectAllThatApplyQuestionWidget: Using SessionManager custom order indices: ${_session.lastSubmittedCustomOrderIndices}");
+        newOriginalIndices = List<int>.from(_session.lastSubmittedCustomOrderIndices!);
+        newShuffledOptions = newOriginalIndices.map((i) => originalOptions[i]).toList();
+      } else {
+        // Fallback to original order if no custom order stored
+        QuizzerLogger.logMessage("SelectAllThatApplyQuestionWidget: No custom order in SessionManager, using original order.");
+        newShuffledOptions = List<Map<String, dynamic>>.from(originalOptions);
+        newOriginalIndices = List<int>.generate(originalOptions.length, (i) => i);
+      }
+    } else if (widget.customOrderIndices != null) {
+      // Use custom order if provided
+      QuizzerLogger.logMessage("SelectAllThatApplyQuestionWidget: Using custom order indices: ${widget.customOrderIndices}");
+      newOriginalIndices = List<int>.from(widget.customOrderIndices!);
+      newShuffledOptions = newOriginalIndices.map((i) => originalOptions[i]).toList();
+    } else if (widget.isDisabled) {
       // If disabled, do not shuffle.
       QuizzerLogger.logMessage("SelectAllThatApplyQuestionWidget: Disabled state, not shuffling.");
       newShuffledOptions = List<Map<String, dynamic>>.from(originalOptions);
@@ -98,18 +129,37 @@ class _SelectAllThatApplyQuestionWidgetState
       newOriginalIndices = indices;
     }
     
-    // Determine default selections for disabled preview
-    bool shouldAutoSubmit = widget.isDisabled;
+    // Determine default selections for disabled preview or auto submit
+    bool shouldAutoSubmit = widget.isDisabled || widget.autoSubmitAnswer;
     Set<int> defaultSelectedIndices = {};
     if (shouldAutoSubmit) {
-      // Find the *shuffled* indices that correspond to the correct *original* indices
-      for (int i = 0; i < newOriginalIndices.length; i++) {
-         // newOriginalIndices[i] gives the original index for the item at shuffled position i
-         if (widget.correctIndices.contains(newOriginalIndices[i])) {
-             defaultSelectedIndices.add(i); // Add the shuffled index `i`
-         }
+      if (widget.autoSubmitAnswer && _session.lastSubmittedUserAnswer != null) {
+        // Use the submitted answer from SessionManager
+        final submittedAnswers = _session.lastSubmittedUserAnswer as List<int>;
+        for (int selectedOriginalIndex in submittedAnswers) {
+          int shuffledIndex = newOriginalIndices.indexOf(selectedOriginalIndex);
+          if (shuffledIndex != -1) {
+            defaultSelectedIndices.add(shuffledIndex);
+          }
+        }
+      } else if (widget.selectedIndices != null) {
+        // Use the provided selected indices (find their positions in the current order)
+        for (int selectedOriginalIndex in widget.selectedIndices!) {
+          int shuffledIndex = newOriginalIndices.indexOf(selectedOriginalIndex);
+          if (shuffledIndex != -1) {
+            defaultSelectedIndices.add(shuffledIndex);
+          }
+        }
+      } else {
+        // Fallback to correct indices if no selected indices provided
+        for (int i = 0; i < newOriginalIndices.length; i++) {
+           // newOriginalIndices[i] gives the original index for the item at shuffled position i
+           if (widget.correctIndices.contains(newOriginalIndices[i])) {
+               defaultSelectedIndices.add(i); // Add the shuffled index `i`
+           }
+        }
       }
-      QuizzerLogger.logMessage("SATA: Disabled state, auto-setting submitted=true, selectedIndices(shuffled)=$defaultSelectedIndices for preview.");
+      QuizzerLogger.logMessage("SATA: Auto-submit state, auto-setting submitted=true, selectedIndices(shuffled)=$defaultSelectedIndices for preview.");
     }
 
     if (mounted) {
@@ -157,6 +207,15 @@ class _SelectAllThatApplyQuestionWidgetState
     });
 
     try {
+      // Set all submission data in SessionManager BEFORE calling submitAnswer
+      _session.setCurrentQuestionCustomOrderIndices(_originalIndices);
+      _session.setCurrentQuestionUserAnswer(selectedOriginalIndices);
+      
+      // Determine correctness and set it
+      final bool isCorrect = const ListEquality().equals(selectedOriginalIndices, widget.correctIndices);
+      _session.setCurrentQuestionIsCorrect(isCorrect);
+      
+      // Now call submitAnswer
       _session.submitAnswer(userAnswer: selectedOriginalIndices); 
       QuizzerLogger.logSuccess('Answer submission initiated (Select All).');
     } catch (e) {

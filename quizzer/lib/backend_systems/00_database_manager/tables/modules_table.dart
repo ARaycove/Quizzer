@@ -1,6 +1,7 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'table_helper.dart'; // Import the helper file
+import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
 
 // TODO setup outbound sync of description field and module names
 
@@ -15,10 +16,8 @@ const String descriptionField = 'description';
 const String primarySubjectField = 'primary_subject';
 const String subjectsField = 'subjects';
 const String relatedConceptsField = 'related_concepts';
-const String questionIdsField = 'question_ids';
 const String creationDateField = 'creation_date';
 const String creatorIdField = 'creator_id';
-const String totalQuestionsField = 'total_questions';
 
 // Create table SQL
 const String createModulesTableSQL = '''
@@ -28,10 +27,8 @@ const String createModulesTableSQL = '''
     $primarySubjectField TEXT,
     $subjectsField TEXT,
     $relatedConceptsField TEXT,
-    $questionIdsField TEXT,
     $creationDateField TEXT,
     $creatorIdField TEXT,
-    $totalQuestionsField INTEGER,
     has_been_synced INTEGER DEFAULT 0,
     edits_are_synced INTEGER DEFAULT 0,
     last_modified_timestamp TEXT
@@ -39,7 +36,7 @@ const String createModulesTableSQL = '''
 ''';
 
 // Verify table exists and create if needed
-Future<void> verifyModulesTable(dynamic db) async {
+Future<void> _verifyModulesTable(dynamic db) async {
   QuizzerLogger.logMessage('Verifying modules table existence');
   final List<Map<String, dynamic>> tables = await db.rawQuery(
     "SELECT name FROM sqlite_master WHERE type='table' AND name='$modulesTableName'"
@@ -64,7 +61,9 @@ Future<void> verifyModulesTable(dynamic db) async {
     final oldFields = [
       'last_modified',
       'has_been_synced_with_central_db',
-      'last_sync_with_central_db'
+      'last_sync_with_central_db',
+      'question_ids',
+      'total_questions'
     ];
     
     for (final field in oldFields) {
@@ -99,206 +98,251 @@ Future<void> insertModule({
   required String primarySubject,
   required List<String> subjects,
   required List<String> relatedConcepts,
-  required List<String> questionIds,
   required String creatorId,
-  required Database db,
 }) async {
-  QuizzerLogger.logMessage('Inserting new module: $name');
-  await verifyModulesTable(db);
-  final now = DateTime.now().toUtc().toIso8601String();
-  
-  // Prepare the raw data map - join lists into strings as needed by schema
-  final Map<String, dynamic> data = {
-    moduleNameField: name,
-    descriptionField: description,
-    primarySubjectField: primarySubject,
-    subjectsField: subjects, // Pass raw list for JSON encoding
-    relatedConceptsField: relatedConcepts, // Pass raw list for JSON encoding
-    questionIdsField: questionIds, // Pass raw list for JSON encoding
-    creationDateField: now,
-    creatorIdField: creatorId,
-    totalQuestionsField: questionIds.length,
-    'has_been_synced': 0,
-    'edits_are_synced': 0,
-    'last_modified_timestamp': DateTime.now().toUtc().toIso8601String()
-  };
+  try {
+    final db = await getDatabaseMonitor().requestDatabaseAccess();
+    if (db == null) {
+      throw Exception('Failed to acquire database access');
+    }
+    QuizzerLogger.logMessage('Inserting new module: $name');
+    await _verifyModulesTable(db);
+    final now = DateTime.now().toUtc().toIso8601String();
+    
+    // Prepare the raw data map - join lists into strings as needed by schema
+    final Map<String, dynamic> data = {
+      moduleNameField: name,
+      descriptionField: description,
+      primarySubjectField: primarySubject,
+      subjectsField: subjects, // Pass raw list for JSON encoding
+      relatedConceptsField: relatedConcepts, // Pass raw list for JSON encoding
+      creationDateField: now,
+      creatorIdField: creatorId,
+      'has_been_synced': 0,
+      'edits_are_synced': 0,
+      'last_modified_timestamp': DateTime.now().toUtc().toIso8601String()
+    };
 
-  // Use the universal insert helper with ConflictAlgorithm.replace
-  final int result = await insertRawData(
-    modulesTableName,
-    data,
-    db,
-    conflictAlgorithm: ConflictAlgorithm.replace,
-  );
-  
-  // Log based on result (insertRawData returns row ID or 0/-1 on failure/ignore)
-  if (result > 0) { // replace returns rowID
-    QuizzerLogger.logSuccess('Module $name inserted/replaced successfully');
-  } else {
-     // This case might indicate an issue if replace was expected to always work
-     QuizzerLogger.logWarning('Insert/replace operation for module $name returned $result.');
+    // Use the universal insert helper with ConflictAlgorithm.replace
+    final int result = await insertRawData(
+      modulesTableName,
+      data,
+      db,
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+    
+    // Log based on result (insertRawData returns row ID or 0/-1 on failure/ignore)
+    if (result > 0) { // replace returns rowID
+      QuizzerLogger.logSuccess('Module $name inserted/replaced successfully');
+    } else {
+       // This case might indicate an issue if replace was expected to always work
+       QuizzerLogger.logWarning('Insert/replace operation for module $name returned $result.');
+    }
+  } catch (e) {
+    QuizzerLogger.logError('Error inserting module - $e');
+    rethrow;
+  } finally {
+    getDatabaseMonitor().releaseDatabaseAccess();
   }
 }
 
 // Update a module
 Future<void> updateModule({
   required String name,
-  required Database db,
   String? description,
   String? primarySubject,
   List<String>? subjects,
   List<String>? relatedConcepts,
-  List<String>? questionIds,
 }) async {
-  QuizzerLogger.logMessage('Updating module: $name');
-  await verifyModulesTable(db);
-  final updates = <String, dynamic>{};
-  
-  // Prepare map with raw data - lists will be handled by encodeValueForDB in the helper
-  if (description != null) {
-    updates[descriptionField] = description;
-    updates['edits_are_synced'] = 0; // Mark as needing sync when description changes
-  }
-  if (primarySubject != null) updates[primarySubjectField] = primarySubject;
-  if (subjects != null) updates[subjectsField] = subjects; // Pass raw list
-  if (relatedConcepts != null) updates[relatedConceptsField] = relatedConcepts; // Pass raw list
-  if (questionIds != null) {
-    updates[questionIdsField] = questionIds; // Pass raw list
-    updates[totalQuestionsField] = questionIds.length;
-  }
-  
-  // Add fields that are always updated
-  updates['last_modified_timestamp'] = DateTime.now().toUtc().toIso8601String();
+  try {
+    final db = await getDatabaseMonitor().requestDatabaseAccess();
+    if (db == null) {
+      throw Exception('Failed to acquire database access');
+    }
+    QuizzerLogger.logMessage('Updating module: $name');
+    await _verifyModulesTable(db);
+    final updates = <String, dynamic>{};
+    
+    // Prepare map with raw data - lists will be handled by encodeValueForDB in the helper
+    if (description != null) {
+      updates[descriptionField] = description;
+      updates['edits_are_synced'] = 0; // Mark as needing sync when description changes
+    }
+    if (primarySubject != null) updates[primarySubjectField] = primarySubject;
+    if (subjects != null) updates[subjectsField] = subjects; // Pass raw list
+    if (relatedConcepts != null) updates[relatedConceptsField] = relatedConcepts; // Pass raw list
+    
+    // Add fields that are always updated
+    updates['last_modified_timestamp'] = DateTime.now().toUtc().toIso8601String();
 
-  // Use the universal update helper (encoding happens inside)
-  final int result = await updateRawData(
-    modulesTableName,
-    updates,
-    '$moduleNameField = ?', // where clause
-    [name],                 // whereArgs
-    db,
-  );
-  
-  // Log based on result (updateRawData returns number of rows affected)
-  if (result > 0) {
-    QuizzerLogger.logSuccess('Module $name updated successfully ($result row affected).');
-  } else {
-    QuizzerLogger.logWarning('Update operation for module $name affected 0 rows. Module might not exist or data was unchanged.');
+    // Use the universal update helper (encoding happens inside)
+    final int result = await updateRawData(
+      modulesTableName,
+      updates,
+      '$moduleNameField = ?', // where clause
+      [name],                 // whereArgs
+      db,
+    );
+    
+    // Log based on result (updateRawData returns number of rows affected)
+    if (result > 0) {
+      QuizzerLogger.logSuccess('Module $name updated successfully ($result row affected).');
+    } else {
+      QuizzerLogger.logWarning('Update operation for module $name affected 0 rows. Module might not exist or data was unchanged.');
+    }
+  } catch (e) {
+    QuizzerLogger.logError('Error updating module - $e');
+    rethrow;
+  } finally {
+    getDatabaseMonitor().releaseDatabaseAccess();
   }
 }
 
 // Get a module by name
-Future<Map<String, dynamic>?> getModule(String name, Database db) async {
-  QuizzerLogger.logMessage('Fetching module: $name');
-  await verifyModulesTable(db);
-  
-  // Use the universal query helper
-  final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
-    modulesTableName,
-    db,
-    where: '$moduleNameField = ?',
-    whereArgs: [name],
-    limit: 2, // Limit to 2 to detect if PK constraint is violated
-  );
+Future<Map<String, dynamic>?> getModule(String name) async {
+  try {
+    final db = await getDatabaseMonitor().requestDatabaseAccess();
+    if (db == null) {
+      throw Exception('Failed to acquire database access');
+    }
+    QuizzerLogger.logMessage('Fetching module: $name');
+    await _verifyModulesTable(db);
+    
+    // Use the universal query helper
+    final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
+      modulesTableName,
+      db,
+      where: '$moduleNameField = ?',
+      whereArgs: [name],
+      limit: 2, // Limit to 2 to detect if PK constraint is violated
+    );
 
-  if (results.isEmpty) {
-    QuizzerLogger.logMessage('Module $name not found');
-    return null;
-  } else if (results.length > 1) {
-    // This shouldn't happen if moduleNameField is a primary key
-    QuizzerLogger.logError('Found multiple modules with the same name: $name. PK constraint violation?');
-    throw StateError('Found multiple modules with the same primary key: $name');
+    if (results.isEmpty) {
+      QuizzerLogger.logMessage('Module $name not found');
+      return null;
+    } else if (results.length > 1) {
+      // This shouldn't happen if moduleNameField is a primary key
+      QuizzerLogger.logError('Found multiple modules with the same name: $name. PK constraint violation?');
+      throw StateError('Found multiple modules with the same primary key: $name');
+    }
+
+    // Get the single, already decoded map
+    final decodedModule = results.first;
+
+    // Manually handle type conversions not covered by the generic decoder
+    // Specifically: Handle creation_date as string (UTC ISO8601)
+    final Map<String, dynamic> finalResult = {
+      moduleNameField: decodedModule[moduleNameField],
+      descriptionField: decodedModule[descriptionField],
+      primarySubjectField: decodedModule[primarySubjectField],
+      subjectsField: decodedModule[subjectsField], // Already decoded to List<String> or similar by helper
+      relatedConceptsField: decodedModule[relatedConceptsField], // Already decoded
+      creationDateField: decodedModule[creationDateField], // Keep as string, no conversion needed
+      creatorIdField: decodedModule[creatorIdField],
+    };
+    
+    QuizzerLogger.logValue('Retrieved and processed module: $finalResult');
+    return finalResult;
+  } catch (e) {
+    QuizzerLogger.logError('Error getting module - $e');
+    rethrow;
+  } finally {
+    getDatabaseMonitor().releaseDatabaseAccess();
   }
-
-  // Get the single, already decoded map
-  final decodedModule = results.first;
-
-  // Manually handle type conversions not covered by the generic decoder
-  // Specifically: Handle creation_date as string (UTC ISO8601)
-  final Map<String, dynamic> finalResult = {
-    moduleNameField: decodedModule[moduleNameField],
-    descriptionField: decodedModule[descriptionField],
-    primarySubjectField: decodedModule[primarySubjectField],
-    subjectsField: decodedModule[subjectsField], // Already decoded to List<String> or similar by helper
-    relatedConceptsField: decodedModule[relatedConceptsField], // Already decoded
-    questionIdsField: decodedModule[questionIdsField], // Already decoded
-    creationDateField: decodedModule[creationDateField], // Keep as string, no conversion needed
-    creatorIdField: decodedModule[creatorIdField],
-    totalQuestionsField: decodedModule[totalQuestionsField],
-  };
-  
-  QuizzerLogger.logValue('Retrieved and processed module: $finalResult');
-  return finalResult;
 }
 
-// Get all modules
-Future<List<Map<String, dynamic>>> getAllModules(Database db) async {
-  QuizzerLogger.logMessage('Fetching all modules');
-  await verifyModulesTable(db);
-  
-  // Use the universal query helper
-  final List<Map<String, dynamic>> decodedModules = await queryAndDecodeDatabase(
-    modulesTableName,
-    db,
-    // No WHERE clause needed to get all
-  );
+// Get all modules with complete data
+/// Retrieves the entire module list with all data associated with all modules.
+/// Returns a full map of all data for each module including name, description, 
+/// primary subject, subjects list, related concepts list, creation date, and creator ID.
+/// This is not a snapshot but the complete current state of all modules in the database.
+Future<List<Map<String, dynamic>>> getAllModules() async {
+  try {
+    final db = await getDatabaseMonitor().requestDatabaseAccess();
+    if (db == null) {
+      throw Exception('Failed to acquire database access');
+    }
+    QuizzerLogger.logMessage('Fetching all modules');
+    await _verifyModulesTable(db);
+    
+    // Use the universal query helper
+    final List<Map<String, dynamic>> decodedModules = await queryAndDecodeDatabase(
+      modulesTableName,
+      db,
+      // No WHERE clause needed to get all
+    );
 
-  // Process the decoded results to perform final type conversions
-  final List<Map<String, dynamic>> finalResults = [];
-  for (final decodedModule in decodedModules) {
-      // Check if module_name is missing (essential)
-      if (decodedModule[moduleNameField] == null) {
-        QuizzerLogger.logError(
-          'Skipping module due to missing essential field: $moduleNameField. Module data: $decodedModule'
-        );
-        continue;
-      }
+    // Process the decoded results to perform final type conversions
+    final List<Map<String, dynamic>> finalResults = [];
+    for (final decodedModule in decodedModules) {
+        // Check if module_name is missing (essential)
+        if (decodedModule[moduleNameField] == null) {
+          QuizzerLogger.logError(
+            'Skipping module due to missing essential field: $moduleNameField. Module data: $decodedModule'
+          );
+          continue;
+        }
 
-      // Check if creation_date is missing (non-critical for loading, but log it)
-      if (decodedModule[creationDateField] == null) {
-        QuizzerLogger.logWarning(
-          'Module \'${decodedModule[moduleNameField]}\' has a null $creationDateField. Proceeding to load.'
-        );
-      }
-      
-      // No other fields are currently checked as critical for skipping in getAllModules.
-      // If other fields were previously part of a critical check that caused skipping, 
-      // that logic is now removed in favor of only moduleNameField being critical.
+        // Check if creation_date is missing (non-critical for loading, but log it)
+        if (decodedModule[creationDateField] == null) {
+          QuizzerLogger.logWarning(
+            'Module \'${decodedModule[moduleNameField]}\' has a null $creationDateField. Proceeding to load.'
+          );
+        }
+        
+        // No other fields are currently checked as critical for skipping in getAllModules.
+        // If other fields were previously part of a critical check that caused skipping, 
+        // that logic is now removed in favor of only moduleNameField being critical.
 
-      // Perform the same type conversions as in getModule
-      final Map<String, dynamic> processedModule = {
-        moduleNameField: decodedModule[moduleNameField],
-        descriptionField: decodedModule[descriptionField],
-        primarySubjectField: decodedModule[primarySubjectField],
-        subjectsField: decodedModule[subjectsField],
-        relatedConceptsField: decodedModule[relatedConceptsField],
-        questionIdsField: decodedModule[questionIdsField],
-        creationDateField: decodedModule[creationDateField], // Keep as string, no conversion needed
-        creatorIdField: decodedModule[creatorIdField],
-        totalQuestionsField: decodedModule[totalQuestionsField],
-      };
-      finalResults.add(processedModule);
+        // Perform the same type conversions as in getModule
+        final Map<String, dynamic> processedModule = {
+          moduleNameField: decodedModule[moduleNameField],
+          descriptionField: decodedModule[descriptionField],
+          primarySubjectField: decodedModule[primarySubjectField],
+          subjectsField: decodedModule[subjectsField],
+          relatedConceptsField: decodedModule[relatedConceptsField],
+          creationDateField: decodedModule[creationDateField], // Keep as string, no conversion needed
+          creatorIdField: decodedModule[creatorIdField],
+        };
+        finalResults.add(processedModule);
+    }
+
+    QuizzerLogger.logValue('Retrieved and processed ${finalResults.length} modules');
+    return finalResults;
+  } catch (e) {
+    QuizzerLogger.logError('Error getting all modules - $e');
+    rethrow;
+  } finally {
+    getDatabaseMonitor().releaseDatabaseAccess();
   }
-
-  QuizzerLogger.logValue('Retrieved and processed ${finalResults.length} modules');
-  return finalResults;
 }
 
 // Get unsynced modules
-Future<List<Map<String, dynamic>>> getUnsyncedModules(Database db) async {
-  QuizzerLogger.logMessage('Fetching unsynced modules');
-  await verifyModulesTable(db);
-  
-  // Use the universal query helper to get modules that need syncing
-  final List<Map<String, dynamic>> unsyncedModules = await queryAndDecodeDatabase(
-    modulesTableName,
-    db,
-    where: 'edits_are_synced = ?',
-    whereArgs: [0],
-  );
+Future<List<Map<String, dynamic>>> getUnsyncedModules() async {
+  try {
+    final db = await getDatabaseMonitor().requestDatabaseAccess();
+    if (db == null) {
+      throw Exception('Failed to acquire database access');
+    }
+    QuizzerLogger.logMessage('Fetching unsynced modules');
+    await _verifyModulesTable(db);
+    
+    // Use the universal query helper to get modules that need syncing
+    final List<Map<String, dynamic>> unsyncedModules = await queryAndDecodeDatabase(
+      modulesTableName,
+      db,
+      where: 'edits_are_synced = ?',
+      whereArgs: [0],
+    );
 
-  QuizzerLogger.logValue('Found ${unsyncedModules.length} unsynced modules');
-  return unsyncedModules;
+    QuizzerLogger.logValue('Found ${unsyncedModules.length} unsynced modules');
+    return unsyncedModules;
+  } catch (e) {
+    QuizzerLogger.logError('Error getting unsynced modules - $e');
+    rethrow;
+  } finally {
+    getDatabaseMonitor().releaseDatabaseAccess();
+  }
 }
 
 // Update module sync flags
@@ -306,28 +350,38 @@ Future<void> updateModuleSyncFlags({
   required String moduleName,
   required bool hasBeenSynced,
   required bool editsAreSynced,
-  required Database db,
 }) async {
-  QuizzerLogger.logMessage('Updating sync flags for module: $moduleName');
-  await verifyModulesTable(db);
-  
-  final updates = {
-    'has_been_synced': hasBeenSynced ? 1 : 0,
-    'edits_are_synced': editsAreSynced ? 1 : 0,
-  };
+  try {
+    final db = await getDatabaseMonitor().requestDatabaseAccess();
+    if (db == null) {
+      throw Exception('Failed to acquire database access');
+    }
+    QuizzerLogger.logMessage('Updating sync flags for module: $moduleName');
+    await _verifyModulesTable(db);
+    
+    final updates = {
+      'has_been_synced': hasBeenSynced ? 1 : 0,
+      'edits_are_synced': editsAreSynced ? 1 : 0,
+    };
 
-  final int result = await updateRawData(
-    modulesTableName,
-    updates,
-    '$moduleNameField = ?',
-    [moduleName],
-    db,
-  );
-  
-  if (result > 0) {
-    QuizzerLogger.logSuccess('Sync flags updated for module $moduleName');
-  } else {
-    QuizzerLogger.logWarning('No rows affected when updating sync flags for module $moduleName');
+    final int result = await updateRawData(
+      modulesTableName,
+      updates,
+      '$moduleNameField = ?',
+      [moduleName],
+      db,
+    );
+    
+    if (result > 0) {
+      QuizzerLogger.logSuccess('Sync flags updated for module $moduleName');
+    } else {
+      QuizzerLogger.logWarning('No rows affected when updating sync flags for module $moduleName');
+    }
+  } catch (e) {
+    QuizzerLogger.logError('Error updating module sync flags - $e');
+    rethrow;
+  } finally {
+    getDatabaseMonitor().releaseDatabaseAccess();
   }
 }
 
@@ -336,27 +390,37 @@ Future<void> updateModuleSyncFlags({
 Future<void> upsertModuleFromInboundSync({
   required String moduleName,
   required String description,
-  required Database db,
 }) async {
-  QuizzerLogger.logMessage('Upserting module $moduleName from inbound sync...');
+  try {
+    final db = await getDatabaseMonitor().requestDatabaseAccess();
+    if (db == null) {
+      throw Exception('Failed to acquire database access');
+    }
+    QuizzerLogger.logMessage('Upserting module $moduleName from inbound sync...');
 
-  await verifyModulesTable(db);
+    await _verifyModulesTable(db);
 
-  // Prepare the data map with only the fields we store in Supabase
-  final Map<String, dynamic> data = {
-    'module_name': moduleName,
-    'description': description,
-    'has_been_synced': 1,
-    'edits_are_synced': 1,
-    'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
-  };
+    // Prepare the data map with only the fields we store in Supabase
+    final Map<String, dynamic> data = {
+      'module_name': moduleName,
+      'description': description,
+      'has_been_synced': 1,
+      'edits_are_synced': 1,
+      'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
+    };
 
-  // Use upsert to handle both insert and update cases
-  await db.insert(
-    'modules',
-    data,
-    conflictAlgorithm: ConflictAlgorithm.replace,
-  );
+    // Use upsert to handle both insert and update cases
+    await db.insert(
+      'modules',
+      data,
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
 
-  QuizzerLogger.logSuccess('Successfully upserted module $moduleName from inbound sync.');
+    QuizzerLogger.logSuccess('Successfully upserted module $moduleName from inbound sync.');
+  } catch (e) {
+    QuizzerLogger.logError('Error upserting module from inbound sync - $e');
+    rethrow;
+  } finally {
+    getDatabaseMonitor().releaseDatabaseAccess();
+  }
 }

@@ -26,74 +26,98 @@ class InactiveModuleWorker {
   // --- Control Methods ---
   /// Starts the worker loop.
   void start() {
-    if (_isRunning) {
-      QuizzerLogger.logWarning('InactiveModuleWorker already running.');
-      return;
+    try {
+      QuizzerLogger.logMessage('Entering InactiveModuleWorker start()...');
+      if (_isRunning) {
+        QuizzerLogger.logWarning('InactiveModuleWorker already running.');
+        return;
+      }
+      QuizzerLogger.logMessage('Starting InactiveModuleWorker...');
+      _isRunning = true;
+      _runLoop();
+    } catch (e) {
+      QuizzerLogger.logError('Error starting InactiveModuleWorker - $e');
+      rethrow;
     }
-    QuizzerLogger.logMessage('Starting InactiveModuleWorker...');
-    _isRunning = true;
-    _runLoop();
   }
 
   /// Stops the worker loop.
-  Future<void> stop() async{
-    if (!_isRunning) {
-      QuizzerLogger.logWarning('InactiveModuleWorker already stopped.');
-      return;
+  Future<void> stop() async {
+    try {
+      QuizzerLogger.logMessage('Entering InactiveModuleWorker stop()...');
+      if (!_isRunning) {
+        QuizzerLogger.logWarning('InactiveModuleWorker already stopped.');
+        return;
+      }
+      QuizzerLogger.logMessage('Stopping InactiveModuleWorker...');
+      _isRunning = false;
+    } catch (e) {
+      QuizzerLogger.logError('Error stopping InactiveModuleWorker - $e');
+      rethrow;
     }
-    QuizzerLogger.logMessage('Stopping InactiveModuleWorker...');
-    _isRunning = false;
   }
 
   // --- Main Loop --- 
   /// Continuously listens for module deactivation signals and processes them.
   Future<void> _runLoop() async {
-    while (_isRunning) {
-      await _performLoopLogic();
+    try {
+      QuizzerLogger.logMessage('Entering InactiveModuleWorker _runLoop()...');
+      while (_isRunning) {
+        await _performLoopLogic();
+      }
+      QuizzerLogger.logMessage('InactiveModuleWorker loop finished.');
+    } catch (e) {
+      QuizzerLogger.logError('Error in InactiveModuleWorker _runLoop - $e');
+      rethrow;
     }
-    QuizzerLogger.logMessage('InactiveModuleWorker loop finished.');
   }
 
   // --- Loop Logic --- 
   /// Waits for a module deactivation signal, then moves relevant records.
   Future<void> _performLoopLogic() async {
-    QuizzerLogger.logMessage('InactiveModuleWorker: Waiting for module deactivation signal...');
-    // Wait for the next deactivation signal from the SwitchBoard
-    if (!_isRunning) return; // Check if stopped while waiting
-    final String activatedModuleName = await _switchBoard.onModuleActivated.first;
-    if (!_isRunning) return; // Check if stopped while waiting
+    try {
+      QuizzerLogger.logMessage('Entering InactiveModuleWorker _performLoopLogic()...');
+      QuizzerLogger.logMessage('InactiveModuleWorker: Waiting for module deactivation signal...');
+      // Wait for the next module activation signal from the SwitchBoard
+      if (!_isRunning) return; // Check if stopped while waiting
+      final String newlyActivatedModuleName = await _switchBoard.onModuleActivated.first;
+      if (!_isRunning) return; // Check if stopped while waiting
 
-    QuizzerLogger.logMessage('InactiveModuleWorker: Received signal for module: $activatedModuleName. Processing...');
+      QuizzerLogger.logMessage('InactiveModuleWorker: Received activation signal for module: $newlyActivatedModuleName. Processing...');
 
-    final Set<String> processedIdsInCycle = {}; // Track IDs processed in this cycle
-    Map<String, dynamic> recordToMove;
+      final Set<String> processedIdsInCycle = {}; // Track IDs processed in this cycle
+      Map<String, dynamic> recordToMove;
 
-    do {
-      if (!_isRunning) break; // Check if stopped during processing
+      do {
+        if (!_isRunning) break; // Check if stopped during processing
 
-      // Get and remove one record for the deactivated module
-      recordToMove = await _moduleInactiveCache.getAndRemoveOneRecordFromModule(activatedModuleName);
+        // Get and remove one record for the newly activated module
+        recordToMove = await _moduleInactiveCache.getAndRemoveOneRecordFromModule(newlyActivatedModuleName);
 
-      if (recordToMove.isNotEmpty) {
-        final String questionId = recordToMove['question_id'] as String;
+        if (recordToMove.isNotEmpty) {
+          final String questionId = recordToMove['question_id'] as String;
 
-        // Check if we already processed this ID *in this specific deactivation cycle*
-        if (processedIdsInCycle.contains(questionId)) {
-          QuizzerLogger.logMessage('InactiveModuleWorker: Skipping re-added record $questionId for module $activatedModuleName in this cycle.');
-          continue; // Skip this record and get the next one
-        }
+          // Check if we already processed this ID *in this specific activation cycle*
+          if (processedIdsInCycle.contains(questionId)) {
+            QuizzerLogger.logMessage('InactiveModuleWorker: Skipping re-added record $questionId for module $newlyActivatedModuleName in this cycle.');
+            continue; // Skip this record and get the next one
+          }
 
-        // Mark as processed for this cycle and move to UnprocessedCache
-        processedIdsInCycle.add(questionId);
-        // QuizzerLogger.logMessage('InactiveModuleWorker: Moving $questionId from module $deactivatedModuleName to UnprocessedCache.');
-        await _unprocessedCache.addRecord(recordToMove);
-      } 
-      // else: No more records for this module in the cache
+          // Mark as processed for this cycle and move to UnprocessedCache
+          processedIdsInCycle.add(questionId);
+          // QuizzerLogger.logMessage('InactiveModuleWorker: Moving $questionId from module $deactivatedModuleName to UnprocessedCache.');
+          await _unprocessedCache.addRecord(recordToMove);
+        } 
+        // else: No more records for this module in the cache
 
-    } while (recordToMove.isNotEmpty && _isRunning);
+      } while (recordToMove.isNotEmpty && _isRunning);
 
-    if (_isRunning) {
-      QuizzerLogger.logSuccess('InactiveModuleWorker: Finished processing deactivated module: $activatedModuleName.');
+      if (_isRunning) {
+        QuizzerLogger.logSuccess('InactiveModuleWorker: Finished processing newly activated module: $newlyActivatedModuleName.');
+      }
+    } catch (e) {
+      QuizzerLogger.logError('Error in InactiveModuleWorker _performLoopLogic - $e');
+      rethrow;
     }
   }
 }

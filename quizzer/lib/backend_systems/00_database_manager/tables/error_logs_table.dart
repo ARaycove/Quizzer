@@ -3,10 +3,11 @@ import 'dart:async';
 import 'dart:io'; // Ensure dart:io is imported
 import 'package:uuid/uuid.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
-import 'table_helper.dart';
-import 'package:quizzer/backend_systems/10_switch_board/switch_board.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/table_helper.dart';
 import 'package:path/path.dart' as path; // Import path package
-import 'package:path_provider/path_provider.dart'; // Added path_provider
+import 'package:quizzer/backend_systems/00_helper_utils/file_locations.dart';
+import 'package:quizzer/backend_systems/10_switch_board/sb_sync_worker_signals.dart';
+import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
 
 // ==========================================
 //          error_logs Table Helper
@@ -19,11 +20,11 @@ Future<String> _readLogFileContent() async {
   // --- Determine the correct log file path --- 
   String logFilePath;
   if (Platform.isAndroid || Platform.isIOS) {
-    final appDir = await getApplicationDocumentsDirectory();
-    logFilePath = path.join(appDir.path, 'quizzer_log.txt');
+    final logsDir = await getQuizzerLogsPath();
+    logFilePath = path.join(logsDir, 'quizzer_log.txt');
   } else if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-    final appDir = await getApplicationSupportDirectory();
-    logFilePath = path.join(appDir.path, 'QuizzerAppLogs', 'quizzer_log.txt');
+    final logsDir = await getQuizzerLogsPath();
+    logFilePath = path.join(logsDir, 'quizzer_log.txt');
   } else {
     // Fallback for unsupported platforms (should match QuizzerLogger's fallback)
     logFilePath = path.join('runtime_cache', 'quizzer_log.txt'); 
@@ -35,8 +36,23 @@ Future<String> _readLogFileContent() async {
   String content;
   // No try-catch for file operations, as per instruction.
   if (await file.exists()) {
-    content = await file.readAsString();
-    QuizzerLogger.logMessage('Successfully read content from $logFilePath.');
+    // Read all lines from the file
+    final List<String> allLines = await file.readAsLines();
+    
+    // Truncate to last 1000 lines to prevent database size issues
+    final int totalLines = allLines.length;
+    const int maxLines = 1000;
+    
+    if (totalLines > maxLines) {
+      // Take only the last 1000 lines
+      final List<String> truncatedLines = allLines.sublist(totalLines - maxLines);
+      content = truncatedLines.join('\n');
+      QuizzerLogger.logMessage('Successfully read and truncated log file from $totalLines lines to $maxLines lines from $logFilePath.');
+    } else {
+      // File is small enough, use all lines
+      content = allLines.join('\n');
+      QuizzerLogger.logMessage('Successfully read content from $logFilePath ($totalLines lines).');
+    }
   } else {
     content = "Log file '$logFilePath' not found or unreadable."; // Keep the path in the message
     QuizzerLogger.logWarning('$logFilePath does not exist. Storing placeholder.');
@@ -45,7 +61,7 @@ Future<String> _readLogFileContent() async {
 }
 
 /// Verifies the existence and schema of the error_logs table.
-Future<void> verifyErrorLogsTable(Database db) async {
+Future<void> _verifyErrorLogsTable(Database db) async {
   QuizzerLogger.logMessage('Verifying $_errorLogsTableName table...');
   final List<Map<String, dynamic>> tables = await db.rawQuery(
     "SELECT name FROM sqlite_master WHERE type='table' AND name='$_errorLogsTableName'"
@@ -113,60 +129,68 @@ Future<void> verifyErrorLogsTable(Database db) async {
 
 /// Adds a new error log record to the local database for outbound syncing.
 Future<String> addErrorLog({
-  required Database db,
   String? userId,
   String? errorMessage,
   String? userFeedback,
 }) async {
-  await verifyErrorLogsTable(db);
-  const uuid = Uuid();
-  final String newId = uuid.v4();
-  final String now = DateTime.now().toUtc().toIso8601String();
+  try {
+    final db = await getDatabaseMonitor().requestDatabaseAccess();
+    if (db == null) {
+      throw Exception('Failed to acquire database access');
+    }
+    await _verifyErrorLogsTable(db);
+    const uuid = Uuid();
+    final String newId = uuid.v4();
+    final String now = DateTime.now().toUtc().toIso8601String();
 
-  // Fetch device information and app version programmatically
-  final String deviceInfo = await getDeviceInfo(); 
-  final String appVersionInfo = await getAppVersionInfo();
+    // Fetch device information and app version programmatically
+    final String deviceInfo = await getDeviceInfo(); 
+    final String appVersionInfo = await getAppVersionInfo();
 
-  // Call the internal helper to get log file content
-  final String logFile = await _readLogFileContent();
+    // Call the internal helper to get log file content
+    final String logFile = await _readLogFileContent();
 
-  final Map<String, dynamic> logData = {
-    'id': newId,
-    'created_at': now,
-    'user_id': userId,
-    'app_version': appVersionInfo, // Use fetched app version
-    'operating_system': deviceInfo, // Use fetched device info
-    'error_message': errorMessage,
-    'log_file': logFile,
-    'user_feedback': userFeedback,
-    'is_resolved': 0, 
-    'has_been_synced': 0, 
-    'edits_are_synced': 0, 
-    'last_modified_timestamp': now, 
-  };
+    final Map<String, dynamic> logData = {
+      'id': newId,
+      'created_at': now,
+      'user_id': userId,
+      'app_version': appVersionInfo, // Use fetched app version
+      'operating_system': deviceInfo, // Use fetched device info
+      'error_message': errorMessage,
+      'log_file': logFile,
+      'user_feedback': userFeedback,
+      'is_resolved': 0, 
+      'has_been_synced': 0, 
+      'edits_are_synced': 0, 
+      'last_modified_timestamp': now, 
+    };
 
-  final int result = await insertRawData(
-    _errorLogsTableName,
-    logData,
-    db,
-    conflictAlgorithm: ConflictAlgorithm.fail, 
-  );
+    final int result = await insertRawData(
+      _errorLogsTableName,
+      logData,
+      db,
+      conflictAlgorithm: ConflictAlgorithm.fail, 
+    );
 
-  if (result <= 0) { 
-    QuizzerLogger.logError('Failed to add error log to local database. Result: $result. Error Log ID: $newId');
-    throw Exception('Failed to insert error log locally.');
+    if (result <= 0) { 
+      QuizzerLogger.logError('Failed to add error log to local database. Result: $result. Error Log ID: $newId');
+      throw Exception('Failed to insert error log locally.');
+    }
+    
+    QuizzerLogger.logSuccess('Successfully added error log with id: $newId. Log file content included.');
+    signalOutboundSyncNeeded();
+    return newId;
+  } catch (e) {
+    QuizzerLogger.logError('Error adding error log - $e');
+    rethrow;
+  } finally {
+    getDatabaseMonitor().releaseDatabaseAccess();
   }
-  
-  QuizzerLogger.logSuccess('Successfully added error log with id: $newId. Log file content included.');
-  final SwitchBoard switchBoard = getSwitchBoard();
-  switchBoard.signalOutboundSyncNeeded(); 
-  return newId;
 }
 
 /// Updates an existing error log record in the local database.
 /// Can be used to add user_feedback or update other fields.
 Future<int> updateErrorLog({
-  required Database db,
   required String id,
   // Provide specific updatable fields as nullable parameters
   String? userFeedback,
@@ -175,150 +199,190 @@ Future<int> updateErrorLog({
   bool? hasBeenSynced, // Allow explicit setting by sync worker if needed
   // Add other fields from the table that are legitimately updatable locally
 }) async {
-  await verifyErrorLogsTable(db);
-  final String now = DateTime.now().toUtc().toIso8601String();
-
-  final Map<String, dynamic> updates = {};
-
-  if (userFeedback != null) updates['user_feedback'] = userFeedback;
-  if (logFile != null) updates['log_file'] = logFile;
-  if (isResolved != null) updates['is_resolved'] = isResolved ? 1 : 0;
-  if (hasBeenSynced != null) updates['has_been_synced'] = hasBeenSynced ? 1 : 0;
-  // Add other updatable fields here
-
-  if (updates.isEmpty) {
-    QuizzerLogger.logMessage('No updates provided for error log id: $id.');
-    return 0;
-  }
-
-  updates['last_modified_timestamp'] = now;
-  // If hasBeenSynced is being set to true, edits_are_synced should also be true (or 1).
-  // Otherwise, any other update means there are local edits needing sync.
-  if (hasBeenSynced == true) {
-    updates['edits_are_synced'] = 1; // Edits are now considered synced because the record itself is.
-  } else {
-    updates['edits_are_synced'] = 0; // Mark that this record has local changes pending sync
-  }
-
-  final int rowsAffected = await updateRawData(
-    _errorLogsTableName,
-    updates,
-    'id = ?',
-    [id],
-    db,
-  );
-
-  if (rowsAffected > 0) {
-    QuizzerLogger.logSuccess('Successfully updated error log id: $id. Rows affected: $rowsAffected. Updates: $updates');
-    // Only signal outbound sync if it wasn't an update to set hasBeenSynced to true
-    // (which implies the sync worker is making the call and doesn't need re-signaling for the same data).
-    if (hasBeenSynced != true) {
-        final SwitchBoard switchBoard = getSwitchBoard();
-        switchBoard.signalOutboundSyncNeeded();
+  try {
+    final db = await getDatabaseMonitor().requestDatabaseAccess();
+    if (db == null) {
+      throw Exception('Failed to acquire database access');
     }
-  } else {
-    QuizzerLogger.logWarning('Failed to update error log id: $id or no changes made. Rows affected: $rowsAffected.');
+    await _verifyErrorLogsTable(db);
+    final String now = DateTime.now().toUtc().toIso8601String();
+
+    final Map<String, dynamic> updates = {};
+
+    if (userFeedback != null) updates['user_feedback'] = userFeedback;
+    if (logFile != null) updates['log_file'] = logFile;
+    if (isResolved != null) updates['is_resolved'] = isResolved ? 1 : 0;
+    if (hasBeenSynced != null) updates['has_been_synced'] = hasBeenSynced ? 1 : 0;
+    // Add other updatable fields here
+
+    if (updates.isEmpty) {
+      QuizzerLogger.logMessage('No updates provided for error log id: $id.');
+      return 0;
+    }
+
+    updates['last_modified_timestamp'] = now;
+    // If hasBeenSynced is being set to true, edits_are_synced should also be true (or 1).
+    // Otherwise, any other update means there are local edits needing sync.
+    if (hasBeenSynced == true) {
+      updates['edits_are_synced'] = 1; // Edits are now considered synced because the record itself is.
+    } else {
+      updates['edits_are_synced'] = 0; // Mark that this record has local changes pending sync
+    }
+
+    final int rowsAffected = await updateRawData(
+      _errorLogsTableName,
+      updates,
+      'id = ?',
+      [id],
+      db,
+    );
+
+    if (rowsAffected > 0) {
+      QuizzerLogger.logSuccess('Successfully updated error log id: $id. Rows affected: $rowsAffected. Updates: $updates');
+      // Only signal outbound sync if it wasn't an update to set hasBeenSynced to true
+      // (which implies the sync worker is making the call and doesn't need re-signaling for the same data).
+      if (hasBeenSynced != true) {
+          signalOutboundSyncNeeded();
+      }
+    } else {
+      QuizzerLogger.logWarning('Failed to update error log id: $id or no changes made. Rows affected: $rowsAffected.');
+    }
+    return rowsAffected;
+  } catch (e) {
+    QuizzerLogger.logError('Error updating error log - $e');
+    rethrow;
+  } finally {
+    getDatabaseMonitor().releaseDatabaseAccess();
   }
-  return rowsAffected;
 }
 
 /// Upserts an error log: Inserts if no ID is provided or if ID doesn't exist,
 /// otherwise updates the existing log with the given ID.
 /// This acts as a routing function to either addErrorLog or updateErrorLog.
 Future<String> upsertErrorLog({
-  required Database db,
   String? id,
   String? userId,
   String? errorMessage,
   String? userFeedback,
 }) async {
-  await verifyErrorLogsTable(db);
+  try {
+    final db = await getDatabaseMonitor().requestDatabaseAccess();
+    if (db == null) {
+      throw Exception('Failed to acquire database access');
+    }
+    await _verifyErrorLogsTable(db);
 
-  String currentId = id ?? const Uuid().v4();
-  bool recordExists = false;
+    String currentId = id ?? const Uuid().v4();
+    bool recordExists = false;
 
-  if (id != null) {
-    final List<Map<String, dynamic>> existingRecords = await db.query(
-      _errorLogsTableName,
-      columns: ['id'],
-      where: 'id = ?',
-      whereArgs: [id],
-      limit: 1,
-    );
-    recordExists = existingRecords.isNotEmpty;
-  }
+    if (id != null) {
+      final List<Map<String, dynamic>> existingRecords = await db.query(
+        _errorLogsTableName,
+        columns: ['id'],
+        where: 'id = ?',
+        whereArgs: [id],
+        limit: 1,
+      );
+      recordExists = existingRecords.isNotEmpty;
+    }
 
-  if (recordExists) {
-    QuizzerLogger.logMessage('upsertErrorLog: Updating existing error log with ID: $currentId for userFeedback.');
-    await updateErrorLog(
-      db: db,
-      id: currentId,
-      userFeedback: userFeedback,
-    );
-    return currentId;
-  } else {
-    QuizzerLogger.logMessage('upsertErrorLog: Adding new error log. Provided ID (if any): $id');
-    final String newLogId = await addErrorLog(
-      db: db,
-      userId: userId,
-      errorMessage: errorMessage,
-      userFeedback: userFeedback,
-    );
-    return newLogId;
+    if (recordExists) {
+      QuizzerLogger.logMessage('upsertErrorLog: Updating existing error log with ID: $currentId for userFeedback.');
+      await updateErrorLog(
+        id: currentId,
+        userFeedback: userFeedback,
+      );
+      return currentId;
+    } else {
+      QuizzerLogger.logMessage('upsertErrorLog: Adding new error log. Provided ID (if any): $id');
+      final String newLogId = await addErrorLog(
+        userId: userId,
+        errorMessage: errorMessage,
+        userFeedback: userFeedback,
+      );
+      return newLogId;
+    }
+  } catch (e) {
+    QuizzerLogger.logError('Error upserting error log - $e');
+    rethrow;
+  } finally {
+    getDatabaseMonitor().releaseDatabaseAccess();
   }
 }
 
 /// Retrieves all error logs that need to be sent to the server.
 /// Only returns records that are at least 1 hour old.
-Future<List<Map<String, dynamic>>> getUnsyncedErrorLogs(Database db) async {
-  await verifyErrorLogsTable(db);
-  QuizzerLogger.logMessage('Fetching unsynced error logs (older than 1 hour) from $_errorLogsTableName...');
-  
-  // First, get all records that are marked as unsynced or have unsynced edits.
-  final List<Map<String, dynamic>> allUnsyncedRecords = await queryAndDecodeDatabase(
-    _errorLogsTableName,
-    db,
-    where: 'has_been_synced = 0 OR edits_are_synced = 0',
-  );
-
-  final List<Map<String, dynamic>> filteredRecords = [];
-  final DateTime oneHourAgo = DateTime.now().toUtc().subtract(const Duration(hours: 1));
-
-  for (final record in allUnsyncedRecords) {
-    final String? createdAtString = record['created_at'] as String?;
-    // Assert that createdAtString is not null because the schema defines it as NOT NULL.
-    // If it were null, it indicates a data integrity issue or schema mismatch.
-    assert(createdAtString != null, 'Error log record (ID: ${record['id']}) has null created_at, but schema expects NOT NULL.');
-    
-    final DateTime createdAtDateTime = DateTime.parse(createdAtString!); // Safe to use ! due to assertion
-
-    if (createdAtDateTime.isBefore(oneHourAgo)) {
-      filteredRecords.add(record);
+Future<List<Map<String, dynamic>>> getUnsyncedErrorLogs() async {
+  try {
+    final db = await getDatabaseMonitor().requestDatabaseAccess();
+    if (db == null) {
+      throw Exception('Failed to acquire database access');
     }
-  }
+    await _verifyErrorLogsTable(db);
+    QuizzerLogger.logMessage('Fetching unsynced error logs (older than 1 hour) from $_errorLogsTableName...');
+    
+    // First, get all records that are marked as unsynced or have unsynced edits.
+    final List<Map<String, dynamic>> allUnsyncedRecords = await queryAndDecodeDatabase(
+      _errorLogsTableName,
+      db,
+      where: 'has_been_synced = 0 OR edits_are_synced = 0',
+    );
 
-  QuizzerLogger.logSuccess('Fetched ${allUnsyncedRecords.length} total unsynced records. ${filteredRecords.length} are older than 1 hour.');
-  return filteredRecords;
+    final List<Map<String, dynamic>> filteredRecords = [];
+    final DateTime oneHourAgo = DateTime.now().toUtc().subtract(const Duration(hours: 1));
+
+    for (final record in allUnsyncedRecords) {
+      final String? createdAtString = record['created_at'] as String?;
+      // Assert that createdAtString is not null because the schema defines it as NOT NULL.
+      // If it were null, it indicates a data integrity issue or schema mismatch.
+      assert(createdAtString != null, 'Error log record (ID: ${record['id']}) has null created_at, but schema expects NOT NULL.');
+      
+      final DateTime createdAtDateTime = DateTime.parse(createdAtString!); // Safe to use ! due to assertion
+
+      if (createdAtDateTime.isBefore(oneHourAgo)) {
+        filteredRecords.add(record);
+      }
+    }
+
+    QuizzerLogger.logSuccess('Fetched ${allUnsyncedRecords.length} total unsynced records. ${filteredRecords.length} are older than 1 hour.');
+    return filteredRecords;
+  } catch (e) {
+    QuizzerLogger.logError('Error getting unsynced error logs - $e');
+    rethrow;
+  } finally {
+    getDatabaseMonitor().releaseDatabaseAccess();
+  }
 }
 
 /// Deletes an error log record from the local database by its ID.
 /// This is typically used after an error log has been successfully synced and confirmed by the server,
 /// or for local housekeeping if logs are not meant to be kept indefinitely.
-Future<int> deleteLocalErrorLog(String id, Database db) async {
-  await verifyErrorLogsTable(db);
-  QuizzerLogger.logMessage('Deleting local error log with id: $id from $_errorLogsTableName');
-  
-  final int rowsDeleted = await db.delete(
-    _errorLogsTableName,
-    where: 'id = ?',
-    whereArgs: [id],
-  );
+Future<int> deleteLocalErrorLog(String id) async {
+  try {
+    final db = await getDatabaseMonitor().requestDatabaseAccess();
+    if (db == null) {
+      throw Exception('Failed to acquire database access');
+    }
+    await _verifyErrorLogsTable(db);
+    QuizzerLogger.logMessage('Deleting local error log with id: $id from $_errorLogsTableName');
+    
+    final int rowsDeleted = await db.delete(
+      _errorLogsTableName,
+      where: 'id = ?',
+      whereArgs: [id],
+    );
 
-  if (rowsDeleted == 0) {
-    QuizzerLogger.logWarning('No local error log found to delete with id: $id.');
-  } else {
-    QuizzerLogger.logSuccess('Deleted $rowsDeleted local error log(s) with id: $id.');
+    if (rowsDeleted == 0) {
+      QuizzerLogger.logWarning('No local error log found to delete with id: $id.');
+    } else {
+      QuizzerLogger.logSuccess('Deleted $rowsDeleted local error log(s) with id: $id.');
+    }
+    // No SwitchBoard signal needed for local deletion post-sync or housekeeping.
+    return rowsDeleted;
+  } catch (e) {
+    QuizzerLogger.logError('Error deleting local error log - $e');
+    rethrow;
+  } finally {
+    getDatabaseMonitor().releaseDatabaseAccess();
   }
-  // No SwitchBoard signal needed for local deletion post-sync or housekeeping.
-  return rowsDeleted;
 }

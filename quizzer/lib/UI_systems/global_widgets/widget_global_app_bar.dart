@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/UI_systems/color_wheel.dart';
 
 class GlobalAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final bool showHomeButton;
   final List<Widget>? additionalActions;
-  final SessionManager session = SessionManager();
 
-  GlobalAppBar({
+  const GlobalAppBar({
     super.key,
     required this.title,
     this.showHomeButton = true,
@@ -31,9 +29,7 @@ class GlobalAppBar extends StatelessWidget implements PreferredSizeWidget {
         icon: const Icon(Icons.arrow_back, color: ColorWheel.primaryText),
         tooltip: 'Back',
         onPressed: () {
-          final previousPage = session.getPreviousPage();
-          session.addPageToHistory(previousPage);
-          Navigator.of(context).pushReplacementNamed(previousPage);
+          Navigator.of(context).pop();
         },
       ),
       actions: [
@@ -42,7 +38,6 @@ class GlobalAppBar extends StatelessWidget implements PreferredSizeWidget {
             icon: const Icon(Icons.home, color: ColorWheel.primaryText),
             tooltip: 'Home',
             onPressed: () {
-              session.addPageToHistory('/home');
               Navigator.of(context).pushReplacementNamed('/home');
             },
           ),
