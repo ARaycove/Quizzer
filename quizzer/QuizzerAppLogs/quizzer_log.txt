@@ -1,0 +1,43 @@
+Quizzer: [13:10:23] [34m[INFO][0m [<asynchronous suspension>] QuizzerLogger successfully set up file logging to: ./QuizzerAppLogs/quizzer_log.txt
+Quizzer: [13:10:23] [34m[INFO][0m [<asynchronous suspension>] QuizzerLogger: Attempting a SECOND test log message to file.
+Quizzer: [13:10:23] [34m[INFO][0m [how_many_lines.dart] Calculating total lines of code...
+Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] 
+--- Line Count Summary ---
+Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] Total_Backend_Systems: 19546
+Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] Total_UI_Systems:      9844
+Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] Total_Test_Lines:      8442
+Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] --------------------------
+Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] Total_Lines:           37832
+Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] --------------------------
+Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] 
+--- Backend Systems Breakdown (recursive, alphabetical) ---
+Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] 00_database_manager/                      13323
+Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] ├── cloud_sync_system/                         3145
+Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] │   ├── inbound_sync/                              1196
+Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] │   └── outbound_sync/                             1667
+Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] ├── platform/                                    65
+Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] ├── review_system/                              286
+Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] └── tables/                                    9321
+Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart]     ├── user_profile/                              1759
+Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart]     └── user_stats/                                3072
+Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] 00_helper_utils/                            223
+Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] 02_login_authentication/                    730
+Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] 03_account_creation/                        134
+Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] 04_module_management/                       448
+Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] 06_question_queue_server/                   746
+Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] 07_user_question_management/                110
+Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] 08_memory_retention_algo/                    90
+Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] 09_data_caches/                             361
+Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] 10_switch_board/                            723
+Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] 11_ai_management/                           247
+Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] 12_subject_concept_classifier/                0
+Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] logger/                                     322
+Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] session_manager/                           2089
+Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] 
+--- UI Systems Breakdown (recursive, alphabetical) ---
+Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] 00_login_page/                              333
+Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] 01_new_user_page/                           315
+Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] 02_home_page/                               437
+Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] 03_add_question_page/                      2257
+Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] ├── helpers/                                    173
+Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] └── widgets/                                   1561

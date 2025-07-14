@@ -4,6 +4,7 @@ import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/UI_systems/global_widgets/widget_edit_question_dialogue.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/backend_systems/00_helper_utils/file_locations.dart';
+import 'package:quizzer/UI_systems/04_display_modules_page/module_card/widget_rename_merge.dart';
 import 'dart:io';
 
 
@@ -66,10 +67,11 @@ class QuestionList extends StatelessWidget {
   });
 
   void _showEditQuestionDialog(BuildContext context, Map<String, dynamic> questionRecord) {
+    final String questionId = questionRecord['question_id'] as String;
     showDialog(
       context: context,
       builder: (context) => EditQuestionDialog(
-        initialQuestionData: questionRecord,
+        questionId: questionId,
         disableSubmission: false,
       ),
     ).then((result) {
@@ -267,99 +269,121 @@ class _EditModuleDialogState extends State<EditModuleDialog> {
       ),
       child: SizedBox(
         width: dialogWidth,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Header
-            Padding(
-              padding: ColorWheel.standardPadding,
-              child: Text(
-                'Edit Module: $_moduleName',
-                style: ColorWheel.titleText,
-              ),
-            ),
-            const Divider(color: ColorWheel.secondaryText),
-            // Description field
-            Padding(
-              padding: ColorWheel.standardPadding,
-              child: EditDescription(
-                descriptionController: _descriptionController,
-              ),
-            ),
-            // Question list
-            Padding(
-              padding: ColorWheel.standardPadding,
-              child: QuestionList(
-                questionRecords: _questionRecords,
-                onQuestionUpdated: () async {
-                  // Refresh the question records when a question is updated
-                  try {
-                    // Get fresh module data from the database
-                    final modulesData = await _session.loadModules();
-                    final modules = modulesData['modules'] as List<Map<String, dynamic>>;
-                    final currentModule = modules.firstWhere(
-                      (module) => module['module_name'] == _moduleName,
-                      orElse: () => widget.moduleData,
-                    );
-                    
-                    setState(() {
-                      // Update with fresh question records
-                      final rawQuestions = currentModule['questions'];
-                      if (rawQuestions is List) {
-                        _questionRecords = rawQuestions.whereType<Map<String, dynamic>>().toList();
-                      } else {
-                        _questionRecords = [];
-                      }
-                    });
-                  } catch (e) {
-                    QuizzerLogger.logError('Failed to refresh question records: $e');
-                  }
-                },
-              ),
-            ),
-            // Footer with buttons
-            Container(
-              padding: ColorWheel.standardPadding,
-              decoration: const BoxDecoration(
-                color: ColorWheel.primaryBackground,
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(ColorWheel.cardRadiusValue),
-                  bottomRight: Radius.circular(ColorWheel.cardRadiusValue),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height * 0.85,
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Header
+                Padding(
+                  padding: ColorWheel.standardPadding,
+                  child: Text(
+                    'Edit Module: $_moduleName',
+                    style: ColorWheel.titleText,
+                  ),
                 ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: const Text(
-                      'Cancel',
-                      style: ColorWheel.secondaryTextStyle,
+                const Divider(color: ColorWheel.secondaryText),
+                // Rename and Merge Widget (only for admin/contributor users)
+                if (_session.userRole == 'admin' || _session.userRole == 'contributor') ...[
+                  Padding(
+                    padding: ColorWheel.standardPadding,
+                    child: ModuleRenameMergeWidget(
+                      currentModuleName: _moduleName,
+                      onModuleUpdated: () {
+                        // Refresh module data when rename/merge operations complete
+                        widget.onModuleUpdated?.call();
+                        // Close the dialog since the module may have been renamed or merged
+                        Navigator.of(context).pop();
+                      },
                     ),
                   ),
-                  const SizedBox(width: ColorWheel.buttonHorizontalSpacing),
-                  ElevatedButton(
-                    onPressed: () {
-                      widget.onSave(_descriptionController.text);
-                      Navigator.of(context).pop();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: ColorWheel.buttonSuccess,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: ColorWheel.buttonBorderRadius,
-                      ),
-                    ),
-                    child: const Text(
-                      'Save',
-                      style: ColorWheel.buttonText,
-                    ),
-                  ),
+                  const Divider(color: ColorWheel.secondaryText),
                 ],
-              ),
+                // Description field
+                Padding(
+                  padding: ColorWheel.standardPadding,
+                  child: EditDescription(
+                    descriptionController: _descriptionController,
+                  ),
+                ),
+                // Question list
+                Padding(
+                  padding: ColorWheel.standardPadding,
+                  child: QuestionList(
+                    questionRecords: _questionRecords,
+                    onQuestionUpdated: () async {
+                      // Refresh the question records when a question is updated
+                      try {
+                        // Get fresh module data from the database using the more efficient single module call
+                        final currentModule = await _session.getModuleDataByName(_moduleName);
+                        if (currentModule != null) {
+                          setState(() {
+                            // Update with fresh question records
+                            final rawQuestions = currentModule['questions'];
+                            if (rawQuestions is List) {
+                              _questionRecords = rawQuestions.whereType<Map<String, dynamic>>().toList();
+                            } else {
+                              _questionRecords = [];
+                            }
+                          });
+                          QuizzerLogger.logSuccess('Successfully refreshed question records for module: $_moduleName');
+                        } else {
+                          QuizzerLogger.logWarning('Module $_moduleName not found when refreshing question records');
+                        }
+                      } catch (e) {
+                        QuizzerLogger.logError('Failed to refresh question records: $e');
+                      }
+                    },
+                  ),
+                ),
+                // Footer with buttons
+                Container(
+                  padding: ColorWheel.standardPadding,
+                  decoration: const BoxDecoration(
+                    color: ColorWheel.primaryBackground,
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(ColorWheel.cardRadiusValue),
+                      bottomRight: Radius.circular(ColorWheel.cardRadiusValue),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text(
+                          'Cancel',
+                          style: ColorWheel.secondaryTextStyle,
+                        ),
+                      ),
+                      const SizedBox(width: ColorWheel.buttonHorizontalSpacing),
+                      ElevatedButton(
+                        onPressed: () {
+                          widget.onSave(_descriptionController.text);
+                          Navigator.of(context).pop();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: ColorWheel.buttonSuccess,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: ColorWheel.buttonBorderRadius,
+                          ),
+                        ),
+                        child: const Text(
+                          'Save',
+                          style: ColorWheel.buttonText,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

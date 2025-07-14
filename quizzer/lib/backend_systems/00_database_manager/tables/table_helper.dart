@@ -30,7 +30,6 @@ _encodeValueForDB(dynamic value) {
 /// Decodes a value retrieved from SQLite back into its likely Dart type.
 /// Assumes that TEXT fields starting with '[' or '{' are JSON strings representing Lists/Maps.
 /// Other TEXT fields are returned as Strings. INTEGER, REAL, and NULL are returned directly.
-// TODO: Implement schema-aware boolean decoding. Currently, integers 0/1 are not automatically converted to booleans.
 // Callers must manually interpret integer fields intended as booleans.
 _decodeValueFromDB(dynamic dbValue) {
   if (dbValue == null || dbValue is int || dbValue is double) {
@@ -238,12 +237,53 @@ Future<String> getDeviceInfo() async {
 }
 
 Future<String> getUserIpAddress() async {
-  // FIXME: SECURITY - Disabled certificate validation (badCertificateCallback) makes this vulnerable to MitM attacks.
-  // FIXME: ROBUSTNESS - IP detection relies on screen scraping dnsleaktest.com, which is fragile and prone to break if the site's HTML changes.
+  QuizzerLogger.logMessage('Attempting to get IP address with multiple fallback methods');
+  
+  // Method 1: Try multiple external IP services with fallbacks
+  final List<String> ipServices = [
+    'https://api.ipify.org',
+    'https://httpbin.org/ip',
+    'https://icanhazip.com',
+    'https://ident.me',
+    'https://ifconfig.me/ip',
+  ];
+  
+  for (final serviceUrl in ipServices) {
+    try {
+      QuizzerLogger.logMessage('Trying IP service: $serviceUrl');
+      
+      // Create a custom HttpClient with certificate bypass
+      final httpClient = HttpClient()
+        ..badCertificateCallback = (cert, host, port) => true;
+      
+      final request = await httpClient.getUrl(Uri.parse(serviceUrl));
+      final response = await request.close();
+      final responseBody = await response.transform(utf8.decoder).join();
+      
+      if (response.statusCode == 200) {
+        // Clean the response - most services return just the IP
+        final ip = responseBody.trim();
+        
+        // Validate it looks like an IPv4 address
+        if (RegExp(r'^\d+\.\d+\.\d+\.\d+$').hasMatch(ip)) {
+          QuizzerLogger.logSuccess('Successfully retrieved IP address from $serviceUrl: $ip');
+          return ip;
+        } else {
+          QuizzerLogger.logWarning('Invalid IP format from $serviceUrl: $ip');
+        }
+      } else {
+        QuizzerLogger.logWarning('Failed to get IP from $serviceUrl, status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      QuizzerLogger.logWarning('Error getting IP from $serviceUrl: $e');
+      continue; // Try next service
+    }
+  }
+  
+  // Method 2: Try the original dnsleaktest.com method as last resort
   try {
-    QuizzerLogger.logMessage('Attempting to get IP address from dnsleaktest.com');
+    QuizzerLogger.logMessage('Trying dnsleaktest.com as last resort');
     
-    // Create a custom HttpClient that skips certificate verification
     final httpClient = HttpClient()
       ..badCertificateCallback = (cert, host, port) => true;
     
@@ -258,20 +298,17 @@ Future<String> getUserIpAddress() async {
       
       if (match != null) {
         final ip = match.group(1)!;
-        QuizzerLogger.logSuccess('Successfully retrieved IP address: $ip');
+        QuizzerLogger.logSuccess('Successfully retrieved IP address from dnsleaktest.com: $ip');
         return ip;
-      } else {
-        QuizzerLogger.logWarning('Could not find IP address in response');
-        return "offline_login";
       }
-    } else {
-      QuizzerLogger.logWarning('Failed to get IP address, status code: ${response.statusCode}');
-      return "offline_login";
     }
   } catch (e) {
-    QuizzerLogger.logError('Error getting IP address: $e');
-    return "offline_login";
+    QuizzerLogger.logWarning('Error getting IP from dnsleaktest.com: $e');
   }
+  
+  // All methods failed, return offline indicator
+  QuizzerLogger.logWarning('All IP address methods failed, returning offline indicator');
+  return "offline_login";
 }
 
 // --- Function to get App Version ---

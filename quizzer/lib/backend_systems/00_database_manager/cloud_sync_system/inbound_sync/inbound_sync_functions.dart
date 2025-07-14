@@ -1,5 +1,6 @@
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
+import 'package:quizzer/backend_systems/10_switch_board/sb_other_signals.dart';
 import 'package:supabase/supabase.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pairs_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_profile_table.dart';
@@ -16,6 +17,7 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/us
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_daily_questions_answered_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_days_left_until_questions_exhaust_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_average_daily_questions_learned_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_module_activation_status_table.dart';
 import 'dart:io'; // For SocketException
 import 'dart:async'; // For Future.delayed
 
@@ -81,57 +83,106 @@ Future<T> executeSupabaseCallWithRetry<T>(
   }
 }
 
-/// Syncs question_answer_pairs from the cloud that are newer than last_login
+/// Syncs question_answer_pairs from the cloud that are newer than the most recent local record
 Future<void> syncQuestionAnswerPairsInbound(
   String userId,
-  String lastLogin,
   SupabaseClient supabaseClient,
 ) async {
   try {
-    SessionManager sessionManager = getSessionManager();
-    QuizzerLogger.logMessage('Syncing inbound question_answer_pairs for user $userId since $lastLogin...');
-    List<dynamic> cloudRecords;
+    QuizzerLogger.logMessage('Syncing inbound question_answer_pairs for user $userId...');
+    
+    // Get the most recent last_modified_timestamp from local question_answer_pairs table
+    String? localLastTimestamp;
     try {
+      localLastTimestamp = await getMostRecentQuestionAnswerPairTimestamp();
+      QuizzerLogger.logMessage('Most recent local question timestamp: ${localLastTimestamp ?? "No local records found"}');
+    } catch (e) {
+      QuizzerLogger.logError('Error getting local last timestamp: $e');
+      // Fallback to using a very old timestamp if we can't get local timestamp
+      localLastTimestamp = DateTime(1996, 8, 20).toUtc().toIso8601String();
+    }
+    
+    // Use local timestamp if available, otherwise use a very old timestamp to get all records
+    final String syncStartTimestamp = localLastTimestamp ?? DateTime.now().subtract(const Duration(days: 365 * 20)).toUtc().toIso8601String();
+    QuizzerLogger.logMessage('Starting sync from timestamp: $syncStartTimestamp');
+    
+    int totalSynced = 0;
+    int batchNumber = 0;
+    bool hasMoreRecords = true;
+    String? lastTimestamp = syncStartTimestamp;
+    
+    while (hasMoreRecords) {
+      batchNumber++;
+    List<dynamic> cloudRecords;
+      
+    try {
+        // Build query with pagination - use the appropriate timestamp for this batch
+        String queryTimestamp = batchNumber == 1 ? syncStartTimestamp : (lastTimestamp ?? syncStartTimestamp);
+        
       cloudRecords = await supabaseClient
           .from('question_answer_pairs')
           .select('*')
-          .gt('last_modified_timestamp', lastLogin);
+            .gt('last_modified_timestamp', queryTimestamp)
+            .order('last_modified_timestamp', ascending: true)
+            .limit(500);
+        
     } on PostgrestException catch (e, s) {
-      QuizzerLogger.logError('syncQuestionAnswerPairsInbound: PostgrestException for user $userId. Error: ${e.message}, Stack: $s');
-      sessionManager.addLoginProgress('Question sync: Error.');
+        QuizzerLogger.logError('syncQuestionAnswerPairsInbound: PostgrestException for user $userId (batch $batchNumber). Error: ${e.message}, Stack: $s');
+      signalLoginProgress('Question sync: Error.');
       return;
     } on SocketException catch (e, s) {
-      QuizzerLogger.logError('syncQuestionAnswerPairsInbound: SocketException for user $userId. Error: $e, Stack: $s');
-      sessionManager.addLoginProgress('Question sync: Network error.');
+        QuizzerLogger.logError('syncQuestionAnswerPairsInbound: SocketException for user $userId (batch $batchNumber). Error: $e, Stack: $s');
+      signalLoginProgress('Question sync: Network error.');
       return;
     } catch (e, s) {
-      QuizzerLogger.logError('syncQuestionAnswerPairsInbound: Unexpected error for user $userId. Error: $e, Stack: $s');
-      sessionManager.addLoginProgress('Question sync: Unexpected error.');
+        QuizzerLogger.logError('syncQuestionAnswerPairsInbound: Unexpected error for user $userId (batch $batchNumber). Error: $e, Stack: $s');
+      signalLoginProgress('Question sync: Unexpected error.');
       return;
     }
 
-    final int totalToSync = cloudRecords.length;
+      if (cloudRecords.isEmpty) {
+        hasMoreRecords = false;
+        break;
+      }
 
-    if (totalToSync == 0) {
-      QuizzerLogger.logMessage('No new question_answer_pairs to sync.');
-      sessionManager.addLoginProgress('Question sync: No new questions.');
-      return;
-    }
+      // Update last timestamp for next batch (use the last record's timestamp)
+      if (cloudRecords.isNotEmpty) {
+        final lastRecord = cloudRecords.last as Map<String, dynamic>;
+        lastTimestamp = lastRecord['last_modified_timestamp'] as String;
+      }
 
-    QuizzerLogger.logMessage('Found $totalToSync new/updated question_answer_pairs to sync.');
-    sessionManager.addLoginProgress('Question sync: Found $totalToSync questions.');
-    int syncedCount = 0;
-    // Process in batches
-    const int batchSize = 500;
-    for (int i = 0; i < cloudRecords.length; i += batchSize) {
-      final end = (i + batchSize < cloudRecords.length) ? i + batchSize : cloudRecords.length;
-      final batch = List<Map<String, dynamic>>.from(cloudRecords.sublist(i, end));
+      final int batchSize = cloudRecords.length;
+      totalSynced += batchSize;
+      
+      QuizzerLogger.logMessage('Processing batch $batchNumber: $batchSize records (Total so far: $totalSynced)');
+      
+      if (batchNumber == 1) {
+        // First batch - show initial count
+        signalLoginProgress('Question sync: Found $batchSize questions.');
+      } else {
+        // Subsequent batches - show progress
+        signalLoginProgress('Question sync: Found $totalSynced questions so far.');
+      }
+
+      // Process this batch
+      final batch = List<Map<String, dynamic>>.from(cloudRecords);
       await batchUpsertQuestionAnswerPairs(records: batch);
-      syncedCount += batch.length;
-      sessionManager.addLoginProgress('Syncing Question $syncedCount/$totalToSync');
+      
+      signalLoginProgress('Syncing Question $totalSynced (batch $batchNumber complete)');
+      
+      // If we got less than 500 records, we've reached the end
+      if (batchSize < 500) {
+        hasMoreRecords = false;
+      }
     }
-    QuizzerLogger.logSuccess('Synced $totalToSync question_answer_pairs from cloud.');
-    sessionManager.addLoginProgress('Question sync: Complete.');
+
+    if (totalSynced == 0) {
+      QuizzerLogger.logMessage('No new question_answer_pairs to sync.');
+      signalLoginProgress('Question sync: No new questions.');
+    } else {
+      QuizzerLogger.logSuccess('Synced $totalSynced question_answer_pairs from cloud in $batchNumber batches.');
+    signalLoginProgress('Question sync: Complete.');
+    }
   } catch (e) {
     QuizzerLogger.logError('syncQuestionAnswerPairsInbound: Error - $e');
     rethrow;
@@ -146,51 +197,89 @@ Future<void> syncUserQuestionAnswerPairsInbound(
 ) async {
   try {
     QuizzerLogger.logMessage('Syncing inbound user_question_answer_pairs for user $userId since $initialTimestamp...');
-    final SessionManager sessionManager = getSessionManager();
+    
+    // Use initial timestamp if available, otherwise use a very old timestamp to get all records
+    final String syncStartTimestamp = initialTimestamp ?? DateTime.now().subtract(const Duration(days: 365 * 20)).toUtc().toIso8601String();
+    QuizzerLogger.logMessage('Starting sync from timestamp: $syncStartTimestamp');
+    
+    int totalSynced = 0;
+    int batchNumber = 0;
+    bool hasMoreRecords = true;
+    String? lastTimestamp = syncStartTimestamp;
+    
+    while (hasMoreRecords) {
+      batchNumber++;
     List<dynamic> cloudRecords;
+      
     try {
+        // Build query with pagination - use the appropriate timestamp for this batch
+        String queryTimestamp = batchNumber == 1 ? syncStartTimestamp : (lastTimestamp ?? syncStartTimestamp);
+        
       cloudRecords = await supabaseClient
           .from('user_question_answer_pairs')
           .select('*')
           .eq('user_uuid', userId)
-          .gt('last_modified_timestamp', initialTimestamp ?? '');
+            .gt('last_modified_timestamp', queryTimestamp)
+            .order('last_modified_timestamp', ascending: true)
+            .limit(500);
+        
     } on PostgrestException catch (e, s) {
-      QuizzerLogger.logError('syncUserQuestionAnswerPairsInbound: PostgrestException for user $userId. Error: ${e.message}, Stack: $s');
-      sessionManager.addLoginProgress('User progress sync: Error.');
+        QuizzerLogger.logError('syncUserQuestionAnswerPairsInbound: PostgrestException for user $userId (batch $batchNumber). Error: ${e.message}, Stack: $s');
+      signalLoginProgress('User progress sync: Error.');
       return;
     } on SocketException catch (e, s) {
-      QuizzerLogger.logError('syncUserQuestionAnswerPairsInbound: SocketException for user $userId. Error: $e, Stack: $s');
-      sessionManager.addLoginProgress('User progress sync: Network error.');
+        QuizzerLogger.logError('syncUserQuestionAnswerPairsInbound: SocketException for user $userId (batch $batchNumber). Error: $e, Stack: $s');
+      signalLoginProgress('User progress sync: Network error.');
       return;
     } catch (e, s) {
-      QuizzerLogger.logError('syncUserQuestionAnswerPairsInbound: Unexpected error for user $userId. Error: $e, Stack: $s');
-      sessionManager.addLoginProgress('User progress sync: Unexpected error.');
+        QuizzerLogger.logError('syncUserQuestionAnswerPairsInbound: Unexpected error for user $userId (batch $batchNumber). Error: $e, Stack: $s');
+      signalLoginProgress('User progress sync: Unexpected error.');
       return;
     }
 
     if (cloudRecords.isEmpty) {
-      QuizzerLogger.logMessage('No new user_question_answer_pairs to sync.');
-      sessionManager.addLoginProgress('User progress sync: No new records.');
-      return;
+        hasMoreRecords = false;
+        break;
+      }
+
+      // Update last timestamp for next batch (use the last record's timestamp)
+      if (cloudRecords.isNotEmpty) {
+        final lastRecord = cloudRecords.last as Map<String, dynamic>;
+        lastTimestamp = lastRecord['last_modified_timestamp'] as String;
     }
 
-    final int totalToSync = cloudRecords.length;
-    QuizzerLogger.logMessage('Found $totalToSync new/updated user_question_answer_pairs to sync.');
-    sessionManager.addLoginProgress('User progress sync: Found $totalToSync records.');
+      final int batchSize = cloudRecords.length;
+      totalSynced += batchSize;
+      
+      QuizzerLogger.logMessage('Processing batch $batchNumber: $batchSize records (Total so far: $totalSynced)');
+      
+      if (batchNumber == 1) {
+        // First batch - show initial count
+        signalLoginProgress('User progress sync: Found $batchSize records.');
+      } else {
+        // Subsequent batches - show progress
+        signalLoginProgress('User progress sync: Found $totalSynced records so far.');
+      }
 
-    // Process in batches of 500
-    const int batchSize = 500;
-    int processedCount = 0;
-    for (int i = 0; i < cloudRecords.length; i += batchSize) {
-      final end = (i + batchSize < cloudRecords.length) ? i + batchSize : cloudRecords.length;
-      final batch = List<Map<String, dynamic>>.from(cloudRecords.sublist(i, end));
+      // Process this batch
+      final batch = List<Map<String, dynamic>>.from(cloudRecords);
       await batchUpsertUserQuestionAnswerPairs(records: batch);
-      processedCount += batch.length;
-      sessionManager.addLoginProgress('Syncing User Progress $processedCount/$totalToSync');
+      
+      signalLoginProgress('Syncing User Progress $totalSynced (batch $batchNumber complete)');
+      
+      // If we got less than 500 records, we've reached the end
+      if (batchSize < 500) {
+        hasMoreRecords = false;
+      }
     }
 
-    QuizzerLogger.logSuccess('Synced $processedCount user_question_answer_pairs from cloud.');
-    sessionManager.addLoginProgress('User progress sync: Complete.');
+    if (totalSynced == 0) {
+      QuizzerLogger.logMessage('No new user_question_answer_pairs to sync.');
+      signalLoginProgress('User progress sync: No new records.');
+    } else {
+      QuizzerLogger.logSuccess('Synced $totalSynced user_question_answer_pairs from cloud in $batchNumber batches.');
+    signalLoginProgress('User progress sync: Complete.');
+    }
   } catch (e) {
     QuizzerLogger.logError('syncUserQuestionAnswerPairsInbound: Error - $e');
     rethrow;
@@ -864,6 +953,63 @@ Future<void> syncUserStatsAverageDailyQuestionsLearnedInbound(
   }
 }
 
+Future<void> syncUserModuleActivationStatusInbound(
+  String userId,
+  String? initialTimestamp,
+  SupabaseClient supabaseClient,
+) async {
+  try {
+    QuizzerLogger.logMessage('Syncing inbound user_module_activation_status for user $userId since $initialTimestamp...');
+
+    List<dynamic> cloudRecords;
+    try {
+      cloudRecords = await executeSupabaseCallWithRetry(
+        () => supabaseClient
+            .from('user_module_activation_status')
+            .select('*')
+            .eq('user_id', userId)
+            .gt('last_modified_timestamp', initialTimestamp ?? DateTime(1970).toIso8601String())
+            .then((response) => List<dynamic>.from(response as List)),
+        logContext: 'syncUserModuleActivationStatusInbound: Fetching for user $userId',
+      );
+    } on PostgrestException catch (e, s) {
+      QuizzerLogger.logError('syncUserModuleActivationStatusInbound: PostgrestException (potentially non-retriable or after retries) for user $userId. Error: ${e.message}, Stack: $s');
+      return;
+    } on SocketException catch (e, s) {
+      QuizzerLogger.logError('syncUserModuleActivationStatusInbound: SocketException (after retries) for user $userId. Error: $e, Stack: $s');
+      return;
+    } catch (e, s) {
+      QuizzerLogger.logError('syncUserModuleActivationStatusInbound: Unexpected error for user $userId. Error: $e, Stack: $s');
+      return;
+    }
+
+    if (cloudRecords.isEmpty) {
+      QuizzerLogger.logMessage('No new user_module_activation_status to sync for user $userId.');
+      return;
+    }
+
+    QuizzerLogger.logMessage('Found ${cloudRecords.length} new/updated user_module_activation_status to sync for user $userId.');
+
+    for (final record in cloudRecords) {
+      if (record is Map<String, dynamic>) {
+        await upsertModuleActivationStatusFromInboundSync(
+          userId: record['user_id'] as String,
+          moduleName: record['module_name'] as String,
+          isActive: (record['is_active'] as int) == 1,
+          lastModifiedTimestamp: record['last_modified_timestamp'] as String,
+        );
+      } else {
+        QuizzerLogger.logWarning('syncUserModuleActivationStatusInbound: Encountered a record not of type Map<String, dynamic>. Record: $record');
+      }
+    }
+
+    QuizzerLogger.logSuccess('Synced ${cloudRecords.length} user_module_activation_status from cloud for user $userId.');
+  } catch (e) {
+    QuizzerLogger.logError('syncUserModuleActivationStatusInbound: Error - $e');
+    rethrow;
+  }
+}
+
 Future<void> runInboundSync(SessionManager sessionManager) async {
   QuizzerLogger.logMessage('Starting inbound sync aggregator...');
   final String? userId = sessionManager.userId;
@@ -874,110 +1020,61 @@ Future<void> runInboundSync(SessionManager sessionManager) async {
   final String effectiveLastLogin = lastLogin ?? DateTime.now().subtract(const Duration(days: 365 * 20)).toUtc().toIso8601String();
   QuizzerLogger.logMessage('Using effective last login timestamp: $effectiveLastLogin');
 
-  // Sync question_answer_pairs
-  await syncQuestionAnswerPairsInbound(userId, effectiveLastLogin, sessionManager.supabase);
-
   // Get initial profile timestamp, if null set to 20 years ago
   final String? initialTimestamp = sessionManager.initialProfileLastModified;
   final String effectiveInitialTimestamp = initialTimestamp ?? DateTime.now().subtract(const Duration(days: 365 * 20)).toUtc().toIso8601String();
   QuizzerLogger.logMessage('Using effective initial timestamp: $effectiveInitialTimestamp');
 
+  // Run all sync operations concurrently using Future.wait()
+  await Future.wait([
+    // Sync question_answer_pairs
+    syncQuestionAnswerPairsInbound(userId, sessionManager.supabase),
+
   // Sync user_question_answer_pairs using the initial profile last_modified_timestamp
-  await syncUserQuestionAnswerPairsInbound(
-    userId,
-    effectiveInitialTimestamp,
-    sessionManager.supabase,
-  );
+    syncUserQuestionAnswerPairsInbound(userId, effectiveInitialTimestamp, sessionManager.supabase),
 
   // Sync user profile using the initial profile last_modified_timestamp
-  await syncUserProfileInbound(
-    userId,
-    effectiveInitialTimestamp,
-    sessionManager.supabase,
-  );
+    syncUserProfileInbound(userId, effectiveInitialTimestamp, sessionManager.supabase),
 
   // Sync user settings using the initial profile last_modified_timestamp
-  await syncUserSettingsInbound(
-    userId,
-    effectiveInitialTimestamp,
-    sessionManager.supabase,
-  );
+    syncUserSettingsInbound(userId, effectiveInitialTimestamp, sessionManager.supabase),
 
   // Sync modules using the initial profile last_modified_timestamp
-  await syncModulesInbound(
-    effectiveInitialTimestamp,
-    sessionManager.supabase,
-  );
+    syncModulesInbound(effectiveInitialTimestamp, sessionManager.supabase),
 
   // Sync user_stats_eligible_questions using the initial profile last_modified_timestamp
-  await syncUserStatsEligibleQuestionsInbound(
-    userId,
-    effectiveInitialTimestamp,
-    sessionManager.supabase,
-  );
+    syncUserStatsEligibleQuestionsInbound(userId, effectiveInitialTimestamp, sessionManager.supabase),
 
   // Sync user_stats_non_circulating_questions using the initial profile last_modified_timestamp
-  await syncUserStatsNonCirculatingQuestionsInbound(
-    userId,
-    effectiveInitialTimestamp,
-    sessionManager.supabase,
-  );
+    syncUserStatsNonCirculatingQuestionsInbound(userId, effectiveInitialTimestamp, sessionManager.supabase),
 
   // Sync user_stats_in_circulation_questions using the initial profile last_modified_timestamp
-  await syncUserStatsInCirculationQuestionsInbound(
-    userId,
-    effectiveInitialTimestamp,
-    sessionManager.supabase,
-  );
+    syncUserStatsInCirculationQuestionsInbound(userId, effectiveInitialTimestamp, sessionManager.supabase),
 
   // Sync user_stats_revision_streak_sum using the initial profile last_modified_timestamp
-  await syncUserStatsRevisionStreakSumInbound(
-    userId,
-    effectiveInitialTimestamp,
-    sessionManager.supabase,
-  );
+    syncUserStatsRevisionStreakSumInbound(userId, effectiveInitialTimestamp, sessionManager.supabase),
 
   // Sync user_stats_total_user_question_answer_pairs using the initial profile last_modified_timestamp
-  await syncUserStatsTotalUserQuestionAnswerPairsInbound(
-    userId,
-    effectiveInitialTimestamp,
-    sessionManager.supabase,
-  );
+    syncUserStatsTotalUserQuestionAnswerPairsInbound(userId, effectiveInitialTimestamp, sessionManager.supabase),
 
   // Sync user_stats_average_questions_shown_per_day using the initial profile last_modified_timestamp
-  await syncUserStatsAverageQuestionsShownPerDayInbound(
-    userId,
-    effectiveInitialTimestamp,
-    sessionManager.supabase,
-  );
+    syncUserStatsAverageQuestionsShownPerDayInbound(userId, effectiveInitialTimestamp, sessionManager.supabase),
 
   // Sync user_stats_total_questions_answered using the initial profile last_modified_timestamp
-  await syncUserStatsTotalQuestionsAnsweredInbound(
-    userId,
-    effectiveInitialTimestamp,
-    sessionManager.supabase,
-  );
+    syncUserStatsTotalQuestionsAnsweredInbound(userId, effectiveInitialTimestamp, sessionManager.supabase),
 
   // Sync user_stats_daily_questions_answered using the initial profile last_modified_timestamp
-  await syncUserStatsDailyQuestionsAnsweredInbound(
-    userId,
-    effectiveInitialTimestamp,
-    sessionManager.supabase,
-  );
+    syncUserStatsDailyQuestionsAnsweredInbound(userId, effectiveInitialTimestamp, sessionManager.supabase),
 
   // Sync user_stats_days_left_until_questions_exhaust using the initial profile last_modified_timestamp
-  await syncUserStatsDaysLeftUntilQuestionsExhaustInbound(
-    userId,
-    effectiveInitialTimestamp,
-    sessionManager.supabase
-  );
+    syncUserStatsDaysLeftUntilQuestionsExhaustInbound(userId, effectiveInitialTimestamp, sessionManager.supabase),
 
   // Sync user_stats_average_daily_questions_learned using the initial profile last_modified_timestamp
-  await syncUserStatsAverageDailyQuestionsLearnedInbound(
-    userId,
-    effectiveInitialTimestamp,
-    sessionManager.supabase
-  );
+    syncUserStatsAverageDailyQuestionsLearnedInbound(userId, effectiveInitialTimestamp, sessionManager.supabase),
+    
+    // Sync user_module_activation_status using the initial profile last_modified_timestamp
+    syncUserModuleActivationStatusInbound(userId, effectiveInitialTimestamp, sessionManager.supabase),
+  ]);
 
   QuizzerLogger.logSuccess('Inbound sync completed successfully.');
 }

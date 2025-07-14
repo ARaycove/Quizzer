@@ -1,65 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:quizzer/UI_systems/global_widgets/widget_global_app_bar.dart';
-import 'package:quizzer/UI_systems/04_display_modules_page/module_card/widget_module_card.dart';
+import 'package:quizzer/UI_systems/04_display_modules_page/widget_module_page_main_body_list.dart';
 import 'package:quizzer/UI_systems/04_display_modules_page/widget_scroll_to_top_button.dart';
 import 'package:quizzer/UI_systems/04_display_modules_page/widget_module_filter_button.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
-import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/UI_systems/color_wheel.dart';
 
-class DisplayModulesPage extends StatefulWidget {
+class DisplayModulesPage extends StatelessWidget {
   const DisplayModulesPage({super.key});
 
   @override
-  State<DisplayModulesPage> createState() => _DisplayModulesPageState();
-}
-
-class _DisplayModulesPageState extends State<DisplayModulesPage> {
-  final ScrollController      _scrollController       = ScrollController();
-  final SessionManager        session                 = SessionManager();
-  late Future<Map<String, dynamic>> _modulesFuture;
-  final ValueNotifier<bool> _showScrollToTopNotifier = ValueNotifier<bool>(false);
-
-  @override
-  void initState() {
-    super.initState();
-    _scrollController.addListener(_scrollListener);
-    QuizzerLogger.logMessage('Initializing Display Modules Page');
-    _loadModulesData();
-  }
-
-  void _loadModulesData() {
-    _modulesFuture = session.loadModules();
-  }
-
-  void _refreshModules() {
-    setState(() {
-      _loadModulesData();
-    });
-  }
-
-  @override
-  void dispose() {
-    _scrollController.removeListener(_scrollListener);
-    _scrollController.dispose();
-    _showScrollToTopNotifier.dispose();
-    super.dispose();
-  }
-
-  void _scrollListener() {
-    if (_scrollController.offset >= 100 && !_showScrollToTopNotifier.value) {
-      _showScrollToTopNotifier.value = true;
-    } else if (_scrollController.offset < 100 && _showScrollToTopNotifier.value) {
-      _showScrollToTopNotifier.value = false;
-    }
-  }
-
-  void _handleFilter() {
-    // TODO: Implement filter functionality
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final ScrollController scrollController = ScrollController();
+    final ValueNotifier<bool> showScrollToTopNotifier = ValueNotifier<bool>(false);
+    
+    // Scroll listener
+    void scrollListener() {
+      if (scrollController.offset >= 100 && !showScrollToTopNotifier.value) {
+        showScrollToTopNotifier.value = true;
+      } else if (scrollController.offset < 100 && showScrollToTopNotifier.value) {
+        showScrollToTopNotifier.value = false;
+      }
+    }
+    
+    scrollController.addListener(scrollListener);
+    
+    void handleFilter() {
+      // TODO: Implement filter functionality
+    }
+
     return Scaffold(
       backgroundColor: ColorWheel.primaryBackground,
       appBar: const GlobalAppBar(
@@ -68,66 +37,10 @@ class _DisplayModulesPageState extends State<DisplayModulesPage> {
       ),
       body: Stack(
         children: [
-          // Main content (loading, error, empty, or module cards)
+          // Main content (module cards list)
           Positioned.fill(
-            child: FutureBuilder<Map<String, dynamic>>(
-              future: _modulesFuture,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(
-                    child: CircularProgressIndicator(
-                      color: ColorWheel.primaryText,
-                    ),
-                  );
-                } else if (snapshot.hasError) {
-                  QuizzerLogger.logError('Error loading modules: \\${snapshot.error}');
-                  return const Center(
-                    child: Text(
-                      'Error loading modules. Please try again.',
-                      style: ColorWheel.secondaryTextStyle,
-                    ),
-                  );
-                } else if (!snapshot.hasData) {
-                  return const Center(
-                    child: Text(
-                      'No data received',
-                      style: ColorWheel.secondaryTextStyle,
-                    ),
-                  );
-                }
-                final modules = snapshot.data!['modules'] as List<Map<String, dynamic>>;
-                final moduleActivationStatus = snapshot.data!['activationStatus'] as Map<String, bool>;
-                final modulesWithQuestions = modules.where((module) => (module['total_questions'] ?? 0) > 0).toList();
-                if (modulesWithQuestions.isEmpty) {
-                  return const Center(
-                    child: Text(
-                      'No modules with questions found',
-                      style: ColorWheel.secondaryTextStyle,
-                    ),
-                  );
-                }
-                return SingleChildScrollView(
-                  controller: _scrollController,
-                  child: Padding(
-                    padding: const EdgeInsets.all(ColorWheel.standardPaddingValue),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Add space for floating buttons
-                        const SizedBox(
-                          height: 48.0,
-                        ),
-                        ...modulesWithQuestions
-                            .map((module) => ModuleCard(
-                                  moduleData: module,
-                                  isActivated: moduleActivationStatus[module['module_name']] ?? false,
-                                  onModuleUpdated: _refreshModules,
-                                )),
-                      ],
-                    ),
-                  ),
-                );
-              },
+            child: ModulePageMainBodyList(
+              scrollController: scrollController,
             ),
           ),
           // Top action buttons (always visible)
@@ -138,17 +51,17 @@ class _DisplayModulesPageState extends State<DisplayModulesPage> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 ValueListenableBuilder<bool>(
-                  valueListenable: _showScrollToTopNotifier,
+                  valueListenable: showScrollToTopNotifier,
                   builder: (context, showScrollToTop, child) {
                     return ScrollToTopButton(
-                      scrollController: _scrollController,
+                      scrollController: scrollController,
                       showScrollToTop: showScrollToTop,
                     );
                   },
                 ),
                 const SizedBox(width: ColorWheel.formFieldSpacing),
                 ModuleFilterButton(
-                  onFilterPressed: _handleFilter,
+                  onFilterPressed: handleFilter,
                 ),
               ],
             ),

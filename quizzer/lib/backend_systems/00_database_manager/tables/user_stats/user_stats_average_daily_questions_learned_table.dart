@@ -69,7 +69,24 @@ Future<void> updateAverageDailyQuestionsLearnedStat(String userId) async {
         'edits_are_synced': 0,
         'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
       };
-      await insertRawData('user_stats_average_daily_questions_learned', data, db);
+      // Check if record exists
+      final List<Map<String, dynamic>> existing = await queryAndDecodeDatabase(
+        'user_stats_average_daily_questions_learned',
+        db,
+        where: 'user_id = ? AND record_date = ?',
+        whereArgs: [userId, today],
+      );
+      if (existing.isEmpty) {
+        await insertRawData('user_stats_average_daily_questions_learned', data, db);
+      } else {
+        await updateRawData(
+          'user_stats_average_daily_questions_learned',
+          data,
+          'user_id = ? AND record_date = ?',
+          [userId, today],
+          db,
+        );
+      }
       QuizzerLogger.logSuccess('Updated average_daily_questions_learned stat for user $userId on $today: 0.0 (not enough data)');
       return;
     }

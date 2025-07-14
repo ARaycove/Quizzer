@@ -38,40 +38,9 @@ Future<Map<String, dynamic>> handleLoadModules(Map<String, dynamic> data) async 
     result['modules'] = modulesWithQuestions;
     result['activationStatus'] = await getModuleActivationStatus(userId);
     
-    // TODO: Module activation status is currently stored as a JSON string in the user profile table,
-    // which is inefficient and not best practice. This should be refactored to use a dedicated
-    // user_module_activation_status_table.dart with the following structure:
-    // - module_name (TEXT)
-    // - user_id (TEXT) 
-    // - is_activated (INTEGER)
-    // This will improve performance and follow proper database normalization practices.
-    
     return result;
   } catch (e) {
     QuizzerLogger.logError('Error in handleLoadModules - $e');
-    rethrow;
-  }
-}
-
-Future<bool> handleModuleActivation(Map<String, dynamic> data) async {
-  try {
-    final userId = data['userId'] as String;
-    final moduleName = data['moduleName'] as String;
-    final isActive = data['isActive'] as bool;
-    
-    QuizzerLogger.logMessage('Starting module activation process for user $userId, module $moduleName, isActive: $isActive');
-    
-    // TODO: This function will need to be updated once we implement the new user_module_activation_status_table.dart.
-    // Instead of updating a JSON string in the user profile, we'll insert/update records in the dedicated table
-    // with fields: module_name, user_id, is_activated. This will improve performance and follow proper database design.
-    
-    QuizzerLogger.logMessage('Updating module activation status');
-    final bool success = await updateModuleActivationStatus(userId, moduleName, isActive);
-    QuizzerLogger.logMessage('Module activation status update ${success ? 'succeeded' : 'failed'}');
-    
-    return success;
-  } catch (e) {
-    QuizzerLogger.logError('Error in module activation: $e');
     rethrow;
   }
 }
@@ -91,5 +60,53 @@ Future<bool> handleUpdateModuleDescription(Map<String, dynamic> data) async {
   } catch (e) {
     QuizzerLogger.logError('Error updating module description: $e');
     rethrow;
+  }
+}
+
+/// Validates that a module exists, creating it if it doesn't.
+/// This function ensures that a module with the given name exists in the database.
+/// If the module doesn't exist, it creates a new module with default values.
+/// 
+/// Parameters:
+/// - moduleName: The name of the module to validate/create
+/// - creatorId: The ID of the user creating the module (optional, defaults to 'system')
+/// 
+/// Returns:
+/// - true if the module exists or was successfully created, false otherwise
+Future<bool> validateModuleExists(String moduleName, {String? creatorId}) async {
+  try {
+    QuizzerLogger.logMessage('Validating module exists: $moduleName');
+    
+    // First, try to get the module
+    final Map<String, dynamic>? existingModule = await getModule(moduleName);
+    
+    if (existingModule != null) {
+      QuizzerLogger.logMessage('Module $moduleName already exists');
+      return true;
+    }
+    
+    // Module doesn't exist, create it with default values
+    QuizzerLogger.logMessage('Module $moduleName does not exist, creating it...');
+    
+    final String defaultDescription = 'Module for $moduleName';
+    const String defaultPrimarySubject = 'General';
+    final List<String> defaultSubjects = ['General'];
+    final List<String> defaultRelatedConcepts = ['General'];
+    final String moduleCreatorId = creatorId ?? 'system';
+    
+    await insertModule(
+      name: moduleName,
+      description: defaultDescription,
+      primarySubject: defaultPrimarySubject,
+      subjects: defaultSubjects,
+      relatedConcepts: defaultRelatedConcepts,
+      creatorId: moduleCreatorId,
+    );
+    
+    QuizzerLogger.logSuccess('Successfully created module: $moduleName');
+    return true;
+  } catch (e) {
+    QuizzerLogger.logError('Error validating/creating module $moduleName: $e');
+    return false;
   }
 } 

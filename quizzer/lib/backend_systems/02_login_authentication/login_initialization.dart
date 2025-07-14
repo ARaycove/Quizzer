@@ -3,26 +3,17 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/
 import 'package:quizzer/backend_systems/02_login_authentication/user_auth.dart';
 import 'package:quizzer/backend_systems/02_login_authentication/offline_login.dart';
 import 'package:quizzer/backend_systems/02_login_authentication/login_attempts_record.dart';
-import 'package:quizzer/backend_systems/02_login_authentication/fill_data_caches.dart';
-import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/inbound_sync/inbound_sync_worker.dart';
-import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/outbound_sync/outbound_sync_worker.dart';
-import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/media_sync_worker.dart';
+import 'package:quizzer/backend_systems/02_login_authentication/sync_worker_init.dart';
 import 'package:quizzer/backend_systems/02_login_authentication/queue_server_init.dart';
+import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
 import 'dart:async';
-import 'package:quizzer/backend_systems/10_switch_board/switch_board.dart';
 import 'package:quizzer/backend_systems/10_switch_board/sb_other_signals.dart';
 import 'package:supabase/supabase.dart';
 import 'package:hive/hive.dart';
-// TODO Move login initialization (currently defined in the session manager) to this file
-// SessionManager should be left with only a login function that is called when the user hits the login button, so this would include functionality like email validation as well.
-
-
-
-// TODO, question queue server needs to be updated such that we have a file with a function that defines the order in which each worker in the system is started
-
-// TODO, the same concept goes for data-caches, with a singlue function that defines and fills the cache with the data that is needed for the session.
-
-
+import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
+import 'package:email_validator/email_validator.dart';
+import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/outbound_sync/outbound_sync_functions.dart';
+import 'package:quizzer/backend_systems/00_helper_utils/utils.dart';
 
 // Spin up necessary processes and get userID from local profile, effectively intialize any session specific variables that should only be brought after successful login
 Future<String?> initializeSession(Map<String, dynamic> data) async {
@@ -40,9 +31,9 @@ Future<String?> initializeSession(Map<String, dynamic> data) async {
   }
 }
 
-/// Validates login form fields
+/// Validates login form fields using email_validator package
 /// Returns a map with 'valid' boolean and 'message' string
-Map<String, dynamic> _validateLoginForm(String email, String password) {
+Map<String, dynamic> validateLoginForm(String email, String password) {
   try {
     QuizzerLogger.logMessage('Entering _validateLoginForm()...');
     
@@ -62,9 +53,8 @@ Map<String, dynamic> _validateLoginForm(String email, String password) {
       };
     }
     
-    // Basic email format validation
-    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+$');
-    if (!emailRegex.hasMatch(email)) {
+    // Use email_validator package for robust email validation
+    if (!EmailValidator.validate(email)) {
       return {
         'valid': false,
         'message': 'Please enter a valid email address'
@@ -85,28 +75,34 @@ Map<String, dynamic> _validateLoginForm(String email, String password) {
   }
 }
 
-/// Single function that handles the login initialization process. Called directly by the attemptLogin function api call of the SessionManager Class.
+/// Performs the core login process including validation, authentication, offline login handling,
+/// profile management, and SessionManager initialization.
+/// 
 /// Steps:
 /// 1. Validate form fields (email, password)
-/// 2. If validation passes, run userAuth (terminate early if auth fails)
-/// 3. If auth succeeds, ensure the local user profile exists
-/// 4. Once user profile is validated and exists, initialize Session
-/// 5. Once we initialize the session, run the inbound sync worker
-/// 6. Return authentication results, which allow the UI to navigate to the home page
-Future<Map<String, dynamic>> loginInitialization({
+/// 2. Attempt user authentication
+/// 3. Handle unsuccessful login (potential offline login)
+/// 4. Handle successful login
+/// 5. Record login attempt
+/// 6. Ensure local profile exists
+/// 7. Initialize SessionManager
+/// 
+/// Returns the login result which can be used to determine if login was successful
+/// and whether it was online or offline mode.
+Future<Map<String, dynamic>> performLoginProcess({
   required String email,
   required String password,
   required SupabaseClient supabase,
   required Box storage,
 }) async {
   try {
-    QuizzerLogger.logMessage('Entering loginInitialization()...');
+    QuizzerLogger.logMessage('Entering performLoginProcess()...');
     
     signalLoginProgress("Starting login process...");
     
     // Step 1: Validate form fields
     signalLoginProgress("Validating your information...");
-    final validationResult = _validateLoginForm(email, password);
+    final validationResult = validateLoginForm(email, password);
     if (!validationResult['valid']) {
       QuizzerLogger.logWarning('Form validation failed: ${validationResult['message']}');
       return {
@@ -115,16 +111,33 @@ Future<Map<String, dynamic>> loginInitialization({
       };
     }
     
-    // Step 2: Attempt user authentication
-    signalLoginProgress("Connecting to your account...");
-    final authResult = await attemptSupabaseLogin(
-      email,
-      password,
-      supabase,
-    );
+    // Step 2: Check connectivity and attempt user authentication
+    signalLoginProgress("Checking connection...");
+    final bool isConnected = await checkConnectivity();
+    
+    Map<String, dynamic> authResult;
+    if (isConnected) {
+      signalLoginProgress("Connecting to your account...");
+      authResult = await attemptSupabaseLogin(
+        email,
+        password,
+        supabase,
+        storage,
+      );
+    } else {
+      QuizzerLogger.logMessage('No network connectivity detected, defaulting to offline login');
+      signalLoginProgress("No internet connection detected...");
+      authResult = {
+        'success': false,
+        'message': 'No internet connection available',
+        'user_role': 'public_user_unverified',
+      };
+    }
 
     // Unified variable for login results throughout the process
-    Map<String, dynamic> loginResult = authResult;
+    // Ensure offline_mode is always present (default to false for online login)
+    Map<String, dynamic> loginResult = Map<String, dynamic>.from(authResult);
+    loginResult['offline_mode'] = false; // Default to online mode
 
     // Step 3: Handle unsuccessful login (potential offline login)  
     if (!loginResult['success']) {
@@ -141,11 +154,10 @@ Future<Map<String, dynamic>> loginInitialization({
       }
     }
 
-    // Step 4: Handle successful login (store token for future offline login)
+    // Step 4: Handle successful login (offline login data already stored by attemptSupabaseLogin)
     if (loginResult['success'] && !loginResult['offline_mode']) {
-      signalLoginProgress("Securing your login for offline use...");
-      QuizzerLogger.logMessage('Supabase login successful, storing offline login data...');
-      await storeOfflineLoginData(email, storage, loginResult);
+      signalLoginProgress("Login successful...");
+      QuizzerLogger.logMessage('Supabase login successful, offline login data already stored');
     }
 
     // Step 5: Record login attempt
@@ -158,7 +170,7 @@ Future<Map<String, dynamic>> loginInitialization({
     // If login failed outright, return after recording the attempt
     if (!loginResult['success']) {
       signalLoginProgress("Login failed. Please check your credentials.");
-      QuizzerLogger.logWarning('Login failed, terminating initialization');
+      QuizzerLogger.logWarning('Login failed, terminating login process');
       return loginResult;
     }
 
@@ -185,105 +197,141 @@ Future<Map<String, dynamic>> loginInitialization({
       signalLoginProgress("Setting up your profile...");
       QuizzerLogger.logMessage('Ensuring local profile exists for online login...');
       await ensureLocalProfileExists(email);
+
+      // Ensure profile exists in Supabase as well
+      signalLoginProgress("Syncing your profile...");
+      QuizzerLogger.logMessage('Ensuring profile exists in Supabase for online login...');
+      await ensureUserProfileExistsInSupabase(email, supabase);
     }
 
-    // Step 7: Run the inbound sync worker
-    if (!loginResult['offline_mode']) {
-      signalLoginProgress("Syncing your data from the cloud...");
-      QuizzerLogger.logMessage('Starting inbound sync worker for online login...');
-      final inboundSyncWorker = InboundSyncWorker();
-      await inboundSyncWorker.start();
-      QuizzerLogger.logSuccess('Inbound sync worker started successfully');
+    // Step 7: Initialize SessionManager
+    if (loginResult['offline_mode']) {
+      signalLoginProgress("Initializing your session...");
+      QuizzerLogger.logMessage('Initializing SessionManager for offline login...');
+      final sessionManager = getSessionManager();
+      final userId = await getUserIdByEmail(email);
       
-      // Wait for the initial inbound sync to complete
-      signalLoginProgress("Downloading your latest data...");
-      QuizzerLogger.logMessage('Waiting for initial inbound sync to complete...');
-      final switchBoard = getSwitchBoard();
-      await switchBoard.onInboundSyncCycleComplete.first;
-      QuizzerLogger.logSuccess('Initial inbound sync completed');
+      // Set SessionManager user state for offline login
+      sessionManager.userLoggedIn = true;
+      sessionManager.userId = userId;
+      sessionManager.userEmail = email;
+      sessionManager.sessionStartTime = DateTime.now();
+      
+      QuizzerLogger.logSuccess('SessionManager initialized with user ID: $userId for offline login');
     } else {
-      QuizzerLogger.logMessage('Skipping inbound sync worker for offline login');
+      QuizzerLogger.logMessage('SessionManager already initialized by attemptSupabaseLogin for online login');
     }
 
-    // Step 8: Run the outbound sync worker
-    if (!loginResult['offline_mode']) {
-      signalLoginProgress("Setting up data synchronization...");
-      QuizzerLogger.logMessage('Starting outbound sync worker for online login...');
-      final outboundSyncWorker = OutboundSyncWorker();
-      outboundSyncWorker.start();
-    } else {
-      QuizzerLogger.logMessage('Skipping outbound sync worker for offline login');
+    QuizzerLogger.logSuccess('Login process completed successfully for email: $email');
+    return loginResult;
+  } catch (e) {
+    QuizzerLogger.logError('Error in performLoginProcess - $e');
+    rethrow;
+  }
+}
+
+/// Single function that handles the login initialization process. Called directly by the attemptLogin function api call of the SessionManager Class.
+/// Steps:
+/// 1. Perform core login process (validation, authentication, profile management, SessionManager initialization)
+/// 2. Check if database is fresh (only user_profile and login_attempts tables exist)
+/// 3. If fresh: await sync workers to populate database with initial data
+/// 4. If not fresh: start sync workers in background (don't await)
+/// 5. Initialize question queue server
+/// 6. Return authentication results, which allow the UI to navigate to the home page
+/// 
+/// [testRun] - When true, bypasses sync worker initialization for testing purposes
+Future<Map<String, dynamic>> loginInitialization({
+  required String email,
+  required String password,
+  required SupabaseClient supabase,
+  required Box storage,
+  bool testRun = false,
+}) async {
+  try {
+    QuizzerLogger.logMessage('Entering loginInitialization()...');
+    
+    // Step 1: Perform core login process
+    final loginResult = await performLoginProcess(
+      email: email,
+      password: password,
+      supabase: supabase,
+      storage: storage,
+    );
+
+    // If login failed, return early
+    if (!loginResult['success']) {
+      return loginResult;
     }
 
-    // Step 9: Run the media sync worker
-    if (!loginResult['offline_mode']) {
-      signalLoginProgress("Setting up media synchronization...");
-      QuizzerLogger.logMessage('Starting media sync worker for online login...');
-      final mediaSyncWorker = MediaSyncWorker();
-      mediaSyncWorker.start();
+    // Step 2: Check if database is fresh and handle sync workers accordingly
+    if (!loginResult['offline_mode'] && !testRun) {
+      signalLoginProgress("Checking your data...");
+      QuizzerLogger.logMessage('Checking database state for sync worker initialization...');
+      
+      final dbMonitor = getDatabaseMonitor();
+      final bool isDatabaseFresh = await dbMonitor.isDatabaseFresh();
+      
+      if (isDatabaseFresh) {
+        // Fresh database - await sync workers to populate initial data
+        signalLoginProgress("Setting up your data for the first time...");
+        QuizzerLogger.logMessage('Database is fresh, awaiting sync workers to populate initial data...');
+        await initializeSyncWorkers();
+        QuizzerLogger.logSuccess('Sync workers completed for fresh database');
+      } else {
+        // Not fresh - start sync workers in background
+        signalLoginProgress("Starting background synchronization...");
+        QuizzerLogger.logMessage('Database has existing data, starting sync workers in background...');
+        initializeSyncWorkers(); // Don't await - let them run in background
+        QuizzerLogger.logSuccess('Sync workers started in background for existing database');
+      }
     } else {
-      QuizzerLogger.logMessage('Skipping media sync worker for offline login');
+      if (testRun) {
+        QuizzerLogger.logMessage('Skipping sync workers for test run');
+      } else {
+        QuizzerLogger.logMessage('Skipping sync workers for offline login');
+      }
     }
 
-    // Step 10: Initialize data caches
-    signalLoginProgress("Loading your data...");
-    QuizzerLogger.logMessage('Initializing data caches...');
-    await fillDataCaches();
-    QuizzerLogger.logSuccess('Data caches initialized successfully');
+    // Step 3: Initialize question queue server (circulation and selection workers)
+    signalLoginProgress("Starting question queue server...");
+    QuizzerLogger.logMessage('Initializing question queue server...');
+    await startQuestionQueueServer();
 
-    // Step 11: Initialize question queue server
-    signalLoginProgress("Preparing your study queue...");
-    QuizzerLogger.logMessage('Starting question queue server...');
-    await startQuestionQueueServerWorkers();
-
-    // Step 12: Wait for at least one question to be added to the queue
-    signalLoginProgress("Finding questions for you to study...");
-    QuizzerLogger.logMessage('Waiting for question queue to be populated...');
-    await _waitForQuestionQueuePopulation();
-
-    // Step 13: Return results
+    // Step 4: Return results
     signalLoginProgress("Welcome back! You're all set.");
     
     QuizzerLogger.logMessage('Login initialization completed for email: $email');
     return loginResult;
   } catch (e) {
     QuizzerLogger.logError('Error in loginInitialization - $e');
-    return {
-      'success': false,
-      'message': 'Login initialization failed: $e'
-    };
+    rethrow;
   }
 }
 
-/// Waits for at least one question to be added to the QuestionQueueCache
-/// Uses a timeout fallback in case the user has no questions to answer
-Future<void> _waitForQuestionQueuePopulation() async {
+Future<void> ensureUserProfileExistsInSupabase(String email, SupabaseClient supabase) async {
   try {
-    QuizzerLogger.logMessage('Entering _waitForQuestionQueuePopulation()...');
-    
-    final switchBoard = getSwitchBoard();
-    
-    // Wait for the QuestionQueueAdded signal with a timeout
-    try {
-      QuizzerLogger.logMessage('Waiting for question to be added to queue...');
-      await switchBoard.onQuestionQueueAdded.first.timeout(
-        const Duration(seconds: 5),
-        onTimeout: () {
-          QuizzerLogger.logWarning('Timeout waiting for question queue population. User may have no questions to answer.');
-          throw TimeoutException('Question queue population timeout', const Duration(seconds: 5));
-        },
-      );
-      QuizzerLogger.logSuccess('Question added to queue successfully');
-    } on TimeoutException {
-      // TODO: Develop a better method for handling users with no questions to answer
-      // For now, we'll just log and continue after the timeout
-      QuizzerLogger.logMessage('User appears to have no questions to answer right now. Continuing with login...');
-    } catch (e) {
-      QuizzerLogger.logError('Error waiting for question queue population - $e');
-      rethrow;
+    // 1. Try to fetch the profile from Supabase
+    final response = await supabase
+        .from('user_profile')
+        .select()
+        .eq('email', email)
+        .maybeSingle();
+
+    if (response == null) {
+      // 2. If not found, get the local profile
+      final localProfile = await getUserProfileByEmail(email);
+      if (localProfile == null) {
+        throw Exception('No local profile found for $email');
+      }
+
+      // 3. Insert the local profile into Supabase using the universal sync function
+      final bool pushSuccess = await pushRecordToSupabase('user_profile', localProfile);
+      if (!pushSuccess) {
+        throw Exception('Failed to insert user profile into Supabase using pushRecordToSupabase');
+      }
     }
   } catch (e) {
-    QuizzerLogger.logError('Error in _waitForQuestionQueuePopulation - $e');
+    QuizzerLogger.logError('Error in ensureUserProfileExistsInSupabase - $e');
     rethrow;
   }
 }

@@ -33,12 +33,11 @@ class _ModuleSelectionState extends State<ModuleSelection> {
       _isLoading = true;
     });
 
-    final result = await session.loadModules();
+    final result = await session.getModuleData();
     
     setState(() {
-      _suggestions = (result['modules'] as List<Map<String, dynamic>>)
-          .map((m) => m['module_name'] as String)
-          .toList();
+      // result is Map<String, Map<String, dynamic>> where keys are module names
+      _suggestions = result.keys.toList();
       _isLoading = false;
     });
   }

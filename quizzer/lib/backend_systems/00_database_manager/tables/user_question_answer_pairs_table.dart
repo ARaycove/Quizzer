@@ -1,9 +1,10 @@
 import 'dart:async';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'table_helper.dart'; // Import the helper file
+import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pairs_table.dart'; // Import for _verifyQuestionAnswerPairTable
 import 'package:quizzer/backend_systems/10_switch_board/sb_sync_worker_signals.dart'; // Import sync signals
-import 'package:quizzer/backend_systems/06_question_queue_server/eligibility_check_worker.dart'; // Import for isUserRecordEligible
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_module_activation_status_table.dart';
 
 Future<void> _verifyUserQuestionAnswerPairTable(dynamic db) async {
   
@@ -23,10 +24,8 @@ Future<void> _verifyUserQuestionAnswerPairTable(dynamic db) async {
         next_revision_due TEXT,
         time_between_revisions REAL,
         average_times_shown_per_day REAL,
-        is_eligible INTEGER,
         in_circulation INTEGER,
         total_attempts INTEGER NOT NULL DEFAULT 0,
-        cache_location INTEGER DEFAULT 0,
         -- Sync Fields --
         has_been_synced INTEGER DEFAULT 0,
         edits_are_synced INTEGER DEFAULT 0,
@@ -36,11 +35,7 @@ Future<void> _verifyUserQuestionAnswerPairTable(dynamic db) async {
       )
     ''');
     
-    // Create index on cache_location for fast queries
-    await db.execute('''
-      CREATE INDEX idx_user_question_answer_pairs_cache_location 
-      ON user_question_answer_pairs(cache_location)
-    ''');
+
   } else {
     // Table exists, check columns
     final List<Map<String, dynamic>> columns = await db.rawQuery(
@@ -53,12 +48,6 @@ Future<void> _verifyUserQuestionAnswerPairTable(dynamic db) async {
        QuizzerLogger.logWarning('Adding missing column: total_attempts');
       // Add with default 0 for existing rows
       await db.execute("ALTER TABLE user_question_answer_pairs ADD COLUMN total_attempts INTEGER NOT NULL DEFAULT 0");
-    }
-
-    // Add check for cache_location field
-    if (!columnNames.contains('cache_location')) {
-      QuizzerLogger.logMessage('Adding cache_location column to user_question_answer_pairs table.');
-      await db.execute('ALTER TABLE user_question_answer_pairs ADD COLUMN cache_location INTEGER DEFAULT 0');
     }
 
     // Add checks for new sync columns
@@ -77,31 +66,7 @@ Future<void> _verifyUserQuestionAnswerPairTable(dynamic db) async {
       // await db.rawUpdate('UPDATE user_question_answer_pairs SET last_modified_timestamp = last_updated WHERE last_modified_timestamp IS NULL');
     }
     
-    // Check if cache_location index exists
-    final List<Map<String, dynamic>> indexes = await db.rawQuery(
-      "SELECT name FROM sqlite_master WHERE type='index' AND name='idx_user_question_answer_pairs_cache_location'"
-    );
-    
-    if (indexes.isEmpty) {
-      QuizzerLogger.logMessage('Creating index on cache_location column for better query performance.');
-      await db.execute('''
-        CREATE INDEX idx_user_question_answer_pairs_cache_location 
-        ON user_question_answer_pairs(cache_location)
-      ''');
-    }
 
-    // Check if is_eligible index exists
-    final List<Map<String, dynamic>> eligibleIndexes = await db.rawQuery(
-      "SELECT name FROM sqlite_master WHERE type='index' AND name='idx_user_question_answer_pairs_is_eligible'"
-    );
-    
-    if (eligibleIndexes.isEmpty) {
-      QuizzerLogger.logMessage('Creating index on is_eligible column for better query performance.');
-      await db.execute('''
-        CREATE INDEX idx_user_question_answer_pairs_is_eligible 
-        ON user_question_answer_pairs(user_uuid, is_eligible)
-      ''');
-    }
   }
 }
 
@@ -136,7 +101,6 @@ Future<int> addUserQuestionAnswerPair({
       'average_times_shown_per_day': averageTimesShownPerDay,
       'in_circulation': false,
       'total_attempts': 0,
-      'cache_location': 0, // Default to UnprocessedCache
       // Sync Fields
       'has_been_synced': 0,
       'edits_are_synced': 0,
@@ -179,7 +143,6 @@ Future<int> editUserQuestionAnswerPair({
   double? averageTimesShownPerDay,
   bool? isEligible,
   bool? inCirculation,
-  int? cacheLocation,
   bool disableOutboundSync = false,
 }) async {
   try {
@@ -193,9 +156,6 @@ Future<int> editUserQuestionAnswerPair({
     if (timeBetweenRevisions != null) newRecord['time_between_revisions'] = timeBetweenRevisions;
     if (averageTimesShownPerDay != null) newRecord['average_times_shown_per_day'] = averageTimesShownPerDay;
     if (inCirculation != null) newRecord['in_circulation'] = inCirculation ? 1 : 0;
-    if (cacheLocation != null) newRecord['cache_location'] = cacheLocation;
-
-    final bool eligible = await isUserRecordEligible(newRecord);
     
     final db = await getDatabaseMonitor().requestDatabaseAccess();
     if (db == null) {
@@ -203,11 +163,6 @@ Future<int> editUserQuestionAnswerPair({
     }
     QuizzerLogger.logMessage('Starting editUserQuestionAnswerPair for User: $userUuid, Q: $questionId');
     await _verifyUserQuestionAnswerPairTable(db);
-
-    // Fetch the current record from the DB to build the full record for eligibility check
-    QuizzerLogger.logMessage('Fetching current record for eligibility check...');
-
-    newRecord['is_eligible'] = eligible ? 1 : 0;
 
     Map<String, dynamic> values = {};
     if (revisionStreak != null) values['revision_streak'] = revisionStreak;
@@ -217,8 +172,6 @@ Future<int> editUserQuestionAnswerPair({
     if (timeBetweenRevisions != null) values['time_between_revisions'] = timeBetweenRevisions;
     if (averageTimesShownPerDay != null) values['average_times_shown_per_day'] = averageTimesShownPerDay;
     if (inCirculation != null) values['in_circulation'] = inCirculation;
-    if (cacheLocation != null) values['cache_location'] = cacheLocation;
-    values['is_eligible'] = eligible ? 1 : 0;
     values['edits_are_synced'] = 0;
     values['last_modified_timestamp'] = DateTime.now().toUtc().toIso8601String();
 
@@ -316,13 +269,24 @@ Future<List<Map<String, dynamic>>> getQuestionsInCirculation(String userUuid) as
       throw Exception('Failed to acquire database access');
     }
     await _verifyUserQuestionAnswerPairTable(db);
-    // Use universal query helper
-    return await queryAndDecodeDatabase(
-      'user_question_answer_pairs',
-      db,
-      where: 'user_uuid = ? AND in_circulation = ?',
-      whereArgs: [userUuid, 1], // Query for in_circulation = 1 (true)
-    );
+    await verifyQuestionAnswerPairTable(db);
+    
+    // Use a JOIN to exclude orphaned records (user records that reference non-existent questions)
+    String sql = '''
+      SELECT user_question_answer_pairs.*
+      FROM user_question_answer_pairs
+      INNER JOIN question_answer_pairs ON user_question_answer_pairs.question_id = question_answer_pairs.question_id
+      WHERE user_question_answer_pairs.user_uuid = ?
+        AND user_question_answer_pairs.in_circulation = 1
+    ''';
+    
+    List<dynamic> whereArgs = [userUuid];
+    
+    QuizzerLogger.logMessage('Executing questions in circulation query (automatically excluding orphaned records)');
+    final List<Map<String, dynamic>> results = await db.rawQuery(sql, whereArgs);
+    
+    QuizzerLogger.logSuccess('Found ${results.length} questions in circulation for user: $userUuid.');
+    return results;
   } catch (e) {
     QuizzerLogger.logError('Error getting questions in circulation - $e');
     rethrow;
@@ -460,118 +424,9 @@ Future<void> setCirculationStatus(String userUuid, String questionId, bool isInC
   }
 }
 
-/// Updates the eligibility status for a specific user-question pair.
-/// Takes a boolean [isEligible] to set the status accordingly.
-/// Throws an Exception if the record is not found, adhering to fail-fast.
-Future<void> setEligibilityStatus(String userUuid, String questionId, bool isEligible) async {
-  try {
-    final db = await getDatabaseMonitor().requestDatabaseAccess();
-    if (db == null) {
-      throw Exception('Failed to acquire database access');
-    }
-    final String statusString = isEligible ? 'ELIGIBLE' : 'INELIGIBLE';
-    QuizzerLogger.logMessage(
-        'DB Table: Setting question $questionId to $statusString for user $userUuid');
 
-    // Ensure table exists before update
-    await _verifyUserQuestionAnswerPairTable(db);
 
-    // Perform the update using the universal update helper directly
-    final Map<String, dynamic> updateData = {
-      'is_eligible': isEligible ? 1 : 0,
-    };
-    
-    final int rowsAffected = await updateRawData(
-      'user_question_answer_pairs',
-      updateData,
-      'user_uuid = ? AND question_id = ?', // where
-      [userUuid, questionId],             // whereArgs
-      db,
-    );
 
-    if (rowsAffected == 0) {
-      // Fail fast if the specific record wasn't found for update
-      QuizzerLogger.logError(
-          'Update eligibility status failed: No record found for user $userUuid and question $questionId');
-      throw StateError(
-          'Record not found for user $userUuid and question $questionId during eligibility update.');
-    }
-
-    QuizzerLogger.logSuccess(
-        'Successfully set eligibility status ($statusString) for question $questionId. Rows affected: $rowsAffected');
-  } catch (e) {
-    QuizzerLogger.logError('Error setting eligibility status - $e');
-    rethrow;
-  } finally {
-    getDatabaseMonitor().releaseDatabaseAccess();
-  }
-}
-
-/// Updates the cache location for a specific user-question pair.
-/// 
-/// Takes an integer [cacheLocation] representing the cache the pair is currently in:
-/// - 0: UnprocessedCache (default, newly added questions)
-/// - 1: QuestionQueueCache (questions ready for presentation)
-/// - 2: PastDueCache (questions past their revision due date)
-/// - 3: NonCirculatingQuestionsCache (questions not in active circulation)
-/// - 4: ModuleInactiveCache (questions from inactive modules)
-/// - 5: EligibleQuestionsCache (questions eligible for selection)
-/// - 6: DueDateWithin24hrsCache (questions due within 24 hours)
-/// - 7: DueDateBeyond24hrsCache (questions due beyond 24 hours)
-/// 
-/// Parameters:
-/// - [userUuid]: The user's unique identifier
-/// - [questionId]: The question's unique identifier
-/// - [cacheLocation]: Integer representing the target cache (0-7)
-/// - [db]: Database connection or transaction
-/// 
-/// Throws an Exception if the record is not found, adhering to fail-fast.
-Future<void> updateCacheLocation(String userUuid, String questionId, int cacheLocation) async {
-  try {
-    final db = await getDatabaseMonitor().requestDatabaseAccess();
-    if (db == null) {
-      throw Exception('Failed to acquire database access');
-    }
-    QuizzerLogger.logMessage(
-        'DB Table: Setting question $questionId cache location to $cacheLocation for user $userUuid');
-
-    // Ensure table exists before update
-    await _verifyUserQuestionAnswerPairTable(db);
-
-    // Perform the update using the universal update helper directly
-    final Map<String, dynamic> updateData = {
-      'cache_location': cacheLocation,
-      'edits_are_synced': 0,
-      'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
-    };
-    
-    final int rowsAffected = await updateRawData(
-      'user_question_answer_pairs',
-      updateData,
-      'user_uuid = ? AND question_id = ?', // where
-      [userUuid, questionId],             // whereArgs
-      db,
-    );
-
-    if (rowsAffected == 0) {
-      // Fail fast if the specific record wasn't found for update
-      QuizzerLogger.logError(
-          'Update cache location failed: No record found for user $userUuid and question $questionId');
-      throw StateError(
-          'Record not found for user $userUuid and question $questionId during cache location update.');
-    }
-
-    QuizzerLogger.logSuccess(
-        'Successfully set cache location to $cacheLocation for question $questionId. Rows affected: $rowsAffected');
-    // Signal SwitchBoard
-    signalOutboundSyncNeeded();
-  } catch (e) {
-    QuizzerLogger.logError('Error updating cache location - $e');
-    rethrow;
-  } finally {
-    getDatabaseMonitor().releaseDatabaseAccess();
-  }
-}
 
 /// Fetches all user-question-answer pairs for a specific user that need outbound synchronization.
 /// This includes records that have never been synced (`has_been_synced = 0`)
@@ -732,7 +587,6 @@ Future<void> batchUpsertUserQuestionAnswerPairs({
       'next_revision_due',
       'time_between_revisions',
       'average_times_shown_per_day',
-      'is_eligible',
       'in_circulation',
       'total_attempts',
       'has_been_synced',
@@ -770,41 +624,19 @@ Future<void> batchUpsertUserQuestionAnswerPairs({
   }
 }
 
-/// Fetches all user question answer pairs for a specific user with a given cache location.
-/// Uses the cache_location index for optimal performance.
-/// Does NOT decode the records.
-Future<List<Map<String, dynamic>>> getUserQuestionAnswerPairsByCacheLocation(
-  int cacheLocation
-) async {
-  try {
-    final db = await getDatabaseMonitor().requestDatabaseAccess();
-    if (db == null) {
-      throw Exception('Failed to acquire database access');
-    }
-    QuizzerLogger.logMessage('Fetching user question answer pairs with cache_location: $cacheLocation...');
-    await _verifyUserQuestionAnswerPairTable(db);
 
-    final List<Map<String, dynamic>> results = await db.query(
-      'user_question_answer_pairs',
-      where: 'cache_location = ?',
-      whereArgs: [cacheLocation],
-    );
-
-    QuizzerLogger.logSuccess('Fetched ${results.length} records with cache_location: $cacheLocation.');
-    return results;
-  } catch (e) {
-    QuizzerLogger.logError('Error getting user question answer pairs by cache location - $e');
-    rethrow;
-  } finally {
-    getDatabaseMonitor().releaseDatabaseAccess();
-  }
-}
 
 /// Fetches all eligible user question answer pairs for a specific user.
-/// Uses the is_eligible index for optimal performance.
+/// Ensures all modules have activation status records before running the query.
 /// Does NOT decode the records.
 Future<List<Map<String, dynamic>>> getEligibleUserQuestionAnswerPairs(String userUuid) async {
   try {
+    // Ensure all modules have activation status records before checking eligibility
+    await ensureAllModulesHaveActivationStatus(userUuid);
+    // Get all active module names for the user
+    final List<String> activeModuleNames = await getActiveModuleNames(userUuid);
+    
+    // Now we can get DB Access and process the query
     final db = await getDatabaseMonitor().requestDatabaseAccess();
     if (db == null) {
       throw Exception('Failed to acquire database access');
@@ -812,13 +644,65 @@ Future<List<Map<String, dynamic>>> getEligibleUserQuestionAnswerPairs(String use
     QuizzerLogger.logMessage('Fetching eligible user question answer pairs for user: $userUuid...');
     await _verifyUserQuestionAnswerPairTable(db);
 
-    final List<Map<String, dynamic>> results = await db.query(
-      'user_question_answer_pairs',
-      where: 'user_uuid = ? AND is_eligible = ?',
-      whereArgs: [userUuid, 1],
+    // Eligible question criteria:
+    // 1. The question must be in circulation -> in_circulation = 1
+    // 2. The question must be past due -> next_revision_due < now
+    // 3. The question's module must be active OR it's concept must be active
+    // We have the list of active modules above, so we can use that to filter the questions
+    // We do not have a system for concept activation yet, so we will not filter by concept right now
+    
+    final String now = DateTime.now().toUtc().toIso8601String();
+    
+    // Build the query with proper joins and conditions - only select needed fields
+    String sql = '''
+      SELECT 
+        user_question_answer_pairs.user_uuid,
+        user_question_answer_pairs.question_id,
+        user_question_answer_pairs.revision_streak,
+        user_question_answer_pairs.last_revised,
+        user_question_answer_pairs.predicted_revision_due_history,
+        user_question_answer_pairs.next_revision_due,
+        user_question_answer_pairs.time_between_revisions,
+        user_question_answer_pairs.average_times_shown_per_day,
+        user_question_answer_pairs.in_circulation,
+        user_question_answer_pairs.total_attempts,
+        question_answer_pairs.citation,
+        question_answer_pairs.question_elements,
+        question_answer_pairs.answer_elements,
+        question_answer_pairs.module_name,
+        question_answer_pairs.question_type,
+        question_answer_pairs.options,
+        question_answer_pairs.correct_option_index,
+        question_answer_pairs.correct_order,
+        question_answer_pairs.index_options_that_apply
+      FROM user_question_answer_pairs
+      INNER JOIN question_answer_pairs ON user_question_answer_pairs.question_id = question_answer_pairs.question_id
+      WHERE user_question_answer_pairs.user_uuid = ?
+        AND user_question_answer_pairs.in_circulation = 1
+        AND user_question_answer_pairs.next_revision_due < ?
+    ''';
+    
+    List<dynamic> whereArgs = [userUuid, now];
+    
+    // Add module filter if there are active modules
+    if (activeModuleNames.isNotEmpty) {
+      final placeholders = List.filled(activeModuleNames.length, '?').join(',');
+      sql += ' AND question_answer_pairs.module_name IN ($placeholders)';
+      whereArgs.addAll(activeModuleNames);
+    }
+    
+    // Add ORDER BY for consistent results
+    sql += ' ORDER BY user_question_answer_pairs.next_revision_due ASC';
+    
+    QuizzerLogger.logMessage('Executing eligibility query with ${activeModuleNames.length} active modules');
+    final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
+      'user_question_answer_pairs', // Use the main table name for the helper
+      db,
+      customQuery: sql,
+      whereArgs: whereArgs,
     );
 
-    QuizzerLogger.logSuccess('Fetched ${results.length} eligible records for user: $userUuid.');
+    QuizzerLogger.logSuccess('Fetched ${results.length} eligible records for user: $userUuid (fields pre-filtered in SQL query).');
     return results;
   } catch (e) {
     QuizzerLogger.logError('Error getting eligible user question answer pairs - $e');
@@ -827,3 +711,158 @@ Future<List<Map<String, dynamic>>> getEligibleUserQuestionAnswerPairs(String use
     getDatabaseMonitor().releaseDatabaseAccess();
   }
 }
+
+/// Gets the count of eligible questions with low revision streak (≤ 2) for a specific user.
+/// Stops counting once it reaches 20 results for performance optimization.
+/// Uses the same eligibility logic as getEligibleUserQuestionAnswerPairs.
+Future<int> getLowRevisionStreakEligibleCount(String userUuid) async {
+  try {
+    // Ensure all modules have activation status records before checking eligibility
+    await ensureAllModulesHaveActivationStatus(userUuid);
+    // Get all active module names for the user
+    final List<String> activeModuleNames = await getActiveModuleNames(userUuid);
+    
+    final db = await getDatabaseMonitor().requestDatabaseAccess();
+    if (db == null) {
+      throw Exception('Failed to acquire database access');
+    }
+    QuizzerLogger.logMessage('Counting low revision streak eligible questions for user: $userUuid...');
+    await _verifyUserQuestionAnswerPairTable(db);
+
+    final String now = DateTime.now().toUtc().toIso8601String();
+    
+    // Build the query with proper joins and conditions, limiting to 20 results
+    String sql = '''
+      SELECT COUNT(*) as count
+      FROM (
+        SELECT user_question_answer_pairs.question_id
+        FROM user_question_answer_pairs
+        INNER JOIN question_answer_pairs ON user_question_answer_pairs.question_id = question_answer_pairs.question_id
+        WHERE user_question_answer_pairs.user_uuid = ?
+          AND user_question_answer_pairs.in_circulation = 1
+          AND user_question_answer_pairs.next_revision_due < ?
+          AND user_question_answer_pairs.revision_streak <= 2
+    ''';
+    
+    List<dynamic> whereArgs = [userUuid, now];
+    
+    // Add module filter if there are active modules
+    if (activeModuleNames.isNotEmpty) {
+      final placeholders = List.filled(activeModuleNames.length, '?').join(',');
+      sql += ' AND question_answer_pairs.module_name IN ($placeholders)';
+      whereArgs.addAll(activeModuleNames);
+    }
+    
+    // Add ORDER BY and LIMIT for consistent results
+    sql += ' ORDER BY user_question_answer_pairs.next_revision_due ASC LIMIT 20) as subquery';
+    
+    QuizzerLogger.logMessage('Executing low revision streak count query with ${activeModuleNames.length} active modules');
+    final List<Map<String, dynamic>> results = await db.rawQuery(sql, whereArgs);
+    
+    final int count = results.isNotEmpty ? (results.first['count'] as int) : 0;
+    QuizzerLogger.logSuccess('Found $count low revision streak eligible questions for user: $userUuid.');
+    return count;
+  } catch (e) {
+    QuizzerLogger.logError('Error counting low revision streak eligible questions - $e');
+    rethrow;
+  } finally {
+    getDatabaseMonitor().releaseDatabaseAccess();
+  }
+}
+
+/// Gets the total count of eligible questions for a specific user.
+/// Stops counting once it reaches 100 results for performance optimization.
+/// Uses the same eligibility logic as getEligibleUserQuestionAnswerPairs.
+Future<int> getTotalEligibleCount(String userUuid) async {
+  try {
+    // Ensure all modules have activation status records before checking eligibility
+    await ensureAllModulesHaveActivationStatus(userUuid);
+    // Get all active module names for the user
+    final List<String> activeModuleNames = await getActiveModuleNames(userUuid);
+    
+    final db = await getDatabaseMonitor().requestDatabaseAccess();
+    if (db == null) {
+      throw Exception('Failed to acquire database access');
+    }
+    QuizzerLogger.logMessage('Counting total eligible questions for user: $userUuid...');
+    await _verifyUserQuestionAnswerPairTable(db);
+
+    final String now = DateTime.now().toUtc().toIso8601String();
+    
+    // Build the query with proper joins and conditions, limiting to 100 results
+    String sql = '''
+      SELECT COUNT(*) as count
+      FROM (
+        SELECT user_question_answer_pairs.question_id
+        FROM user_question_answer_pairs
+        INNER JOIN question_answer_pairs ON user_question_answer_pairs.question_id = question_answer_pairs.question_id
+        WHERE user_question_answer_pairs.user_uuid = ?
+          AND user_question_answer_pairs.in_circulation = 1
+          AND user_question_answer_pairs.next_revision_due < ?
+    ''';
+    
+    List<dynamic> whereArgs = [userUuid, now];
+    
+    // Add module filter if there are active modules
+    if (activeModuleNames.isNotEmpty) {
+      final placeholders = List.filled(activeModuleNames.length, '?').join(',');
+      sql += ' AND question_answer_pairs.module_name IN ($placeholders)';
+      whereArgs.addAll(activeModuleNames);
+    }
+    
+    // Add ORDER BY and LIMIT for consistent results
+    sql += ' ORDER BY user_question_answer_pairs.next_revision_due ASC LIMIT 100) as subquery';
+    
+    QuizzerLogger.logMessage('Executing total eligible count query with ${activeModuleNames.length} active modules');
+    final List<Map<String, dynamic>> results = await db.rawQuery(sql, whereArgs);
+    
+    final int count = results.isNotEmpty ? (results.first['count'] as int) : 0;
+    QuizzerLogger.logSuccess('Found $count total eligible questions for user: $userUuid.');
+    return count;
+  } catch (e) {
+    QuizzerLogger.logError('Error counting total eligible questions - $e');
+    rethrow;
+  } finally {
+    getDatabaseMonitor().releaseDatabaseAccess();
+  }
+}
+
+/// Gets non-circulating questions with full question details for a specific user.
+/// Returns questions that are not in circulation (in_circulation = 0) with their complete details.
+/// Automatically excludes orphaned records (user records that reference non-existent questions).
+Future<List<Map<String, dynamic>>> getNonCirculatingQuestionsWithDetails(String userUuid) async {
+  try {
+    final db = await getDatabaseMonitor().requestDatabaseAccess();
+    if (db == null) {
+      throw Exception('Failed to acquire database access');
+    }
+    QuizzerLogger.logMessage('Fetching non-circulating questions with details for user: $userUuid...');
+    // Ensure BOTH tables exist before running the query
+    await _verifyUserQuestionAnswerPairTable(db);
+    await verifyQuestionAnswerPairTable(db);
+
+    // Build the query with proper joins to get both user question data and question details
+    String sql = '''
+      SELECT user_question_answer_pairs.*, question_answer_pairs.*
+      FROM user_question_answer_pairs
+      INNER JOIN question_answer_pairs ON user_question_answer_pairs.question_id = question_answer_pairs.question_id
+      WHERE user_question_answer_pairs.user_uuid = ?
+        AND user_question_answer_pairs.in_circulation = 0
+      ORDER BY user_question_answer_pairs.next_revision_due ASC
+    ''';
+    
+    List<dynamic> whereArgs = [userUuid];
+    
+    QuizzerLogger.logMessage('Executing non-circulating questions query');
+    final List<Map<String, dynamic>> results = await db.rawQuery(sql, whereArgs);
+    
+    QuizzerLogger.logSuccess('Found ${results.length} non-circulating questions for user: $userUuid.');
+    return results;
+  } catch (e) {
+    QuizzerLogger.logError('Error getting non-circulating questions with details - $e');
+    rethrow;
+  } finally {
+    getDatabaseMonitor().releaseDatabaseAccess();
+  }
+}
+

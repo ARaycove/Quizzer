@@ -125,4 +125,27 @@ class AnswerHistoryCache {
       rethrow;
     }
   }
+
+  /// Returns the last 5 answered question IDs (most recent first).
+  /// Returns fewer than 5 if history is shorter.
+  /// Ensures thread safety using a lock.
+  Future<List<String>> getLastFiveAnsweredQuestions() async {
+    try {
+      QuizzerLogger.logMessage('Entering AnswerHistoryCache getLastFiveAnsweredQuestions()...');
+      return await _lock.synchronized(() {
+        final int historyLength = _history.length;
+        final int returnCount = min(5, historyLength);
+        
+        if (returnCount == 0) {
+          return <String>[];
+        }
+        
+        // Return the first 'returnCount' items (most recent first)
+        return List<String>.from(_history.take(returnCount));
+      });
+    } catch (e) {
+      QuizzerLogger.logError('Error in AnswerHistoryCache getLastFiveAnsweredQuestions - $e');
+      rethrow;
+    }
+  }
 }

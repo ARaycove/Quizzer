@@ -59,10 +59,16 @@ Future<void> updateNonCirculatingQuestionsStat(String userId) async {
   
   // Count questions that are not in circulation and from active modules
   int nonCirculatingCount = 0;
+  
+  if (questionIdsNotInCirculation.isNotEmpty) {
+    // Get module names for all question IDs in a single query
+    final Map<String, String> questionIdToModuleName = await getModuleNamesForQuestionIds(questionIdsNotInCirculation);
+    
   for (final String questionId in questionIdsNotInCirculation) {
-    final String moduleName = await getModuleNameForQuestionId(questionId);
+      final String moduleName = questionIdToModuleName[questionId] ?? 'Unknown Module';
     if (moduleActivationStatus[moduleName] == true) {
       nonCirculatingCount++;
+      }
     }
   }
 

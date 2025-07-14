@@ -3,9 +3,6 @@ import 'dart:math';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 // Caches
-import 'package:quizzer/backend_systems/09_data_caches/non_circulating_questions_cache.dart';
-import 'package:quizzer/backend_systems/09_data_caches/unprocessed_cache.dart';
-import 'package:quizzer/backend_systems/09_data_caches/circulating_questions_cache.dart';
 // Table Access
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_question_answer_pairs_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pairs_table.dart';
@@ -13,6 +10,7 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/
 // Workers
 import 'package:quizzer/backend_systems/10_switch_board/switch_board.dart'; // Import SwitchBoard
 import 'package:quizzer/backend_systems/10_switch_board/sb_question_worker_signals.dart'; // Import worker signals
+import 'package:quizzer/backend_systems/10_switch_board/sb_other_signals.dart'; // Import other signals
 
 // ==========================================
 // Circulation Worker
@@ -26,20 +24,15 @@ class CirculationWorker {
 
   // --- Worker State ---
   bool                _isRunning = false;
-  DateTime?           _lastActivationSignalTime; // Timestamp of the last signal
-  StreamSubscription? _activationSubscription; // Subscription to the SwitchBoard stream
+  StreamSubscription? _questionAnsweredSubscription; // Subscription to question answered correctly signal
   // --------------------
 
-  // --- Dependencies ---
-  final NonCirculatingQuestionsCache  _nonCirculatingCache  = NonCirculatingQuestionsCache();
-  final UnprocessedCache              _unprocessedCache     = UnprocessedCache();
-  final CirculatingQuestionsCache     _circulatingCache     = CirculatingQuestionsCache();
   final SessionManager                _sessionManager       = SessionManager();
   final SwitchBoard                   _switchBoard          = SwitchBoard(); // Get SwitchBoard instance
 
   // --- Control Methods ---
   /// Starts the worker loop.
-  void start() {
+  Future<void> start() async {
     try {
       QuizzerLogger.logMessage('Entering CirculationWorker start()...');
       if (_isRunning) {
@@ -48,12 +41,11 @@ class CirculationWorker {
       }
       _isRunning = true;
 
-      // Subscribe to the module activation stream - Uses the activation time from the signal
-      _activationSubscription = _switchBoard.onModuleRecentlyActivated.listen((DateTime activationTime) {
-        QuizzerLogger.logMessage('CirculationWorker: Received recent activation signal with time: $activationTime.');
-        _lastActivationSignalTime = activationTime; // Use the time from the signal
+      // Subscribe to the question answered correctly stream
+      _questionAnsweredSubscription = _switchBoard.onQuestionAnsweredCorrectly.listen((String questionId) {
+        QuizzerLogger.logMessage('CirculationWorker: Received question answered correctly signal for question: $questionId.');
       });
-      QuizzerLogger.logMessage('CirculationWorker: Subscribed to onModuleRecentlyActivated stream.');
+      QuizzerLogger.logMessage('CirculationWorker: Subscribed to onQuestionAnsweredCorrectly stream.');
 
       _runLoop(); // Start the loop asynchronously
     } catch (e) {
@@ -71,9 +63,8 @@ class CirculationWorker {
         return;
       }
       _isRunning = false;
-      await _activationSubscription?.cancel(); // Cancel stream subscription
-      _activationSubscription = null;
-      QuizzerLogger.logMessage('CirculationWorker: Unsubscribed from onModuleRecentlyActivated stream.');
+      await _questionAnsweredSubscription?.cancel();
+      QuizzerLogger.logMessage('CirculationWorker: Unsubscribed from all streams.');
     } catch (e) {
       QuizzerLogger.logError('Error stopping CirculationWorker - $e');
       rethrow;
@@ -96,24 +87,22 @@ class CirculationWorker {
 
         if (shouldAdd) {
           QuizzerLogger.logMessage("$shouldAdd : selecting question");
-          await _selectAndAddQuestionToCirculation(userId);
+          try {
+            await _selectAndAddQuestionToCirculation(userId);
+          } catch (e) {
+            QuizzerLogger.logWarning('Error in _selectAndAddQuestionToCirculation: $e');
+            // Continue the loop even if selection fails
+          }
           if (!_isRunning) break; // Check after processing
         } else {
-          // Conditions not met to add. Determine why and wait appropriately.
-          final bool nonCirculatingIsEmpty = await _nonCirculatingCache.isEmpty();
-          if (nonCirculatingIsEmpty) {
-            // Wait because input is empty
-            QuizzerLogger.logMessage('CirculationWorker: Conditions not met & NonCirculating empty, waiting for non-circulating record...');
-            if (!_isRunning) break;
-            await _switchBoard.onNonCirculatingQuestionsAdded.first;
-            QuizzerLogger.logMessage('CirculationWorker: Woke up by NonCirculatingQuestionsCache signal.');
-          } else {
-            // Wait because eligible cache conditions were not met
-            QuizzerLogger.logMessage('CirculationWorker: Conditions not met (Eligible Cache ok), waiting for EligibleCache removal signal...');
-            if (!_isRunning) break;
-            await _switchBoard.onEligibleQuestionsRemoved.first;
-            QuizzerLogger.logMessage('CirculationWorker: Woke up by EligibleQuestionsCache removal signal.');
-          }
+          // Conditions not met to add. Wait for question answered correctly signal.
+          if (!_isRunning) break;
+          QuizzerLogger.logMessage('CirculationWorker: Conditions not met, waiting for question answered correctly signal...');
+
+          // Signal that circulation worker is done adding questions
+          signalCirculationWorkerFinished();
+          await _switchBoard.onQuestionAnsweredCorrectly.first;
+          QuizzerLogger.logMessage('CirculationWorker: Woke up by question answered correctly signal.');
         }
       }
       QuizzerLogger.logMessage('CirculationWorker loop finished.');
@@ -125,59 +114,38 @@ class CirculationWorker {
   // -----------------
 
     /// Checks if conditions are met to add a new question to circulation.
-  /// Includes logic to delay check if a module activation signal was recently received.
+  /// Uses direct database queries instead of caches for determination.
   Future<bool> _shouldAddNewQuestion() async {
     try {
       QuizzerLogger.logMessage('Entering CirculationWorker _shouldAddNewQuestion()...');
       
-      // 1. Check if the timestamp indicates a recent activation
-      DateTime? activationTimeToProcess = _lastActivationSignalTime; // Capture timestamp locally
-      if (activationTimeToProcess != null) {
-          // Consume the signal timestamp immediately so it's only processed once
-          _lastActivationSignalTime = null; 
-
-          final now = DateTime.now();
-          final timeSinceSignal = now.difference(activationTimeToProcess);
-          // User wants 1 second check
-          const requiredDelay = Duration(seconds: 1); 
-
-          if (timeSinceSignal < requiredDelay) {
-              // Calculate remaining delay needed to reach 1 second total
-              final delayNeeded = requiredDelay - timeSinceSignal; 
-              QuizzerLogger.logMessage('CirculationWorker: Recent activation detected. Delaying check by ${delayNeeded.inMilliseconds}ms...');
-              await Future.delayed(delayNeeded);
-              if (!_isRunning) return false; // Check if stopped during delay
-          }
-          QuizzerLogger.logMessage('CirculationWorker: Resuming check after handling recent activation signal.');
-      }
-
-      // 2. Query database directly for eligible questions data
       assert(_sessionManager.userId != null, 'Circulation check requires logged-in user.');
       final userId = _sessionManager.userId!;
       
       QuizzerLogger.logMessage("Querying database for eligible questions data...");
-      
-      // Get all eligible questions from database (efficient query with index)
-      final eligibleQuestions = await getEligibleUserQuestionAnswerPairs(userId);
 
-      // Condition 1: Less than 20 eligible questions with streak < 3
-      final lowStreakCount = eligibleQuestions.where((r) => (r['revision_streak'] as int? ?? 0) < 3).length;
+      // Check if there are any non-circulating questions available first
+      final List<Map<String, dynamic>> nonCirculatingQuestions = await getNonCirculatingQuestionsWithDetails(userId);
+      if (nonCirculatingQuestions.isEmpty) {
+        QuizzerLogger.logMessage("No non-circulating questions available, shouldAdd evaluates to -> false");
+        return false;
+      }
+
+      // Use the two optimized database queries
+      final int lowStreakCount = await getLowRevisionStreakEligibleCount(userId);
+      final int totalEligibleCount = await getTotalEligibleCount(userId);
+
+      // Condition 1: Less than 20 eligible questions with revision streak ≤ 2
       final bool lowStreakCondition = lowStreakCount < 20;
       QuizzerLogger.logMessage("lowStreakCondition evaluates to -> $lowStreakCondition (count: $lowStreakCount)");
 
       // Condition 2: Less than 100 total eligible questions
-      final totalEligibleCount = eligibleQuestions.length;
       final bool lowTotalCondition = totalEligibleCount < 100;
       QuizzerLogger.logMessage("lowTotalCondition evaluates to -> $lowTotalCondition (count: $totalEligibleCount)");
       
-      // --- Proceed only if eligible questions ARE low --- 
-      // Condition 3: Non-circulating cache must NOT be empty
-      final bool nonCirculatingEmpty = await _nonCirculatingCache.isEmpty();
-      QuizzerLogger.logMessage("nonCirculatingNotEmpty evaluates to -> $nonCirculatingEmpty");
-
-      // Return true only if eligible is low AND non-circulating has questions
-      final bool shouldAdd = (lowStreakCondition || lowTotalCondition) && !nonCirculatingEmpty;
-      QuizzerLogger.logMessage("shouldAdd evaluates to -> $shouldAdd (Eligible low: ${(lowStreakCondition || lowTotalCondition)}, NonCirculatingEmpty: $nonCirculatingEmpty)");
+      // Return true if either condition is met (we need more questions in circulation)
+      final bool shouldAdd = lowStreakCondition || lowTotalCondition;
+      QuizzerLogger.logMessage("shouldAdd evaluates to -> $shouldAdd");
       return shouldAdd;
     } catch (e) {
       QuizzerLogger.logError('Error in CirculationWorker _shouldAddNewQuestion - $e');
@@ -189,8 +157,6 @@ class CirculationWorker {
   Future<void> _selectAndAddQuestionToCirculation(String userId) async {
     try {
       QuizzerLogger.logMessage('Entering CirculationWorker _selectAndAddQuestionToCirculation()...');
-      final nonCirculatingRecords = await _nonCirculatingCache.peekAllRecords();
-      if (nonCirculatingRecords.isEmpty) { return; }
 
       // --- Database Operations Required for Selection ---
       Map<String, int> currentRatio = {};
@@ -203,14 +169,20 @@ class CirculationWorker {
       interestData = await getUserSubjectInterests(userId);
       // --- End DB Operations ---
 
-      // Select the prioritized question
-      Map<String, dynamic> selectedRecord = _selectPrioritizedQuestion(
+      // Select the prioritized question - it will fetch its own data
+      Map<String, dynamic> selectedRecord = await _selectPrioritizedQuestion(
         interestData,
-        currentRatio,
-        nonCirculatingRecords
+        currentRatio
       );
+      
+      // Check if a question was selected
+      if (selectedRecord.isEmpty) {
+        QuizzerLogger.logWarning('No question selected for circulation - no non-circulating questions available');
+        return; // Exit early without adding any question
+      }
+      
       // Create mutable copy and update circulation status BEFORE passing down
-      await _addQuestionToCirculation(userId, selectedRecord);
+      await _addQuestionToCirculation(userId, selectedRecord['question_id'] as String);
     } catch (e) {
       QuizzerLogger.logError('Error in CirculationWorker _selectAndAddQuestionToCirculation - $e');
       rethrow;
@@ -218,24 +190,30 @@ class CirculationWorker {
   }
 
   /// Calculates the subject distribution ratio of currently circulating questions
-  /// using the CirculatingQuestionsCache.
+  /// by querying the database directly.
   Future<Map<String, int>> _calculateCurrentRatio() async {
     try {
       QuizzerLogger.logMessage('Entering CirculationWorker _calculateCurrentRatio()...');
       Map<String, int> ratio = {};
-      final circulatingQuestionIds = await _circulatingCache.peekAllQuestionIds();
 
-      if (circulatingQuestionIds.isEmpty) {
-        // QuizzerLogger.logMessage('CirculationWorker: No questions currently circulating.');
+      assert(_sessionManager.userId != null, 'Circulation check requires logged-in user.');
+      final userId = _sessionManager.userId!;
+
+      // Get all questions currently in circulation for this user
+      final List<Map<String, dynamic>> circulatingQuestions = await getQuestionsInCirculation(userId);
+
+      if (circulatingQuestions.isEmpty) {
+        QuizzerLogger.logMessage('CirculationWorker: No questions currently circulating.');
         return ratio; // Return empty ratio
       }
 
-      // QuizzerLogger.logMessage('CirculationWorker: Calculating ratio for ${circulatingQuestionIds.length} circulating questions...');
+      QuizzerLogger.logMessage('CirculationWorker: Calculating ratio for ${circulatingQuestions.length} circulating questions...');
       
-      // Loop will proceed. If getQuestionAnswerPairById fails, it will throw (Fail Fast).
-      for (var questionId in circulatingQuestionIds) {
+      // Loop through circulating questions and calculate subject distribution
+      for (final questionRecord in circulatingQuestions) {
+        final String questionId = questionRecord['question_id'] as String;
         final questionDetails = await getQuestionAnswerPairById(questionId);
-        // Handle case where question might be in cache but removed from DB? Unlikely but possible.
+        
         if (questionDetails.isNotEmpty) {
           final subjects = (questionDetails['subjects'] as String? ?? '').split(',');
           for (var subject in subjects) {
@@ -248,7 +226,7 @@ class CirculationWorker {
         }
       }
 
-      // QuizzerLogger.logValue('CirculationWorker: Calculated Current Ratio: $ratio');
+      QuizzerLogger.logValue('CirculationWorker: Calculated Current Ratio: $ratio');
       return ratio;
     } catch (e) {
       QuizzerLogger.logError('Error in CirculationWorker _calculateCurrentRatio - $e');
@@ -257,14 +235,22 @@ class CirculationWorker {
   }
 
   /// Selects the best question to add based on interest, ratio, and availability.
-  /// Replaces placeholder with logic from question_queue_maintainer.
-  Map<String, dynamic> _selectPrioritizedQuestion(
+  /// Fetches its own non-circulating questions data from the database.
+  Future<Map<String, dynamic>> _selectPrioritizedQuestion(
     Map<String, int> interestData,
     Map<String, int> currentRatio,
-    List<Map<String, dynamic>> nonCirculatingRecords
-  ) {
+  ) async {
     try {
       QuizzerLogger.logMessage('Entering CirculationWorker _selectPrioritizedQuestion()...');
+      
+      // Fetch non-circulating questions with details from the database
+      final List<Map<String, dynamic>> nonCirculatingRecords = await getNonCirculatingQuestionsWithDetails(_sessionManager.userId!);
+      
+      if (nonCirculatingRecords.isEmpty) {
+        QuizzerLogger.logWarning('No non-circulating questions available for selection');
+        return {}; // Return empty map to indicate no selection possible
+      }
+      
       // Calculate deficit scores
       final Map<String, double> deficits = {};
       final int totalInterestWeight =
@@ -335,36 +321,21 @@ class CirculationWorker {
     }
   }
 
-  /// Updates the DB status and moves the record from NonCirculating to Unprocessed cache.
-  Future<void> _addQuestionToCirculation(String userId, Map<String, dynamic> recordToAdd) async {
+  /// Updates the DB status to put a question into circulation.
+  Future<void> _addQuestionToCirculation(String userId, String questionId) async {
     try {
       QuizzerLogger.logMessage('Entering CirculationWorker _addQuestionToCirculation()...');
-      final questionId = recordToAdd['question_id'] as String;
       
-      // Remove from NonCirculating Cache first
-      final removedRecord = await _nonCirculatingCache.getAndRemoveRecordByQuestionId(questionId);
-      if (removedRecord.isEmpty) {
-        QuizzerLogger.logWarning('CirculationWorker: Selected record $questionId not found in NonCirculatingCache during add.');
-        return;
-      }
-      Map<String, dynamic> mutableRecord = Map<String, dynamic>.from(removedRecord);
-      mutableRecord['in_circulation'] = 1;
-      
-      // Add to Unprocessed Cache first
-      await _unprocessedCache.addRecord(removedRecord);
-
-      // Set 'inCirculation' to true in the database - table function handles its own database access
+      // Set 'inCirculation' to true in the database
       await setCirculationStatus(userId, questionId, true);
-
-      // Add the record (already modified by caller) back to the UnprocessedCache
-      await _unprocessedCache.addRecord(mutableRecord);
 
       // Signal that a question was added to circulation
       signalCirculationWorkerQuestionAdded();
+      
+      QuizzerLogger.logSuccess('Question $questionId added to circulation');
     } catch (e) {
       QuizzerLogger.logError('Error in CirculationWorker _addQuestionToCirculation - $e');
       rethrow;
     }
   }
-
 }

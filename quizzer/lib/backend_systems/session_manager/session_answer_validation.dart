@@ -31,23 +31,38 @@ bool validateMultipleChoiceAnswer({
 ///
 /// Returns:
 ///   true if the user selected exactly the correct options, false otherwise.
+///   Note: Empty lists are considered valid when both userAnswer and correctIndices are empty.
 bool validateSelectAllThatApplyAnswer({
   required dynamic userAnswer,
   required List<int> correctIndices,
 }) {
   try {
     QuizzerLogger.logMessage('Entering validateSelectAllThatApplyAnswer()...');
-    // 1. Check if userAnswer is a List<int>
-    if (userAnswer is! List<int>) {
+    // 1. Check if userAnswer is a List (allow empty lists)
+    if (userAnswer is! List) {
       return false; // Incorrect type
     }
 
-    // 2. Check if the lists have the same length
+    // 2. Handle empty lists case (both empty is valid)
+    if (userAnswer.isEmpty && correctIndices.isEmpty) {
+      return true; // Both empty is a valid state
+    }
+
+    // 3. For non-empty lists, check if all elements are int
+    if (userAnswer.isNotEmpty) {
+      for (final element in userAnswer) {
+        if (element is! int) {
+          return false; // Contains non-int elements
+        }
+      }
+    }
+
+    // 3. Check if the lists have the same length
     if (userAnswer.length != correctIndices.length) {
       return false; // Different number of selections
     }
 
-    // 3. Check if both lists contain the same elements (order doesn't matter)
+    // 4. Check if both lists contain the same elements (order doesn't matter)
     // Convert both to Sets for efficient comparison
     final Set<int> userAnswerSet = Set<int>.from(userAnswer);
     final Set<int> correctIndicesSet = Set<int>.from(correctIndices);

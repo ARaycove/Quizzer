@@ -190,30 +190,14 @@ class SwitchBoard {
   Stream<String> get onLoginProgress => loginProgressController.stream;
   // -------------------------------------
 
-  // --- Module Activated Stream ---
-  final StreamController<String> _moduleActivatedController = StreamController<String>.broadcast();
-  Stream<String> get onModuleActivated => _moduleActivatedController.stream;
-  void signalModuleActivated(String moduleName) {
-    if (!_moduleActivatedController.isClosed) {
-      QuizzerLogger.logMessage('SwitchBoard: Signaling module activated: $moduleName.');
-      _moduleActivatedController.add(moduleName);
-    } else {
-      QuizzerLogger.logWarning('SwitchBoard: Attempted to signal on closed ModuleActivated stream.');
-    }
-  }
+  // --- Question Answered Correctly Stream ---
+  final StreamController<String> questionAnsweredCorrectlyController = StreamController<String>.broadcast();
+  Stream<String> get onQuestionAnsweredCorrectly => questionAnsweredCorrectlyController.stream;
   // -------------------------------------
 
-  // --- Module Recently Activated Stream ---
-  final StreamController<DateTime> _moduleRecentlyActivatedController = StreamController<DateTime>.broadcast();
-  Stream<DateTime> get onModuleRecentlyActivated => _moduleRecentlyActivatedController.stream;
-  void signalModuleRecentlyActivated(DateTime activationTime) {
-    if (!_moduleRecentlyActivatedController.isClosed) {
-      QuizzerLogger.logMessage('SwitchBoard: Signaling module recently activated at $activationTime.');
-      _moduleRecentlyActivatedController.add(activationTime);
-    } else {
-      QuizzerLogger.logWarning('SwitchBoard: Attempted to signal on closed ModuleRecentlyActivated stream.');
-    }
-  }
+  // --- Circulation Worker Finished Stream ---
+  final StreamController<bool> circulationWorkerFinishedController = StreamController<bool>.broadcast();
+  Stream<bool> get onCirculationWorkerFinished => circulationWorkerFinishedController.stream;
   // -------------------------------------
 
   // --- Dispose Method ---
@@ -261,8 +245,8 @@ class SwitchBoard {
     
     // Other streams
     loginProgressController.close();
-    _moduleActivatedController.close();
-    _moduleRecentlyActivatedController.close();
+    questionAnsweredCorrectlyController.close();
+    circulationWorkerFinishedController.close();
     
     QuizzerLogger.logMessage('SwitchBoard disposed.');
   }

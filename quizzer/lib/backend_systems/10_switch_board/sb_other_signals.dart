@@ -11,3 +11,14 @@ void signalLoginProgress(String message) {
     QuizzerLogger.logWarning('SwitchBoard: Attempted to signal on closed LoginProgress stream.');
   }
 }
+
+/// Signals that the circulation worker has finished adding questions to circulation
+void signalCirculationWorkerFinished() {
+  final switchBoard = getSwitchBoard();
+  if (!switchBoard.circulationWorkerFinishedController.isClosed) {
+    QuizzerLogger.logMessage('SwitchBoard: Signaling circulation worker finished');
+    switchBoard.circulationWorkerFinishedController.add(true);
+  } else {
+    QuizzerLogger.logWarning('SwitchBoard: Attempted to signal on closed CirculationWorkerFinished stream.');
+  }
+}

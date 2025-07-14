@@ -94,16 +94,12 @@ class _HomePageTopBarState extends State<HomePageTopBar> {
 
                QuizzerLogger.logMessage('Edit button pressed for question ID: $currentQuestionId');
                
-               // Fetch current question details
+               // Show the edit dialog and wait for result
                try {
-                 final details = await _session.fetchQuestionDetailsById(currentQuestionId);
-                 if (!mounted) return; // Check if widget is still mounted after async call
-
-                 // Show the edit dialog and wait for result
                  if (!context.mounted) return;
                  final result = await showDialog(
                     context: context,
-                    builder: (dialogContext) => EditQuestionDialog(initialQuestionData: details),
+                    builder: (dialogContext) => EditQuestionDialog(questionId: currentQuestionId),
                  );
 
                  // If dialog submitted and returned data, call the callback
@@ -111,7 +107,7 @@ class _HomePageTopBarState extends State<HomePageTopBar> {
                      await widget.onQuestionEdited(result); // Call the callback passed from HomePage
                  }
                } catch (e) {
-                  QuizzerLogger.logError("Error fetching details or showing edit dialog: $e");
+                  QuizzerLogger.logError("Error showing edit dialog: $e");
                   if (context.mounted) {
                        ScaffoldMessenger.of(context).showSnackBar(
                          SnackBar(content: Text('Error opening edit dialog: $e'), backgroundColor: ColorWheel.buttonError),

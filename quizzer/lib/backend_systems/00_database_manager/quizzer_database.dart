@@ -27,3 +27,12 @@ Future<Database> getDatabaseForMonitor() async {
   _database ??= await initDb();
   return _database!;
 }
+
+/// Properly closes the database and ensures data is persisted to disk
+/// This should be called when the app is shutting down or when you want to ensure data is saved
+Future<void> closeDatabase() async {
+  if (_database != null && _database!.isOpen) {
+    await _database!.close();
+    _database = null;
+  }
+}

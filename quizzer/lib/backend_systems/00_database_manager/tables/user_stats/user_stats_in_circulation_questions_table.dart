@@ -59,10 +59,16 @@ Future<void> updateInCirculationQuestionsStat(String userId) async {
   
   // Count questions that are in circulation and from active modules
   int inCirculationCount = 0;
+  
+  if (questionIdsInCirculation.isNotEmpty) {
+    // Get module names for all question IDs in a single query
+    final Map<String, String> questionIdToModuleName = await getModuleNamesForQuestionIds(questionIdsInCirculation);
+    
   for (final String questionId in questionIdsInCirculation) {
-    final String moduleName = await getModuleNameForQuestionId(questionId); // Will be updated when that function is refactored
+      final String moduleName = questionIdToModuleName[questionId] ?? 'Unknown Module';
     if (moduleActivationStatus[moduleName] == true) {
       inCirculationCount++;
+      }
     }
   }
 

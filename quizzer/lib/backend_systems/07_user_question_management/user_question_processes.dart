@@ -1,8 +1,7 @@
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_question_answer_pairs_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_profile_table.dart' as user_profile;
-import 'package:quizzer/backend_systems/00_database_manager/tables/modules_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pairs_table.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
-import 'package:quizzer/backend_systems/09_data_caches/unprocessed_cache.dart';
 
 /// Checks if a module is active for a specific user
 /// Returns true if the module is active, false otherwise
@@ -32,35 +31,33 @@ Future<void> validateModuleQuestionsInUserProfile(String moduleName, String user
     QuizzerLogger.logMessage('Entering validateModuleQuestionsInUserProfile()...');
     QuizzerLogger.logMessage('Ensuring questions from module $moduleName are in user profile');
     
-    // Check if the module is active for this user
-    final isActive = await isModuleActiveForUser(userId, moduleName);
-    if (!isActive) {
-      QuizzerLogger.logMessage('Module $moduleName is not active, skipping question validation');
-      return;
-    }
-    
-    // Get the module data from the modules table - table function handles its own database access
-    final module = await getModule(moduleName);
-    if (module == null) {
-      QuizzerLogger.logError('Module $moduleName not found in modules table');
-      return;
-    }
-    
-    // Verbose -> just here to log
-    // QuizzerLogger.logMessage("Getting list of question ids from this ->\n $module");
-    // Correctly handle List<dynamic> from decoded data
-    final List<dynamic> dynamicQuestionIds = module['question_ids'] as List<dynamic>? ?? []; 
-    final List<String> questionIds = List<String>.from(dynamicQuestionIds.map((id) => id.toString()));
-    
-    // Get all existing user question-answer pairs - table function handles its own database access
+    // 1. Get all existing user question-answer pairs
     final existingPairs = await getUserQuestionAnswerPairsByUser(userId);
     final existingQuestionIds = existingPairs.map((pair) => pair['question_id'] as String).toSet();
+    QuizzerLogger.logMessage('Found ${existingQuestionIds.length} existing questions for user');
     
-    // Add any missing questions to the user's profile
-    for (final questionId in questionIds) {
+    // 2. Get all question IDs that belong to the module we are validating
+    final List<String> moduleQuestionIds = await getQuestionIdsForModule(moduleName);
+    QuizzerLogger.logMessage('Found ${moduleQuestionIds.length} questions for module $moduleName');
+    
+    // 3. Create an empty working list
+    final List<String> questionsToAdd = [];
+    
+    // 4. Iterate over the question IDs that belong to the module, if that question ID is not in the existing list, add that ID to the working list
+    for (final questionId in moduleQuestionIds) {
       if (!existingQuestionIds.contains(questionId)) {
-        QuizzerLogger.logMessage('Adding question $questionId to user profile');
-        
+        questionsToAdd.add(questionId);
+        QuizzerLogger.logMessage('Question $questionId needs to be added to user profile');
+      }
+    }
+    
+    QuizzerLogger.logMessage('Found ${questionsToAdd.length} questions to add for module $moduleName');
+    
+    // 5. Iterate over the now constructed working list and run the addUserQuestionAnswerPair to add our non-existent questions
+    for (final questionId in questionsToAdd) {
+      QuizzerLogger.logMessage('Adding question $questionId to user profile');
+      
+      try {
         // Add the question to the user's profile - table function handles its own database access
         await addUserQuestionAnswerPair(
           userUuid: userId,
@@ -72,13 +69,14 @@ Future<void> validateModuleQuestionsInUserProfile(String moduleName, String user
           timeBetweenRevisions: 0.37,
           averageTimesShownPerDay: 0.0,
         );
-        
-        // Fetch the newly added record from the DB - table function handles its own database access
-        final newUserRecord = await getUserQuestionAnswerPairById(userId, questionId);
-        
-        // Add the new record to the UnprocessedCache
-        final unprocessedCache = UnprocessedCache(); 
-        await unprocessedCache.addRecord(newUserRecord); // Also add to the unprocessed Cache
+      } catch (e) {
+        // If this is a unique constraint violation, ignore it (question already exists)
+        if (e.toString().contains('UNIQUE constraint failed') || e.toString().contains('1555')) {
+          QuizzerLogger.logMessage('Question $questionId already exists, skipping insert');
+        } else {
+          // Re-throw any other errors
+          rethrow;
+        }
       }
     }
     

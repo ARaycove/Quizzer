@@ -6,13 +6,14 @@ import 'package:quizzer/UI_systems/color_wheel.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 
+
 class EditQuestionDialog extends StatefulWidget {
-  final Map<String, dynamic> initialQuestionData;
+  final String questionId;
   final bool disableSubmission;
 
   const EditQuestionDialog({
     super.key, 
-    required this.initialQuestionData,
+    required this.questionId,
     this.disableSubmission = false,
   });
 
@@ -23,7 +24,6 @@ class EditQuestionDialog extends StatefulWidget {
 class _EditQuestionDialogState extends State<EditQuestionDialog> {
   final SessionManager _session = SessionManager();
   late final TextEditingController _moduleController;
-  late final String _questionId;
   late final String _questionType;
 
   // State for editing
@@ -35,20 +35,48 @@ class _EditQuestionDialogState extends State<EditQuestionDialog> {
   int _previewRebuildCounter = 0;
 
   late final String _originalModuleName; // Track the original module name
+  
+  // Loading state
+  bool _isLoading = true;
+  String? _errorMessage;
 
   @override
   void initState() {
     super.initState();
-    final data = widget.initialQuestionData;
-    _questionId = data['question_id'] as String;
-    _questionType = data['question_type'] as String;
-    _moduleController = TextEditingController(text: data['module_name'] as String? ?? '');
-    _originalModuleName = data['module_name'] as String? ?? '';
-    _questionElements = (data['question_elements'] as List<dynamic>?)?.map((e) => Map<String, dynamic>.from(e as Map)).toList() ?? [];
-    _answerElements = (data['answer_elements'] as List<dynamic>?)?.map((e) => Map<String, dynamic>.from(e as Map)).toList() ?? [];
-    _options = (data['options'] as List<dynamic>?)?.map((e) => Map<String, dynamic>.from(e as Map)).toList() ?? [];
-    _correctOptionIndex = data['correct_option_index'] as int?;
-    _correctIndicesSATA = (data['index_options_that_apply'] as List<dynamic>?)?.map((e) => e as int).toList() ?? [];
+    _loadQuestionData();
+  }
+
+  Future<void> _loadQuestionData() async {
+    try {
+      QuizzerLogger.logMessage('EditQuestionDialog: Loading question data for ID: ${widget.questionId}');
+      
+      // Fetch question data through SessionManager API
+      final Map<String, dynamic> data = await _session.fetchQuestionDetailsById(widget.questionId);
+      
+      if (mounted) {
+        setState(() {
+          _questionType = data['question_type'] as String;
+          _moduleController = TextEditingController(text: data['module_name'] as String? ?? '');
+          _originalModuleName = data['module_name'] as String? ?? '';
+          _questionElements = (data['question_elements'] as List<dynamic>?)?.map((e) => Map<String, dynamic>.from(e as Map)).toList() ?? [];
+          _answerElements = (data['answer_elements'] as List<dynamic>?)?.map((e) => Map<String, dynamic>.from(e as Map)).toList() ?? [];
+          _options = (data['options'] as List<dynamic>?)?.map((e) => Map<String, dynamic>.from(e as Map)).toList() ?? [];
+          _correctOptionIndex = data['correct_option_index'] as int?;
+          _correctIndicesSATA = (data['index_options_that_apply'] as List<dynamic>?)?.map((e) => e as int).toList() ?? [];
+          _isLoading = false;
+        });
+        
+        QuizzerLogger.logSuccess('EditQuestionDialog: Successfully loaded question data');
+      }
+    } catch (e) {
+      QuizzerLogger.logError('EditQuestionDialog: Error loading question data: $e');
+      if (mounted) {
+        setState(() {
+          _errorMessage = 'Failed to load question data: $e';
+          _isLoading = false;
+        });
+      }
+    }
   }
 
   void _handleAddElement(String typeOrContent, String category) {
@@ -176,7 +204,7 @@ class _EditQuestionDialogState extends State<EditQuestionDialog> {
     // Construct the map of data that will be sent for update
     // This is also the data we want to return to the caller
     final Map<String, dynamic> updatedQuestionDataForSession = {
-      'question_id': _questionId, // Essential for SessionManager to identify
+      'question_id': widget.questionId, // Essential for SessionManager to identify
       'module_name': _moduleController.text,
       'question_elements': _questionElements,
       'answer_elements': _answerElements,
@@ -193,7 +221,7 @@ class _EditQuestionDialogState extends State<EditQuestionDialog> {
     if (!widget.disableSubmission) {
       QuizzerLogger.logMessage('EditQuestionDialog: Submitting changes to SessionManager.');
       await _session.updateExistingQuestion(
-        questionId: _questionId,
+        questionId: widget.questionId,
         moduleName: _moduleController.text,
         questionElements: _questionElements,
         answerElements: _answerElements,
@@ -220,6 +248,39 @@ class _EditQuestionDialogState extends State<EditQuestionDialog> {
     final screenHeight = MediaQuery.of(context).size.height;
     final dialogWidth = screenWidth * 0.85 > 460 ? 460.0 : screenWidth * 0.85;
     final maxDialogHeight = screenHeight * 0.8;
+
+    if (_isLoading) {
+      return Dialog(
+        backgroundColor: ColorWheel.secondaryBackground,
+        shape: RoundedRectangleBorder(borderRadius: ColorWheel.cardBorderRadius),
+        child: SizedBox(
+          width: dialogWidth,
+          child: const Padding(
+            padding: ColorWheel.standardPadding,
+            child: Center(
+              child: CircularProgressIndicator(color: ColorWheel.primaryText),
+            ),
+          ),
+        ),
+      );
+    }
+
+    if (_errorMessage != null) {
+      return Dialog(
+        backgroundColor: ColorWheel.secondaryBackground,
+        shape: RoundedRectangleBorder(borderRadius: ColorWheel.cardBorderRadius),
+        child: SizedBox(
+          width: dialogWidth,
+          child: Padding(
+            padding: ColorWheel.standardPadding,
+                         child: Center(
+               child: Text(_errorMessage!, style: ColorWheel.titleText),
+             ),
+          ),
+        ),
+      );
+    }
+
     return Dialog(
       backgroundColor: ColorWheel.secondaryBackground,
       shape: RoundedRectangleBorder(borderRadius: ColorWheel.cardBorderRadius),

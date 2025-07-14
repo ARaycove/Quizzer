@@ -48,3 +48,14 @@ void signalPresentationSelectionWorkerCycleComplete() {
     QuizzerLogger.logWarning('SwitchBoard: Attempted to signal on closed PresentationSelectionWorkerCycleComplete stream.');
   }
 }
+
+/// Signals that a question has been answered correctly
+void signalQuestionAnsweredCorrectly(String questionId) {
+  final switchBoard = getSwitchBoard();
+  if (!switchBoard.questionAnsweredCorrectlyController.isClosed) {
+    QuizzerLogger.logMessage('SwitchBoard: Signaling question answered correctly: $questionId.');
+    switchBoard.questionAnsweredCorrectlyController.add(questionId);
+  } else {
+    QuizzerLogger.logWarning('SwitchBoard: Attempted to signal on closed QuestionAnsweredCorrectly stream.');
+  }
+}

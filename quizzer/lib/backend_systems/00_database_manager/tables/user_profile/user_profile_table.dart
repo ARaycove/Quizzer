@@ -8,21 +8,17 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/table_helper.
 import 'package:sqflite/sqflite.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 
-// TODO Enforce and introduce primary and secondary languages
-// This will be used to determine whether questions should be synced based on language
-// User's should be able to opt into new languages by updating secondary languages
-
 /// Gets the user ID for a given email address.
 /// Throws a StateError if no user is found.
 Future<String> getUserIdByEmail(String emailAddress) async {
   try {
     QuizzerLogger.logMessage('Getting user ID for email: $emailAddress');
-    await verifyUserProfileTable();
     final db = await getDatabaseMonitor().requestDatabaseAccess();
+    await _verifyUserProfileTable(db!);
     // First verify the table exists
     
     // Query might fail if table doesn't exist yet, let it crash (Fail Fast)
-    final List<Map<String, dynamic>> result = await db!.query(
+    final List<Map<String, dynamic>> result = await db.query(
         'user_profile',
         columns: ['uuid'],
         where: 'email = ?',
@@ -49,8 +45,8 @@ Future<String> getUserIdByEmail(String emailAddress) async {
 Future<bool> createNewUserProfile(String email, String username) async {
   try {
     QuizzerLogger.logMessage('Creating new user profile for email: $email, username: $username');
-    await verifyUserProfileTable();
     final db = await getDatabaseMonitor().requestDatabaseAccess();
+    await _verifyUserProfileTable(db!);
     
     // First verify that the User Profile Table exists
     
@@ -59,7 +55,7 @@ Future<bool> createNewUserProfile(String email, String username) async {
     QuizzerLogger.logSuccess('User registered with Supabase');
 
     // Next Verify that the profile doesn't already exist in that Table
-    final duplicateCheck = await _verifyNonDuplicateProfile(email, username, db!);
+    final duplicateCheck = await _verifyNonDuplicateProfile(email, username, db);
     if (!duplicateCheck['isValid']) {
         QuizzerLogger.logError(duplicateCheck['message']);
         // If validation fails, returning false is acceptable as it's a known flow,
@@ -113,13 +109,13 @@ String generateUserUUID() {
 
 /// Verifies that the User Profile Table exists in the database
 /// Creates the table if it doesn't exist based on the schema in documentation
-Future<void> verifyUserProfileTable() async {
+/// Private function that requires a database parameter to avoid race conditions
+Future<void> _verifyUserProfileTable(Database db) async {
   try {
     QuizzerLogger.logMessage('Verifying user profile table existence');
-    final db = await getDatabaseMonitor().requestDatabaseAccess();
     
     // Check if the table exists
-    final List<Map<String, dynamic>> tables = await db!.rawQuery(
+    final List<Map<String, dynamic>> tables = await db.rawQuery(
       "SELECT name FROM sqlite_master WHERE type='table' AND name=?",
       ['user_profile']
     );
@@ -194,8 +190,6 @@ Future<void> verifyUserProfileTable() async {
   } catch (e) {
     QuizzerLogger.logError('Error verifying user profile table - $e');
     rethrow;
-  } finally {
-    getDatabaseMonitor().releaseDatabaseAccess();
   }
 }
 
@@ -227,8 +221,8 @@ Future<Map<String, dynamic>> _verifyNonDuplicateProfile(String email, String use
 Future<bool> updateLastLogin(String userId) async {
   try {
     QuizzerLogger.logMessage('Updating last login for userId: $userId');
-    await verifyUserProfileTable();
     final db = await getDatabaseMonitor().requestDatabaseAccess();
+    await _verifyUserProfileTable(db!);
     
     final String nowTimestamp = DateTime.now().toUtc().toIso8601String();
     final Map<String, dynamic> updates = {
@@ -241,7 +235,7 @@ Future<bool> updateLastLogin(String userId) async {
       updates,
       'uuid = ?',
       [userId],
-      db!,
+      db,
     );
     QuizzerLogger.logSuccess('Last login updated successfully for userId: $userId');
     // Signal SwitchBoard
@@ -258,14 +252,14 @@ Future<bool> updateLastLogin(String userId) async {
 /// Gets the activation status of modules for a user
 /// Returns a Map<String, bool> where keys are module names and values are activation status
 Future<Map<String, bool>> getModuleActivationStatus(String userId) async {
-  // TODO: This function once the new user_module_activation_status_table.dart is implemented, should be updated to use that table instead of the user_profile table. Once this is updated, we need to go back to the user_profile table and remove the activation_status_of_modules column.
   try {
-    await verifyUserProfileTable();
+    
     final db = await getDatabaseMonitor().requestDatabaseAccess();
+    await _verifyUserProfileTable(db!);
     
     final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
       'user_profile',
-      db!,
+      db,
       columns: ['activation_status_of_modules'],
       where: 'uuid = ?',
       whereArgs: [userId],
@@ -307,57 +301,20 @@ Future<Map<String, bool>> getModuleActivationStatus(String userId) async {
   }
 }
 
-/// Updates the activation status of a specific module for a user
-/// Takes a module name and boolean value to set its activation status
-Future<bool> updateModuleActivationStatus(String userId, String moduleName, bool isActive) async {
-  try {
-    QuizzerLogger.logMessage('Updating activation status for module: $moduleName, user: $userId, status: $isActive');
-    await verifyUserProfileTable();
-    final db = await getDatabaseMonitor().requestDatabaseAccess();
-    
-    // First get the current activation status
-    final Map<String, bool> currentStatus = await getModuleActivationStatus(userId);
-    
-    // Update the status for the specified module
-    currentStatus[moduleName] = isActive;
-    
-    // Convert the map to a JSON string
-    final String statusJson = json.encode(currentStatus);
-    
-    // Update the database
-    await db!.update(
-      'user_profile',
-      {
-        'activation_status_of_modules': statusJson,
-        'edits_are_synced': 0,
-        'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
-      },
-      where: 'uuid = ?',
-      whereArgs: [userId],
-    );
-    
-    // Signal SwitchBoard
-    signalOutboundSyncNeeded();
-    return true;
-  } catch (e) {
-    QuizzerLogger.logError('Error updating module activation status for module: $moduleName, user: $userId - $e');
-    rethrow;
-  } finally {
-    getDatabaseMonitor().releaseDatabaseAccess();
-  }
-}
-
 /// Gets the subject interest data for a user
 /// If new subjects are found in the question database that aren't in the user profile,
 /// they will be added with a default interest value of 10
 Future<Map<String, int>> getUserSubjectInterests(String userId) async {
   try {
     // QuizzerLogger.logMessage('Getting subject interests for user: $userId');
-    await verifyUserProfileTable();
-    final db = await getDatabaseMonitor().requestDatabaseAccess();
+    // Get all unique subjects from question database
+    final List<String> allSubjectsList = await getUniqueSubjects();
+    final Set<String> allSubjects = allSubjectsList.toSet();
     
+    final db = await getDatabaseMonitor().requestDatabaseAccess();
+    await _verifyUserProfileTable(db!);
     // Query for the user's interest data column
-    final List<Map<String, dynamic>> result = await db!.query(
+    final List<Map<String, dynamic>> result = await db.query(
       'user_profile',
       columns: ['interest_data'],
       where: 'uuid = ?',
@@ -395,9 +352,7 @@ Future<Map<String, int>> getUserSubjectInterests(String userId) async {
        interestData = {};
     }
 
-    // Get all unique subjects from question database
-    final List<String> allSubjectsList = await getUniqueSubjects();
-    final Set<String> allSubjects = allSubjectsList.toSet();
+
     allSubjects.add('misc'); // hidden misc subject for handling questions without subjects
     QuizzerLogger.logMessage('Unique subjects from questions table: $allSubjects');
 
@@ -489,12 +444,11 @@ Future<List<String>> getAllUserEmails() async {
   try {
     QuizzerLogger.logMessage('Fetching all emails from user_profile table.');
     // Ensure table exists (Fail Fast if verifyUserProfileTable fails)
-    await verifyUserProfileTable();
     final db = await getDatabaseMonitor().requestDatabaseAccess();
-
+    await _verifyUserProfileTable(db!);
     // Query the database for the email column
     // If query fails (e.g., table structure wrong), let it crash (Fail Fast)
-    final List<Map<String, dynamic>> results = await db!.query(
+    final List<Map<String, dynamic>> results = await db.query(
       'user_profile',
       columns: ['email'],
     );
@@ -526,10 +480,9 @@ Future<List<String>> getAllUserEmails() async {
 Future<List<Map<String, dynamic>>> getUnsyncedUserProfiles(String userId) async {
   try {
     QuizzerLogger.logMessage('Fetching unsynced user profile for user ID: $userId...');
-    await verifyUserProfileTable(); // Ensure table and sync columns exist
     final db = await getDatabaseMonitor().requestDatabaseAccess();
-
-    final List<Map<String, dynamic>> results = await db!.query(
+    await _verifyUserProfileTable(db!);
+    final List<Map<String, dynamic>> results = await db.query(
       'user_profile',
       where: '(has_been_synced = 0 OR edits_are_synced = 0) AND uuid = ?',
       whereArgs: [userId], // Use the passed userId parameter
@@ -556,9 +509,8 @@ Future<void> updateUserProfileSyncFlags({
 }) async {
   try {
     QuizzerLogger.logMessage('Updating sync flags for User Profile: $userId -> Synced: $hasBeenSynced, Edits Synced: $editsAreSynced');
-    await verifyUserProfileTable(); // Ensure table/columns exist
     final db = await getDatabaseMonitor().requestDatabaseAccess();
-
+    await _verifyUserProfileTable(db!);
     final Map<String, dynamic> updates = {
       'has_been_synced': hasBeenSynced ? 1 : 0,
       'edits_are_synced': editsAreSynced ? 1 : 0,
@@ -569,7 +521,7 @@ Future<void> updateUserProfileSyncFlags({
       updates,
       'uuid = ?', // Where clause using primary key
       [userId],   // Where args
-      db!,
+      db,
     );
 
     if (rowsAffected == 0) {
@@ -646,7 +598,7 @@ Future<void> upsertUserProfileFromInboundSync(Map<String, dynamic> profileData) 
     }
     
     // Ensure the table exists
-    await verifyUserProfileTable();
+    await _verifyUserProfileTable(db);
 
     final Map<String, dynamic> dataToInsertOrUpdate = {
       'uuid': userId,
@@ -741,4 +693,19 @@ Future<void> fetchAndInsertUserProfileFromSupabase(String email) async {
     QuizzerLogger.logError('Error fetching and inserting user profile from Supabase for email: $email - $e');
     rethrow;
   }
+}
+
+Future<Map<String, dynamic>?> getUserProfileByEmail(String email) async {
+  final db = await getDatabaseMonitor().requestDatabaseAccess();
+  await _verifyUserProfileTable(db!);
+  final List<Map<String, dynamic>> result = await db.query(
+    'user_profile',
+    where: 'email = ?',
+    whereArgs: [email],
+  );
+  getDatabaseMonitor().releaseDatabaseAccess();
+  if (result.isNotEmpty) {
+    return result.first;
+  }
+  return null;
 }

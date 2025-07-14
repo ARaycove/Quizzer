@@ -1,10 +1,8 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:synchronized/synchronized.dart';
 import 'package:quizzer/backend_systems/10_switch_board/sb_cache_signals.dart'; // Import cache signals
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart'; // Import for logging
-import 'unprocessed_cache.dart'; // Import for flushing
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_question_answer_pairs_table.dart'; // For updateCacheLocation
-import 'package:quizzer/backend_systems/session_manager/session_manager.dart'; // For user ID
 
 // ==========================================
 
@@ -19,11 +17,7 @@ class QuestionQueueCache {
 
   final Lock _lock = Lock();
   final List<Map<String, dynamic>> _cache = [];
-  static const int queueThreshold = 15; // Threshold for signalling removal
-  final UnprocessedCache _unprocessedCache = UnprocessedCache(); // Added
-
-  // Make SessionManager reference lazy to avoid circular dependency
-  SessionManager get _sessionManager => getSessionManager();
+  static const int queueThreshold = 5; // Threshold for signalling removal
 
   // --- Add Record (with duplicate check within this cache only) ---
 
@@ -48,12 +42,6 @@ class QuestionQueueCache {
           signalQuestionQueueAdded(); // Use unified signal
         }
         return true;
-      }).then((added) async {
-        // Update cache location in database after successful addition (only if requested)
-        if (added && updateDatabaseLocation) {
-          await _updateCacheLocationInDatabase(record['question_id'], 1);
-        }
-        return added;
       });
     } catch (e) {
       QuizzerLogger.logError('Error in QuestionQueueCache addRecord - $e');
@@ -63,17 +51,64 @@ class QuestionQueueCache {
 
   // --- Get and Remove Record (FIFO) ---
 
-  /// Removes and returns the first record added to the cache (FIFO).
+  /// Builds placeholder records for display when the question queue is empty.
+  Map<String, dynamic> _buildDummyNoQuestionsRecord() {
+    try {
+      QuizzerLogger.logMessage('Entering QuestionQueueCache _buildDummyNoQuestionsRecord()...');
+      
+      const String dummyId = "dummy_no_questions";
+      
+      // Return a complete dummy question record
+      final Map<String, dynamic> dummyRecord = {
+        'question_id': dummyId,
+        'question_type': 'multiple_choice', // Use multiple choice as requested
+        // Format follows the parsed structure from getQuestionAnswerPairById
+        'question_elements': [{'type': 'text', 'content': 'No new questions available right now. Check back later!'}], 
+        'answer_elements': [{'type': 'text', 'content': ''}], // Empty answer
+        'options': [
+          {'type': 'text', 'content': 'Okay'},
+          {'type': 'text', 'content': 'Add new modules'},
+          {'type': 'text', 'content': 'Check Back Later!'},
+        ], 
+        'correct_option_index': 0, // Index of the 'Okay' option (or -1 if no default correct)
+        'module_name': 'System', // Placeholder module
+        'subjects': '', // Placeholder subjects
+        'concepts': '', // Placeholder concepts
+        // Add other QPair fields with default/placeholder values if required by UI
+        'time_stamp': DateTime.now().millisecondsSinceEpoch.toString(),
+        'qst_contrib': 'system',
+        'ans_contrib': 'system',
+        'citation': '',
+        'ans_flagged': false,
+        'has_been_reviewed': true,
+        'flag_for_removal': false,
+        'completed': true, 
+        'correct_order': '', // Empty for non-sort_order
+      };
+      
+      QuizzerLogger.logMessage('Successfully built dummy no questions record with ID: $dummyId');
+      
+      return dummyRecord;
+    } catch (e) {
+      QuizzerLogger.logError('Error in QuestionQueueCache _buildDummyNoQuestionsRecord - $e');
+      rethrow;
+    }
+  }
+
+  /// Removes and returns a random record from the cache.
   /// Used to get the next question for presentation.
   /// Ensures thread safety using a lock.
-  /// Returns an empty Map `{}` if the cache is empty.
+  /// Returns a dummy record if the cache is empty.
   Future<Map<String, dynamic>> getAndRemoveRecord() async {
      try {
        QuizzerLogger.logMessage('Entering QuestionQueueCache getAndRemoveRecord()...');
        return await _lock.synchronized(() {
          if (_cache.isNotEmpty) {
            final int lengthBeforeRemove = _cache.length;
-           final record = _cache.removeAt(0);
+           // Select a random index
+           final random = Random();
+           final int randomIndex = random.nextInt(_cache.length);
+           final record = _cache.removeAt(randomIndex);
            final int lengthAfterRemove = _cache.length;
 
            // Signal that a record was removed
@@ -84,9 +119,9 @@ class QuestionQueueCache {
            }
            return record;
          } else {
-           // Return an empty map if the cache is empty
-           QuizzerLogger.logWarning('QuestionQueueCache: Cache is empty, no record to remove');
-           return <String, dynamic>{};
+           // Return a dummy record if the cache is empty
+           QuizzerLogger.logWarning('QuestionQueueCache: Cache is empty, returning dummy record');
+           return _buildDummyNoQuestionsRecord();
          }
        });
      } catch (e) {
@@ -123,40 +158,6 @@ class QuestionQueueCache {
       });
     } catch (e) {
       QuizzerLogger.logError('Error in QuestionQueueCache peekAllRecords - $e');
-      rethrow;
-    }
-  }
-
-  // --- Flush Cache to Unprocessed ---
-  /// Removes all records from this cache and adds them to the UnprocessedCache.
-  /// Ensures thread safety using locks on both caches implicitly via their methods.
-  Future<void> flushToUnprocessedCache() async {
-    try {
-      QuizzerLogger.logMessage('Entering QuestionQueueCache flushToUnprocessedCache()...');
-      List<Map<String, dynamic>> recordsToMove = []; // Initialize
-      bool wasNotEmpty = false; // Track if cache had items before flush
-      // Atomically get and clear records from this cache
-      await _lock.synchronized(() {
-        recordsToMove = List.from(_cache);
-        wasNotEmpty = _cache.isNotEmpty; // Check *before* clearing
-        _cache.clear();
-        // If it was not empty before clearing, signal that removals happened.
-        // This wakes up listeners waiting for space (like PresentationSelectionWorker).
-        if (wasNotEmpty) {
-           QuizzerLogger.logMessage('QuestionQueueCache: Flushed non-empty queue. Signaling removal.');
-           signalQuestionQueueRemoved(); // Use unified signal
-        }
-      });
-
-      // Add the retrieved records to the unprocessed cache
-      if (recordsToMove.isNotEmpty) {
-         QuizzerLogger.logMessage('Flushing ${recordsToMove.length} records from QuestionQueueCache to UnprocessedCache.');
-         await _unprocessedCache.addRecords(recordsToMove);
-      } else {
-         QuizzerLogger.logMessage('QuestionQueueCache was empty, nothing to flush.');
-      }
-    } catch (e) {
-      QuizzerLogger.logError('Error in QuestionQueueCache flushToUnprocessedCache - $e');
       rethrow;
     }
   }
@@ -203,23 +204,6 @@ class QuestionQueueCache {
       });
     } catch (e) {
       QuizzerLogger.logError('Error in QuestionQueueCache clear - $e');
-      rethrow;
-    }
-  }
-
-  // --- Helper function to update cache location in database ---
-  Future<void> _updateCacheLocationInDatabase(String questionId, int cacheLocation) async {
-    try {
-      QuizzerLogger.logMessage('Entering QuestionQueueCache _updateCacheLocationInDatabase()...');
-      final userId = _sessionManager.userId;
-      if (userId == null) {
-        throw StateError('QuestionQueueCache: Cannot update cache location - no user ID available');
-      }
-
-      // Table function handles its own database access
-      await updateCacheLocation(userId, questionId, cacheLocation);
-    } catch (e) {
-      QuizzerLogger.logError('Error in QuestionQueueCache _updateCacheLocationInDatabase - $e');
       rethrow;
     }
   }

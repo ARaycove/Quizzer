@@ -2,14 +2,14 @@ import 'dart:async';
 import 'dart:math';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
-import 'package:quizzer/backend_systems/09_data_caches/eligible_questions_cache.dart';
 import 'package:quizzer/backend_systems/09_data_caches/question_queue_cache.dart';
-import 'package:quizzer/backend_systems/09_data_caches/temp_question_details.dart';
+import 'package:quizzer/backend_systems/09_data_caches/answer_history_cache.dart';
 import 'package:quizzer/backend_systems/10_switch_board/switch_board.dart';
 import 'package:quizzer/backend_systems/10_switch_board/sb_question_worker_signals.dart';
 // Table Imports
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_profile_table.dart' as user_profile_table;
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pairs_table.dart' as q_pairs_table;
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_question_answer_pairs_table.dart';
 
 // ==========================================
 // Presentation Selection Worker
@@ -32,10 +32,12 @@ class PresentationSelectionWorker {
 
   // --- Dependencies ---
   final SessionManager            _sessionManager = SessionManager();
-  final EligibleQuestionsCache    _eligibleCache = EligibleQuestionsCache();
   final QuestionQueueCache        _queueCache = QuestionQueueCache();
-  final TempQuestionDetailsCache  _tempDetailsCache = TempQuestionDetailsCache();
   // final UnprocessedCache        _unprocessedCache = UnprocessedCache();
+  
+  // --- Internal tracking of recently selected questions ---
+  final List<String> _recentlySelectedQuestionIds = [];
+  static const int _maxRecentlySelectedCount = 5;
 
   // --- Control Methods ---
   void start() {
@@ -45,6 +47,15 @@ class PresentationSelectionWorker {
         QuizzerLogger.logWarning('PresentationSelectionWorker is already running.');
         return;
       }
+      
+      // Clear both caches to ensure clean state
+      QuizzerLogger.logMessage('Clearing QuestionQueueCache and AnswerHistoryCache...');
+      _queueCache.clear();
+      final AnswerHistoryCache historyCache = AnswerHistoryCache();
+      historyCache.clear();
+      
+      QuizzerLogger.logSuccess('✅ QuestionQueueCache and AnswerHistoryCache cleared');
+      
       _isRunning = true;
       _stopCompleter = Completer<void>();
       QuizzerLogger.logMessage('PresentationSelectionWorker started.');
@@ -60,11 +71,23 @@ class PresentationSelectionWorker {
       QuizzerLogger.logMessage('Entering PresentationSelectionWorker stop()...');
       if (!_isRunning) {
         QuizzerLogger.logWarning('PresentationSelectionWorker is not running.');
-        return Future.value();
+        return;
       }
       QuizzerLogger.logMessage('PresentationSelectionWorker stopping...');
       _isRunning = false;
-      // Wait for the current loop iteration to finish
+      
+      // Clear both caches when stopping to ensure clean state
+      QuizzerLogger.logMessage('Clearing QuestionQueueCache and AnswerHistoryCache on stop...');
+      _queueCache.clear();
+      final AnswerHistoryCache historyCache = AnswerHistoryCache();
+      historyCache.clear();
+      QuizzerLogger.logSuccess('Both caches cleared');
+      
+      // Wait for the loop to finish if there's a completer
+      if (_stopCompleter != null && !_stopCompleter!.isCompleted) {
+        await _stopCompleter!.future;
+      }
+      
       QuizzerLogger.logMessage('PresentationSelectionWorker stopped.');
     } catch (e) {
       QuizzerLogger.logError('Error stopping PresentationSelectionWorker - $e');
@@ -77,140 +100,157 @@ class PresentationSelectionWorker {
     try {
       QuizzerLogger.logMessage('Entering PresentationSelectionWorker _runLoop()...');
       while (_isRunning) {
-        await _performLoopLogic();
+        // Step 1: Check if the length of the questionQueueCache is below the threshold
+        final int currentLength = await _queueCache.getLength();
+        const int threshold = QuestionQueueCache.queueThreshold;
+        
+        if (currentLength < threshold) {
+          // Step 2: Get eligible questions
+          final List<Map<String, dynamic>> eligibleQuestions = await getEligibleUserQuestionAnswerPairs(_sessionManager.userId!);
+          
+          // Step 3: Filter out recently answered questions and questions already in queue cache
+          List<Map<String, dynamic>> filteredEligibleQuestions = List<Map<String, dynamic>>.from(eligibleQuestions);
+          
+          if (filteredEligibleQuestions.isNotEmpty) {
+            // Get the last 5 questions from answer history cache
+            final List<String> recentQuestionIds = await AnswerHistoryCache().getLastFiveAnsweredQuestions();
+            
+            // Get questions already in the queue cache
+            final List<Map<String, dynamic>> queueCacheQuestions = await _queueCache.peekAllRecords();
+            final List<String> queueCacheQuestionIds = queueCacheQuestions.map((q) => q['question_id'] as String).toList();
+            
+            // Remove any questions that were recently answered, recently selected by this worker, or are already in the queue cache
+            filteredEligibleQuestions = filteredEligibleQuestions.where((question) {
+              final String questionId = question['question_id'] as String;
+              final bool notRecentlyAnswered = recentQuestionIds.isEmpty || !recentQuestionIds.contains(questionId);
+              final bool notRecentlySelected = !_recentlySelectedQuestionIds.contains(questionId);
+              final bool notInQueueCache = !queueCacheQuestionIds.contains(questionId);
+              return notRecentlyAnswered && notRecentlySelected && notInQueueCache;
+            }).toList();
+            
+            final int removedCount = eligibleQuestions.length - filteredEligibleQuestions.length;
+            if (removedCount > 0) {
+              // Calculate how many were removed due to each reason
+              final int recentlyAnsweredCount = eligibleQuestions.where((q) => 
+                recentQuestionIds.contains(q['question_id'] as String)).length;
+              final int recentlySelectedCount = eligibleQuestions.where((q) => 
+                _recentlySelectedQuestionIds.contains(q['question_id'] as String)).length;
+              final int inQueueCacheCount = removedCount - recentlyAnsweredCount - recentlySelectedCount;
+              QuizzerLogger.logMessage('Removed $removedCount questions from eligible list ($recentlyAnsweredCount recently answered, $recentlySelectedCount recently selected, $inQueueCacheCount already in queue cache).');
+            }
+          }
+          
+          // Step 4: Handle different scenarios based on filtered eligible questions count
+          if (!_isRunning) break; // Abort if worker was stopped
+          
+          if (filteredEligibleQuestions.isEmpty) {
+            // If 0 eligible questions then we do nothing at all
+            QuizzerLogger.logMessage('No eligible questions available after filtering recently answered questions. Waiting for question answered signal.');
+          } else {
+            final int cyclesNeeded = threshold - currentLength;
+            final int availableQuestions = eligibleQuestions.length;
+            
+            if (availableQuestions < cyclesNeeded) {
+              // If num eligible questions not enough to bring the queueCache up to the threshold, 
+              // then we skip the advanced selection logic and just directly add the remaining questions
+              final int filteredQuestionsCount = filteredEligibleQuestions.length;
+              QuizzerLogger.logMessage('Only $filteredQuestionsCount filtered eligible questions available (need $cyclesNeeded). Adding all directly to queue cache.');
+              
+              for (int i = 0; i < filteredQuestionsCount && _isRunning; i++) {
+                final Map<String, dynamic> questionRecord = filteredEligibleQuestions[i];
+                if (!_isRunning) break; // Abort if worker was stopped
+                await _queueCache.addRecord(questionRecord);
+                
+              }
+            } else {
+              // Use advanced selection logic for the needed cycles
+              QuizzerLogger.logMessage('Queue length $currentLength is below threshold $threshold. Running $cyclesNeeded cycles of _selectAndQueueQuestion');
+              
+              for (int i = 0; i < cyclesNeeded && _isRunning; i++) {
+                if (!_isRunning) break; // Abort if worker was stopped
+                await _selectAndQueueQuestion(filteredEligibleQuestions);
+                
+              }
+            }
+          }
+        }
+        
+        // Step 4: Signal that the selection cycle is complete
+        signalPresentationSelectionWorkerCycleComplete();
+        
+        // Step 5: Wait for either the submitAnswer signal or circulation worker question added signal
+        if (_isRunning) {
+          await Future.any([
+            _switchBoard.onQuestionAnsweredCorrectly.first,
+            _switchBoard.onCirculationWorkerQuestionAdded.first,
+            _switchBoard.onQuestionQueueRemoved.first,
+          ]);
+        }
       }
-      _stopCompleter?.complete();
+      
+      // Only complete the completer if it hasn't been completed yet
+      if (_stopCompleter != null && !_stopCompleter!.isCompleted) {
+        _stopCompleter!.complete();
+      }
       QuizzerLogger.logMessage('PresentationSelectionWorker loop finished.');
     } catch (e) {
       QuizzerLogger.logError('Error in PresentationSelectionWorker _runLoop - $e');
-      rethrow;
-    }
-  }
-
-  // --- Main Loop Logic ---
-  Future<void> _performLoopLogic() async {
-    try {
-      QuizzerLogger.logMessage('Entering PresentationSelectionWorker _performLoopLogic()...');
-      if (!_isRunning) return;
-
-      // Check 1: Is the queue full?
-      final queueLength = await _queueCache.getLength();
-      final bool queueIsFull = queueLength >= QuestionQueueCache.queueThreshold;
-
-      if (queueIsFull) {
-          // Queue is full. BEFORE waiting, check for duplicates between Queue and Eligible.
-          QuizzerLogger.logMessage('PresentationSelectionWorker Loop: Queue full. Checking for duplicates between Queue and Eligible.');
-          final queueRecords = await _queueCache.peekAllRecords();
-          final eligibleRecords = await _eligibleCache.peekAllRecords();
-          final Set<String> eligibleIds = eligibleRecords.map((r) => r['question_id'] as String).toSet();
-          int duplicatesRemoved = 0;
-
-          for (final queueRecord in queueRecords) {
-              final String? queueQuestionId = queueRecord['question_id'] as String?;
-              if (queueQuestionId != null && eligibleIds.contains(queueQuestionId)) {
-                  // Found a question present in both Queue and Eligible cache. Remove from Eligible.
-                  await _eligibleCache.getAndRemoveRecordByQuestionId(queueQuestionId);
-                  duplicatesRemoved++;
-              }
-          }
-          if (duplicatesRemoved > 0) {
-              QuizzerLogger.logSuccess('PresentationSelectionWorker Loop: Removed $duplicatesRemoved duplicate(s) from EligibleCache.');
-          }
-
-          // Re-check if queue is STILL full after potential removals from Eligible
-          final currentQueueLength = await _queueCache.getLength();
-          if (currentQueueLength >= QuestionQueueCache.queueThreshold) {
-              // Queue is still full, wait specifically for removal signal.
-              QuizzerLogger.logMessage('PSW Loop: Queue still full after check, waiting for removal signal...');
-              await _switchBoard.onQuestionQueueRemoved.first;
-              QuizzerLogger.logMessage('PSW Loop: Woke up from queueCache wait.');
-          } else {
-              QuizzerLogger.logMessage('PSW Loop: Queue no longer full after duplicate check. Continuing loop.');
-          }
-          // Whether we waited or not, continue to top of loop to re-evaluate all conditions
-          return; 
+      
+      // Only complete the completer if it hasn't been completed yet
+      if (_stopCompleter != null && !_stopCompleter!.isCompleted) {
+        _stopCompleter!.completeError(e);
       }
-
-      // If queue is NOT full, proceed to check eligible cache.
-      // Check 2: Is the eligible cache empty?
-      final bool eligibleIsEmpty = await _eligibleCache.isEmpty();
-
-      if (eligibleIsEmpty) {
-          // Queue has space, but no eligible questions. Wait specifically for eligible questions.
-          QuizzerLogger.logMessage('PSW Loop: Eligible cache empty, waiting for add signal...');
-          await _switchBoard.onEligibleQuestionsAdded.first;
-          QuizzerLogger.logMessage('PSW Loop: Woke up from eligibleCache wait.');
-          return; // After waiting, loop back and re-check everything from the top.
-      }
-
-      // If we reach here: Queue is NOT full AND Eligible Cache is NOT empty.
-      // Proceed to select and queue one question.
-      await _selectAndQueueQuestion();
-
-      // Signal cycle completion
-      signalPresentationSelectionWorkerCycleComplete();
-    } catch (e) {
-      QuizzerLogger.logError('Error in PresentationSelectionWorker _performLoopLogic - $e');
       rethrow;
     }
   }
 
   // --- Core Selection and Queuing Logic ---
-  Future<bool> _selectAndQueueQuestion() async {
+  Future<bool> _selectAndQueueQuestion(List<Map<String, dynamic>> eligibleQuestions) async {
     try {
       QuizzerLogger.logMessage('Entering PresentationSelectionWorker _selectAndQueueQuestion()...');
-      // QuizzerLogger.logMessage('PSW: Entering _selectAndQueueQuestion.');
       if (!_isRunning) return false;
 
-      final List<Map<String, dynamic>> eligibleQuestions = await _eligibleCache.peekAllRecords();
-      // QuizzerLogger.logValue('PSW Select: Found ${eligibleQuestions.length} eligible questions.');
-      if (eligibleQuestions.isEmpty) {
-        // QuizzerLogger.logMessage('PSW Select: Eligible cache empty, returning.');
-        return false; // Nothing to do
-      }
-
-      // Call the adapted selection logic
+      // 1. Call _selectNextQuestionFromList to get the selected question
       final Map<String, dynamic> selectedQuestion = await _selectNextQuestionFromList(eligibleQuestions);
-      String questionId = selectedQuestion['question_id'];
-
-      // 1. Grab the selected question by its id from the eligible cache
-      // QuizzerLogger.logMessage('PSW Select: Attempting to get and remove $questionId from EligibleCache...');
-      final Map<String, dynamic> recordToQueue = await _eligibleCache.getAndRemoveRecordByQuestionId(questionId);
-
-      // 1a. handle case where that selected question is no longer in there (I believe this is handled by the cache??)
-      if (recordToQueue.isEmpty) {
-        // This means the record was removed from EligibleCache between selection and this fetch.
-        // Could be due to module deactivation flush, concurrent processing, etc.
-        QuizzerLogger.logWarning('PSW Select: Record $questionId was not found in EligibleCache during get/remove (likely removed concurrently).');
-        return false; // Cannot queue a record we couldn't fetch.
-      }
-      // QuizzerLogger.logSuccess('PSW Select: Successfully got and removed $questionId from EligibleCache.');
-
-      // 2. Get static question details from question_answer_pairs table and place that record into the temp Cache
-      // Table functions handle their own database access
-      // QuizzerLogger.logMessage('PSW Select: Fetching static details for $questionId from q_pairs_table...');
-      final Map<String, dynamic> staticQuestionDetails = await q_pairs_table.getQuestionAnswerPairById(questionId);
-
-      if (staticQuestionDetails.isEmpty) {
-        QuizzerLogger.logError('PSW Select: CRITICAL - Fetched empty static details for $questionId from DB. This should not happen if question_id is valid.');
-        // If static details are missing, we probably shouldn't queue the user record either.
-        // Returning to avoid putting potentially orphaned user record in queue without its details.
+      
+      // 2. Check if selection was successful
+      if (selectedQuestion.isEmpty) {
+        QuizzerLogger.logWarning('PSW Select: No question was selected from eligible questions.');
         return false;
       }
-      
-      // QuizzerLogger.logMessage('PSW Select: Adding static details for $questionId to TempQuestionDetailsCache...');
-      await _tempDetailsCache.addRecord(questionId, staticQuestionDetails);
-      // QuizzerLogger.logSuccess('PSW Select: Successfully added $questionId static details to TempQuestionDetailsCache.');
 
-      // 3. Place it in queue
-      // QuizzerLogger.logMessage('PSW Select: Adding fetched record $questionId to QueueCache...');
-      final bool added = await _queueCache.addRecord(recordToQueue);
-      // QuizzerLogger.logSuccess('PSW Select: Successfully added $questionId to QueueCache.');
+      // 3. Check if worker was stopped before adding to queue
+      if (!_isRunning) return false;
+
+      // 4. Add the selected question to the queue cache
+      final bool added = await _queueCache.addRecord(selectedQuestion);
+      
+      if (added) {
+        // 5. Track the selected question in our internal list
+        _trackSelectedQuestion(selectedQuestion['question_id'] as String);
+        QuizzerLogger.logSuccess('PSW Select: Successfully added question ${selectedQuestion['question_id']} to QueueCache.');
+      } else {
+        QuizzerLogger.logWarning('PSW Select: Failed to add question ${selectedQuestion['question_id']} to QueueCache.');
+      }
+      
       return added;
     } catch (e) {
       QuizzerLogger.logError('Error in PresentationSelectionWorker _selectAndQueueQuestion - $e');
       rethrow;
     }
+  }
+  
+  // --- Internal tracking method ---
+  void _trackSelectedQuestion(String questionId) {
+    // Remove if already exists (to move to front)
+    _recentlySelectedQuestionIds.remove(questionId);
+    // Add to the front (most recent first)
+    _recentlySelectedQuestionIds.insert(0, questionId);
+    // Keep only the last 5
+    if (_recentlySelectedQuestionIds.length > _maxRecentlySelectedCount) {
+      _recentlySelectedQuestionIds.removeRange(_maxRecentlySelectedCount, _recentlySelectedQuestionIds.length);
+    }
+    QuizzerLogger.logMessage('PSW Tracking: Added $questionId to recently selected list (${_recentlySelectedQuestionIds.length} total)');
   }
 
   // --- Adapted Selection Logic (Table functions handle their own database access) ---
@@ -218,6 +258,8 @@ class PresentationSelectionWorker {
   Future<Map<String, dynamic>> _selectNextQuestionFromList(List<Map<String, dynamic>> eligibleQuestions) async {
     try {
       QuizzerLogger.logMessage('Entering PresentationSelectionWorker _selectNextQuestionFromList()...');
+      if (!_isRunning) return {}; // Abort if worker was stopped
+      
       // QuizzerLogger.logMessage('PSW Algo: Entering _selectNextQuestionFromList with ${eligibleQuestions.length} items.');
       // Assumes eligibleQuestions is not empty (checked by caller)
       assert(_sessionManager.userId != null, "User ID must be set for selection.");
@@ -259,11 +301,15 @@ class PresentationSelectionWorker {
       double totalScore = 0.0;
       // QuizzerLogger.logMessage('PSW Algo: Calculating scores...');
       for (final question in eligibleQuestions) {
+        if (!_isRunning) return {}; // Abort if worker was stopped
+        
         final String questionId = question['question_id'];
         final int revisionStreak = question['revision_streak'] ?? 0;
         
         // Fetch full pair directly from DB - table function handles its own database access
         final Map<String, dynamic> questionDetails = await q_pairs_table.getQuestionAnswerPairById(questionId);
+        if (!_isRunning) return {}; // Abort if worker was stopped after DB call
+        
         final String? subjectsCsv = questionDetails['subjects'] as String?;
 
         final double timePastDueInDays = overdueDaysMap[questionId]!;
@@ -302,11 +348,15 @@ class PresentationSelectionWorker {
 
       // Weighted Random Selection
       // QuizzerLogger.logMessage('PSW Algo: Performing weighted random selection...');
+      if (!_isRunning) return {}; // Abort if worker was stopped
+      
       final random = Random();
       double randomThreshold = random.nextDouble() * totalScore;
       double cumulativeScore = 0.0;
 
       for (final question in eligibleQuestions) {
+        if (!_isRunning) return {}; // Abort if worker was stopped
+        
         final String questionId = question['question_id'];
         final double score = scoreMap[questionId]!;
         cumulativeScore += score;
@@ -318,6 +368,8 @@ class PresentationSelectionWorker {
 
       // Fallback
       // QuizzerLogger.logError('PSW Algo: Weighted random selection failed! Returning first eligible.'); // Keep this error
+      if (!_isRunning) return {}; // Abort if worker was stopped
+      
       if (eligibleQuestions.isNotEmpty) {
          return eligibleQuestions.first;
       }
@@ -339,7 +391,6 @@ class PresentationSelectionWorker {
     double bias
   ) {
     try {
-      QuizzerLogger.logMessage('Entering PresentationSelectionWorker _selectionAlgorithm()...');
       return (
         (subInterestWeight * normalizedInterest) + 
         (revisionStreakWeight * normalizedStreak) + 

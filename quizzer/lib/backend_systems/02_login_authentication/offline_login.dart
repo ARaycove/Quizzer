@@ -1,5 +1,6 @@
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:hive/hive.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_profile_table.dart';
 
 /// Stores offline login data in Hive storage
 /// 
@@ -17,9 +18,12 @@ Future<void> storeOfflineLoginData(String email, Box storage, Map<String, dynami
     
     final user = authResult['user'];
     
+    // Get the local user profile UUID, not the Supabase user ID
+    final localUserId = await getUserIdByEmail(email);
+    
     final loginData = {
       'last_sign_in_at': user['last_sign_in_at'],
-      'user_id': user['id'],
+      'user_id': localUserId,
       'user_role': authResult['user_role'],
       'offline_login_count': 0,
       'last_online_sync': DateTime.now().toIso8601String(),
@@ -62,6 +66,9 @@ Map<String, dynamic> checkOfflineLogin(String email, Box storage, Map<String, dy
   try {
     QuizzerLogger.logMessage('Checking for offline login data for $email');
     Map<String, dynamic> updatedResults = Map.from(currentResults);
+    
+    // Always initialize offline_mode to false
+    updatedResults['offline_mode'] = false;
 
     final loginData = getOfflineLoginData(email, storage);
     if (loginData != null) {
@@ -91,10 +98,12 @@ Map<String, dynamic> checkOfflineLogin(String email, Box storage, Map<String, dy
       } else {
         QuizzerLogger.logMessage('Offline login data found but expired for $email');
         updatedResults['message'] = 'Offline login expired. Please connect and log in online.';
+        // offline_mode remains false
       }
     } else {
       QuizzerLogger.logMessage('No valid offline login data found for $email');
       // Keep the original error message from the Supabase failure
+      // offline_mode remains false
     }
     
     return updatedResults;

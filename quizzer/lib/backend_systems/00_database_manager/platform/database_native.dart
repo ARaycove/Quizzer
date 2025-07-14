@@ -1,7 +1,6 @@
 import 'package:sqflite_common_ffi/sqflite_ffi.dart' as ffi;
 import 'package:sqflite/sqflite.dart';
 import 'dart:io';
-import 'package:flutter/services.dart' show ByteData, rootBundle;
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/00_helper_utils/file_locations.dart';
 
@@ -22,27 +21,31 @@ Future<Database> initializeDatabase() async {
     QuizzerLogger.logMessage("[DB_INIT] Using standard sqflite factory (Mobile)");
   }
 
-  QuizzerLogger.logMessage('[DB_INIT] Final Target Database path: $targetPath');
+  // Force absolute path to prevent test environment from redirecting
+  final absolutePath = File(targetPath).absolute.path;
+  // Normalize the path to remove ./ prefix and match SQLite's normalization
+  final normalizedPath = absolutePath.replaceAll('/./', '/');
+  QuizzerLogger.logMessage('[DB_INIT] Original target path: $targetPath');
+  QuizzerLogger.logMessage('[DB_INIT] Absolute target path: $absolutePath');
+  QuizzerLogger.logMessage('[DB_INIT] Normalized target path: $normalizedPath');
 
-  final dbFile = File(targetPath);
+  final dbFile = File(normalizedPath);
   final bool dbFileExists = await dbFile.exists();
-  QuizzerLogger.logMessage('[DB_INIT] Checking existence of dbFile at $targetPath. Exists: $dbFileExists');
+  QuizzerLogger.logMessage('[DB_INIT] Checking existence of dbFile at $normalizedPath. Exists: $dbFileExists');
 
   if (!dbFileExists) {
-    QuizzerLogger.logWarning('[DB_INIT] Database NOT found at $targetPath. Copying bundled database...');
-    // Copy the bundled database from runtime_cache/sqlite/quizzer.db
-    final ByteData data = await rootBundle.load('runtime_cache/sqlite/quizzer.db');
-    final List<int> bytes = data.buffer.asUint8List();
+    QuizzerLogger.logMessage('[DB_INIT] Database NOT found at $normalizedPath. Creating empty database...');
+    // Create an empty database instead of copying bundled data
+    // This allows fresh users to start with no initial data and get everything through sync
     await dbFile.create(recursive: true);
-    await dbFile.writeAsBytes(bytes);
-    QuizzerLogger.logSuccess('[DB_INIT] Bundled database copied to $targetPath');
+    QuizzerLogger.logSuccess('[DB_INIT] Empty database created at $normalizedPath');
   } else {
-    QuizzerLogger.logMessage('[DB_INIT] Existing database found at $targetPath. Using it.');
+    QuizzerLogger.logMessage('[DB_INIT] Existing database found at $normalizedPath. Using it.');
   }
 
-  QuizzerLogger.logMessage('[DB_INIT] Attempting to open database at $targetPath');
+  QuizzerLogger.logMessage('[DB_INIT] Attempting to open database at $normalizedPath');
   final database = await factory.openDatabase(
-    targetPath,
+    normalizedPath,
     options: OpenDatabaseOptions(
       version: 1,
       onUpgrade: (Database db, int oldVersion, int newVersion) async {
@@ -50,6 +53,13 @@ Future<Database> initializeDatabase() async {
       }
     )
   );
-  QuizzerLogger.logSuccess('[DB_INIT] Database initialized successfully at: $targetPath. IsOpen: ${database.isOpen}');
+  
+  // Verify the database is actually at the expected location
+  final actualPath = database.path;
+  QuizzerLogger.logMessage('[DB_INIT] Database opened at actual path: $actualPath');
+  QuizzerLogger.logMessage('[DB_INIT] Expected path: $normalizedPath');
+  QuizzerLogger.logMessage('[DB_INIT] Paths match: ${actualPath == normalizedPath}');
+  
+  QuizzerLogger.logSuccess('[DB_INIT] Database initialized successfully at: $normalizedPath. IsOpen: ${database.isOpen}');
   return database;
 } 

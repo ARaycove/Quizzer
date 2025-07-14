@@ -41,32 +41,18 @@ class QuizzerLogger {
 
   // --- Source Filtering --- 
   static List<String> _excludedSources = [
-    // "user_question_processes.dart",
-    // // "outbound_sync_functions.dart",
-    // // "outbound_sync_worker.dart",
-    // "widget_multiple_choice_question.dart",
-    // "database_monitor.dart",
-    // "question_answer_pairs_table.dart",
-    // "login_attempts_table.dart",
-    // "login_attempts_record.dart",
-    // // "session_manager.dart",
-    // "circulation_worker.dart",
-    // "question_queue_monitor.dart",
-    // "module_updates_process.dart",
-    // "modules_table.dart",
-    // "module_isolates.dart",
-    // "answered_history_monitor.dart",
-    // "user_question_answer_pairs_table.dart",
-    // "module_inactive_cache.dart",
-    // "session_toggle_scheduler.dart",
-    // "unprocessed_cache.dart",
-    // "past_due_cache.dart",
-    // "eligibility_check_worker.dart",
-    // "due_date_worker.dart",
-    // "pre_process_worker.dart",
-    // "inactive_module_worker.dart",
-    // "user_profile_table.dart",
-    // "home_page.dart"
+    "modules_table.dart",
+    "user_question_answer_pairs_table.dart",
+    "user_question_processes.dart",
+    "database_monitor.dart",
+    "sb_sync_worker_signals.dart",
+    "user_module_activation_status_table.dart",
+    "stat_update_aggregator.dart",
+    "user_stats_days_left_until_questions_exhaust_table.dart",
+    "user_stats_non_circulating_questions_table.dart",
+    "user_stats_daily_questions_answered_table.dart",
+    "user_stats_average_questions_shown_per_day_table.dart",
+    "user_stats_revision_streak_sum_table.dart"
   ]; // List of source filenames to exclude
 
   /// Sets the list of source filenames (e.g., 'my_table.dart') to exclude from logging.
@@ -243,19 +229,19 @@ class QuizzerLogger {
   static void logError(String message) {
     final source = _getCallerInfo();
     if (_excludedSources.contains(source)) return; // Check exclusion
-    _logger.severe('[$source] $message'); // Map logError to SEVERE level
+    _logger.severe('[$source] ❌ $message'); // Map logError to SEVERE level with X emoji
   }
 
   static void logWarning(String message) {
     final source = _getCallerInfo();
     if (_excludedSources.contains(source)) return; // Check exclusion
-    _logger.warning('[$source] $message');
+    _logger.warning('[$source] ⚠️ $message');
   }
 
   static void logSuccess(String message) {
     final source = _getCallerInfo();
     if (_excludedSources.contains(source)) return; // Check exclusion
-    _logger.info('[$source] SUCCESS: $message'); // Use INFO level for success
+    _logger.info('[$source] ✅ $message'); // Use INFO level for success with checkmark emoji
   }
 
   // Formatting functions (kept separate, still using stdout)

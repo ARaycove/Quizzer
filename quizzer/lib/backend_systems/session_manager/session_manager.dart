@@ -1,38 +1,26 @@
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_profile_table.dart';
-import 'package:quizzer/backend_systems/06_question_queue_server/inactive_module_worker.dart';
 import 'package:quizzer/backend_systems/07_user_question_management/user_question_processes.dart' show validateAllModuleQuestions;
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pairs_table.dart' as q_pairs_table;
 import 'package:quizzer/backend_systems/03_account_creation/new_user_signup.dart' as account_creation;
-import 'package:quizzer/backend_systems/04_module_management/module_management.dart';
-import 'package:quizzer/backend_systems/09_data_caches/past_due_cache.dart';
+import 'package:quizzer/backend_systems/04_module_management/module_management.dart' as module_management;
+import 'package:quizzer/backend_systems/04_module_management/rename_modules.dart' as rename_modules;
+import 'package:quizzer/backend_systems/04_module_management/merge_modules.dart' as merge_modules;
 import 'package:quizzer/backend_systems/02_login_authentication/login_initialization.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:hive/hive.dart';
 import 'package:supabase/supabase.dart';
-import 'package:quizzer/backend_systems/06_question_queue_server/pre_process_worker.dart';
 import 'dart:async'; // For Completer and StreamController
 import 'dart:io'; // For Directory
 // Data Caches for Backend management
-import 'package:quizzer/backend_systems/09_data_caches/module_inactive_cache.dart';
-import 'package:quizzer/backend_systems/09_data_caches/unprocessed_cache.dart';
-import 'package:quizzer/backend_systems/09_data_caches/non_circulating_questions_cache.dart';
-import 'package:quizzer/backend_systems/09_data_caches/circulating_questions_cache.dart';
-import 'package:quizzer/backend_systems/09_data_caches/due_date_beyond_24hrs_cache.dart';
-import 'package:quizzer/backend_systems/09_data_caches/due_date_within_24hrs_cache.dart';
-import 'package:quizzer/backend_systems/09_data_caches/eligible_questions_cache.dart';
 import 'package:quizzer/backend_systems/09_data_caches/question_queue_cache.dart';
 import 'package:quizzer/backend_systems/09_data_caches/answer_history_cache.dart';
 import 'package:quizzer/backend_systems/06_question_queue_server/question_selection_worker.dart';
-import 'session_toggle_scheduler.dart'; // Import the new scheduler
 import 'package:quizzer/backend_systems/10_switch_board/switch_board.dart'; // Import SwitchBoard
+import 'package:quizzer/backend_systems/10_switch_board/sb_question_worker_signals.dart';
 import 'package:quizzer/backend_systems/session_manager/session_helper.dart';
 import 'package:quizzer/backend_systems/session_manager/session_answer_validation.dart' as answer_validator;
-import 'package:quizzer/backend_systems/06_question_queue_server/circulation_worker.dart';
-import 'package:quizzer/backend_systems/06_question_queue_server/due_date_worker.dart';
-import 'package:quizzer/backend_systems/06_question_queue_server/eligibility_check_worker.dart';
 import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/outbound_sync/outbound_sync_worker.dart'; // Import the new worker
 import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/media_sync_worker.dart'; // Added import for MediaSyncWorker
-import 'package:quizzer/backend_systems/09_data_caches/temp_question_details.dart'; // Added import
 import 'package:quizzer/backend_systems/00_database_manager/review_system/get_send_postgre.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/error_logs_table.dart'; // Direct import
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_feedback_table.dart'; // Removed alias
@@ -49,9 +37,11 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/us
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_daily_questions_answered_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_average_daily_questions_learned_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_days_left_until_questions_exhaust_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_module_activation_status_table.dart'; // Added import for the new table
 
 
 import 'package:quizzer/backend_systems/00_helper_utils/file_locations.dart';
+import 'package:quizzer/backend_systems/00_database_manager/custom_queries.dart';
 
 class SessionManager {
   // Singleton instance
@@ -69,18 +59,9 @@ class SessionManager {
   late final  SupabaseClient                  supabase;
   // Database monitor instance
   // Cache Instances (as instance variables)
-  final       UnprocessedCache                _unprocessedCache;
-  final       NonCirculatingQuestionsCache    _nonCirculatingCache;
-  final       ModuleInactiveCache             _moduleInactiveCache;
-  final       CirculatingQuestionsCache       _circulatingCache;
-  final       DueDateBeyond24hrsCache         _dueDateBeyondCache;
-  final       DueDateWithin24hrsCache         _dueDateWithinCache;
-  final       EligibleQuestionsCache          _eligibleCache;
   final       QuestionQueueCache              _queueCache;
   final       AnswerHistoryCache              _historyCache;
   final       SwitchBoard                     _switchBoard; // Add SwitchBoard instance
-  final       PastDueCache                    _pastDueCache = PastDueCache();
-  final       TempQuestionDetailsCache        _tempDetailsCache = TempQuestionDetailsCache();
 
   // user State
               bool                            userLoggedIn = false;
@@ -101,7 +82,6 @@ class SessionManager {
               bool                            _lastSubmittedIsCorrect = false; // Whether the submitted answer was correct
   // MetaData
               DateTime?                       sessionStartTime;
-  final       ToggleScheduler                 _toggleScheduler = getToggleScheduler(); // Get scheduler instance      
   
           
   // --- Public Getters for UI State ---
@@ -110,6 +90,19 @@ class SessionManager {
   String?               get initialProfileLastModified => _initialProfileLastModified;
   // ADDED: Getter that dynamically determines user role from JWT
   String                get userRole => determineUserRoleFromSupabaseSession(supabase.auth.currentSession);
+  
+  // --- Public Method for Testing (Password Protected) ---
+  Box getBox(String password) {
+    // Password protection to prevent accidental access in production
+    // Only use this for testing purposes
+    const String testAccessPassword = "⌘✆✈✉✌✍✎✏✐✑✒✓✔✕✖✗✘✙✚✛✜✝✞✟✠✡✢✣✤✥✦✧★✩✪✫✬✭✮✯✰✱✲✳✴✵✶✷✸✹✺✻✼✽✾✿❀❁❂❃❄❅❆❇❈❉❊❋●❍■❏❐❑❒▲▼◆◇◈◉◊○◌◍◎●◐◑◒◓◔◕◖◗◘◙◎◌◍◎●◐◑◒◓◔◕◖◗◘◙";
+    
+    if (password != testAccessPassword) {
+      throw UnsupportedError('Storage access is password protected for testing only');
+    }
+    
+    return _storage;
+  }
   
   // Login progress stream is now managed by SwitchBoard
   Stream<String> get loginProgressStream => _switchBoard.onLoginProgress;
@@ -220,15 +213,7 @@ class SessionManager {
   // ================================================================================
   // --------------------------------------------------------------------------------
   // SessionManager Constructor (Initializes Supabase and starts async init)
-  SessionManager._internal()
-      // Initialize cache instance variables
-      : _unprocessedCache       = UnprocessedCache(),
-        _nonCirculatingCache    = NonCirculatingQuestionsCache(),
-        _moduleInactiveCache    = ModuleInactiveCache(),
-        _circulatingCache       = CirculatingQuestionsCache(),
-        _dueDateBeyondCache     = DueDateBeyond24hrsCache(),
-        _dueDateWithinCache     = DueDateWithin24hrsCache(),
-        _eligibleCache          = EligibleQuestionsCache(),
+  SessionManager._internal(): 
         _queueCache             = QuestionQueueCache(),
         _historyCache           = AnswerHistoryCache(),
         _switchBoard            = SwitchBoard()
@@ -362,17 +347,26 @@ class SessionManager {
         storage: _storage,
       );
 
-      if (response['success'] == true) {
-        // If we reach this point, it means the question queue server is initialized and ready to go.
-        await requestNextQuestion();
-      }
-
       // Response information is for front-end UI, not necessary for backend
       // Send signal to UI that it's ok to login now
       QuizzerLogger.logMessage('Successfully completed attemptLogin for email: $email');
       return response;
     } catch (e) {
       QuizzerLogger.logError('Error in attemptLogin - $e');
+      rethrow;
+    }
+  }
+
+  //  --------------------------------------------------------------------------------
+  /// Clears all Hive storage data (for testing purposes)
+  Future<void> clearStorage() async {
+    try {
+      QuizzerLogger.logMessage('Entering clearStorage()...');
+      await initializationComplete;
+      await _storage.clear();
+      QuizzerLogger.logSuccess('Storage cleared successfully');
+    } catch (e) {
+      QuizzerLogger.logError('Error in clearStorage - $e');
       rethrow;
     }
   }
@@ -401,21 +395,11 @@ class SessionManager {
       QuizzerLogger.logMessage("Stopping background workers...");
       // Get worker instances (assuming they are singletons accessed via factory)
       final psw                   = PresentationSelectionWorker();
-      final dueDateWorker         = DueDateWorker();
-      final circulationWorker     = CirculationWorker();
-      final eligibilityWorker     = EligibilityCheckWorker();
-      final preProcessWorker      = PreProcessWorker(); 
-      final inactiveModuleWorker  = InactiveModuleWorker();
       final outboundSyncWorker    = OutboundSyncWorker(); // Get the outbound sync worker instance
       final mediaSyncWorker       = MediaSyncWorker(); // Get MediaSyncWorker instance
       
       // Stop them (await completion)
       await psw.stop();
-      await dueDateWorker.stop();
-      await circulationWorker.stop();
-      await eligibilityWorker.stop();
-      await preProcessWorker.stop(); 
-      await inactiveModuleWorker.stop();
       await outboundSyncWorker.stop(); // Stop the outbound sync worker
       await mediaSyncWorker.stop(); // Stop the media sync worker
       QuizzerLogger.logSuccess("Background workers stopped.");
@@ -424,14 +408,6 @@ class SessionManager {
       // 2. Clear Caches (TODO: Implement clear methods in caches)
       QuizzerLogger.logMessage("Clearing data caches...");
       _queueCache.          clear();
-      _eligibleCache.       clear();
-      _dueDateWithinCache.  clear();
-      _dueDateBeyondCache.  clear();
-      _pastDueCache.        clear();
-      _circulatingCache.    clear();
-      _nonCirculatingCache. clear();
-      _moduleInactiveCache. clear(); 
-      _unprocessedCache.    clear();
       _historyCache.        clear();
       QuizzerLogger.logSuccess("Data caches cleared (Placeholder - Clear methods TBD).");
 
@@ -479,59 +455,71 @@ class SessionManager {
   // Module management Calls
   // =================================================================================
   // API for loading module names and their activation status
-  Future<Map<String, dynamic>> loadModules() async {
+  Future<Map<String, Map<String, dynamic>>> getModuleData({bool onlyWithQuestions = false}) async {
     try {
-      QuizzerLogger.logMessage('Entering loadModules()...');
+      QuizzerLogger.logMessage('Entering getModuleData()...');
       
       assert(userId != null);
-      final result = await handleLoadModules({
-        'userId': userId,
-      });
-      // The getAllModulesWithQuestionInfo function now handles all the data formatting
+      final result = await getOptimizedModuleData(userId!);
+      
+      // Filter modules if requested
+      if (onlyWithQuestions) {
+        final Map<String, Map<String, dynamic>> filteredResult = {};
+        for (final entry in result.entries) {
+          final String moduleName = entry.key;
+          final Map<String, dynamic> moduleData = entry.value;
+          final int questionCount = moduleData['total_questions'] as int? ?? 0;
+          if (questionCount > 0) {
+            filteredResult[moduleName] = moduleData;
+          }
+        }
+        QuizzerLogger.logMessage('Successfully loaded modules for user: $userId (filtered: only with questions)');
+        return filteredResult;
+      }
       
       QuizzerLogger.logMessage('Successfully loaded modules for user: $userId');
       return result;
     } catch (e) {
-      QuizzerLogger.logError('Error in loadModules - $e');
+      QuizzerLogger.logError('Error in getModuleData - $e');
       rethrow;
     }
   }
 
   //  --------------------------------------------------------------------------------
-  // API for activating or deactivating a module (Reverted to direct execution - Attempt 3)
+  // API for loading individual module data
+  Future<Map<String, dynamic>?> getModuleDataByName(String moduleName) async {
+    try {
+      QuizzerLogger.logMessage('Entering getModuleDataByName()...');
+      
+      assert(userId != null);
+      final result = await getIndividualModuleData(userId!, moduleName);
+      
+      QuizzerLogger.logMessage('Successfully loaded individual module data for module: $moduleName');
+      return result;
+    } catch (e) {
+      QuizzerLogger.logError('Error in getModuleDataByName - $e');
+      rethrow;
+    }
+  }
+
+  //  --------------------------------------------------------------------------------
+  // API for activating or deactivating a module (Updated to use new table)
   Future<void> toggleModuleActivation(String moduleName, bool activate) async {
     try {
       QuizzerLogger.logMessage('Entering toggleModuleActivation()...');
       
       assert(userId != null);
       
-      // 1. Request slot from scheduler, passing module/state
-      await _toggleScheduler.requestToggleSlot();
-
-      // --- START of actual toggle work (after acquiring slot) --- 
+      // Update module activation status using the new table function
+      final bool result = await updateModuleActivationStatus(userId!, moduleName, activate);
       
-      // 2. Update DB activation status FIRST 
-      await handleModuleActivation({
-        'userId': userId,
-        'moduleName': moduleName,
-        'isActive': activate,
-      });
-
-      // 2. Validate profile questions (table function handles its own DB access)
-      await validateAllModuleQuestions(userId!);
-
-      // 3. Signal deactivation if needed, then flush other caches
-      if (!activate) {
-         _eligibleCache.flushToPastDueCache();
-         _queueCache.flushToUnprocessedCache();
-         
-      } else {
-        _switchBoard.signalModuleActivated(moduleName);
+      if (!result) {
+        throw Exception('Failed to update module activation status for module: $moduleName');
       }
       
-      // 4. Release slot AFTER all work is done
-      await _toggleScheduler.releaseToggleSlot();
-      // --- End Direct Execution Logic ---
+      // Clear the question queue cache when module activation changes
+      _queueCache.clear();
+      QuizzerLogger.logMessage('Cleared question queue cache due to module activation change');
       
       QuizzerLogger.logMessage('Successfully toggled module activation for module: $moduleName, activate: $activate');
     } catch (e) {
@@ -548,7 +536,7 @@ class SessionManager {
       
       assert(userId != null);
       
-      final result = await handleUpdateModuleDescription({
+      final result = await module_management.handleUpdateModuleDescription({
         'moduleName': moduleName,
         'description': newDescription,
       });
@@ -557,6 +545,65 @@ class SessionManager {
       return result;
     } catch (e) {
       QuizzerLogger.logError('Error in updateModuleDescription - $e');
+      rethrow;
+    }
+  }
+
+  //  --------------------------------------------------------------------------------
+  // API for renaming a module
+  Future<bool> renameModule(String oldModuleName, String newModuleName) async {
+    try {
+      QuizzerLogger.logMessage('Entering renameModule()...');
+      
+      assert(userId != null);
+      
+      // Call the rename function from the module management layer
+      final result = await rename_modules.renameModule(
+        oldModuleName: oldModuleName,
+        newModuleName: newModuleName,
+      );
+      
+      if (result) {
+        QuizzerLogger.logMessage('Successfully renamed module from "$oldModuleName" to "$newModuleName"');
+        // Clear the question queue cache when module is renamed
+        _queueCache.clear();
+        QuizzerLogger.logMessage('Cleared question queue cache due to module rename');
+      } else {
+        QuizzerLogger.logWarning('Module rename operation failed for "$oldModuleName" to "$newModuleName"');
+      }
+      
+      return result;
+    } catch (e) {
+      QuizzerLogger.logError('Error in renameModule - $e');
+      rethrow;
+    }
+  }
+
+  // API for merging two modules
+  Future<bool> mergeModules(String sourceModuleName, String targetModuleName) async {
+    try {
+      QuizzerLogger.logMessage('Entering mergeModules()...');
+      
+      assert(userId != null);
+      
+      // Call the merge function from the module management layer
+      final result = await merge_modules.mergeModules(
+        sourceModuleName: sourceModuleName,
+        targetModuleName: targetModuleName,
+      );
+      
+      if (result) {
+        QuizzerLogger.logMessage('Successfully merged module "$sourceModuleName" into "$targetModuleName"');
+        // Clear the question queue cache when modules are merged
+        _queueCache.clear();
+        QuizzerLogger.logMessage('Cleared question queue cache due to module merge');
+      } else {
+        QuizzerLogger.logWarning('Module merge operation failed for "$sourceModuleName" into "$targetModuleName"');
+      }
+      
+      return result;
+    } catch (e) {
+      QuizzerLogger.logError('Error in mergeModules - $e');
       rethrow;
     }
   }
@@ -577,56 +624,36 @@ class SessionManager {
       // 1. Clear existing question state
       _clearQuestionState();
 
-      // 2. Get next user record from QuestionQueueCache
+      // 2. Get next user record from QuestionQueueCache (now handles dummy records internally)
       final Map<String, dynamic> newUserRecord = await _queueCache.getAndRemoveRecord();
 
-      if (newUserRecord.isEmpty) {
-          // --- Build and set dummy question state ---
-          final dummyRecords = buildDummyNoQuestionsRecord();
-          _currentQuestionRecord = null;
-          _currentQuestionDetails = dummyRecords['staticDetails'];
+      // Check if this is a dummy record
+      final String questionId = newUserRecord['question_id'] as String;
+      if (questionId == 'dummy_no_questions') {
+        // This is a dummy record - set it up appropriately
+        _currentQuestionRecord = null; // No user record for dummy
+        _currentQuestionDetails = newUserRecord; // Use the dummy record as static details
           _currentQuestionType = _currentQuestionDetails!['question_type'] as String;
           _timeDisplayed = DateTime.now();
-          // --- Dummy state set, stop processing ---
           QuizzerLogger.logMessage('Successfully loaded dummy question (no questions available)');
+          // Note: Dummy questions are NOT added to answer history cache
           return; 
       }
       
       // --- If queue was NOT empty, proceed as before ---
       _currentQuestionRecord = newUserRecord;
-      final String questionId = _currentQuestionRecord!['question_id'] as String;
 
-      // 3. Get static question details from TempQuestionDetailsCache
-      Map<String, dynamic>? staticDetails = await _tempDetailsCache.getAndRemoveRecord(questionId);
-
-      if (staticDetails == null) {
-          // This is a critical error: details for a queued question are missing.
-          // This might indicate a logic flaw where details weren't added or were prematurely removed.
-          QuizzerLogger.logError('SessionManager.requestNextQuestion: CRITICAL - Failed to get question details for QID: $questionId from TempQuestionDetailsCache. The question was in the queue, but its details were not found in the details cache.');
-          // Create a dummy error question to display to the user, or handle error appropriately.
-          // For now, setting a specific error state that the UI can check.
-          final dummyRecords = buildDummyNoQuestionsRecord(); // Or a specific error dummy
-          _currentQuestionDetails = dummyRecords['staticDetails'];
-          _currentQuestionDetails!['question_elements'] = [{'type': 'text', 'content': 'Error: Could not load question details. Please try again.'}];
-          _currentQuestionType = _currentQuestionDetails!['question_type'] as String;
-          _timeDisplayed = DateTime.now();
-          QuizzerLogger.logMessage('Successfully loaded error question due to missing details for QID: $questionId');
-          return; // Stop further processing for this question
-      }
-
-      // --- DIAGNOSTIC LOGGING (can be kept or removed) ---
-      final dynamic fetchedOptions = staticDetails['options'];
-      QuizzerLogger.logValue('SessionManager.requestNextQuestion: Fetched options type: ${fetchedOptions.runtimeType}, value: $fetchedOptions');
-      // --- END DIAGNOSTIC LOGGING ---
-
-      // 4. Update state with new details
-      _currentQuestionDetails = staticDetails;
+      // The record from queue cache now contains both user data and question details
+      _currentQuestionDetails = newUserRecord;
       // Assert that the key exists and is not null before casting
       assert(_currentQuestionDetails!.containsKey('question_type') && _currentQuestionDetails!['question_type'] != null, 
              "Question details missing 'question_type'");
       // Directly cast to non-nullable String - will throw if not a String
       _currentQuestionType = _currentQuestionDetails!['question_type'] as String; 
       _timeDisplayed = DateTime.now();
+      
+      // Add the question to answer history cache when it's requested (not when answered)
+      await _historyCache.addRecord(questionId);
       
       QuizzerLogger.logMessage('Successfully loaded next question with QID: $questionId, type: $_currentQuestionType');
     } catch (e) {
@@ -647,7 +674,8 @@ class SessionManager {
       if (_currentQuestionRecord == null) {
         // This means the dummy "No Questions" record is loaded
         QuizzerLogger.logWarning('submitAnswer called when no real question was loaded (currentQuestionRecord is null).');
-        return {'success': false, 'message': 'No real question loaded to submit answer for.'};
+        signalQuestionAnsweredCorrectly("dummy_no_questions");
+        return {'success': true, 'message': 'No real question loaded to submit answer for.'};
       }
       // --- Original validation continues below ---
 
@@ -755,12 +783,14 @@ class SessionManager {
         inCirculation: (updatedUserRecord['in_circulation'] as int? ?? 0) == 1,
       );
 
+      // Don't send signal until the current question is updated in the DB. . .
+      if (isCorrect) {
+        signalQuestionAnsweredCorrectly(questionId);
+      }
       // --- 7. Update In-Memory State ---
       _currentQuestionRecord = updatedUserRecord;
 
-      // --- 8. Move updated question to unprocessed cache and add to history ---
-      await _historyCache.addRecord(questionId);
-      await _unprocessedCache.addRecord(updatedUserRecord);
+      // Note: Question was already added to answer history cache when requested
       
       QuizzerLogger.logMessage('Successfully submitted answer for QID: $questionId, isCorrect: $isCorrect');
       return {'success': true, 'message': 'Answer submitted successfully.'};
@@ -798,7 +828,15 @@ class SessionManager {
 
       final String qstContrib = userId!; // Use current user ID as the question contributor
 
-      // --- 2. Database Operation (table functions handle their own DB access) --- 
+      // --- 2. Validate/Create Module ---
+      QuizzerLogger.logMessage('Validating module exists: $moduleName');
+      final bool moduleValidated = await module_management.validateModuleExists(moduleName, creatorId: userId!);
+      if (!moduleValidated) {
+        throw Exception('Failed to validate or create module: $moduleName');
+      }
+      QuizzerLogger.logMessage('Module validated/created successfully: $moduleName');
+
+      // --- 3. Database Operation (table functions handle their own DB access) --- 
       Map<String, dynamic> response;
 
       switch (questionType) {
@@ -883,8 +921,10 @@ class SessionManager {
       }
 
       // --- 3. Post-question operations (table functions handle their own DB access) ---
-      await updateModuleActivationStatus(userId!, moduleName, true);
-      // TODO validateAll is very inefficient, should probably write a proper function that just adds the userRecord directly to the unprocessedCache and to the table (works but slower at scale)
+      final bool activationResult = await updateModuleActivationStatus(userId!, moduleName, true);
+      if (!activationResult) {
+        QuizzerLogger.logWarning('Failed to activate module $moduleName after adding question');
+      }
       await validateAllModuleQuestions(userId!);
       
       QuizzerLogger.logMessage('SessionManager.addNewQuestion: Question added successfully.');

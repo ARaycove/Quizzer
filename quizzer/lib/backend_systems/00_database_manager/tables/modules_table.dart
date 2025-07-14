@@ -3,12 +3,6 @@ import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'table_helper.dart'; // Import the helper file
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
 
-// TODO setup outbound sync of description field and module names
-
-// TODO setup inbound sync of description fields
-
-// TODO Setup and plan the module completion status of the module card
-
 // Table name and field constants
 const String modulesTableName = 'modules';
 const String moduleNameField = 'module_name';
@@ -36,7 +30,7 @@ const String createModulesTableSQL = '''
 ''';
 
 // Verify table exists and create if needed
-Future<void> _verifyModulesTable(dynamic db) async {
+Future<void> verifyModulesTable(dynamic db) async {
   QuizzerLogger.logMessage('Verifying modules table existence');
   final List<Map<String, dynamic>> tables = await db.rawQuery(
     "SELECT name FROM sqlite_master WHERE type='table' AND name='$modulesTableName'"
@@ -106,7 +100,7 @@ Future<void> insertModule({
       throw Exception('Failed to acquire database access');
     }
     QuizzerLogger.logMessage('Inserting new module: $name');
-    await _verifyModulesTable(db);
+    await verifyModulesTable(db);
     final now = DateTime.now().toUtc().toIso8601String();
     
     // Prepare the raw data map - join lists into strings as needed by schema
@@ -149,6 +143,7 @@ Future<void> insertModule({
 // Update a module
 Future<void> updateModule({
   required String name,
+  String? newName,
   String? description,
   String? primarySubject,
   List<String>? subjects,
@@ -160,8 +155,15 @@ Future<void> updateModule({
       throw Exception('Failed to acquire database access');
     }
     QuizzerLogger.logMessage('Updating module: $name');
-    await _verifyModulesTable(db);
+    await verifyModulesTable(db);
     final updates = <String, dynamic>{};
+    
+    // Handle module name change if provided
+    if (newName != null && newName != name) {
+      updates[moduleNameField] = newName;
+      updates['edits_are_synced'] = 0; // Mark as needing sync when name changes
+      QuizzerLogger.logMessage('Module name will be changed from "$name" to "$newName"');
+    }
     
     // Prepare map with raw data - lists will be handled by encodeValueForDB in the helper
     if (description != null) {
@@ -186,7 +188,11 @@ Future<void> updateModule({
     
     // Log based on result (updateRawData returns number of rows affected)
     if (result > 0) {
-      QuizzerLogger.logSuccess('Module $name updated successfully ($result row affected).');
+      if (newName != null && newName != name) {
+        QuizzerLogger.logSuccess('Module renamed from "$name" to "$newName" successfully ($result row affected).');
+      } else {
+        QuizzerLogger.logSuccess('Module $name updated successfully ($result row affected).');
+      }
     } else {
       QuizzerLogger.logWarning('Update operation for module $name affected 0 rows. Module might not exist or data was unchanged.');
     }
@@ -206,7 +212,7 @@ Future<Map<String, dynamic>?> getModule(String name) async {
       throw Exception('Failed to acquire database access');
     }
     QuizzerLogger.logMessage('Fetching module: $name');
-    await _verifyModulesTable(db);
+    await verifyModulesTable(db);
     
     // Use the universal query helper
     final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
@@ -263,7 +269,7 @@ Future<List<Map<String, dynamic>>> getAllModules() async {
       throw Exception('Failed to acquire database access');
     }
     QuizzerLogger.logMessage('Fetching all modules');
-    await _verifyModulesTable(db);
+    await verifyModulesTable(db);
     
     // Use the universal query helper
     final List<Map<String, dynamic>> decodedModules = await queryAndDecodeDatabase(
@@ -325,7 +331,7 @@ Future<List<Map<String, dynamic>>> getUnsyncedModules() async {
       throw Exception('Failed to acquire database access');
     }
     QuizzerLogger.logMessage('Fetching unsynced modules');
-    await _verifyModulesTable(db);
+    await verifyModulesTable(db);
     
     // Use the universal query helper to get modules that need syncing
     final List<Map<String, dynamic>> unsyncedModules = await queryAndDecodeDatabase(
@@ -357,7 +363,7 @@ Future<void> updateModuleSyncFlags({
       throw Exception('Failed to acquire database access');
     }
     QuizzerLogger.logMessage('Updating sync flags for module: $moduleName');
-    await _verifyModulesTable(db);
+    await verifyModulesTable(db);
     
     final updates = {
       'has_been_synced': hasBeenSynced ? 1 : 0,
@@ -398,7 +404,7 @@ Future<void> upsertModuleFromInboundSync({
     }
     QuizzerLogger.logMessage('Upserting module $moduleName from inbound sync...');
 
-    await _verifyModulesTable(db);
+    await verifyModulesTable(db);
 
     // Prepare the data map with only the fields we store in Supabase
     final Map<String, dynamic> data = {

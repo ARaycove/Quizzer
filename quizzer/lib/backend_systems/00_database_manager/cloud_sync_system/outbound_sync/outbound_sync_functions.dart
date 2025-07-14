@@ -20,6 +20,7 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/us
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_daily_questions_answered_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_days_left_until_questions_exhaust_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_average_daily_questions_learned_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_module_activation_status_table.dart';
 import 'dart:io'; // For SocketException
 
 // ==========================================
@@ -1353,6 +1354,98 @@ Future<void> syncUserStatsAverageDailyQuestionsLearned() async {
     QuizzerLogger.logMessage('Finished sync attempt for average_daily_questions_learned.');
   } catch (e) {
     QuizzerLogger.logError('syncUserStatsAverageDailyQuestionsLearned: Error - $e');
+    rethrow;
+  }
+}
+
+// ==========================================
+// Outbound Sync - User Module Activation Status
+// ==========================================
+
+/// Fetches unsynced user module activation status records for the current user,
+/// pushes new ones or updates existing ones, and updates local sync flags.
+Future<void> syncUserModuleActivationStatus() async {
+  try {
+    QuizzerLogger.logMessage('Starting sync for UserModuleActivationStatus...');
+
+    final SessionManager sessionManager = getSessionManager();
+    final String? currentUserId = sessionManager.userId;
+
+    if (currentUserId == null) {
+      QuizzerLogger.logWarning('syncUserModuleActivationStatus: No current user logged in. Cannot proceed.');
+      return;
+    }
+
+    // Fetch records needing sync for the current user
+    final List<Map<String, dynamic>> unsyncedRecords = await getUnsyncedModuleActivationStatusRecords(currentUserId);
+
+    if (unsyncedRecords.isEmpty) {
+      QuizzerLogger.logMessage('No unsynced UserModuleActivationStatus found for user $currentUserId.');
+      return;
+    }
+
+    QuizzerLogger.logMessage('Found ${unsyncedRecords.length} unsynced UserModuleActivationStatus for user $currentUserId.');
+
+    const String tableName = 'user_module_activation_status';
+
+    for (final record in unsyncedRecords) {
+      final String? userId = record['user_id'] as String?;
+      final String? moduleName = record['module_name'] as String?;
+      final int hasBeenSynced = record['has_been_synced'] as int? ?? 0;
+
+      if (userId == null || moduleName == null) {
+        QuizzerLogger.logWarning('Skipping unsynced user module activation status record due to missing PK: $record');
+        continue;
+      }
+
+      // Ensure the record belongs to the current user
+      if (userId != currentUserId) {
+        QuizzerLogger.logWarning('syncUserModuleActivationStatus: Skipping record not belonging to current user. User in record: $userId, Current User: $currentUserId');
+        continue;
+      }
+
+      // Ensure last_modified_timestamp is present before push/update
+      Map<String, dynamic> mutableRecord = Map<String, dynamic>.from(record);
+      if (mutableRecord['last_modified_timestamp'] == null || 
+          (mutableRecord['last_modified_timestamp'] is String && (mutableRecord['last_modified_timestamp'] as String).isEmpty)) {
+        QuizzerLogger.logWarning('syncUserModuleActivationStatus: Record (User: $userId, Module: $moduleName) missing last_modified_timestamp. Assigning current time.');
+        mutableRecord['last_modified_timestamp'] = DateTime.now().toUtc().toIso8601String();
+      }
+
+      bool operationSuccess = false;
+
+      if (hasBeenSynced == 0) {
+        // This is a new record, use insert
+        QuizzerLogger.logValue('Preparing to insert UserModuleActivationStatus (User: $userId, Module: $moduleName) into $tableName');
+        operationSuccess = await pushRecordToSupabase(tableName, mutableRecord);
+      } else {
+        // This is an existing record with edits, use update
+        QuizzerLogger.logValue('Preparing to update UserModuleActivationStatus (User: $userId, Module: $moduleName) in $tableName');
+        operationSuccess = await updateRecordWithCompositeKeyInSupabase(
+          tableName,
+          mutableRecord,
+          compositeKeyFilters: {'user_id': userId, 'module_name': moduleName},
+        );
+      }
+
+      if (operationSuccess) {
+        final operation = (hasBeenSynced == 0) ? 'Insert' : 'Update';
+        QuizzerLogger.logMessage('$operation successful for UserModuleActivationStatus (User: $userId, Module: $moduleName). Updating local flags...');
+        await updateModuleActivationStatusSyncFlags(
+          userId: userId,
+          moduleName: moduleName,
+          hasBeenSynced: true, 
+          editsAreSynced: true, 
+        );
+      } else {
+        final operation = (hasBeenSynced == 0) ? 'Insert' : 'Update';
+        QuizzerLogger.logWarning('$operation FAILED for UserModuleActivationStatus (User: $userId, Module: $moduleName). Local flags remain unchanged.');
+      }
+    }
+
+    QuizzerLogger.logMessage('Finished sync attempt for UserModuleActivationStatus.');
+  } catch (e) {
+    QuizzerLogger.logError('syncUserModuleActivationStatus: Error - $e');
     rethrow;
   }
 }

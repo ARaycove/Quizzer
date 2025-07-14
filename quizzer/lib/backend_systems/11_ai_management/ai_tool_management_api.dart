@@ -26,7 +26,6 @@ Future<String> _chooseAIModelAndExecute({
       QuizzerLogger.logMessage('AI Tool Lib: Attachment: ${attachment.path}');
     }
   }
-  // TODO: Implement actual logic to select and call an AI model.
   QuizzerLogger.logWarning('_chooseAIModelAndExecute is a placeholder and not yet implemented.');
   throw UnimplementedError(
       '_chooseAIModelAndExecute: AI model selection and execution logic is not implemented.');

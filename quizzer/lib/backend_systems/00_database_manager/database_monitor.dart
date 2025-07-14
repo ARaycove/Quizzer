@@ -9,7 +9,20 @@ final DatabaseMonitor _globalDatabaseMonitor = DatabaseMonitor._internal();
 /// Gets the global database monitor instance
 DatabaseMonitor getDatabaseMonitor() => _globalDatabaseMonitor;
 
-/// A monitor for controlling database access
+/// Internal class for queue entries
+class _QueueEntry {
+  final Completer<Database> completer;
+  final String caller;
+  final bool isSyncRequest;
+  
+  _QueueEntry({
+    required this.completer,
+    required this.caller,
+    required this.isSyncRequest,
+  });
+}
+
+/// A monitor for controlling database access with priority queue
 class DatabaseMonitor {
   static final DatabaseMonitor _instance = DatabaseMonitor._internal();
   factory DatabaseMonitor() => _instance;
@@ -17,7 +30,20 @@ class DatabaseMonitor {
 
   // Access control state
   bool _isLocked = false;
-  final _accessQueue = <Completer<Database>>[];
+  String? _currentLockHolder;
+  
+  // Priority queue system
+  final List<_QueueEntry> _priorityQueue = []; // High priority (non-sync) requests
+  final List<_QueueEntry> _syncQueue = [];     // Low priority (sync) requests
+
+  /// Returns whether the database is currently locked
+  bool get isLocked => _isLocked;
+
+  /// Returns the number of requests currently waiting in the queue
+  int get queueLength => _priorityQueue.length + _syncQueue.length;
+
+  /// Returns the current lock holder (function name and location)
+  String? get currentLockHolder => _currentLockHolder;
 
   /// Extracts caller information from stack trace
   String _getCallerInfo(StackTrace stackTrace) {
@@ -62,24 +88,49 @@ class DatabaseMonitor {
     return 'unknown caller (stack trace parsing failed)';
   }
 
-  /// Requests access to the database
+  /// Determines if a caller is a sync-related function (involves network sync with central server)
+  bool _isSyncRequest(String caller) {
+    final lowerCaller = caller.toLowerCase();
+    return lowerCaller.contains('inbound_sync_worker.dart') ||
+           lowerCaller.contains('inbound_sync_functions.dart') ||
+           lowerCaller.contains('outbound_sync_worker.dart') ||
+           lowerCaller.contains('outbound_sync_functions.dart') ||
+           lowerCaller.contains('media_sync_worker.dart');
+  }
+
+  /// Requests access to the database with priority queue
   /// Returns the database instance if available, null if locked
   Future<Database?> requestDatabaseAccess() async {
     final caller = _getCallerInfo(StackTrace.current);
+    final isSyncRequest = _isSyncRequest(caller);
     
     if (_isLocked) {
       final completer = Completer<Database>();
-      _accessQueue.add(completer);
-      QuizzerLogger.logMessage('Database access queued by $caller, waiting for lock release');
+      final queueEntry = _QueueEntry(
+        completer: completer,
+        caller: caller,
+        isSyncRequest: isSyncRequest,
+      );
+      
+      // Add to appropriate queue based on priority
+      if (isSyncRequest) {
+        _syncQueue.add(queueEntry);
+        QuizzerLogger.logMessage('Sync database access queued by $caller, waiting for lock release (currently held by: ${_currentLockHolder ?? 'unknown'})');
+      } else {
+        _priorityQueue.add(queueEntry);
+        QuizzerLogger.logMessage('Priority database access queued by $caller, waiting for lock release (currently held by: ${_currentLockHolder ?? 'unknown'})');
+      }
+      
       return await completer.future;
     }
 
     _isLocked = true;
-    QuizzerLogger.logMessage('Database access granted to $caller with lock');
+    _currentLockHolder = caller;
+    QuizzerLogger.logMessage('Database access granted to $caller with lock (${isSyncRequest ? 'sync' : 'priority'} request)');
     return getDatabaseForMonitor();
   }
 
-  /// Releases the database lock
+  /// Releases the database lock and gives access to the next highest priority request
   void releaseDatabaseAccess() {
     final caller = _getCallerInfo(StackTrace.current);
     
@@ -90,14 +141,23 @@ class DatabaseMonitor {
       QuizzerLogger.logMessage("Database Lock Released by $caller!");
     }
 
-    if (_accessQueue.isNotEmpty) {
-      final nextCompleter = _accessQueue.removeAt(0);
-      final nextCaller = _getCallerInfo(StackTrace.current);
-      QuizzerLogger.logMessage('Database access passed to next in queue (originally requested by $nextCaller)');
-      nextCompleter.complete(getDatabaseForMonitor());
+    // Give priority to non-sync requests first
+    _QueueEntry? nextEntry;
+    if (_priorityQueue.isNotEmpty) {
+      nextEntry = _priorityQueue.removeAt(0);
+      QuizzerLogger.logMessage('Database access passed to priority queue (originally requested by ${nextEntry.caller})');
+    } else if (_syncQueue.isNotEmpty) {
+      nextEntry = _syncQueue.removeAt(0);
+      QuizzerLogger.logMessage('Database access passed to sync queue (originally requested by ${nextEntry.caller})');
+    }
+
+    if (nextEntry != null) {
+      _currentLockHolder = nextEntry.caller;
+      nextEntry.completer.complete(getDatabaseForMonitor());
     } else {
       _isLocked = false;
-      QuizzerLogger.logMessage('Database lock released by $caller');
+      _currentLockHolder = null;
+      QuizzerLogger.logMessage('Database lock released by $caller - no more requests in queue');
     }
   }
 
@@ -119,6 +179,48 @@ class DatabaseMonitor {
     final caller = _getCallerInfo(StackTrace.current);
     QuizzerLogger.logWarning('DATABASE_MONITOR: CRITICAL OVERRIDE - Providing direct, unlocked DB access for error logging to $caller.');
     _isLocked = true;
+    _currentLockHolder = caller;
     return getDatabaseForMonitor();
+  }
+
+  /// Checks if the database is in a fresh state (only user_profile and login_attempts tables exist).
+  /// This is used to determine whether to await sync workers during login initialization.
+  /// 
+  /// Returns:
+  /// - true if database is fresh (only basic tables exist)
+  /// - false if database has additional tables (indicating previous data exists)
+  Future<bool> isDatabaseFresh() async {
+    try {
+      QuizzerLogger.logMessage('Checking if database is in fresh state...');
+      
+      final db = await requestDatabaseAccess();
+      if (db == null) {
+        throw Exception('Failed to acquire database access');
+      }
+      
+      // Get all table names
+      final List<Map<String, dynamic>> tables = await db.rawQuery(
+        "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' AND name != 'android_metadata'"
+      );
+      
+      final List<String> tableNames = tables.map((row) => row['name'] as String).toList();
+      QuizzerLogger.logMessage('Found tables: ${tableNames.join(', ')}');
+      
+      // Check if question_answer_pairs table exists
+      final bool hasQuestionAnswerPairs = tableNames.contains('question_answer_pairs');
+      
+      // Fresh state means only user_profile and login_attempts tables exist
+      final bool isFresh = !hasQuestionAnswerPairs;
+      
+      QuizzerLogger.logMessage('Database fresh state check: $isFresh (question_answer_pairs exists: $hasQuestionAnswerPairs)');
+      
+      return isFresh;
+      
+    } catch (e) {
+      QuizzerLogger.logError('Error checking database fresh state: $e');
+      rethrow;
+    } finally {
+      releaseDatabaseAccess();
+    }
   }
 }

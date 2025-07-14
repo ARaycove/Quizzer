@@ -66,10 +66,6 @@ Future<bool> addLoginAttemptRecord({
   required String statusCode,
 }) async {
   try {
-    final db = await getDatabaseMonitor().requestDatabaseAccess();
-    if (db == null) {
-      throw Exception('Failed to acquire database access');
-    }
     String? userId;
     try {
       userId = await getUserIdByEmail(email);
@@ -87,6 +83,12 @@ Future<bool> addLoginAttemptRecord({
       QuizzerLogger.logError('Unexpected error while getting user ID for login attempt: $e');
       rethrow; // Fail fast for other errors
     }
+    
+    final db = await getDatabaseMonitor().requestDatabaseAccess();
+    if (db == null) {
+      throw Exception('Failed to acquire database access');
+    }
+
 
     // If we reach here, userId was successfully retrieved.
     await _verifyLoginAttemptsTableFields(db); 
@@ -163,6 +165,34 @@ Future<List<Map<String, dynamic>>> getUnsyncedLoginAttempts() async {
 }
 
 // --- Delete Record ---
+
+/// Gets login attempts for a specific user by email
+/// Returns a list of login attempt records for the given email
+Future<List<Map<String, dynamic>>> getLoginAttemptsByEmail(String email) async {
+  try {
+    final db = await getDatabaseMonitor().requestDatabaseAccess();
+    if (db == null) {
+      throw Exception('Failed to acquire database access');
+    }
+    QuizzerLogger.logMessage('Fetching login attempts for email: $email');
+    await _verifyLoginAttemptsTableFields(db);
+
+    final List<Map<String, dynamic>> results = await db.query(
+      'login_attempts',
+      where: 'email = ?',
+      whereArgs: [email],
+      orderBy: 'timestamp DESC', // Most recent first
+    );
+
+    QuizzerLogger.logSuccess('Fetched ${results.length} login attempts for email: $email');
+    return results;
+  } catch (e) {
+    QuizzerLogger.logError('Error getting login attempts for email: $email - $e');
+    rethrow;
+  } finally {
+    getDatabaseMonitor().releaseDatabaseAccess();
+  }
+}
 
 /// Deletes a specific login attempt record from the local database.
 Future<int> deleteLoginAttemptRecord(String loginAttemptId) async {

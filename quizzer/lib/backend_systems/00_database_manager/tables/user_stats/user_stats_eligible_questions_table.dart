@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import '../table_helper.dart';
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_question_answer_pairs_table.dart';
 
 Future<void> _verifyUserStatsEligibleQuestionsTable(Database db) async {
   final List<Map<String, dynamic>> tables = await db.rawQuery(
@@ -46,16 +47,17 @@ Future<void> _verifyUserStatsEligibleQuestionsTable(Database db) async {
 /// Updates the eligible questions stat for a user for today (YYYY-MM-DD).
 Future<void> updateEligibleQuestionsStat(String userId) async {
   try {
+    // Get the count of eligible questions using the proper function
+    final List<Map<String, dynamic>> eligibleQuestions = await getEligibleUserQuestionAnswerPairs(userId);
+    final int eligibleCount = eligibleQuestions.length;
     final db = await getDatabaseMonitor().requestDatabaseAccess();
+    if (db == null) {
+      throw Exception('Failed to acquire database access');
+    }
     // Get today's date in YYYY-MM-DD format
     final String today = DateTime.now().toUtc().toIso8601String().substring(0, 10);
 
-    // Query the count of eligible questions for this user (read-only, do not verify)
-    final List<Map<String, dynamic>> result = await db!.rawQuery(
-      'SELECT COUNT(*) as count FROM user_question_answer_pairs WHERE user_uuid = ? AND is_eligible = 1',
-      [userId],
-    );
-    final int eligibleCount = result.isNotEmpty ? (result.first['count'] as int) : 0;
+
 
     // Verify only the stats table before writing
     await _verifyUserStatsEligibleQuestionsTable(db);

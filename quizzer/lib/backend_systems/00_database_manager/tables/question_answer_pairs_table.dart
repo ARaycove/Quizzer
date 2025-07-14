@@ -11,11 +11,9 @@ import 'dart:io';
 import 'package:quizzer/backend_systems/00_helper_utils/file_locations.dart';
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
 
-// TODO flag questions by user's primary language
-
 // --- Universal Encoding/Decoding Helpers --- Removed, moved to 00_table_helper.dart ---
 
-Future<void> _verifyQuestionAnswerPairTable(dynamic db) async {
+Future<void> verifyQuestionAnswerPairTable(dynamic db) async {
   
   // Check if the table exists
   final List<Map<String, dynamic>> tables = await db.rawQuery(
@@ -42,7 +40,7 @@ Future<void> _verifyQuestionAnswerPairTable(dynamic db) async {
         question_type TEXT,      -- Added for multiple choice support
         options TEXT,            -- Added for multiple choice options
         correct_option_index INTEGER,  -- Added for multiple choice correct answer
-        question_id TEXT,        -- Added for unique question identification
+        question_id TEXT UNIQUE, -- Added for unique question identification with UNIQUE constraint
         correct_order TEXT,      -- Added for sort_order
         index_options_that_apply TEXT,
         has_been_synced INTEGER DEFAULT 0,  -- Added for outbound sync tracking
@@ -128,6 +126,66 @@ Future<void> _verifyQuestionAnswerPairTable(dynamic db) async {
       await db.execute('ALTER TABLE question_answer_pairs ADD COLUMN has_media INTEGER DEFAULT NULL');
     }
     
+    // Check if question_id has UNIQUE constraint and add it if missing
+    final List<Map<String, dynamic>> uniqueIndexes = await db.rawQuery(
+      "SELECT name FROM sqlite_master WHERE type='index' AND tbl_name='question_answer_pairs'"
+    );
+    
+    final List<String> existingUniqueIndexes = uniqueIndexes.map((index) => index['name'] as String).toList();
+    
+    // Check if unique constraint on question_id exists
+    if (!existingUniqueIndexes.contains('idx_question_answer_pairs_question_id_unique')) {
+      QuizzerLogger.logMessage('Checking for existing duplicates before adding UNIQUE constraint on question_id...');
+      
+      // First, find and clean up any existing duplicates
+      final List<Map<String, dynamic>> duplicateGroups = await db.rawQuery('''
+        SELECT question_id, COUNT(*) as count
+        FROM question_answer_pairs 
+        WHERE question_id IS NOT NULL 
+        GROUP BY question_id 
+        HAVING COUNT(*) > 1
+      ''');
+      
+      if (duplicateGroups.isNotEmpty) {
+        QuizzerLogger.logMessage('Found ${duplicateGroups.length} question_id groups with duplicates. Cleaning up...');
+        
+        for (final group in duplicateGroups) {
+          final String questionId = group['question_id'] as String;
+          final int count = group['count'] as int;
+          
+          QuizzerLogger.logMessage('Cleaning up $count duplicates for question_id: $questionId');
+          
+          // Get all records for this question_id
+          final List<Map<String, dynamic>> duplicates = await db.query(
+            'question_answer_pairs',
+            where: 'question_id = ?',
+            whereArgs: [questionId],
+            orderBy: 'time_stamp ASC', // Keep the oldest record
+          );
+          
+          // Keep the first record, delete the rest
+          for (int i = 1; i < duplicates.length; i++) {
+            final Map<String, dynamic> duplicate = duplicates[i];
+            final String timeStamp = duplicate['time_stamp'] as String;
+            final String qstContrib = duplicate['qst_contrib'] as String;
+            
+            QuizzerLogger.logMessage('Deleting duplicate: time_stamp=$timeStamp, qst_contrib=$qstContrib');
+            await db.delete(
+              'question_answer_pairs',
+              where: 'time_stamp = ? AND qst_contrib = ?',
+              whereArgs: [timeStamp, qstContrib],
+            );
+          }
+        }
+        
+        QuizzerLogger.logSuccess('Finished cleaning up duplicates');
+      }
+      
+      // Now create the unique index
+      QuizzerLogger.logMessage('Adding UNIQUE constraint on question_id column to prevent duplicates.');
+      await db.execute('CREATE UNIQUE INDEX idx_question_answer_pairs_question_id_unique ON question_answer_pairs(question_id)');
+    }
+    
     // Check if module_name index exists and create it if it doesn't
     final List<Map<String, dynamic>> indexes = await db.rawQuery(
       "SELECT name FROM sqlite_master WHERE type='index' AND tbl_name='question_answer_pairs'"
@@ -139,9 +197,6 @@ Future<void> _verifyQuestionAnswerPairTable(dynamic db) async {
       QuizzerLogger.logMessage('Creating index on module_name column for better query performance.');
       await db.execute('CREATE INDEX idx_question_answer_pairs_module_name ON question_answer_pairs(module_name)');
     }
-    
-    // TODO: Add checks for columns needed by other future question types here
-
   }
 }
 
@@ -340,7 +395,7 @@ Future<int> editQuestionAnswerPair({
       throw Exception('Failed to acquire database access');
     }
     // First verify that the table exists
-    await _verifyQuestionAnswerPairTable(db);
+    await verifyQuestionAnswerPairTable(db);
 
     // Prepare map for raw values to update 
     Map<String, dynamic> valuesToUpdate = {};
@@ -414,7 +469,7 @@ Future<Map<String, dynamic>> getQuestionAnswerPairById(String questionId) async 
       throw Exception('Failed to acquire database access');
     }
     // First verify that the table exists
-    await _verifyQuestionAnswerPairTable(db);
+    await verifyQuestionAnswerPairTable(db);
     // Use the single helper function
     final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
       'question_answer_pairs',
@@ -429,8 +484,24 @@ Future<Map<String, dynamic>> getQuestionAnswerPairById(String questionId) async 
       QuizzerLogger.logError('Query for single row (getQuestionAnswerPairById) returned no results for ID: $questionId');
       throw StateError('Expected exactly one row for question ID $questionId, but found none.');
     } else if (results.length > 1) {
-      QuizzerLogger.logError('Query for single row (getQuestionAnswerPairById) returned ${results.length} results for ID: $questionId');
-      throw StateError('Expected exactly one row for question ID $questionId, but found ${results.length}.');
+      QuizzerLogger.logError('Query for single row (getQuestionAnswerPairById) returned ${results.length} results for ID: $questionId - removing duplicates');
+      
+      // Keep the first record and delete the duplicates
+      final List<Map<String, dynamic>> duplicates = results.skip(1).toList();
+      
+      for (final duplicate in duplicates) {
+        final String timeStamp = duplicate['time_stamp'] as String;
+        final String qstContrib = duplicate['qst_contrib'] as String;
+        
+        QuizzerLogger.logMessage('Deleting duplicate question record: time_stamp=$timeStamp, qst_contrib=$qstContrib');
+        await db.delete(
+          'question_answer_pairs',
+          where: 'time_stamp = ? AND qst_contrib = ?',
+          whereArgs: [timeStamp, qstContrib],
+        );
+      }
+      
+      QuizzerLogger.logSuccess('Removed ${duplicates.length} duplicate records for question ID: $questionId');
     }
 
     // Return the single decoded row
@@ -450,7 +521,7 @@ Future<List<Map<String, dynamic>>>  getQuestionAnswerPairsBySubject(String subje
       throw Exception('Failed to acquire database access');
     }
     // First verify that the table exists
-    await _verifyQuestionAnswerPairTable(db);
+    await verifyQuestionAnswerPairTable(db);
     // Use the helper function to query and decode the list of rows
     return await queryAndDecodeDatabase(
       'question_answer_pairs',
@@ -473,7 +544,7 @@ Future<List<Map<String, dynamic>>>  getQuestionAnswerPairsByConcept(String conce
       throw Exception('Failed to acquire database access');
     }
     // First verify that the table exists
-    await _verifyQuestionAnswerPairTable(db);
+    await verifyQuestionAnswerPairTable(db);
     // Use the helper function to query and decode the list of rows
     return await queryAndDecodeDatabase(
       'question_answer_pairs',
@@ -496,7 +567,7 @@ Future<List<Map<String, dynamic>>>  getQuestionAnswerPairsBySubjectAndConcept(St
       throw Exception('Failed to acquire database access');
     }
     // First verify that the table exists
-    await _verifyQuestionAnswerPairTable(db);
+    await verifyQuestionAnswerPairTable(db);
     // Use the helper function to query and decode the list of rows
     return await queryAndDecodeDatabase(
       'question_answer_pairs',
@@ -519,7 +590,7 @@ Future<Map<String, dynamic>?> getRandomQuestionAnswerPair() async {
       throw Exception('Failed to acquire database access');
     }
     // First verify that the table exists
-    await _verifyQuestionAnswerPairTable(db);
+    await verifyQuestionAnswerPairTable(db);
 
     final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
       'question_answer_pairs', // tableName is still useful for context/logging if helper uses it
@@ -547,7 +618,7 @@ Future<List<Map<String, dynamic>>>  getAllQuestionAnswerPairs() async {
       throw Exception('Failed to acquire database access');
     }
     // First verify that the table exists
-    await _verifyQuestionAnswerPairTable(db);
+    await verifyQuestionAnswerPairTable(db);
     // Use the helper function to query and decode all rows
     return await queryAndDecodeDatabase('question_answer_pairs', db);
   } catch (e) {
@@ -565,7 +636,7 @@ Future<int> removeQuestionAnswerPair(String timeStamp, String qstContrib) async 
       throw Exception('Failed to acquire database access');
     }
     // First verify that the table exists
-    await _verifyQuestionAnswerPairTable(db);
+    await verifyQuestionAnswerPairTable(db);
 
     return await db.delete(
       'question_answer_pairs',
@@ -588,7 +659,7 @@ Future<String> getModuleNameForQuestionId(String questionId) async {
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    await _verifyQuestionAnswerPairTable(db);
+    await verifyQuestionAnswerPairTable(db);
     
     final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
       'question_answer_pairs',
@@ -626,7 +697,7 @@ Future<List<Map<String, dynamic>>> getQuestionRecordsForModule(String moduleName
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    await _verifyQuestionAnswerPairTable(db);
+    await verifyQuestionAnswerPairTable(db);
     
     final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
       'question_answer_pairs',
@@ -645,6 +716,54 @@ Future<List<Map<String, dynamic>>> getQuestionRecordsForModule(String moduleName
   }
 }
 
+/// Fetches module names for multiple question IDs in a single database query.
+/// This is more efficient than calling getModuleNameForQuestionId multiple times.
+/// Returns a map of question ID to module name.
+Future<Map<String, String>> getModuleNamesForQuestionIds(List<String> questionIds) async {
+  try {
+    if (questionIds.isEmpty) {
+      return {};
+    }
+    
+    final db = await getDatabaseMonitor().requestDatabaseAccess();
+    if (db == null) {
+      throw Exception('Failed to acquire database access');
+    }
+    await verifyQuestionAnswerPairTable(db);
+    
+    // Create placeholders for the IN clause
+    final placeholders = List.filled(questionIds.length, '?').join(',');
+    
+    final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
+      'question_answer_pairs',
+      db,
+      columns: ['question_id', 'module_name'],
+      where: 'question_id IN ($placeholders)',
+      whereArgs: questionIds,
+    );
+    
+    final Map<String, String> questionIdToModuleName = {};
+    for (final row in results) {
+      final String questionId = row['question_id'] as String;
+      final String? moduleName = row['module_name'] as String?;
+      
+      if (moduleName != null && moduleName.isNotEmpty) {
+        questionIdToModuleName[questionId] = moduleName;
+      } else {
+        questionIdToModuleName[questionId] = 'Unknown Module';
+      }
+    }
+    
+    QuizzerLogger.logMessage('Fetched module names for ${questionIdToModuleName.length} question IDs');
+    return questionIdToModuleName;
+  } catch (e) {
+    QuizzerLogger.logError('Error getting module names for question IDs - $e');
+    rethrow;
+  } finally {
+    getDatabaseMonitor().releaseDatabaseAccess();
+  }
+}
+
 /// Fetches all question IDs for a specific module name.
 /// Returns an empty list if no questions are found for the module.
 Future<List<String>> getQuestionIdsForModule(String moduleName) async {
@@ -653,7 +772,7 @@ Future<List<String>> getQuestionIdsForModule(String moduleName) async {
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    await _verifyQuestionAnswerPairTable(db);
+    await verifyQuestionAnswerPairTable(db);
     
     final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
       'question_answer_pairs',
@@ -686,7 +805,7 @@ Future<List<String>> getUniqueSubjects() async {
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    await _verifyQuestionAnswerPairTable(db);
+    await verifyQuestionAnswerPairTable(db);
     
     final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
       'question_answer_pairs',
@@ -720,7 +839,7 @@ Future<List<String>> getUniqueSubjects() async {
 Future<Set<String>> getUniqueConcepts(dynamic db) async {
   QuizzerLogger.logMessage('Fetching unique concepts from question_answer_pairs table');
   // First verify that the table exists
-  await _verifyQuestionAnswerPairTable(db);
+  await verifyQuestionAnswerPairTable(db);
   
   // Query the database for all distinct concept values
   final List<Map<String, dynamic>> result = await db.rawQuery(
@@ -748,7 +867,7 @@ Future<void> updateQuestionSyncFlags({
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    await _verifyQuestionAnswerPairTable(db);
+    await verifyQuestionAnswerPairTable(db);
     
     final Map<String, dynamic> updates = {
       'has_been_synced': hasBeenSynced ? 1 : 0,
@@ -788,7 +907,7 @@ Future<List<Map<String, dynamic>>> getUnsyncedQuestionAnswerPairs() async {
       throw Exception('Failed to acquire database access');
     }
     QuizzerLogger.logMessage('Fetching unsynced question-answer pairs...');
-    await _verifyQuestionAnswerPairTable(db); // Ensure table and sync columns exist
+    await verifyQuestionAnswerPairTable(db); // Ensure table and sync columns exist
 
     final List<Map<String, dynamic>> results = await db.query(
       'question_answer_pairs',
@@ -814,7 +933,7 @@ Future<void> insertOrUpdateQuestionAnswerPair(Map<String, dynamic> questionData)
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    await _verifyQuestionAnswerPairTable(db);
+    await verifyQuestionAnswerPairTable(db);
 
     // Ensure all required fields are present in the incoming data
     final String? questionId = questionData['question_id'] as String?;
@@ -872,7 +991,7 @@ Future<String> addQuestionMultipleChoice({
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    await _verifyQuestionAnswerPairTable(db);
+    await verifyQuestionAnswerPairTable(db);
     final String timeStamp = DateTime.now().toUtc().toIso8601String();
     final String questionId = '${timeStamp}_$qstContrib';
 
@@ -937,7 +1056,7 @@ Future<String> addQuestionSelectAllThatApply({
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    await _verifyQuestionAnswerPairTable(db);
+    await verifyQuestionAnswerPairTable(db);
     final String timeStamp = DateTime.now().toUtc().toIso8601String();
     final String questionId = '${timeStamp}_$qstContrib';
 
@@ -1000,7 +1119,7 @@ Future<String> addQuestionTrueFalse({
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    await _verifyQuestionAnswerPairTable(db);
+    await verifyQuestionAnswerPairTable(db);
     final String timeStamp = DateTime.now().toUtc().toIso8601String();
     final String questionId = '${timeStamp}_$qstContrib';
 
@@ -1079,7 +1198,7 @@ Future<String> addSortOrderQuestion({
       throw Exception('Failed to acquire database access');
     }
     // First verify that the table exists
-    await _verifyQuestionAnswerPairTable(db); // Ensure table and columns are ready
+    await verifyQuestionAnswerPairTable(db); // Ensure table and columns are ready
 
     // Generate ID components using the established pattern
     final String timeStamp = DateTime.now().toUtc().toIso8601String();
@@ -1159,7 +1278,7 @@ Future<List<Map<String, dynamic>>> getPairsWithNullMediaStatus() async {
       throw Exception('Failed to acquire database access');
     }
     QuizzerLogger.logMessage('Fetching question-answer pairs with NULL has_media status...');
-    await _verifyQuestionAnswerPairTable(db); // Ensure table and columns exist
+    await verifyQuestionAnswerPairTable(db); // Ensure table and columns exist
 
     final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
       'question_answer_pairs',
@@ -1247,7 +1366,7 @@ Future<void> batchUpsertQuestionAnswerPairs({
     }
     if (records.isEmpty) return;
     QuizzerLogger.logMessage('Starting TRUE batch upsert for question_answer_pairs: \\${records.length} records');
-    await _verifyQuestionAnswerPairTable(db);
+    await verifyQuestionAnswerPairTable(db);
 
     // List of all columns in the table
     final columns = [
@@ -1301,6 +1420,37 @@ Future<void> batchUpsertQuestionAnswerPairs({
     QuizzerLogger.logSuccess('TRUE batch upsert for question_answer_pairs complete.');
   } catch (e) {
     QuizzerLogger.logError('Error batch upserting question answer pairs - $e');
+    rethrow;
+  } finally {
+    getDatabaseMonitor().releaseDatabaseAccess();
+  }
+}
+
+/// Gets the most recent last_modified_timestamp from the question_answer_pairs table
+Future<String?> getMostRecentQuestionAnswerPairTimestamp() async {
+  try {
+    final db = await getDatabaseMonitor().requestDatabaseAccess();
+    if (db == null) {
+      throw Exception('Failed to acquire database access');
+    }
+    
+    await verifyQuestionAnswerPairTable(db);
+    
+    // Query to get the maximum last_modified_timestamp
+    final List<Map<String, dynamic>> results = await db.rawQuery(
+      'SELECT MAX(last_modified_timestamp) as max_timestamp FROM question_answer_pairs WHERE last_modified_timestamp IS NOT NULL'
+    );
+    
+    if (results.isNotEmpty && results.first['max_timestamp'] != null) {
+      final String? maxTimestamp = results.first['max_timestamp'] as String?;
+      QuizzerLogger.logMessage('Most recent question timestamp found: $maxTimestamp');
+      return maxTimestamp;
+    } else {
+      QuizzerLogger.logMessage('No question records found with last_modified_timestamp');
+      return null;
+    }
+  } catch (e) {
+    QuizzerLogger.logError('Error getting most recent question timestamp - $e');
     rethrow;
   } finally {
     getDatabaseMonitor().releaseDatabaseAccess();
