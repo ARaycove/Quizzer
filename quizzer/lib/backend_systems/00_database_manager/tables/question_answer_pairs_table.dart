@@ -869,11 +869,18 @@ Future<void> updateQuestionSyncFlags({
     }
     await verifyQuestionAnswerPairTable(db);
     
+    // Ensure sync flags are only 1 or 0, never -1 or other values
     final Map<String, dynamic> updates = {
       'has_been_synced': hasBeenSynced ? 1 : 0,
       'edits_are_synced': editsAreSynced ? 1 : 0,
       'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
     };
+    
+    // Validate that we're only setting valid sync flag values
+    assert(updates['has_been_synced'] == 1 || updates['has_been_synced'] == 0, 
+           'has_been_synced must be 1 or 0, got: ${updates['has_been_synced']}');
+    assert(updates['edits_are_synced'] == 1 || updates['edits_are_synced'] == 0, 
+           'edits_are_synced must be 1 or 0, got: ${updates['edits_are_synced']}');
 
     final int rowsAffected = await updateRawData(
       'question_answer_pairs',
@@ -1409,12 +1416,9 @@ Future<void> batchUpsertQuestionAnswerPairs({
         return '(${List.filled(columns.length, '?').join(',')})';
       }).join(', ');
 
-      // Use question_id as the upsert key if present, else (time_stamp, qst_contrib)
-      // We'll use question_id for ON CONFLICT if available in all records, else fallback
-      // For now, use question_id if present, else fallback to (time_stamp, qst_contrib)
-      // But for compatibility, use question_id as the upsert key
-      final updateSet = columns.where((c) => c != 'time_stamp' && c != 'qst_contrib').map((c) => '$c=excluded.$c').join(', ');
-      final sql = 'INSERT INTO question_answer_pairs (${columns.join(',')}) VALUES $valuePlaceholders ON CONFLICT(time_stamp, qst_contrib) DO UPDATE SET $updateSet;';
+      // Use question_id as the upsert key since it has a UNIQUE constraint
+      final updateSet = columns.where((c) => c != 'question_id').map((c) => '$c=excluded.$c').join(', ');
+      final sql = 'INSERT INTO question_answer_pairs (${columns.join(',')}) VALUES $valuePlaceholders ON CONFLICT(question_id) DO UPDATE SET $updateSet;';
       await db.rawInsert(sql, values);
     }
     QuizzerLogger.logSuccess('TRUE batch upsert for question_answer_pairs complete.');

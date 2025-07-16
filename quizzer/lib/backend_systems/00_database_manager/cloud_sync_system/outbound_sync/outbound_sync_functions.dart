@@ -287,8 +287,20 @@ Future<void> syncQuestionAnswerPairs() async {
     int failureCount = 0;
 
     for (final record in unsyncedRecords) {
-      final int hasBeenSynced = record['has_been_synced'] as int? ?? -1;
-      final int editsAreSynced = record['edits_are_synced'] as int? ?? -1;
+      // Handle corrupted sync flags: treat -1 as 1 (synced)
+      int hasBeenSynced = record['has_been_synced'] as int? ?? -1;
+      int editsAreSynced = record['edits_are_synced'] as int? ?? -1;
+      
+      // Fix corrupted sync flags
+      if (hasBeenSynced == -1) {
+        QuizzerLogger.logWarning('Fixing corrupted has_been_synced flag from -1 to 1 for record: ${record['question_id']}');
+        hasBeenSynced = 1;
+      }
+      if (editsAreSynced == -1) {
+        QuizzerLogger.logWarning('Fixing corrupted edits_are_synced flag from -1 to 1 for record: ${record['question_id']}');
+        editsAreSynced = 1;
+      }
+      
       String? reviewTable;
       if (hasBeenSynced == 0 && editsAreSynced == 0) {
         reviewTable = 'question_answer_pair_new_review';
