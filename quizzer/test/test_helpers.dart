@@ -8,6 +8,7 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/user_question
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pairs_table.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
+import 'package:supabase/supabase.dart';
 import 'dart:math'; // Import for max function
 // import 'dart:convert'; // ADDED for jsonDecode
 // import 'dart:io'; // ADDED for File operations
@@ -853,4 +854,36 @@ List<Map<String, dynamic>> generateTestQuestionRecords({
   }
   
   return testRecords;
+}
+
+/// Gets the count of questions in the review tables from Supabase.
+/// 
+/// Returns:
+/// - Map containing counts for both review tables
+Future<Map<String, int>> getReviewTableCounts() async {
+  try {
+    final sessionManager = getSessionManager();
+    final supabase = sessionManager.supabase;
+    
+    // Get count from new review table
+    final int newReviewCount = await supabase
+        .from('question_answer_pair_new_review')
+        .count(CountOption.exact);
+    
+    // Get count from edits review table  
+    final int editsReviewCount = await supabase
+        .from('question_answer_pair_edits_review')
+        .count(CountOption.exact);
+    
+    final Map<String, int> counts = {
+      'new_review_count': newReviewCount,
+      'edits_review_count': editsReviewCount,
+      'total_review_count': newReviewCount + editsReviewCount,
+    };
+    
+    return counts;
+  } catch (e) {
+    QuizzerLogger.logError('Error getting review table counts: $e');
+    rethrow;
+  }
 }

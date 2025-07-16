@@ -342,7 +342,6 @@ Future<Map<String, int>> getUserSubjectInterests(String userId) async {
             }
           }
         );
-        QuizzerLogger.logMessage('Parsed existing interests: $interestData');
       } catch (e) {
          QuizzerLogger.logError('Failed to parse interest_data JSON for user $userId: $e');
          throw FormatException('Failed to parse interest_data JSON for user $userId: $e');
@@ -354,7 +353,6 @@ Future<Map<String, int>> getUserSubjectInterests(String userId) async {
 
 
     allSubjects.add('misc'); // hidden misc subject for handling questions without subjects
-    QuizzerLogger.logMessage('Unique subjects from questions table: $allSubjects');
 
     // Check for new subjects and add them with default value
     bool hasNewSubjects = false;
@@ -389,7 +387,7 @@ Future<Map<String, int>> getUserSubjectInterests(String userId) async {
       }
     }
 
-    QuizzerLogger.logSuccess('Returning final subject interests for user $userId: $interestData');
+    QuizzerLogger.logSuccess('Returning final subject interests for user');
     return interestData;
   } catch (e) {
     QuizzerLogger.logError('Error getting user subject interests for user ID: $userId - $e');

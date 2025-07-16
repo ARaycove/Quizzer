@@ -132,12 +132,13 @@ class _ReviewPanelWidgetState extends State<ReviewPanelWidget> {
 
     QuizzerLogger.logMessage('Opening edit dialog for review question: ${dataForEdit['question_id']}');
 
-    // Show the dialog
+    // Show the dialog with the question data
     final String questionId = dataForEdit['question_id'] as String;
     final result = await showDialog<Map<String, dynamic>>(
       context: context,
       builder: (dialogContext) => EditQuestionDialog(
         questionId: questionId,
+        questionData: dataForEdit, // Pass the question data directly
         disableSubmission: true, // Keep submission disabled here
       ),
     );

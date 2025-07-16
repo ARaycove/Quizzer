@@ -10,11 +10,13 @@ import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 class EditQuestionDialog extends StatefulWidget {
   final String questionId;
   final bool disableSubmission;
+  final Map<String, dynamic>? questionData; // NEW: Optional pre-loaded question data
 
   const EditQuestionDialog({
     super.key, 
     required this.questionId,
     this.disableSubmission = false,
+    this.questionData, // NEW: Optional parameter
   });
 
   @override
@@ -50,8 +52,17 @@ class _EditQuestionDialogState extends State<EditQuestionDialog> {
     try {
       QuizzerLogger.logMessage('EditQuestionDialog: Loading question data for ID: ${widget.questionId}');
       
-      // Fetch question data through SessionManager API
-      final Map<String, dynamic> data = await _session.fetchQuestionDetailsById(widget.questionId);
+      Map<String, dynamic> data;
+      
+      // Use passed data if available, otherwise fetch from SessionManager
+      if (widget.questionData != null) {
+        QuizzerLogger.logMessage('EditQuestionDialog: Using passed question data');
+        data = widget.questionData!;
+      } else {
+        QuizzerLogger.logMessage('EditQuestionDialog: Fetching question data from SessionManager');
+        // Fetch question data through SessionManager API
+        data = await _session.fetchQuestionDetailsById(widget.questionId);
+      }
       
       if (mounted) {
         setState(() {
