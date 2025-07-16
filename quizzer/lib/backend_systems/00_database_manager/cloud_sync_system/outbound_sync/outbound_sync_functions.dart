@@ -1,15 +1,15 @@
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart'; // To get Supabase client
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pairs_table.dart'; // Import for table functions
-import 'package:quizzer/backend_systems/00_database_manager/tables/login_attempts_table.dart'; // Import for login attempts table functions
+import 'package:quizzer/backend_systems/00_database_manager/tables/system_data/login_attempts_table.dart'; // Import for login attempts table functions
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_attempts_table.dart'; // Import for attempt table functions
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_profile_table.dart'; // Import for user profile table functions
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_question_answer_pairs_table.dart'; // Import for UserQuestionAnswerPairs table functions
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart'; // Import Logger
 import 'package:supabase/supabase.dart'; // Import for PostgrestException & SupabaseClient
-import 'package:quizzer/backend_systems/00_database_manager/tables/error_logs_table.dart'; // Added for syncErrorLogs
+import 'package:quizzer/backend_systems/00_database_manager/tables/system_data/error_logs_table.dart'; // Added for syncErrorLogs
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_settings_table.dart'; // Added for user settings table
 import 'package:quizzer/backend_systems/00_database_manager/tables/modules_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_feedback_table.dart'; // Added for user feedback
+import 'package:quizzer/backend_systems/00_database_manager/tables/system_data/user_feedback_table.dart'; // Added for user feedback
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_eligible_questions_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_non_circulating_questions_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_in_circulation_questions_table.dart';

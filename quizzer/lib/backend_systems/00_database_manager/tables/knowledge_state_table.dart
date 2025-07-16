@@ -1,2 +1,0 @@
-// This table will record the active state of knowledge after every attempt, designed to concatanate with the attempts table when we process the data
-// Keeps the state of the user's knowledge in it's own table

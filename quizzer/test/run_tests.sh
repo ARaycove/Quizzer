@@ -1,11 +1,7 @@
 #!/bin/bash
 
-# Colors for output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+# Import line count functions
+source "$(dirname "$0")/line_count_functions.sh"
 
 # Check for starting test number argument
 START_TEST_NUM=""
@@ -35,128 +31,6 @@ declare -a passed_files
 declare -a failed_files
 declare -a skipped_files
 declare -a test_times
-
-# Function to count lines in a file
-count_lines_in_file() {
-    local file="$1"
-    if [ -f "$file" ]; then
-        wc -l < "$file" 2>/dev/null || echo "0"
-    else
-        echo "0"
-    fi
-}
-
-# Function to count lines in all .dart files in a directory recursively
-count_lines_in_directory() {
-    local dir="$1"
-    local total=0
-    
-    if [ ! -d "$dir" ]; then
-        return 0
-    fi
-    
-    # Count lines in .dart files in current directory
-    for file in "$dir"/*.dart 2>/dev/null; do
-        if [ -f "$file" ]; then
-            local lines=$(count_lines_in_file "$file")
-            total=$((total + lines))
-        fi
-    done
-    
-    # Recursively count in subdirectories
-    for subdir in "$dir"/*/ 2>/dev/null; do
-        if [ -d "$subdir" ]; then
-            local sublines=$(count_lines_in_directory "$subdir")
-            total=$((total + sublines))
-        fi
-    done
-    
-    echo $total
-}
-
-# Function to build directory tree with line counts
-build_directory_tree() {
-    local dir="$1"
-    local indent="$2"
-    local total=0
-    
-    if [ ! -d "$dir" ]; then
-        return 0
-    fi
-    
-    # Count lines in .dart files in current directory
-    for file in "$dir"/*.dart 2>/dev/null; do
-        if [ -f "$file" ]; then
-            local lines=$(count_lines_in_file "$file")
-            total=$((total + lines))
-        fi
-    done
-    
-    # Process subdirectories
-    local subdirs=()
-    for subdir in "$dir"/*/ 2>/dev/null; do
-        if [ -d "$subdir" ]; then
-            subdirs+=("$subdir")
-        fi
-    done
-    
-    # Sort subdirectories alphabetically
-    IFS=$'\n' subdirs=($(sort <<<"${subdirs[*]}"))
-    unset IFS
-    
-    # Recursively process subdirectories
-    for subdir in "${subdirs[@]}"; do
-        local subname=$(basename "$subdir")
-        local sublines=$(build_directory_tree "$subdir" "$indent  ")
-        total=$((total + sublines))
-        
-        # Print subdirectory with line count
-        printf "%s├── %-40s %6d\n" "$indent" "$subname/" "$sublines"
-    done
-    
-    echo $total
-}
-
-# Function to print directory tree with proper formatting
-print_directory_tree() {
-    local dir="$1"
-    local dirname="$2"
-    
-    echo -e "${BLUE}--- $dirname Breakdown (recursive, alphabetical) ---${NC}"
-    
-    # Count lines in .dart files in current directory
-    local total=0
-    for file in "$dir"/*.dart 2>/dev/null; do
-        if [ -f "$file" ]; then
-            local lines=$(count_lines_in_file "$file")
-            total=$((total + lines))
-        fi
-    done
-    
-    # Process subdirectories
-    local subdirs=()
-    for subdir in "$dir"/*/ 2>/dev/null; do
-        if [ -d "$subdir" ]; then
-            subdirs+=("$subdir")
-        fi
-    done
-    
-    # Sort subdirectories alphabetically
-    IFS=$'\n' subdirs=($(sort <<<"${subdirs[*]}"))
-    unset IFS
-    
-    # Recursively process subdirectories
-    for subdir in "${subdirs[@]}"; do
-        local subname=$(basename "$subdir")
-        local sublines=$(build_directory_tree "$subdir" "    ")
-        total=$((total + sublines))
-        
-        # Print subdirectory with line count
-        printf "├── %-40s %6d\n" "$subname/" "$sublines"
-    done
-    
-    return $total
-}
 
 # Find all test files matching the pattern test_##_*.dart and sort them numerically
 test_files=$(find . -name "test_*.dart" | grep -E "test_[0-9]+_.*\.dart" | sort -V)
@@ -189,6 +63,9 @@ else
 fi
 echo "$test_files" | sed 's|^\./||'
 echo ""
+
+# 1. Comprehensive breakdown of line counts
+print_line_count_report
 
 # Run each test file
 for test_file in $test_files; do
@@ -341,35 +218,8 @@ else
     echo -e "${RED}❌ Some tests failed!${NC}"
 fi
 
-# Generate line count report
-echo ""
-echo -e "${BLUE}=== Line Count Report ===${NC}"
-echo ""
-
-# Count lines in different directories
-backend_lines=$(count_lines_in_directory "lib/backend_systems")
-ui_lines=$(count_lines_in_directory "lib/UI_systems")
-test_lines=$(count_lines_in_directory "test")
-
-# Calculate total lines
-total_lines=$((backend_lines + ui_lines + test_lines))
-
-# Print line count summary
-echo -e "${BLUE}--- Line Count Summary ---${NC}"
-printf "%-25s %6d\n" "Total_Backend_Systems:" "$backend_lines"
-printf "%-25s %6d\n" "Total_UI_Systems:" "$ui_lines"
-printf "%-25s %6d\n" "Total_Test_Lines:" "$test_lines"
-echo "--------------------------"
-printf "%-25s %6d\n" "Total_Lines:" "$total_lines"
-echo "--------------------------"
-
-# Print backend systems breakdown
-backend_total=$(print_directory_tree "lib/backend_systems" "Backend Systems")
-
-# Print UI systems breakdown
-ui_total=$(print_directory_tree "lib/UI_systems" "UI Systems")
-
-echo ""
+# 3. Final Line Count Report
+print_line_count_report
 
 # Final exit code
 if [ $failed_tests -eq 0 ]; then

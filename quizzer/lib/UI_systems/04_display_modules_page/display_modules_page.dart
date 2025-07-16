@@ -3,7 +3,6 @@ import 'package:quizzer/UI_systems/global_widgets/widget_global_app_bar.dart';
 import 'package:quizzer/UI_systems/04_display_modules_page/widget_module_page_main_body_list.dart';
 import 'package:quizzer/UI_systems/04_display_modules_page/widget_scroll_to_top_button.dart';
 import 'package:quizzer/UI_systems/04_display_modules_page/widget_module_filter_button.dart';
-import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/UI_systems/color_wheel.dart';
 
 class DisplayModulesPage extends StatelessWidget {

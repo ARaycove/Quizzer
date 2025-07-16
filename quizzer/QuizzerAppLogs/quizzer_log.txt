@@ -1,43 +1,54 @@
-Quizzer: [13:10:23] [34m[INFO][0m [<asynchronous suspension>] QuizzerLogger successfully set up file logging to: ./QuizzerAppLogs/quizzer_log.txt
-Quizzer: [13:10:23] [34m[INFO][0m [<asynchronous suspension>] QuizzerLogger: Attempting a SECOND test log message to file.
-Quizzer: [13:10:23] [34m[INFO][0m [how_many_lines.dart] Calculating total lines of code...
-Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] 
---- Line Count Summary ---
-Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] Total_Backend_Systems: 19546
-Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] Total_UI_Systems:      9844
-Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] Total_Test_Lines:      8442
-Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] --------------------------
-Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] Total_Lines:           37832
-Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] --------------------------
-Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] 
---- Backend Systems Breakdown (recursive, alphabetical) ---
-Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] 00_database_manager/                      13323
-Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] ├── cloud_sync_system/                         3145
-Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] │   ├── inbound_sync/                              1196
-Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] │   └── outbound_sync/                             1667
-Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] ├── platform/                                    65
-Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] ├── review_system/                              286
-Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] └── tables/                                    9321
-Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart]     ├── user_profile/                              1759
-Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart]     └── user_stats/                                3072
-Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] 00_helper_utils/                            223
-Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] 02_login_authentication/                    730
-Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] 03_account_creation/                        134
-Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] 04_module_management/                       448
-Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] 06_question_queue_server/                   746
-Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] 07_user_question_management/                110
-Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] 08_memory_retention_algo/                    90
-Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] 09_data_caches/                             361
-Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] 10_switch_board/                            723
-Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] 11_ai_management/                           247
-Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] 12_subject_concept_classifier/                0
-Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] logger/                                     322
-Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] session_manager/                           2089
-Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] 
---- UI Systems Breakdown (recursive, alphabetical) ---
-Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] 00_login_page/                              333
-Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] 01_new_user_page/                           315
-Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] 02_home_page/                               437
-Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] 03_add_question_page/                      2257
-Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] ├── helpers/                                    173
-Quizzer: [13:10:24] [34m[INFO][0m [how_many_lines.dart] └── widgets/                                   1561
+Quizzer: [14:50:33] [34m[INFO][0m [<asynchronous suspension>] QuizzerLogger successfully set up file logging to: ./QuizzerAppLogs/quizzer_log.txt
+Quizzer: [14:50:33] [34m[INFO][0m [<asynchronous suspension>] QuizzerLogger: Attempting a SECOND test log message to file.
+Quizzer: [14:50:33] [34m[INFO][0m [test_22_answer_validation_unit_tests.dart] === Test 1: Multiple Choice Answer Validation ===
+Quizzer: [14:50:33] [34m[INFO][0m [test_22_answer_validation_unit_tests.dart] Test case 1: Correct answer
+Quizzer: [14:50:33] [34m[INFO][0m [session_answer_validation.dart] Entering validateMultipleChoiceAnswer()...
+Quizzer: [14:50:33] [34m[INFO][0m [test_22_answer_validation_unit_tests.dart] ✅ Correct answer validation passed
+Quizzer: [14:50:33] [34m[INFO][0m [test_22_answer_validation_unit_tests.dart] Test case 2: Wrong answer
+Quizzer: [14:50:33] [34m[INFO][0m [session_answer_validation.dart] Entering validateMultipleChoiceAnswer()...
+Quizzer: [14:50:33] [34m[INFO][0m [test_22_answer_validation_unit_tests.dart] ✅ Wrong answer validation passed
+Quizzer: [14:50:33] [34m[INFO][0m [test_22_answer_validation_unit_tests.dart] Test case 3: Wrong type
+Quizzer: [14:50:33] [34m[INFO][0m [session_answer_validation.dart] Entering validateMultipleChoiceAnswer()...
+Quizzer: [14:50:33] [34m[INFO][0m [test_22_answer_validation_unit_tests.dart] ✅ Wrong type validation passed
+Quizzer: [14:50:33] [34m[INFO][0m [test_22_answer_validation_unit_tests.dart] Test case 4: Null correctIndex
+Quizzer: [14:50:33] [34m[INFO][0m [session_answer_validation.dart] Entering validateMultipleChoiceAnswer()...
+Quizzer: [14:50:33] [34m[INFO][0m [test_22_answer_validation_unit_tests.dart] ✅ Null correctIndex validation passed
+Quizzer: [14:50:33] [34m[INFO][0m [test_22_answer_validation_unit_tests.dart] Test case 5: Zero index
+Quizzer: [14:50:33] [34m[INFO][0m [session_answer_validation.dart] Entering validateMultipleChoiceAnswer()...
+Quizzer: [14:50:33] [34m[INFO][0m [test_22_answer_validation_unit_tests.dart] ✅ Zero index validation passed
+Quizzer: [14:50:33] [34m[INFO][0m [test_22_answer_validation_unit_tests.dart] ✅ ✅ Multiple choice validation tests completed successfully
+Quizzer: [14:50:33] [34m[INFO][0m [test_22_answer_validation_unit_tests.dart] === Test 2: Select All That Apply Answer Validation ===
+Quizzer: [14:50:33] [34m[INFO][0m [test_22_answer_validation_unit_tests.dart] Test case 1: Correct answer in correct order
+Quizzer: [14:50:33] [34m[INFO][0m [session_answer_validation.dart] Entering validateSelectAllThatApplyAnswer()...
+Quizzer: [14:50:33] [34m[INFO][0m [test_22_answer_validation_unit_tests.dart] ✅ Correct answer in order validation passed
+Quizzer: [14:50:33] [34m[INFO][0m [test_22_answer_validation_unit_tests.dart] Test case 2: Correct answer in different order
+Quizzer: [14:50:33] [34m[INFO][0m [session_answer_validation.dart] Entering validateSelectAllThatApplyAnswer()...
+Quizzer: [14:50:33] [34m[INFO][0m [test_22_answer_validation_unit_tests.dart] ✅ Correct answer different order validation passed
+Quizzer: [14:50:33] [34m[INFO][0m [test_22_answer_validation_unit_tests.dart] Test case 3: Wrong answer (missing correct option)
+Quizzer: [14:50:33] [34m[INFO][0m [session_answer_validation.dart] Entering validateSelectAllThatApplyAnswer()...
+Quizzer: [14:50:33] [34m[INFO][0m [test_22_answer_validation_unit_tests.dart] ✅ Missing option validation passed
+Quizzer: [14:50:33] [34m[INFO][0m [test_22_answer_validation_unit_tests.dart] Test case 4: Wrong answer (extra incorrect option)
+Quizzer: [14:50:33] [34m[INFO][0m [session_answer_validation.dart] Entering validateSelectAllThatApplyAnswer()...
+Quizzer: [14:50:33] [34m[INFO][0m [test_22_answer_validation_unit_tests.dart] ✅ Extra option validation passed
+Quizzer: [14:50:33] [34m[INFO][0m [test_22_answer_validation_unit_tests.dart] Test case 5: Wrong type
+Quizzer: [14:50:33] [34m[INFO][0m [session_answer_validation.dart] Entering validateSelectAllThatApplyAnswer()...
+Quizzer: [14:50:33] [34m[INFO][0m [test_22_answer_validation_unit_tests.dart] ✅ Wrong type validation passed
+Quizzer: [14:50:33] [34m[INFO][0m [test_22_answer_validation_unit_tests.dart] Test case 6: Empty lists
+Quizzer: [14:50:33] [34m[INFO][0m [session_answer_validation.dart] Entering validateSelectAllThatApplyAnswer()...
+Quizzer: [14:50:33] [34m[INFO][0m [test_22_answer_validation_unit_tests.dart] ✅ Empty lists validation passed
+Quizzer: [14:50:33] [34m[INFO][0m [test_22_answer_validation_unit_tests.dart] Test case 6b: Empty user answer with non-empty correct indices
+Quizzer: [14:50:33] [34m[INFO][0m [session_answer_validation.dart] Entering validateSelectAllThatApplyAnswer()...
+Quizzer: [14:50:33] [34m[INFO][0m [test_22_answer_validation_unit_tests.dart] ✅ Empty user answer with non-empty correct validation passed
+Quizzer: [14:50:33] [34m[INFO][0m [test_22_answer_validation_unit_tests.dart] Test case 7: Single element
+Quizzer: [14:50:33] [34m[INFO][0m [session_answer_validation.dart] Entering validateSelectAllThatApplyAnswer()...
+Quizzer: [14:50:33] [34m[INFO][0m [test_22_answer_validation_unit_tests.dart] ✅ Single element validation passed
+Quizzer: [14:50:33] [34m[INFO][0m [test_22_answer_validation_unit_tests.dart] ✅ ✅ Select all that apply validation tests completed successfully
+Quizzer: [14:50:33] [34m[INFO][0m [test_22_answer_validation_unit_tests.dart] === Test 3: True/False Answer Validation ===
+Quizzer: [14:50:33] [34m[INFO][0m [test_22_answer_validation_unit_tests.dart] Test case 1: Correct answer - True (0)
+Quizzer: [14:50:33] [34m[INFO][0m [session_answer_validation.dart] Entering validateTrueFalseAnswer()...
+Quizzer: [14:50:33] [34m[INFO][0m [test_22_answer_validation_unit_tests.dart] ✅ Correct True answer validation passed
+Quizzer: [14:50:33] [34m[INFO][0m [test_22_answer_validation_unit_tests.dart] Test case 2: Correct answer - False (1)
+Quizzer: [14:50:33] [34m[INFO][0m [session_answer_validation.dart] Entering validateTrueFalseAnswer()...
+Quizzer: [14:50:33] [34m[INFO][0m [test_22_answer_validation_unit_tests.dart] ✅ Correct False answer validation passed
+Quizzer: [14:50:33] [34m[INFO][0m [test_22_answer_validation_unit_tests.dart] Test case 3: Wrong answer - True when False is correct
+Quizzer: [14:50:33] [34m[INFO][0m [session_answer_validation.dart] Entering validateTrueFalseAnswer()...

@@ -312,6 +312,7 @@ Future<String> upsertErrorLog({
 
 /// Retrieves all error logs that need to be sent to the server.
 /// Only returns records that are at least 1 hour old.
+/// Uses table helper functions for proper encoding/decoding and works within default cursor window size.
 Future<List<Map<String, dynamic>>> getUnsyncedErrorLogs() async {
   try {
     final db = await getDatabaseMonitor().requestDatabaseAccess();
@@ -319,12 +320,25 @@ Future<List<Map<String, dynamic>>> getUnsyncedErrorLogs() async {
       throw Exception('Failed to acquire database access');
     }
     await _verifyErrorLogsTable(db);
+    
     QuizzerLogger.logMessage('Fetching unsynced error logs (older than 1 hour) from $_errorLogsTableName...');
     
-    // First, get all records that are marked as unsynced or have unsynced edits.
+    // Use table helper function for proper querying and decoding
+    // Only select essential columns to avoid cursor window overflow
     final List<Map<String, dynamic>> allUnsyncedRecords = await queryAndDecodeDatabase(
       _errorLogsTableName,
       db,
+      columns: [
+        'id',
+        'created_at',
+        'user_id',
+        'app_version',
+        'operating_system',
+        'is_resolved',
+        'has_been_synced',
+        'edits_are_synced',
+        'last_modified_timestamp'
+      ],
       where: 'has_been_synced = 0 OR edits_are_synced = 0',
     );
 
@@ -333,20 +347,89 @@ Future<List<Map<String, dynamic>>> getUnsyncedErrorLogs() async {
 
     for (final record in allUnsyncedRecords) {
       final String? createdAtString = record['created_at'] as String?;
-      // Assert that createdAtString is not null because the schema defines it as NOT NULL.
-      // If it were null, it indicates a data integrity issue or schema mismatch.
       assert(createdAtString != null, 'Error log record (ID: ${record['id']}) has null created_at, but schema expects NOT NULL.');
       
-      final DateTime createdAtDateTime = DateTime.parse(createdAtString!); // Safe to use ! due to assertion
+      final DateTime createdAtDateTime = DateTime.parse(createdAtString!);
 
       if (createdAtDateTime.isBefore(oneHourAgo)) {
-        filteredRecords.add(record);
+        // Truncate large text fields to prevent cursor window issues
+        final Map<String, dynamic> truncatedRecord = Map<String, dynamic>.from(record);
+        
+        // Truncate error_message to 1000 characters
+        if (truncatedRecord['error_message'] != null) {
+          final String errorMsg = truncatedRecord['error_message'] as String;
+          if (errorMsg.length > 1000) {
+            truncatedRecord['error_message'] = '${errorMsg.substring(0, 1000)}... (truncated)';
+          }
+        }
+        
+        // Truncate log_file to 2000 characters
+        if (truncatedRecord['log_file'] != null) {
+          final String logFile = truncatedRecord['log_file'] as String;
+          if (logFile.length > 2000) {
+            truncatedRecord['log_file'] = '${logFile.substring(0, 2000)}... (truncated)';
+          }
+        }
+        
+        // Truncate user_feedback to 500 characters
+        if (truncatedRecord['user_feedback'] != null) {
+          final String userFeedback = truncatedRecord['user_feedback'] as String;
+          if (userFeedback.length > 500) {
+            truncatedRecord['user_feedback'] = '${userFeedback.substring(0, 500)}... (truncated)';
+          }
+        }
+        
+        filteredRecords.add(truncatedRecord);
       }
     }
 
     QuizzerLogger.logSuccess('Fetched ${allUnsyncedRecords.length} total unsynced records. ${filteredRecords.length} are older than 1 hour.');
     return filteredRecords;
   } catch (e) {
+    // Check if this is the specific cursor window error
+    if (e.toString().contains('Row too big to fit into CursorWindow')) {
+      QuizzerLogger.logError('❌ CURSOR WINDOW ERROR DETECTED - DELETING ALL APP DATA FILES AND FORCING RESTART');
+      
+      // Delete ALL app data directories to force complete reset
+      try {
+        // Delete QuizzerApp directory (database)
+        final dbPath = await getQuizzerDatabasePath();
+        final dbDir = Directory(dbPath).parent;
+        if (await dbDir.exists()) {
+          await dbDir.delete(recursive: true);
+          QuizzerLogger.logMessage('Deleted database directory: ${dbDir.path}');
+        }
+        
+        // Delete QuizzerAppMedia directory (media files)
+        final mediaPath = await getQuizzerMediaPath();
+        final mediaDir = Directory(mediaPath).parent;
+        if (await mediaDir.exists()) {
+          await mediaDir.delete(recursive: true);
+          QuizzerLogger.logMessage('Deleted media directory: ${mediaDir.path}');
+        }
+        
+        // Delete QuizzerAppHive directory (Hive data)
+        final hivePath = await getQuizzerHivePath();
+        final hiveDir = Directory(hivePath);
+        if (await hiveDir.exists()) {
+          await hiveDir.delete(recursive: true);
+          QuizzerLogger.logMessage('Deleted Hive directory: ${hiveDir.path}');
+        }
+        
+        // Delete QuizzerAppLogs directory (log files)
+        final logsPath = await getQuizzerLogsPath();
+        final logsDir = Directory(logsPath);
+        if (await logsDir.exists()) {
+          await logsDir.delete(recursive: true);
+          QuizzerLogger.logMessage('Deleted logs directory: ${logsDir.path}');
+        }
+        
+        QuizzerLogger.logSuccess('DELETED ALL APP DATA FILES - Complete reset forced');
+      } catch (deleteError) {
+        QuizzerLogger.logError('Failed to delete app data files: $deleteError');
+      }
+    }
+    
     QuizzerLogger.logError('Error getting unsynced error logs - $e');
     rethrow;
   } finally {

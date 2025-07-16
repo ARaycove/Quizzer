@@ -1,4 +1,4 @@
-import 'package:quizzer/backend_systems/00_database_manager/tables/login_attempts_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/system_data/login_attempts_table.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 
 
