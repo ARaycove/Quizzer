@@ -5,7 +5,7 @@ import 'package:quizzer/backend_systems/02_login_authentication/login_initializa
 import 'package:quizzer/backend_systems/09_data_caches/question_queue_cache.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_profile_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_question_answer_pairs_table.dart';
-import 'test_helpers.dart';
+import '../test_helpers.dart';
 import 'dart:io';
 
 void main() {
@@ -47,11 +47,6 @@ void main() {
       QuizzerLogger.logMessage('Testing complete login initialization and final state verification');
       
       try {
-        // Complete cleanup to ensure brand new user state
-        QuizzerLogger.logMessage('Performing complete cleanup for state verification test...');
-        final bool cleanupSuccess = await deleteAllLocalAppData();
-        expect(cleanupSuccess, isTrue, reason: 'Failed to perform complete cleanup');
-        
         // Step 1: Perform full login initialization
         QuizzerLogger.logMessage('Step 1: Performing full login initialization...');
         final stopwatch = Stopwatch()..start();

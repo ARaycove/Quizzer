@@ -1,0 +1,8306 @@
+[
+  {
+    "subject": "natural_sciences",
+    "immediate_parent": ""
+  },
+  {
+    "subject": "biology",
+    "immediate_parent": "natural_sciences"
+  },
+  {
+    "subject": "aerobiology",
+    "immediate_parent": "biology"
+  },
+  {
+    "subject": "anatomy",
+    "immediate_parent": "biology"
+  },
+  {
+    "subject": "comparative_anatomy",
+    "immediate_parent": "anatomy"
+  },
+  {
+    "subject": "human_anatomy",
+    "immediate_parent": "anatomy"
+  },
+  {
+    "subject": "bacteriology",
+    "immediate_parent": "biology"
+  },
+  {
+    "subject": "biochemistry",
+    "immediate_parent": "biology"
+  },
+  {
+    "subject": "bioinformatics",
+    "immediate_parent": "biology"
+  },
+  {
+    "subject": "biophysics",
+    "immediate_parent": "biology"
+  },
+  {
+    "subject": "biotechnology",
+    "immediate_parent": "biology"
+  },
+  {
+    "subject": "botany",
+    "immediate_parent": "biology"
+  },
+  {
+    "subject": "ethnobotany",
+    "immediate_parent": "botany"
+  },
+  {
+    "subject": "phycology",
+    "immediate_parent": "botany"
+  },
+  {
+    "subject": "cell_biology",
+    "immediate_parent": "biology"
+  },
+  {
+    "subject": "chronobiology",
+    "immediate_parent": "biology"
+  },
+  {
+    "subject": "cognitive_biology",
+    "immediate_parent": "biology"
+  },
+  {
+    "subject": "computational_biology",
+    "immediate_parent": "biology"
+  },
+  {
+    "subject": "conservation_biology",
+    "immediate_parent": "biology"
+  },
+  {
+    "subject": "cryobiology",
+    "immediate_parent": "biology"
+  },
+  {
+    "subject": "developmental_biology",
+    "immediate_parent": "biology"
+  },
+  {
+    "subject": "embryology",
+    "immediate_parent": "developmental_biology"
+  },
+  {
+    "subject": "gerontology",
+    "immediate_parent": "developmental_biology"
+  },
+  {
+    "subject": "teratology",
+    "immediate_parent": "developmental_biology"
+  },
+  {
+    "subject": "ecology",
+    "immediate_parent": "biology"
+  },
+  {
+    "subject": "agroecology",
+    "immediate_parent": "ecology"
+  },
+  {
+    "subject": "ethnoecology",
+    "immediate_parent": "ecology"
+  },
+  {
+    "subject": "human_ecology",
+    "immediate_parent": "ecology"
+  },
+  {
+    "subject": "landscape_ecology",
+    "immediate_parent": "ecology"
+  },
+  {
+    "subject": "forensic_biology",
+    "immediate_parent": "biology"
+  },
+  {
+    "subject": "genetics",
+    "immediate_parent": "biology"
+  },
+  {
+    "subject": "behavioural_genetics",
+    "immediate_parent": "genetics"
+  },
+  {
+    "subject": "molecular_genetics",
+    "immediate_parent": "genetics"
+  },
+  {
+    "subject": "population_genetics",
+    "immediate_parent": "genetics"
+  },
+  {
+    "subject": "geobiology",
+    "immediate_parent": "biology"
+  },
+  {
+    "subject": "endocrinology",
+    "immediate_parent": "biology"
+  },
+  {
+    "subject": "evolution",
+    "immediate_parent": "biology"
+  },
+  {
+    "subject": "systematics",
+    "immediate_parent": "evolution"
+  },
+  {
+    "subject": "taxonomy",
+    "immediate_parent": "evolution"
+  },
+  {
+    "subject": "histology",
+    "immediate_parent": "biology"
+  },
+  {
+    "subject": "human_biology",
+    "immediate_parent": "biology"
+  },
+  {
+    "subject": "immunology",
+    "immediate_parent": "biology"
+  },
+  {
+    "subject": "limnology",
+    "immediate_parent": "biology"
+  },
+  {
+    "subject": "linnaean_taxonomy",
+    "immediate_parent": "biology"
+  },
+  {
+    "subject": "marine_biology",
+    "immediate_parent": "biology"
+  },
+  {
+    "subject": "mathematical_biology",
+    "immediate_parent": "biology"
+  },
+  {
+    "subject": "microbiology",
+    "immediate_parent": "biology"
+  },
+  {
+    "subject": "molecular_biology",
+    "immediate_parent": "biology"
+  },
+  {
+    "subject": "mycology",
+    "immediate_parent": "biology"
+  },
+  {
+    "subject": "neuroscience",
+    "immediate_parent": "biology"
+  },
+  {
+    "subject": "behavioral_neuroscience",
+    "immediate_parent": "neuroscience"
+  },
+  {
+    "subject": "neurophysics",
+    "immediate_parent": "neuroscience"
+  },
+  {
+    "subject": "computational_neuroscience",
+    "immediate_parent": "neuroscience"
+  },
+  {
+    "subject": "nutrition",
+    "immediate_parent": "biology"
+  },
+  {
+    "subject": "paleobiology",
+    "immediate_parent": "biology"
+  },
+  {
+    "subject": "paleontology",
+    "immediate_parent": "paleobiology"
+  },
+  {
+    "subject": "parasitology",
+    "immediate_parent": "biology"
+  },
+  {
+    "subject": "pathology",
+    "immediate_parent": "biology"
+  },
+  {
+    "subject": "anatomical_pathology",
+    "immediate_parent": "pathology"
+  },
+  {
+    "subject": "clinical_pathology",
+    "immediate_parent": "pathology"
+  },
+  {
+    "subject": "dermatopathology",
+    "immediate_parent": "pathology"
+  },
+  {
+    "subject": "forensic_pathology",
+    "immediate_parent": "pathology"
+  },
+  {
+    "subject": "hematopathology",
+    "immediate_parent": "pathology"
+  },
+  {
+    "subject": "histopathology",
+    "immediate_parent": "pathology"
+  },
+  {
+    "subject": "molecular_pathology",
+    "immediate_parent": "pathology"
+  },
+  {
+    "subject": "surgical_pathology",
+    "immediate_parent": "pathology"
+  },
+  {
+    "subject": "phytopathology",
+    "immediate_parent": "pathology"
+  },
+  {
+    "subject": "physiology",
+    "immediate_parent": "biology"
+  },
+  {
+    "subject": "human_physiology",
+    "immediate_parent": "physiology"
+  },
+  {
+    "subject": "exercise_physiology",
+    "immediate_parent": "human_physiology"
+  },
+  {
+    "subject": "population_biology",
+    "immediate_parent": "biology"
+  },
+  {
+    "subject": "quantum_biology",
+    "immediate_parent": "biology"
+  },
+  {
+    "subject": "sociobiology",
+    "immediate_parent": "biology"
+  },
+  {
+    "subject": "structural_biology",
+    "immediate_parent": "biology"
+  },
+  {
+    "subject": "systems_biology",
+    "immediate_parent": "biology"
+  },
+  {
+    "subject": "theoretical_biology",
+    "immediate_parent": "biology"
+  },
+  {
+    "subject": "toxicology",
+    "immediate_parent": "biology"
+  },
+  {
+    "subject": "virology",
+    "immediate_parent": "biology"
+  },
+  {
+    "subject": "molecular_virology",
+    "immediate_parent": "virology"
+  },
+  {
+    "subject": "xenobiology",
+    "immediate_parent": "biology"
+  },
+  {
+    "subject": "zoology",
+    "immediate_parent": "biology"
+  },
+  {
+    "subject": "animal_communications",
+    "immediate_parent": "zoology"
+  },
+  {
+    "subject": "apiology",
+    "immediate_parent": "zoology"
+  },
+  {
+    "subject": "arachnology",
+    "immediate_parent": "zoology"
+  },
+  {
+    "subject": "arthropodology",
+    "immediate_parent": "zoology"
+  },
+  {
+    "subject": "batrachology",
+    "immediate_parent": "zoology"
+  },
+  {
+    "subject": "bryozoology",
+    "immediate_parent": "zoology"
+  },
+  {
+    "subject": "carcinology",
+    "immediate_parent": "zoology"
+  },
+  {
+    "subject": "cetology",
+    "immediate_parent": "zoology"
+  },
+  {
+    "subject": "cnidariology",
+    "immediate_parent": "zoology"
+  },
+  {
+    "subject": "entomology",
+    "immediate_parent": "zoology"
+  },
+  {
+    "subject": "forensic_entomology",
+    "immediate_parent": "entomology"
+  },
+  {
+    "subject": "ethnozoology",
+    "immediate_parent": "zoology"
+  },
+  {
+    "subject": "ethology",
+    "immediate_parent": "zoology"
+  },
+  {
+    "subject": "helminthology",
+    "immediate_parent": "zoology"
+  },
+  {
+    "subject": "herpetology",
+    "immediate_parent": "zoology"
+  },
+  {
+    "subject": "ichthyology",
+    "immediate_parent": "zoology"
+  },
+  {
+    "subject": "invertebrate_zoology",
+    "immediate_parent": "zoology"
+  },
+  {
+    "subject": "mammalogy",
+    "immediate_parent": "zoology"
+  },
+  {
+    "subject": "cynology",
+    "immediate_parent": "mammalogy"
+  },
+  {
+    "subject": "felinology",
+    "immediate_parent": "mammalogy"
+  },
+  {
+    "subject": "malacology",
+    "immediate_parent": "zoology"
+  },
+  {
+    "subject": "conchology",
+    "immediate_parent": "malacology"
+  },
+  {
+    "subject": "limacology",
+    "immediate_parent": "malacology"
+  },
+  {
+    "subject": "teuthology",
+    "immediate_parent": "malacology"
+  },
+  {
+    "subject": "myriapodology",
+    "immediate_parent": "zoology"
+  },
+  {
+    "subject": "myrmecology",
+    "immediate_parent": "zoology"
+  },
+  {
+    "subject": "nematology",
+    "immediate_parent": "zoology"
+  },
+  {
+    "subject": "neuroethology",
+    "immediate_parent": "zoology"
+  },
+  {
+    "subject": "oology",
+    "immediate_parent": "zoology"
+  },
+  {
+    "subject": "ornithology",
+    "immediate_parent": "zoology"
+  },
+  {
+    "subject": "planktology",
+    "immediate_parent": "zoology"
+  },
+  {
+    "subject": "primatology",
+    "immediate_parent": "zoology"
+  },
+  {
+    "subject": "zootomy",
+    "immediate_parent": "zoology"
+  },
+  {
+    "subject": "zoosemiotics",
+    "immediate_parent": "zoology"
+  },
+  {
+    "subject": "chemistry",
+    "immediate_parent": "natural_sciences"
+  },
+  {
+    "subject": "agrochemistry",
+    "immediate_parent": "chemistry"
+  },
+  {
+    "subject": "analytical_chemistry",
+    "immediate_parent": "chemistry"
+  },
+  {
+    "subject": "astrochemistry",
+    "immediate_parent": "chemistry"
+  },
+  {
+    "subject": "atmospheric_chemistry",
+    "immediate_parent": "chemistry"
+  },
+  {
+    "subject": "biochemistry",
+    "immediate_parent": "chemistry"
+  },
+  {
+    "subject": "catalysts",
+    "immediate_parent": "chemistry"
+  },
+  {
+    "subject": "chemical_engineering",
+    "immediate_parent": "chemistry"
+  },
+  {
+    "subject": "chemical biology",
+    "immediate_parent": "chemistry"
+  },
+  {
+    "subject": "chemical_physics",
+    "immediate_parent": "chemistry"
+  },
+  {
+    "subject": "cheminformatics",
+    "immediate_parent": "chemistry"
+  },
+  {
+    "subject": "computational_chemistry",
+    "immediate_parent": "chemistry"
+  },
+  {
+    "subject": "cosmochemistry",
+    "immediate_parent": "chemistry"
+  },
+  {
+    "subject": "environmental_chemistry",
+    "immediate_parent": "chemistry"
+  },
+  {
+    "subject": "femtochemistry",
+    "immediate_parent": "chemistry"
+  },
+  {
+    "subject": "flow_chemistry",
+    "immediate_parent": "chemistry"
+  },
+  {
+    "subject": "forensic_chemistry",
+    "immediate_parent": "chemistry"
+  },
+  {
+    "subject": "geochemistry",
+    "immediate_parent": "chemistry"
+  },
+  {
+    "subject": "green_chemistry",
+    "immediate_parent": "chemistry"
+  },
+  {
+    "subject": "histochemistry",
+    "immediate_parent": "chemistry"
+  },
+  {
+    "subject": "immunochemistry",
+    "immediate_parent": "chemistry"
+  },
+  {
+    "subject": "inorganic_chemistry",
+    "immediate_parent": "chemistry"
+  },
+  {
+    "subject": "marine_chemistry",
+    "immediate_parent": "chemistry"
+  },
+  {
+    "subject": "mathematical_chemistry",
+    "immediate_parent": "chemistry"
+  },
+  {
+    "subject": "mechanochemistry",
+    "immediate_parent": "chemistry"
+  },
+  {
+    "subject": "medicinal_chemistry",
+    "immediate_parent": "chemistry"
+  },
+  {
+    "subject": "molecular_biology",
+    "immediate_parent": "chemistry"
+  },
+  {
+    "subject": "molecular_mechanics",
+    "immediate_parent": "chemistry"
+  },
+  {
+    "subject": "nanotechnology",
+    "immediate_parent": "chemistry"
+  },
+  {
+    "subject": "natural_product_chemistry",
+    "immediate_parent": "chemistry"
+  },
+  {
+    "subject": "neurochemistry",
+    "immediate_parent": "chemistry"
+  },
+  {
+    "subject": "oenology",
+    "immediate_parent": "chemistry"
+  },
+  {
+    "subject": "organic_chemistry",
+    "immediate_parent": "chemistry"
+  },
+  {
+    "subject": "organometallic_chemistry",
+    "immediate_parent": "chemistry"
+  },
+  {
+    "subject": "petrochemistry",
+    "immediate_parent": "chemistry"
+  },
+  {
+    "subject": "pharmacology",
+    "immediate_parent": "chemistry"
+  },
+  {
+    "subject": "photochemistry",
+    "immediate_parent": "chemistry"
+  },
+  {
+    "subject": "physical_chemistry",
+    "immediate_parent": "chemistry"
+  },
+  {
+    "subject": "electrochemistry",
+    "immediate_parent": "physical_chemistry"
+  },
+  {
+    "subject": "physical_organic_chemistry",
+    "immediate_parent": "physical_chemistry"
+  },
+  {
+    "subject": "phytochemistry",
+    "immediate_parent": "chemistry"
+  },
+  {
+    "subject": "polymer_chemistry",
+    "immediate_parent": "chemistry"
+  },
+  {
+    "subject": "quantum_chemistry",
+    "immediate_parent": "chemistry"
+  },
+  {
+    "subject": "radiochemistry",
+    "immediate_parent": "chemistry"
+  },
+  {
+    "subject": "soil_chemistry",
+    "immediate_parent": "chemistry"
+  },
+  {
+    "subject": "solid_state_chemistry",
+    "immediate_parent": "chemistry"
+  },
+  {
+    "subject": "sonochemistry",
+    "immediate_parent": "chemistry"
+  },
+  {
+    "subject": "supramolecular_chemistry",
+    "immediate_parent": "chemistry"
+  },
+  {
+    "subject": "surface_chemistry",
+    "immediate_parent": "chemistry"
+  },
+  {
+    "subject": "synthetic_chemistry",
+    "immediate_parent": "chemistry"
+  },
+  {
+    "subject": "systems_chemistry",
+    "immediate_parent": "chemistry"
+  },
+  {
+    "subject": "theoretical_chemistry",
+    "immediate_parent": "chemistry"
+  },
+  {
+    "subject": "thermochemistry",
+    "immediate_parent": "chemistry"
+  },
+  {
+    "subject": "earth_sciences",
+    "immediate_parent": "natural_sciences"
+  },
+  {
+    "subject": "atmospheric_science",
+    "immediate_parent": "earth_sciences"
+  },
+  {
+    "subject": "climatology",
+    "immediate_parent": "earth_sciences"
+  },
+  {
+    "subject": "ecology",
+    "immediate_parent": "earth_sciences"
+  },
+  {
+    "subject": "edaphology",
+    "immediate_parent": "earth_sciences"
+  },
+  {
+    "subject": "environmental_science",
+    "immediate_parent": "earth_sciences"
+  },
+  {
+    "subject": "environmental_chemistry",
+    "immediate_parent": "earth_sciences"
+  },
+  {
+    "subject": "forensic_geology",
+    "immediate_parent": "earth_sciences"
+  },
+  {
+    "subject": "gemology",
+    "immediate_parent": "earth_sciences"
+  },
+  {
+    "subject": "geobiology",
+    "immediate_parent": "earth_sciences"
+  },
+  {
+    "subject": "geodesy",
+    "immediate_parent": "earth_sciences"
+  },
+  {
+    "subject": "geography",
+    "immediate_parent": "earth_sciences"
+  },
+  {
+    "subject": "geology",
+    "immediate_parent": "earth_sciences"
+  },
+  {
+    "subject": "geochemistry",
+    "immediate_parent": "earth_sciences"
+  },
+  {
+    "subject": "geomorphology",
+    "immediate_parent": "earth_sciences"
+  },
+  {
+    "subject": "geophysics",
+    "immediate_parent": "earth_sciences"
+  },
+  {
+    "subject": "glaciology",
+    "immediate_parent": "earth_sciences"
+  },
+  {
+    "subject": "hydrogeology",
+    "immediate_parent": "earth_sciences"
+  },
+  {
+    "subject": "hydrology",
+    "immediate_parent": "earth_sciences"
+  },
+  {
+    "subject": "meteorology",
+    "immediate_parent": "earth_sciences"
+  },
+  {
+    "subject": "mineralogy",
+    "immediate_parent": "earth_sciences"
+  },
+  {
+    "subject": "limnology",
+    "immediate_parent": "earth_sciences"
+  },
+  {
+    "subject": "oceanography",
+    "immediate_parent": "earth_sciences"
+  },
+  {
+    "subject": "pedology",
+    "immediate_parent": "earth_sciences"
+  },
+  {
+    "subject": "paleontology",
+    "immediate_parent": "earth_sciences"
+  },
+  {
+    "subject": "paleobiology",
+    "immediate_parent": "paleontology"
+  },
+  {
+    "subject": "paleoecology",
+    "immediate_parent": "paleontology"
+  },
+  {
+    "subject": "petrology",
+    "immediate_parent": "earth_sciences"
+  },
+  {
+    "subject": "planetary_science",
+    "immediate_parent": "earth_sciences"
+  },
+  {
+    "subject": "sedimentology",
+    "immediate_parent": "earth_sciences"
+  },
+  {
+    "subject": "seismology",
+    "immediate_parent": "earth_sciences"
+  },
+  {
+    "subject": "soil_science",
+    "immediate_parent": "earth_sciences"
+  },
+  {
+    "subject": "speleology",
+    "immediate_parent": "earth_sciences"
+  },
+  {
+    "subject": "tectonics",
+    "immediate_parent": "earth_sciences"
+  },
+  {
+    "subject": "volcanology",
+    "immediate_parent": "earth_sciences"
+  },
+  {
+    "subject": "physics",
+    "immediate_parent": "natural_sciences"
+  },
+  {
+    "subject": "acoustics",
+    "immediate_parent": "physics"
+  },
+  {
+    "subject": "quantum_acoustics",
+    "immediate_parent": "acoustics"
+  },
+  {
+    "subject": "agrophysics",
+    "immediate_parent": "physics"
+  },
+  {
+    "subject": "applied_physics",
+    "immediate_parent": "physics"
+  },
+  {
+    "subject": "accelerator_physics",
+    "immediate_parent": "applied_physics"
+  },
+  {
+    "subject": "communication_physics",
+    "immediate_parent": "applied_physics"
+  },
+  {
+    "subject": "astrophysics",
+    "immediate_parent": "physics"
+  },
+  {
+    "subject": "atmospheric_physics",
+    "immediate_parent": "physics"
+  },
+  {
+    "subject": "atmospheric_electricity",
+    "immediate_parent": "atmospheric_physics"
+  },
+  {
+    "subject": "atomic_physics",
+    "immediate_parent": "physics"
+  },
+  {
+    "subject": "molecular_physics",
+    "immediate_parent": "physics"
+  },
+  {
+    "subject": "optical_physics",
+    "immediate_parent": "physics"
+  },
+  {
+    "subject": "biophysics",
+    "immediate_parent": "physics"
+  },
+  {
+    "subject": "neurophysics",
+    "immediate_parent": "biophysics"
+  },
+  {
+    "subject": "chemical_physics",
+    "immediate_parent": "physics"
+  },
+  {
+    "subject": "classical_physics",
+    "immediate_parent": "physics"
+  },
+  {
+    "subject": "computational_physics",
+    "immediate_parent": "physics"
+  },
+  {
+    "subject": "condensed_matter_physics",
+    "immediate_parent": "physics"
+  },
+  {
+    "subject": "cryogenics",
+    "immediate_parent": "physics"
+  },
+  {
+    "subject": "digital_physics",
+    "immediate_parent": "physics"
+  },
+  {
+    "subject": "dynamics",
+    "immediate_parent": "physics"
+  },
+  {
+    "subject": "analytical_dynamics",
+    "immediate_parent": "dynamics"
+  },
+  {
+    "subject": "astrodynamics",
+    "immediate_parent": "dynamics"
+  },
+  {
+    "subject": "brownian_dynamics",
+    "immediate_parent": "dynamics"
+  },
+  {
+    "subject": "file_dynamics",
+    "immediate_parent": "dynamics"
+  },
+  {
+    "subject": "flight_dynamics",
+    "immediate_parent": "dynamics"
+  },
+  {
+    "subject": "fluid_dynamics",
+    "immediate_parent": "dynamics"
+  },
+  {
+    "subject": "aerodynamics",
+    "immediate_parent": "dynamics"
+  },
+  {
+    "subject": "hydrodynamics",
+    "immediate_parent": "dynamics"
+  },
+  {
+    "subject": "fractional_dynamics",
+    "immediate_parent": "dynamics"
+  },
+  {
+    "subject": "geodynamics",
+    "immediate_parent": "dynamics"
+  },
+  {
+    "subject": "molecular_dynamics",
+    "immediate_parent": "dynamics"
+  },
+  {
+    "subject": "newtonian_dynamics",
+    "immediate_parent": "dynamics"
+  },
+  {
+    "subject": "langevin_dynamics",
+    "immediate_parent": "dynamics"
+  },
+  {
+    "subject": "quantum_chromodynamics",
+    "immediate_parent": "dynamics"
+  },
+  {
+    "subject": "quantum_electrodynamics",
+    "immediate_parent": "dynamics"
+  },
+  {
+    "subject": "relativistic_dynamics",
+    "immediate_parent": "dynamics"
+  },
+  {
+    "subject": "stellar_dynamics",
+    "immediate_parent": "dynamics"
+  },
+  {
+    "subject": "system_dynamics",
+    "immediate_parent": "dynamics"
+  },
+  {
+    "subject": "thermodynamics",
+    "immediate_parent": "dynamics"
+  },
+  {
+    "subject": "vehicle_dynamics",
+    "immediate_parent": "dynamics"
+  },
+  {
+    "subject": "econophysics",
+    "immediate_parent": "physics"
+  },
+  {
+    "subject": "electromagnetism",
+    "immediate_parent": "physics"
+  },
+  {
+    "subject": "electricity",
+    "immediate_parent": "electromagnetism"
+  },
+  {
+    "subject": "magnetism",
+    "immediate_parent": "electromagnetism"
+  },
+  {
+    "subject": "engineering_physics",
+    "immediate_parent": "physics"
+  },
+  {
+    "subject": "experimental_physics",
+    "immediate_parent": "physics"
+  },
+  {
+    "subject": "geophysics",
+    "immediate_parent": "physics"
+  },
+  {
+    "subject": "biogeophysics",
+    "immediate_parent": "geophysics"
+  },
+  {
+    "subject": "geomagnetism",
+    "immediate_parent": "geophysics"
+  },
+  {
+    "subject": "kinematics",
+    "immediate_parent": "physics"
+  },
+  {
+    "subject": "fluid_kinematics",
+    "immediate_parent": "kinematics"
+  },
+  {
+    "subject": "relativistic_kinematics",
+    "immediate_parent": "kinematics"
+  },
+  {
+    "subject": "kinetics",
+    "immediate_parent": "physics"
+  },
+  {
+    "subject": "electrokinetics",
+    "immediate_parent": "kinetics"
+  },
+  {
+    "subject": "homeokinetics",
+    "immediate_parent": "kinetics"
+  },
+  {
+    "subject": "laser_physics",
+    "immediate_parent": "physics"
+  },
+  {
+    "subject": "materials_physics",
+    "immediate_parent": "physics"
+  },
+  {
+    "subject": "mathematical_physics",
+    "immediate_parent": "physics"
+  },
+  {
+    "subject": "medical_physics",
+    "immediate_parent": "physics"
+  },
+  {
+    "subject": "mechanics",
+    "immediate_parent": "physics"
+  },
+  {
+    "subject": "analytical_mechanics",
+    "immediate_parent": "mechanics"
+  },
+  {
+    "subject": "applied_mechanics",
+    "immediate_parent": "mechanics"
+  },
+  {
+    "subject": "ballistics",
+    "immediate_parent": "mechanics"
+  },
+  {
+    "subject": "biomechanics",
+    "immediate_parent": "mechanics"
+  },
+  {
+    "subject": "celestial_mechanics",
+    "immediate_parent": "mechanics"
+  },
+  {
+    "subject": "classical_mechanics",
+    "immediate_parent": "mechanics"
+  },
+  {
+    "subject": "continuum_mechanics",
+    "immediate_parent": "mechanics"
+  },
+  {
+    "subject": "fluid_mechanics",
+    "immediate_parent": "mechanics"
+  },
+  {
+    "subject": "fracture_mechanics",
+    "immediate_parent": "mechanics"
+  },
+  {
+    "subject": "hamiltonian_mechanics",
+    "immediate_parent": "mechanics"
+  },
+  {
+    "subject": "hydraulics",
+    "immediate_parent": "mechanics"
+  },
+  {
+    "subject": "lagrangrian_mechanics",
+    "immediate_parent": "mechanics"
+  },
+  {
+    "subject": "matrix_mechanics",
+    "immediate_parent": "mechanics"
+  },
+  {
+    "subject": "molecular_mechanisms",
+    "immediate_parent": "mechanics"
+  },
+  {
+    "subject": "optomechanics",
+    "immediate_parent": "mechanics"
+  },
+  {
+    "subject": "particle_mechanics",
+    "immediate_parent": "mechanics"
+  },
+  {
+    "subject": "quantum_mechanics",
+    "immediate_parent": "mechanics"
+  },
+  {
+    "subject": "relativistic_mechanics",
+    "immediate_parent": "mechanics"
+  },
+  {
+    "subject": "relativistic_quantum_mechanics",
+    "immediate_parent": "mechanics"
+  },
+  {
+    "subject": "soil_mechanics",
+    "immediate_parent": "mechanics"
+  },
+  {
+    "subject": "solid_mechanics",
+    "immediate_parent": "mechanics"
+  },
+  {
+    "subject": "statistical_mechanics",
+    "immediate_parent": "mechanics"
+  },
+  {
+    "subject": "mineral_physics",
+    "immediate_parent": "physics"
+  },
+  {
+    "subject": "nuclear_physics",
+    "immediate_parent": "physics"
+  },
+  {
+    "subject": "optics",
+    "immediate_parent": "physics"
+  },
+  {
+    "subject": "geometrical_optics",
+    "immediate_parent": "optics"
+  },
+  {
+    "subject": "physical_optics",
+    "immediate_parent": "optics"
+  },
+  {
+    "subject": "quantum_optics",
+    "immediate_parent": "optics"
+  },
+  {
+    "subject": "particle_physics",
+    "immediate_parent": "physics"
+  },
+  {
+    "subject": "petrophysics",
+    "immediate_parent": "physics"
+  },
+  {
+    "subject": "photonics",
+    "immediate_parent": "physics"
+  },
+  {
+    "subject": "physical_chemistry",
+    "immediate_parent": "physics"
+  },
+  {
+    "subject": "plasma_physics",
+    "immediate_parent": "physics"
+  },
+  {
+    "subject": "polymer_physics",
+    "immediate_parent": "physics"
+  },
+  {
+    "subject": "quantum_physics",
+    "immediate_parent": "physics"
+  },
+  {
+    "subject": "quantum_technology",
+    "immediate_parent": "quantum_physics"
+  },
+  {
+    "subject": "radiophysics",
+    "immediate_parent": "physics"
+  },
+  {
+    "subject": "relativity",
+    "immediate_parent": "physics"
+  },
+  {
+    "subject": "general_relativity",
+    "immediate_parent": "relativity"
+  },
+  {
+    "subject": "special_relativity",
+    "immediate_parent": "relativity"
+  },
+  {
+    "subject": "social_physics",
+    "immediate_parent": "physics"
+  },
+  {
+    "subject": "soil_physics",
+    "immediate_parent": "physics"
+  },
+  {
+    "subject": "solid_state_physics",
+    "immediate_parent": "physics"
+  },
+  {
+    "subject": "spintronics",
+    "immediate_parent": "physics"
+  },
+  {
+    "subject": "fluid_statics",
+    "immediate_parent": "physics"
+  },
+  {
+    "subject": "statistical_physics",
+    "immediate_parent": "physics"
+  },
+  {
+    "subject": "surface_physics",
+    "immediate_parent": "physics"
+  },
+  {
+    "subject": "theoretical_physics",
+    "immediate_parent": "physics"
+  },
+  {
+    "subject": "quantum_field_theory",
+    "immediate_parent": "physics"
+  },
+  {
+    "subject": "quantum_gravity",
+    "immediate_parent": "physics"
+  },
+  {
+    "subject": "thermal_physics",
+    "immediate_parent": "physics"
+  },
+  {
+    "subject": "space_sciences",
+    "immediate_parent": "natural_sciences"
+  },
+  {
+    "subject": "aerospace_engineering",
+    "immediate_parent": "space_sciences"
+  },
+  {
+    "subject": "aerospace_architecture",
+    "immediate_parent": "aerospace_engineering"
+  },
+  {
+    "subject": "aerospace_physiology",
+    "immediate_parent": "aerospace_engineering"
+  },
+  {
+    "subject": "aerospace_manufacturing",
+    "immediate_parent": "aerospace_engineering"
+  },
+  {
+    "subject": "astronautics",
+    "immediate_parent": "aerospace_engineering"
+  },
+  {
+    "subject": "space_architecture",
+    "immediate_parent": "astronautics"
+  },
+  {
+    "subject": "space_colonization",
+    "immediate_parent": "astronautics"
+  },
+  {
+    "subject": "space_commercialization",
+    "immediate_parent": "astronautics"
+  },
+  {
+    "subject": "space_based_economy",
+    "immediate_parent": "space_commercialization"
+  },
+  {
+    "subject": "space_industry",
+    "immediate_parent": "space_commercialization"
+  },
+  {
+    "subject": "space_manufacturing",
+    "immediate_parent": "space_commercialization"
+  },
+  {
+    "subject": "space_tourism",
+    "immediate_parent": "space_commercialization"
+  },
+  {
+    "subject": "space_environment",
+    "immediate_parent": "astronautics"
+  },
+  {
+    "subject": "space_logistics",
+    "immediate_parent": "astronautics"
+  },
+  {
+    "subject": "space_food",
+    "immediate_parent": "astronautics"
+  },
+  {
+    "subject": "space_medicine",
+    "immediate_parent": "astronautics"
+  },
+  {
+    "subject": "space_religion",
+    "immediate_parent": "astronautics"
+  },
+  {
+    "subject": "space_sex",
+    "immediate_parent": "astronautics"
+  },
+  {
+    "subject": "space_survival",
+    "immediate_parent": "astronautics"
+  },
+  {
+    "subject": "space_warfare",
+    "immediate_parent": "astronautics"
+  },
+  {
+    "subject": "space_writing",
+    "immediate_parent": "astronautics"
+  },
+  {
+    "subject": "aeronautics",
+    "immediate_parent": "aerospace_engineering"
+  },
+  {
+    "subject": "control_engineering",
+    "immediate_parent": "aerospace_engineering"
+  },
+  {
+    "subject": "human_spaceflight",
+    "immediate_parent": "aerospace_engineering"
+  },
+  {
+    "subject": "robotic_spacecraft",
+    "immediate_parent": "aerospace_engineering"
+  },
+  {
+    "subject": "space_corrosion",
+    "immediate_parent": "aerospace_engineering"
+  },
+  {
+    "subject": "space_technology",
+    "immediate_parent": "space_sciences"
+  },
+  {
+    "subject": "space_telescopes",
+    "immediate_parent": "space_technology"
+  },
+  {
+    "subject": "space_based_radar",
+    "immediate_parent": "space_technology"
+  },
+  {
+    "subject": "space_based_solar_power",
+    "immediate_parent": "space_technology"
+  },
+  {
+    "subject": "spacecraft_design",
+    "immediate_parent": "space_technology"
+  },
+  {
+    "subject": "spacecraft_propulsion",
+    "immediate_parent": "space_technology"
+  },
+  {
+    "subject": "asteroid_impact_avoidance",
+    "immediate_parent": "space_sciences"
+  },
+  {
+    "subject": "astrobiology",
+    "immediate_parent": "space_sciences"
+  },
+  {
+    "subject": "astrobotany",
+    "immediate_parent": "space_sciences"
+  },
+  {
+    "subject": "astrochemistry",
+    "immediate_parent": "space_sciences"
+  },
+  {
+    "subject": "cosmochemistry",
+    "immediate_parent": "space_sciences"
+  },
+  {
+    "subject": "cosmology",
+    "immediate_parent": "space_sciences"
+  },
+  {
+    "subject": "physical_cosmology",
+    "immediate_parent": "cosmology"
+  },
+  {
+    "subject": "micro_gravity_environment_research",
+    "immediate_parent": "space_sciences"
+  },
+  {
+    "subject": "remote_sensing",
+    "immediate_parent": "space_sciences"
+  },
+  {
+    "subject": "space_archaeology",
+    "immediate_parent": "space_sciences"
+  },
+  {
+    "subject": "space_exploration",
+    "immediate_parent": "space_sciences"
+  },
+  {
+    "subject": "space_law",
+    "immediate_parent": "space_sciences"
+  },
+  {
+    "subject": "space_nuclear_power",
+    "immediate_parent": "space_sciences"
+  },
+  {
+    "subject": "astronomy",
+    "immediate_parent": "space_sciences"
+  },
+  {
+    "subject": "archaeoastronomy",
+    "immediate_parent": "astronomy"
+  },
+  {
+    "subject": "astrometry",
+    "immediate_parent": "astronomy"
+  },
+  {
+    "subject": "amateur_astronomy",
+    "immediate_parent": "astronomy"
+  },
+  {
+    "subject": "forensic_astronomy",
+    "immediate_parent": "astronomy"
+  },
+  {
+    "subject": "extra_galactic_astronomy",
+    "immediate_parent": "astronomy"
+  },
+  {
+    "subject": "galactic_astronomy",
+    "immediate_parent": "astronomy"
+  },
+  {
+    "subject": "high_energy_astronomy",
+    "immediate_parent": "astronomy"
+  },
+  {
+    "subject": "observational_astronomy",
+    "immediate_parent": "astronomy"
+  },
+  {
+    "subject": "radio_astronomy",
+    "immediate_parent": "observational_astronomy"
+  },
+  {
+    "subject": "microwave_astronomy",
+    "immediate_parent": "observational_astronomy"
+  },
+  {
+    "subject": "submillimetre_astronomy",
+    "immediate_parent": "observational_astronomy"
+  },
+  {
+    "subject": "infrared_astronomy",
+    "immediate_parent": "observational_astronomy"
+  },
+  {
+    "subject": "optical_astronomy",
+    "immediate_parent": "observational_astronomy"
+  },
+  {
+    "subject": "uv_astronomy",
+    "immediate_parent": "observational_astronomy"
+  },
+  {
+    "subject": "x_ray_astronomy",
+    "immediate_parent": "observational_astronomy"
+  },
+  {
+    "subject": "gamma_ray_astronomy",
+    "immediate_parent": "observational_astronomy"
+  },
+  {
+    "subject": "cosmic_ray_astronomy",
+    "immediate_parent": "observational_astronomy"
+  },
+  {
+    "subject": "neutrino_astronomy",
+    "immediate_parent": "observational_astronomy"
+  },
+  {
+    "subject": "gravitational_wave_astronomy",
+    "immediate_parent": "observational_astronomy"
+  },
+  {
+    "subject": "photometry",
+    "immediate_parent": "astronomy"
+  },
+  {
+    "subject": "spectroscopy",
+    "immediate_parent": "astronomy"
+  },
+  {
+    "subject": "stellar_astronomy",
+    "immediate_parent": "astronomy"
+  },
+  {
+    "subject": "solar_astronomy",
+    "immediate_parent": "astronomy"
+  },
+  {
+    "subject": "astrophysics",
+    "immediate_parent": "space_sciences"
+  },
+  {
+    "subject": "celestial_mechanics",
+    "immediate_parent": "astrophysics"
+  },
+  {
+    "subject": "compact_objects",
+    "immediate_parent": "astrophysics"
+  },
+  {
+    "subject": "computational_astrophysics",
+    "immediate_parent": "astrophysics"
+  },
+  {
+    "subject": "gravitational_astronomy",
+    "immediate_parent": "astrophysics"
+  },
+  {
+    "subject": "black_holes",
+    "immediate_parent": "gravitational_astronomy"
+  },
+  {
+    "subject": "interstellar_medium",
+    "immediate_parent": "astrophysics"
+  },
+  {
+    "subject": "numerical_simulations",
+    "immediate_parent": "astrophysics"
+  },
+  {
+    "subject": "astrophysical_plasma",
+    "immediate_parent": "numerical_simulations"
+  },
+  {
+    "subject": "galaxy_formation_and_evolution",
+    "immediate_parent": "numerical_simulations"
+  },
+  {
+    "subject": "high_energy_astrophysics",
+    "immediate_parent": "numerical_simulations"
+  },
+  {
+    "subject": "hydrodynamics",
+    "immediate_parent": "numerical_simulations"
+  },
+  {
+    "subject": "magnetohydrodynamics",
+    "immediate_parent": "numerical_simulations"
+  },
+  {
+    "subject": "star_formation",
+    "immediate_parent": "numerical_simulations"
+  },
+  {
+    "subject": "orbital_mechanics",
+    "immediate_parent": "astrophysics"
+  },
+  {
+    "subject": "physical_cosmology",
+    "immediate_parent": "astrophysics"
+  },
+  {
+    "subject": "relativistic_astrophysics",
+    "immediate_parent": "astrophysics"
+  },
+  {
+    "subject": "stellar_astrophysics",
+    "immediate_parent": "astrophysics"
+  },
+  {
+    "subject": "helioseismology",
+    "immediate_parent": "stellar_astrophysics"
+  },
+  {
+    "subject": "solar_physics",
+    "immediate_parent": "stellar_astrophysics"
+  },
+  {
+    "subject": "stellar_evolution",
+    "immediate_parent": "stellar_astrophysics"
+  },
+  {
+    "subject": "stellar_nucleosynthesis",
+    "immediate_parent": "stellar_astrophysics"
+  },
+  {
+    "subject": "space_plasma_physics",
+    "immediate_parent": "astrophysics"
+  },
+  {
+    "subject": "planetary_science",
+    "immediate_parent": "space_sciences"
+  },
+  {
+    "subject": "atmospheric_science",
+    "immediate_parent": "planetary_science"
+  },
+  {
+    "subject": "exoplanetology",
+    "immediate_parent": "planetary_science"
+  },
+  {
+    "subject": "planetary_formation",
+    "immediate_parent": "planetary_science"
+  },
+  {
+    "subject": "planetary_rings",
+    "immediate_parent": "planetary_science"
+  },
+  {
+    "subject": "magnetospheres",
+    "immediate_parent": "planetary_science"
+  },
+  {
+    "subject": "planetary_geology",
+    "immediate_parent": "planetary_science"
+  },
+  {
+    "subject": "planetary_surfaces",
+    "immediate_parent": "planetary_science"
+  },
+  {
+    "subject": "small_solar_system_bodies",
+    "immediate_parent": "planetary_science"
+  },
+  {
+    "subject": "formal_sciences",
+    "immediate_parent": ""
+  },
+  {
+    "subject": "computer_science",
+    "immediate_parent": "formal_sciences"
+  },
+  {
+    "subject": "theory_of_computation",
+    "immediate_parent": "computer_science"
+  },
+  {
+    "subject": "automata_theory",
+    "immediate_parent": "theory_of_computation"
+  },
+  {
+    "subject": "computability_theory",
+    "immediate_parent": "theory_of_computation"
+  },
+  {
+    "subject": "computational_complexity_theory",
+    "immediate_parent": "theory_of_computation"
+  },
+  {
+    "subject": "concurrency_theory",
+    "immediate_parent": "theory_of_computation"
+  },
+  {
+    "subject": "vlsi_design",
+    "immediate_parent": "computer_science"
+  },
+  {
+    "subject": "operating_systems",
+    "immediate_parent": "computer_science"
+  },
+  {
+    "subject": "algorithms",
+    "immediate_parent": "computer_science"
+  },
+  {
+    "subject": "randomized_algorithms",
+    "immediate_parent": "algorithms"
+  },
+  {
+    "subject": "distributed_algorithms",
+    "immediate_parent": "algorithms"
+  },
+  {
+    "subject": "parallel_algorithms",
+    "immediate_parent": "algorithms"
+  },
+  {
+    "subject": "computational_geometry",
+    "immediate_parent": "algorithms"
+  },
+  {
+    "subject": "databases",
+    "immediate_parent": "computer_science"
+  },
+  {
+    "subject": "relational_database",
+    "immediate_parent": "databases"
+  },
+  {
+    "subject": "distributed_database",
+    "immediate_parent": "databases"
+  },
+  {
+    "subject": "object_database",
+    "immediate_parent": "databases"
+  },
+  {
+    "subject": "network_database",
+    "immediate_parent": "databases"
+  },
+  {
+    "subject": "data_science",
+    "immediate_parent": "computer_science"
+  },
+  {
+    "subject": "data_structures",
+    "immediate_parent": "computer_science"
+  },
+  {
+    "subject": "computer_architecture",
+    "immediate_parent": "computer_science"
+  },
+  {
+    "subject": "computer_communications_networks",
+    "immediate_parent": "computer_science"
+  },
+  {
+    "subject": "information_theory",
+    "immediate_parent": "computer_communications_networks"
+  },
+  {
+    "subject": "internet",
+    "immediate_parent": "computer_communications_networks"
+  },
+  {
+    "subject": "world_wide_web",
+    "immediate_parent": "computer_communications_networks"
+  },
+  {
+    "subject": "wireless_computing",
+    "immediate_parent": "computer_communications_networks"
+  },
+  {
+    "subject": "ubiquitous_computing",
+    "immediate_parent": "computer_communications_networks"
+  },
+  {
+    "subject": "cloud_computing",
+    "immediate_parent": "computer_communications_networks"
+  },
+  {
+    "subject": "computer_programming",
+    "immediate_parent": "computer_science"
+  },
+  {
+    "subject": "computer_security",
+    "immediate_parent": "computer_science"
+  },
+  {
+    "subject": "cryptanalysis",
+    "immediate_parent": "computer_security"
+  },
+  {
+    "subject": "cryptography",
+    "immediate_parent": "computer_security"
+  },
+  {
+    "subject": "fault_tolerant_computing",
+    "immediate_parent": "computer_security"
+  },
+  {
+    "subject": "distributed_computing",
+    "immediate_parent": "computer_science"
+  },
+  {
+    "subject": "grid_computing",
+    "immediate_parent": "distributed_computing"
+  },
+  {
+    "subject": "parallel_computing",
+    "immediate_parent": "computer_science"
+  },
+  {
+    "subject": "high_performance_computing",
+    "immediate_parent": "parallel_computing"
+  },
+  {
+    "subject": "quantum_computing",
+    "immediate_parent": "computer_science"
+  },
+  {
+    "subject": "computer_graphics",
+    "immediate_parent": "computer_science"
+  },
+  {
+    "subject": "image_processing",
+    "immediate_parent": "computer_graphics"
+  },
+  {
+    "subject": "scientific_visualization",
+    "immediate_parent": "computer_graphics"
+  },
+  {
+    "subject": "software_engineering",
+    "immediate_parent": "computer_science"
+  },
+  {
+    "subject": "programming_languages",
+    "immediate_parent": "computer_science"
+  },
+  {
+    "subject": "programming_paradigms",
+    "immediate_parent": "programming_languages"
+  },
+  {
+    "subject": "imperative_programming",
+    "immediate_parent": "programming_paradigms"
+  },
+  {
+    "subject": "object_oriented_programming",
+    "immediate_parent": "programming_paradigms"
+  },
+  {
+    "subject": "functional_programming",
+    "immediate_parent": "programming_paradigms"
+  },
+  {
+    "subject": "logic_programming",
+    "immediate_parent": "programming_paradigms"
+  },
+  {
+    "subject": "concurrent_programming",
+    "immediate_parent": "programming_paradigms"
+  },
+  {
+    "subject": "program_semantics",
+    "immediate_parent": "programming_languages"
+  },
+  {
+    "subject": "type_theory",
+    "immediate_parent": "programming_languages"
+  },
+  {
+    "subject": "compilers",
+    "immediate_parent": "programming_languages"
+  },
+  {
+    "subject": "human_computer_interaction",
+    "immediate_parent": "computer_science"
+  },
+  {
+    "subject": "information_science",
+    "immediate_parent": "computer_science"
+  },
+  {
+    "subject": "data_management",
+    "immediate_parent": "information_science"
+  },
+  {
+    "subject": "data_mining",
+    "immediate_parent": "information_science"
+  },
+  {
+    "subject": "information_retrieval",
+    "immediate_parent": "information_science"
+  },
+  {
+    "subject": "information_management",
+    "immediate_parent": "information_science"
+  },
+  {
+    "subject": "information_system",
+    "immediate_parent": "information_science"
+  },
+  {
+    "subject": "information_technology",
+    "immediate_parent": "information_science"
+  },
+  {
+    "subject": "knowledge_management",
+    "immediate_parent": "information_science"
+  },
+  {
+    "subject": "multimedia",
+    "immediate_parent": "information_science"
+  },
+  {
+    "subject": "hypermedia",
+    "immediate_parent": "information_science"
+  },
+  {
+    "subject": "quantum_information",
+    "immediate_parent": "information_science"
+  },
+  {
+    "subject": "theoretical_computer_science",
+    "immediate_parent": "computer_science"
+  },
+  {
+    "subject": "artificial_intelligence",
+    "immediate_parent": "computer_science"
+  },
+  {
+    "subject": "cognitive_science",
+    "immediate_parent": "computer_science"
+  },
+  {
+    "subject": "machine_learning",
+    "immediate_parent": "computer_science"
+  },
+  {
+    "subject": "artificial_neural_networks",
+    "immediate_parent": "computer_science"
+  },
+  {
+    "subject": "support_vector_machines",
+    "immediate_parent": "computer_science"
+  },
+  {
+    "subject": "natural_language_processing",
+    "immediate_parent": "computer_science"
+  },
+  {
+    "subject": "computer_vision",
+    "immediate_parent": "computer_science"
+  },
+  {
+    "subject": "expert_systems",
+    "immediate_parent": "computer_science"
+  },
+  {
+    "subject": "robotics",
+    "immediate_parent": "computer_science"
+  },
+  {
+    "subject": "numerical_analysis",
+    "immediate_parent": "computer_science"
+  },
+  {
+    "subject": "algebraic_computation",
+    "immediate_parent": "computer_science"
+  },
+  {
+    "subject": "computational_number_theory",
+    "immediate_parent": "computer_science"
+  },
+  {
+    "subject": "computational_mathematics",
+    "immediate_parent": "computer_science"
+  },
+  {
+    "subject": "scientific_computing",
+    "immediate_parent": "computer_science"
+  },
+  {
+    "subject": "computational_biology",
+    "immediate_parent": "computer_science"
+  },
+  {
+    "subject": "computational_physics",
+    "immediate_parent": "computer_science"
+  },
+  {
+    "subject": "computational_chemistry",
+    "immediate_parent": "computer_science"
+  },
+  {
+    "subject": "computational_neuroscience",
+    "immediate_parent": "computer_science"
+  },
+  {
+    "subject": "computer_aided_engineering",
+    "immediate_parent": "computer_science"
+  },
+  {
+    "subject": "finite_element_analysis",
+    "immediate_parent": "computer_aided_engineering"
+  },
+  {
+    "subject": "computational_fluid_dynamics",
+    "immediate_parent": "computer_aided_engineering"
+  },
+  {
+    "subject": "computational_economics",
+    "immediate_parent": "computer_science"
+  },
+  {
+    "subject": "computational_sociology",
+    "immediate_parent": "computer_science"
+  },
+  {
+    "subject": "computational_finance",
+    "immediate_parent": "computer_science"
+  },
+  {
+    "subject": "digital_humanities",
+    "immediate_parent": "computer_science"
+  },
+  {
+    "subject": "history_of_computer_hardware",
+    "immediate_parent": "computer_science"
+  },
+  {
+    "subject": "history_of_computer_science",
+    "immediate_parent": "computer_science"
+  },
+  {
+    "subject": "humanistic_informatics",
+    "immediate_parent": "computer_science"
+  },
+  {
+    "subject": "community_informatics",
+    "immediate_parent": "computer_science"
+  },
+  {
+    "subject": "logic",
+    "immediate_parent": "formal_sciences"
+  },
+  {
+    "subject": "philosophical_logic",
+    "immediate_parent": "logic"
+  },
+  {
+    "subject": "logical_reasoning",
+    "immediate_parent": "philosophical_logic"
+  },
+  {
+    "subject": "modal_logic",
+    "immediate_parent": "philosophical_logic"
+  },
+  {
+    "subject": "deontic_logic",
+    "immediate_parent": "philosophical_logic"
+  },
+  {
+    "subject": "doxastic_logic",
+    "immediate_parent": "philosophical_logic"
+  },
+  {
+    "subject": "mathematical_logic",
+    "immediate_parent": "logic"
+  },
+  {
+    "subject": "set_theory",
+    "immediate_parent": "mathematical_logic"
+  },
+  {
+    "subject": "proof_theory",
+    "immediate_parent": "mathematical_logic"
+  },
+  {
+    "subject": "model_theory",
+    "immediate_parent": "mathematical_logic"
+  },
+  {
+    "subject": "recursion_theory",
+    "immediate_parent": "mathematical_logic"
+  },
+  {
+    "subject": "modal_logic",
+    "immediate_parent": "mathematical_logic"
+  },
+  {
+    "subject": "intuitionistic_logic",
+    "immediate_parent": "mathematical_logic"
+  },
+  {
+    "subject": "mathematics",
+    "immediate_parent": "formal_sciences"
+  },
+  {
+    "subject": "algebra",
+    "immediate_parent": "mathematics"
+  },
+  {
+    "subject": "group_theory",
+    "immediate_parent": "algebra"
+  },
+  {
+    "subject": "ring_theory",
+    "immediate_parent": "algebra"
+  },
+  {
+    "subject": "commutative_algebra",
+    "immediate_parent": "algebra"
+  },
+  {
+    "subject": "field_theory",
+    "immediate_parent": "algebra"
+  },
+  {
+    "subject": "linear_algebra",
+    "immediate_parent": "algebra"
+  },
+  {
+    "subject": "multilinear_algebra",
+    "immediate_parent": "algebra"
+  },
+  {
+    "subject": "universal_algebra",
+    "immediate_parent": "algebra"
+  },
+  {
+    "subject": "homological_algebra",
+    "immediate_parent": "algebra"
+  },
+  {
+    "subject": "differential_algebra",
+    "immediate_parent": "algebra"
+  },
+  {
+    "subject": "lattice_theory",
+    "immediate_parent": "algebra"
+  },
+  {
+    "subject": "order_theory",
+    "immediate_parent": "algebra"
+  },
+  {
+    "subject": "representational_theory",
+    "immediate_parent": "algebra"
+  },
+  {
+    "subject": "k_theory",
+    "immediate_parent": "algebra"
+  },
+  {
+    "subject": "category_theory",
+    "immediate_parent": "algebra"
+  },
+  {
+    "subject": "topos_theory",
+    "immediate_parent": "algebra"
+  },
+  {
+    "subject": "analysis",
+    "immediate_parent": "mathematics"
+  },
+  {
+    "subject": "real_analysis",
+    "immediate_parent": "analysis"
+  },
+  {
+    "subject": "calculus",
+    "immediate_parent": "analysis"
+  },
+  {
+    "subject": "complex_analysis",
+    "immediate_parent": "analysis"
+  },
+  {
+    "subject": "functional_analysis",
+    "immediate_parent": "analysis"
+  },
+  {
+    "subject": "operator_theory",
+    "immediate_parent": "analysis"
+  },
+  {
+    "subject": "non_standard_analysis",
+    "immediate_parent": "analysis"
+  },
+  {
+    "subject": "harmonic_analysis",
+    "immediate_parent": "analysis"
+  },
+  {
+    "subject": "fourier_analysis",
+    "immediate_parent": "analysis"
+  },
+  {
+    "subject": "p_adic_analysis",
+    "immediate_parent": "analysis"
+  },
+  {
+    "subject": "ordinary_differential_equations",
+    "immediate_parent": "analysis"
+  },
+  {
+    "subject": "partial_differential_equations",
+    "immediate_parent": "analysis"
+  },
+  {
+    "subject": "probability_theory",
+    "immediate_parent": "mathematics"
+  },
+  {
+    "subject": "measure_theory",
+    "immediate_parent": "probability_theory"
+  },
+  {
+    "subject": "integral_geometry",
+    "immediate_parent": "probability_theory"
+  },
+  {
+    "subject": "ergodic_theory",
+    "immediate_parent": "probability_theory"
+  },
+  {
+    "subject": "stochastic_process",
+    "immediate_parent": "probability_theory"
+  },
+  {
+    "subject": "geometry",
+    "immediate_parent": "mathematics"
+  },
+  {
+    "subject": "algebraic_geometry",
+    "immediate_parent": "geometry"
+  },
+  {
+    "subject": "projective_geometry",
+    "immediate_parent": "geometry"
+  },
+  {
+    "subject": "affine_geometry",
+    "immediate_parent": "geometry"
+  },
+  {
+    "subject": "non_euclidean_geometry",
+    "immediate_parent": "geometry"
+  },
+  {
+    "subject": "convex_geometry",
+    "immediate_parent": "geometry"
+  },
+  {
+    "subject": "discrete_geometry",
+    "immediate_parent": "geometry"
+  },
+  {
+    "subject": "integral_geometry",
+    "immediate_parent": "geometry"
+  },
+  {
+    "subject": "euclidean_geometry",
+    "immediate_parent": "geometry"
+  },
+  {
+    "subject": "finite_geometry",
+    "immediate_parent": "geometry"
+  },
+  {
+    "subject": "galois_geomtry",
+    "immediate_parent": "geometry"
+  },
+  {
+    "subject": "noncommutative_geometry",
+    "immediate_parent": "geometry"
+  },
+  {
+    "subject": "solid_geometry",
+    "immediate_parent": "geometry"
+  },
+  {
+    "subject": "trigonometry",
+    "immediate_parent": "geometry"
+  },
+  {
+    "subject": "topology",
+    "immediate_parent": "mathematics"
+  },
+  {
+    "subject": "general_topology",
+    "immediate_parent": "topology"
+  },
+  {
+    "subject": "algebraic_topology",
+    "immediate_parent": "topology"
+  },
+  {
+    "subject": "geometric_topology",
+    "immediate_parent": "topology"
+  },
+  {
+    "subject": "differential_topology",
+    "immediate_parent": "topology"
+  },
+  {
+    "subject": "number_theory",
+    "immediate_parent": "mathematics"
+  },
+  {
+    "subject": "analytic_number_theory",
+    "immediate_parent": "number_theory"
+  },
+  {
+    "subject": "algebraic_number_theory",
+    "immediate_parent": "number_theory"
+  },
+  {
+    "subject": "geometric_number_theory",
+    "immediate_parent": "number_theory"
+  },
+  {
+    "subject": "arithmetic",
+    "immediate_parent": "number_theory"
+  },
+  {
+    "subject": "arithmetic_combinatorics",
+    "immediate_parent": "number_theory"
+  },
+  {
+    "subject": "approximation_theory",
+    "immediate_parent": "mathematics"
+  },
+  {
+    "subject": "computational_mathematics",
+    "immediate_parent": "mathematics"
+  },
+  {
+    "subject": "numerical_analysis",
+    "immediate_parent": "mathematics"
+  },
+  {
+    "subject": "operations_research",
+    "immediate_parent": "mathematics"
+  },
+  {
+    "subject": "mathematical_optimization",
+    "immediate_parent": "operations_research"
+  },
+  {
+    "subject": "linear_programming",
+    "immediate_parent": "operations_research"
+  },
+  {
+    "subject": "dynamic_programming",
+    "immediate_parent": "operations_research"
+  },
+  {
+    "subject": "assignment_problem",
+    "immediate_parent": "operations_research"
+  },
+  {
+    "subject": "decision_analysis",
+    "immediate_parent": "operations_research"
+  },
+  {
+    "subject": "inventory_theory",
+    "immediate_parent": "operations_research"
+  },
+  {
+    "subject": "scheduling",
+    "immediate_parent": "operations_research"
+  },
+  {
+    "subject": "real_options_analysis",
+    "immediate_parent": "operations_research"
+  },
+  {
+    "subject": "systems_analysis",
+    "immediate_parent": "operations_research"
+  },
+  {
+    "subject": "stochastic_processes",
+    "immediate_parent": "operations_research"
+  },
+  {
+    "subject": "optimal_maintenance",
+    "immediate_parent": "operations_research"
+  },
+  {
+    "subject": "chaos_theory",
+    "immediate_parent": "mathematics"
+  },
+  {
+    "subject": "fractal_geometry",
+    "immediate_parent": "mathematics"
+  },
+  {
+    "subject": "mathematical_physics",
+    "immediate_parent": "mathematics"
+  },
+  {
+    "subject": "quantum_mechanics",
+    "immediate_parent": "mathematical_physics"
+  },
+  {
+    "subject": "quantum_field_theory",
+    "immediate_parent": "mathematical_physics"
+  },
+  {
+    "subject": "quantum_gravity",
+    "immediate_parent": "mathematical_physics"
+  },
+  {
+    "subject": "string_theory",
+    "immediate_parent": "mathematical_physics"
+  },
+  {
+    "subject": "statistical_mechanics",
+    "immediate_parent": "mathematical_physics"
+  },
+  {
+    "subject": "computational_complexity_theory",
+    "immediate_parent": "mathematics"
+  },
+  {
+    "subject": "information_theory",
+    "immediate_parent": "mathematics"
+  },
+  {
+    "subject": "cryptography",
+    "immediate_parent": "mathematics"
+  },
+  {
+    "subject": "steganography",
+    "immediate_parent": "mathematics"
+  },
+  {
+    "subject": "cominatorics",
+    "immediate_parent": "mathematics"
+  },
+  {
+    "subject": "coding_theory",
+    "immediate_parent": "cominatorics"
+  },
+  {
+    "subject": "graph_theory",
+    "immediate_parent": "mathematics"
+  },
+  {
+    "subject": "game_theory",
+    "immediate_parent": "mathematics"
+  },
+  {
+    "subject": "statistics",
+    "immediate_parent": "mathematics"
+  },
+  {
+    "subject": "econometrics",
+    "immediate_parent": "statistics"
+  },
+  {
+    "subject": "actuaurial_science",
+    "immediate_parent": "statistics"
+  },
+  {
+    "subject": "demography",
+    "immediate_parent": "statistics"
+  },
+  {
+    "subject": "computational_statistics",
+    "immediate_parent": "statistics"
+  },
+  {
+    "subject": "data_mining",
+    "immediate_parent": "computational_statistics"
+  },
+  {
+    "subject": "regression",
+    "immediate_parent": "computational_statistics"
+  },
+  {
+    "subject": "simulation",
+    "immediate_parent": "computational_statistics"
+  },
+  {
+    "subject": "design_of_experiments",
+    "immediate_parent": "statistics"
+  },
+  {
+    "subject": "block_design",
+    "immediate_parent": "design_of_experiments"
+  },
+  {
+    "subject": "analysis_of_variance",
+    "immediate_parent": "design_of_experiments"
+  },
+  {
+    "subject": "response_surface_methodology",
+    "immediate_parent": "design_of_experiments"
+  },
+  {
+    "subject": "sample_survey",
+    "immediate_parent": "statistics"
+  },
+  {
+    "subject": "sampling_theory",
+    "immediate_parent": "statistics"
+  },
+  {
+    "subject": "statistical_modeling",
+    "immediate_parent": "statistics"
+  },
+  {
+    "subject": "biostatistics",
+    "immediate_parent": "statistical_modeling"
+  },
+  {
+    "subject": "epidemiology",
+    "immediate_parent": "statistical_modeling"
+  },
+  {
+    "subject": "multivariate_analysis",
+    "immediate_parent": "statistical_modeling"
+  },
+  {
+    "subject": "structural_equation_model",
+    "immediate_parent": "statistical_modeling"
+  },
+  {
+    "subject": "time_series",
+    "immediate_parent": "statistical_modeling"
+  },
+  {
+    "subject": "reliability_theory",
+    "immediate_parent": "statistical_modeling"
+  },
+  {
+    "subject": "quality_control",
+    "immediate_parent": "statistical_modeling"
+  },
+  {
+    "subject": "statistical_theory",
+    "immediate_parent": "statistics"
+  },
+  {
+    "subject": "decision_theory",
+    "immediate_parent": "statistics"
+  },
+  {
+    "subject": "probability",
+    "immediate_parent": "statistics"
+  },
+  {
+    "subject": "survey_methodology",
+    "immediate_parent": "statistics"
+  },
+  {
+    "subject": "systems_science",
+    "immediate_parent": "formal_sciences"
+  },
+  {
+    "subject": "network_science",
+    "immediate_parent": "systems_science"
+  },
+  {
+    "subject": "chaos_theory",
+    "immediate_parent": "systems_science"
+  },
+  {
+    "subject": "conceptual_systems",
+    "immediate_parent": "systems_science"
+  },
+  {
+    "subject": "complex_systems",
+    "immediate_parent": "systems_science"
+  },
+  {
+    "subject": "cybernetics",
+    "immediate_parent": "systems_science"
+  },
+  {
+    "subject": "biocybernetics",
+    "immediate_parent": "cybernetics"
+  },
+  {
+    "subject": "engineering_cybernetics",
+    "immediate_parent": "cybernetics"
+  },
+  {
+    "subject": "management_cybernetics",
+    "immediate_parent": "cybernetics"
+  },
+  {
+    "subject": "medical_cybernetics",
+    "immediate_parent": "cybernetics"
+  },
+  {
+    "subject": "new_cybernetics",
+    "immediate_parent": "cybernetics"
+  },
+  {
+    "subject": "second_order_cybernetics",
+    "immediate_parent": "cybernetics"
+  },
+  {
+    "subject": "sociocybernetics",
+    "immediate_parent": "cybernetics"
+  },
+  {
+    "subject": "control_theory",
+    "immediate_parent": "systems_science"
+  },
+  {
+    "subject": "affect_control_theory",
+    "immediate_parent": "control_theory"
+  },
+  {
+    "subject": "control_engineering",
+    "immediate_parent": "control_theory"
+  },
+  {
+    "subject": "control_systems",
+    "immediate_parent": "control_theory"
+  },
+  {
+    "subject": "dynamical_systems",
+    "immediate_parent": "control_theory"
+  },
+  {
+    "subject": "perceptual_control_theory",
+    "immediate_parent": "control_theory"
+  },
+  {
+    "subject": "operations_research",
+    "immediate_parent": "systems_science"
+  },
+  {
+    "subject": "systems_biology",
+    "immediate_parent": "systems_science"
+  },
+  {
+    "subject": "computational_systems_biology",
+    "immediate_parent": "systems_biology"
+  },
+  {
+    "subject": "synthetic_biology",
+    "immediate_parent": "systems_biology"
+  },
+  {
+    "subject": "systems_immunology",
+    "immediate_parent": "systems_biology"
+  },
+  {
+    "subject": "systems_neuroscience",
+    "immediate_parent": "systems_biology"
+  },
+  {
+    "subject": "systems_chemistry",
+    "immediate_parent": "systems_science"
+  },
+  {
+    "subject": "system_dynamics",
+    "immediate_parent": "systems_science"
+  },
+  {
+    "subject": "social_dynamics",
+    "immediate_parent": "system_dynamics"
+  },
+  {
+    "subject": "systems_ecology",
+    "immediate_parent": "systems_science"
+  },
+  {
+    "subject": "ecosystem_ecology",
+    "immediate_parent": "systems_ecology"
+  },
+  {
+    "subject": "systems_engineering",
+    "immediate_parent": "systems_science"
+  },
+  {
+    "subject": "biological_systems_engineering",
+    "immediate_parent": "systems_engineering"
+  },
+  {
+    "subject": "earth_systems_engineering_and_management",
+    "immediate_parent": "systems_engineering"
+  },
+  {
+    "subject": "enterprise_systems_engineering",
+    "immediate_parent": "systems_engineering"
+  },
+  {
+    "subject": "systems_analysis",
+    "immediate_parent": "systems_engineering"
+  },
+  {
+    "subject": "systems_theory_in_anthropology",
+    "immediate_parent": "systems_science"
+  },
+  {
+    "subject": "systems_psychology",
+    "immediate_parent": "systems_science"
+  },
+  {
+    "subject": "ergonomics",
+    "immediate_parent": "systems_psychology"
+  },
+  {
+    "subject": "family_systems_theory",
+    "immediate_parent": "systems_psychology"
+  },
+  {
+    "subject": "systemic_therapy",
+    "immediate_parent": "systems_psychology"
+  },
+  {
+    "subject": "systems_theory",
+    "immediate_parent": "systems_science"
+  },
+  {
+    "subject": "biochemical_systems_theory",
+    "immediate_parent": "systems_theory"
+  },
+  {
+    "subject": "ecological_systems_theory",
+    "immediate_parent": "systems_theory"
+  },
+  {
+    "subject": "developmental_systems_theory",
+    "immediate_parent": "systems_theory"
+  },
+  {
+    "subject": "general_systems_theory",
+    "immediate_parent": "systems_theory"
+  },
+  {
+    "subject": "living_systems_theory",
+    "immediate_parent": "systems_theory"
+  },
+  {
+    "subject": "lti_system_theory",
+    "immediate_parent": "systems_theory"
+  },
+  {
+    "subject": "sociotechnical_systems_theory",
+    "immediate_parent": "systems_theory"
+  },
+  {
+    "subject": "mathematical_systems_theory",
+    "immediate_parent": "systems_theory"
+  },
+  {
+    "subject": "world_systems_theory",
+    "immediate_parent": "systems_theory"
+  },
+  {
+    "subject": "social_sciences",
+    "immediate_parent": ""
+  },
+  {
+    "subject": "psychology",
+    "immediate_parent": "social_sciences"
+  },
+  {
+    "subject": "abnormal_psychology",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "applied_psychology",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "asian_psychology",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "biological_psychology",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "black_psychology",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "clinical_psychology",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "cognitive_psychology",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "community_psychology",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "comparative_psychology",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "conservation_psychology",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "consumer_psychology",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "counseling_psychology",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "criminal_psychology",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "cultural_psychology",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "developmental_psychology",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "differential_psychology",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "ecological_psychology",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "educational_psychology",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "environmental_psychology",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "evolutionary_psychology",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "experimental_psychology",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "group_psychology",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "family_psychology",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "feminine_psychology",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "forensic_psychology",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "forensic_development_psychology",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "health_psychology",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "humanistic_psychology",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "indigenous_psychology",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "legal_psychology",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "mathematical_psychology",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "media_psychology",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "medical_psychology",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "military_psychology",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "moral_psychology",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "descriptive_ethics",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "music_psychology",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "neuropsychology",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "occupational_psychology",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "occupational_health_psychology",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "organizational_psychology",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "parapsychology",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "pediatric_psychology",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "pedology",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "personality_psychology",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "phenomenology",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "political_psychology",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "positive_psychology",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "problem_solving",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "psychoanalytics",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "psychometrics",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "psychology_of_religion",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "psychopathology",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "child_psychopathology",
+    "immediate_parent": "psychopathology"
+  },
+  {
+    "subject": "psychophysics",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "quantitative_psychology",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "rehabilitation_psychology",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "school_psychology",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "social_psychology",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "sport_psychology",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "traffic_psychology",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "transpersonal_psychology",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "travel_psychology",
+    "immediate_parent": "psychology"
+  },
+  {
+    "subject": "sociology",
+    "immediate_parent": "social_sciences"
+  },
+  {
+    "subject": "analytical_sociology",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "applied_sociology",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "political_sociology",
+    "immediate_parent": "applied_sociology"
+  },
+  {
+    "subject": "public_sociology",
+    "immediate_parent": "applied_sociology"
+  },
+  {
+    "subject": "social_engineering",
+    "immediate_parent": "applied_sociology"
+  },
+  {
+    "subject": "leisure_studies",
+    "immediate_parent": "applied_sociology"
+  },
+  {
+    "subject": "architectural_sociology",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "behavioral_sociology",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "chinese_sociology",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "collective_behavior",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "activism",
+    "immediate_parent": "collective_behavior"
+  },
+  {
+    "subject": "social_movements",
+    "immediate_parent": "collective_behavior"
+  },
+  {
+    "subject": "social_phenomenon",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "community_informatics",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "social_network_analysis",
+    "immediate_parent": "community_informatics"
+  },
+  {
+    "subject": "comparative_sociology",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "conflict_theory",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "critical_sociology",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "cultural_sociology",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "cultural_studies",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "criminology",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "critical_management_studies",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "demography",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "digital_sociology",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "dramaturgical_sociology",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "economic_sociology",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "educational_sociology",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "empirical_sociology",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "environmental_sociology",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "evolutionary_sociology",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "feminist_sociology",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "figurational_sociology",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "futures_studies",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "historical_sociology",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "human_ecology",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "humanistic_sociology",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "industrial_sociology",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "interactionism",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "internet_sociology",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "interpretive_sociology",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "phenomenology",
+    "immediate_parent": "interpretive_sociology"
+  },
+  {
+    "subject": "ethnomethodology",
+    "immediate_parent": "interpretive_sociology"
+  },
+  {
+    "subject": "symbolic_interactionism",
+    "immediate_parent": "interpretive_sociology"
+  },
+  {
+    "subject": "social_constructionism",
+    "immediate_parent": "interpretive_sociology"
+  },
+  {
+    "subject": "jealousy_sociology",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "macrosociology",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "marxist_sociology",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "mathematical_sociology",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "medical_sociology",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "mesosociology",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "microsociology",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "military_sociology",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "natural_resource_sociology",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "organizational_studies",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "phenomenological_sociology",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "policy_sociology",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "polish_sociology",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "postcolonialism",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "psychoanalytic_sociology",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "sexology",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "social_capital",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "social_change",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "social_conflict_theory",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "social_control",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "social_economy",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "social_philosophy",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "social_psychology",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "social_policy",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "social_research",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "sociology_of_aging",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "sociology_of_agriculture",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "sociology_of_art",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "sociology_of_autism",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "sociology_of_childhood",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "sociology_of_conflict",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "sociology_of_culture",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "sociology_of_cyberspace",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "sociology_of_deviance",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "sociology_of_development",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "sociology_of_disaster",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "sociology_of_education",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "sociology_of_emotions",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "sociology_of_fatherhood",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "sociology_of_film",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "sociology_of_finance",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "sociology_of_food",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "sociology_of_gender",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "sociology_of_generations",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "sociology_of_globalization",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "sociology_of_government",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "sociology_of_health_and_illness",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "sociology_of_human_consciousness",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "sociology_of_immigration",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "sociology_of_knowledge",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "sociology_of_language",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "sociology_of_law",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "sociology_of_leisure",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "sociology_of_literature",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "sociology_of_markets",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "sociology_of_marriage",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "sociology_of_mothermood",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "sociology_of_music",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "sociology_of_natural_resources",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "sociology_of_organizations",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "sociology_of_peace_war_and_social_conflict",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "sociology_of_punishment",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "sociology_of_race_and_ethnic_relations",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "sociology_of_religion",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "sociology_of_risk",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "sociology_of_science",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "sociology_of_scientific_knowledge",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "sociology_of_social_change",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "sociology_of_social_movements",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "sociology_of_space",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "sociology_of_sport",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "sociology_of_technology",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "sociology_of_terrorism",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "sociology_of_the_body",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "sociology_of_the_family",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "sociology_of_the_history_of_science",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "sociology_of_the_internet",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "sociology_of_work",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "social_theory",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "social_stratificiation",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "sociological_theory",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "sociobiology",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "sociocybernetics",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "sociolinguistics",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "sociomusicology",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "structural_sociology",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "theoretical_sociology",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "urban_sociology",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "rural_sociology",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "victimology",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "visual_sociology",
+    "immediate_parent": "sociology"
+  },
+  {
+    "subject": "economics",
+    "immediate_parent": "social_sciences"
+  },
+  {
+    "subject": "agricultural_economics",
+    "immediate_parent": "economics"
+  },
+  {
+    "subject": "anarchist_economics",
+    "immediate_parent": "economics"
+  },
+  {
+    "subject": "applied_economics",
+    "immediate_parent": "economics"
+  },
+  {
+    "subject": "behavioural_economics",
+    "immediate_parent": "economics"
+  },
+  {
+    "subject": "bioeconomics",
+    "immediate_parent": "economics"
+  },
+  {
+    "subject": "business",
+    "immediate_parent": "economics"
+  },
+  {
+    "subject": "complexity_economics",
+    "immediate_parent": "economics"
+  },
+  {
+    "subject": "computational_economics",
+    "immediate_parent": "economics"
+  },
+  {
+    "subject": "consumer_economics",
+    "immediate_parent": "economics"
+  },
+  {
+    "subject": "development_economics",
+    "immediate_parent": "economics"
+  },
+  {
+    "subject": "digital_economics",
+    "immediate_parent": "economics"
+  },
+  {
+    "subject": "ecological_economics",
+    "immediate_parent": "economics"
+  },
+  {
+    "subject": "econometrics",
+    "immediate_parent": "economics"
+  },
+  {
+    "subject": "economic_geography",
+    "immediate_parent": "economics"
+  },
+  {
+    "subject": "economic_history",
+    "immediate_parent": "economics"
+  },
+  {
+    "subject": "economic_sector",
+    "immediate_parent": "economics"
+  },
+  {
+    "subject": "economic_sociology",
+    "immediate_parent": "economics"
+  },
+  {
+    "subject": "economic_systems",
+    "immediate_parent": "economics"
+  },
+  {
+    "subject": "economic_value",
+    "immediate_parent": "economics"
+  },
+  {
+    "subject": "energy_economics",
+    "immediate_parent": "economics"
+  },
+  {
+    "subject": "entrepreneurial_economics",
+    "immediate_parent": "economics"
+  },
+  {
+    "subject": "environmental_economics",
+    "immediate_parent": "economics"
+  },
+  {
+    "subject": "evolutionary_economics",
+    "immediate_parent": "economics"
+  },
+  {
+    "subject": "experimental_economics",
+    "immediate_parent": "economics"
+  },
+  {
+    "subject": "feminist_economics",
+    "immediate_parent": "economics"
+  },
+  {
+    "subject": "financial_economics",
+    "immediate_parent": "economics"
+  },
+  {
+    "subject": "green_economics",
+    "immediate_parent": "economics"
+  },
+  {
+    "subject": "growth_economics",
+    "immediate_parent": "economics"
+  },
+  {
+    "subject": "human_development_theory",
+    "immediate_parent": "economics"
+  },
+  {
+    "subject": "industrial_organization",
+    "immediate_parent": "economics"
+  },
+  {
+    "subject": "information_economics",
+    "immediate_parent": "economics"
+  },
+  {
+    "subject": "institutional_economics",
+    "immediate_parent": "economics"
+  },
+  {
+    "subject": "international_economics",
+    "immediate_parent": "economics"
+  },
+  {
+    "subject": "islamic_economics",
+    "immediate_parent": "economics"
+  },
+  {
+    "subject": "JEL_classification_codes",
+    "immediate_parent": "economics"
+  },
+  {
+    "subject": "knowledge_economy",
+    "immediate_parent": "economics"
+  },
+  {
+    "subject": "labor_economics",
+    "immediate_parent": "economics"
+  },
+  {
+    "subject": "law_and_economics",
+    "immediate_parent": "economics"
+  },
+  {
+    "subject": "macroeconomics",
+    "immediate_parent": "economics"
+  },
+  {
+    "subject": "managerial_economics",
+    "immediate_parent": "economics"
+  },
+  {
+    "subject": "market_economy",
+    "immediate_parent": "economics"
+  },
+  {
+    "subject": "marxian_economics",
+    "immediate_parent": "economics"
+  },
+  {
+    "subject": "mathematical_economics",
+    "immediate_parent": "economics"
+  },
+  {
+    "subject": "microeconomics",
+    "immediate_parent": "economics"
+  },
+  {
+    "subject": "monetary_economics",
+    "immediate_parent": "economics"
+  },
+  {
+    "subject": "neuroeconomics",
+    "immediate_parent": "economics"
+  },
+  {
+    "subject": "participatory_economics",
+    "immediate_parent": "economics"
+  },
+  {
+    "subject": "political_economy",
+    "immediate_parent": "economics"
+  },
+  {
+    "subject": "public_finance",
+    "immediate_parent": "economics"
+  },
+  {
+    "subject": "real_estate_economics",
+    "immediate_parent": "economics"
+  },
+  {
+    "subject": "resource_economics",
+    "immediate_parent": "economics"
+  },
+  {
+    "subject": "social_choice_theory",
+    "immediate_parent": "economics"
+  },
+  {
+    "subject": "socialist_economics",
+    "immediate_parent": "economics"
+  },
+  {
+    "subject": "socioeconomics",
+    "immediate_parent": "economics"
+  },
+  {
+    "subject": "transport_economics",
+    "immediate_parent": "economics"
+  },
+  {
+    "subject": "welfare_economics",
+    "immediate_parent": "economics"
+  },
+  {
+    "subject": "political_science",
+    "immediate_parent": "social_sciences"
+  },
+  {
+    "subject": "american_politics",
+    "immediate_parent": "political_science"
+  },
+  {
+    "subject": "canadian_politics",
+    "immediate_parent": "political_science"
+  },
+  {
+    "subject": "civics",
+    "immediate_parent": "political_science"
+  },
+  {
+    "subject": "comparative_politics",
+    "immediate_parent": "political_science"
+  },
+  {
+    "subject": "european_studies",
+    "immediate_parent": "political_science"
+  },
+  {
+    "subject": "geopolitics",
+    "immediate_parent": "political_science"
+  },
+  {
+    "subject": "international_relations",
+    "immediate_parent": "political_science"
+  },
+  {
+    "subject": "international organizations",
+    "immediate_parent": "political_science"
+  },
+  {
+    "subject": "nationalism_studies",
+    "immediate_parent": "political_science"
+  },
+  {
+    "subject": "peace_and_conflict_studies",
+    "immediate_parent": "political_science"
+  },
+  {
+    "subject": "policy_studies",
+    "immediate_parent": "political_science"
+  },
+  {
+    "subject": "political_behavior",
+    "immediate_parent": "political_science"
+  },
+  {
+    "subject": "political_culture",
+    "immediate_parent": "political_science"
+  },
+  {
+    "subject": "political_economy",
+    "immediate_parent": "political_science"
+  },
+  {
+    "subject": "political_history",
+    "immediate_parent": "political_science"
+  },
+  {
+    "subject": "political_philosophy",
+    "immediate_parent": "political_science"
+  },
+  {
+    "subject": "psephology",
+    "immediate_parent": "political_science"
+  },
+  {
+    "subject": "public_administration",
+    "immediate_parent": "political_science"
+  },
+  {
+    "subject": "nonprofit_administration",
+    "immediate_parent": "political_science"
+  },
+  {
+    "subject": "nongovernmental_organization_administration",
+    "immediate_parent": "political_science"
+  },
+  {
+    "subject": "public_policy",
+    "immediate_parent": "political_science"
+  },
+  {
+    "subject": "social_choice_theory",
+    "immediate_parent": "political_science"
+  },
+  {
+    "subject": "anthropology",
+    "immediate_parent": "social_sciences"
+  },
+  {
+    "subject": "cultural_anthropology",
+    "immediate_parent": "anthropology"
+  },
+  {
+    "subject": "biological_anthropology",
+    "immediate_parent": "anthropology"
+  },
+  {
+    "subject": "archaeological_anthropology",
+    "immediate_parent": "anthropology"
+  },
+  {
+    "subject": "linguistic_anthropology",
+    "immediate_parent": "anthropology"
+  },
+  {
+    "subject": "medical_anthropology",
+    "immediate_parent": "anthropology"
+  },
+  {
+    "subject": "forensic_anthropology",
+    "immediate_parent": "anthropology"
+  },
+  {
+    "subject": "archaeology",
+    "immediate_parent": "social_sciences"
+  },
+  {
+    "subject": "aerial_archaeology",
+    "immediate_parent": "archaeology"
+  },
+  {
+    "subject": "aviation_archaeology",
+    "immediate_parent": "archaeology"
+  },
+  {
+    "subject": "anthracology",
+    "immediate_parent": "archaeology"
+  },
+  {
+    "subject": "archaeo-optics",
+    "immediate_parent": "archaeology"
+  },
+  {
+    "subject": "archaeoastronomy",
+    "immediate_parent": "archaeology"
+  },
+  {
+    "subject": "archaeogeography",
+    "immediate_parent": "archaeology"
+  },
+  {
+    "subject": "archaeological_culture",
+    "immediate_parent": "archaeology"
+  },
+  {
+    "subject": "archaeological_theory",
+    "immediate_parent": "archaeology"
+  },
+  {
+    "subject": "great_ages_archaeology",
+    "immediate_parent": "archaeological_theory"
+  },
+  {
+    "subject": "functionalism",
+    "immediate_parent": "archaeological_theory"
+  },
+  {
+    "subject": "processualism",
+    "immediate_parent": "archaeological_theory"
+  },
+  {
+    "subject": "post-processualism",
+    "immediate_parent": "archaeological_theory"
+  },
+  {
+    "subject": "cognitive_archaeology",
+    "immediate_parent": "archaeological_theory"
+  },
+  {
+    "subject": "gender_archaeology",
+    "immediate_parent": "archaeological_theory"
+  },
+  {
+    "subject": "feminist_archaeology",
+    "immediate_parent": "archaeological_theory"
+  },
+  {
+    "subject": "archaeometry",
+    "immediate_parent": "archaeology"
+  },
+  {
+    "subject": "archaeogenetics",
+    "immediate_parent": "archaeometry"
+  },
+  {
+    "subject": "bioarchaeology",
+    "immediate_parent": "archaeometry"
+  },
+  {
+    "subject": "computational_archaeology",
+    "immediate_parent": "archaeometry"
+  },
+  {
+    "subject": "dendrochronology",
+    "immediate_parent": "archaeometry"
+  },
+  {
+    "subject": "geoarchaeology",
+    "immediate_parent": "archaeometry"
+  },
+  {
+    "subject": "isotope_analysis",
+    "immediate_parent": "archaeometry"
+  },
+  {
+    "subject": "palynology",
+    "immediate_parent": "archaeometry"
+  },
+  {
+    "subject": "radiocarbon_dating",
+    "immediate_parent": "archaeometry"
+  },
+  {
+    "subject": "zooarchaeology",
+    "immediate_parent": "archaeometry"
+  },
+  {
+    "subject": "archaeology_of_religion_and_ritual",
+    "immediate_parent": "archaeology"
+  },
+  {
+    "subject": "archaeology_of_trade",
+    "immediate_parent": "archaeology"
+  },
+  {
+    "subject": "archaeomythology",
+    "immediate_parent": "archaeology"
+  },
+  {
+    "subject": "architectural_analytics",
+    "immediate_parent": "archaeology"
+  },
+  {
+    "subject": "battlefield_archaeology",
+    "immediate_parent": "archaeology"
+  },
+  {
+    "subject": "calceology",
+    "immediate_parent": "archaeology"
+  },
+  {
+    "subject": "conflict_archaeology",
+    "immediate_parent": "archaeology"
+  },
+  {
+    "subject": "data_archaeology",
+    "immediate_parent": "archaeology"
+  },
+  {
+    "subject": "digital_archaeology",
+    "immediate_parent": "archaeology"
+  },
+  {
+    "subject": "experimental_archaeology",
+    "immediate_parent": "archaeology"
+  },
+  {
+    "subject": "environmental_archaeology",
+    "immediate_parent": "archaeology"
+  },
+  {
+    "subject": "ethnoarchaeology",
+    "immediate_parent": "archaeology"
+  },
+  {
+    "subject": "forensic_archaeology",
+    "immediate_parent": "archaeology"
+  },
+  {
+    "subject": "glyptology",
+    "immediate_parent": "archaeology"
+  },
+  {
+    "subject": "history_of_archaeology",
+    "immediate_parent": "archaeology"
+  },
+  {
+    "subject": "household_archaeology",
+    "immediate_parent": "archaeology"
+  },
+  {
+    "subject": "landscape_archaeology",
+    "immediate_parent": "archaeology"
+  },
+  {
+    "subject": "manuscriptology",
+    "immediate_parent": "archaeology"
+  },
+  {
+    "subject": "maritime_archaeology",
+    "immediate_parent": "archaeology"
+  },
+  {
+    "subject": "media_archaeology",
+    "immediate_parent": "archaeology"
+  },
+  {
+    "subject": "modern_archaeology",
+    "immediate_parent": "archaeology"
+  },
+  {
+    "subject": "settlement_archaeology",
+    "immediate_parent": "modern_archaeology"
+  },
+  {
+    "subject": "music_archaeology",
+    "immediate_parent": "archaeology"
+  },
+  {
+    "subject": "osteology",
+    "immediate_parent": "archaeology"
+  },
+  {
+    "subject": "palaeoarchaeology",
+    "immediate_parent": "archaeology"
+  },
+  {
+    "subject": "paleoanthropology",
+    "immediate_parent": "archaeology"
+  },
+  {
+    "subject": "paleopathology",
+    "immediate_parent": "archaeology"
+  },
+  {
+    "subject": "paleoradiology",
+    "immediate_parent": "archaeology"
+  },
+  {
+    "subject": "taphonomy",
+    "immediate_parent": "archaeology"
+  },
+  {
+    "subject": "urban_archaeology",
+    "immediate_parent": "archaeology"
+  },
+  {
+    "subject": "historical_archaeology",
+    "immediate_parent": "archaeology"
+  },
+  {
+    "subject": "prehistoric_archaeology",
+    "immediate_parent": "historical_archaeology"
+  },
+  {
+    "subject": "protohistoric_archaeology",
+    "immediate_parent": "historical_archaeology"
+  },
+  {
+    "subject": "biblical_archaeology",
+    "immediate_parent": "historical_archaeology"
+  },
+  {
+    "subject": "classical_archaeology",
+    "immediate_parent": "historical_archaeology"
+  },
+  {
+    "subject": "egyptology",
+    "immediate_parent": "historical_archaeology"
+  },
+  {
+    "subject": "assyriology",
+    "immediate_parent": "historical_archaeology"
+  },
+  {
+    "subject": "etruscology",
+    "immediate_parent": "historical_archaeology"
+  },
+  {
+    "subject": "near_eastern_archaeology",
+    "immediate_parent": "historical_archaeology"
+  },
+  {
+    "subject": "medieval_archaeology",
+    "immediate_parent": "historical_archaeology"
+  },
+  {
+    "subject": "post-medieval_archaeology",
+    "immediate_parent": "historical_archaeology"
+  },
+  {
+    "subject": "industrial_archeaology",
+    "immediate_parent": "historical_archaeology"
+  },
+  {
+    "subject": "contemporary_archaeology",
+    "immediate_parent": "historical_archaeology"
+  },
+  {
+    "subject": "geography",
+    "immediate_parent": "social_sciences"
+  },
+  {
+    "subject": "cartography",
+    "immediate_parent": "geography"
+  },
+  {
+    "subject": "navigation",
+    "immediate_parent": "geography"
+  },
+  {
+    "subject": "human_geography",
+    "immediate_parent": "geography"
+  },
+  {
+    "subject": "cultural_geography",
+    "immediate_parent": "human_geography"
+  },
+  {
+    "subject": "feminist_geography",
+    "immediate_parent": "human_geography"
+  },
+  {
+    "subject": "economic_geography",
+    "immediate_parent": "human_geography"
+  },
+  {
+    "subject": "development_geography",
+    "immediate_parent": "human_geography"
+  },
+  {
+    "subject": "historical_geography",
+    "immediate_parent": "human_geography"
+  },
+  {
+    "subject": "time_geography",
+    "immediate_parent": "human_geography"
+  },
+  {
+    "subject": "political_geography",
+    "immediate_parent": "human_geography"
+  },
+  {
+    "subject": "military_geography",
+    "immediate_parent": "human_geography"
+  },
+  {
+    "subject": "strategic_geography",
+    "immediate_parent": "human_geography"
+  },
+  {
+    "subject": "population_geography",
+    "immediate_parent": "human_geography"
+  },
+  {
+    "subject": "social_geography",
+    "immediate_parent": "human_geography"
+  },
+  {
+    "subject": "behaviorial_geography",
+    "immediate_parent": "human_geography"
+  },
+  {
+    "subject": "childrens_geographies",
+    "immediate_parent": "human_geography"
+  },
+  {
+    "subject": "health_geography",
+    "immediate_parent": "human_geography"
+  },
+  {
+    "subject": "tourism_geography",
+    "immediate_parent": "human_geography"
+  },
+  {
+    "subject": "urban_geography",
+    "immediate_parent": "human_geography"
+  },
+  {
+    "subject": "environmental_geography",
+    "immediate_parent": "geography"
+  },
+  {
+    "subject": "physical_geography",
+    "immediate_parent": "geography"
+  },
+  {
+    "subject": "biogeography",
+    "immediate_parent": "physical_geography"
+  },
+  {
+    "subject": "climatology",
+    "immediate_parent": "physical_geography"
+  },
+  {
+    "subject": "palaeoclimatology",
+    "immediate_parent": "physical_geography"
+  },
+  {
+    "subject": "coastal_geography",
+    "immediate_parent": "physical_geography"
+  },
+  {
+    "subject": "geomorphology",
+    "immediate_parent": "physical_geography"
+  },
+  {
+    "subject": "geodesy",
+    "immediate_parent": "physical_geography"
+  },
+  {
+    "subject": "hydrology_hydrography",
+    "immediate_parent": "physical_geography"
+  },
+  {
+    "subject": "glaciology",
+    "immediate_parent": "physical_geography"
+  },
+  {
+    "subject": "limnology",
+    "immediate_parent": "physical_geography"
+  },
+  {
+    "subject": "biogeochemistry",
+    "immediate_parent": "physical_geography"
+  },
+  {
+    "subject": "oceanography",
+    "immediate_parent": "physical_geography"
+  },
+  {
+    "subject": "landscape_ecology",
+    "immediate_parent": "physical_geography"
+  },
+  {
+    "subject": "palaeogeography",
+    "immediate_parent": "physical_geography"
+  },
+  {
+    "subject": "regional_geography",
+    "immediate_parent": "geography"
+  },
+  {
+    "subject": "remote_sensing",
+    "immediate_parent": "geography"
+  },
+  {
+    "subject": "organizational_studies",
+    "immediate_parent": "social_sciences"
+  },
+  {
+    "subject": "business_economics",
+    "immediate_parent": "organizational_studies"
+  },
+  {
+    "subject": "business_ethics",
+    "immediate_parent": "organizational_studies"
+  },
+  {
+    "subject": "business_studies",
+    "immediate_parent": "organizational_studies"
+  },
+  {
+    "subject": "decision_science",
+    "immediate_parent": "organizational_studies"
+  },
+  {
+    "subject": "entrepreneurship",
+    "immediate_parent": "organizational_studies"
+  },
+  {
+    "subject": "human_resources_management",
+    "immediate_parent": "organizational_studies"
+  },
+  {
+    "subject": "industrial_organization",
+    "immediate_parent": "organizational_studies"
+  },
+  {
+    "subject": "management",
+    "immediate_parent": "organizational_studies"
+  },
+  {
+    "subject": "organizational_behavior",
+    "immediate_parent": "organizational_studies"
+  },
+  {
+    "subject": "organizational_thoery",
+    "immediate_parent": "organizational_studies"
+  },
+  {
+    "subject": "project_management",
+    "immediate_parent": "organizational_studies"
+  },
+  {
+    "subject": "quality_control",
+    "immediate_parent": "organizational_studies"
+  },
+  {
+    "subject": "strategy",
+    "immediate_parent": "organizational_studies"
+  },
+  {
+    "subject": "humanities",
+    "immediate_parent": ""
+  },
+  {
+    "subject": "history",
+    "immediate_parent": "humanities"
+  },
+  {
+    "subject": "african_history",
+    "immediate_parent": "history"
+  },
+  {
+    "subject": "south_african_history",
+    "immediate_parent": "african_history"
+  },
+  {
+    "subject": "egyptian_history",
+    "immediate_parent": "african_history"
+  },
+  {
+    "subject": "nigerian_history",
+    "immediate_parent": "african_history"
+  },
+  {
+    "subject": "north_american_history",
+    "immediate_parent": "history"
+  },
+  {
+    "subject": "american_history",
+    "immediate_parent": "north_american_history"
+  },
+  {
+    "subject": "canadian_history",
+    "immediate_parent": "north_american_history"
+  },
+  {
+    "subject": "mexican_history",
+    "immediate_parent": "north_american_history"
+  },
+  {
+    "subject": "cuban_history",
+    "immediate_parent": "north_american_history"
+  },
+  {
+    "subject": "south_american_history",
+    "immediate_parent": "history"
+  },
+  {
+    "subject": "latin_american_history",
+    "immediate_parent": "south_american_history"
+  },
+  {
+    "subject": "brazilian_history",
+    "immediate_parent": "south_american_history"
+  },
+  {
+    "subject": "colombian_history",
+    "immediate_parent": "south_american_history"
+  },
+  {
+    "subject": "venezuelan_history",
+    "immediate_parent": "south_american_history"
+  },
+  {
+    "subject": "peruvian_history",
+    "immediate_parent": "south_american_history"
+  },
+  {
+    "subject": "argentine_history",
+    "immediate_parent": "south_american_history"
+  },
+  {
+    "subject": "pre_columbian_era",
+    "immediate_parent": "history"
+  },
+  {
+    "subject": "mayan_history",
+    "immediate_parent": "pre_columbian_era"
+  },
+  {
+    "subject": "aztec_history",
+    "immediate_parent": "pre_columbian_era"
+  },
+  {
+    "subject": "inca_history",
+    "immediate_parent": "pre_columbian_era"
+  },
+  {
+    "subject": "mississippian_culture",
+    "immediate_parent": "pre_columbian_era"
+  },
+  {
+    "subject": "native_american_history",
+    "immediate_parent": "pre_columbian_era"
+  },
+  {
+    "subject": "ancient_history",
+    "immediate_parent": "history"
+  },
+  {
+    "subject": "ancient_greek_history",
+    "immediate_parent": "ancient_history"
+  },
+  {
+    "subject": "ancient_roman_history",
+    "immediate_parent": "ancient_history"
+  },
+  {
+    "subject": "history_roman_republic",
+    "immediate_parent": "ancient_roman_history"
+  },
+  {
+    "subject": "history_roman_empire",
+    "immediate_parent": "ancient_roman_history"
+  },
+  {
+    "subject": "ancient_egyptian_history",
+    "immediate_parent": "ancient_history"
+  },
+  {
+    "subject": "ancient_chinese_history",
+    "immediate_parent": "ancient_history"
+  },
+  {
+    "subject": "ancient_middle_eastern_history",
+    "immediate_parent": "ancient_history"
+  },
+  {
+    "subject": "asian_history",
+    "immediate_parent": "history"
+  },
+  {
+    "subject": "chinese_history",
+    "immediate_parent": "asian_history"
+  },
+  {
+    "subject": "japanese_history",
+    "immediate_parent": "asian_history"
+  },
+  {
+    "subject": "korean_history",
+    "immediate_parent": "asian_history"
+  },
+  {
+    "subject": "mongolian_history",
+    "immediate_parent": "asian_history"
+  },
+  {
+    "subject": "indian_history",
+    "immediate_parent": "asian_history"
+  },
+  {
+    "subject": "turkish_history",
+    "immediate_parent": "asian_history"
+  },
+  {
+    "subject": "iranian_history",
+    "immediate_parent": "asian_history"
+  },
+  {
+    "subject": "phillipine_history",
+    "immediate_parent": "asian_history"
+  },
+  {
+    "subject": "indonesian_history",
+    "immediate_parent": "asian_history"
+  },
+  {
+    "subject": "european_history",
+    "immediate_parent": "history"
+  },
+  {
+    "subject": "british_history",
+    "immediate_parent": "european_history"
+  },
+  {
+    "subject": "french_history",
+    "immediate_parent": "european_history"
+  },
+  {
+    "subject": "german_history",
+    "immediate_parent": "european_history"
+  },
+  {
+    "subject": "dutch_history",
+    "immediate_parent": "european_history"
+  },
+  {
+    "subject": "italian_history",
+    "immediate_parent": "european_history"
+  },
+  {
+    "subject": "spanish_history",
+    "immediate_parent": "european_history"
+  },
+  {
+    "subject": "portuguese_history",
+    "immediate_parent": "european_history"
+  },
+  {
+    "subject": "polish_history",
+    "immediate_parent": "european_history"
+  },
+  {
+    "subject": "balkan_history",
+    "immediate_parent": "european_history"
+  },
+  {
+    "subject": "scandinavian_history",
+    "immediate_parent": "european_history"
+  },
+  {
+    "subject": "swedish_history",
+    "immediate_parent": "scandinavian_history"
+  },
+  {
+    "subject": "norwegian_history",
+    "immediate_parent": "scandinavian_history"
+  },
+  {
+    "subject": "danish_history",
+    "immediate_parent": "scandinavian_history"
+  },
+  {
+    "subject": "finnish_history",
+    "immediate_parent": "scandinavian_history"
+  },
+  {
+    "subject": "icelandic_history",
+    "immediate_parent": "scandinavian_history"
+  },
+  {
+    "subject": "russian_history",
+    "immediate_parent": "european_history"
+  },
+  {
+    "subject": "australian_history",
+    "immediate_parent": "history"
+  },
+  {
+    "subject": "economic_history",
+    "immediate_parent": "history"
+  },
+  {
+    "subject": "environmental_history",
+    "immediate_parent": "history"
+  },
+  {
+    "subject": "intellectual_history",
+    "immediate_parent": "history"
+  },
+  {
+    "subject": "modern_history",
+    "immediate_parent": "history"
+  },
+  {
+    "subject": "political_history",
+    "immediate_parent": "history"
+  },
+  {
+    "subject": "scientific_history",
+    "immediate_parent": "history"
+  },
+  {
+    "subject": "technological_history",
+    "immediate_parent": "history"
+  },
+  {
+    "subject": "world_history",
+    "immediate_parent": "history"
+  },
+  {
+    "subject": "public_history",
+    "immediate_parent": "history"
+  },
+  {
+    "subject": "philosophy",
+    "immediate_parent": "humanities"
+  },
+  {
+    "subject": "meta_philosophy",
+    "immediate_parent": "philosophy"
+  },
+  {
+    "subject": "metaphysics",
+    "immediate_parent": "philosophy"
+  },
+  {
+    "subject": "ontology",
+    "immediate_parent": "metaphysics"
+  },
+  {
+    "subject": "teleology",
+    "immediate_parent": "metaphysics"
+  },
+  {
+    "subject": "philosophy_of_mind",
+    "immediate_parent": "metaphysics"
+  },
+  {
+    "subject": "philosophy_of_artificial_intelligence",
+    "immediate_parent": "metaphysics"
+  },
+  {
+    "subject": "philosophy_of_perception",
+    "immediate_parent": "metaphysics"
+  },
+  {
+    "subject": "philosophy_of_pain",
+    "immediate_parent": "metaphysics"
+  },
+  {
+    "subject": "philosophy_of_space_and_time",
+    "immediate_parent": "metaphysics"
+  },
+  {
+    "subject": "philosophy_of_action",
+    "immediate_parent": "metaphysics"
+  },
+  {
+    "subject": "determinism_and_free_will",
+    "immediate_parent": "metaphysics"
+  },
+  {
+    "subject": "epistemology",
+    "immediate_parent": "philosophy"
+  },
+  {
+    "subject": "ethics",
+    "immediate_parent": "philosophy"
+  },
+  {
+    "subject": "meta_ethics",
+    "immediate_parent": "ethics"
+  },
+  {
+    "subject": "normative_ethics",
+    "immediate_parent": "ethics"
+  },
+  {
+    "subject": "virtue_ethics",
+    "immediate_parent": "ethics"
+  },
+  {
+    "subject": "applied_ethics",
+    "immediate_parent": "ethics"
+  },
+  {
+    "subject": "ethics_of_animal_rights",
+    "immediate_parent": "ethics"
+  },
+  {
+    "subject": "bio_ethics",
+    "immediate_parent": "ethics"
+  },
+  {
+    "subject": "environmental_ethics",
+    "immediate_parent": "ethics"
+  },
+  {
+    "subject": "moral_psychology",
+    "immediate_parent": "ethics"
+  },
+  {
+    "subject": "descriptive_ethics",
+    "immediate_parent": "ethics"
+  },
+  {
+    "subject": "value_theory",
+    "immediate_parent": "ethics"
+  },
+  {
+    "subject": "aesthetics",
+    "immediate_parent": "philosophy"
+  },
+  {
+    "subject": "philosophy_of_art",
+    "immediate_parent": "philosophy"
+  },
+  {
+    "subject": "social_philosophy",
+    "immediate_parent": "philosophy"
+  },
+  {
+    "subject": "political_philosophy",
+    "immediate_parent": "philosophy"
+  },
+  {
+    "subject": "platonism",
+    "immediate_parent": "philosophy"
+  },
+  {
+    "subject": "aristotelianism",
+    "immediate_parent": "philosophy"
+  },
+  {
+    "subject": "continental_philosophy",
+    "immediate_parent": "philosophy"
+  },
+  {
+    "subject": "eastern_philosophy",
+    "immediate_parent": "philosophy"
+  },
+  {
+    "subject": "feminist_philosophy",
+    "immediate_parent": "philosophy"
+  },
+  {
+    "subject": "history_of_philosophy",
+    "immediate_parent": "philosophy"
+  },
+  {
+    "subject": "ancient_philosophy",
+    "immediate_parent": "philosophy"
+  },
+  {
+    "subject": "medieval_philosophy",
+    "immediate_parent": "philosophy"
+  },
+  {
+    "subject": "logic",
+    "immediate_parent": "philosophy"
+  },
+  {
+    "subject": "philosophical_logic",
+    "immediate_parent": "logic"
+  },
+  {
+    "subject": "mathematical_logic",
+    "immediate_parent": "logic"
+  },
+  {
+    "subject": "philosophy_of_education",
+    "immediate_parent": "philosophy"
+  },
+  {
+    "subject": "philosophy_of_history",
+    "immediate_parent": "philosophy"
+  },
+  {
+    "subject": "philosophy_of_religion",
+    "immediate_parent": "philosophy"
+  },
+  {
+    "subject": "philosophy_of_language",
+    "immediate_parent": "philosophy"
+  },
+  {
+    "subject": "philosophy_of_law",
+    "immediate_parent": "philosophy"
+  },
+  {
+    "subject": "philosophy_of_mathematics",
+    "immediate_parent": "philosophy"
+  },
+  {
+    "subject": "philosophy_of_music",
+    "immediate_parent": "philosophy"
+  },
+  {
+    "subject": "philosophy_of_science",
+    "immediate_parent": "philosophy"
+  },
+  {
+    "subject": "philosophy_of_social_science",
+    "immediate_parent": "philosophy"
+  },
+  {
+    "subject": "philosophy_of_physics",
+    "immediate_parent": "philosophy"
+  },
+  {
+    "subject": "philosophy_of_biology",
+    "immediate_parent": "philosophy"
+  },
+  {
+    "subject": "philosophy_of_chemistry",
+    "immediate_parent": "philosophy"
+  },
+  {
+    "subject": "philosophy_of_economics",
+    "immediate_parent": "philosophy"
+  },
+  {
+    "subject": "philosophy_of_psychology",
+    "immediate_parent": "philosophy"
+  },
+  {
+    "subject": "philosophy_of_engineering",
+    "immediate_parent": "philosophy"
+  },
+  {
+    "subject": "systems_philosophy",
+    "immediate_parent": "philosophy"
+  },
+  {
+    "subject": "languages",
+    "immediate_parent": "humanities"
+  },
+  {
+    "subject": "business_english",
+    "immediate_parent": "languages"
+  },
+  {
+    "subject": "classical_language",
+    "immediate_parent": "languages"
+  },
+  {
+    "subject": "modern_language",
+    "immediate_parent": "languages"
+  },
+  {
+    "subject": "standard_english",
+    "immediate_parent": "languages"
+  },
+  {
+    "subject": "world_englishes",
+    "immediate_parent": "languages"
+  },
+  {
+    "subject": "linguistics",
+    "immediate_parent": "humanities"
+  },
+  {
+    "subject": "applied_linguistics",
+    "immediate_parent": "linguistics"
+  },
+  {
+    "subject": "comics_studies",
+    "immediate_parent": "linguistics"
+  },
+  {
+    "subject": "composition_studies",
+    "immediate_parent": "linguistics"
+  },
+  {
+    "subject": "discourse_analysis",
+    "immediate_parent": "linguistics"
+  },
+  {
+    "subject": "english_studies",
+    "immediate_parent": "linguistics"
+  },
+  {
+    "subject": "etymology",
+    "immediate_parent": "linguistics"
+  },
+  {
+    "subject": "grammar",
+    "immediate_parent": "linguistics"
+  },
+  {
+    "subject": "history_of_linguistics",
+    "immediate_parent": "linguistics"
+  },
+  {
+    "subject": "interlinguistics",
+    "immediate_parent": "linguistics"
+  },
+  {
+    "subject": "lexicology",
+    "immediate_parent": "linguistics"
+  },
+  {
+    "subject": "linguistic_topology",
+    "immediate_parent": "linguistics"
+  },
+  {
+    "subject": "natural_language_processing",
+    "immediate_parent": "linguistics"
+  },
+  {
+    "subject": "philosophy_of_language",
+    "immediate_parent": "linguistics"
+  },
+  {
+    "subject": "philosophy_of_linguistics",
+    "immediate_parent": "linguistics"
+  },
+  {
+    "subject": "linguistic_philosophy",
+    "immediate_parent": "linguistics"
+  },
+  {
+    "subject": "philology",
+    "immediate_parent": "linguistics"
+  },
+  {
+    "subject": "semantics",
+    "immediate_parent": "linguistics"
+  },
+  {
+    "subject": "semiotics",
+    "immediate_parent": "linguistics"
+  },
+  {
+    "subject": "terminology_science",
+    "immediate_parent": "linguistics"
+  },
+  {
+    "subject": "rhetoric",
+    "immediate_parent": "linguistics"
+  },
+  {
+    "subject": "word_usage",
+    "immediate_parent": "linguistics"
+  },
+  {
+    "subject": "phonetics",
+    "immediate_parent": "linguistics"
+  },
+  {
+    "subject": "phonology",
+    "immediate_parent": "linguistics"
+  },
+  {
+    "subject": "morphology",
+    "immediate_parent": "linguistics"
+  },
+  {
+    "subject": "syntax",
+    "immediate_parent": "linguistics"
+  },
+  {
+    "subject": "pragmatics",
+    "immediate_parent": "linguistics"
+  },
+  {
+    "subject": "sociolinguistics",
+    "immediate_parent": "linguistics"
+  },
+  {
+    "subject": "psycholinguistics",
+    "immediate_parent": "linguistics"
+  },
+  {
+    "subject": "historical_linguistics",
+    "immediate_parent": "linguistics"
+  },
+  {
+    "subject": "computational_linguistics",
+    "immediate_parent": "linguistics"
+  },
+  {
+    "subject": "literature",
+    "immediate_parent": "humanities"
+  },
+  {
+    "subject": "poetry",
+    "immediate_parent": "literature"
+  },
+  {
+    "subject": "comparative_literature",
+    "immediate_parent": "literature"
+  },
+  {
+    "subject": "english_literature",
+    "immediate_parent": "literature"
+  },
+  {
+    "subject": "world_literature",
+    "immediate_parent": "literature"
+  },
+  {
+    "subject": "american_literature",
+    "immediate_parent": "literature"
+  },
+  {
+    "subject": "british_literature",
+    "immediate_parent": "literature"
+  },
+  {
+    "subject": "history_of_literature",
+    "immediate_parent": "literature"
+  },
+  {
+    "subject": "medieval_literature",
+    "immediate_parent": "literature"
+  },
+  {
+    "subject": "post_colonial_literature",
+    "immediate_parent": "literature"
+  },
+  {
+    "subject": "post_modern_literature",
+    "immediate_parent": "literature"
+  },
+  {
+    "subject": "literary_theory",
+    "immediate_parent": "literature"
+  },
+  {
+    "subject": "critical_theory",
+    "immediate_parent": "literature"
+  },
+  {
+    "subject": "poetics",
+    "immediate_parent": "literature"
+  },
+  {
+    "subject": "rhetoric",
+    "immediate_parent": "literature"
+  },
+  {
+    "subject": "literary_genre",
+    "immediate_parent": "literature"
+  },
+  {
+    "subject": "creative_writing",
+    "immediate_parent": "literature"
+  },
+  {
+    "subject": "creative_nonfiction",
+    "immediate_parent": "creative_writing"
+  },
+  {
+    "subject": "fiction_writing",
+    "immediate_parent": "creative_writing"
+  },
+  {
+    "subject": "non_fiction_writing",
+    "immediate_parent": "creative_writing"
+  },
+  {
+    "subject": "literary_journalism",
+    "immediate_parent": "creative_writing"
+  },
+  {
+    "subject": "screen_writing",
+    "immediate_parent": "creative_writing"
+  },
+  {
+    "subject": "playwrighting",
+    "immediate_parent": "creative_writing"
+  },
+  {
+    "subject": "divinity",
+    "immediate_parent": "humanities"
+  },
+  {
+    "subject": "canon_law",
+    "immediate_parent": "divinity"
+  },
+  {
+    "subject": "church_history",
+    "immediate_parent": "divinity"
+  },
+  {
+    "subject": "field_ministry",
+    "immediate_parent": "divinity"
+  },
+  {
+    "subject": "pastoral_counseling",
+    "immediate_parent": "field_ministry"
+  },
+  {
+    "subject": "pastoral_theology",
+    "immediate_parent": "field_ministry"
+  },
+  {
+    "subject": "religious_education",
+    "immediate_parent": "field_ministry"
+  },
+  {
+    "subject": "homiletics",
+    "immediate_parent": "field_ministry"
+  },
+  {
+    "subject": "liturgy",
+    "immediate_parent": "field_ministry"
+  },
+  {
+    "subject": "sacred_music",
+    "immediate_parent": "field_ministry"
+  },
+  {
+    "subject": "missiology",
+    "immediate_parent": "field_ministry"
+  },
+  {
+    "subject": "hermeneutics",
+    "immediate_parent": "divinity"
+  },
+  {
+    "subject": "scriptural_study_and_languages",
+    "immediate_parent": "divinity"
+  },
+  {
+    "subject": "biblical_hebrew",
+    "immediate_parent": "scriptural_study_and_languages"
+  },
+  {
+    "subject": "biblical_studies",
+    "immediate_parent": "scriptural_study_and_languages"
+  },
+  {
+    "subject": "sacred_scripture",
+    "immediate_parent": "scriptural_study_and_languages"
+  },
+  {
+    "subject": "vedic_study",
+    "immediate_parent": "scriptural_study_and_languages"
+  },
+  {
+    "subject": "new_testament_greek",
+    "immediate_parent": "scriptural_study_and_languages"
+  },
+  {
+    "subject": "latin",
+    "immediate_parent": "scriptural_study_and_languages"
+  },
+  {
+    "subject": "old_church_slavonic",
+    "immediate_parent": "scriptural_study_and_languages"
+  },
+  {
+    "subject": "theology",
+    "immediate_parent": "divinity"
+  },
+  {
+    "subject": "dogmatic_theology",
+    "immediate_parent": "theology"
+  },
+  {
+    "subject": "ecclesiology",
+    "immediate_parent": "theology"
+  },
+  {
+    "subject": "sacramental_theology",
+    "immediate_parent": "theology"
+  },
+  {
+    "subject": "systemic_theology",
+    "immediate_parent": "theology"
+  },
+  {
+    "subject": "christian_ethics",
+    "immediate_parent": "theology"
+  },
+  {
+    "subject": "hindu_ethics",
+    "immediate_parent": "theology"
+  },
+  {
+    "subject": "moral_theology",
+    "immediate_parent": "theology"
+  },
+  {
+    "subject": "historical_theology",
+    "immediate_parent": "theology"
+  },
+  {
+    "subject": "comparative_religion",
+    "immediate_parent": "divinity"
+  },
+  {
+    "subject": "religious_history",
+    "immediate_parent": "divinity"
+  },
+  {
+    "subject": "religious_philosophy",
+    "immediate_parent": "divinity"
+  },
+  {
+    "subject": "biblical_studies",
+    "immediate_parent": "divinity"
+  },
+  {
+    "subject": "islamic_studies",
+    "immediate_parent": "divinity"
+  },
+  {
+    "subject": "buddhist_studies",
+    "immediate_parent": "divinity"
+  },
+  {
+    "subject": "hindu_studies",
+    "immediate_parent": "divinity"
+  },
+  {
+    "subject": "performing_arts",
+    "immediate_parent": "humanities"
+  },
+  {
+    "subject": "music",
+    "immediate_parent": "performing_arts"
+  },
+  {
+    "subject": "accompanying",
+    "immediate_parent": "music"
+  },
+  {
+    "subject": "chamber_music",
+    "immediate_parent": "music"
+  },
+  {
+    "subject": "church_music",
+    "immediate_parent": "music"
+  },
+  {
+    "subject": "musical_composition",
+    "immediate_parent": "music"
+  },
+  {
+    "subject": "conducting",
+    "immediate_parent": "music"
+  },
+  {
+    "subject": "choral_conducting",
+    "immediate_parent": "conducting"
+  },
+  {
+    "subject": "orchestral_conducting",
+    "immediate_parent": "conducting"
+  },
+  {
+    "subject": "wind_ensemble_conducting",
+    "immediate_parent": "conducting"
+  },
+  {
+    "subject": "early_music",
+    "immediate_parent": "music"
+  },
+  {
+    "subject": "jazz_studies",
+    "immediate_parent": "music"
+  },
+  {
+    "subject": "music_education",
+    "immediate_parent": "music"
+  },
+  {
+    "subject": "music_history",
+    "immediate_parent": "music"
+  },
+  {
+    "subject": "music_genre",
+    "immediate_parent": "music"
+  },
+  {
+    "subject": "music_theory",
+    "immediate_parent": "music"
+  },
+  {
+    "subject": "musicology",
+    "immediate_parent": "music"
+  },
+  {
+    "subject": "historical_musicology",
+    "immediate_parent": "musicology"
+  },
+  {
+    "subject": "systematic_musicology",
+    "immediate_parent": "musicology"
+  },
+  {
+    "subject": "ethnomusicology",
+    "immediate_parent": "musicology"
+  },
+  {
+    "subject": "organology",
+    "immediate_parent": "music"
+  },
+  {
+    "subject": "organ",
+    "immediate_parent": "organology"
+  },
+  {
+    "subject": "piano",
+    "immediate_parent": "organology"
+  },
+  {
+    "subject": "strings_harp_oud_guitar",
+    "immediate_parent": "organology"
+  },
+  {
+    "subject": "singing",
+    "immediate_parent": "organology"
+  },
+  {
+    "subject": "woodwinds",
+    "immediate_parent": "organology"
+  },
+  {
+    "subject": "brass",
+    "immediate_parent": "organology"
+  },
+  {
+    "subject": "percussion",
+    "immediate_parent": "organology"
+  },
+  {
+    "subject": "recording",
+    "immediate_parent": "music"
+  },
+  {
+    "subject": "orchestral_studies",
+    "immediate_parent": "music"
+  },
+  {
+    "subject": "dance",
+    "immediate_parent": "performing_arts"
+  },
+  {
+    "subject": "choreography",
+    "immediate_parent": "dance"
+  },
+  {
+    "subject": "dance_notation",
+    "immediate_parent": "dance"
+  },
+  {
+    "subject": "ethnochoreology",
+    "immediate_parent": "dance"
+  },
+  {
+    "subject": "history_of_dance",
+    "immediate_parent": "dance"
+  },
+  {
+    "subject": "television_studies",
+    "immediate_parent": "performing_arts"
+  },
+  {
+    "subject": "theatre",
+    "immediate_parent": "performing_arts"
+  },
+  {
+    "subject": "history_of_theatre",
+    "immediate_parent": "theatre"
+  },
+  {
+    "subject": "acting",
+    "immediate_parent": "theatre"
+  },
+  {
+    "subject": "directing",
+    "immediate_parent": "theatre"
+  },
+  {
+    "subject": "stage_design",
+    "immediate_parent": "theatre"
+  },
+  {
+    "subject": "puppetry",
+    "immediate_parent": "theatre"
+  },
+  {
+    "subject": "dramaturgy",
+    "immediate_parent": "theatre"
+  },
+  {
+    "subject": "scenography",
+    "immediate_parent": "theatre"
+  },
+  {
+    "subject": "musical_theatre",
+    "immediate_parent": "theatre"
+  },
+  {
+    "subject": "film",
+    "immediate_parent": "performing_arts"
+  },
+  {
+    "subject": "animation",
+    "immediate_parent": "film"
+  },
+  {
+    "subject": "live_action",
+    "immediate_parent": "film"
+  },
+  {
+    "subject": "film_making",
+    "immediate_parent": "film"
+  },
+  {
+    "subject": "film_criticism",
+    "immediate_parent": "film"
+  },
+  {
+    "subject": "film_genre",
+    "immediate_parent": "film"
+  },
+  {
+    "subject": "film_studies",
+    "immediate_parent": "film"
+  },
+  {
+    "subject": "film_theory",
+    "immediate_parent": "film"
+  },
+  {
+    "subject": "oral_literature",
+    "immediate_parent": "performing_arts"
+  },
+  {
+    "subject": "public_speaking",
+    "immediate_parent": "oral_literature"
+  },
+  {
+    "subject": "performance_poetry",
+    "immediate_parent": "oral_literature"
+  },
+  {
+    "subject": "spoken_word",
+    "immediate_parent": "oral_literature"
+  },
+  {
+    "subject": "storytelling",
+    "immediate_parent": "oral_literature"
+  },
+  {
+    "subject": "electronic_game",
+    "immediate_parent": "performing_arts"
+  },
+  {
+    "subject": "arcade_games",
+    "immediate_parent": "electronic_game"
+  },
+  {
+    "subject": "audio_games",
+    "immediate_parent": "electronic_game"
+  },
+  {
+    "subject": "visual_arts",
+    "immediate_parent": "humanities"
+  },
+  {
+    "subject": "craft",
+    "immediate_parent": "visual_arts"
+  },
+  {
+    "subject": "fine_arts",
+    "immediate_parent": "visual_arts"
+  },
+  {
+    "subject": "forgery",
+    "immediate_parent": "visual_arts"
+  },
+  {
+    "subject": "graphic_design",
+    "immediate_parent": "visual_arts"
+  },
+  {
+    "subject": "painting",
+    "immediate_parent": "visual_arts"
+  },
+  {
+    "subject": "sculpture",
+    "immediate_parent": "visual_arts"
+  },
+  {
+    "subject": "architecture",
+    "immediate_parent": "visual_arts"
+  },
+  {
+    "subject": "drawing",
+    "immediate_parent": "visual_arts"
+  },
+  {
+    "subject": "printmaking",
+    "immediate_parent": "visual_arts"
+  },
+  {
+    "subject": "photography",
+    "immediate_parent": "visual_arts"
+  },
+  {
+    "subject": "ceramics",
+    "immediate_parent": "visual_arts"
+  },
+  {
+    "subject": "art_history",
+    "immediate_parent": "visual_arts"
+  },
+  {
+    "subject": "art_criticism",
+    "immediate_parent": "visual_arts"
+  },
+  {
+    "subject": "digital_art",
+    "immediate_parent": "visual_arts"
+  },
+  {
+    "subject": "religious_studies",
+    "immediate_parent": "humanities"
+  },
+  {
+    "subject": "abrahamic_religions",
+    "immediate_parent": "religious_studies"
+  },
+  {
+    "subject": "christian_theology",
+    "immediate_parent": "abrahamic_religions"
+  },
+  {
+    "subject": "islamic_studies",
+    "immediate_parent": "abrahamic_religions"
+  },
+  {
+    "subject": "judaism_studies",
+    "immediate_parent": "abrahamic_religions"
+  },
+  {
+    "subject": "apologetics",
+    "immediate_parent": "religious_studies"
+  },
+  {
+    "subject": "indian_religions",
+    "immediate_parent": "religious_studies"
+  },
+  {
+    "subject": "buddhist_studies",
+    "immediate_parent": "indian_religions"
+  },
+  {
+    "subject": "hinduism",
+    "immediate_parent": "indian_religions"
+  },
+  {
+    "subject": "jainism",
+    "immediate_parent": "indian_religions"
+  },
+  {
+    "subject": "sikhism",
+    "immediate_parent": "indian_religions"
+  },
+  {
+    "subject": "east_asian_religions",
+    "immediate_parent": "religious_studies"
+  },
+  {
+    "subject": "chinese_folk_religion",
+    "immediate_parent": "east_asian_religions"
+  },
+  {
+    "subject": "confucianism",
+    "immediate_parent": "east_asian_religions"
+  },
+  {
+    "subject": "shinto",
+    "immediate_parent": "east_asian_religions"
+  },
+  {
+    "subject": "daoism",
+    "immediate_parent": "east_asian_religions"
+  },
+  {
+    "subject": "i_kuan_tao",
+    "immediate_parent": "east_asian_religions"
+  },
+  {
+    "subject": "caodaism",
+    "immediate_parent": "east_asian_religions"
+  },
+  {
+    "subject": "chondogyo",
+    "immediate_parent": "east_asian_religions"
+  },
+  {
+    "subject": "tenrikyo",
+    "immediate_parent": "east_asian_religions"
+  },
+  {
+    "subject": "oomoto",
+    "immediate_parent": "east_asian_religions"
+  },
+  {
+    "subject": "african_religions",
+    "immediate_parent": "religious_studies"
+  },
+  {
+    "subject": "ancient_egyptian_religion",
+    "immediate_parent": "religious_studies"
+  },
+  {
+    "subject": "kemitism",
+    "immediate_parent": "ancient_egyptian_religion"
+  },
+  {
+    "subject": "native_american_religions",
+    "immediate_parent": "religious_studies"
+  },
+  {
+    "subject": "gnosticism",
+    "immediate_parent": "religious_studies"
+  },
+  {
+    "subject": "occult",
+    "immediate_parent": "religious_studies"
+  },
+  {
+    "subject": "esotericism",
+    "immediate_parent": "religious_studies"
+  },
+  {
+    "subject": "mysticism",
+    "immediate_parent": "religious_studies"
+  },
+  {
+    "subject": "spirituality",
+    "immediate_parent": "religious_studies"
+  },
+  {
+    "subject": "sumerian_religion",
+    "immediate_parent": "religious_studies"
+  },
+  {
+    "subject": "zoroastrianism",
+    "immediate_parent": "religious_studies"
+  },
+  {
+    "subject": "comparative_religion",
+    "immediate_parent": "religious_studies"
+  },
+  {
+    "subject": "mythology",
+    "immediate_parent": "religious_studies"
+  },
+  {
+    "subject": "theism",
+    "immediate_parent": "religious_studies"
+  },
+  {
+    "subject": "irreligion",
+    "immediate_parent": "religious_studies"
+  },
+  {
+    "subject": "agnosticism",
+    "immediate_parent": "irreligion"
+  },
+  {
+    "subject": "atheism",
+    "immediate_parent": "irreligion"
+  },
+  {
+    "subject": "religious_humanism",
+    "immediate_parent": "irreligion"
+  },
+  {
+    "subject": "nontheism",
+    "immediate_parent": "irreligion"
+  },
+  {
+    "subject": "culinary_arts",
+    "immediate_parent": "humanities"
+  },
+  {
+    "subject": "acquired_taste",
+    "immediate_parent": "culinary_arts"
+  },
+  {
+    "subject": "aftertaste",
+    "immediate_parent": "culinary_arts"
+  },
+  {
+    "subject": "appetite",
+    "immediate_parent": "culinary_arts"
+  },
+  {
+    "subject": "artisanal_food",
+    "immediate_parent": "culinary_arts"
+  },
+  {
+    "subject": "cooking",
+    "immediate_parent": "culinary_arts"
+  },
+  {
+    "subject": "cuisine",
+    "immediate_parent": "culinary_arts"
+  },
+  {
+    "subject": "culinary_tourism",
+    "immediate_parent": "culinary_arts"
+  },
+  {
+    "subject": "delicacy",
+    "immediate_parent": "culinary_arts"
+  },
+  {
+    "subject": "diet",
+    "immediate_parent": "culinary_arts"
+  },
+  {
+    "subject": "flavor",
+    "immediate_parent": "culinary_arts"
+  },
+  {
+    "subject": "food_choice",
+    "immediate_parent": "culinary_arts"
+  },
+  {
+    "subject": "food_pairing",
+    "immediate_parent": "culinary_arts"
+  },
+  {
+    "subject": "food_photography",
+    "immediate_parent": "culinary_arts"
+  },
+  {
+    "subject": "food_preparation",
+    "immediate_parent": "culinary_arts"
+  },
+  {
+    "subject": "food_presentation",
+    "immediate_parent": "culinary_arts"
+  },
+  {
+    "subject": "food_safety",
+    "immediate_parent": "culinary_arts"
+  },
+  {
+    "subject": "food_security",
+    "immediate_parent": "culinary_arts"
+  },
+  {
+    "subject": "food_studies",
+    "immediate_parent": "culinary_arts"
+  },
+  {
+    "subject": "gastronomy",
+    "immediate_parent": "culinary_arts"
+  },
+  {
+    "subject": "gourmet",
+    "immediate_parent": "culinary_arts"
+  },
+  {
+    "subject": "palatability",
+    "immediate_parent": "culinary_arts"
+  },
+  {
+    "subject": "specialty_foods",
+    "immediate_parent": "culinary_arts"
+  },
+  {
+    "subject": "traditional_food",
+    "immediate_parent": "culinary_arts"
+  },
+  {
+    "subject": "professions_and_applied_sciences",
+    "immediate_parent": ""
+  },
+  {
+    "subject": "agriculture",
+    "immediate_parent": "professions_and_applied_sciences"
+  },
+  {
+    "subject": "aeroponics",
+    "immediate_parent": "agriculture"
+  },
+  {
+    "subject": "agroecology",
+    "immediate_parent": "agriculture"
+  },
+  {
+    "subject": "agrology",
+    "immediate_parent": "agriculture"
+  },
+  {
+    "subject": "agronomy",
+    "immediate_parent": "agriculture"
+  },
+  {
+    "subject": "animal_husbandry",
+    "immediate_parent": "agriculture"
+  },
+  {
+    "subject": "beekeeping",
+    "immediate_parent": "agriculture"
+  },
+  {
+    "subject": "anthroponics",
+    "immediate_parent": "agriculture"
+  },
+  {
+    "subject": "agricultural_economics",
+    "immediate_parent": "agriculture"
+  },
+  {
+    "subject": "agricultural_engineering",
+    "immediate_parent": "agriculture"
+  },
+  {
+    "subject": "biological_systems_engineering",
+    "immediate_parent": "agriculture"
+  },
+  {
+    "subject": "food_engineering",
+    "immediate_parent": "agriculture"
+  },
+  {
+    "subject": "aquaculture",
+    "immediate_parent": "agriculture"
+  },
+  {
+    "subject": "aquaponics",
+    "immediate_parent": "agriculture"
+  },
+  {
+    "subject": "enology",
+    "immediate_parent": "agriculture"
+  },
+  {
+    "subject": "entomology",
+    "immediate_parent": "agriculture"
+  },
+  {
+    "subject": "fogponics",
+    "immediate_parent": "agriculture"
+  },
+  {
+    "subject": "food_science",
+    "immediate_parent": "agriculture"
+  },
+  {
+    "subject": "culinary_arts",
+    "immediate_parent": "food_science"
+  },
+  {
+    "subject": "forestry",
+    "immediate_parent": "agriculture"
+  },
+  {
+    "subject": "horticulture",
+    "immediate_parent": "agriculture"
+  },
+  {
+    "subject": "hydrology",
+    "immediate_parent": "agriculture"
+  },
+  {
+    "subject": "pedology",
+    "immediate_parent": "agriculture"
+  },
+  {
+    "subject": "plant_science",
+    "immediate_parent": "agriculture"
+  },
+  {
+    "subject": "pomology",
+    "immediate_parent": "agriculture"
+  },
+  {
+    "subject": "pest_control",
+    "immediate_parent": "agriculture"
+  },
+  {
+    "subject": "purification",
+    "immediate_parent": "agriculture"
+  },
+  {
+    "subject": "vitculture",
+    "immediate_parent": "agriculture"
+  },
+  {
+    "subject": "architecture_design",
+    "immediate_parent": "professions_and_applied_sciences"
+  },
+  {
+    "subject": "interior_architecture",
+    "immediate_parent": "architecture_design"
+  },
+  {
+    "subject": "landscape_architecture",
+    "immediate_parent": "architecture_design"
+  },
+  {
+    "subject": "architectural_analysis",
+    "immediate_parent": "architecture_design"
+  },
+  {
+    "subject": "historic_preservation",
+    "immediate_parent": "architecture_design"
+  },
+  {
+    "subject": "landscape_design",
+    "immediate_parent": "architecture_design"
+  },
+  {
+    "subject": "urban_planning",
+    "immediate_parent": "architecture_design"
+  },
+  {
+    "subject": "visual_communication",
+    "immediate_parent": "architecture_design"
+  },
+  {
+    "subject": "graphic_design",
+    "immediate_parent": "visual_communication"
+  },
+  {
+    "subject": "type_design",
+    "immediate_parent": "visual_communication"
+  },
+  {
+    "subject": "technical_drawing",
+    "immediate_parent": "visual_communication"
+  },
+  {
+    "subject": "industrial_design",
+    "immediate_parent": "architecture_design"
+  },
+  {
+    "subject": "ergonomics",
+    "immediate_parent": "industrial_design"
+  },
+  {
+    "subject": "toy_and_amusement_design",
+    "immediate_parent": "industrial_design"
+  },
+  {
+    "subject": "user_experience_design",
+    "immediate_parent": "architecture_design"
+  },
+  {
+    "subject": "interaction_design",
+    "immediate_parent": "user_experience_design"
+  },
+  {
+    "subject": "information_architecture",
+    "immediate_parent": "user_experience_design"
+  },
+  {
+    "subject": "user_interface_design",
+    "immediate_parent": "user_experience_design"
+  },
+  {
+    "subject": "user_experience_evaluation",
+    "immediate_parent": "user_experience_design"
+  },
+  {
+    "subject": "decorative_arts",
+    "immediate_parent": "architecture_design"
+  },
+  {
+    "subject": "fashion_design",
+    "immediate_parent": "architecture_design"
+  },
+  {
+    "subject": "textile_design",
+    "immediate_parent": "architecture_design"
+  },
+  {
+    "subject": "business",
+    "immediate_parent": "professions_and_applied_sciences"
+  },
+  {
+    "subject": "accounting",
+    "immediate_parent": "business"
+  },
+  {
+    "subject": "accounting_research",
+    "immediate_parent": "accounting"
+  },
+  {
+    "subject": "accounting_scholarship",
+    "immediate_parent": "accounting"
+  },
+  {
+    "subject": "business_administration",
+    "immediate_parent": "business"
+  },
+  {
+    "subject": "business_analysis",
+    "immediate_parent": "business"
+  },
+  {
+    "subject": "business_ethics",
+    "immediate_parent": "business"
+  },
+  {
+    "subject": "business_law",
+    "immediate_parent": "business"
+  },
+  {
+    "subject": "e_business",
+    "immediate_parent": "business"
+  },
+  {
+    "subject": "entrepreneurship",
+    "immediate_parent": "business"
+  },
+  {
+    "subject": "finance",
+    "immediate_parent": "business"
+  },
+  {
+    "subject": "industrial_and_labor_relations",
+    "immediate_parent": "business"
+  },
+  {
+    "subject": "collective_bargaining",
+    "immediate_parent": "industrial_and_labor_relations"
+  },
+  {
+    "subject": "human_resources",
+    "immediate_parent": "industrial_and_labor_relations"
+  },
+  {
+    "subject": "organizational_studies",
+    "immediate_parent": "industrial_and_labor_relations"
+  },
+  {
+    "subject": "labor_economics",
+    "immediate_parent": "industrial_and_labor_relations"
+  },
+  {
+    "subject": "labor_history",
+    "immediate_parent": "industrial_and_labor_relations"
+  },
+  {
+    "subject": "information_systems",
+    "immediate_parent": "business"
+  },
+  {
+    "subject": "management_information_systems",
+    "immediate_parent": "information_systems"
+  },
+  {
+    "subject": "health_informatics",
+    "immediate_parent": "information_systems"
+  },
+  {
+    "subject": "international_trade",
+    "immediate_parent": "business"
+  },
+  {
+    "subject": "management",
+    "immediate_parent": "business"
+  },
+  {
+    "subject": "marketing",
+    "immediate_parent": "business"
+  },
+  {
+    "subject": "operations_management",
+    "immediate_parent": "business"
+  },
+  {
+    "subject": "purchasing",
+    "immediate_parent": "business"
+  },
+  {
+    "subject": "risk_management",
+    "immediate_parent": "business"
+  },
+  {
+    "subject": "insurance",
+    "immediate_parent": "business"
+  },
+  {
+    "subject": "systems_science",
+    "immediate_parent": "business"
+  },
+  {
+    "subject": "education",
+    "immediate_parent": "professions_and_applied_sciences"
+  },
+  {
+    "subject": "comparative_education",
+    "immediate_parent": "education"
+  },
+  {
+    "subject": "critical_pedagogy",
+    "immediate_parent": "education"
+  },
+  {
+    "subject": "cirriculum_and_instruction",
+    "immediate_parent": "education"
+  },
+  {
+    "subject": "alternative_education",
+    "immediate_parent": "cirriculum_and_instruction"
+  },
+  {
+    "subject": "early_childhood_education",
+    "immediate_parent": "cirriculum_and_instruction"
+  },
+  {
+    "subject": "elementary_education",
+    "immediate_parent": "cirriculum_and_instruction"
+  },
+  {
+    "subject": "secondary_education",
+    "immediate_parent": "cirriculum_and_instruction"
+  },
+  {
+    "subject": "higher_education",
+    "immediate_parent": "cirriculum_and_instruction"
+  },
+  {
+    "subject": "mastery_learning",
+    "immediate_parent": "cirriculum_and_instruction"
+  },
+  {
+    "subject": "cooperative_learning",
+    "immediate_parent": "cirriculum_and_instruction"
+  },
+  {
+    "subject": "agricultural_education",
+    "immediate_parent": "cirriculum_and_instruction"
+  },
+  {
+    "subject": "art_education",
+    "immediate_parent": "cirriculum_and_instruction"
+  },
+  {
+    "subject": "bilingual_education",
+    "immediate_parent": "cirriculum_and_instruction"
+  },
+  {
+    "subject": "chemistry_education",
+    "immediate_parent": "cirriculum_and_instruction"
+  },
+  {
+    "subject": "counselor_education",
+    "immediate_parent": "cirriculum_and_instruction"
+  },
+  {
+    "subject": "language_education",
+    "immediate_parent": "cirriculum_and_instruction"
+  },
+  {
+    "subject": "legal_education",
+    "immediate_parent": "cirriculum_and_instruction"
+  },
+  {
+    "subject": "mathematics_education",
+    "immediate_parent": "cirriculum_and_instruction"
+  },
+  {
+    "subject": "medical_education",
+    "immediate_parent": "cirriculum_and_instruction"
+  },
+  {
+    "subject": "military_education_and_training",
+    "immediate_parent": "cirriculum_and_instruction"
+  },
+  {
+    "subject": "music_education",
+    "immediate_parent": "cirriculum_and_instruction"
+  },
+  {
+    "subject": "nursing_education",
+    "immediate_parent": "cirriculum_and_instruction"
+  },
+  {
+    "subject": "outdoor_education",
+    "immediate_parent": "cirriculum_and_instruction"
+  },
+  {
+    "subject": "peace_education",
+    "immediate_parent": "cirriculum_and_instruction"
+  },
+  {
+    "subject": "physical_education",
+    "immediate_parent": "cirriculum_and_instruction"
+  },
+  {
+    "subject": "physics_education",
+    "immediate_parent": "cirriculum_and_instruction"
+  },
+  {
+    "subject": "reading_education",
+    "immediate_parent": "cirriculum_and_instruction"
+  },
+  {
+    "subject": "religious_education",
+    "immediate_parent": "cirriculum_and_instruction"
+  },
+  {
+    "subject": "science_education",
+    "immediate_parent": "cirriculum_and_instruction"
+  },
+  {
+    "subject": "sex_education",
+    "immediate_parent": "cirriculum_and_instruction"
+  },
+  {
+    "subject": "sociology_of_education",
+    "immediate_parent": "cirriculum_and_instruction"
+  },
+  {
+    "subject": "technology_education",
+    "immediate_parent": "cirriculum_and_instruction"
+  },
+  {
+    "subject": "vocational_educations",
+    "immediate_parent": "cirriculum_and_instruction"
+  },
+  {
+    "subject": "educational_leadership",
+    "immediate_parent": "education"
+  },
+  {
+    "subject": "educational_philosophy",
+    "immediate_parent": "education"
+  },
+  {
+    "subject": "educational_psychology",
+    "immediate_parent": "education"
+  },
+  {
+    "subject": "educational_technology",
+    "immediate_parent": "education"
+  },
+  {
+    "subject": "distance_education",
+    "immediate_parent": "education"
+  },
+  {
+    "subject": "engineering",
+    "immediate_parent": "professions_and_applied_sciences"
+  },
+  {
+    "subject": "chemical_engineering",
+    "immediate_parent": "engineering"
+  },
+  {
+    "subject": "biocatalysts",
+    "immediate_parent": "chemical_engineering"
+  },
+  {
+    "subject": "bioengineering",
+    "immediate_parent": "chemical_engineering"
+  },
+  {
+    "subject": "biochemical_engineering",
+    "immediate_parent": "bioengineering"
+  },
+  {
+    "subject": "biomolecular_engineering",
+    "immediate_parent": "bioengineering"
+  },
+  {
+    "subject": "bionics",
+    "immediate_parent": "bioengineering"
+  },
+  {
+    "subject": "catalysis",
+    "immediate_parent": "chemical_engineering"
+  },
+  {
+    "subject": "materials_engineering",
+    "immediate_parent": "chemical_engineering"
+  },
+  {
+    "subject": "molecular_engineering",
+    "immediate_parent": "chemical_engineering"
+  },
+  {
+    "subject": "nanotechnology",
+    "immediate_parent": "chemical_engineering"
+  },
+  {
+    "subject": "polymer_engineering",
+    "immediate_parent": "chemical_engineering"
+  },
+  {
+    "subject": "petroleum_engineering",
+    "immediate_parent": "chemical_engineering"
+  },
+  {
+    "subject": "nuclear_engineering",
+    "immediate_parent": "chemical_engineering"
+  },
+  {
+    "subject": "food_engineering",
+    "immediate_parent": "chemical_engineering"
+  },
+  {
+    "subject": "process_engineering",
+    "immediate_parent": "chemical_engineering"
+  },
+  {
+    "subject": "reaction_engineering",
+    "immediate_parent": "chemical_engineering"
+  },
+  {
+    "subject": "thermodynamics",
+    "immediate_parent": "chemical_engineering"
+  },
+  {
+    "subject": "transport_phenomena",
+    "immediate_parent": "chemical_engineering"
+  },
+  {
+    "subject": "civil_engineering",
+    "immediate_parent": "engineering"
+  },
+  {
+    "subject": "agricultural_engineering",
+    "immediate_parent": "civil_engineering"
+  },
+  {
+    "subject": "coastal_engineering",
+    "immediate_parent": "civil_engineering"
+  },
+  {
+    "subject": "construction",
+    "immediate_parent": "civil_engineering"
+  },
+  {
+    "subject": "earthquake_engineering",
+    "immediate_parent": "civil_engineering"
+  },
+  {
+    "subject": "ecological_engineering",
+    "immediate_parent": "civil_engineering"
+  },
+  {
+    "subject": "environmental_engineering",
+    "immediate_parent": "civil_engineering"
+  },
+  {
+    "subject": "geotechnical_engineering",
+    "immediate_parent": "civil_engineering"
+  },
+  {
+    "subject": "engineering_geology",
+    "immediate_parent": "civil_engineering"
+  },
+  {
+    "subject": "hydraulic_engineering",
+    "immediate_parent": "civil_engineering"
+  },
+  {
+    "subject": "infrastructure",
+    "immediate_parent": "civil_engineering"
+  },
+  {
+    "subject": "mining_engineering",
+    "immediate_parent": "civil_engineering"
+  },
+  {
+    "subject": "transportation_engineering",
+    "immediate_parent": "civil_engineering"
+  },
+  {
+    "subject": "highway_engineering",
+    "immediate_parent": "civil_engineering"
+  },
+  {
+    "subject": "structural_engineering",
+    "immediate_parent": "civil_engineering"
+  },
+  {
+    "subject": "architectural_engineering",
+    "immediate_parent": "civil_engineering"
+  },
+  {
+    "subject": "structural_mechanics",
+    "immediate_parent": "civil_engineering"
+  },
+  {
+    "subject": "surveying",
+    "immediate_parent": "civil_engineering"
+  },
+  {
+    "subject": "electrical_engineering",
+    "immediate_parent": "engineering"
+  },
+  {
+    "subject": "applied_physics",
+    "immediate_parent": "electrical_engineering"
+  },
+  {
+    "subject": "computer_engineering",
+    "immediate_parent": "electrical_engineering"
+  },
+  {
+    "subject": "computer_science",
+    "immediate_parent": "electrical_engineering"
+  },
+  {
+    "subject": "control_systems_engineering",
+    "immediate_parent": "electrical_engineering"
+  },
+  {
+    "subject": "control_theory",
+    "immediate_parent": "electrical_engineering"
+  },
+  {
+    "subject": "electronic_engineering",
+    "immediate_parent": "electrical_engineering"
+  },
+  {
+    "subject": "electronics",
+    "immediate_parent": "electronic_engineering"
+  },
+  {
+    "subject": "instrumentation_engineering",
+    "immediate_parent": "electronic_engineering"
+  },
+  {
+    "subject": "engineering_physics",
+    "immediate_parent": "electrical_engineering"
+  },
+  {
+    "subject": "photonics",
+    "immediate_parent": "electrical_engineering"
+  },
+  {
+    "subject": "information_theory",
+    "immediate_parent": "electrical_engineering"
+  },
+  {
+    "subject": "mechatronics",
+    "immediate_parent": "electrical_engineering"
+  },
+  {
+    "subject": "power_engineering",
+    "immediate_parent": "electrical_engineering"
+  },
+  {
+    "subject": "robotics",
+    "immediate_parent": "electrical_engineering"
+  },
+  {
+    "subject": "microbotics",
+    "immediate_parent": "robotics"
+  },
+  {
+    "subject": "semiconductors",
+    "immediate_parent": "electrical_engineering"
+  },
+  {
+    "subject": "telecommunications_engineering",
+    "immediate_parent": "electrical_engineering"
+  },
+  {
+    "subject": "quantum_computing",
+    "immediate_parent": "electrical_engineering"
+  },
+  {
+    "subject": "materials_science_and_engineering",
+    "immediate_parent": "engineering"
+  },
+  {
+    "subject": "biomaterials",
+    "immediate_parent": "materials_science_and_engineering"
+  },
+  {
+    "subject": "ceramic_engineering",
+    "immediate_parent": "materials_science_and_engineering"
+  },
+  {
+    "subject": "corrosion_engineering",
+    "immediate_parent": "materials_science_and_engineering"
+  },
+  {
+    "subject": "crystallography",
+    "immediate_parent": "materials_science_and_engineering"
+  },
+  {
+    "subject": "nanomaterials",
+    "immediate_parent": "materials_science_and_engineering"
+  },
+  {
+    "subject": "photonics",
+    "immediate_parent": "materials_science_and_engineering"
+  },
+  {
+    "subject": "physical_metallurgy",
+    "immediate_parent": "materials_science_and_engineering"
+  },
+  {
+    "subject": "polymer_engineering",
+    "immediate_parent": "materials_science_and_engineering"
+  },
+  {
+    "subject": "polymer_science",
+    "immediate_parent": "materials_science_and_engineering"
+  },
+  {
+    "subject": "semiconductors",
+    "immediate_parent": "materials_science_and_engineering"
+  },
+  {
+    "subject": "mechanical_engineering",
+    "immediate_parent": "engineering"
+  },
+  {
+    "subject": "aerospace_engineering",
+    "immediate_parent": "mechanical_engineering"
+  },
+  {
+    "subject": "aeronautics",
+    "immediate_parent": "aerospace_engineering"
+  },
+  {
+    "subject": "astronautics",
+    "immediate_parent": "aerospace_engineering"
+  },
+  {
+    "subject": "acoustical_engineering",
+    "immediate_parent": "mechanical_engineering"
+  },
+  {
+    "subject": "automotive_engineering",
+    "immediate_parent": "mechanical_engineering"
+  },
+  {
+    "subject": "biomedical_engineering",
+    "immediate_parent": "mechanical_engineering"
+  },
+  {
+    "subject": "biomechanical_engineering",
+    "immediate_parent": "mechanical_engineering"
+  },
+  {
+    "subject": "continuum_mechanics",
+    "immediate_parent": "mechanical_engineering"
+  },
+  {
+    "subject": "fluid_mechanics",
+    "immediate_parent": "mechanical_engineering"
+  },
+  {
+    "subject": "heat_transfer",
+    "immediate_parent": "mechanical_engineering"
+  },
+  {
+    "subject": "industrial_engineering",
+    "immediate_parent": "mechanical_engineering"
+  },
+  {
+    "subject": "manufacturing_engineering",
+    "immediate_parent": "mechanical_engineering"
+  },
+  {
+    "subject": "marine_engineering",
+    "immediate_parent": "mechanical_engineering"
+  },
+  {
+    "subject": "mass_transfer",
+    "immediate_parent": "mechanical_engineering"
+  },
+  {
+    "subject": "mechatronics",
+    "immediate_parent": "mechanical_engineering"
+  },
+  {
+    "subject": "nano_engineering",
+    "immediate_parent": "mechanical_engineering"
+  },
+  {
+    "subject": "ocean_engineering",
+    "immediate_parent": "mechanical_engineering"
+  },
+  {
+    "subject": "optical_engineering",
+    "immediate_parent": "mechanical_engineering"
+  },
+  {
+    "subject": "robotics",
+    "immediate_parent": "mechanical_engineering"
+  },
+  {
+    "subject": "thermal_engineering",
+    "immediate_parent": "mechanical_engineering"
+  },
+  {
+    "subject": "thermodynamics",
+    "immediate_parent": "mechanical_engineering"
+  },
+  {
+    "subject": "environmental_studies",
+    "immediate_parent": "professions_and_applied_sciences"
+  },
+  {
+    "subject": "environmental_management",
+    "immediate_parent": "environmental_studies"
+  },
+  {
+    "subject": "coastal_management",
+    "immediate_parent": "environmental_management"
+  },
+  {
+    "subject": "fisheries_management",
+    "immediate_parent": "environmental_management"
+  },
+  {
+    "subject": "land_management",
+    "immediate_parent": "environmental_management"
+  },
+  {
+    "subject": "natural_resource_management",
+    "immediate_parent": "environmental_management"
+  },
+  {
+    "subject": "waste_management",
+    "immediate_parent": "environmental_management"
+  },
+  {
+    "subject": "wildlife_management",
+    "immediate_parent": "environmental_management"
+  },
+  {
+    "subject": "environmental_policy",
+    "immediate_parent": "environmental_studies"
+  },
+  {
+    "subject": "wildlife_observation",
+    "immediate_parent": "environmental_studies"
+  },
+  {
+    "subject": "recreation_ecology",
+    "immediate_parent": "environmental_studies"
+  },
+  {
+    "subject": "silviculture",
+    "immediate_parent": "environmental_studies"
+  },
+  {
+    "subject": "sustainability_studies",
+    "immediate_parent": "environmental_studies"
+  },
+  {
+    "subject": "sustainable_development",
+    "immediate_parent": "environmental_studies"
+  },
+  {
+    "subject": "toxicology",
+    "immediate_parent": "environmental_studies"
+  },
+  {
+    "subject": "ecology",
+    "immediate_parent": "environmental_studies"
+  },
+  {
+    "subject": "human_physical_performance_and_recreation",
+    "immediate_parent": "professions_and_applied_sciences"
+  },
+  {
+    "subject": "biomechanics",
+    "immediate_parent": "human_physical_performance_and_recreation"
+  },
+  {
+    "subject": "sports_coaching",
+    "immediate_parent": "human_physical_performance_and_recreation"
+  },
+  {
+    "subject": "escapology",
+    "immediate_parent": "human_physical_performance_and_recreation"
+  },
+  {
+    "subject": "ergonomics",
+    "immediate_parent": "human_physical_performance_and_recreation"
+  },
+  {
+    "subject": "physical_fitness",
+    "immediate_parent": "human_physical_performance_and_recreation"
+  },
+  {
+    "subject": "aerobics",
+    "immediate_parent": "physical_fitness"
+  },
+  {
+    "subject": "personal_fitness_training",
+    "immediate_parent": "physical_fitness"
+  },
+  {
+    "subject": "game_design",
+    "immediate_parent": "human_physical_performance_and_recreation"
+  },
+  {
+    "subject": "exercise_physiology",
+    "immediate_parent": "human_physical_performance_and_recreation"
+  },
+  {
+    "subject": "kinesiology",
+    "immediate_parent": "human_physical_performance_and_recreation"
+  },
+  {
+    "subject": "leisure_studies",
+    "immediate_parent": "human_physical_performance_and_recreation"
+  },
+  {
+    "subject": "navigation",
+    "immediate_parent": "human_physical_performance_and_recreation"
+  },
+  {
+    "subject": "outdoor_activity",
+    "immediate_parent": "human_physical_performance_and_recreation"
+  },
+  {
+    "subject": "physical_activity",
+    "immediate_parent": "human_physical_performance_and_recreation"
+  },
+  {
+    "subject": "physical_education",
+    "immediate_parent": "human_physical_performance_and_recreation"
+  },
+  {
+    "subject": "sociology_of_sport",
+    "immediate_parent": "human_physical_performance_and_recreation"
+  },
+  {
+    "subject": "sexology",
+    "immediate_parent": "human_physical_performance_and_recreation"
+  },
+  {
+    "subject": "sports",
+    "immediate_parent": "human_physical_performance_and_recreation"
+  },
+  {
+    "subject": "sports_journalism",
+    "immediate_parent": "human_physical_performance_and_recreation"
+  },
+  {
+    "subject": "sport_management",
+    "immediate_parent": "human_physical_performance_and_recreation"
+  },
+  {
+    "subject": "sport_psychology",
+    "immediate_parent": "human_physical_performance_and_recreation"
+  },
+  {
+    "subject": "sports_medicine",
+    "immediate_parent": "human_physical_performance_and_recreation"
+  },
+  {
+    "subject": "survival_skills",
+    "immediate_parent": "human_physical_performance_and_recreation"
+  },
+  {
+    "subject": "batoning",
+    "immediate_parent": "survival_skills"
+  },
+  {
+    "subject": "bushcraft",
+    "immediate_parent": "survival_skills"
+  },
+  {
+    "subject": "scoutcraft",
+    "immediate_parent": "survival_skills"
+  },
+  {
+    "subject": "woodcraft",
+    "immediate_parent": "survival_skills"
+  },
+  {
+    "subject": "toy_and_amusement_design",
+    "immediate_parent": "human_physical_performance_and_recreation"
+  },
+  {
+    "subject": "journalism_media_studies_and_communication",
+    "immediate_parent": "professions_and_applied_sciences"
+  },
+  {
+    "subject": "journalism",
+    "immediate_parent": "journalism_media_studies_and_communication"
+  },
+  {
+    "subject": "broadcast_journalism",
+    "immediate_parent": "journalism"
+  },
+  {
+    "subject": "digitial_journalism",
+    "immediate_parent": "journalism"
+  },
+  {
+    "subject": "literary_journalism",
+    "immediate_parent": "journalism"
+  },
+  {
+    "subject": "new_media_journalism",
+    "immediate_parent": "journalism"
+  },
+  {
+    "subject": "print_journalism",
+    "immediate_parent": "journalism"
+  },
+  {
+    "subject": "sports_journalism",
+    "immediate_parent": "journalism"
+  },
+  {
+    "subject": "media_studies",
+    "immediate_parent": "journalism_media_studies_and_communication"
+  },
+  {
+    "subject": "newspaper",
+    "immediate_parent": "media_studies"
+  },
+  {
+    "subject": "magazine",
+    "immediate_parent": "media_studies"
+  },
+  {
+    "subject": "radio",
+    "immediate_parent": "media_studies"
+  },
+  {
+    "subject": "television_studies",
+    "immediate_parent": "media_studies"
+  },
+  {
+    "subject": "film_studies",
+    "immediate_parent": "media_studies"
+  },
+  {
+    "subject": "game_studies",
+    "immediate_parent": "media_studies"
+  },
+  {
+    "subject": "fan_studies",
+    "immediate_parent": "media_studies"
+  },
+  {
+    "subject": "narratology",
+    "immediate_parent": "journalism_media_studies_and_communication"
+  },
+  {
+    "subject": "communication_studies",
+    "immediate_parent": "journalism_media_studies_and_communication"
+  },
+  {
+    "subject": "advertising",
+    "immediate_parent": "communication_studies"
+  },
+  {
+    "subject": "animal_communication",
+    "immediate_parent": "communication_studies"
+  },
+  {
+    "subject": "communication_design",
+    "immediate_parent": "communication_studies"
+  },
+  {
+    "subject": "conspiracy_theory",
+    "immediate_parent": "communication_studies"
+  },
+  {
+    "subject": "digital_media",
+    "immediate_parent": "communication_studies"
+  },
+  {
+    "subject": "electronic_media",
+    "immediate_parent": "communication_studies"
+  },
+  {
+    "subject": "environmental_communication",
+    "immediate_parent": "communication_studies"
+  },
+  {
+    "subject": "hoaxes",
+    "immediate_parent": "communication_studies"
+  },
+  {
+    "subject": "information_theory",
+    "immediate_parent": "communication_studies"
+  },
+  {
+    "subject": "intercultural_communication",
+    "immediate_parent": "communication_studies"
+  },
+  {
+    "subject": "marketing",
+    "immediate_parent": "communication_studies"
+  },
+  {
+    "subject": "mass_communication",
+    "immediate_parent": "communication_studies"
+  },
+  {
+    "subject": "nonverbal_communication",
+    "immediate_parent": "communication_studies"
+  },
+  {
+    "subject": "organizational_communication",
+    "immediate_parent": "communication_studies"
+  },
+  {
+    "subject": "popular_culture_studies",
+    "immediate_parent": "communication_studies"
+  },
+  {
+    "subject": "propaganda_studies",
+    "immediate_parent": "communication_studies"
+  },
+  {
+    "subject": "public_relations",
+    "immediate_parent": "communication_studies"
+  },
+  {
+    "subject": "speech_communication",
+    "immediate_parent": "communication_studies"
+  },
+  {
+    "subject": "technical_writing",
+    "immediate_parent": "communication_studies"
+  },
+  {
+    "subject": "translation",
+    "immediate_parent": "communication_studies"
+  },
+  {
+    "subject": "law",
+    "immediate_parent": "professions_and_applied_sciences"
+  },
+  {
+    "subject": "legal_management",
+    "immediate_parent": "law"
+  },
+  {
+    "subject": "corporate_law",
+    "immediate_parent": "law"
+  },
+  {
+    "subject": "mercantile_law",
+    "immediate_parent": "law"
+  },
+  {
+    "subject": "business_law",
+    "immediate_parent": "law"
+  },
+  {
+    "subject": "administrative_law",
+    "immediate_parent": "law"
+  },
+  {
+    "subject": "canon_law",
+    "immediate_parent": "law"
+  },
+  {
+    "subject": "comparative_law",
+    "immediate_parent": "law"
+  },
+  {
+    "subject": "constitutional_law",
+    "immediate_parent": "law"
+  },
+  {
+    "subject": "competition_law",
+    "immediate_parent": "law"
+  },
+  {
+    "subject": "criminal_law",
+    "immediate_parent": "law"
+  },
+  {
+    "subject": "criminal_procedure",
+    "immediate_parent": "criminal_law"
+  },
+  {
+    "subject": "criminal_justice",
+    "immediate_parent": "criminal_law"
+  },
+  {
+    "subject": "police_science",
+    "immediate_parent": "criminal_justice"
+  },
+  {
+    "subject": "forensic_science",
+    "immediate_parent": "criminal_justice"
+  },
+  {
+    "subject": "islamic_law",
+    "immediate_parent": "law"
+  },
+  {
+    "subject": "jewish_law",
+    "immediate_parent": "law"
+  },
+  {
+    "subject": "jurisprudence",
+    "immediate_parent": "law"
+  },
+  {
+    "subject": "civil_law",
+    "immediate_parent": "law"
+  },
+  {
+    "subject": "admirality_law",
+    "immediate_parent": "civil_law"
+  },
+  {
+    "subject": "animal_law",
+    "immediate_parent": "civil_law"
+  },
+  {
+    "subject": "common_law",
+    "immediate_parent": "civil_law"
+  },
+  {
+    "subject": "corporations",
+    "immediate_parent": "civil_law"
+  },
+  {
+    "subject": "civil_procedure",
+    "immediate_parent": "civil_law"
+  },
+  {
+    "subject": "contract_law",
+    "immediate_parent": "civil_law"
+  },
+  {
+    "subject": "environmental_law",
+    "immediate_parent": "civil_law"
+  },
+  {
+    "subject": "family_law",
+    "immediate_parent": "civil_law"
+  },
+  {
+    "subject": "international_law",
+    "immediate_parent": "civil_law"
+  },
+  {
+    "subject": "public_international_law",
+    "immediate_parent": "international_law"
+  },
+  {
+    "subject": "supranational_law",
+    "immediate_parent": "international_law"
+  },
+  {
+    "subject": "labor_law",
+    "immediate_parent": "civil_law"
+  },
+  {
+    "subject": "paralegal_studies",
+    "immediate_parent": "civil_law"
+  },
+  {
+    "subject": "property_law",
+    "immediate_parent": "civil_law"
+  },
+  {
+    "subject": "tax_law",
+    "immediate_parent": "civil_law"
+  },
+  {
+    "subject": "tort_law",
+    "immediate_parent": "civil_law"
+  },
+  {
+    "subject": "law_enforcement",
+    "immediate_parent": "law"
+  },
+  {
+    "subject": "procedural_law",
+    "immediate_parent": "law"
+  },
+  {
+    "subject": "substantive_law",
+    "immediate_parent": "law"
+  },
+  {
+    "subject": "library_and_museum_studies",
+    "immediate_parent": "professions_and_applied_sciences"
+  },
+  {
+    "subject": "archival_science",
+    "immediate_parent": "library_and_museum_studies"
+  },
+  {
+    "subject": "bibliographic_databases",
+    "immediate_parent": "library_and_museum_studies"
+  },
+  {
+    "subject": "bibliometrics",
+    "immediate_parent": "library_and_museum_studies"
+  },
+  {
+    "subject": "cataloging",
+    "immediate_parent": "library_and_museum_studies"
+  },
+  {
+    "subject": "citation_analysis",
+    "immediate_parent": "cataloging"
+  },
+  {
+    "subject": "categorization",
+    "immediate_parent": "library_and_museum_studies"
+  },
+  {
+    "subject": "classification",
+    "immediate_parent": "library_and_museum_studies"
+  },
+  {
+    "subject": "library_classfication",
+    "immediate_parent": "classification"
+  },
+  {
+    "subject": "taxonomic_classification",
+    "immediate_parent": "classification"
+  },
+  {
+    "subject": "scientific_classification",
+    "immediate_parent": "classification"
+  },
+  {
+    "subject": "statistical_classification",
+    "immediate_parent": "classification"
+  },
+  {
+    "subject": "security_classification",
+    "immediate_parent": "classification"
+  },
+  {
+    "subject": "film_classification",
+    "immediate_parent": "classification"
+  },
+  {
+    "subject": "collections_care",
+    "immediate_parent": "library_and_museum_studies"
+  },
+  {
+    "subject": "collection_management",
+    "immediate_parent": "library_and_museum_studies"
+  },
+  {
+    "subject": "conservation_science",
+    "immediate_parent": "library_and_museum_studies"
+  },
+  {
+    "subject": "database_management",
+    "immediate_parent": "library_and_museum_studies"
+  },
+  {
+    "subject": "data_modeling",
+    "immediate_parent": "library_and_museum_studies"
+  },
+  {
+    "subject": "digital_preservation",
+    "immediate_parent": "library_and_museum_studies"
+  },
+  {
+    "subject": "dissemination",
+    "immediate_parent": "library_and_museum_studies"
+  },
+  {
+    "subject": "film_preservation",
+    "immediate_parent": "library_and_museum_studies"
+  },
+  {
+    "subject": "historic_preservation",
+    "immediate_parent": "library_and_museum_studies"
+  },
+  {
+    "subject": "history_of_library_science",
+    "immediate_parent": "library_and_museum_studies"
+  },
+  {
+    "subject": "human_computer_interaction",
+    "immediate_parent": "library_and_museum_studies"
+  },
+  {
+    "subject": "informatics",
+    "immediate_parent": "library_and_museum_studies"
+  },
+  {
+    "subject": "information_architecture",
+    "immediate_parent": "library_and_museum_studies"
+  },
+  {
+    "subject": "information_science",
+    "immediate_parent": "library_and_museum_studies"
+  },
+  {
+    "subject": "knowledge_engineering",
+    "immediate_parent": "library_and_museum_studies"
+  },
+  {
+    "subject": "knowledge_management",
+    "immediate_parent": "library_and_museum_studies"
+  },
+  {
+    "subject": "museology",
+    "immediate_parent": "library_and_museum_studies"
+  },
+  {
+    "subject": "museum_education",
+    "immediate_parent": "library_and_museum_studies"
+  },
+  {
+    "subject": "records_management",
+    "immediate_parent": "library_and_museum_studies"
+  },
+  {
+    "subject": "medicine_and_health",
+    "immediate_parent": "professions_and_applied_sciences"
+  },
+  {
+    "subject": "alternative_medicine",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "anesthesiology",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "cleaning",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "clinical_laboratory_science",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "clinical_biochemistry",
+    "immediate_parent": "clinical_laboratory_science"
+  },
+  {
+    "subject": "cytogenetics",
+    "immediate_parent": "clinical_laboratory_science"
+  },
+  {
+    "subject": "cytohematology",
+    "immediate_parent": "clinical_laboratory_science"
+  },
+  {
+    "subject": "cytology",
+    "immediate_parent": "clinical_laboratory_science"
+  },
+  {
+    "subject": "haemostasiology",
+    "immediate_parent": "clinical_laboratory_science"
+  },
+  {
+    "subject": "histology",
+    "immediate_parent": "clinical_laboratory_science"
+  },
+  {
+    "subject": "clinicial_immunology",
+    "immediate_parent": "clinical_laboratory_science"
+  },
+  {
+    "subject": "clinical_micobiology",
+    "immediate_parent": "clinical_laboratory_science"
+  },
+  {
+    "subject": "molecular_genetics",
+    "immediate_parent": "clinical_laboratory_science"
+  },
+  {
+    "subject": "parasitology",
+    "immediate_parent": "clinical_laboratory_science"
+  },
+  {
+    "subject": "clinical_psychology",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "cosmetology",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "decontamination",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "dentistry",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "dental_hygiene",
+    "immediate_parent": "dentistry"
+  },
+  {
+    "subject": "dental_surgery",
+    "immediate_parent": "dentistry"
+  },
+  {
+    "subject": "endodontics",
+    "immediate_parent": "dentistry"
+  },
+  {
+    "subject": "orthodontics",
+    "immediate_parent": "dentistry"
+  },
+  {
+    "subject": "oral_and_maxillofacial_surgery",
+    "immediate_parent": "dentistry"
+  },
+  {
+    "subject": "periodontics",
+    "immediate_parent": "dentistry"
+  },
+  {
+    "subject": "prosthodontics",
+    "immediate_parent": "dentistry"
+  },
+  {
+    "subject": "implantology",
+    "immediate_parent": "dentistry"
+  },
+  {
+    "subject": "dermatology",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "emergency_medicine",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "health_informatics",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "music_therapy",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "nursing",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "nutrition",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "optometry",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "orthoptics",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "osteopaty",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "physiotherapy",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "occupational_theory",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "speech_and_language_pathology",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "preventative_medicine",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "cardiology",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "cardiac_electrophysiology",
+    "immediate_parent": "cardiology"
+  },
+  {
+    "subject": "pulmonology",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "medical_toxicology",
+    "immediate_parent": "pulmonology"
+  },
+  {
+    "subject": "endocrinology",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "gastroenterology",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "hepatology",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "oncology",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "geriatrics",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "gynaecology",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "hematology",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "infectious_diseases",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "nephrology",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "neurology",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "neurosurgery",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "obstetrics",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "ophthalmology",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "neuro_ophthalmology",
+    "immediate_parent": "ophthalmology"
+  },
+  {
+    "subject": "orthopedic_surgery",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "otolaryngology",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "pathology",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "pediatrics",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "pharmacy",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "pharmaceutical_sciences",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "pharmacognosy",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "physical_fitness",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "aerobics",
+    "immediate_parent": "physical_fitness"
+  },
+  {
+    "subject": "personal_fitness_training",
+    "immediate_parent": "physical_fitness"
+  },
+  {
+    "subject": "kinesiology",
+    "immediate_parent": "physical_fitness"
+  },
+  {
+    "subject": "physical_therapy",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "podiatry",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "psychiatry",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "psychology",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "psychosomatic",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "psychotherapy",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "public_health",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "radiology",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "recreation_therapy",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "rehabilitation_medicine",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "respiratory_medicine",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "pulmonology",
+    "immediate_parent": "respiratory_medicine"
+  },
+  {
+    "subject": "sleep_medicine",
+    "immediate_parent": "respiratory_medicine"
+  },
+  {
+    "subject": "respiratory_therapy",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "rheumatology",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "sports_medicine",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "sterilization",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "surgery",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "bariatric_surgery",
+    "immediate_parent": "surgery"
+  },
+  {
+    "subject": "cardiothoracic_surgery",
+    "immediate_parent": "surgery"
+  },
+  {
+    "subject": "neurosurgery",
+    "immediate_parent": "surgery"
+  },
+  {
+    "subject": "plastic_surgery",
+    "immediate_parent": "surgery"
+  },
+  {
+    "subject": "trauma_surgery",
+    "immediate_parent": "surgery"
+  },
+  {
+    "subject": "traumatology",
+    "immediate_parent": "surgery"
+  },
+  {
+    "subject": "traditional_medicine",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "therapy",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "urology",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "andrology",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "veterinary_medicine",
+    "immediate_parent": "medicine_and_health"
+  },
+  {
+    "subject": "military_science",
+    "immediate_parent": "professions_and_applied_sciences"
+  },
+  {
+    "subject": "amphibious_warfare",
+    "immediate_parent": "military_science"
+  },
+  {
+    "subject": "artillery",
+    "immediate_parent": "military_science"
+  },
+  {
+    "subject": "battlespace",
+    "immediate_parent": "military_science"
+  },
+  {
+    "subject": "campaigning",
+    "immediate_parent": "military_science"
+  },
+  {
+    "subject": "military_engineering",
+    "immediate_parent": "military_science"
+  },
+  {
+    "subject": "doctrine",
+    "immediate_parent": "military_science"
+  },
+  {
+    "subject": "espionage",
+    "immediate_parent": "military_science"
+  },
+  {
+    "subject": "game theory",
+    "immediate_parent": "military_science"
+  },
+  {
+    "subject": "grand_strategy",
+    "immediate_parent": "military_science"
+  },
+  {
+    "subject": "containment",
+    "immediate_parent": "grand_strategy"
+  },
+  {
+    "subject": "limited_war",
+    "immediate_parent": "grand_strategy"
+  },
+  {
+    "subject": "philosophy_of_war",
+    "immediate_parent": "grand_strategy"
+  },
+  {
+    "subject": "strategic_studies",
+    "immediate_parent": "grand_strategy"
+  },
+  {
+    "subject": "total_war",
+    "immediate_parent": "grand_strategy"
+  },
+  {
+    "subject": "war",
+    "immediate_parent": "grand_strategy"
+  },
+  {
+    "subject": "leadership",
+    "immediate_parent": "military_science"
+  },
+  {
+    "subject": "logistics",
+    "immediate_parent": "military_science"
+  },
+  {
+    "subject": "supply_chain_management",
+    "immediate_parent": "military_science"
+  },
+  {
+    "subject": "military_operation",
+    "immediate_parent": "military_science"
+  },
+  {
+    "subject": "military_history",
+    "immediate_parent": "military_science"
+  },
+  {
+    "subject": "prehistoric_military_history",
+    "immediate_parent": "military_history"
+  },
+  {
+    "subject": "ancient_military_history",
+    "immediate_parent": "military_history"
+  },
+  {
+    "subject": "early_modern_military_history",
+    "immediate_parent": "military_history"
+  },
+  {
+    "subject": "industrial_military_history",
+    "immediate_parent": "military_history"
+  },
+  {
+    "subject": "modern_military_history",
+    "immediate_parent": "military_history"
+  },
+  {
+    "subject": "fourth_generation_warfare",
+    "immediate_parent": "military_history"
+  },
+  {
+    "subject": "military_intelligence",
+    "immediate_parent": "military_science"
+  },
+  {
+    "subject": "military_law",
+    "immediate_parent": "military_science"
+  },
+  {
+    "subject": "military_medicine",
+    "immediate_parent": "military_science"
+  },
+  {
+    "subject": "naval_science",
+    "immediate_parent": "military_science"
+  },
+  {
+    "subject": "naval_engineering",
+    "immediate_parent": "naval_science"
+  },
+  {
+    "subject": "naval_tactics",
+    "immediate_parent": "naval_science"
+  },
+  {
+    "subject": "naval_architecture",
+    "immediate_parent": "naval_science"
+  },
+  {
+    "subject": "military_organization",
+    "immediate_parent": "military_science"
+  },
+  {
+    "subject": "command_and_control",
+    "immediate_parent": "military_organization"
+  },
+  {
+    "subject": "military_doctrine",
+    "immediate_parent": "military_organization"
+  },
+  {
+    "subject": "military_education_and_training",
+    "immediate_parent": "military_organization"
+  },
+  {
+    "subject": "military_engineers",
+    "immediate_parent": "military_organization"
+  },
+  {
+    "subject": "military_ranks",
+    "immediate_parent": "military_organization"
+  },
+  {
+    "subject": "military_staff",
+    "immediate_parent": "military_organization"
+  },
+  {
+    "subject": "military_techonology_and_equipment",
+    "immediate_parent": "military_organization"
+  },
+  {
+    "subject": "military_exercises",
+    "immediate_parent": "military_organization"
+  },
+  {
+    "subject": "military_simulation",
+    "immediate_parent": "military_organization"
+  },
+  {
+    "subject": "military_sports",
+    "immediate_parent": "military_organization"
+  },
+  {
+    "subject": "military_strategy",
+    "immediate_parent": "military_science"
+  },
+  {
+    "subject": "attrition_warfare",
+    "immediate_parent": "military_strategy"
+  },
+  {
+    "subject": "military_deception",
+    "immediate_parent": "military_strategy"
+  },
+  {
+    "subject": "strategic_defence",
+    "immediate_parent": "military_strategy"
+  },
+  {
+    "subject": "military_offensive",
+    "immediate_parent": "military_strategy"
+  },
+  {
+    "subject": "military_counter_offensive",
+    "immediate_parent": "military_strategy"
+  },
+  {
+    "subject": "maneuver_warfare",
+    "immediate_parent": "military_strategy"
+  },
+  {
+    "subject": "strategic_military_goal",
+    "immediate_parent": "military_strategy"
+  },
+  {
+    "subject": "naval_strategy",
+    "immediate_parent": "military_strategy"
+  },
+  {
+    "subject": "military_tactics",
+    "immediate_parent": "military_science"
+  },
+  {
+    "subject": "air_combat_manoeuvring",
+    "immediate_parent": "military_tactics"
+  },
+  {
+    "subject": "battle_tactics",
+    "immediate_parent": "military_tactics"
+  },
+  {
+    "subject": "cavalry_tactics",
+    "immediate_parent": "military_tactics"
+  },
+  {
+    "subject": "charge_maneuvers",
+    "immediate_parent": "military_tactics"
+  },
+  {
+    "subject": "military_counter_offensive",
+    "immediate_parent": "military_tactics"
+  },
+  {
+    "subject": "counterinsurgency",
+    "immediate_parent": "military_tactics"
+  },
+  {
+    "subject": "counter_intelligence",
+    "immediate_parent": "military_tactics"
+  },
+  {
+    "subject": "counter_terrorism",
+    "immediate_parent": "military_tactics"
+  },
+  {
+    "subject": "defensive_fighting_positions",
+    "immediate_parent": "military_tactics"
+  },
+  {
+    "subject": "endemic_warfare",
+    "immediate_parent": "military_tactics"
+  },
+  {
+    "subject": "guerrilla_warfare",
+    "immediate_parent": "military_tactics"
+  },
+  {
+    "subject": "infiltration",
+    "immediate_parent": "military_tactics"
+  },
+  {
+    "subject": "irregular_warfare",
+    "immediate_parent": "military_tactics"
+  },
+  {
+    "subject": "morale",
+    "immediate_parent": "military_tactics"
+  },
+  {
+    "subject": "naval_tactics",
+    "immediate_parent": "military_tactics"
+  },
+  {
+    "subject": "siege warfare",
+    "immediate_parent": "military_tactics"
+  },
+  {
+    "subject": "surgical_strikes",
+    "immediate_parent": "military_tactics"
+  },
+  {
+    "subject": "tactical_objectives",
+    "immediate_parent": "military_tactics"
+  },
+  {
+    "subject": "trench_warfare",
+    "immediate_parent": "military_tactics"
+  },
+  {
+    "subject": "military_weapons",
+    "immediate_parent": "military_science"
+  },
+  {
+    "subject": "armor",
+    "immediate_parent": "military_weapons"
+  },
+  {
+    "subject": "artillery",
+    "immediate_parent": "military_weapons"
+  },
+  {
+    "subject": "biological_weapons",
+    "immediate_parent": "military_weapons"
+  },
+  {
+    "subject": "cavalry",
+    "immediate_parent": "military_weapons"
+  },
+  {
+    "subject": "conventional_weapons",
+    "immediate_parent": "military_weapons"
+  },
+  {
+    "subject": "chemical_weapons",
+    "immediate_parent": "military_weapons"
+  },
+  {
+    "subject": "cyber_weapons",
+    "immediate_parent": "military_weapons"
+  },
+  {
+    "subject": "economic_warfare",
+    "immediate_parent": "military_weapons"
+  },
+  {
+    "subject": "electronic_warfare",
+    "immediate_parent": "military_weapons"
+  },
+  {
+    "subject": "infantry",
+    "immediate_parent": "military_weapons"
+  },
+  {
+    "subject": "nuclear_weapons",
+    "immediate_parent": "military_weapons"
+  },
+  {
+    "subject": "psychological_warfare",
+    "immediate_parent": "military_weapons"
+  },
+  {
+    "subject": "unconventional_warfare",
+    "immediate_parent": "military_weapons"
+  },
+  {
+    "subject": "arms_control",
+    "immediate_parent": "military_science"
+  },
+  {
+    "subject": "arms_race",
+    "immediate_parent": "military_science"
+  },
+  {
+    "subject": "assassination",
+    "immediate_parent": "military_science"
+  },
+  {
+    "subject": "asymmetric_warfare",
+    "immediate_parent": "military_science"
+  },
+  {
+    "subject": "civil_defense",
+    "immediate_parent": "military_science"
+  },
+  {
+    "subject": "cyberwarfare",
+    "immediate_parent": "military_science"
+  },
+  {
+    "subject": "network-centric_warfare",
+    "immediate_parent": "military_science"
+  },
+  {
+    "subject": "special_operations",
+    "immediate_parent": "military_science"
+  },
+  {
+    "subject": "public_administration",
+    "immediate_parent": "professions_and_applied_sciences"
+  },
+  {
+    "subject": "civil_service",
+    "immediate_parent": "public_administration"
+  },
+  {
+    "subject": "corrections",
+    "immediate_parent": "public_administration"
+  },
+  {
+    "subject": "conservation_biology",
+    "immediate_parent": "public_administration"
+  },
+  {
+    "subject": "criminal_justice",
+    "immediate_parent": "public_administration"
+  },
+  {
+    "subject": "disaster_research",
+    "immediate_parent": "public_administration"
+  },
+  {
+    "subject": "disaster_response",
+    "immediate_parent": "public_administration"
+  },
+  {
+    "subject": "emergency_management",
+    "immediate_parent": "public_administration"
+  },
+  {
+    "subject": "emergency_services",
+    "immediate_parent": "public_administration"
+  },
+  {
+    "subject": "fire_safety",
+    "immediate_parent": "public_administration"
+  },
+  {
+    "subject": "fire_ecology",
+    "immediate_parent": "public_administration"
+  },
+  {
+    "subject": "governmental_affairs",
+    "immediate_parent": "public_administration"
+  },
+  {
+    "subject": "international_affairs",
+    "immediate_parent": "public_administration"
+  },
+  {
+    "subject": "law_enforcement",
+    "immediate_parent": "public_administration"
+  },
+  {
+    "subject": "peace_and_conflict_studies",
+    "immediate_parent": "public_administration"
+  },
+  {
+    "subject": "police_science",
+    "immediate_parent": "public_administration"
+  },
+  {
+    "subject": "policy_studies",
+    "immediate_parent": "public_administration"
+  },
+  {
+    "subject": "policy_analysis",
+    "immediate_parent": "policy_studies"
+  },
+  {
+    "subject": "nonprofit_administration",
+    "immediate_parent": "public_administration"
+  },
+  {
+    "subject": "non_governmental_organization_administration",
+    "immediate_parent": "public_administration"
+  },
+  {
+    "subject": "public_policy_doctrine",
+    "immediate_parent": "public_administration"
+  },
+  {
+    "subject": "public_policy_school",
+    "immediate_parent": "public_administration"
+  },
+  {
+    "subject": "regulation",
+    "immediate_parent": "public_administration"
+  },
+  {
+    "subject": "public_safety",
+    "immediate_parent": "public_administration"
+  },
+  {
+    "subject": "public_service",
+    "immediate_parent": "public_administration"
+  },
+  {
+    "subject": "public_policy",
+    "immediate_parent": "public_administration"
+  },
+  {
+    "subject": "agricultural_policy",
+    "immediate_parent": "public_policy"
+  },
+  {
+    "subject": "commercial_policy",
+    "immediate_parent": "public_policy"
+  },
+  {
+    "subject": "cultural_policy",
+    "immediate_parent": "public_policy"
+  },
+  {
+    "subject": "domestic_policy",
+    "immediate_parent": "public_policy"
+  },
+  {
+    "subject": "drug_policy",
+    "immediate_parent": "public_policy"
+  },
+  {
+    "subject": "economic_policy",
+    "immediate_parent": "public_policy"
+  },
+  {
+    "subject": "fiscal_policy",
+    "immediate_parent": "economic_policy"
+  },
+  {
+    "subject": "incomes_policy",
+    "immediate_parent": "economic_policy"
+  },
+  {
+    "subject": "industrial_policy",
+    "immediate_parent": "economic_policy"
+  },
+  {
+    "subject": "investment_policy",
+    "immediate_parent": "economic_policy"
+  },
+  {
+    "subject": "monetary_policy",
+    "immediate_parent": "economic_policy"
+  },
+  {
+    "subject": "tax_policy",
+    "immediate_parent": "economic_policy"
+  },
+  {
+    "subject": "education_policy",
+    "immediate_parent": "public_policy"
+  },
+  {
+    "subject": "energy_policy",
+    "immediate_parent": "public_policy"
+  },
+  {
+    "subject": "nuclear_energy_policy",
+    "immediate_parent": "energy_policy"
+  },
+  {
+    "subject": "renewable_energy_policy",
+    "immediate_parent": "energy_policy"
+  },
+  {
+    "subject": "environmental_policy",
+    "immediate_parent": "public_policy"
+  },
+  {
+    "subject": "food_policy",
+    "immediate_parent": "public_policy"
+  },
+  {
+    "subject": "foreign_policy",
+    "immediate_parent": "public_policy"
+  },
+  {
+    "subject": "governance",
+    "immediate_parent": "public_policy"
+  },
+  {
+    "subject": "health_policy",
+    "immediate_parent": "public_policy"
+  },
+  {
+    "subject": "pharmaceutical_policy",
+    "immediate_parent": "health_policy"
+  },
+  {
+    "subject": "vaccination_policy",
+    "immediate_parent": "health_policy"
+  },
+  {
+    "subject": "housing_policy",
+    "immediate_parent": "public_policy"
+  },
+  {
+    "subject": "immigration_policy",
+    "immediate_parent": "public_policy"
+  },
+  {
+    "subject": "knowledge_policy",
+    "immediate_parent": "public_policy"
+  },
+  {
+    "subject": "language_policy",
+    "immediate_parent": "public_policy"
+  },
+  {
+    "subject": "military_policy",
+    "immediate_parent": "public_policy"
+  },
+  {
+    "subject": "science_policy",
+    "immediate_parent": "public_policy"
+  },
+  {
+    "subject": "climate_change_policy",
+    "immediate_parent": "science_policy"
+  },
+  {
+    "subject": "stem_cell_research_policy",
+    "immediate_parent": "science_policy"
+  },
+  {
+    "subject": "space_policy",
+    "immediate_parent": "science_policy"
+  },
+  {
+    "subject": "technology_policy",
+    "immediate_parent": "science_policy"
+  },
+  {
+    "subject": "security_policy",
+    "immediate_parent": "public_policy"
+  },
+  {
+    "subject": "social_policy",
+    "immediate_parent": "public_policy"
+  }
+]

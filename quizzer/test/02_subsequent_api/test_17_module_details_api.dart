@@ -6,7 +6,7 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/modules_table
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_module_activation_status_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pairs_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/custom_queries.dart';
-import 'test_helpers.dart';
+import '../test_helpers.dart';
 import 'dart:io';
 
 void main() {
@@ -272,7 +272,7 @@ void main() {
       // Step 4: Verify both data structures have the same fields
       QuizzerLogger.logMessage('Step 4: Verifying data structure consistency...');
       
-      final Set<String> individualKeys = individualModuleData!.keys.toSet();
+      final Set<String> individualKeys = individualModuleData.keys.toSet();
       final Set<String> getAllKeys = getAllModuleData!.keys.toSet();
       
       // Log the keys for debugging
@@ -321,13 +321,11 @@ void main() {
       final List<Map<String, dynamic>> getAllQuestions = List<Map<String, dynamic>>.from(getAllModuleData['questions'] as List);
       // --- NEW: Validate question fields are Dart types for both sources ---
       for (final q in individualQuestions) {
-        if (q == null) continue;
         expect(q['question_elements'], anyOf(isNull, isA<List>()), reason: 'individualModuleData: question_elements should be a List or null');
         expect(q['answer_elements'], anyOf(isNull, isA<List>()), reason: 'individualModuleData: answer_elements should be a List or null');
         expect(q['options'], anyOf(isNull, isA<List>()), reason: 'individualModuleData: options should be a List or null');
       }
       for (final q in getAllQuestions) {
-        if (q == null) continue;
         expect(q['question_elements'], anyOf(isNull, isA<List>()), reason: 'getAllModuleData: question_elements should be a List or null');
         expect(q['answer_elements'], anyOf(isNull, isA<List>()), reason: 'getAllModuleData: answer_elements should be a List or null');
         expect(q['options'], anyOf(isNull, isA<List>()), reason: 'getAllModuleData: options should be a List or null');
@@ -346,7 +344,7 @@ void main() {
       QuizzerLogger.logMessage('Step 7: Performance comparison...');
       
       final stopwatch = Stopwatch()..start();
-      final Map<String, dynamic>? individualResult = await getIndividualModuleData(sessionManager.userId!, testModuleName);
+      await getIndividualModuleData(sessionManager.userId!, testModuleName);
       stopwatch.stop();
       
       final int individualQueryTime = stopwatch.elapsedMilliseconds;

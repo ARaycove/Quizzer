@@ -6,7 +6,8 @@ import 'package:quizzer/backend_systems/10_switch_board/switch_board.dart';
 import 'package:quizzer/backend_systems/10_switch_board/sb_sync_worker_signals.dart';
 import 'package:quizzer/backend_systems/02_login_authentication/login_initialization.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pairs_table.dart';
-import 'test_helpers.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/academic_archive.dart/subject_details_table.dart';
+import '../test_helpers.dart';
 import 'dart:io';
 
 void main() {
@@ -131,5 +132,47 @@ void main() {
           rethrow;
         }
       });
+
+      test('Should have synced at least 1500 subject_details records from Supabase', () async {
+        QuizzerLogger.logMessage('Checking count of subject_details synced by previous test');
+        
+        try {
+          // Get the count of subject_details that were synced by the previous test
+          final localRecords = await getAllSubjectDetails();
+          final totalLocalCount = localRecords.length;
+          QuizzerLogger.logMessage('Total local subject_details count: $totalLocalCount');
+          
+          // Verify we got at least 1500 records (allowing for small margin of error)
+          expect(totalLocalCount, greaterThanOrEqualTo(1500), 
+            reason: 'Should have at least 1500 subject_details synced from Supabase. Got: $totalLocalCount');
+          
+          QuizzerLogger.logSuccess('✅ Verified $totalLocalCount subject_details were synced from Supabase');
+          
+          // Additional validation: Check that records have the expected structure
+          if (localRecords.isNotEmpty) {
+            final sampleRecord = localRecords.first;
+            expect(sampleRecord.containsKey('subject'), isTrue, 
+              reason: 'Subject details records should have a "subject" field');
+            expect(sampleRecord.containsKey('immediate_parent'), isTrue, 
+              reason: 'Subject details records should have an "immediate_parent" field');
+            expect(sampleRecord.containsKey('subject_description'), isTrue, 
+              reason: 'Subject details records should have a "subject_description" field');
+            expect(sampleRecord.containsKey('last_modified_timestamp'), isTrue, 
+              reason: 'Subject details records should have a "last_modified_timestamp" field');
+            
+            QuizzerLogger.logSuccess('✅ Verified subject_details record structure is correct');
+          }
+          
+        } catch (e, stackTrace) {
+          QuizzerLogger.logError('Subject details count verification failed: $e');
+          QuizzerLogger.logError('Stack trace: $stackTrace');
+          rethrow;
+        }
+      });
+    
+    
+    
+    
+    
     });
 }

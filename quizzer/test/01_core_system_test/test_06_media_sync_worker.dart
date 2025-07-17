@@ -6,7 +6,7 @@ import 'package:quizzer/backend_systems/10_switch_board/switch_board.dart';
 import 'package:quizzer/backend_systems/10_switch_board/sb_sync_worker_signals.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/media_sync_status_table.dart';
 import 'package:quizzer/backend_systems/02_login_authentication/login_initialization.dart';
-import 'test_helpers.dart';
+import '../test_helpers.dart';
 import 'dart:io';
 
 void main() {

@@ -4,8 +4,7 @@ import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/backend_systems/02_login_authentication/login_initialization.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/modules_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pairs_table.dart';
-import 'package:quizzer/backend_systems/04_module_management/rename_modules.dart';
-import 'test_helpers.dart';
+import '../test_helpers.dart';
 import 'dart:io';
 import 'dart:math';
 

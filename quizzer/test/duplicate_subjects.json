@@ -1,0 +1,732 @@
+{
+  "biochemistry": [
+    "biology",
+    "chemistry"
+  ],
+  "biophysics": [
+    "biology",
+    "physics"
+  ],
+  "computational_biology": [
+    "biology",
+    "computer_science"
+  ],
+  "conservation_biology": [
+    "biology",
+    "public_administration"
+  ],
+  "ecology": [
+    "biology",
+    "earth_sciences",
+    "environmental_studies"
+  ],
+  "agroecology": [
+    "ecology",
+    "agriculture"
+  ],
+  "human_ecology": [
+    "ecology",
+    "sociology"
+  ],
+  "landscape_ecology": [
+    "ecology",
+    "physical_geography"
+  ],
+  "molecular_genetics": [
+    "genetics",
+    "clinical_laboratory_science"
+  ],
+  "geobiology": [
+    "biology",
+    "earth_sciences"
+  ],
+  "endocrinology": [
+    "biology",
+    "medicine_and_health"
+  ],
+  "histology": [
+    "biology",
+    "clinical_laboratory_science"
+  ],
+  "limnology": [
+    "biology",
+    "earth_sciences",
+    "physical_geography"
+  ],
+  "molecular_biology": [
+    "biology",
+    "chemistry"
+  ],
+  "neurophysics": [
+    "neuroscience",
+    "biophysics"
+  ],
+  "computational_neuroscience": [
+    "neuroscience",
+    "computer_science"
+  ],
+  "nutrition": [
+    "biology",
+    "medicine_and_health"
+  ],
+  "paleobiology": [
+    "biology",
+    "paleontology"
+  ],
+  "paleontology": [
+    "paleobiology",
+    "earth_sciences"
+  ],
+  "parasitology": [
+    "biology",
+    "clinical_laboratory_science"
+  ],
+  "pathology": [
+    "biology",
+    "medicine_and_health"
+  ],
+  "exercise_physiology": [
+    "human_physiology",
+    "human_physical_performance_and_recreation"
+  ],
+  "sociobiology": [
+    "biology",
+    "sociology"
+  ],
+  "systems_biology": [
+    "biology",
+    "systems_science"
+  ],
+  "toxicology": [
+    "biology",
+    "environmental_studies"
+  ],
+  "entomology": [
+    "zoology",
+    "agriculture"
+  ],
+  "astrochemistry": [
+    "chemistry",
+    "space_sciences"
+  ],
+  "chemical_engineering": [
+    "chemistry",
+    "engineering"
+  ],
+  "chemical_physics": [
+    "chemistry",
+    "physics"
+  ],
+  "computational_chemistry": [
+    "chemistry",
+    "computer_science"
+  ],
+  "cosmochemistry": [
+    "chemistry",
+    "space_sciences"
+  ],
+  "environmental_chemistry": [
+    "chemistry",
+    "earth_sciences"
+  ],
+  "geochemistry": [
+    "chemistry",
+    "earth_sciences"
+  ],
+  "nanotechnology": [
+    "chemistry",
+    "chemical_engineering"
+  ],
+  "physical_chemistry": [
+    "chemistry",
+    "physics"
+  ],
+  "systems_chemistry": [
+    "chemistry",
+    "systems_science"
+  ],
+  "atmospheric_science": [
+    "earth_sciences",
+    "planetary_science"
+  ],
+  "climatology": [
+    "earth_sciences",
+    "physical_geography"
+  ],
+  "geodesy": [
+    "earth_sciences",
+    "physical_geography"
+  ],
+  "geography": [
+    "earth_sciences",
+    "social_sciences"
+  ],
+  "geomorphology": [
+    "earth_sciences",
+    "physical_geography"
+  ],
+  "geophysics": [
+    "earth_sciences",
+    "physics"
+  ],
+  "glaciology": [
+    "earth_sciences",
+    "physical_geography"
+  ],
+  "hydrology": [
+    "earth_sciences",
+    "agriculture"
+  ],
+  "oceanography": [
+    "earth_sciences",
+    "physical_geography"
+  ],
+  "pedology": [
+    "earth_sciences",
+    "psychology",
+    "agriculture"
+  ],
+  "planetary_science": [
+    "earth_sciences",
+    "space_sciences"
+  ],
+  "applied_physics": [
+    "physics",
+    "electrical_engineering"
+  ],
+  "astrophysics": [
+    "physics",
+    "space_sciences"
+  ],
+  "computational_physics": [
+    "physics",
+    "computer_science"
+  ],
+  "hydrodynamics": [
+    "dynamics",
+    "numerical_simulations"
+  ],
+  "system_dynamics": [
+    "dynamics",
+    "systems_science"
+  ],
+  "thermodynamics": [
+    "dynamics",
+    "chemical_engineering",
+    "mechanical_engineering"
+  ],
+  "engineering_physics": [
+    "physics",
+    "electrical_engineering"
+  ],
+  "mathematical_physics": [
+    "physics",
+    "mathematics"
+  ],
+  "biomechanics": [
+    "mechanics",
+    "human_physical_performance_and_recreation"
+  ],
+  "celestial_mechanics": [
+    "mechanics",
+    "astrophysics"
+  ],
+  "continuum_mechanics": [
+    "mechanics",
+    "mechanical_engineering"
+  ],
+  "fluid_mechanics": [
+    "mechanics",
+    "mechanical_engineering"
+  ],
+  "quantum_mechanics": [
+    "mechanics",
+    "mathematical_physics"
+  ],
+  "statistical_mechanics": [
+    "mechanics",
+    "mathematical_physics"
+  ],
+  "photonics": [
+    "physics",
+    "electrical_engineering",
+    "materials_science_and_engineering"
+  ],
+  "quantum_field_theory": [
+    "physics",
+    "mathematical_physics"
+  ],
+  "quantum_gravity": [
+    "physics",
+    "mathematical_physics"
+  ],
+  "aerospace_engineering": [
+    "space_sciences",
+    "mechanical_engineering"
+  ],
+  "astronautics": [
+    "aerospace_engineering",
+    "aerospace_engineering"
+  ],
+  "aeronautics": [
+    "aerospace_engineering",
+    "aerospace_engineering"
+  ],
+  "control_engineering": [
+    "aerospace_engineering",
+    "control_theory"
+  ],
+  "physical_cosmology": [
+    "cosmology",
+    "astrophysics"
+  ],
+  "remote_sensing": [
+    "space_sciences",
+    "geography"
+  ],
+  "archaeoastronomy": [
+    "astronomy",
+    "archaeology"
+  ],
+  "computer_science": [
+    "formal_sciences",
+    "electrical_engineering"
+  ],
+  "computational_complexity_theory": [
+    "theory_of_computation",
+    "mathematics"
+  ],
+  "information_theory": [
+    "computer_communications_networks",
+    "mathematics",
+    "electrical_engineering",
+    "communication_studies"
+  ],
+  "cryptography": [
+    "computer_security",
+    "mathematics"
+  ],
+  "quantum_computing": [
+    "computer_science",
+    "electrical_engineering"
+  ],
+  "human_computer_interaction": [
+    "computer_science",
+    "library_and_museum_studies"
+  ],
+  "information_science": [
+    "computer_science",
+    "library_and_museum_studies"
+  ],
+  "data_mining": [
+    "information_science",
+    "computational_statistics"
+  ],
+  "knowledge_management": [
+    "information_science",
+    "library_and_museum_studies"
+  ],
+  "natural_language_processing": [
+    "computer_science",
+    "linguistics"
+  ],
+  "robotics": [
+    "computer_science",
+    "electrical_engineering",
+    "mechanical_engineering"
+  ],
+  "numerical_analysis": [
+    "computer_science",
+    "mathematics"
+  ],
+  "computational_mathematics": [
+    "computer_science",
+    "mathematics"
+  ],
+  "computational_economics": [
+    "computer_science",
+    "economics"
+  ],
+  "community_informatics": [
+    "computer_science",
+    "sociology"
+  ],
+  "logic": [
+    "formal_sciences",
+    "philosophy"
+  ],
+  "philosophical_logic": [
+    "logic",
+    "logic"
+  ],
+  "modal_logic": [
+    "philosophical_logic",
+    "mathematical_logic"
+  ],
+  "mathematical_logic": [
+    "logic",
+    "logic"
+  ],
+  "integral_geometry": [
+    "probability_theory",
+    "geometry"
+  ],
+  "operations_research": [
+    "mathematics",
+    "systems_science"
+  ],
+  "systems_analysis": [
+    "operations_research",
+    "systems_engineering"
+  ],
+  "chaos_theory": [
+    "mathematics",
+    "systems_science"
+  ],
+  "econometrics": [
+    "statistics",
+    "economics"
+  ],
+  "demography": [
+    "statistics",
+    "sociology"
+  ],
+  "quality_control": [
+    "statistical_modeling",
+    "organizational_studies"
+  ],
+  "systems_science": [
+    "formal_sciences",
+    "business"
+  ],
+  "sociocybernetics": [
+    "cybernetics",
+    "sociology"
+  ],
+  "control_theory": [
+    "systems_science",
+    "electrical_engineering"
+  ],
+  "biological_systems_engineering": [
+    "systems_engineering",
+    "agriculture"
+  ],
+  "ergonomics": [
+    "systems_psychology",
+    "industrial_design",
+    "human_physical_performance_and_recreation"
+  ],
+  "psychology": [
+    "social_sciences",
+    "medicine_and_health"
+  ],
+  "clinical_psychology": [
+    "psychology",
+    "medicine_and_health"
+  ],
+  "educational_psychology": [
+    "psychology",
+    "education"
+  ],
+  "moral_psychology": [
+    "psychology",
+    "ethics"
+  ],
+  "descriptive_ethics": [
+    "psychology",
+    "ethics"
+  ],
+  "phenomenology": [
+    "psychology",
+    "interpretive_sociology"
+  ],
+  "social_psychology": [
+    "psychology",
+    "sociology"
+  ],
+  "sport_psychology": [
+    "psychology",
+    "human_physical_performance_and_recreation"
+  ],
+  "leisure_studies": [
+    "applied_sociology",
+    "human_physical_performance_and_recreation"
+  ],
+  "economic_sociology": [
+    "sociology",
+    "economics"
+  ],
+  "organizational_studies": [
+    "sociology",
+    "social_sciences",
+    "industrial_and_labor_relations"
+  ],
+  "sexology": [
+    "sociology",
+    "human_physical_performance_and_recreation"
+  ],
+  "social_philosophy": [
+    "sociology",
+    "philosophy"
+  ],
+  "social_policy": [
+    "sociology",
+    "public_policy"
+  ],
+  "sociology_of_education": [
+    "sociology",
+    "cirriculum_and_instruction"
+  ],
+  "sociology_of_sport": [
+    "sociology",
+    "human_physical_performance_and_recreation"
+  ],
+  "sociolinguistics": [
+    "sociology",
+    "linguistics"
+  ],
+  "agricultural_economics": [
+    "economics",
+    "agriculture"
+  ],
+  "business": [
+    "economics",
+    "professions_and_applied_sciences"
+  ],
+  "economic_geography": [
+    "economics",
+    "human_geography"
+  ],
+  "economic_history": [
+    "economics",
+    "history"
+  ],
+  "industrial_organization": [
+    "economics",
+    "organizational_studies"
+  ],
+  "labor_economics": [
+    "economics",
+    "industrial_and_labor_relations"
+  ],
+  "political_economy": [
+    "economics",
+    "political_science"
+  ],
+  "social_choice_theory": [
+    "economics",
+    "political_science"
+  ],
+  "peace_and_conflict_studies": [
+    "political_science",
+    "public_administration"
+  ],
+  "policy_studies": [
+    "political_science",
+    "public_administration"
+  ],
+  "political_history": [
+    "political_science",
+    "history"
+  ],
+  "political_philosophy": [
+    "political_science",
+    "philosophy"
+  ],
+  "public_administration": [
+    "political_science",
+    "professions_and_applied_sciences"
+  ],
+  "nonprofit_administration": [
+    "political_science",
+    "public_administration"
+  ],
+  "public_policy": [
+    "political_science",
+    "public_administration"
+  ],
+  "navigation": [
+    "geography",
+    "human_physical_performance_and_recreation"
+  ],
+  "business_ethics": [
+    "organizational_studies",
+    "business"
+  ],
+  "entrepreneurship": [
+    "organizational_studies",
+    "business"
+  ],
+  "management": [
+    "organizational_studies",
+    "business"
+  ],
+  "philosophy_of_language": [
+    "philosophy",
+    "linguistics"
+  ],
+  "rhetoric": [
+    "linguistics",
+    "literature"
+  ],
+  "literary_journalism": [
+    "creative_writing",
+    "journalism"
+  ],
+  "canon_law": [
+    "divinity",
+    "law"
+  ],
+  "religious_education": [
+    "field_ministry",
+    "cirriculum_and_instruction"
+  ],
+  "biblical_studies": [
+    "scriptural_study_and_languages",
+    "divinity"
+  ],
+  "comparative_religion": [
+    "divinity",
+    "religious_studies"
+  ],
+  "islamic_studies": [
+    "divinity",
+    "abrahamic_religions"
+  ],
+  "buddhist_studies": [
+    "divinity",
+    "indian_religions"
+  ],
+  "music_education": [
+    "music",
+    "cirriculum_and_instruction"
+  ],
+  "television_studies": [
+    "performing_arts",
+    "media_studies"
+  ],
+  "film_studies": [
+    "film",
+    "media_studies"
+  ],
+  "graphic_design": [
+    "visual_arts",
+    "visual_communication"
+  ],
+  "culinary_arts": [
+    "humanities",
+    "food_science"
+  ],
+  "agricultural_engineering": [
+    "agriculture",
+    "civil_engineering"
+  ],
+  "food_engineering": [
+    "agriculture",
+    "chemical_engineering"
+  ],
+  "historic_preservation": [
+    "architecture_design",
+    "library_and_museum_studies"
+  ],
+  "toy_and_amusement_design": [
+    "industrial_design",
+    "human_physical_performance_and_recreation"
+  ],
+  "information_architecture": [
+    "user_experience_design",
+    "library_and_museum_studies"
+  ],
+  "business_law": [
+    "business",
+    "law"
+  ],
+  "health_informatics": [
+    "information_systems",
+    "medicine_and_health"
+  ],
+  "marketing": [
+    "business",
+    "communication_studies"
+  ],
+  "military_education_and_training": [
+    "cirriculum_and_instruction",
+    "military_organization"
+  ],
+  "physical_education": [
+    "cirriculum_and_instruction",
+    "human_physical_performance_and_recreation"
+  ],
+  "polymer_engineering": [
+    "chemical_engineering",
+    "materials_science_and_engineering"
+  ],
+  "mechatronics": [
+    "electrical_engineering",
+    "mechanical_engineering"
+  ],
+  "semiconductors": [
+    "electrical_engineering",
+    "materials_science_and_engineering"
+  ],
+  "environmental_policy": [
+    "environmental_studies",
+    "public_policy"
+  ],
+  "physical_fitness": [
+    "human_physical_performance_and_recreation",
+    "medicine_and_health"
+  ],
+  "aerobics": [
+    "physical_fitness",
+    "physical_fitness"
+  ],
+  "personal_fitness_training": [
+    "physical_fitness",
+    "physical_fitness"
+  ],
+  "kinesiology": [
+    "human_physical_performance_and_recreation",
+    "physical_fitness"
+  ],
+  "sports_journalism": [
+    "human_physical_performance_and_recreation",
+    "journalism"
+  ],
+  "sports_medicine": [
+    "human_physical_performance_and_recreation",
+    "medicine_and_health"
+  ],
+  "criminal_justice": [
+    "criminal_law",
+    "public_administration"
+  ],
+  "police_science": [
+    "criminal_justice",
+    "public_administration"
+  ],
+  "law_enforcement": [
+    "law",
+    "public_administration"
+  ],
+  "pulmonology": [
+    "medicine_and_health",
+    "respiratory_medicine"
+  ],
+  "neurosurgery": [
+    "medicine_and_health",
+    "surgery"
+  ],
+  "artillery": [
+    "military_science",
+    "military_weapons"
+  ],
+  "naval_tactics": [
+    "naval_science",
+    "military_tactics"
+  ],
+  "military_counter_offensive": [
+    "military_strategy",
+    "military_tactics"
+  ]
+}

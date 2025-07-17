@@ -22,6 +22,7 @@ import 'package:quizzer/backend_systems/session_manager/session_answer_validatio
 import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/outbound_sync/outbound_sync_worker.dart'; // Import the new worker
 import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/media_sync_worker.dart'; // Added import for MediaSyncWorker
 import 'package:quizzer/backend_systems/00_database_manager/review_system/get_send_postgre.dart';
+import 'package:quizzer/backend_systems/00_database_manager/review_system/review_subject_nodes.dart' as subject_review;
 import 'package:quizzer/backend_systems/00_database_manager/tables/system_data/error_logs_table.dart'; // Direct import
 import 'package:quizzer/backend_systems/00_database_manager/tables/system_data/user_feedback_table.dart'; // Removed alias
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_settings_table.dart' as user_settings_table;
@@ -1181,6 +1182,34 @@ class SessionManager {
       // Call the deny function without the alias
       return denyQuestion(sourceTable, primaryKey);
     }
+  }
+
+  /// Fetches a single subject_details record for review.
+  ///
+  /// Criteria for review:
+  /// - subject_description is null, OR
+  /// - last_modified_timestamp is older than 3 months
+  ///
+  /// Returns a Map containing:
+  /// - 'data': The decoded subject data (Map<String, dynamic>). Null if no subjects found or error.
+  /// - 'primary_key': A Map representing the primary key {'subject': value}. Null if no subjects found.
+  /// - 'error': An error message (String) if no subjects are available. Null otherwise.
+  Future<Map<String, dynamic>> getSubjectForReview() async {
+    QuizzerLogger.logMessage('SessionManager: Requesting a subject for review...');
+    return subject_review.getSubjectForReview();
+  }
+
+  /// Updates a reviewed subject_details record.
+  ///
+  /// Args:
+  ///   subjectDetails: The decoded subject data map (potentially modified by admin).
+  ///   primaryKey: The map representing the primary key {'subject': value}.
+  ///
+  /// Returns:
+  ///   `true` if the update operation succeeds, `false` otherwise.
+  Future<bool> updateReviewedSubject(Map<String, dynamic> subjectDetails, Map<String, dynamic> primaryKey) async {
+    QuizzerLogger.logMessage('SessionManager: Updating reviewed subject with PK: $primaryKey');
+    return subject_review.updateReviewedSubject(subjectDetails, primaryKey);
   }
 
   // --- End Review System Interface ---

@@ -887,3 +887,103 @@ Future<Map<String, int>> getReviewTableCounts() async {
     rethrow;
   }
 }
+
+/// Loads the subject taxonomy JSON file and extracts all subjects with their immediate parents.
+/// 
+/// Returns:
+/// - List<Map<String, String>> where each map contains 'subject' and 'immediate_parent'
+Future<List<Map<String, String>>> extractAllSubjectsFromTaxonomy() async {
+  // Load the subject taxonomy JSON file
+  final file = File('runtime_cache/subject_data/subject_taxonomy.json');
+  final jsonString = await file.readAsString();
+  final Map<String, dynamic> taxonomy = json.decode(jsonString);
+  
+  final List<Map<String, String>> allSubjects = [];
+  
+  void traverseSubjects(Map<String, dynamic> subjects, String? parentSubject) {
+    for (final entry in subjects.entries) {
+      final String subjectName = entry.key;
+      final Map<String, dynamic> children = entry.value as Map<String, dynamic>;
+      
+      // Add this subject with its parent
+      allSubjects.add({
+        'subject': subjectName,
+        'immediate_parent': parentSubject ?? '',
+      });
+      
+      // Recursively process children if they exist
+      if (children.isNotEmpty) {
+        traverseSubjects(children, subjectName);
+      }
+    }
+  }
+  
+  // Start the recursive traversal
+  traverseSubjects(taxonomy, null);
+  
+  return allSubjects;
+}
+
+/// Extracts duplicate subjects from the taxonomy data.
+/// 
+/// Returns:
+/// - Map<String, List<String>> where key is the subject name and value is list of all its parents
+Future<Map<String, List<String>>> extractDuplicateSubjectsFromTaxonomy() async {
+  // Load the subject taxonomy JSON file
+  final file = File('runtime_cache/subject_data/subject_taxonomy.json');
+  final jsonString = await file.readAsString();
+  final Map<String, dynamic> taxonomy = json.decode(jsonString);
+  
+  final Map<String, List<String>> subjectParents = {};
+  
+  void traverseSubjects(Map<String, dynamic> subjects, String? parentSubject) {
+    for (final entry in subjects.entries) {
+      final String subjectName = entry.key;
+      final Map<String, dynamic> children = entry.value as Map<String, dynamic>;
+      
+      // Add this subject with its parent
+      if (subjectParents.containsKey(subjectName)) {
+        // Subject already exists, add this parent to the list
+        subjectParents[subjectName]!.add(parentSubject ?? '');
+      } else {
+        // First occurrence of this subject
+        subjectParents[subjectName] = [parentSubject ?? ''];
+      }
+      
+      // Recursively process children if they exist
+      if (children.isNotEmpty) {
+        traverseSubjects(children, subjectName);
+      }
+    }
+  }
+  
+  // Start the recursive traversal
+  traverseSubjects(taxonomy, null);
+  
+  // Filter to only subjects that have multiple parents (duplicates)
+  final Map<String, List<String>> duplicates = {};
+  for (final entry in subjectParents.entries) {
+    if (entry.value.length > 1) {
+      duplicates[entry.key] = entry.value;
+    }
+  }
+  
+  return duplicates;
+}
+
+/// Gets the count of unique subjects in the taxonomy
+/// This is different from the total count because some subjects appear multiple times
+Future<int> getUniqueSubjectCountFromTaxonomy() async {
+  try {
+    // Use the existing function to get all subjects
+    final List<Map<String, String>> allSubjects = await extractAllSubjectsFromTaxonomy();
+    
+    // Extract unique subject names using a Set
+    final Set<String> uniqueSubjects = allSubjects.map((subject) => subject['subject']!).toSet();
+    
+    return uniqueSubjects.length;
+  } catch (e) {
+    QuizzerLogger.logError('Error getting unique subject count from taxonomy: $e');
+    rethrow;
+  }
+}

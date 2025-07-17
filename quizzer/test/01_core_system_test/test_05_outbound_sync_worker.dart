@@ -13,7 +13,7 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/system_data/u
 import 'package:quizzer/backend_systems/00_database_manager/tables/system_data/error_logs_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/system_data/login_attempts_table.dart';
 import 'package:quizzer/backend_systems/02_login_authentication/login_initialization.dart';
-import 'test_helpers.dart';
+import '../test_helpers.dart';
 import 'dart:io';
 import 'dart:async';
 

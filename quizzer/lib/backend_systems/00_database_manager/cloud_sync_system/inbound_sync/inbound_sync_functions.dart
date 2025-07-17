@@ -18,6 +18,7 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/us
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_days_left_until_questions_exhaust_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_average_daily_questions_learned_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_module_activation_status_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/academic_archive.dart/subject_details_table.dart';
 import 'dart:io'; // For SocketException
 import 'dart:async'; // For Future.delayed
 
@@ -1010,6 +1011,95 @@ Future<void> syncUserModuleActivationStatusInbound(
   }
 }
 
+Future<void> syncSubjectDetailsInbound(
+  SupabaseClient supabaseClient,
+) async {
+  try {
+    QuizzerLogger.logMessage('Syncing inbound subject_details...');
+    
+    // Get the most recent last_modified_timestamp from local subject_details table
+    String? localLastTimestamp;
+    try {
+      localLastTimestamp = await getMostRecentSubjectDetailTimestamp();
+      QuizzerLogger.logMessage('Most recent local subject_detail timestamp: ${localLastTimestamp ?? "No local records found"}');
+    } catch (e) {
+      QuizzerLogger.logError('Error getting local last timestamp: $e');
+      // Fallback to using a very old timestamp if we can't get local timestamp
+      localLastTimestamp = DateTime(1996, 8, 20).toUtc().toIso8601String();
+    }
+    
+    // Use local timestamp if available, otherwise use a very old timestamp to get all records
+    final String syncStartTimestamp = localLastTimestamp ?? DateTime.now().subtract(const Duration(days: 365 * 20)).toUtc().toIso8601String();
+    QuizzerLogger.logMessage('Starting sync from timestamp: $syncStartTimestamp');
+    
+    int totalSynced = 0;
+    int batchNumber = 0;
+    bool hasMoreRecords = true;
+    String? lastTimestamp = syncStartTimestamp;
+    
+    while (hasMoreRecords) {
+      batchNumber++;
+      List<dynamic> cloudRecords;
+      
+      try {
+        // Build query with pagination - use the appropriate timestamp for this batch
+        String queryTimestamp = batchNumber == 1 ? syncStartTimestamp : (lastTimestamp ?? syncStartTimestamp);
+        
+        cloudRecords = await supabaseClient
+            .from('subject_details')
+            .select('*')
+            .gt('last_modified_timestamp', queryTimestamp)
+            .order('last_modified_timestamp', ascending: true)
+            .limit(500);
+        
+      } on PostgrestException catch (e, s) {
+        QuizzerLogger.logError('syncSubjectDetailsInbound: PostgrestException (batch $batchNumber). Error: ${e.message}, Stack: $s');
+        return;
+      } on SocketException catch (e, s) {
+        QuizzerLogger.logError('syncSubjectDetailsInbound: SocketException (batch $batchNumber). Error: $e, Stack: $s');
+        return;
+      } catch (e, s) {
+        QuizzerLogger.logError('syncSubjectDetailsInbound: Unexpected error (batch $batchNumber). Error: $e, Stack: $s');
+        return;
+      }
+
+      if (cloudRecords.isEmpty) {
+        hasMoreRecords = false;
+        break;
+      }
+
+      // Update last timestamp for next batch (use the last record's timestamp)
+      if (cloudRecords.isNotEmpty) {
+        final lastRecord = cloudRecords.last as Map<String, dynamic>;
+        lastTimestamp = lastRecord['last_modified_timestamp'] as String;
+      }
+
+      final int batchSize = cloudRecords.length;
+      totalSynced += batchSize;
+      
+      QuizzerLogger.logMessage('Processing batch $batchNumber: $batchSize records (Total so far: $totalSynced)');
+
+      // Process this batch
+      final batch = List<Map<String, dynamic>>.from(cloudRecords);
+      await batchUpsertSubjectDetails(records: batch);
+      
+      // If we got less than 500 records, we've reached the end
+      if (batchSize < 500) {
+        hasMoreRecords = false;
+      }
+    }
+
+    if (totalSynced == 0) {
+      QuizzerLogger.logMessage('No new subject_details to sync.');
+    } else {
+      QuizzerLogger.logSuccess('Synced $totalSynced subject_details from cloud in $batchNumber batches.');
+    }
+  } catch (e) {
+    QuizzerLogger.logError('syncSubjectDetailsInbound: Error - $e');
+    rethrow;
+  }
+}
+
 Future<void> runInboundSync(SessionManager sessionManager) async {
   QuizzerLogger.logMessage('Starting inbound sync aggregator...');
   final String? userId = sessionManager.userId;
@@ -1041,6 +1131,9 @@ Future<void> runInboundSync(SessionManager sessionManager) async {
 
   // Sync modules using the initial profile last_modified_timestamp
     syncModulesInbound(effectiveInitialTimestamp, sessionManager.supabase),
+
+  // Sync subject_details using the local table's most recent timestamp
+    syncSubjectDetailsInbound(sessionManager.supabase),
 
   // Sync user_stats_eligible_questions using the initial profile last_modified_timestamp
     syncUserStatsEligibleQuestionsInbound(userId, effectiveInitialTimestamp, sessionManager.supabase),

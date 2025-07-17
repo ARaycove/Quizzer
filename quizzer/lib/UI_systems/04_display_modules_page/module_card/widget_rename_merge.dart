@@ -9,10 +9,10 @@ class ModuleRenameMergeWidget extends StatefulWidget {
   final VoidCallback? onModuleUpdated;
 
   const ModuleRenameMergeWidget({
-    Key? key,
+    super.key,
     required this.currentModuleName,
     this.onModuleUpdated,
-  }) : super(key: key);
+  });
 
   @override
   State<ModuleRenameMergeWidget> createState() => _ModuleRenameMergeWidgetState();
@@ -24,10 +24,8 @@ class _ModuleRenameMergeWidgetState extends State<ModuleRenameMergeWidget> {
   final FocusNode _searchFocusNode = FocusNode();
   String? _selectedMergeTarget;
   List<Map<String, dynamic>> _availableModules = [];
-  List<String> _filteredModules = [];
   bool _isLoading = false;
   bool _showRenameField = false;
-  bool _showDropdown = false;
 
   @override
   void initState() {
@@ -45,12 +43,7 @@ class _ModuleRenameMergeWidgetState extends State<ModuleRenameMergeWidget> {
   }
 
   void _filterModules() {
-    final query = _searchController.text.toLowerCase();
     setState(() {
-      _filteredModules = _availableModules
-          .map((module) => module['module_name'] as String)
-          .where((name) => name.toLowerCase().contains(query))
-          .toList();
     });
   }
 
@@ -72,7 +65,6 @@ class _ModuleRenameMergeWidgetState extends State<ModuleRenameMergeWidget> {
 
       setState(() {
         _availableModules = availableModules;
-        _filteredModules = availableModules.map((module) => module['module_name'] as String).toList();
         _isLoading = false;
       });
     } catch (e) {

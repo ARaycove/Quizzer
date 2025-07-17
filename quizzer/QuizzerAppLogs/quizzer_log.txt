@@ -1,277 +1,257 @@
-Quizzer: [10:25:29] [34m[INFO][0m [<asynchronous suspension>] QuizzerLogger successfully set up file logging to: ./QuizzerAppLogs/quizzer_log.txt
-Quizzer: [10:25:29] [34m[INFO][0m [<asynchronous suspension>] QuizzerLogger: Attempting a SECOND test log message to file.
-Quizzer: [10:25:29] [34m[INFO][0m [switch_board.dart] SwitchBoard initialized.
-Quizzer: [10:25:29] [34m[INFO][0m [file_locations.dart] [PATH] Path provider not available (likely test environment), using current directory for Hive.
-Quizzer: [10:25:29] [34m[INFO][0m [file_locations.dart] [PATH] QuizzerHive path: ./QuizzerAppHive
-Quizzer: [10:25:29] [34m[INFO][0m [session_manager.dart] SessionManager: Initializing Hive at path: ./QuizzerAppHive
-Quizzer: [10:25:29] [34m[INFO][0m [login_initialization.dart] Entering loginInitialization()...
-Quizzer: [10:25:29] [34m[INFO][0m [login_initialization.dart] Entering performLoginProcess()...
-Quizzer: [10:25:29] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Starting login process...
-Quizzer: [10:25:29] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Validating your information...
-Quizzer: [10:25:29] [34m[INFO][0m [login_initialization.dart] Entering _validateLoginForm()...
-Quizzer: [10:25:29] [34m[INFO][0m [login_initialization.dart] Form validation passed for email: test_user_5@example.com
-Quizzer: [10:25:29] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Checking connection...
-Quizzer: [10:25:29] [34m[INFO][0m [utils.dart] Network check successful.
-Quizzer: [10:25:29] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Connecting to your account...
-Quizzer: [10:25:29] [34m[INFO][0m [user_auth.dart] Attempting Supabase authentication for test_user_5@example.com
-Quizzer: [10:25:29] [34m[INFO][0m [user_auth.dart] Attempting Supabase authentication
-Quizzer: [10:25:30] [34m[INFO][0m [user_auth.dart] ✅ Supabase authentication successful for test_user_5@example.com
-Quizzer: [10:25:30] [34m[INFO][0m [session_helper.dart] Entering determineUserRoleFromSupabaseSession()...
-Quizzer: [10:25:30] [34m[INFO][0m [user_auth.dart] Ensuring local profile exists for test_user_5@example.com
-Quizzer: [10:25:30] [34m[INFO][0m [user_profile_table.dart] Fetching all emails from user_profile table.
-Quizzer: [10:25:30] [34m[INFO][0m [file_locations.dart] [PATH] Path provider not available (likely test environment), using current directory.
-Quizzer: [10:25:30] [34m[INFO][0m [file_locations.dart] [PATH] Quizzer database path: ./QuizzerApp/sqlite/quizzer.db
-Quizzer: [10:25:30] [34m[INFO][0m [database_native.dart] [DB_INIT] Starting database initialization. Desktop: true
-Quizzer: [10:25:30] [34m[INFO][0m [database_native.dart] [DB_INIT] Using sqflite FFI factory (Desktop)
-Quizzer: [10:25:30] [34m[INFO][0m [database_native.dart] [DB_INIT] Original target path: ./QuizzerApp/sqlite/quizzer.db
-Quizzer: [10:25:30] [34m[INFO][0m [database_native.dart] [DB_INIT] Absolute target path: /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/./QuizzerApp/sqlite/quizzer.db
-Quizzer: [10:25:30] [34m[INFO][0m [database_native.dart] [DB_INIT] Normalized target path: /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/QuizzerApp/sqlite/quizzer.db
-Quizzer: [10:25:30] [34m[INFO][0m [database_native.dart] [DB_INIT] Checking existence of dbFile at /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/QuizzerApp/sqlite/quizzer.db. Exists: true
-Quizzer: [10:25:30] [34m[INFO][0m [database_native.dart] [DB_INIT] Existing database found at /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/QuizzerApp/sqlite/quizzer.db. Using it.
-Quizzer: [10:25:30] [34m[INFO][0m [database_native.dart] [DB_INIT] Attempting to open database at /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/QuizzerApp/sqlite/quizzer.db
-Quizzer: [10:25:30] [34m[INFO][0m [database_native.dart] [DB_INIT] Database opened at actual path: /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/QuizzerApp/sqlite/quizzer.db
-Quizzer: [10:25:30] [34m[INFO][0m [database_native.dart] [DB_INIT] Expected path: /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/QuizzerApp/sqlite/quizzer.db
-Quizzer: [10:25:30] [34m[INFO][0m [database_native.dart] [DB_INIT] Paths match: true
-Quizzer: [10:25:30] [34m[INFO][0m [database_native.dart] ✅ [DB_INIT] Database initialized successfully at: /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/QuizzerApp/sqlite/quizzer.db. IsOpen: true
-Quizzer: [10:25:30] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
-Quizzer: [10:25:30] [34m[INFO][0m [user_profile_table.dart] ✅ Successfully fetched 1 emails.
-Quizzer: [10:25:30] [34m[INFO][0m [user_auth.dart] Is user in local profile list -> true
-Quizzer: [10:25:30] [34m[INFO][0m [user_profile_table.dart] Fetching all emails from user_profile table.
-Quizzer: [10:25:30] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
-Quizzer: [10:25:30] [34m[INFO][0m [user_profile_table.dart] ✅ Successfully fetched 1 emails.
-Quizzer: [10:25:30] [34m[INFO][0m [user_auth.dart] Final check - is user in local profile list -> true
-Quizzer: [10:25:30] [34m[INFO][0m [offline_login.dart] Storing offline login data for test_user_5@example.com
-Quizzer: [10:25:30] [34m[INFO][0m [user_profile_table.dart] Getting user ID for email: test_user_5@example.com
-Quizzer: [10:25:30] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
-Quizzer: [10:25:30] [34m[INFO][0m [user_profile_table.dart] ✅ Found user ID: 5ea57367-1bbc-47d3-99b6-62f866d45956
-Quizzer: [10:25:30] [34m[INFO][0m [offline_login.dart] ✅ Offline login data stored for test_user_5@example.com
-Quizzer: [10:25:30] [34m[INFO][0m [user_profile_table.dart] Getting user ID for email: test_user_5@example.com
-Quizzer: [10:25:30] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
-Quizzer: [10:25:30] [34m[INFO][0m [user_profile_table.dart] ✅ Found user ID: 5ea57367-1bbc-47d3-99b6-62f866d45956
-Quizzer: [10:25:30] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Login successful...
-Quizzer: [10:25:30] [34m[INFO][0m [login_initialization.dart] Supabase login successful, offline login data already stored
-Quizzer: [10:25:30] [34m[INFO][0m [login_initialization.dart] Recording login attempt...
-Quizzer: [10:25:30] [34m[INFO][0m [login_attempts_record.dart] Recording login Attempt test_user_5@example.com with result Login successful
-Quizzer: [10:25:30] [34m[INFO][0m [user_profile_table.dart] Getting user ID for email: test_user_5@example.com
-Quizzer: [10:25:30] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
-Quizzer: [10:25:30] [34m[INFO][0m [user_profile_table.dart] ✅ Found user ID: 5ea57367-1bbc-47d3-99b6-62f866d45956
-Quizzer: [10:25:30] [34m[INFO][0m [table_helper.dart] Attempting to get IP address with multiple fallback methods
-Quizzer: [10:25:30] [34m[INFO][0m [table_helper.dart] Trying IP service: https://api.ipify.org
-Quizzer: [10:25:31] [34m[INFO][0m [table_helper.dart] ✅ Successfully retrieved IP address from https://api.ipify.org: 72.174.64.52
-Quizzer: [10:25:31] [34m[INFO][0m [login_attempts_table.dart] Login attempt recorded successfully: 2025-07-16T16:25:31.025087Z5ea57367-1bbc-47d3-99b6-62f866d45956
-Quizzer: [10:25:31] [34m[INFO][0m [login_attempts_record.dart] Login attempt recorded for user: test_user_5@example.com with status: Login successful
-Quizzer: [10:25:31] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Setting up your profile...
-Quizzer: [10:25:31] [34m[INFO][0m [login_initialization.dart] Ensuring local profile exists for online login...
-Quizzer: [10:25:31] [34m[INFO][0m [user_auth.dart] Ensuring local profile exists for test_user_5@example.com
-Quizzer: [10:25:31] [34m[INFO][0m [user_profile_table.dart] Fetching all emails from user_profile table.
-Quizzer: [10:25:31] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
-Quizzer: [10:25:31] [34m[INFO][0m [user_profile_table.dart] ✅ Successfully fetched 1 emails.
-Quizzer: [10:25:31] [34m[INFO][0m [user_auth.dart] Is user in local profile list -> true
-Quizzer: [10:25:31] [34m[INFO][0m [user_profile_table.dart] Fetching all emails from user_profile table.
-Quizzer: [10:25:31] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
-Quizzer: [10:25:31] [34m[INFO][0m [user_profile_table.dart] ✅ Successfully fetched 1 emails.
-Quizzer: [10:25:31] [34m[INFO][0m [user_auth.dart] Final check - is user in local profile list -> true
-Quizzer: [10:25:31] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Syncing your profile...
-Quizzer: [10:25:31] [34m[INFO][0m [login_initialization.dart] Ensuring profile exists in Supabase for online login...
-Quizzer: [10:25:31] [34m[INFO][0m [login_initialization.dart] SessionManager already initialized by attemptSupabaseLogin for online login
-Quizzer: [10:25:31] [34m[INFO][0m [login_initialization.dart] ✅ Login process completed successfully for email: test_user_5@example.com
-Quizzer: [10:25:31] [34m[INFO][0m [login_initialization.dart] Skipping sync workers for test run
-Quizzer: [10:25:31] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Starting question queue server...
-Quizzer: [10:25:31] [34m[INFO][0m [login_initialization.dart] Initializing question queue server...
-Quizzer: [10:25:31] [34m[INFO][0m [queue_server_init.dart] Starting question queue server workers...
-Quizzer: [10:25:31] [34m[INFO][0m [queue_server_init.dart] Starting CirculationWorker...
-Quizzer: [10:25:31] [34m[INFO][0m [circulation_worker.dart] Entering CirculationWorker start()...
-Quizzer: [10:25:31] [34m[INFO][0m [circulation_worker.dart] CirculationWorker: Subscribed to onQuestionAnsweredCorrectly stream.
-Quizzer: [10:25:31] [34m[INFO][0m [circulation_worker.dart] Entering CirculationWorker _runLoop()...
-Quizzer: [10:25:31] [34m[INFO][0m [circulation_worker.dart] Entering CirculationWorker _shouldAddNewQuestion()...
-Quizzer: [10:25:31] [34m[INFO][0m [circulation_worker.dart] Querying database for eligible questions data...
-Quizzer: [10:25:31] [34m[INFO][0m [queue_server_init.dart] Starting PresentationSelectionWorker...
-Quizzer: [10:25:31] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker start()...
-Quizzer: [10:25:31] [34m[INFO][0m [question_selection_worker.dart] Clearing QuestionQueueCache and AnswerHistoryCache...
-Quizzer: [10:25:31] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache clear()...
-Quizzer: [10:25:31] [34m[INFO][0m [answer_history_cache.dart] Entering AnswerHistoryCache clear()...
-Quizzer: [10:25:31] [34m[INFO][0m [question_selection_worker.dart] ✅ ✅ QuestionQueueCache and AnswerHistoryCache cleared
-Quizzer: [10:25:31] [34m[INFO][0m [question_selection_worker.dart] PresentationSelectionWorker started.
-Quizzer: [10:25:31] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _runLoop()...
-Quizzer: [10:25:31] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache getLength()...
-Quizzer: [10:25:31] [34m[INFO][0m [queue_server_init.dart] Question queue server worker startup initiated
-Quizzer: [10:25:31] [34m[INFO][0m [queue_server_init.dart] Found 100 eligible questions - waiting for questions to be added to cache...
-Quizzer: [10:25:31] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache getLength()...
-Quizzer: [10:25:31] [34m[INFO][0m [answer_history_cache.dart] Entering AnswerHistoryCache getLastFiveAnsweredQuestions()...
-Quizzer: [10:25:31] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache peekAllRecords()...
-Quizzer: [10:25:31] [34m[INFO][0m [question_selection_worker.dart] Queue length 0 is below threshold 5. Running 5 cycles of _selectAndQueueQuestion
-Quizzer: [10:25:31] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _selectAndQueueQuestion()...
-Quizzer: [10:25:31] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _selectNextQuestionFromList()...
-Quizzer: [10:25:31] [34m[INFO][0m [question_answer_pairs_table.dart] Found 262 unique subjects
-Quizzer: [10:25:31] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
-Quizzer: [10:25:31] [34m[INFO][0m [user_profile_table.dart] ✅ Returning final subject interests for user
-Quizzer: [10:25:31] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache getLength()...
-Quizzer: [10:25:31] [34m[INFO][0m [circulation_worker.dart] lowStreakCondition evaluates to -> false (count: 20)
-Quizzer: [10:25:31] [34m[INFO][0m [circulation_worker.dart] lowTotalCondition evaluates to -> false (count: 100)
-Quizzer: [10:25:31] [34m[INFO][0m [circulation_worker.dart] shouldAdd evaluates to -> false
-Quizzer: [10:25:31] [34m[INFO][0m [circulation_worker.dart] CirculationWorker: Conditions not met, waiting for question answered correctly signal...
-Quizzer: [10:25:31] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling circulation worker finished
-Quizzer: [10:25:31] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache getLength()...
-Quizzer: [10:25:31] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache getLength()...
-Quizzer: [10:25:31] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache addRecord()...
-Quizzer: [10:25:31] [34m[INFO][0m [question_queue_cache.dart] QuestionQueueCache: Added record 2025-07-15T20:49:36.289316Z_5ea57367-1bbc-47d3-99b6-62f866d45956 to empty queue.
-Quizzer: [10:25:31] [34m[INFO][0m [sb_cache_signals.dart] SwitchBoard: Signaling Question Queue Added
-Quizzer: [10:25:31] [34m[INFO][0m [question_selection_worker.dart] PSW Tracking: Added 2025-07-15T20:49:36.289316Z_5ea57367-1bbc-47d3-99b6-62f866d45956 to recently selected list (1 total)
-Quizzer: [10:25:31] [34m[INFO][0m [question_selection_worker.dart] ✅ PSW Select: Successfully added question 2025-07-15T20:49:36.289316Z_5ea57367-1bbc-47d3-99b6-62f866d45956 to QueueCache.
-Quizzer: [10:25:31] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _selectAndQueueQuestion()...
-Quizzer: [10:25:31] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _selectNextQuestionFromList()...
-Quizzer: [10:25:31] [34m[INFO][0m [question_answer_pairs_table.dart] Found 262 unique subjects
-Quizzer: [10:25:31] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
-Quizzer: [10:25:31] [34m[INFO][0m [user_profile_table.dart] ✅ Returning final subject interests for user
-Quizzer: [10:25:31] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache getLength()...
-Quizzer: [10:25:31] [34m[INFO][0m [queue_server_init.dart] ✅ Questions are now available in cache
-Quizzer: [10:25:31] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Welcome back! You're all set.
-Quizzer: [10:25:31] [34m[INFO][0m [login_initialization.dart] Login initialization completed for email: test_user_5@example.com
-Quizzer: [10:25:31] [34m[INFO][0m [test_23_review_get_review.dart] ✅ Full login initialization completed successfully
-Quizzer: [10:25:32] [34m[INFO][0m [test_23_review_get_review.dart] === Test 1: Call the review API 10 times and ensure we get something back each time ===
-Quizzer: [10:25:32] [34m[INFO][0m [test_23_review_get_review.dart] Call 1/10: Calling getReviewQuestion() API...
-Quizzer: [10:25:32] [34m[INFO][0m [session_manager.dart] SessionManager: Requesting a question for review...
-Quizzer: [10:25:32] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache addRecord()...
-Quizzer: [10:25:32] [34m[INFO][0m [question_selection_worker.dart] PSW Tracking: Added 2025-07-15T20:49:41.196165Z_5ea57367-1bbc-47d3-99b6-62f866d45956 to recently selected list (2 total)
-Quizzer: [10:25:32] [34m[INFO][0m [question_selection_worker.dart] ✅ PSW Select: Successfully added question 2025-07-15T20:49:41.196165Z_5ea57367-1bbc-47d3-99b6-62f866d45956 to QueueCache.
-Quizzer: [10:25:32] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _selectAndQueueQuestion()...
-Quizzer: [10:25:32] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _selectNextQuestionFromList()...
-Quizzer: [10:25:32] [34m[INFO][0m [question_answer_pairs_table.dart] Found 262 unique subjects
-Quizzer: [10:25:32] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
-Quizzer: [10:25:32] [34m[INFO][0m [user_profile_table.dart] ✅ Returning final subject interests for user
-Quizzer: [10:25:32] [34m[INFO][0m [get_send_postgre.dart] Fetching random record from question_answer_pair_new_review (offset: 46 / 71)
-Quizzer: [10:25:32] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache addRecord()...
-Quizzer: [10:25:32] [34m[INFO][0m [question_selection_worker.dart] PSW Tracking: Added 2025-07-15T20:49:36.329818Z_5ea57367-1bbc-47d3-99b6-62f866d45956 to recently selected list (3 total)
-Quizzer: [10:25:32] [34m[INFO][0m [question_selection_worker.dart] ✅ PSW Select: Successfully added question 2025-07-15T20:49:36.329818Z_5ea57367-1bbc-47d3-99b6-62f866d45956 to QueueCache.
-Quizzer: [10:25:32] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _selectAndQueueQuestion()...
-Quizzer: [10:25:32] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _selectNextQuestionFromList()...
-Quizzer: [10:25:32] [34m[INFO][0m [question_answer_pairs_table.dart] Found 262 unique subjects
-Quizzer: [10:25:32] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
-Quizzer: [10:25:32] [34m[INFO][0m [user_profile_table.dart] ✅ Returning final subject interests for user
-Quizzer: [10:25:32] [34m[INFO][0m [get_send_postgre.dart] Performing hasMediaCheck for reviewed Question ID: 2025-07-15T18:34:21.831852Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d
-Quizzer: [10:25:32] [34m[INFO][0m [question_answer_pairs_table.dart] Processing media for question record (Question ID: 2025-07-15T18:34:21.831852Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d)
-Quizzer: [10:25:32] [34m[INFO][0m [question_answer_pairs_table.dart] No media found in record (Question ID: 2025-07-15T18:34:21.831852Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d).
-Quizzer: [10:25:32] [34m[INFO][0m [get_send_postgre.dart] hasMediaCheck completed for Question ID: 2025-07-15T18:34:21.831852Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d. DB access released.
-Quizzer: [10:25:32] [34m[INFO][0m [get_send_postgre.dart] ✅ Successfully fetched and decoded question 2025-07-15T18:34:21.831852Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d from question_answer_pair_new_review
-Quizzer: [10:25:32] [34m[INFO][0m [test_23_review_get_review.dart] ✅ ✅ Call 1/10 completed - got response back
-Quizzer: [10:25:32] [34m[INFO][0m [test_23_review_get_review.dart] Response keys: data, source_table, primary_key, error
-Quizzer: [10:25:32] [34m[INFO][0m [test_23_review_get_review.dart] Full response: {data: {time_stamp: 2025-07-15T18:34:21.831852Z, citation: null, question_elements: [{type: text, content: The null hypothesis in one-way ANOVA is:}], answer_elements: [{type: text, content: The null is that all means are equal.}], ans_contrib: , concepts: null, subjects: null, qst_contrib: 82b1a6b9-6ae4-4bf6-903e-d84361bb506d, qst_reviewer: , module_name: Experimental Design, question_type: multiple_choice, options: [{type: text, content: All group means are equal}, {type: text, content: All group variances are equal}, {type: text, content: At least one group mean is different}, {type: text, content: The data are Normal}], correct_option_index: 0, question_id: 2025-07-15T18:34:21.831852Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d, correct_order: null, index_options_that_apply: null, flag_for_removal: 0, ans_flagged: 0, has_been_reviewed: 0, completed: 1, last_modified_timestamp: 2025-07-15T18:34:21.831852Z, has_media: false}, source_table: question_answer_pair_new_review, primary_key: {question_id: 2025-07-15T18:34:21.831852Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d}, error: null}
-Quizzer: [10:25:32] [34m[INFO][0m [test_23_review_get_review.dart] Call 2/10: Calling getReviewQuestion() API...
-Quizzer: [10:25:32] [34m[INFO][0m [session_manager.dart] SessionManager: Requesting a question for review...
-Quizzer: [10:25:32] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache addRecord()...
-Quizzer: [10:25:32] [34m[INFO][0m [question_selection_worker.dart] PSW Tracking: Added 2025-07-15T20:49:36.461923Z_5ea57367-1bbc-47d3-99b6-62f866d45956 to recently selected list (4 total)
-Quizzer: [10:25:32] [34m[INFO][0m [question_selection_worker.dart] ✅ PSW Select: Successfully added question 2025-07-15T20:49:36.461923Z_5ea57367-1bbc-47d3-99b6-62f866d45956 to QueueCache.
-Quizzer: [10:25:32] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _selectAndQueueQuestion()...
-Quizzer: [10:25:32] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _selectNextQuestionFromList()...
-Quizzer: [10:25:32] [34m[INFO][0m [question_answer_pairs_table.dart] Found 262 unique subjects
-Quizzer: [10:25:32] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
-Quizzer: [10:25:32] [34m[INFO][0m [user_profile_table.dart] ✅ Returning final subject interests for user
-Quizzer: [10:25:32] [34m[INFO][0m [get_send_postgre.dart] Fetching random record from question_answer_pair_new_review (offset: 46 / 71)
-Quizzer: [10:25:32] [34m[INFO][0m [get_send_postgre.dart] Performing hasMediaCheck for reviewed Question ID: 2025-07-15T18:34:21.831852Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d
-Quizzer: [10:25:32] [34m[INFO][0m [question_answer_pairs_table.dart] Processing media for question record (Question ID: 2025-07-15T18:34:21.831852Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d)
-Quizzer: [10:25:32] [34m[INFO][0m [question_answer_pairs_table.dart] No media found in record (Question ID: 2025-07-15T18:34:21.831852Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d).
-Quizzer: [10:25:32] [34m[INFO][0m [get_send_postgre.dart] hasMediaCheck completed for Question ID: 2025-07-15T18:34:21.831852Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d. DB access released.
-Quizzer: [10:25:32] [34m[INFO][0m [get_send_postgre.dart] ✅ Successfully fetched and decoded question 2025-07-15T18:34:21.831852Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d from question_answer_pair_new_review
-Quizzer: [10:25:32] [34m[INFO][0m [test_23_review_get_review.dart] ✅ ✅ Call 2/10 completed - got response back
-Quizzer: [10:25:32] [34m[INFO][0m [test_23_review_get_review.dart] Response keys: data, source_table, primary_key, error
-Quizzer: [10:25:32] [34m[INFO][0m [test_23_review_get_review.dart] Full response: {data: {time_stamp: 2025-07-15T18:34:21.831852Z, citation: null, question_elements: [{type: text, content: The null hypothesis in one-way ANOVA is:}], answer_elements: [{type: text, content: The null is that all means are equal.}], ans_contrib: , concepts: null, subjects: null, qst_contrib: 82b1a6b9-6ae4-4bf6-903e-d84361bb506d, qst_reviewer: , module_name: Experimental Design, question_type: multiple_choice, options: [{type: text, content: All group means are equal}, {type: text, content: All group variances are equal}, {type: text, content: At least one group mean is different}, {type: text, content: The data are Normal}], correct_option_index: 0, question_id: 2025-07-15T18:34:21.831852Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d, correct_order: null, index_options_that_apply: null, flag_for_removal: 0, ans_flagged: 0, has_been_reviewed: 0, completed: 1, last_modified_timestamp: 2025-07-15T18:34:21.831852Z, has_media: false}, source_table: question_answer_pair_new_review, primary_key: {question_id: 2025-07-15T18:34:21.831852Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d}, error: null}
-Quizzer: [10:25:32] [34m[INFO][0m [test_23_review_get_review.dart] Call 3/10: Calling getReviewQuestion() API...
-Quizzer: [10:25:32] [34m[INFO][0m [session_manager.dart] SessionManager: Requesting a question for review...
-Quizzer: [10:25:32] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache addRecord()...
-Quizzer: [10:25:32] [34m[INFO][0m [question_selection_worker.dart] PSW Tracking: Added 2025-07-15T20:49:37.119100Z_5ea57367-1bbc-47d3-99b6-62f866d45956 to recently selected list (5 total)
-Quizzer: [10:25:32] [34m[INFO][0m [question_selection_worker.dart] ✅ PSW Select: Successfully added question 2025-07-15T20:49:37.119100Z_5ea57367-1bbc-47d3-99b6-62f866d45956 to QueueCache.
-Quizzer: [10:25:32] [34m[INFO][0m [sb_question_worker_signals.dart] SwitchBoard: Signaling PresentationSelectionWorker Cycle Complete
-Quizzer: [10:25:33] [34m[INFO][0m [get_send_postgre.dart] Fetching random record from question_answer_pair_new_review (offset: 63 / 71)
-Quizzer: [10:25:33] [34m[INFO][0m [get_send_postgre.dart] Performing hasMediaCheck for reviewed Question ID: 2025-07-15T18:55:10.142870Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d
-Quizzer: [10:25:33] [34m[INFO][0m [question_answer_pairs_table.dart] Processing media for question record (Question ID: 2025-07-15T18:55:10.142870Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d)
-Quizzer: [10:25:33] [34m[INFO][0m [question_answer_pairs_table.dart] No media found in record (Question ID: 2025-07-15T18:55:10.142870Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d).
-Quizzer: [10:25:33] [34m[INFO][0m [get_send_postgre.dart] hasMediaCheck completed for Question ID: 2025-07-15T18:55:10.142870Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d. DB access released.
-Quizzer: [10:25:33] [34m[INFO][0m [get_send_postgre.dart] ✅ Successfully fetched and decoded question 2025-07-15T18:55:10.142870Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d from question_answer_pair_new_review
-Quizzer: [10:25:33] [34m[INFO][0m [test_23_review_get_review.dart] ✅ ✅ Call 3/10 completed - got response back
-Quizzer: [10:25:33] [34m[INFO][0m [test_23_review_get_review.dart] Response keys: data, source_table, primary_key, error
-Quizzer: [10:25:33] [34m[INFO][0m [test_23_review_get_review.dart] Full response: {data: {time_stamp: 2025-07-15T18:55:10.142870Z, citation: null, question_elements: [{type: text, content: The problem with multiple comparisons is:}], answer_elements: [{type: text, content: Multiple comparisons inflate the Type I error rate if not corrected.}], ans_contrib: , concepts: null, subjects: null, qst_contrib: 82b1a6b9-6ae4-4bf6-903e-d84361bb506d, qst_reviewer: , module_name: Experimental Design, question_type: multiple_choice, options: [{type: text, content: Increased power}, {type: text, content: Decreased sample size}, {type: text, content: Decreased Type II error}, {type: text, content: Increased Type I error rate}], correct_option_index: 3, question_id: 2025-07-15T18:55:10.142870Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d, correct_order: null, index_options_that_apply: null, flag_for_removal: 0, ans_flagged: 0, has_been_reviewed: 0, completed: 1, last_modified_timestamp: 2025-07-15T18:55:10.142870Z, has_media: false}, source_table: question_answer_pair_new_review, primary_key: {question_id: 2025-07-15T18:55:10.142870Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d}, error: null}
-Quizzer: [10:25:33] [34m[INFO][0m [test_23_review_get_review.dart] Call 4/10: Calling getReviewQuestion() API...
-Quizzer: [10:25:33] [34m[INFO][0m [session_manager.dart] SessionManager: Requesting a question for review...
-Quizzer: [10:25:33] [34m[INFO][0m [get_send_postgre.dart] Fetching random record from question_answer_pair_new_review (offset: 8 / 71)
-Quizzer: [10:25:33] [34m[INFO][0m [get_send_postgre.dart] Performing hasMediaCheck for reviewed Question ID: 2025-07-16T15:48:18.183164Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d
-Quizzer: [10:25:33] [34m[INFO][0m [question_answer_pairs_table.dart] Processing media for question record (Question ID: 2025-07-16T15:48:18.183164Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d)
-Quizzer: [10:25:33] [34m[INFO][0m [question_answer_pairs_table.dart] No media found in record (Question ID: 2025-07-16T15:48:18.183164Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d).
-Quizzer: [10:25:33] [34m[INFO][0m [get_send_postgre.dart] hasMediaCheck completed for Question ID: 2025-07-16T15:48:18.183164Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d. DB access released.
-Quizzer: [10:25:33] [34m[INFO][0m [get_send_postgre.dart] ✅ Successfully fetched and decoded question 2025-07-16T15:48:18.183164Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d from question_answer_pair_new_review
-Quizzer: [10:25:33] [34m[INFO][0m [test_23_review_get_review.dart] ✅ ✅ Call 4/10 completed - got response back
-Quizzer: [10:25:33] [34m[INFO][0m [test_23_review_get_review.dart] Response keys: data, source_table, primary_key, error
-Quizzer: [10:25:33] [34m[INFO][0m [test_23_review_get_review.dart] Full response: {data: {time_stamp: 2025-07-16T15:48:18.183164Z, citation: null, question_elements: [{type: text, content: Reducing variability in measurements:}], answer_elements: [{type: text, content: Less variability means higher power.}], ans_contrib: , concepts: null, subjects: null, qst_contrib: 82b1a6b9-6ae4-4bf6-903e-d84361bb506d, qst_reviewer: , module_name: Experimental Design, question_type: multiple_choice, options: [{type: text, content: Increases power}, {type: text, content: Decreases power}, {type: text, content: Has no effect}, {type: text, content: Increases Type I error}], correct_option_index: 0, question_id: 2025-07-16T15:48:18.183164Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d, correct_order: null, index_options_that_apply: null, flag_for_removal: 0, ans_flagged: 0, has_been_reviewed: 0, completed: 1, last_modified_timestamp: 2025-07-16T15:48:18.183164Z, has_media: false}, source_table: question_answer_pair_new_review, primary_key: {question_id: 2025-07-16T15:48:18.183164Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d}, error: null}
-Quizzer: [10:25:33] [34m[INFO][0m [test_23_review_get_review.dart] Call 5/10: Calling getReviewQuestion() API...
-Quizzer: [10:25:33] [34m[INFO][0m [session_manager.dart] SessionManager: Requesting a question for review...
-Quizzer: [10:25:34] [34m[INFO][0m [get_send_postgre.dart] Fetching random record from question_answer_pair_new_review (offset: 66 / 71)
-Quizzer: [10:25:34] [34m[INFO][0m [get_send_postgre.dart] Performing hasMediaCheck for reviewed Question ID: 2025-07-15T19:44:19.549193Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d
-Quizzer: [10:25:34] [34m[INFO][0m [question_answer_pairs_table.dart] Processing media for question record (Question ID: 2025-07-15T19:44:19.549193Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d)
-Quizzer: [10:25:34] [34m[INFO][0m [question_answer_pairs_table.dart] No media found in record (Question ID: 2025-07-15T19:44:19.549193Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d).
-Quizzer: [10:25:34] [34m[INFO][0m [get_send_postgre.dart] hasMediaCheck completed for Question ID: 2025-07-15T19:44:19.549193Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d. DB access released.
-Quizzer: [10:25:34] [34m[INFO][0m [get_send_postgre.dart] ✅ Successfully fetched and decoded question 2025-07-15T19:44:19.549193Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d from question_answer_pair_new_review
-Quizzer: [10:25:34] [34m[INFO][0m [test_23_review_get_review.dart] ✅ ✅ Call 5/10 completed - got response back
-Quizzer: [10:25:34] [34m[INFO][0m [test_23_review_get_review.dart] Response keys: data, source_table, primary_key, error
-Quizzer: [10:25:34] [34m[INFO][0m [test_23_review_get_review.dart] Full response: {data: {time_stamp: 2025-07-15T19:44:19.549193Z, citation: null, question_elements: [{type: text, content: An interaction occurs when:}], answer_elements: [{type: text, content:  Interaction means the effect of one variable depends on another.}], ans_contrib: , concepts: null, subjects: null, qst_contrib: 82b1a6b9-6ae4-4bf6-903e-d84361bb506d, qst_reviewer: , module_name: Experimental Design, question_type: multiple_choice, options: [{type: text, content:  The effect of one factor depends on the level of another factor}, {type: text, content: There is only one factor}, {type: text, content: The sample size is sma}, {type: text, content: The data are Normal}], correct_option_index: 0, question_id: 2025-07-15T19:44:19.549193Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d, correct_order: null, index_options_that_apply: null, flag_for_removal: 0, ans_flagged: 0, has_been_reviewed: 0, completed: 1, last_modified_timestamp: 2025-07-15T19:44:19.549193Z, has_media: false}, source_table: question_answer_pair_new_review, primary_key: {question_id: 2025-07-15T19:44:19.549193Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d}, error: null}
-Quizzer: [10:25:34] [34m[INFO][0m [test_23_review_get_review.dart] Call 6/10: Calling getReviewQuestion() API...
-Quizzer: [10:25:34] [34m[INFO][0m [session_manager.dart] SessionManager: Requesting a question for review...
-Quizzer: [10:25:34] [34m[INFO][0m [get_send_postgre.dart] Fetching random record from question_answer_pair_new_review (offset: 9 / 71)
-Quizzer: [10:25:34] [34m[INFO][0m [get_send_postgre.dart] Performing hasMediaCheck for reviewed Question ID: 2025-07-16T16:05:25.789180Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d
-Quizzer: [10:25:34] [34m[INFO][0m [question_answer_pairs_table.dart] Processing media for question record (Question ID: 2025-07-16T16:05:25.789180Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d)
-Quizzer: [10:25:34] [34m[INFO][0m [question_answer_pairs_table.dart] No media found in record (Question ID: 2025-07-16T16:05:25.789180Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d).
-Quizzer: [10:25:34] [34m[INFO][0m [get_send_postgre.dart] hasMediaCheck completed for Question ID: 2025-07-16T16:05:25.789180Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d. DB access released.
-Quizzer: [10:25:34] [34m[INFO][0m [get_send_postgre.dart] ✅ Successfully fetched and decoded question 2025-07-16T16:05:25.789180Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d from question_answer_pair_new_review
-Quizzer: [10:25:34] [34m[INFO][0m [test_23_review_get_review.dart] ✅ ✅ Call 6/10 completed - got response back
-Quizzer: [10:25:34] [34m[INFO][0m [test_23_review_get_review.dart] Response keys: data, source_table, primary_key, error
-Quizzer: [10:25:34] [34m[INFO][0m [test_23_review_get_review.dart] Full response: {data: {time_stamp: 2025-07-16T16:05:25.789180Z, citation: null, question_elements: [{type: text, content: The main difference between a field experiment and a laboratory experiment is:}], answer_elements: [{type: text, content:  Field experiments take place in natural environments, while lab experiments are in controlled settings.}], ans_contrib: , concepts: null, subjects: null, qst_contrib: 82b1a6b9-6ae4-4bf6-903e-d84361bb506d, qst_reviewer: , module_name: Experimental Design, question_type: multiple_choice, options: [{type: text, content: Field experiments are conducted in more natural settings}, {type: text, content: Field experiments do not use randomization}, {type: text, content: Laboratory experiments can never have control groups}, {type: text, content: Laboratory experiments use larger sample sizes}], correct_option_index: 0, question_id: 2025-07-16T16:05:25.789180Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d, correct_order: null, index_options_that_apply: null, flag_for_removal: 0, ans_flagged: 0, has_been_reviewed: 0, completed: 1, last_modified_timestamp: 2025-07-16T16:05:25.789180Z, has_media: false}, source_table: question_answer_pair_new_review, primary_key: {question_id: 2025-07-16T16:05:25.789180Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d}, error: null}
-Quizzer: [10:25:34] [34m[INFO][0m [test_23_review_get_review.dart] Call 7/10: Calling getReviewQuestion() API...
-Quizzer: [10:25:34] [34m[INFO][0m [session_manager.dart] SessionManager: Requesting a question for review...
-Quizzer: [10:25:35] [34m[INFO][0m [get_send_postgre.dart] Fetching random record from question_answer_pair_new_review (offset: 68 / 71)
-Quizzer: [10:25:35] [34m[INFO][0m [get_send_postgre.dart] Performing hasMediaCheck for reviewed Question ID: 2025-07-16T15:47:07.894841Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d
-Quizzer: [10:25:35] [34m[INFO][0m [question_answer_pairs_table.dart] Processing media for question record (Question ID: 2025-07-16T15:47:07.894841Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d)
-Quizzer: [10:25:35] [34m[INFO][0m [question_answer_pairs_table.dart] No media found in record (Question ID: 2025-07-16T15:47:07.894841Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d).
-Quizzer: [10:25:35] [34m[INFO][0m [get_send_postgre.dart] hasMediaCheck completed for Question ID: 2025-07-16T15:47:07.894841Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d. DB access released.
-Quizzer: [10:25:35] [34m[INFO][0m [get_send_postgre.dart] ✅ Successfully fetched and decoded question 2025-07-16T15:47:07.894841Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d from question_answer_pair_new_review
-Quizzer: [10:25:35] [34m[INFO][0m [test_23_review_get_review.dart] ✅ ✅ Call 7/10 completed - got response back
-Quizzer: [10:25:35] [34m[INFO][0m [test_23_review_get_review.dart] Response keys: data, source_table, primary_key, error
-Quizzer: [10:25:35] [34m[INFO][0m [test_23_review_get_review.dart] Full response: {data: {time_stamp: 2025-07-16T15:47:07.894841Z, citation: null, question_elements: [{type: text, content: Power calculations should be performed:}], answer_elements: [{type: text, content:  Power should be considered during planning.}], ans_contrib: , concepts: null, subjects: null, qst_contrib: 82b1a6b9-6ae4-4bf6-903e-d84361bb506d, qst_reviewer: , module_name: Experimental Design, question_type: multiple_choice, options: [{type: text, content: After data collection}, {type: text, content: Only for large samples}, {type: text, content: Before running the experiment}, {type: text, content: Only for t-tests}], correct_option_index: 2, question_id: 2025-07-16T15:47:07.894841Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d, correct_order: null, index_options_that_apply: null, flag_for_removal: 0, ans_flagged: 0, has_been_reviewed: 0, completed: 1, last_modified_timestamp: 2025-07-16T15:47:07.894841Z, has_media: false}, source_table: question_answer_pair_new_review, primary_key: {question_id: 2025-07-16T15:47:07.894841Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d}, error: null}
-Quizzer: [10:25:35] [34m[INFO][0m [test_23_review_get_review.dart] Call 8/10: Calling getReviewQuestion() API...
-Quizzer: [10:25:35] [34m[INFO][0m [session_manager.dart] SessionManager: Requesting a question for review...
-Quizzer: [10:25:35] [34m[INFO][0m [get_send_postgre.dart] Fetching random record from question_answer_pair_new_review (offset: 13 / 71)
-Quizzer: [10:25:35] [34m[INFO][0m [get_send_postgre.dart] Performing hasMediaCheck for reviewed Question ID: 2025-07-16T15:40:50.404855Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d
-Quizzer: [10:25:35] [34m[INFO][0m [question_answer_pairs_table.dart] Processing media for question record (Question ID: 2025-07-16T15:40:50.404855Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d)
-Quizzer: [10:25:35] [34m[INFO][0m [question_answer_pairs_table.dart] No media found in record (Question ID: 2025-07-16T15:40:50.404855Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d).
-Quizzer: [10:25:35] [34m[INFO][0m [get_send_postgre.dart] hasMediaCheck completed for Question ID: 2025-07-16T15:40:50.404855Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d. DB access released.
-Quizzer: [10:25:35] [34m[INFO][0m [get_send_postgre.dart] ✅ Successfully fetched and decoded question 2025-07-16T15:40:50.404855Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d from question_answer_pair_new_review
-Quizzer: [10:25:35] [34m[INFO][0m [test_23_review_get_review.dart] ✅ ✅ Call 8/10 completed - got response back
-Quizzer: [10:25:35] [34m[INFO][0m [test_23_review_get_review.dart] Response keys: data, source_table, primary_key, error
-Quizzer: [10:25:35] [34m[INFO][0m [test_23_review_get_review.dart] Full response: {data: {time_stamp: 2025-07-16T15:40:50.404855Z, citation: null, question_elements: [{type: text, content: Model selection involves:}], answer_elements: [{type: text, content: Model selection is about choosing the best-fitting model.}], ans_contrib: , concepts: null, subjects: null, qst_contrib: 82b1a6b9-6ae4-4bf6-903e-d84361bb506d, qst_reviewer: , module_name: Experimental Design, question_type: multiple_choice, options: [{type: text, content: Choosing the statistical model that best fits the data}, {type: text, content: Randomizing treatments}, {type: text, content:  Increasing sample size}, {type: text, content:  Calculating means}], correct_option_index: 0, question_id: 2025-07-16T15:40:50.404855Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d, correct_order: null, index_options_that_apply: null, flag_for_removal: 0, ans_flagged: 0, has_been_reviewed: 0, completed: 1, last_modified_timestamp: 2025-07-16T15:40:50.404855Z, has_media: false}, source_table: question_answer_pair_new_review, primary_key: {question_id: 2025-07-16T15:40:50.404855Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d}, error: null}
-Quizzer: [10:25:35] [34m[INFO][0m [test_23_review_get_review.dart] Call 9/10: Calling getReviewQuestion() API...
-Quizzer: [10:25:35] [34m[INFO][0m [session_manager.dart] SessionManager: Requesting a question for review...
-Quizzer: [10:25:36] [34m[INFO][0m [get_send_postgre.dart] Fetching random record from question_answer_pair_new_review (offset: 37 / 71)
-Quizzer: [10:25:36] [34m[INFO][0m [get_send_postgre.dart] Performing hasMediaCheck for reviewed Question ID: 2025-07-16T15:43:56.333758Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d
-Quizzer: [10:25:36] [34m[INFO][0m [question_answer_pairs_table.dart] Processing media for question record (Question ID: 2025-07-16T15:43:56.333758Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d)
-Quizzer: [10:25:36] [34m[INFO][0m [question_answer_pairs_table.dart] No media found in record (Question ID: 2025-07-16T15:43:56.333758Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d).
-Quizzer: [10:25:36] [34m[INFO][0m [get_send_postgre.dart] hasMediaCheck completed for Question ID: 2025-07-16T15:43:56.333758Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d. DB access released.
-Quizzer: [10:25:36] [34m[INFO][0m [get_send_postgre.dart] ✅ Successfully fetched and decoded question 2025-07-16T15:43:56.333758Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d from question_answer_pair_new_review
-Quizzer: [10:25:36] [34m[INFO][0m [test_23_review_get_review.dart] ✅ ✅ Call 9/10 completed - got response back
-Quizzer: [10:25:36] [34m[INFO][0m [test_23_review_get_review.dart] Response keys: data, source_table, primary_key, error
-Quizzer: [10:25:36] [34m[INFO][0m [test_23_review_get_review.dart] Full response: {data: {time_stamp: 2025-07-16T15:43:56.333758Z, citation: null, question_elements: [{type: text, content: ANCOVA combines:}], answer_elements: [{type: text, content: ANCOVA includes both categorical and quantitative predictors.}], ans_contrib: , concepts: null, subjects: null, qst_contrib: 82b1a6b9-6ae4-4bf6-903e-d84361bb506d, qst_reviewer: , module_name: Experimental Design, question_type: multiple_choice, options: [{type: text, content: ANOVA and regression}, {type: text, content: Only regression}, {type: text, content: Only ANOVA}, {type: text, content: Only categorical variables}], correct_option_index: 0, question_id: 2025-07-16T15:43:56.333758Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d, correct_order: null, index_options_that_apply: null, flag_for_removal: 0, ans_flagged: 0, has_been_reviewed: 0, completed: 1, last_modified_timestamp: 2025-07-16T15:43:56.333758Z, has_media: false}, source_table: question_answer_pair_new_review, primary_key: {question_id: 2025-07-16T15:43:56.333758Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d}, error: null}
-Quizzer: [10:25:36] [34m[INFO][0m [test_23_review_get_review.dart] Call 10/10: Calling getReviewQuestion() API...
-Quizzer: [10:25:36] [34m[INFO][0m [session_manager.dart] SessionManager: Requesting a question for review...
-Quizzer: [10:25:36] [34m[INFO][0m [get_send_postgre.dart] Fetching random record from question_answer_pair_new_review (offset: 48 / 71)
-Quizzer: [10:25:36] [34m[INFO][0m [get_send_postgre.dart] Performing hasMediaCheck for reviewed Question ID: 2025-07-15T18:37:16.007525Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d
-Quizzer: [10:25:36] [34m[INFO][0m [question_answer_pairs_table.dart] Processing media for question record (Question ID: 2025-07-15T18:37:16.007525Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d)
-Quizzer: [10:25:36] [34m[INFO][0m [question_answer_pairs_table.dart] No media found in record (Question ID: 2025-07-15T18:37:16.007525Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d).
-Quizzer: [10:25:36] [34m[INFO][0m [get_send_postgre.dart] hasMediaCheck completed for Question ID: 2025-07-15T18:37:16.007525Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d. DB access released.
-Quizzer: [10:25:36] [34m[INFO][0m [get_send_postgre.dart] ✅ Successfully fetched and decoded question 2025-07-15T18:37:16.007525Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d from question_answer_pair_new_review
-Quizzer: [10:25:36] [34m[INFO][0m [test_23_review_get_review.dart] ✅ ✅ Call 10/10 completed - got response back
-Quizzer: [10:25:36] [34m[INFO][0m [test_23_review_get_review.dart] Response keys: data, source_table, primary_key, error
-Quizzer: [10:25:36] [34m[INFO][0m [test_23_review_get_review.dart] Full response: {data: {time_stamp: 2025-07-15T18:37:16.007525Z, citation: null, question_elements: [{type: text, content: Blocking in experimental design is used to:}], answer_elements: [{type: text, content: Blocking controls for known sources of variability.}], ans_contrib: , concepts: null, subjects: null, qst_contrib: 82b1a6b9-6ae4-4bf6-903e-d84361bb506d, qst_reviewer: , module_name: Experimental Design, question_type: multiple_choice, options: [{type: text, content:  Increase generalizability}, {type: text, content: Reduce variability by grouping similar units}, {type: text, content:  Increase sample size}, {type: text, content: Randomize treatments}], correct_option_index: 1, question_id: 2025-07-15T18:37:16.007525Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d, correct_order: null, index_options_that_apply: null, flag_for_removal: 0, ans_flagged: 0, has_been_reviewed: 0, completed: 1, last_modified_timestamp: 2025-07-15T18:37:16.007525Z, has_media: false}, source_table: question_answer_pair_new_review, primary_key: {question_id: 2025-07-15T18:37:16.007525Z_82b1a6b9-6ae4-4bf6-903e-d84361bb506d}, error: null}
-Quizzer: [10:25:36] [34m[INFO][0m [test_23_review_get_review.dart] ✅ ✅ All 10 review API calls completed successfully
-Quizzer: [10:25:36] [34m[INFO][0m [test_23_review_get_review.dart] === Test 2: Check review table counts and store them in global variable ===
-Quizzer: [10:25:36] [34m[INFO][0m [test_23_review_get_review.dart] About to call getReviewTableCounts()...
-Quizzer: [10:25:37] [34m[INFO][0m [test_23_review_get_review.dart] getReviewTableCounts() completed, result: {new_review_count: 71, edits_review_count: 0, total_review_count: 71}
-Quizzer: [10:25:37] [34m[INFO][0m [test_23_review_get_review.dart] NEW REVIEW TABLE COUNT: 71
-Quizzer: [10:25:37] [34m[INFO][0m [test_23_review_get_review.dart] EDITS REVIEW TABLE COUNT: 0
-Quizzer: [10:25:37] [34m[INFO][0m [test_23_review_get_review.dart] TOTAL REVIEW COUNT: 71
-Quizzer: [10:25:37] [34m[INFO][0m [test_23_review_get_review.dart] ✅ ✅ Review table counts retrieved and stored in global variable
+Quizzer: [17:26:03] [34m[INFO][0m [<asynchronous suspension>] QuizzerLogger successfully set up file logging to: ./QuizzerAppLogs/quizzer_log.txt
+Quizzer: [17:26:03] [34m[INFO][0m [<asynchronous suspension>] QuizzerLogger: Attempting a SECOND test log message to file.
+Quizzer: [17:26:03] [34m[INFO][0m [switch_board.dart] SwitchBoard initialized.
+Quizzer: [17:26:03] [34m[INFO][0m [file_locations.dart] [PATH] Path provider not available (likely test environment), using current directory for Hive.
+Quizzer: [17:26:03] [34m[INFO][0m [file_locations.dart] [PATH] QuizzerHive path: ./QuizzerAppHive
+Quizzer: [17:26:03] [34m[INFO][0m [session_manager.dart] SessionManager: Initializing Hive at path: ./QuizzerAppHive
+Quizzer: [17:26:03] [34m[INFO][0m [login_initialization.dart] Entering loginInitialization()...
+Quizzer: [17:26:03] [34m[INFO][0m [login_initialization.dart] Entering performLoginProcess()...
+Quizzer: [17:26:03] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Starting login process...
+Quizzer: [17:26:03] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Validating your information...
+Quizzer: [17:26:03] [34m[INFO][0m [login_initialization.dart] Entering _validateLoginForm()...
+Quizzer: [17:26:03] [34m[INFO][0m [login_initialization.dart] Form validation passed for email: test_user_5@example.com
+Quizzer: [17:26:03] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Checking connection...
+Quizzer: [17:26:03] [34m[INFO][0m [utils.dart] Network check successful.
+Quizzer: [17:26:03] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Connecting to your account...
+Quizzer: [17:26:03] [34m[INFO][0m [user_auth.dart] Attempting Supabase authentication for test_user_5@example.com
+Quizzer: [17:26:03] [34m[INFO][0m [user_auth.dart] Attempting Supabase authentication
+Quizzer: [17:26:04] [34m[INFO][0m [user_auth.dart] ✅ Supabase authentication successful for test_user_5@example.com
+Quizzer: [17:26:04] [34m[INFO][0m [session_helper.dart] Entering determineUserRoleFromSupabaseSession()...
+Quizzer: [17:26:04] [34m[INFO][0m [user_auth.dart] Ensuring local profile exists for test_user_5@example.com
+Quizzer: [17:26:04] [34m[INFO][0m [user_profile_table.dart] Fetching all emails from user_profile table.
+Quizzer: [17:26:04] [34m[INFO][0m [file_locations.dart] [PATH] Path provider not available (likely test environment), using current directory.
+Quizzer: [17:26:04] [34m[INFO][0m [file_locations.dart] [PATH] Quizzer database path: ./QuizzerApp/sqlite/quizzer.db
+Quizzer: [17:26:04] [34m[INFO][0m [database_native.dart] [DB_INIT] Starting database initialization. Desktop: true
+Quizzer: [17:26:04] [34m[INFO][0m [database_native.dart] [DB_INIT] Using sqflite FFI factory (Desktop)
+Quizzer: [17:26:04] [34m[INFO][0m [database_native.dart] [DB_INIT] Original target path: ./QuizzerApp/sqlite/quizzer.db
+Quizzer: [17:26:04] [34m[INFO][0m [database_native.dart] [DB_INIT] Absolute target path: /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/./QuizzerApp/sqlite/quizzer.db
+Quizzer: [17:26:04] [34m[INFO][0m [database_native.dart] [DB_INIT] Normalized target path: /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/QuizzerApp/sqlite/quizzer.db
+Quizzer: [17:26:04] [34m[INFO][0m [database_native.dart] [DB_INIT] Checking existence of dbFile at /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/QuizzerApp/sqlite/quizzer.db. Exists: true
+Quizzer: [17:26:04] [34m[INFO][0m [database_native.dart] [DB_INIT] Existing database found at /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/QuizzerApp/sqlite/quizzer.db. Using it.
+Quizzer: [17:26:04] [34m[INFO][0m [database_native.dart] [DB_INIT] Attempting to open database at /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/QuizzerApp/sqlite/quizzer.db
+Quizzer: [17:26:04] [34m[INFO][0m [database_native.dart] [DB_INIT] Database opened at actual path: /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/QuizzerApp/sqlite/quizzer.db
+Quizzer: [17:26:04] [34m[INFO][0m [database_native.dart] [DB_INIT] Expected path: /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/QuizzerApp/sqlite/quizzer.db
+Quizzer: [17:26:04] [34m[INFO][0m [database_native.dart] [DB_INIT] Paths match: true
+Quizzer: [17:26:04] [34m[INFO][0m [database_native.dart] ✅ [DB_INIT] Database initialized successfully at: /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/QuizzerApp/sqlite/quizzer.db. IsOpen: true
+Quizzer: [17:26:04] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
+Quizzer: [17:26:04] [34m[INFO][0m [user_profile_table.dart] ✅ Successfully fetched 1 emails.
+Quizzer: [17:26:04] [34m[INFO][0m [user_auth.dart] Is user in local profile list -> true
+Quizzer: [17:26:04] [34m[INFO][0m [user_profile_table.dart] Fetching all emails from user_profile table.
+Quizzer: [17:26:04] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
+Quizzer: [17:26:04] [34m[INFO][0m [user_profile_table.dart] ✅ Successfully fetched 1 emails.
+Quizzer: [17:26:04] [34m[INFO][0m [user_auth.dart] Final check - is user in local profile list -> true
+Quizzer: [17:26:04] [34m[INFO][0m [offline_login.dart] Storing offline login data for test_user_5@example.com
+Quizzer: [17:26:04] [34m[INFO][0m [user_profile_table.dart] Getting user ID for email: test_user_5@example.com
+Quizzer: [17:26:04] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
+Quizzer: [17:26:04] [34m[INFO][0m [user_profile_table.dart] ✅ Found user ID: 6ed90fb7-5b36-453f-bb14-2abae22d7747
+Quizzer: [17:26:04] [34m[INFO][0m [offline_login.dart] ✅ Offline login data stored for test_user_5@example.com
+Quizzer: [17:26:04] [34m[INFO][0m [user_profile_table.dart] Getting user ID for email: test_user_5@example.com
+Quizzer: [17:26:04] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
+Quizzer: [17:26:04] [34m[INFO][0m [user_profile_table.dart] ✅ Found user ID: 6ed90fb7-5b36-453f-bb14-2abae22d7747
+Quizzer: [17:26:04] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Login successful...
+Quizzer: [17:26:04] [34m[INFO][0m [login_initialization.dart] Supabase login successful, offline login data already stored
+Quizzer: [17:26:04] [34m[INFO][0m [login_initialization.dart] Recording login attempt...
+Quizzer: [17:26:04] [34m[INFO][0m [login_attempts_record.dart] Recording login Attempt test_user_5@example.com with result Login successful
+Quizzer: [17:26:04] [34m[INFO][0m [user_profile_table.dart] Getting user ID for email: test_user_5@example.com
+Quizzer: [17:26:04] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
+Quizzer: [17:26:04] [34m[INFO][0m [user_profile_table.dart] ✅ Found user ID: 6ed90fb7-5b36-453f-bb14-2abae22d7747
+Quizzer: [17:26:04] [34m[INFO][0m [table_helper.dart] Attempting to get IP address with multiple fallback methods
+Quizzer: [17:26:04] [34m[INFO][0m [table_helper.dart] Trying IP service: https://api.ipify.org
+Quizzer: [17:26:05] [34m[INFO][0m [table_helper.dart] ✅ Successfully retrieved IP address from https://api.ipify.org: 72.174.64.52
+Quizzer: [17:26:05] [34m[INFO][0m [login_attempts_table.dart] Login attempt recorded successfully: 2025-07-16T23:26:05.163851Z6ed90fb7-5b36-453f-bb14-2abae22d7747
+Quizzer: [17:26:05] [34m[INFO][0m [login_attempts_record.dart] Login attempt recorded for user: test_user_5@example.com with status: Login successful
+Quizzer: [17:26:05] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Setting up your profile...
+Quizzer: [17:26:05] [34m[INFO][0m [login_initialization.dart] Ensuring local profile exists for online login...
+Quizzer: [17:26:05] [34m[INFO][0m [user_auth.dart] Ensuring local profile exists for test_user_5@example.com
+Quizzer: [17:26:05] [34m[INFO][0m [user_profile_table.dart] Fetching all emails from user_profile table.
+Quizzer: [17:26:05] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
+Quizzer: [17:26:05] [34m[INFO][0m [user_profile_table.dart] ✅ Successfully fetched 1 emails.
+Quizzer: [17:26:05] [34m[INFO][0m [user_auth.dart] Is user in local profile list -> true
+Quizzer: [17:26:05] [34m[INFO][0m [user_profile_table.dart] Fetching all emails from user_profile table.
+Quizzer: [17:26:05] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
+Quizzer: [17:26:05] [34m[INFO][0m [user_profile_table.dart] ✅ Successfully fetched 1 emails.
+Quizzer: [17:26:05] [34m[INFO][0m [user_auth.dart] Final check - is user in local profile list -> true
+Quizzer: [17:26:05] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Syncing your profile...
+Quizzer: [17:26:05] [34m[INFO][0m [login_initialization.dart] Ensuring profile exists in Supabase for online login...
+Quizzer: [17:26:05] [34m[INFO][0m [login_initialization.dart] SessionManager already initialized by attemptSupabaseLogin for online login
+Quizzer: [17:26:05] [34m[INFO][0m [login_initialization.dart] ✅ Login process completed successfully for email: test_user_5@example.com
+Quizzer: [17:26:05] [34m[INFO][0m [login_initialization.dart] Skipping sync workers for test run
+Quizzer: [17:26:05] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Starting question queue server...
+Quizzer: [17:26:05] [34m[INFO][0m [login_initialization.dart] Initializing question queue server...
+Quizzer: [17:26:05] [34m[INFO][0m [queue_server_init.dart] Starting question queue server workers...
+Quizzer: [17:26:05] [34m[INFO][0m [queue_server_init.dart] Starting CirculationWorker...
+Quizzer: [17:26:05] [34m[INFO][0m [circulation_worker.dart] Entering CirculationWorker start()...
+Quizzer: [17:26:05] [34m[INFO][0m [circulation_worker.dart] CirculationWorker: Subscribed to onQuestionAnsweredCorrectly stream.
+Quizzer: [17:26:05] [34m[INFO][0m [circulation_worker.dart] Entering CirculationWorker _runLoop()...
+Quizzer: [17:26:05] [34m[INFO][0m [circulation_worker.dart] Entering CirculationWorker _shouldAddNewQuestion()...
+Quizzer: [17:26:05] [34m[INFO][0m [circulation_worker.dart] Querying database for eligible questions data...
+Quizzer: [17:26:05] [34m[INFO][0m [queue_server_init.dart] Starting PresentationSelectionWorker...
+Quizzer: [17:26:05] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker start()...
+Quizzer: [17:26:05] [34m[INFO][0m [question_selection_worker.dart] Clearing QuestionQueueCache and AnswerHistoryCache...
+Quizzer: [17:26:05] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache clear()...
+Quizzer: [17:26:05] [34m[INFO][0m [answer_history_cache.dart] Entering AnswerHistoryCache clear()...
+Quizzer: [17:26:05] [34m[INFO][0m [question_selection_worker.dart] ✅ ✅ QuestionQueueCache and AnswerHistoryCache cleared
+Quizzer: [17:26:05] [34m[INFO][0m [question_selection_worker.dart] PresentationSelectionWorker started.
+Quizzer: [17:26:05] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _runLoop()...
+Quizzer: [17:26:05] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache getLength()...
+Quizzer: [17:26:05] [34m[INFO][0m [queue_server_init.dart] Question queue server worker startup initiated
+Quizzer: [17:26:05] [34m[INFO][0m [queue_server_init.dart] Found 100 eligible questions - waiting for questions to be added to cache...
+Quizzer: [17:26:05] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache getLength()...
+Quizzer: [17:26:05] [34m[INFO][0m [answer_history_cache.dart] Entering AnswerHistoryCache getLastFiveAnsweredQuestions()...
+Quizzer: [17:26:05] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache peekAllRecords()...
+Quizzer: [17:26:05] [34m[INFO][0m [question_selection_worker.dart] Queue length 0 is below threshold 5. Running 5 cycles of _selectAndQueueQuestion
+Quizzer: [17:26:05] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _selectAndQueueQuestion()...
+Quizzer: [17:26:05] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _selectNextQuestionFromList()...
+Quizzer: [17:26:06] [34m[INFO][0m [question_answer_pairs_table.dart] Found 262 unique subjects
+Quizzer: [17:26:06] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
+Quizzer: [17:26:06] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache getLength()...
+Quizzer: [17:26:06] [34m[INFO][0m [user_profile_table.dart] ✅ Returning final subject interests for user
+Quizzer: [17:26:06] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache getLength()...
+Quizzer: [17:26:06] [34m[INFO][0m [circulation_worker.dart] lowStreakCondition evaluates to -> false (count: 20)
+Quizzer: [17:26:06] [34m[INFO][0m [circulation_worker.dart] lowTotalCondition evaluates to -> false (count: 100)
+Quizzer: [17:26:06] [34m[INFO][0m [circulation_worker.dart] shouldAdd evaluates to -> false
+Quizzer: [17:26:06] [34m[INFO][0m [circulation_worker.dart] CirculationWorker: Conditions not met, waiting for question answered correctly signal...
+Quizzer: [17:26:06] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling circulation worker finished
+Quizzer: [17:26:06] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache getLength()...
+Quizzer: [17:26:06] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache getLength()...
+Quizzer: [17:26:06] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache getLength()...
+Quizzer: [17:26:06] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache getLength()...
+Quizzer: [17:26:06] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache getLength()...
+Quizzer: [17:26:06] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache getLength()...
+Quizzer: [17:26:06] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache addRecord()...
+Quizzer: [17:26:06] [34m[INFO][0m [question_queue_cache.dart] QuestionQueueCache: Added record 2025-07-16T23:21:41.892963Z_6ed90fb7-5b36-453f-bb14-2abae22d7747 to empty queue.
+Quizzer: [17:26:06] [34m[INFO][0m [sb_cache_signals.dart] SwitchBoard: Signaling Question Queue Added
+Quizzer: [17:26:06] [34m[INFO][0m [question_selection_worker.dart] PSW Tracking: Added 2025-07-16T23:21:41.892963Z_6ed90fb7-5b36-453f-bb14-2abae22d7747 to recently selected list (1 total)
+Quizzer: [17:26:06] [34m[INFO][0m [question_selection_worker.dart] ✅ PSW Select: Successfully added question 2025-07-16T23:21:41.892963Z_6ed90fb7-5b36-453f-bb14-2abae22d7747 to QueueCache.
+Quizzer: [17:26:06] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _selectAndQueueQuestion()...
+Quizzer: [17:26:06] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _selectNextQuestionFromList()...
+Quizzer: [17:26:06] [34m[INFO][0m [question_answer_pairs_table.dart] Found 262 unique subjects
+Quizzer: [17:26:06] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
+Quizzer: [17:26:06] [34m[INFO][0m [user_profile_table.dart] ✅ Returning final subject interests for user
+Quizzer: [17:26:06] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache getLength()...
+Quizzer: [17:26:06] [34m[INFO][0m [queue_server_init.dart] ✅ Questions are now available in cache
+Quizzer: [17:26:06] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Welcome back! You're all set.
+Quizzer: [17:26:06] [34m[INFO][0m [login_initialization.dart] Login initialization completed for email: test_user_5@example.com
+Quizzer: [17:26:06] [34m[INFO][0m [test_25_review_subjects.dart] ✅ Full login initialization completed successfully
+Quizzer: [17:26:06] [34m[INFO][0m [test_25_review_subjects.dart] Test 1: Testing subject review functions directly with 5 iterations
+Quizzer: [17:26:06] [34m[INFO][0m [test_25_review_subjects.dart] Iteration 1/5
+Quizzer: [17:26:06] [34m[INFO][0m [review_subject_nodes.dart] Fetching subject for review. Cutoff timestamp: 2025-04-17T23:26:06.875113Z
+Quizzer: [17:26:07] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully fetched subject "aerobiology" for review
+Quizzer: [17:26:07] [34m[INFO][0m [test_25_review_subjects.dart] Extracted subject_description: null for subject: aerobiology
+Quizzer: [17:26:07] [34m[INFO][0m [test_25_review_subjects.dart] Set fresh timestamp: 2025-07-16T23:26:07.026346Z
+Quizzer: [17:26:07] [34m[INFO][0m [review_subject_nodes.dart] Updating reviewed subject "aerobiology"...
+Quizzer: [17:26:07] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully updated subject "aerobiology"
+Quizzer: [17:26:07] [34m[INFO][0m [test_25_review_subjects.dart] ✅ Successfully updated subject in iteration 1
+Quizzer: [17:26:07] [34m[INFO][0m [test_25_review_subjects.dart] Iteration 2/5
+Quizzer: [17:26:07] [34m[INFO][0m [review_subject_nodes.dart] Fetching subject for review. Cutoff timestamp: 2025-04-17T23:26:07.177644Z
+Quizzer: [17:26:07] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully fetched subject "embryology" for review
+Quizzer: [17:26:07] [34m[INFO][0m [test_25_review_subjects.dart] Extracted subject_description: null for subject: embryology
+Quizzer: [17:26:07] [34m[INFO][0m [test_25_review_subjects.dart] Set fresh timestamp: 2025-07-16T23:26:07.383700Z
+Quizzer: [17:26:07] [34m[INFO][0m [review_subject_nodes.dart] Updating reviewed subject "embryology"...
+Quizzer: [17:26:07] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache addRecord()...
+Quizzer: [17:26:07] [34m[INFO][0m [question_selection_worker.dart] PSW Tracking: Added 2025-07-16T23:21:39.258144Z_6ed90fb7-5b36-453f-bb14-2abae22d7747 to recently selected list (2 total)
+Quizzer: [17:26:07] [34m[INFO][0m [question_selection_worker.dart] ✅ PSW Select: Successfully added question 2025-07-16T23:21:39.258144Z_6ed90fb7-5b36-453f-bb14-2abae22d7747 to QueueCache.
+Quizzer: [17:26:07] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _selectAndQueueQuestion()...
+Quizzer: [17:26:07] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _selectNextQuestionFromList()...
+Quizzer: [17:26:07] [34m[INFO][0m [question_answer_pairs_table.dart] Found 262 unique subjects
+Quizzer: [17:26:07] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
+Quizzer: [17:26:07] [34m[INFO][0m [user_profile_table.dart] ✅ Returning final subject interests for user
+Quizzer: [17:26:07] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully updated subject "embryology"
+Quizzer: [17:26:07] [34m[INFO][0m [test_25_review_subjects.dart] ✅ Successfully updated subject in iteration 2
+Quizzer: [17:26:07] [34m[INFO][0m [test_25_review_subjects.dart] Iteration 3/5
+Quizzer: [17:26:07] [34m[INFO][0m [review_subject_nodes.dart] Fetching subject for review. Cutoff timestamp: 2025-04-17T23:26:07.586223Z
+Quizzer: [17:26:07] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully fetched subject "embryology" for review
+Quizzer: [17:26:07] [34m[INFO][0m [test_25_review_subjects.dart] Extracted subject_description: null for subject: embryology
+Quizzer: [17:26:07] [34m[INFO][0m [test_25_review_subjects.dart] Set fresh timestamp: 2025-07-16T23:26:07.722455Z
+Quizzer: [17:26:07] [34m[INFO][0m [review_subject_nodes.dart] Updating reviewed subject "embryology"...
+Quizzer: [17:26:07] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully updated subject "embryology"
+Quizzer: [17:26:07] [34m[INFO][0m [test_25_review_subjects.dart] ✅ Successfully updated subject in iteration 3
+Quizzer: [17:26:07] [34m[INFO][0m [test_25_review_subjects.dart] Iteration 4/5
+Quizzer: [17:26:07] [34m[INFO][0m [review_subject_nodes.dart] Fetching subject for review. Cutoff timestamp: 2025-04-17T23:26:07.893502Z
+Quizzer: [17:26:07] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache addRecord()...
+Quizzer: [17:26:07] [34m[INFO][0m [question_selection_worker.dart] PSW Tracking: Added 2025-07-16T23:21:41.174113Z_6ed90fb7-5b36-453f-bb14-2abae22d7747 to recently selected list (3 total)
+Quizzer: [17:26:07] [34m[INFO][0m [question_selection_worker.dart] ✅ PSW Select: Successfully added question 2025-07-16T23:21:41.174113Z_6ed90fb7-5b36-453f-bb14-2abae22d7747 to QueueCache.
+Quizzer: [17:26:07] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _selectAndQueueQuestion()...
+Quizzer: [17:26:07] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _selectNextQuestionFromList()...
+Quizzer: [17:26:07] [34m[INFO][0m [question_answer_pairs_table.dart] Found 262 unique subjects
+Quizzer: [17:26:07] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
+Quizzer: [17:26:07] [34m[INFO][0m [user_profile_table.dart] ✅ Returning final subject interests for user
+Quizzer: [17:26:08] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully fetched subject "analytical_dynamics" for review
+Quizzer: [17:26:08] [34m[INFO][0m [test_25_review_subjects.dart] Extracted subject_description: null for subject: analytical_dynamics
+Quizzer: [17:26:08] [34m[INFO][0m [test_25_review_subjects.dart] Set fresh timestamp: 2025-07-16T23:26:08.037080Z
+Quizzer: [17:26:08] [34m[INFO][0m [review_subject_nodes.dart] Updating reviewed subject "analytical_dynamics"...
+Quizzer: [17:26:08] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully updated subject "analytical_dynamics"
+Quizzer: [17:26:08] [34m[INFO][0m [test_25_review_subjects.dart] ✅ Successfully updated subject in iteration 4
+Quizzer: [17:26:08] [34m[INFO][0m [test_25_review_subjects.dart] Iteration 5/5
+Quizzer: [17:26:08] [34m[INFO][0m [review_subject_nodes.dart] Fetching subject for review. Cutoff timestamp: 2025-04-17T23:26:08.217426Z
+Quizzer: [17:26:08] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully fetched subject "analytical_dynamics" for review
+Quizzer: [17:26:08] [34m[INFO][0m [test_25_review_subjects.dart] Extracted subject_description: null for subject: analytical_dynamics
+Quizzer: [17:26:08] [34m[INFO][0m [test_25_review_subjects.dart] Set fresh timestamp: 2025-07-16T23:26:08.351743Z
+Quizzer: [17:26:08] [34m[INFO][0m [review_subject_nodes.dart] Updating reviewed subject "analytical_dynamics"...
+Quizzer: [17:26:08] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully updated subject "analytical_dynamics"
+Quizzer: [17:26:08] [34m[INFO][0m [test_25_review_subjects.dart] ✅ Successfully updated subject in iteration 5
+Quizzer: [17:26:08] [34m[INFO][0m [test_25_review_subjects.dart] ✅ Completed all 5 iterations of Test 1
+Quizzer: [17:26:08] [34m[INFO][0m [test_25_review_subjects.dart] Test 2: Testing subject review functions through SessionManager with 5 iterations
+Quizzer: [17:26:08] [34m[INFO][0m [test_25_review_subjects.dart] Iteration 1/5
+Quizzer: [17:26:08] [34m[INFO][0m [session_manager.dart] SessionManager: Requesting a subject for review...
+Quizzer: [17:26:08] [34m[INFO][0m [review_subject_nodes.dart] Fetching subject for review. Cutoff timestamp: 2025-04-17T23:26:08.499826Z
+Quizzer: [17:26:08] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully fetched subject "analytical_dynamics" for review
+Quizzer: [17:26:08] [34m[INFO][0m [test_25_review_subjects.dart] Extracted subject_description: null for subject: analytical_dynamics
+Quizzer: [17:26:08] [34m[INFO][0m [test_25_review_subjects.dart] Set fresh timestamp: 2025-07-16T23:26:08.616357Z
+Quizzer: [17:26:08] [34m[INFO][0m [session_manager.dart] SessionManager: Updating reviewed subject with PK: {subject: analytical_dynamics}
+Quizzer: [17:26:08] [34m[INFO][0m [review_subject_nodes.dart] Updating reviewed subject "analytical_dynamics"...
+Quizzer: [17:26:08] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache addRecord()...
+Quizzer: [17:26:08] [34m[INFO][0m [question_selection_worker.dart] PSW Tracking: Added 2025-07-16T23:21:42.110458Z_6ed90fb7-5b36-453f-bb14-2abae22d7747 to recently selected list (4 total)
+Quizzer: [17:26:08] [34m[INFO][0m [question_selection_worker.dart] ✅ PSW Select: Successfully added question 2025-07-16T23:21:42.110458Z_6ed90fb7-5b36-453f-bb14-2abae22d7747 to QueueCache.
+Quizzer: [17:26:08] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _selectAndQueueQuestion()...
+Quizzer: [17:26:08] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _selectNextQuestionFromList()...
+Quizzer: [17:26:08] [34m[INFO][0m [question_answer_pairs_table.dart] Found 262 unique subjects
+Quizzer: [17:26:08] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
+Quizzer: [17:26:08] [34m[INFO][0m [user_profile_table.dart] ✅ Returning final subject interests for user
+Quizzer: [17:26:08] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully updated subject "analytical_dynamics"
+Quizzer: [17:26:08] [34m[INFO][0m [test_25_review_subjects.dart] ✅ Successfully updated subject in iteration 1
+Quizzer: [17:26:08] [34m[INFO][0m [test_25_review_subjects.dart] Iteration 2/5
+Quizzer: [17:26:08] [34m[INFO][0m [session_manager.dart] SessionManager: Requesting a subject for review...
+Quizzer: [17:26:08] [34m[INFO][0m [review_subject_nodes.dart] Fetching subject for review. Cutoff timestamp: 2025-04-17T23:26:08.816447Z
+Quizzer: [17:26:08] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully fetched subject "analytical_dynamics" for review
+Quizzer: [17:26:08] [34m[INFO][0m [test_25_review_subjects.dart] Extracted subject_description: null for subject: analytical_dynamics
+Quizzer: [17:26:08] [34m[INFO][0m [test_25_review_subjects.dart] Set fresh timestamp: 2025-07-16T23:26:08.942038Z
+Quizzer: [17:26:08] [34m[INFO][0m [session_manager.dart] SessionManager: Updating reviewed subject with PK: {subject: analytical_dynamics}
+Quizzer: [17:26:08] [34m[INFO][0m [review_subject_nodes.dart] Updating reviewed subject "analytical_dynamics"...
+Quizzer: [17:26:09] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully updated subject "analytical_dynamics"
+Quizzer: [17:26:09] [34m[INFO][0m [test_25_review_subjects.dart] ✅ Successfully updated subject in iteration 2
+Quizzer: [17:26:09] [34m[INFO][0m [test_25_review_subjects.dart] Iteration 3/5
+Quizzer: [17:26:09] [34m[INFO][0m [session_manager.dart] SessionManager: Requesting a subject for review...
+Quizzer: [17:26:09] [34m[INFO][0m [review_subject_nodes.dart] Fetching subject for review. Cutoff timestamp: 2025-04-17T23:26:09.068361Z
+Quizzer: [17:26:09] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache addRecord()...
+Quizzer: [17:26:09] [34m[INFO][0m [question_selection_worker.dart] PSW Tracking: Added 2025-07-16T23:21:33.775366Z_6ed90fb7-5b36-453f-bb14-2abae22d7747 to recently selected list (5 total)
+Quizzer: [17:26:09] [34m[INFO][0m [question_selection_worker.dart] ✅ PSW Select: Successfully added question 2025-07-16T23:21:33.775366Z_6ed90fb7-5b36-453f-bb14-2abae22d7747 to QueueCache.
+Quizzer: [17:26:09] [34m[INFO][0m [sb_question_worker_signals.dart] SwitchBoard: Signaling PresentationSelectionWorker Cycle Complete
+Quizzer: [17:26:09] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully fetched subject "analytical_dynamics" for review
+Quizzer: [17:26:09] [34m[INFO][0m [test_25_review_subjects.dart] Extracted subject_description: null for subject: analytical_dynamics
+Quizzer: [17:26:09] [34m[INFO][0m [test_25_review_subjects.dart] Set fresh timestamp: 2025-07-16T23:26:09.324527Z
+Quizzer: [17:26:09] [34m[INFO][0m [session_manager.dart] SessionManager: Updating reviewed subject with PK: {subject: analytical_dynamics}
+Quizzer: [17:26:09] [34m[INFO][0m [review_subject_nodes.dart] Updating reviewed subject "analytical_dynamics"...
+Quizzer: [17:26:09] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully updated subject "analytical_dynamics"
+Quizzer: [17:26:09] [34m[INFO][0m [test_25_review_subjects.dart] ✅ Successfully updated subject in iteration 3
+Quizzer: [17:26:09] [34m[INFO][0m [test_25_review_subjects.dart] Iteration 4/5
+Quizzer: [17:26:09] [34m[INFO][0m [session_manager.dart] SessionManager: Requesting a subject for review...
+Quizzer: [17:26:09] [34m[INFO][0m [review_subject_nodes.dart] Fetching subject for review. Cutoff timestamp: 2025-04-17T23:26:09.538116Z
+Quizzer: [17:26:09] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully fetched subject "analytical_dynamics" for review
+Quizzer: [17:26:09] [34m[INFO][0m [test_25_review_subjects.dart] Extracted subject_description: null for subject: analytical_dynamics
+Quizzer: [17:26:09] [34m[INFO][0m [test_25_review_subjects.dart] Set fresh timestamp: 2025-07-16T23:26:09.678722Z
+Quizzer: [17:26:09] [34m[INFO][0m [session_manager.dart] SessionManager: Updating reviewed subject with PK: {subject: analytical_dynamics}
+Quizzer: [17:26:09] [34m[INFO][0m [review_subject_nodes.dart] Updating reviewed subject "analytical_dynamics"...
+Quizzer: [17:26:09] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully updated subject "analytical_dynamics"
+Quizzer: [17:26:09] [34m[INFO][0m [test_25_review_subjects.dart] ✅ Successfully updated subject in iteration 4
+Quizzer: [17:26:09] [34m[INFO][0m [test_25_review_subjects.dart] Iteration 5/5
+Quizzer: [17:26:09] [34m[INFO][0m [session_manager.dart] SessionManager: Requesting a subject for review...
+Quizzer: [17:26:09] [34m[INFO][0m [review_subject_nodes.dart] Fetching subject for review. Cutoff timestamp: 2025-04-17T23:26:09.814857Z
+Quizzer: [17:26:09] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully fetched subject "analytical_dynamics" for review
+Quizzer: [17:26:09] [34m[INFO][0m [test_25_review_subjects.dart] Extracted subject_description: null for subject: analytical_dynamics
+Quizzer: [17:26:09] [34m[INFO][0m [test_25_review_subjects.dart] Set fresh timestamp: 2025-07-16T23:26:09.944283Z
+Quizzer: [17:26:09] [34m[INFO][0m [session_manager.dart] SessionManager: Updating reviewed subject with PK: {subject: analytical_dynamics}
+Quizzer: [17:26:09] [34m[INFO][0m [review_subject_nodes.dart] Updating reviewed subject "analytical_dynamics"...
+Quizzer: [17:26:10] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully updated subject "analytical_dynamics"
+Quizzer: [17:26:10] [34m[INFO][0m [test_25_review_subjects.dart] ✅ Successfully updated subject in iteration 5
+Quizzer: [17:26:10] [34m[INFO][0m [test_25_review_subjects.dart] ✅ Completed all 5 iterations of Test 2
