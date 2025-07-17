@@ -27,15 +27,15 @@ Future<void> verifyQuestionAnswerPairTable(dynamic db) async {
         citation TEXT,
         question_elements TEXT,  -- CSV of question elements in format: type:content
         answer_elements TEXT,    -- CSV of answer elements in format: type:content
-        ans_flagged BOOLEAN,
+        ans_flagged INTEGER,     -- Changed from BOOLEAN to INTEGER
         ans_contrib TEXT,
         concepts TEXT,
         subjects TEXT,
         qst_contrib TEXT,
         qst_reviewer TEXT,
-        has_been_reviewed BOOLEAN,
-        flag_for_removal BOOLEAN,
-        completed BOOLEAN,
+        has_been_reviewed INTEGER,  -- Changed from BOOLEAN to INTEGER
+        flag_for_removal INTEGER,   -- Changed from BOOLEAN to INTEGER
+        completed INTEGER,           -- Changed from BOOLEAN to INTEGER
         module_name TEXT,
         question_type TEXT,      -- Added for multiple choice support
         options TEXT,            -- Added for multiple choice options
@@ -200,8 +200,8 @@ Future<void> verifyQuestionAnswerPairTable(dynamic db) async {
   }
 }
 
-bool _checkCompletionStatus(String questionElements, String answerElements) {
-  return questionElements.isNotEmpty && answerElements.isNotEmpty;
+int checkCompletionStatus(String questionElements, String answerElements) {
+  return (questionElements.isNotEmpty && answerElements.isNotEmpty) ? 1 : 0;
 }
 // =============================================================
 // Media Sync Helper functionality
@@ -405,13 +405,13 @@ Future<int> editQuestionAnswerPair({
     if (questionElements != null) valuesToUpdate['question_elements'] = questionElements;
     if (answerElements != null) valuesToUpdate['answer_elements'] = answerElements;
     if (indexOptionsThatApply != null) valuesToUpdate['index_options_that_apply'] = indexOptionsThatApply;
-    if (ansFlagged != null) valuesToUpdate['ans_flagged'] = ansFlagged;
+    if (ansFlagged != null) valuesToUpdate['ans_flagged'] = ansFlagged ? 1 : 0;
     if (ansContrib != null) valuesToUpdate['ans_contrib'] = ansContrib;
     if (concepts != null) valuesToUpdate['concepts'] = concepts;
     if (subjects != null) valuesToUpdate['subjects'] = subjects;
     if (qstReviewer != null) valuesToUpdate['qst_reviewer'] = qstReviewer;
-    if (hasBeenReviewed != null) valuesToUpdate['has_been_reviewed'] = hasBeenReviewed;
-    if (flagForRemoval != null) valuesToUpdate['flag_for_removal'] = flagForRemoval;
+    if (hasBeenReviewed != null) valuesToUpdate['has_been_reviewed'] = hasBeenReviewed ? 1 : 0;
+    if (flagForRemoval != null) valuesToUpdate['flag_for_removal'] = flagForRemoval ? 1 : 0;
     if (moduleName != null) valuesToUpdate['module_name'] = moduleName;
     if (questionType != null) valuesToUpdate['question_type'] = questionType;
     if (options != null) valuesToUpdate['options'] = options;
@@ -1008,16 +1008,16 @@ Future<String> addQuestionMultipleChoice({
       'citation': citation,
       'question_elements': questionElements,
       'answer_elements': answerElements,
-      'ans_flagged': false,
+      'ans_flagged': 0, // Changed from false to 0
       'ans_contrib': '', // Default empty
       'concepts': concepts,
       'subjects': subjects,
       'qst_contrib': qstContrib,
       'qst_reviewer': '', // Default empty
-      'has_been_reviewed': false,
-      'flag_for_removal': false,
+      'has_been_reviewed': 0, // Changed from false to 0
+      'flag_for_removal': 0, // Changed from false to 0
       // Check completion based on raw lists before encoding
-      'completed': _checkCompletionStatus(
+      'completed': checkCompletionStatus(
           questionElements.isNotEmpty ? json.encode(questionElements) : '', // Check if list is not empty before encoding for check
           answerElements.isNotEmpty ? json.encode(answerElements) : ''
       ),
@@ -1073,15 +1073,15 @@ Future<String> addQuestionSelectAllThatApply({
       'citation': citation,
       'question_elements': questionElements,
       'answer_elements': answerElements,
-      'ans_flagged': false,
-      'ans_contrib': '',
+      'ans_flagged': 0, // Changed from false to 0
+      'ans_contrib': '', // Default empty
       'concepts': concepts,
       'subjects': subjects,
       'qst_contrib': qstContrib,
-      'qst_reviewer': '',
-      'has_been_reviewed': false,
-      'flag_for_removal': false,
-      'completed': _checkCompletionStatus(
+      'qst_reviewer': '', // Default empty
+      'has_been_reviewed': 0, // Changed from false to 0
+      'flag_for_removal': 0, // Changed from false to 0
+      'completed': checkCompletionStatus(
           questionElements.isNotEmpty ? json.encode(questionElements) : '',
           answerElements.isNotEmpty ? json.encode(answerElements) : ''
       ),
@@ -1136,15 +1136,15 @@ Future<String> addQuestionTrueFalse({
       'citation': citation,
       'question_elements': questionElements,
       'answer_elements': answerElements,
-      'ans_flagged': false,
-      'ans_contrib': '',
+      'ans_flagged': 0, // Changed from false to 0
+      'ans_contrib': '', // Default empty
       'concepts': concepts,
       'subjects': subjects,
       'qst_contrib': qstContrib,
-      'qst_reviewer': '',
-      'has_been_reviewed': false,
-      'flag_for_removal': false,
-      'completed': _checkCompletionStatus(
+      'qst_reviewer': '', // Default empty
+      'has_been_reviewed': 0, // Changed from false to 0
+      'flag_for_removal': 0, // Changed from false to 0
+      'completed': checkCompletionStatus(
           questionElements.isNotEmpty ? json.encode(questionElements) : '',
           answerElements.isNotEmpty ? json.encode(answerElements) : ''
       ),
@@ -1217,16 +1217,16 @@ Future<String> addSortOrderQuestion({
       'citation': citation,
       'question_elements': questionElements, // Will be JSON encoded by helper
       'answer_elements': answerElements,     // Will be JSON encoded by helper
-      'ans_flagged': false, // Default
+      'ans_flagged': 0, // Default
       'ans_contrib': '', // Default
       'concepts': concepts,
       'subjects': subjects,
       'qst_contrib': qstContrib, // Store contributor ID
       'qst_reviewer': '', // Default
-      'has_been_reviewed': false, // Default
-      'flag_for_removal': false, // Default
+      'has_been_reviewed': 0, // Default
+      'flag_for_removal': 0, // Default
       // Use the helper to check completion status, mirroring other add functions
-      'completed': _checkCompletionStatus(
+      'completed': checkCompletionStatus(
           questionElements.isNotEmpty ? json.encode(questionElements) : '',
           answerElements.isNotEmpty ? json.encode(answerElements) : ''
       ),
@@ -1372,7 +1372,7 @@ Future<void> batchUpsertQuestionAnswerPairs({
       throw Exception('Failed to acquire database access');
     }
     if (records.isEmpty) return;
-    QuizzerLogger.logMessage('Starting TRUE batch upsert for question_answer_pairs: \\${records.length} records');
+    QuizzerLogger.logMessage('Starting TRUE batch upsert for question_answer_pairs: ${records.length} records');
     await verifyQuestionAnswerPairTable(db);
 
     // List of all columns in the table
@@ -1408,8 +1408,30 @@ Future<void> batchUpsertQuestionAnswerPairs({
 
     for (int i = 0; i < records.length; i += chunkSize) {
       final batch = records.sublist(i, i + chunkSize > records.length ? records.length : i + chunkSize);
+      
+      // Check for duplicate question_ids within this batch
+      final Set<String> questionIds = {};
+      final List<Map<String, dynamic>> deduplicatedBatch = [];
+      
+      for (final record in batch) {
+        final String? questionId = record['question_id'] as String?;
+        if (questionId != null && questionId.isNotEmpty) {
+          if (questionIds.contains(questionId)) {
+            QuizzerLogger.logWarning('Skipping duplicate question_id in batch: $questionId');
+            continue;
+          }
+          questionIds.add(questionId);
+        }
+        deduplicatedBatch.add(record);
+      }
+      
+      if (deduplicatedBatch.isEmpty) {
+        QuizzerLogger.logMessage('Skipping empty batch after deduplication');
+        continue;
+      }
+      
       final values = <dynamic>[];
-      final valuePlaceholders = batch.map((r) {
+      final valuePlaceholders = deduplicatedBatch.map((r) {
         for (final col in columns) {
           values.add(getVal(r, col, null));
         }
@@ -1419,7 +1441,26 @@ Future<void> batchUpsertQuestionAnswerPairs({
       // Use question_id as the upsert key since it has a UNIQUE constraint
       final updateSet = columns.where((c) => c != 'question_id').map((c) => '$c=excluded.$c').join(', ');
       final sql = 'INSERT INTO question_answer_pairs (${columns.join(',')}) VALUES $valuePlaceholders ON CONFLICT(question_id) DO UPDATE SET $updateSet;';
-      await db.rawInsert(sql, values);
+      
+      try {
+        await db.rawInsert(sql, values);
+        QuizzerLogger.logMessage('Successfully processed batch of ${deduplicatedBatch.length} records');
+      } catch (e) {
+        if (e.toString().contains('UNIQUE constraint failed') || e.toString().contains('2067')) {
+          QuizzerLogger.logWarning('Unique constraint violation in batch upsert. Falling back to individual inserts.');
+          // Fall back to individual inserts for this batch
+          for (final record in deduplicatedBatch) {
+            try {
+              await insertRawData('question_answer_pairs', record, db, conflictAlgorithm: ConflictAlgorithm.replace);
+            } catch (individualError) {
+              QuizzerLogger.logError('Failed to insert individual record: $individualError');
+              // Continue with other records instead of failing the entire batch
+            }
+          }
+        } else {
+          rethrow;
+        }
+      }
     }
     QuizzerLogger.logSuccess('TRUE batch upsert for question_answer_pairs complete.');
   } catch (e) {

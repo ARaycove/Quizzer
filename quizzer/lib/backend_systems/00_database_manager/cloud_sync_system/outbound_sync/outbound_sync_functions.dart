@@ -275,18 +275,54 @@ Future<void> syncQuestionAnswerPairs() async {
 
     QuizzerLogger.logMessage('Found ${unsyncedRecords.length} unsynced QuestionAnswerPairs.');
 
-    // Ensure all records have last_modified_timestamp
+    // Ensure all records have last_modified_timestamp and time_stamp
+    final List<Map<String, dynamic>> processedRecords = [];
+    final SessionManager sessionManager = getSessionManager();
+    final String? currentUserId = sessionManager.userId;
+    
     for (final record in unsyncedRecords) {
+      Map<String, dynamic> mutableRecord = Map<String, dynamic>.from(record);
+      
       if (record['last_modified_timestamp'] == null || (record['last_modified_timestamp'] is String && (record['last_modified_timestamp'] as String).isEmpty)) {
-        record['last_modified_timestamp'] = DateTime.now().toUtc().toIso8601String();
+        mutableRecord['last_modified_timestamp'] = DateTime.now().toUtc().toIso8601String();
       }
+      
+      // Ensure time_stamp is not null (required by review tables)
+      if (record['time_stamp'] == null || (record['time_stamp'] is String && (record['time_stamp'] as String).isEmpty)) {
+        QuizzerLogger.logWarning('Fixing null time_stamp for question ${record['question_id']}. Setting to current timestamp.');
+        mutableRecord['time_stamp'] = DateTime.now().toUtc().toIso8601String();
+      }
+      
+      // Ensure ans_contrib is not null (required by review tables)
+      if (record['ans_contrib'] == null || (record['ans_contrib'] is String && (record['ans_contrib'] as String).isEmpty)) {
+        if (currentUserId != null) {
+          QuizzerLogger.logWarning('Fixing null ans_contrib for question ${record['question_id']}. Setting to current user ID: $currentUserId');
+          mutableRecord['ans_contrib'] = currentUserId;
+        } else {
+          QuizzerLogger.logWarning('Fixing null ans_contrib for question ${record['question_id']}. No current user ID available, setting to empty string.');
+          mutableRecord['ans_contrib'] = '';
+        }
+      }
+      
+      // Ensure completed is not null (required by review tables)
+      if (record['completed'] == null) {
+        QuizzerLogger.logWarning('Fixing null completed for question ${record['question_id']}. Calculating completion status.');
+        // Import the function from question_answer_pairs_table.dart
+        final int completionStatus = checkCompletionStatus(
+          record['question_elements'] as String? ?? '',
+          record['answer_elements'] as String? ?? ''
+        );
+        mutableRecord['completed'] = completionStatus;
+      }
+      
+      processedRecords.add(mutableRecord);
     }
 
     // Push records to the appropriate review table
     int successCount = 0;
     int failureCount = 0;
 
-    for (final record in unsyncedRecords) {
+    for (final record in processedRecords) {
       // Handle corrupted sync flags: treat -1 as 1 (synced)
       int hasBeenSynced = record['has_been_synced'] as int? ?? -1;
       int editsAreSynced = record['edits_are_synced'] as int? ?? -1;

@@ -39,8 +39,6 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/us
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_average_daily_questions_learned_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_days_left_until_questions_exhaust_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_module_activation_status_table.dart'; // Added import for the new table
-
-
 import 'package:quizzer/backend_systems/00_helper_utils/file_locations.dart';
 import 'package:quizzer/backend_systems/00_database_manager/custom_queries.dart';
 

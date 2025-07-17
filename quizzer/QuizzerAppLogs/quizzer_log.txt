@@ -1,257 +1,255 @@
-Quizzer: [17:26:03] [34m[INFO][0m [<asynchronous suspension>] QuizzerLogger successfully set up file logging to: ./QuizzerAppLogs/quizzer_log.txt
-Quizzer: [17:26:03] [34m[INFO][0m [<asynchronous suspension>] QuizzerLogger: Attempting a SECOND test log message to file.
-Quizzer: [17:26:03] [34m[INFO][0m [switch_board.dart] SwitchBoard initialized.
-Quizzer: [17:26:03] [34m[INFO][0m [file_locations.dart] [PATH] Path provider not available (likely test environment), using current directory for Hive.
-Quizzer: [17:26:03] [34m[INFO][0m [file_locations.dart] [PATH] QuizzerHive path: ./QuizzerAppHive
-Quizzer: [17:26:03] [34m[INFO][0m [session_manager.dart] SessionManager: Initializing Hive at path: ./QuizzerAppHive
-Quizzer: [17:26:03] [34m[INFO][0m [login_initialization.dart] Entering loginInitialization()...
-Quizzer: [17:26:03] [34m[INFO][0m [login_initialization.dart] Entering performLoginProcess()...
-Quizzer: [17:26:03] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Starting login process...
-Quizzer: [17:26:03] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Validating your information...
-Quizzer: [17:26:03] [34m[INFO][0m [login_initialization.dart] Entering _validateLoginForm()...
-Quizzer: [17:26:03] [34m[INFO][0m [login_initialization.dart] Form validation passed for email: test_user_5@example.com
-Quizzer: [17:26:03] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Checking connection...
-Quizzer: [17:26:03] [34m[INFO][0m [utils.dart] Network check successful.
-Quizzer: [17:26:03] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Connecting to your account...
-Quizzer: [17:26:03] [34m[INFO][0m [user_auth.dart] Attempting Supabase authentication for test_user_5@example.com
-Quizzer: [17:26:03] [34m[INFO][0m [user_auth.dart] Attempting Supabase authentication
-Quizzer: [17:26:04] [34m[INFO][0m [user_auth.dart] ✅ Supabase authentication successful for test_user_5@example.com
-Quizzer: [17:26:04] [34m[INFO][0m [session_helper.dart] Entering determineUserRoleFromSupabaseSession()...
-Quizzer: [17:26:04] [34m[INFO][0m [user_auth.dart] Ensuring local profile exists for test_user_5@example.com
-Quizzer: [17:26:04] [34m[INFO][0m [user_profile_table.dart] Fetching all emails from user_profile table.
-Quizzer: [17:26:04] [34m[INFO][0m [file_locations.dart] [PATH] Path provider not available (likely test environment), using current directory.
-Quizzer: [17:26:04] [34m[INFO][0m [file_locations.dart] [PATH] Quizzer database path: ./QuizzerApp/sqlite/quizzer.db
-Quizzer: [17:26:04] [34m[INFO][0m [database_native.dart] [DB_INIT] Starting database initialization. Desktop: true
-Quizzer: [17:26:04] [34m[INFO][0m [database_native.dart] [DB_INIT] Using sqflite FFI factory (Desktop)
-Quizzer: [17:26:04] [34m[INFO][0m [database_native.dart] [DB_INIT] Original target path: ./QuizzerApp/sqlite/quizzer.db
-Quizzer: [17:26:04] [34m[INFO][0m [database_native.dart] [DB_INIT] Absolute target path: /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/./QuizzerApp/sqlite/quizzer.db
-Quizzer: [17:26:04] [34m[INFO][0m [database_native.dart] [DB_INIT] Normalized target path: /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/QuizzerApp/sqlite/quizzer.db
-Quizzer: [17:26:04] [34m[INFO][0m [database_native.dart] [DB_INIT] Checking existence of dbFile at /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/QuizzerApp/sqlite/quizzer.db. Exists: true
-Quizzer: [17:26:04] [34m[INFO][0m [database_native.dart] [DB_INIT] Existing database found at /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/QuizzerApp/sqlite/quizzer.db. Using it.
-Quizzer: [17:26:04] [34m[INFO][0m [database_native.dart] [DB_INIT] Attempting to open database at /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/QuizzerApp/sqlite/quizzer.db
-Quizzer: [17:26:04] [34m[INFO][0m [database_native.dart] [DB_INIT] Database opened at actual path: /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/QuizzerApp/sqlite/quizzer.db
-Quizzer: [17:26:04] [34m[INFO][0m [database_native.dart] [DB_INIT] Expected path: /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/QuizzerApp/sqlite/quizzer.db
-Quizzer: [17:26:04] [34m[INFO][0m [database_native.dart] [DB_INIT] Paths match: true
-Quizzer: [17:26:04] [34m[INFO][0m [database_native.dart] ✅ [DB_INIT] Database initialized successfully at: /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/QuizzerApp/sqlite/quizzer.db. IsOpen: true
-Quizzer: [17:26:04] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
-Quizzer: [17:26:04] [34m[INFO][0m [user_profile_table.dart] ✅ Successfully fetched 1 emails.
-Quizzer: [17:26:04] [34m[INFO][0m [user_auth.dart] Is user in local profile list -> true
-Quizzer: [17:26:04] [34m[INFO][0m [user_profile_table.dart] Fetching all emails from user_profile table.
-Quizzer: [17:26:04] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
-Quizzer: [17:26:04] [34m[INFO][0m [user_profile_table.dart] ✅ Successfully fetched 1 emails.
-Quizzer: [17:26:04] [34m[INFO][0m [user_auth.dart] Final check - is user in local profile list -> true
-Quizzer: [17:26:04] [34m[INFO][0m [offline_login.dart] Storing offline login data for test_user_5@example.com
-Quizzer: [17:26:04] [34m[INFO][0m [user_profile_table.dart] Getting user ID for email: test_user_5@example.com
-Quizzer: [17:26:04] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
-Quizzer: [17:26:04] [34m[INFO][0m [user_profile_table.dart] ✅ Found user ID: 6ed90fb7-5b36-453f-bb14-2abae22d7747
-Quizzer: [17:26:04] [34m[INFO][0m [offline_login.dart] ✅ Offline login data stored for test_user_5@example.com
-Quizzer: [17:26:04] [34m[INFO][0m [user_profile_table.dart] Getting user ID for email: test_user_5@example.com
-Quizzer: [17:26:04] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
-Quizzer: [17:26:04] [34m[INFO][0m [user_profile_table.dart] ✅ Found user ID: 6ed90fb7-5b36-453f-bb14-2abae22d7747
-Quizzer: [17:26:04] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Login successful...
-Quizzer: [17:26:04] [34m[INFO][0m [login_initialization.dart] Supabase login successful, offline login data already stored
-Quizzer: [17:26:04] [34m[INFO][0m [login_initialization.dart] Recording login attempt...
-Quizzer: [17:26:04] [34m[INFO][0m [login_attempts_record.dart] Recording login Attempt test_user_5@example.com with result Login successful
-Quizzer: [17:26:04] [34m[INFO][0m [user_profile_table.dart] Getting user ID for email: test_user_5@example.com
-Quizzer: [17:26:04] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
-Quizzer: [17:26:04] [34m[INFO][0m [user_profile_table.dart] ✅ Found user ID: 6ed90fb7-5b36-453f-bb14-2abae22d7747
-Quizzer: [17:26:04] [34m[INFO][0m [table_helper.dart] Attempting to get IP address with multiple fallback methods
-Quizzer: [17:26:04] [34m[INFO][0m [table_helper.dart] Trying IP service: https://api.ipify.org
-Quizzer: [17:26:05] [34m[INFO][0m [table_helper.dart] ✅ Successfully retrieved IP address from https://api.ipify.org: 72.174.64.52
-Quizzer: [17:26:05] [34m[INFO][0m [login_attempts_table.dart] Login attempt recorded successfully: 2025-07-16T23:26:05.163851Z6ed90fb7-5b36-453f-bb14-2abae22d7747
-Quizzer: [17:26:05] [34m[INFO][0m [login_attempts_record.dart] Login attempt recorded for user: test_user_5@example.com with status: Login successful
-Quizzer: [17:26:05] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Setting up your profile...
-Quizzer: [17:26:05] [34m[INFO][0m [login_initialization.dart] Ensuring local profile exists for online login...
-Quizzer: [17:26:05] [34m[INFO][0m [user_auth.dart] Ensuring local profile exists for test_user_5@example.com
-Quizzer: [17:26:05] [34m[INFO][0m [user_profile_table.dart] Fetching all emails from user_profile table.
-Quizzer: [17:26:05] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
-Quizzer: [17:26:05] [34m[INFO][0m [user_profile_table.dart] ✅ Successfully fetched 1 emails.
-Quizzer: [17:26:05] [34m[INFO][0m [user_auth.dart] Is user in local profile list -> true
-Quizzer: [17:26:05] [34m[INFO][0m [user_profile_table.dart] Fetching all emails from user_profile table.
-Quizzer: [17:26:05] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
-Quizzer: [17:26:05] [34m[INFO][0m [user_profile_table.dart] ✅ Successfully fetched 1 emails.
-Quizzer: [17:26:05] [34m[INFO][0m [user_auth.dart] Final check - is user in local profile list -> true
-Quizzer: [17:26:05] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Syncing your profile...
-Quizzer: [17:26:05] [34m[INFO][0m [login_initialization.dart] Ensuring profile exists in Supabase for online login...
-Quizzer: [17:26:05] [34m[INFO][0m [login_initialization.dart] SessionManager already initialized by attemptSupabaseLogin for online login
-Quizzer: [17:26:05] [34m[INFO][0m [login_initialization.dart] ✅ Login process completed successfully for email: test_user_5@example.com
-Quizzer: [17:26:05] [34m[INFO][0m [login_initialization.dart] Skipping sync workers for test run
-Quizzer: [17:26:05] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Starting question queue server...
-Quizzer: [17:26:05] [34m[INFO][0m [login_initialization.dart] Initializing question queue server...
-Quizzer: [17:26:05] [34m[INFO][0m [queue_server_init.dart] Starting question queue server workers...
-Quizzer: [17:26:05] [34m[INFO][0m [queue_server_init.dart] Starting CirculationWorker...
-Quizzer: [17:26:05] [34m[INFO][0m [circulation_worker.dart] Entering CirculationWorker start()...
-Quizzer: [17:26:05] [34m[INFO][0m [circulation_worker.dart] CirculationWorker: Subscribed to onQuestionAnsweredCorrectly stream.
-Quizzer: [17:26:05] [34m[INFO][0m [circulation_worker.dart] Entering CirculationWorker _runLoop()...
-Quizzer: [17:26:05] [34m[INFO][0m [circulation_worker.dart] Entering CirculationWorker _shouldAddNewQuestion()...
-Quizzer: [17:26:05] [34m[INFO][0m [circulation_worker.dart] Querying database for eligible questions data...
-Quizzer: [17:26:05] [34m[INFO][0m [queue_server_init.dart] Starting PresentationSelectionWorker...
-Quizzer: [17:26:05] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker start()...
-Quizzer: [17:26:05] [34m[INFO][0m [question_selection_worker.dart] Clearing QuestionQueueCache and AnswerHistoryCache...
-Quizzer: [17:26:05] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache clear()...
-Quizzer: [17:26:05] [34m[INFO][0m [answer_history_cache.dart] Entering AnswerHistoryCache clear()...
-Quizzer: [17:26:05] [34m[INFO][0m [question_selection_worker.dart] ✅ ✅ QuestionQueueCache and AnswerHistoryCache cleared
-Quizzer: [17:26:05] [34m[INFO][0m [question_selection_worker.dart] PresentationSelectionWorker started.
-Quizzer: [17:26:05] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _runLoop()...
-Quizzer: [17:26:05] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache getLength()...
-Quizzer: [17:26:05] [34m[INFO][0m [queue_server_init.dart] Question queue server worker startup initiated
-Quizzer: [17:26:05] [34m[INFO][0m [queue_server_init.dart] Found 100 eligible questions - waiting for questions to be added to cache...
-Quizzer: [17:26:05] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache getLength()...
-Quizzer: [17:26:05] [34m[INFO][0m [answer_history_cache.dart] Entering AnswerHistoryCache getLastFiveAnsweredQuestions()...
-Quizzer: [17:26:05] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache peekAllRecords()...
-Quizzer: [17:26:05] [34m[INFO][0m [question_selection_worker.dart] Queue length 0 is below threshold 5. Running 5 cycles of _selectAndQueueQuestion
-Quizzer: [17:26:05] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _selectAndQueueQuestion()...
-Quizzer: [17:26:05] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _selectNextQuestionFromList()...
-Quizzer: [17:26:06] [34m[INFO][0m [question_answer_pairs_table.dart] Found 262 unique subjects
-Quizzer: [17:26:06] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
-Quizzer: [17:26:06] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache getLength()...
-Quizzer: [17:26:06] [34m[INFO][0m [user_profile_table.dart] ✅ Returning final subject interests for user
-Quizzer: [17:26:06] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache getLength()...
-Quizzer: [17:26:06] [34m[INFO][0m [circulation_worker.dart] lowStreakCondition evaluates to -> false (count: 20)
-Quizzer: [17:26:06] [34m[INFO][0m [circulation_worker.dart] lowTotalCondition evaluates to -> false (count: 100)
-Quizzer: [17:26:06] [34m[INFO][0m [circulation_worker.dart] shouldAdd evaluates to -> false
-Quizzer: [17:26:06] [34m[INFO][0m [circulation_worker.dart] CirculationWorker: Conditions not met, waiting for question answered correctly signal...
-Quizzer: [17:26:06] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling circulation worker finished
-Quizzer: [17:26:06] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache getLength()...
-Quizzer: [17:26:06] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache getLength()...
-Quizzer: [17:26:06] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache getLength()...
-Quizzer: [17:26:06] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache getLength()...
-Quizzer: [17:26:06] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache getLength()...
-Quizzer: [17:26:06] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache getLength()...
-Quizzer: [17:26:06] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache addRecord()...
-Quizzer: [17:26:06] [34m[INFO][0m [question_queue_cache.dart] QuestionQueueCache: Added record 2025-07-16T23:21:41.892963Z_6ed90fb7-5b36-453f-bb14-2abae22d7747 to empty queue.
-Quizzer: [17:26:06] [34m[INFO][0m [sb_cache_signals.dart] SwitchBoard: Signaling Question Queue Added
-Quizzer: [17:26:06] [34m[INFO][0m [question_selection_worker.dart] PSW Tracking: Added 2025-07-16T23:21:41.892963Z_6ed90fb7-5b36-453f-bb14-2abae22d7747 to recently selected list (1 total)
-Quizzer: [17:26:06] [34m[INFO][0m [question_selection_worker.dart] ✅ PSW Select: Successfully added question 2025-07-16T23:21:41.892963Z_6ed90fb7-5b36-453f-bb14-2abae22d7747 to QueueCache.
-Quizzer: [17:26:06] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _selectAndQueueQuestion()...
-Quizzer: [17:26:06] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _selectNextQuestionFromList()...
-Quizzer: [17:26:06] [34m[INFO][0m [question_answer_pairs_table.dart] Found 262 unique subjects
-Quizzer: [17:26:06] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
-Quizzer: [17:26:06] [34m[INFO][0m [user_profile_table.dart] ✅ Returning final subject interests for user
-Quizzer: [17:26:06] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache getLength()...
-Quizzer: [17:26:06] [34m[INFO][0m [queue_server_init.dart] ✅ Questions are now available in cache
-Quizzer: [17:26:06] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Welcome back! You're all set.
-Quizzer: [17:26:06] [34m[INFO][0m [login_initialization.dart] Login initialization completed for email: test_user_5@example.com
-Quizzer: [17:26:06] [34m[INFO][0m [test_25_review_subjects.dart] ✅ Full login initialization completed successfully
-Quizzer: [17:26:06] [34m[INFO][0m [test_25_review_subjects.dart] Test 1: Testing subject review functions directly with 5 iterations
-Quizzer: [17:26:06] [34m[INFO][0m [test_25_review_subjects.dart] Iteration 1/5
-Quizzer: [17:26:06] [34m[INFO][0m [review_subject_nodes.dart] Fetching subject for review. Cutoff timestamp: 2025-04-17T23:26:06.875113Z
-Quizzer: [17:26:07] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully fetched subject "aerobiology" for review
-Quizzer: [17:26:07] [34m[INFO][0m [test_25_review_subjects.dart] Extracted subject_description: null for subject: aerobiology
-Quizzer: [17:26:07] [34m[INFO][0m [test_25_review_subjects.dart] Set fresh timestamp: 2025-07-16T23:26:07.026346Z
-Quizzer: [17:26:07] [34m[INFO][0m [review_subject_nodes.dart] Updating reviewed subject "aerobiology"...
-Quizzer: [17:26:07] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully updated subject "aerobiology"
-Quizzer: [17:26:07] [34m[INFO][0m [test_25_review_subjects.dart] ✅ Successfully updated subject in iteration 1
-Quizzer: [17:26:07] [34m[INFO][0m [test_25_review_subjects.dart] Iteration 2/5
-Quizzer: [17:26:07] [34m[INFO][0m [review_subject_nodes.dart] Fetching subject for review. Cutoff timestamp: 2025-04-17T23:26:07.177644Z
-Quizzer: [17:26:07] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully fetched subject "embryology" for review
-Quizzer: [17:26:07] [34m[INFO][0m [test_25_review_subjects.dart] Extracted subject_description: null for subject: embryology
-Quizzer: [17:26:07] [34m[INFO][0m [test_25_review_subjects.dart] Set fresh timestamp: 2025-07-16T23:26:07.383700Z
-Quizzer: [17:26:07] [34m[INFO][0m [review_subject_nodes.dart] Updating reviewed subject "embryology"...
-Quizzer: [17:26:07] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache addRecord()...
-Quizzer: [17:26:07] [34m[INFO][0m [question_selection_worker.dart] PSW Tracking: Added 2025-07-16T23:21:39.258144Z_6ed90fb7-5b36-453f-bb14-2abae22d7747 to recently selected list (2 total)
-Quizzer: [17:26:07] [34m[INFO][0m [question_selection_worker.dart] ✅ PSW Select: Successfully added question 2025-07-16T23:21:39.258144Z_6ed90fb7-5b36-453f-bb14-2abae22d7747 to QueueCache.
-Quizzer: [17:26:07] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _selectAndQueueQuestion()...
-Quizzer: [17:26:07] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _selectNextQuestionFromList()...
-Quizzer: [17:26:07] [34m[INFO][0m [question_answer_pairs_table.dart] Found 262 unique subjects
-Quizzer: [17:26:07] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
-Quizzer: [17:26:07] [34m[INFO][0m [user_profile_table.dart] ✅ Returning final subject interests for user
-Quizzer: [17:26:07] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully updated subject "embryology"
-Quizzer: [17:26:07] [34m[INFO][0m [test_25_review_subjects.dart] ✅ Successfully updated subject in iteration 2
-Quizzer: [17:26:07] [34m[INFO][0m [test_25_review_subjects.dart] Iteration 3/5
-Quizzer: [17:26:07] [34m[INFO][0m [review_subject_nodes.dart] Fetching subject for review. Cutoff timestamp: 2025-04-17T23:26:07.586223Z
-Quizzer: [17:26:07] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully fetched subject "embryology" for review
-Quizzer: [17:26:07] [34m[INFO][0m [test_25_review_subjects.dart] Extracted subject_description: null for subject: embryology
-Quizzer: [17:26:07] [34m[INFO][0m [test_25_review_subjects.dart] Set fresh timestamp: 2025-07-16T23:26:07.722455Z
-Quizzer: [17:26:07] [34m[INFO][0m [review_subject_nodes.dart] Updating reviewed subject "embryology"...
-Quizzer: [17:26:07] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully updated subject "embryology"
-Quizzer: [17:26:07] [34m[INFO][0m [test_25_review_subjects.dart] ✅ Successfully updated subject in iteration 3
-Quizzer: [17:26:07] [34m[INFO][0m [test_25_review_subjects.dart] Iteration 4/5
-Quizzer: [17:26:07] [34m[INFO][0m [review_subject_nodes.dart] Fetching subject for review. Cutoff timestamp: 2025-04-17T23:26:07.893502Z
-Quizzer: [17:26:07] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache addRecord()...
-Quizzer: [17:26:07] [34m[INFO][0m [question_selection_worker.dart] PSW Tracking: Added 2025-07-16T23:21:41.174113Z_6ed90fb7-5b36-453f-bb14-2abae22d7747 to recently selected list (3 total)
-Quizzer: [17:26:07] [34m[INFO][0m [question_selection_worker.dart] ✅ PSW Select: Successfully added question 2025-07-16T23:21:41.174113Z_6ed90fb7-5b36-453f-bb14-2abae22d7747 to QueueCache.
-Quizzer: [17:26:07] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _selectAndQueueQuestion()...
-Quizzer: [17:26:07] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _selectNextQuestionFromList()...
-Quizzer: [17:26:07] [34m[INFO][0m [question_answer_pairs_table.dart] Found 262 unique subjects
-Quizzer: [17:26:07] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
-Quizzer: [17:26:07] [34m[INFO][0m [user_profile_table.dart] ✅ Returning final subject interests for user
-Quizzer: [17:26:08] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully fetched subject "analytical_dynamics" for review
-Quizzer: [17:26:08] [34m[INFO][0m [test_25_review_subjects.dart] Extracted subject_description: null for subject: analytical_dynamics
-Quizzer: [17:26:08] [34m[INFO][0m [test_25_review_subjects.dart] Set fresh timestamp: 2025-07-16T23:26:08.037080Z
-Quizzer: [17:26:08] [34m[INFO][0m [review_subject_nodes.dart] Updating reviewed subject "analytical_dynamics"...
-Quizzer: [17:26:08] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully updated subject "analytical_dynamics"
-Quizzer: [17:26:08] [34m[INFO][0m [test_25_review_subjects.dart] ✅ Successfully updated subject in iteration 4
-Quizzer: [17:26:08] [34m[INFO][0m [test_25_review_subjects.dart] Iteration 5/5
-Quizzer: [17:26:08] [34m[INFO][0m [review_subject_nodes.dart] Fetching subject for review. Cutoff timestamp: 2025-04-17T23:26:08.217426Z
-Quizzer: [17:26:08] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully fetched subject "analytical_dynamics" for review
-Quizzer: [17:26:08] [34m[INFO][0m [test_25_review_subjects.dart] Extracted subject_description: null for subject: analytical_dynamics
-Quizzer: [17:26:08] [34m[INFO][0m [test_25_review_subjects.dart] Set fresh timestamp: 2025-07-16T23:26:08.351743Z
-Quizzer: [17:26:08] [34m[INFO][0m [review_subject_nodes.dart] Updating reviewed subject "analytical_dynamics"...
-Quizzer: [17:26:08] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully updated subject "analytical_dynamics"
-Quizzer: [17:26:08] [34m[INFO][0m [test_25_review_subjects.dart] ✅ Successfully updated subject in iteration 5
-Quizzer: [17:26:08] [34m[INFO][0m [test_25_review_subjects.dart] ✅ Completed all 5 iterations of Test 1
-Quizzer: [17:26:08] [34m[INFO][0m [test_25_review_subjects.dart] Test 2: Testing subject review functions through SessionManager with 5 iterations
-Quizzer: [17:26:08] [34m[INFO][0m [test_25_review_subjects.dart] Iteration 1/5
-Quizzer: [17:26:08] [34m[INFO][0m [session_manager.dart] SessionManager: Requesting a subject for review...
-Quizzer: [17:26:08] [34m[INFO][0m [review_subject_nodes.dart] Fetching subject for review. Cutoff timestamp: 2025-04-17T23:26:08.499826Z
-Quizzer: [17:26:08] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully fetched subject "analytical_dynamics" for review
-Quizzer: [17:26:08] [34m[INFO][0m [test_25_review_subjects.dart] Extracted subject_description: null for subject: analytical_dynamics
-Quizzer: [17:26:08] [34m[INFO][0m [test_25_review_subjects.dart] Set fresh timestamp: 2025-07-16T23:26:08.616357Z
-Quizzer: [17:26:08] [34m[INFO][0m [session_manager.dart] SessionManager: Updating reviewed subject with PK: {subject: analytical_dynamics}
-Quizzer: [17:26:08] [34m[INFO][0m [review_subject_nodes.dart] Updating reviewed subject "analytical_dynamics"...
-Quizzer: [17:26:08] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache addRecord()...
-Quizzer: [17:26:08] [34m[INFO][0m [question_selection_worker.dart] PSW Tracking: Added 2025-07-16T23:21:42.110458Z_6ed90fb7-5b36-453f-bb14-2abae22d7747 to recently selected list (4 total)
-Quizzer: [17:26:08] [34m[INFO][0m [question_selection_worker.dart] ✅ PSW Select: Successfully added question 2025-07-16T23:21:42.110458Z_6ed90fb7-5b36-453f-bb14-2abae22d7747 to QueueCache.
-Quizzer: [17:26:08] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _selectAndQueueQuestion()...
-Quizzer: [17:26:08] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _selectNextQuestionFromList()...
-Quizzer: [17:26:08] [34m[INFO][0m [question_answer_pairs_table.dart] Found 262 unique subjects
-Quizzer: [17:26:08] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
-Quizzer: [17:26:08] [34m[INFO][0m [user_profile_table.dart] ✅ Returning final subject interests for user
-Quizzer: [17:26:08] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully updated subject "analytical_dynamics"
-Quizzer: [17:26:08] [34m[INFO][0m [test_25_review_subjects.dart] ✅ Successfully updated subject in iteration 1
-Quizzer: [17:26:08] [34m[INFO][0m [test_25_review_subjects.dart] Iteration 2/5
-Quizzer: [17:26:08] [34m[INFO][0m [session_manager.dart] SessionManager: Requesting a subject for review...
-Quizzer: [17:26:08] [34m[INFO][0m [review_subject_nodes.dart] Fetching subject for review. Cutoff timestamp: 2025-04-17T23:26:08.816447Z
-Quizzer: [17:26:08] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully fetched subject "analytical_dynamics" for review
-Quizzer: [17:26:08] [34m[INFO][0m [test_25_review_subjects.dart] Extracted subject_description: null for subject: analytical_dynamics
-Quizzer: [17:26:08] [34m[INFO][0m [test_25_review_subjects.dart] Set fresh timestamp: 2025-07-16T23:26:08.942038Z
-Quizzer: [17:26:08] [34m[INFO][0m [session_manager.dart] SessionManager: Updating reviewed subject with PK: {subject: analytical_dynamics}
-Quizzer: [17:26:08] [34m[INFO][0m [review_subject_nodes.dart] Updating reviewed subject "analytical_dynamics"...
-Quizzer: [17:26:09] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully updated subject "analytical_dynamics"
-Quizzer: [17:26:09] [34m[INFO][0m [test_25_review_subjects.dart] ✅ Successfully updated subject in iteration 2
-Quizzer: [17:26:09] [34m[INFO][0m [test_25_review_subjects.dart] Iteration 3/5
-Quizzer: [17:26:09] [34m[INFO][0m [session_manager.dart] SessionManager: Requesting a subject for review...
-Quizzer: [17:26:09] [34m[INFO][0m [review_subject_nodes.dart] Fetching subject for review. Cutoff timestamp: 2025-04-17T23:26:09.068361Z
-Quizzer: [17:26:09] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache addRecord()...
-Quizzer: [17:26:09] [34m[INFO][0m [question_selection_worker.dart] PSW Tracking: Added 2025-07-16T23:21:33.775366Z_6ed90fb7-5b36-453f-bb14-2abae22d7747 to recently selected list (5 total)
-Quizzer: [17:26:09] [34m[INFO][0m [question_selection_worker.dart] ✅ PSW Select: Successfully added question 2025-07-16T23:21:33.775366Z_6ed90fb7-5b36-453f-bb14-2abae22d7747 to QueueCache.
-Quizzer: [17:26:09] [34m[INFO][0m [sb_question_worker_signals.dart] SwitchBoard: Signaling PresentationSelectionWorker Cycle Complete
-Quizzer: [17:26:09] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully fetched subject "analytical_dynamics" for review
-Quizzer: [17:26:09] [34m[INFO][0m [test_25_review_subjects.dart] Extracted subject_description: null for subject: analytical_dynamics
-Quizzer: [17:26:09] [34m[INFO][0m [test_25_review_subjects.dart] Set fresh timestamp: 2025-07-16T23:26:09.324527Z
-Quizzer: [17:26:09] [34m[INFO][0m [session_manager.dart] SessionManager: Updating reviewed subject with PK: {subject: analytical_dynamics}
-Quizzer: [17:26:09] [34m[INFO][0m [review_subject_nodes.dart] Updating reviewed subject "analytical_dynamics"...
-Quizzer: [17:26:09] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully updated subject "analytical_dynamics"
-Quizzer: [17:26:09] [34m[INFO][0m [test_25_review_subjects.dart] ✅ Successfully updated subject in iteration 3
-Quizzer: [17:26:09] [34m[INFO][0m [test_25_review_subjects.dart] Iteration 4/5
-Quizzer: [17:26:09] [34m[INFO][0m [session_manager.dart] SessionManager: Requesting a subject for review...
-Quizzer: [17:26:09] [34m[INFO][0m [review_subject_nodes.dart] Fetching subject for review. Cutoff timestamp: 2025-04-17T23:26:09.538116Z
-Quizzer: [17:26:09] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully fetched subject "analytical_dynamics" for review
-Quizzer: [17:26:09] [34m[INFO][0m [test_25_review_subjects.dart] Extracted subject_description: null for subject: analytical_dynamics
-Quizzer: [17:26:09] [34m[INFO][0m [test_25_review_subjects.dart] Set fresh timestamp: 2025-07-16T23:26:09.678722Z
-Quizzer: [17:26:09] [34m[INFO][0m [session_manager.dart] SessionManager: Updating reviewed subject with PK: {subject: analytical_dynamics}
-Quizzer: [17:26:09] [34m[INFO][0m [review_subject_nodes.dart] Updating reviewed subject "analytical_dynamics"...
-Quizzer: [17:26:09] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully updated subject "analytical_dynamics"
-Quizzer: [17:26:09] [34m[INFO][0m [test_25_review_subjects.dart] ✅ Successfully updated subject in iteration 4
-Quizzer: [17:26:09] [34m[INFO][0m [test_25_review_subjects.dart] Iteration 5/5
-Quizzer: [17:26:09] [34m[INFO][0m [session_manager.dart] SessionManager: Requesting a subject for review...
-Quizzer: [17:26:09] [34m[INFO][0m [review_subject_nodes.dart] Fetching subject for review. Cutoff timestamp: 2025-04-17T23:26:09.814857Z
-Quizzer: [17:26:09] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully fetched subject "analytical_dynamics" for review
-Quizzer: [17:26:09] [34m[INFO][0m [test_25_review_subjects.dart] Extracted subject_description: null for subject: analytical_dynamics
-Quizzer: [17:26:09] [34m[INFO][0m [test_25_review_subjects.dart] Set fresh timestamp: 2025-07-16T23:26:09.944283Z
-Quizzer: [17:26:09] [34m[INFO][0m [session_manager.dart] SessionManager: Updating reviewed subject with PK: {subject: analytical_dynamics}
-Quizzer: [17:26:09] [34m[INFO][0m [review_subject_nodes.dart] Updating reviewed subject "analytical_dynamics"...
-Quizzer: [17:26:10] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully updated subject "analytical_dynamics"
-Quizzer: [17:26:10] [34m[INFO][0m [test_25_review_subjects.dart] ✅ Successfully updated subject in iteration 5
-Quizzer: [17:26:10] [34m[INFO][0m [test_25_review_subjects.dart] ✅ Completed all 5 iterations of Test 2
+Quizzer: [10:12:59] [34m[INFO][0m [<asynchronous suspension>] QuizzerLogger successfully set up file logging to: ./QuizzerAppLogs/quizzer_log.txt
+Quizzer: [10:12:59] [34m[INFO][0m [<asynchronous suspension>] QuizzerLogger: Attempting a SECOND test log message to file.
+Quizzer: [10:12:59] [34m[INFO][0m [switch_board.dart] SwitchBoard initialized.
+Quizzer: [10:12:59] [34m[INFO][0m [file_locations.dart] [PATH] Path provider not available (likely test environment), using current directory for Hive.
+Quizzer: [10:12:59] [34m[INFO][0m [file_locations.dart] [PATH] QuizzerHive path: ./QuizzerAppHive
+Quizzer: [10:12:59] [34m[INFO][0m [session_manager.dart] SessionManager: Initializing Hive at path: ./QuizzerAppHive
+Quizzer: [10:12:59] [34m[INFO][0m [login_initialization.dart] Entering loginInitialization()...
+Quizzer: [10:12:59] [34m[INFO][0m [login_initialization.dart] Entering performLoginProcess()...
+Quizzer: [10:12:59] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Starting login process...
+Quizzer: [10:12:59] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Validating your information...
+Quizzer: [10:12:59] [34m[INFO][0m [login_initialization.dart] Entering _validateLoginForm()...
+Quizzer: [10:12:59] [34m[INFO][0m [login_initialization.dart] Form validation passed for email: test_user_5@example.com
+Quizzer: [10:12:59] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Checking connection...
+Quizzer: [10:12:59] [34m[INFO][0m [utils.dart] Network check successful.
+Quizzer: [10:12:59] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Connecting to your account...
+Quizzer: [10:12:59] [34m[INFO][0m [user_auth.dart] Attempting Supabase authentication for test_user_5@example.com
+Quizzer: [10:12:59] [34m[INFO][0m [user_auth.dart] Attempting Supabase authentication
+Quizzer: [10:13:00] [34m[INFO][0m [user_auth.dart] ✅ Supabase authentication successful for test_user_5@example.com
+Quizzer: [10:13:00] [34m[INFO][0m [session_helper.dart] Entering determineUserRoleFromSupabaseSession()...
+Quizzer: [10:13:00] [34m[INFO][0m [user_auth.dart] Ensuring local profile exists for test_user_5@example.com
+Quizzer: [10:13:00] [34m[INFO][0m [user_profile_table.dart] Fetching all emails from user_profile table.
+Quizzer: [10:13:00] [34m[INFO][0m [file_locations.dart] [PATH] Path provider not available (likely test environment), using current directory.
+Quizzer: [10:13:00] [34m[INFO][0m [file_locations.dart] [PATH] Quizzer database path: ./QuizzerApp/sqlite/quizzer.db
+Quizzer: [10:13:00] [34m[INFO][0m [database_native.dart] [DB_INIT] Starting database initialization. Desktop: true
+Quizzer: [10:13:00] [34m[INFO][0m [database_native.dart] [DB_INIT] Using sqflite FFI factory (Desktop)
+Quizzer: [10:13:00] [34m[INFO][0m [database_native.dart] [DB_INIT] Original target path: ./QuizzerApp/sqlite/quizzer.db
+Quizzer: [10:13:00] [34m[INFO][0m [database_native.dart] [DB_INIT] Absolute target path: /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/./QuizzerApp/sqlite/quizzer.db
+Quizzer: [10:13:00] [34m[INFO][0m [database_native.dart] [DB_INIT] Normalized target path: /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/QuizzerApp/sqlite/quizzer.db
+Quizzer: [10:13:00] [34m[INFO][0m [database_native.dart] [DB_INIT] Checking existence of dbFile at /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/QuizzerApp/sqlite/quizzer.db. Exists: true
+Quizzer: [10:13:00] [34m[INFO][0m [database_native.dart] [DB_INIT] Existing database found at /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/QuizzerApp/sqlite/quizzer.db. Using it.
+Quizzer: [10:13:00] [34m[INFO][0m [database_native.dart] [DB_INIT] Attempting to open database at /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/QuizzerApp/sqlite/quizzer.db
+Quizzer: [10:13:00] [34m[INFO][0m [database_native.dart] [DB_INIT] Database opened at actual path: /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/QuizzerApp/sqlite/quizzer.db
+Quizzer: [10:13:00] [34m[INFO][0m [database_native.dart] [DB_INIT] Expected path: /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/QuizzerApp/sqlite/quizzer.db
+Quizzer: [10:13:00] [34m[INFO][0m [database_native.dart] [DB_INIT] Paths match: true
+Quizzer: [10:13:00] [34m[INFO][0m [database_native.dart] ✅ [DB_INIT] Database initialized successfully at: /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/QuizzerApp/sqlite/quizzer.db. IsOpen: true
+Quizzer: [10:13:00] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
+Quizzer: [10:13:00] [34m[INFO][0m [user_profile_table.dart] ✅ Successfully fetched 1 emails.
+Quizzer: [10:13:00] [34m[INFO][0m [user_auth.dart] Is user in local profile list -> true
+Quizzer: [10:13:00] [34m[INFO][0m [user_profile_table.dart] Fetching all emails from user_profile table.
+Quizzer: [10:13:00] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
+Quizzer: [10:13:00] [34m[INFO][0m [user_profile_table.dart] ✅ Successfully fetched 1 emails.
+Quizzer: [10:13:00] [34m[INFO][0m [user_auth.dart] Final check - is user in local profile list -> true
+Quizzer: [10:13:00] [34m[INFO][0m [offline_login.dart] Storing offline login data for test_user_5@example.com
+Quizzer: [10:13:00] [34m[INFO][0m [user_profile_table.dart] Getting user ID for email: test_user_5@example.com
+Quizzer: [10:13:00] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
+Quizzer: [10:13:00] [34m[INFO][0m [user_profile_table.dart] ✅ Found user ID: 49077910-058a-4d80-8506-e9e3d15c240e
+Quizzer: [10:13:00] [34m[INFO][0m [offline_login.dart] ✅ Offline login data stored for test_user_5@example.com
+Quizzer: [10:13:00] [34m[INFO][0m [user_profile_table.dart] Getting user ID for email: test_user_5@example.com
+Quizzer: [10:13:00] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
+Quizzer: [10:13:00] [34m[INFO][0m [user_profile_table.dart] ✅ Found user ID: 49077910-058a-4d80-8506-e9e3d15c240e
+Quizzer: [10:13:00] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Login successful...
+Quizzer: [10:13:00] [34m[INFO][0m [login_initialization.dart] Supabase login successful, offline login data already stored
+Quizzer: [10:13:00] [34m[INFO][0m [login_initialization.dart] Recording login attempt...
+Quizzer: [10:13:00] [34m[INFO][0m [login_attempts_record.dart] Recording login Attempt test_user_5@example.com with result Login successful
+Quizzer: [10:13:00] [34m[INFO][0m [user_profile_table.dart] Getting user ID for email: test_user_5@example.com
+Quizzer: [10:13:00] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
+Quizzer: [10:13:00] [34m[INFO][0m [user_profile_table.dart] ✅ Found user ID: 49077910-058a-4d80-8506-e9e3d15c240e
+Quizzer: [10:13:00] [34m[INFO][0m [table_helper.dart] Attempting to get IP address with multiple fallback methods
+Quizzer: [10:13:00] [34m[INFO][0m [table_helper.dart] Trying IP service: https://api.ipify.org
+Quizzer: [10:13:01] [34m[INFO][0m [table_helper.dart] ✅ Successfully retrieved IP address from https://api.ipify.org: 72.174.64.52
+Quizzer: [10:13:01] [34m[INFO][0m [login_attempts_table.dart] Login attempt recorded successfully: 2025-07-17T16:13:01.094904Z49077910-058a-4d80-8506-e9e3d15c240e
+Quizzer: [10:13:01] [34m[INFO][0m [login_attempts_record.dart] Login attempt recorded for user: test_user_5@example.com with status: Login successful
+Quizzer: [10:13:01] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Setting up your profile...
+Quizzer: [10:13:01] [34m[INFO][0m [login_initialization.dart] Ensuring local profile exists for online login...
+Quizzer: [10:13:01] [34m[INFO][0m [user_auth.dart] Ensuring local profile exists for test_user_5@example.com
+Quizzer: [10:13:01] [34m[INFO][0m [user_profile_table.dart] Fetching all emails from user_profile table.
+Quizzer: [10:13:01] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
+Quizzer: [10:13:01] [34m[INFO][0m [user_profile_table.dart] ✅ Successfully fetched 1 emails.
+Quizzer: [10:13:01] [34m[INFO][0m [user_auth.dart] Is user in local profile list -> true
+Quizzer: [10:13:01] [34m[INFO][0m [user_profile_table.dart] Fetching all emails from user_profile table.
+Quizzer: [10:13:01] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
+Quizzer: [10:13:01] [34m[INFO][0m [user_profile_table.dart] ✅ Successfully fetched 1 emails.
+Quizzer: [10:13:01] [34m[INFO][0m [user_auth.dart] Final check - is user in local profile list -> true
+Quizzer: [10:13:01] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Syncing your profile...
+Quizzer: [10:13:01] [34m[INFO][0m [login_initialization.dart] Ensuring profile exists in Supabase for online login...
+Quizzer: [10:13:01] [34m[INFO][0m [login_initialization.dart] SessionManager already initialized by attemptSupabaseLogin for online login
+Quizzer: [10:13:01] [34m[INFO][0m [login_initialization.dart] ✅ Login process completed successfully for email: test_user_5@example.com
+Quizzer: [10:13:01] [34m[INFO][0m [login_initialization.dart] Skipping sync workers for test run
+Quizzer: [10:13:01] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Starting question queue server...
+Quizzer: [10:13:01] [34m[INFO][0m [login_initialization.dart] Initializing question queue server...
+Quizzer: [10:13:01] [34m[INFO][0m [queue_server_init.dart] Starting question queue server workers...
+Quizzer: [10:13:01] [34m[INFO][0m [queue_server_init.dart] Starting CirculationWorker...
+Quizzer: [10:13:01] [34m[INFO][0m [circulation_worker.dart] Entering CirculationWorker start()...
+Quizzer: [10:13:01] [34m[INFO][0m [circulation_worker.dart] CirculationWorker: Subscribed to onQuestionAnsweredCorrectly stream.
+Quizzer: [10:13:01] [34m[INFO][0m [circulation_worker.dart] Entering CirculationWorker _runLoop()...
+Quizzer: [10:13:01] [34m[INFO][0m [circulation_worker.dart] Entering CirculationWorker _shouldAddNewQuestion()...
+Quizzer: [10:13:01] [34m[INFO][0m [circulation_worker.dart] Querying database for eligible questions data...
+Quizzer: [10:13:01] [34m[INFO][0m [queue_server_init.dart] Starting PresentationSelectionWorker...
+Quizzer: [10:13:01] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker start()...
+Quizzer: [10:13:01] [34m[INFO][0m [question_selection_worker.dart] Clearing QuestionQueueCache and AnswerHistoryCache...
+Quizzer: [10:13:01] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache clear()...
+Quizzer: [10:13:01] [34m[INFO][0m [answer_history_cache.dart] Entering AnswerHistoryCache clear()...
+Quizzer: [10:13:01] [34m[INFO][0m [question_selection_worker.dart] ✅ ✅ QuestionQueueCache and AnswerHistoryCache cleared
+Quizzer: [10:13:01] [34m[INFO][0m [question_selection_worker.dart] PresentationSelectionWorker started.
+Quizzer: [10:13:01] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _runLoop()...
+Quizzer: [10:13:01] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache getLength()...
+Quizzer: [10:13:01] [34m[INFO][0m [queue_server_init.dart] Question queue server worker startup initiated
+Quizzer: [10:13:01] [34m[INFO][0m [queue_server_init.dart] Found 100 eligible questions - waiting for questions to be added to cache...
+Quizzer: [10:13:01] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache getLength()...
+Quizzer: [10:13:01] [34m[INFO][0m [answer_history_cache.dart] Entering AnswerHistoryCache getLastFiveAnsweredQuestions()...
+Quizzer: [10:13:01] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache peekAllRecords()...
+Quizzer: [10:13:01] [34m[INFO][0m [question_selection_worker.dart] Queue length 0 is below threshold 5. Running 5 cycles of _selectAndQueueQuestion
+Quizzer: [10:13:01] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _selectAndQueueQuestion()...
+Quizzer: [10:13:01] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _selectNextQuestionFromList()...
+Quizzer: [10:13:01] [34m[INFO][0m [question_answer_pairs_table.dart] Found 262 unique subjects
+Quizzer: [10:13:01] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache getLength()...
+Quizzer: [10:13:01] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
+Quizzer: [10:13:01] [34m[INFO][0m [user_profile_table.dart] ✅ Returning final subject interests for user
+Quizzer: [10:13:01] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache getLength()...
+Quizzer: [10:13:01] [34m[INFO][0m [circulation_worker.dart] lowStreakCondition evaluates to -> false (count: 20)
+Quizzer: [10:13:01] [34m[INFO][0m [circulation_worker.dart] lowTotalCondition evaluates to -> false (count: 100)
+Quizzer: [10:13:01] [34m[INFO][0m [circulation_worker.dart] shouldAdd evaluates to -> false
+Quizzer: [10:13:01] [34m[INFO][0m [circulation_worker.dart] CirculationWorker: Conditions not met, waiting for question answered correctly signal...
+Quizzer: [10:13:01] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling circulation worker finished
+Quizzer: [10:13:02] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache getLength()...
+Quizzer: [10:13:02] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache getLength()...
+Quizzer: [10:13:02] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache getLength()...
+Quizzer: [10:13:02] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache getLength()...
+Quizzer: [10:13:02] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache addRecord()...
+Quizzer: [10:13:02] [34m[INFO][0m [question_queue_cache.dart] QuestionQueueCache: Added record 2025-07-17T16:05:55.747605Z_49077910-058a-4d80-8506-e9e3d15c240e to empty queue.
+Quizzer: [10:13:02] [34m[INFO][0m [sb_cache_signals.dart] SwitchBoard: Signaling Question Queue Added
+Quizzer: [10:13:02] [34m[INFO][0m [question_selection_worker.dart] PSW Tracking: Added 2025-07-17T16:05:55.747605Z_49077910-058a-4d80-8506-e9e3d15c240e to recently selected list (1 total)
+Quizzer: [10:13:02] [34m[INFO][0m [question_selection_worker.dart] ✅ PSW Select: Successfully added question 2025-07-17T16:05:55.747605Z_49077910-058a-4d80-8506-e9e3d15c240e to QueueCache.
+Quizzer: [10:13:02] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _selectAndQueueQuestion()...
+Quizzer: [10:13:02] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _selectNextQuestionFromList()...
+Quizzer: [10:13:02] [34m[INFO][0m [question_answer_pairs_table.dart] Found 262 unique subjects
+Quizzer: [10:13:02] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
+Quizzer: [10:13:02] [34m[INFO][0m [user_profile_table.dart] ✅ Returning final subject interests for user
+Quizzer: [10:13:02] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache getLength()...
+Quizzer: [10:13:02] [34m[INFO][0m [queue_server_init.dart] ✅ Questions are now available in cache
+Quizzer: [10:13:02] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Welcome back! You're all set.
+Quizzer: [10:13:02] [34m[INFO][0m [login_initialization.dart] Login initialization completed for email: test_user_5@example.com
+Quizzer: [10:13:02] [34m[INFO][0m [test_25_review_subjects.dart] ✅ Full login initialization completed successfully
+Quizzer: [10:13:02] [34m[INFO][0m [test_25_review_subjects.dart] Test 1: Testing subject review functions directly with 5 iterations
+Quizzer: [10:13:02] [34m[INFO][0m [test_25_review_subjects.dart] Iteration 1/5
+Quizzer: [10:13:02] [34m[INFO][0m [review_subject_nodes.dart] Fetching subject for review. Cutoff timestamp: 2025-04-18T16:13:02.492500Z
+Quizzer: [10:13:02] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache addRecord()...
+Quizzer: [10:13:02] [34m[INFO][0m [question_selection_worker.dart] PSW Tracking: Added 2025-07-17T16:06:06.360505Z_49077910-058a-4d80-8506-e9e3d15c240e to recently selected list (2 total)
+Quizzer: [10:13:02] [34m[INFO][0m [question_selection_worker.dart] ✅ PSW Select: Successfully added question 2025-07-17T16:06:06.360505Z_49077910-058a-4d80-8506-e9e3d15c240e to QueueCache.
+Quizzer: [10:13:02] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _selectAndQueueQuestion()...
+Quizzer: [10:13:02] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _selectNextQuestionFromList()...
+Quizzer: [10:13:02] [34m[INFO][0m [question_answer_pairs_table.dart] Found 262 unique subjects
+Quizzer: [10:13:02] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
+Quizzer: [10:13:02] [34m[INFO][0m [user_profile_table.dart] ✅ Returning final subject interests for user
+Quizzer: [10:13:02] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully fetched subject "agricultural_economics" for review
+Quizzer: [10:13:02] [34m[INFO][0m [test_25_review_subjects.dart] Extracted subject_description: null for subject: agricultural_economics
+Quizzer: [10:13:02] [34m[INFO][0m [test_25_review_subjects.dart] Set fresh timestamp: 2025-07-17T16:13:02.817857Z
+Quizzer: [10:13:02] [34m[INFO][0m [review_subject_nodes.dart] Updating reviewed subject "agricultural_economics"...
+Quizzer: [10:13:03] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully updated subject "agricultural_economics"
+Quizzer: [10:13:03] [34m[INFO][0m [test_25_review_subjects.dart] ✅ Successfully updated subject in iteration 1
+Quizzer: [10:13:03] [34m[INFO][0m [test_25_review_subjects.dart] Iteration 2/5
+Quizzer: [10:13:03] [34m[INFO][0m [review_subject_nodes.dart] Fetching subject for review. Cutoff timestamp: 2025-04-18T16:13:03.016357Z
+Quizzer: [10:13:03] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache addRecord()...
+Quizzer: [10:13:03] [34m[INFO][0m [question_selection_worker.dart] PSW Tracking: Added 2025-07-17T16:05:49.812722Z_49077910-058a-4d80-8506-e9e3d15c240e to recently selected list (3 total)
+Quizzer: [10:13:03] [34m[INFO][0m [question_selection_worker.dart] ✅ PSW Select: Successfully added question 2025-07-17T16:05:49.812722Z_49077910-058a-4d80-8506-e9e3d15c240e to QueueCache.
+Quizzer: [10:13:03] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _selectAndQueueQuestion()...
+Quizzer: [10:13:03] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _selectNextQuestionFromList()...
+Quizzer: [10:13:03] [34m[INFO][0m [question_answer_pairs_table.dart] Found 262 unique subjects
+Quizzer: [10:13:03] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
+Quizzer: [10:13:03] [34m[INFO][0m [user_profile_table.dart] ✅ Returning final subject interests for user
+Quizzer: [10:13:03] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully fetched subject "agrophysics" for review
+Quizzer: [10:13:03] [34m[INFO][0m [test_25_review_subjects.dart] Extracted subject_description: null for subject: agrophysics
+Quizzer: [10:13:03] [34m[INFO][0m [test_25_review_subjects.dart] Set fresh timestamp: 2025-07-17T16:13:03.339908Z
+Quizzer: [10:13:03] [34m[INFO][0m [review_subject_nodes.dart] Updating reviewed subject "agrophysics"...
+Quizzer: [10:13:03] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully updated subject "agrophysics"
+Quizzer: [10:13:03] [34m[INFO][0m [test_25_review_subjects.dart] ✅ Successfully updated subject in iteration 2
+Quizzer: [10:13:03] [34m[INFO][0m [test_25_review_subjects.dart] Iteration 3/5
+Quizzer: [10:13:03] [34m[INFO][0m [review_subject_nodes.dart] Fetching subject for review. Cutoff timestamp: 2025-04-18T16:13:03.552750Z
+Quizzer: [10:13:03] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache addRecord()...
+Quizzer: [10:13:03] [34m[INFO][0m [question_selection_worker.dart] PSW Tracking: Added 2025-07-17T16:05:55.398715Z_49077910-058a-4d80-8506-e9e3d15c240e to recently selected list (4 total)
+Quizzer: [10:13:03] [34m[INFO][0m [question_selection_worker.dart] ✅ PSW Select: Successfully added question 2025-07-17T16:05:55.398715Z_49077910-058a-4d80-8506-e9e3d15c240e to QueueCache.
+Quizzer: [10:13:03] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _selectAndQueueQuestion()...
+Quizzer: [10:13:03] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _selectNextQuestionFromList()...
+Quizzer: [10:13:03] [34m[INFO][0m [question_answer_pairs_table.dart] Found 262 unique subjects
+Quizzer: [10:13:03] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
+Quizzer: [10:13:03] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully fetched subject "agrophysics" for review
+Quizzer: [10:13:03] [34m[INFO][0m [test_25_review_subjects.dart] Extracted subject_description: null for subject: agrophysics
+Quizzer: [10:13:03] [34m[INFO][0m [test_25_review_subjects.dart] Set fresh timestamp: 2025-07-17T16:13:03.748947Z
+Quizzer: [10:13:03] [34m[INFO][0m [review_subject_nodes.dart] Updating reviewed subject "agrophysics"...
+Quizzer: [10:13:03] [34m[INFO][0m [user_profile_table.dart] ✅ Returning final subject interests for user
+Quizzer: [10:13:03] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully updated subject "agrophysics"
+Quizzer: [10:13:03] [34m[INFO][0m [test_25_review_subjects.dart] ✅ Successfully updated subject in iteration 3
+Quizzer: [10:13:03] [34m[INFO][0m [test_25_review_subjects.dart] Iteration 4/5
+Quizzer: [10:13:03] [34m[INFO][0m [review_subject_nodes.dart] Fetching subject for review. Cutoff timestamp: 2025-04-18T16:13:03.927671Z
+Quizzer: [10:13:04] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully fetched subject "agrophysics" for review
+Quizzer: [10:13:04] [34m[INFO][0m [test_25_review_subjects.dart] Extracted subject_description: null for subject: agrophysics
+Quizzer: [10:13:04] [34m[INFO][0m [test_25_review_subjects.dart] Set fresh timestamp: 2025-07-17T16:13:04.082507Z
+Quizzer: [10:13:04] [34m[INFO][0m [review_subject_nodes.dart] Updating reviewed subject "agrophysics"...
+Quizzer: [10:13:04] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache addRecord()...
+Quizzer: [10:13:04] [34m[INFO][0m [question_selection_worker.dart] PSW Tracking: Added 2025-07-17T16:05:50.081474Z_49077910-058a-4d80-8506-e9e3d15c240e to recently selected list (5 total)
+Quizzer: [10:13:04] [34m[INFO][0m [question_selection_worker.dart] ✅ PSW Select: Successfully added question 2025-07-17T16:05:50.081474Z_49077910-058a-4d80-8506-e9e3d15c240e to QueueCache.
+Quizzer: [10:13:04] [34m[INFO][0m [sb_question_worker_signals.dart] SwitchBoard: Signaling PresentationSelectionWorker Cycle Complete
+Quizzer: [10:13:04] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully updated subject "agrophysics"
+Quizzer: [10:13:04] [34m[INFO][0m [test_25_review_subjects.dart] ✅ Successfully updated subject in iteration 4
+Quizzer: [10:13:04] [34m[INFO][0m [test_25_review_subjects.dart] Iteration 5/5
+Quizzer: [10:13:04] [34m[INFO][0m [review_subject_nodes.dart] Fetching subject for review. Cutoff timestamp: 2025-04-18T16:13:04.259175Z
+Quizzer: [10:13:04] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully fetched subject "agrophysics" for review
+Quizzer: [10:13:04] [34m[INFO][0m [test_25_review_subjects.dart] Extracted subject_description: null for subject: agrophysics
+Quizzer: [10:13:04] [34m[INFO][0m [test_25_review_subjects.dart] Set fresh timestamp: 2025-07-17T16:13:04.410535Z
+Quizzer: [10:13:04] [34m[INFO][0m [review_subject_nodes.dart] Updating reviewed subject "agrophysics"...
+Quizzer: [10:13:04] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully updated subject "agrophysics"
+Quizzer: [10:13:04] [34m[INFO][0m [test_25_review_subjects.dart] ✅ Successfully updated subject in iteration 5
+Quizzer: [10:13:04] [34m[INFO][0m [test_25_review_subjects.dart] ✅ Completed all 5 iterations of Test 1
+Quizzer: [10:13:04] [34m[INFO][0m [test_25_review_subjects.dart] Test 2: Testing subject review functions through SessionManager with 5 iterations
+Quizzer: [10:13:04] [34m[INFO][0m [test_25_review_subjects.dart] Iteration 1/5
+Quizzer: [10:13:04] [34m[INFO][0m [session_manager.dart] SessionManager: Requesting a subject for review...
+Quizzer: [10:13:04] [34m[INFO][0m [review_subject_nodes.dart] Fetching subject for review. Cutoff timestamp: 2025-04-18T16:13:04.738599Z
+Quizzer: [10:13:04] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully fetched subject "agrophysics" for review
+Quizzer: [10:13:04] [34m[INFO][0m [test_25_review_subjects.dart] Extracted subject_description: null for subject: agrophysics
+Quizzer: [10:13:04] [34m[INFO][0m [test_25_review_subjects.dart] Set fresh timestamp: 2025-07-17T16:13:04.871251Z
+Quizzer: [10:13:04] [34m[INFO][0m [session_manager.dart] SessionManager: Updating reviewed subject with PK: {subject: agrophysics}
+Quizzer: [10:13:04] [34m[INFO][0m [review_subject_nodes.dart] Updating reviewed subject "agrophysics"...
+Quizzer: [10:13:05] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully updated subject "agrophysics"
+Quizzer: [10:13:05] [34m[INFO][0m [test_25_review_subjects.dart] ✅ Successfully updated subject in iteration 1
+Quizzer: [10:13:05] [34m[INFO][0m [test_25_review_subjects.dart] Iteration 2/5
+Quizzer: [10:13:05] [34m[INFO][0m [session_manager.dart] SessionManager: Requesting a subject for review...
+Quizzer: [10:13:05] [34m[INFO][0m [review_subject_nodes.dart] Fetching subject for review. Cutoff timestamp: 2025-04-18T16:13:05.009318Z
+Quizzer: [10:13:05] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully fetched subject "agrophysics" for review
+Quizzer: [10:13:05] [34m[INFO][0m [test_25_review_subjects.dart] Extracted subject_description: null for subject: agrophysics
+Quizzer: [10:13:05] [34m[INFO][0m [test_25_review_subjects.dart] Set fresh timestamp: 2025-07-17T16:13:05.159904Z
+Quizzer: [10:13:05] [34m[INFO][0m [session_manager.dart] SessionManager: Updating reviewed subject with PK: {subject: agrophysics}
+Quizzer: [10:13:05] [34m[INFO][0m [review_subject_nodes.dart] Updating reviewed subject "agrophysics"...
+Quizzer: [10:13:05] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully updated subject "agrophysics"
+Quizzer: [10:13:05] [34m[INFO][0m [test_25_review_subjects.dart] ✅ Successfully updated subject in iteration 2
+Quizzer: [10:13:05] [34m[INFO][0m [test_25_review_subjects.dart] Iteration 3/5
+Quizzer: [10:13:05] [34m[INFO][0m [session_manager.dart] SessionManager: Requesting a subject for review...
+Quizzer: [10:13:05] [34m[INFO][0m [review_subject_nodes.dart] Fetching subject for review. Cutoff timestamp: 2025-04-18T16:13:05.299630Z
+Quizzer: [10:13:05] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully fetched subject "agrophysics" for review
+Quizzer: [10:13:05] [34m[INFO][0m [test_25_review_subjects.dart] Extracted subject_description: null for subject: agrophysics
+Quizzer: [10:13:05] [34m[INFO][0m [test_25_review_subjects.dart] Set fresh timestamp: 2025-07-17T16:13:05.444257Z
+Quizzer: [10:13:05] [34m[INFO][0m [session_manager.dart] SessionManager: Updating reviewed subject with PK: {subject: agrophysics}
+Quizzer: [10:13:05] [34m[INFO][0m [review_subject_nodes.dart] Updating reviewed subject "agrophysics"...
+Quizzer: [10:13:05] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully updated subject "agrophysics"
+Quizzer: [10:13:05] [34m[INFO][0m [test_25_review_subjects.dart] ✅ Successfully updated subject in iteration 3
+Quizzer: [10:13:05] [34m[INFO][0m [test_25_review_subjects.dart] Iteration 4/5
+Quizzer: [10:13:05] [34m[INFO][0m [session_manager.dart] SessionManager: Requesting a subject for review...
+Quizzer: [10:13:05] [34m[INFO][0m [review_subject_nodes.dart] Fetching subject for review. Cutoff timestamp: 2025-04-18T16:13:05.580381Z
+Quizzer: [10:13:05] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully fetched subject "agrophysics" for review
+Quizzer: [10:13:05] [34m[INFO][0m [test_25_review_subjects.dart] Extracted subject_description: null for subject: agrophysics
+Quizzer: [10:13:05] [34m[INFO][0m [test_25_review_subjects.dart] Set fresh timestamp: 2025-07-17T16:13:05.717750Z
+Quizzer: [10:13:05] [34m[INFO][0m [session_manager.dart] SessionManager: Updating reviewed subject with PK: {subject: agrophysics}
+Quizzer: [10:13:05] [34m[INFO][0m [review_subject_nodes.dart] Updating reviewed subject "agrophysics"...
+Quizzer: [10:13:05] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully updated subject "agrophysics"
+Quizzer: [10:13:05] [34m[INFO][0m [test_25_review_subjects.dart] ✅ Successfully updated subject in iteration 4
+Quizzer: [10:13:05] [34m[INFO][0m [test_25_review_subjects.dart] Iteration 5/5
+Quizzer: [10:13:05] [34m[INFO][0m [session_manager.dart] SessionManager: Requesting a subject for review...
+Quizzer: [10:13:05] [34m[INFO][0m [review_subject_nodes.dart] Fetching subject for review. Cutoff timestamp: 2025-04-18T16:13:05.986807Z
+Quizzer: [10:13:06] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully fetched subject "agrophysics" for review
+Quizzer: [10:13:06] [34m[INFO][0m [test_25_review_subjects.dart] Extracted subject_description: null for subject: agrophysics
+Quizzer: [10:13:06] [34m[INFO][0m [test_25_review_subjects.dart] Set fresh timestamp: 2025-07-17T16:13:06.117334Z
+Quizzer: [10:13:06] [34m[INFO][0m [session_manager.dart] SessionManager: Updating reviewed subject with PK: {subject: agrophysics}
+Quizzer: [10:13:06] [34m[INFO][0m [review_subject_nodes.dart] Updating reviewed subject "agrophysics"...
+Quizzer: [10:13:06] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully updated subject "agrophysics"
+Quizzer: [10:13:06] [34m[INFO][0m [test_25_review_subjects.dart] ✅ Successfully updated subject in iteration 5
+Quizzer: [10:13:06] [34m[INFO][0m [test_25_review_subjects.dart] ✅ Completed all 5 iterations of Test 2
