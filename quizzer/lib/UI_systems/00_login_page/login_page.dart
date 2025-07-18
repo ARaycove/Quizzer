@@ -142,6 +142,7 @@ class _LoginPageState extends State<LoginPage> {
                 child: TextField(
                   controller: _emailController,
                   enabled: !_isLoading,
+                  style: const TextStyle(color: Colors.black),
                   decoration: InputDecoration(
                     labelText: "Email Address",
                     hintText: "Enter your email address to login",
@@ -165,6 +166,7 @@ class _LoginPageState extends State<LoginPage> {
                   controller: _passwordController,
                   obscureText: true,
                   enabled: !_isLoading,
+                  style: const TextStyle(color: Colors.black),
                   decoration: InputDecoration(
                     labelText: "Password",
                     hintText: "Enter your account password to login",

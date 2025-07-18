@@ -106,6 +106,7 @@ class _NewUserPageState extends State<NewUserPage> {
                                 width: fieldWidth,
                                 child: TextField(
                                     controller: _emailController,
+                                    style: const TextStyle(color: Colors.black),
                                     decoration: InputDecoration(
                                         labelText: 'Email Address',
                                         hintText: 'Enter your email address',
@@ -126,6 +127,7 @@ class _NewUserPageState extends State<NewUserPage> {
                                 width: fieldWidth,
                                 child: TextField(
                                     controller: _usernameController,
+                                    style: const TextStyle(color: Colors.black),
                                     decoration: InputDecoration(
                                         labelText: 'Username',
                                         hintText: 'Enter your desired username',
@@ -147,6 +149,7 @@ class _NewUserPageState extends State<NewUserPage> {
                                 child: TextField(
                                     controller: _passwordController,
                                     obscureText: true,
+                                    style: const TextStyle(color: Colors.black),
                                     decoration: InputDecoration(
                                         labelText: 'Password',
                                         hintText: 'Create a password',
@@ -169,6 +172,7 @@ class _NewUserPageState extends State<NewUserPage> {
                                 child: TextField(
                                     controller: _confirmPasswordController,
                                     obscureText: true,
+                                    style: const TextStyle(color: Colors.black),
                                     decoration: InputDecoration(
                                         labelText: 'Confirm Password',
                                         hintText: 'Confirm your password',

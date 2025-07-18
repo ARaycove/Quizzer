@@ -255,6 +255,9 @@ class _QuizzerAppState extends State<QuizzerApp> {
           filled: true,
           fillColor: ColorWheel.secondaryBackground,
         ),
+        textSelectionTheme: const TextSelectionThemeData(
+          cursorColor: Colors.white,
+        ),
       ),
       debugShowCheckedModeBanner: false,
       initialRoute: '/login',
