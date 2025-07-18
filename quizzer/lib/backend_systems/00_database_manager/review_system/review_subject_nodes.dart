@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'get_send_postgre.dart' show encodeValueForDB, decodeValueFromDB;
@@ -30,14 +31,14 @@ Future<Map<String, dynamic>> getSubjectForReview() async {
   QuizzerLogger.logMessage('Fetching subject for review. Cutoff timestamp: $cutoffTimestamp');
 
   try {
-    // Query for subjects that need review
-    final response = await supabase
+    // First get up to 100 subject names that need review
+    final subjectNamesResponse = await supabase
         .from(_subjectDetailsTable)
-        .select()
+        .select('subject')
         .or('subject_description.is.null,last_modified_timestamp.lt.$cutoffTimestamp')
-        .limit(1);
-
-    if (response.isEmpty) {
+        .limit(100);
+    
+    if (subjectNamesResponse.isEmpty) {
       QuizzerLogger.logMessage('No subjects available for review.');
       return {
         'data': null, 
@@ -45,7 +46,28 @@ Future<Map<String, dynamic>> getSubjectForReview() async {
         'error': 'No subjects available for review.'
       };
     }
-
+    
+    // Randomly select one subject name
+    final random = Random();
+    final int randomIndex = random.nextInt(subjectNamesResponse.length);
+    final String selectedSubject = subjectNamesResponse[randomIndex]['subject'] as String;
+    
+    // Now fetch the full record for the selected subject
+    final response = await supabase
+        .from(_subjectDetailsTable)
+        .select()
+        .eq('subject', selectedSubject)
+        .limit(1);
+    
+    if (response.isEmpty) {
+      QuizzerLogger.logError('Selected subject "$selectedSubject" not found in full query.');
+      return {
+        'data': null, 
+        'primary_key': null, 
+        'error': 'Failed to fetch full subject data.'
+      };
+    }
+    
     final Map<String, dynamic> rawData = response[0];
     final Map<String, dynamic> decodedData = _decodeSubjectRecord(rawData);
     final String subject = decodedData['subject'] as String;

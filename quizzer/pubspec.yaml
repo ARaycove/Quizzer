@@ -55,7 +55,7 @@ dependencies:
   jwt_decode: ^0.3.1
   email_validator: ^2.1.17
   dropdown_search: ^6.0.2
-
+  markdown_editor_plus: ^0.2.15
 
 dev_dependencies:
   flutter_test:

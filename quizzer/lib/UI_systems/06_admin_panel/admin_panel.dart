@@ -3,8 +3,9 @@ import 'package:quizzer/UI_systems/color_wheel.dart';
 import 'package:quizzer/UI_systems/global_widgets/widget_global_app_bar.dart';
 import 'package:quizzer/UI_systems/06_admin_panel/widget_categorization_panel.dart';
 import 'package:quizzer/UI_systems/06_admin_panel/widget_review_panel.dart';
+import 'package:quizzer/UI_systems/06_admin_panel/widget_review_subjects_panel.dart';
 
-enum AdminPanel { none, review, categorize }
+enum AdminPanel { none, review, categorize, reviewSubjects }
 
 class AdminPanelPage extends StatefulWidget {
   const AdminPanelPage({super.key});
@@ -49,6 +50,13 @@ class _AdminPanelPageState extends State<AdminPanelPage> {
                     panel: AdminPanel.categorize,
                   ),
                 ),
+                const SizedBox(width: ColorWheel.standardPaddingValue / 2),
+                Expanded(
+                  child: _buildPanelButton(
+                    label: 'Review Subjects',
+                    panel: AdminPanel.reviewSubjects,
+                  ),
+                ),
               ],
             ),
           ),
@@ -87,6 +95,8 @@ class _AdminPanelPageState extends State<AdminPanelPage> {
         return const ReviewPanelWidget();
       case AdminPanel.categorize:
         return const CategorizationPanelWidget();
+      case AdminPanel.reviewSubjects:
+        return const ReviewSubjectsPanelWidget();
       case AdminPanel.none:
         return const Center(
           child: Text('Select a panel above', style: ColorWheel.secondaryTextStyle),
