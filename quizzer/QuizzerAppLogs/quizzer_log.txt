@@ -1,255 +1,618 @@
-Quizzer: [10:12:59] [34m[INFO][0m [<asynchronous suspension>] QuizzerLogger successfully set up file logging to: ./QuizzerAppLogs/quizzer_log.txt
-Quizzer: [10:12:59] [34m[INFO][0m [<asynchronous suspension>] QuizzerLogger: Attempting a SECOND test log message to file.
-Quizzer: [10:12:59] [34m[INFO][0m [switch_board.dart] SwitchBoard initialized.
-Quizzer: [10:12:59] [34m[INFO][0m [file_locations.dart] [PATH] Path provider not available (likely test environment), using current directory for Hive.
-Quizzer: [10:12:59] [34m[INFO][0m [file_locations.dart] [PATH] QuizzerHive path: ./QuizzerAppHive
-Quizzer: [10:12:59] [34m[INFO][0m [session_manager.dart] SessionManager: Initializing Hive at path: ./QuizzerAppHive
-Quizzer: [10:12:59] [34m[INFO][0m [login_initialization.dart] Entering loginInitialization()...
-Quizzer: [10:12:59] [34m[INFO][0m [login_initialization.dart] Entering performLoginProcess()...
-Quizzer: [10:12:59] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Starting login process...
-Quizzer: [10:12:59] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Validating your information...
-Quizzer: [10:12:59] [34m[INFO][0m [login_initialization.dart] Entering _validateLoginForm()...
-Quizzer: [10:12:59] [34m[INFO][0m [login_initialization.dart] Form validation passed for email: test_user_5@example.com
-Quizzer: [10:12:59] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Checking connection...
-Quizzer: [10:12:59] [34m[INFO][0m [utils.dart] Network check successful.
-Quizzer: [10:12:59] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Connecting to your account...
-Quizzer: [10:12:59] [34m[INFO][0m [user_auth.dart] Attempting Supabase authentication for test_user_5@example.com
-Quizzer: [10:12:59] [34m[INFO][0m [user_auth.dart] Attempting Supabase authentication
-Quizzer: [10:13:00] [34m[INFO][0m [user_auth.dart] ✅ Supabase authentication successful for test_user_5@example.com
-Quizzer: [10:13:00] [34m[INFO][0m [session_helper.dart] Entering determineUserRoleFromSupabaseSession()...
-Quizzer: [10:13:00] [34m[INFO][0m [user_auth.dart] Ensuring local profile exists for test_user_5@example.com
-Quizzer: [10:13:00] [34m[INFO][0m [user_profile_table.dart] Fetching all emails from user_profile table.
-Quizzer: [10:13:00] [34m[INFO][0m [file_locations.dart] [PATH] Path provider not available (likely test environment), using current directory.
-Quizzer: [10:13:00] [34m[INFO][0m [file_locations.dart] [PATH] Quizzer database path: ./QuizzerApp/sqlite/quizzer.db
-Quizzer: [10:13:00] [34m[INFO][0m [database_native.dart] [DB_INIT] Starting database initialization. Desktop: true
-Quizzer: [10:13:00] [34m[INFO][0m [database_native.dart] [DB_INIT] Using sqflite FFI factory (Desktop)
-Quizzer: [10:13:00] [34m[INFO][0m [database_native.dart] [DB_INIT] Original target path: ./QuizzerApp/sqlite/quizzer.db
-Quizzer: [10:13:00] [34m[INFO][0m [database_native.dart] [DB_INIT] Absolute target path: /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/./QuizzerApp/sqlite/quizzer.db
-Quizzer: [10:13:00] [34m[INFO][0m [database_native.dart] [DB_INIT] Normalized target path: /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/QuizzerApp/sqlite/quizzer.db
-Quizzer: [10:13:00] [34m[INFO][0m [database_native.dart] [DB_INIT] Checking existence of dbFile at /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/QuizzerApp/sqlite/quizzer.db. Exists: true
-Quizzer: [10:13:00] [34m[INFO][0m [database_native.dart] [DB_INIT] Existing database found at /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/QuizzerApp/sqlite/quizzer.db. Using it.
-Quizzer: [10:13:00] [34m[INFO][0m [database_native.dart] [DB_INIT] Attempting to open database at /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/QuizzerApp/sqlite/quizzer.db
-Quizzer: [10:13:00] [34m[INFO][0m [database_native.dart] [DB_INIT] Database opened at actual path: /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/QuizzerApp/sqlite/quizzer.db
-Quizzer: [10:13:00] [34m[INFO][0m [database_native.dart] [DB_INIT] Expected path: /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/QuizzerApp/sqlite/quizzer.db
-Quizzer: [10:13:00] [34m[INFO][0m [database_native.dart] [DB_INIT] Paths match: true
-Quizzer: [10:13:00] [34m[INFO][0m [database_native.dart] ✅ [DB_INIT] Database initialized successfully at: /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/QuizzerApp/sqlite/quizzer.db. IsOpen: true
-Quizzer: [10:13:00] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
-Quizzer: [10:13:00] [34m[INFO][0m [user_profile_table.dart] ✅ Successfully fetched 1 emails.
-Quizzer: [10:13:00] [34m[INFO][0m [user_auth.dart] Is user in local profile list -> true
-Quizzer: [10:13:00] [34m[INFO][0m [user_profile_table.dart] Fetching all emails from user_profile table.
-Quizzer: [10:13:00] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
-Quizzer: [10:13:00] [34m[INFO][0m [user_profile_table.dart] ✅ Successfully fetched 1 emails.
-Quizzer: [10:13:00] [34m[INFO][0m [user_auth.dart] Final check - is user in local profile list -> true
-Quizzer: [10:13:00] [34m[INFO][0m [offline_login.dart] Storing offline login data for test_user_5@example.com
-Quizzer: [10:13:00] [34m[INFO][0m [user_profile_table.dart] Getting user ID for email: test_user_5@example.com
-Quizzer: [10:13:00] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
-Quizzer: [10:13:00] [34m[INFO][0m [user_profile_table.dart] ✅ Found user ID: 49077910-058a-4d80-8506-e9e3d15c240e
-Quizzer: [10:13:00] [34m[INFO][0m [offline_login.dart] ✅ Offline login data stored for test_user_5@example.com
-Quizzer: [10:13:00] [34m[INFO][0m [user_profile_table.dart] Getting user ID for email: test_user_5@example.com
-Quizzer: [10:13:00] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
-Quizzer: [10:13:00] [34m[INFO][0m [user_profile_table.dart] ✅ Found user ID: 49077910-058a-4d80-8506-e9e3d15c240e
-Quizzer: [10:13:00] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Login successful...
-Quizzer: [10:13:00] [34m[INFO][0m [login_initialization.dart] Supabase login successful, offline login data already stored
-Quizzer: [10:13:00] [34m[INFO][0m [login_initialization.dart] Recording login attempt...
-Quizzer: [10:13:00] [34m[INFO][0m [login_attempts_record.dart] Recording login Attempt test_user_5@example.com with result Login successful
-Quizzer: [10:13:00] [34m[INFO][0m [user_profile_table.dart] Getting user ID for email: test_user_5@example.com
-Quizzer: [10:13:00] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
-Quizzer: [10:13:00] [34m[INFO][0m [user_profile_table.dart] ✅ Found user ID: 49077910-058a-4d80-8506-e9e3d15c240e
-Quizzer: [10:13:00] [34m[INFO][0m [table_helper.dart] Attempting to get IP address with multiple fallback methods
-Quizzer: [10:13:00] [34m[INFO][0m [table_helper.dart] Trying IP service: https://api.ipify.org
-Quizzer: [10:13:01] [34m[INFO][0m [table_helper.dart] ✅ Successfully retrieved IP address from https://api.ipify.org: 72.174.64.52
-Quizzer: [10:13:01] [34m[INFO][0m [login_attempts_table.dart] Login attempt recorded successfully: 2025-07-17T16:13:01.094904Z49077910-058a-4d80-8506-e9e3d15c240e
-Quizzer: [10:13:01] [34m[INFO][0m [login_attempts_record.dart] Login attempt recorded for user: test_user_5@example.com with status: Login successful
-Quizzer: [10:13:01] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Setting up your profile...
-Quizzer: [10:13:01] [34m[INFO][0m [login_initialization.dart] Ensuring local profile exists for online login...
-Quizzer: [10:13:01] [34m[INFO][0m [user_auth.dart] Ensuring local profile exists for test_user_5@example.com
-Quizzer: [10:13:01] [34m[INFO][0m [user_profile_table.dart] Fetching all emails from user_profile table.
-Quizzer: [10:13:01] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
-Quizzer: [10:13:01] [34m[INFO][0m [user_profile_table.dart] ✅ Successfully fetched 1 emails.
-Quizzer: [10:13:01] [34m[INFO][0m [user_auth.dart] Is user in local profile list -> true
-Quizzer: [10:13:01] [34m[INFO][0m [user_profile_table.dart] Fetching all emails from user_profile table.
-Quizzer: [10:13:01] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
-Quizzer: [10:13:01] [34m[INFO][0m [user_profile_table.dart] ✅ Successfully fetched 1 emails.
-Quizzer: [10:13:01] [34m[INFO][0m [user_auth.dart] Final check - is user in local profile list -> true
-Quizzer: [10:13:01] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Syncing your profile...
-Quizzer: [10:13:01] [34m[INFO][0m [login_initialization.dart] Ensuring profile exists in Supabase for online login...
-Quizzer: [10:13:01] [34m[INFO][0m [login_initialization.dart] SessionManager already initialized by attemptSupabaseLogin for online login
-Quizzer: [10:13:01] [34m[INFO][0m [login_initialization.dart] ✅ Login process completed successfully for email: test_user_5@example.com
-Quizzer: [10:13:01] [34m[INFO][0m [login_initialization.dart] Skipping sync workers for test run
-Quizzer: [10:13:01] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Starting question queue server...
-Quizzer: [10:13:01] [34m[INFO][0m [login_initialization.dart] Initializing question queue server...
-Quizzer: [10:13:01] [34m[INFO][0m [queue_server_init.dart] Starting question queue server workers...
-Quizzer: [10:13:01] [34m[INFO][0m [queue_server_init.dart] Starting CirculationWorker...
-Quizzer: [10:13:01] [34m[INFO][0m [circulation_worker.dart] Entering CirculationWorker start()...
-Quizzer: [10:13:01] [34m[INFO][0m [circulation_worker.dart] CirculationWorker: Subscribed to onQuestionAnsweredCorrectly stream.
-Quizzer: [10:13:01] [34m[INFO][0m [circulation_worker.dart] Entering CirculationWorker _runLoop()...
-Quizzer: [10:13:01] [34m[INFO][0m [circulation_worker.dart] Entering CirculationWorker _shouldAddNewQuestion()...
-Quizzer: [10:13:01] [34m[INFO][0m [circulation_worker.dart] Querying database for eligible questions data...
-Quizzer: [10:13:01] [34m[INFO][0m [queue_server_init.dart] Starting PresentationSelectionWorker...
-Quizzer: [10:13:01] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker start()...
-Quizzer: [10:13:01] [34m[INFO][0m [question_selection_worker.dart] Clearing QuestionQueueCache and AnswerHistoryCache...
-Quizzer: [10:13:01] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache clear()...
-Quizzer: [10:13:01] [34m[INFO][0m [answer_history_cache.dart] Entering AnswerHistoryCache clear()...
-Quizzer: [10:13:01] [34m[INFO][0m [question_selection_worker.dart] ✅ ✅ QuestionQueueCache and AnswerHistoryCache cleared
-Quizzer: [10:13:01] [34m[INFO][0m [question_selection_worker.dart] PresentationSelectionWorker started.
-Quizzer: [10:13:01] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _runLoop()...
-Quizzer: [10:13:01] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache getLength()...
-Quizzer: [10:13:01] [34m[INFO][0m [queue_server_init.dart] Question queue server worker startup initiated
-Quizzer: [10:13:01] [34m[INFO][0m [queue_server_init.dart] Found 100 eligible questions - waiting for questions to be added to cache...
-Quizzer: [10:13:01] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache getLength()...
-Quizzer: [10:13:01] [34m[INFO][0m [answer_history_cache.dart] Entering AnswerHistoryCache getLastFiveAnsweredQuestions()...
-Quizzer: [10:13:01] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache peekAllRecords()...
-Quizzer: [10:13:01] [34m[INFO][0m [question_selection_worker.dart] Queue length 0 is below threshold 5. Running 5 cycles of _selectAndQueueQuestion
-Quizzer: [10:13:01] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _selectAndQueueQuestion()...
-Quizzer: [10:13:01] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _selectNextQuestionFromList()...
-Quizzer: [10:13:01] [34m[INFO][0m [question_answer_pairs_table.dart] Found 262 unique subjects
-Quizzer: [10:13:01] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache getLength()...
-Quizzer: [10:13:01] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
-Quizzer: [10:13:01] [34m[INFO][0m [user_profile_table.dart] ✅ Returning final subject interests for user
-Quizzer: [10:13:01] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache getLength()...
-Quizzer: [10:13:01] [34m[INFO][0m [circulation_worker.dart] lowStreakCondition evaluates to -> false (count: 20)
-Quizzer: [10:13:01] [34m[INFO][0m [circulation_worker.dart] lowTotalCondition evaluates to -> false (count: 100)
-Quizzer: [10:13:01] [34m[INFO][0m [circulation_worker.dart] shouldAdd evaluates to -> false
-Quizzer: [10:13:01] [34m[INFO][0m [circulation_worker.dart] CirculationWorker: Conditions not met, waiting for question answered correctly signal...
-Quizzer: [10:13:01] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling circulation worker finished
-Quizzer: [10:13:02] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache getLength()...
-Quizzer: [10:13:02] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache getLength()...
-Quizzer: [10:13:02] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache getLength()...
-Quizzer: [10:13:02] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache getLength()...
-Quizzer: [10:13:02] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache addRecord()...
-Quizzer: [10:13:02] [34m[INFO][0m [question_queue_cache.dart] QuestionQueueCache: Added record 2025-07-17T16:05:55.747605Z_49077910-058a-4d80-8506-e9e3d15c240e to empty queue.
-Quizzer: [10:13:02] [34m[INFO][0m [sb_cache_signals.dart] SwitchBoard: Signaling Question Queue Added
-Quizzer: [10:13:02] [34m[INFO][0m [question_selection_worker.dart] PSW Tracking: Added 2025-07-17T16:05:55.747605Z_49077910-058a-4d80-8506-e9e3d15c240e to recently selected list (1 total)
-Quizzer: [10:13:02] [34m[INFO][0m [question_selection_worker.dart] ✅ PSW Select: Successfully added question 2025-07-17T16:05:55.747605Z_49077910-058a-4d80-8506-e9e3d15c240e to QueueCache.
-Quizzer: [10:13:02] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _selectAndQueueQuestion()...
-Quizzer: [10:13:02] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _selectNextQuestionFromList()...
-Quizzer: [10:13:02] [34m[INFO][0m [question_answer_pairs_table.dart] Found 262 unique subjects
-Quizzer: [10:13:02] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
-Quizzer: [10:13:02] [34m[INFO][0m [user_profile_table.dart] ✅ Returning final subject interests for user
-Quizzer: [10:13:02] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache getLength()...
-Quizzer: [10:13:02] [34m[INFO][0m [queue_server_init.dart] ✅ Questions are now available in cache
-Quizzer: [10:13:02] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Welcome back! You're all set.
-Quizzer: [10:13:02] [34m[INFO][0m [login_initialization.dart] Login initialization completed for email: test_user_5@example.com
-Quizzer: [10:13:02] [34m[INFO][0m [test_25_review_subjects.dart] ✅ Full login initialization completed successfully
-Quizzer: [10:13:02] [34m[INFO][0m [test_25_review_subjects.dart] Test 1: Testing subject review functions directly with 5 iterations
-Quizzer: [10:13:02] [34m[INFO][0m [test_25_review_subjects.dart] Iteration 1/5
-Quizzer: [10:13:02] [34m[INFO][0m [review_subject_nodes.dart] Fetching subject for review. Cutoff timestamp: 2025-04-18T16:13:02.492500Z
-Quizzer: [10:13:02] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache addRecord()...
-Quizzer: [10:13:02] [34m[INFO][0m [question_selection_worker.dart] PSW Tracking: Added 2025-07-17T16:06:06.360505Z_49077910-058a-4d80-8506-e9e3d15c240e to recently selected list (2 total)
-Quizzer: [10:13:02] [34m[INFO][0m [question_selection_worker.dart] ✅ PSW Select: Successfully added question 2025-07-17T16:06:06.360505Z_49077910-058a-4d80-8506-e9e3d15c240e to QueueCache.
-Quizzer: [10:13:02] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _selectAndQueueQuestion()...
-Quizzer: [10:13:02] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _selectNextQuestionFromList()...
-Quizzer: [10:13:02] [34m[INFO][0m [question_answer_pairs_table.dart] Found 262 unique subjects
-Quizzer: [10:13:02] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
-Quizzer: [10:13:02] [34m[INFO][0m [user_profile_table.dart] ✅ Returning final subject interests for user
-Quizzer: [10:13:02] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully fetched subject "agricultural_economics" for review
-Quizzer: [10:13:02] [34m[INFO][0m [test_25_review_subjects.dart] Extracted subject_description: null for subject: agricultural_economics
-Quizzer: [10:13:02] [34m[INFO][0m [test_25_review_subjects.dart] Set fresh timestamp: 2025-07-17T16:13:02.817857Z
-Quizzer: [10:13:02] [34m[INFO][0m [review_subject_nodes.dart] Updating reviewed subject "agricultural_economics"...
-Quizzer: [10:13:03] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully updated subject "agricultural_economics"
-Quizzer: [10:13:03] [34m[INFO][0m [test_25_review_subjects.dart] ✅ Successfully updated subject in iteration 1
-Quizzer: [10:13:03] [34m[INFO][0m [test_25_review_subjects.dart] Iteration 2/5
-Quizzer: [10:13:03] [34m[INFO][0m [review_subject_nodes.dart] Fetching subject for review. Cutoff timestamp: 2025-04-18T16:13:03.016357Z
-Quizzer: [10:13:03] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache addRecord()...
-Quizzer: [10:13:03] [34m[INFO][0m [question_selection_worker.dart] PSW Tracking: Added 2025-07-17T16:05:49.812722Z_49077910-058a-4d80-8506-e9e3d15c240e to recently selected list (3 total)
-Quizzer: [10:13:03] [34m[INFO][0m [question_selection_worker.dart] ✅ PSW Select: Successfully added question 2025-07-17T16:05:49.812722Z_49077910-058a-4d80-8506-e9e3d15c240e to QueueCache.
-Quizzer: [10:13:03] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _selectAndQueueQuestion()...
-Quizzer: [10:13:03] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _selectNextQuestionFromList()...
-Quizzer: [10:13:03] [34m[INFO][0m [question_answer_pairs_table.dart] Found 262 unique subjects
-Quizzer: [10:13:03] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
-Quizzer: [10:13:03] [34m[INFO][0m [user_profile_table.dart] ✅ Returning final subject interests for user
-Quizzer: [10:13:03] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully fetched subject "agrophysics" for review
-Quizzer: [10:13:03] [34m[INFO][0m [test_25_review_subjects.dart] Extracted subject_description: null for subject: agrophysics
-Quizzer: [10:13:03] [34m[INFO][0m [test_25_review_subjects.dart] Set fresh timestamp: 2025-07-17T16:13:03.339908Z
-Quizzer: [10:13:03] [34m[INFO][0m [review_subject_nodes.dart] Updating reviewed subject "agrophysics"...
-Quizzer: [10:13:03] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully updated subject "agrophysics"
-Quizzer: [10:13:03] [34m[INFO][0m [test_25_review_subjects.dart] ✅ Successfully updated subject in iteration 2
-Quizzer: [10:13:03] [34m[INFO][0m [test_25_review_subjects.dart] Iteration 3/5
-Quizzer: [10:13:03] [34m[INFO][0m [review_subject_nodes.dart] Fetching subject for review. Cutoff timestamp: 2025-04-18T16:13:03.552750Z
-Quizzer: [10:13:03] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache addRecord()...
-Quizzer: [10:13:03] [34m[INFO][0m [question_selection_worker.dart] PSW Tracking: Added 2025-07-17T16:05:55.398715Z_49077910-058a-4d80-8506-e9e3d15c240e to recently selected list (4 total)
-Quizzer: [10:13:03] [34m[INFO][0m [question_selection_worker.dart] ✅ PSW Select: Successfully added question 2025-07-17T16:05:55.398715Z_49077910-058a-4d80-8506-e9e3d15c240e to QueueCache.
-Quizzer: [10:13:03] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _selectAndQueueQuestion()...
-Quizzer: [10:13:03] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _selectNextQuestionFromList()...
-Quizzer: [10:13:03] [34m[INFO][0m [question_answer_pairs_table.dart] Found 262 unique subjects
-Quizzer: [10:13:03] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
-Quizzer: [10:13:03] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully fetched subject "agrophysics" for review
-Quizzer: [10:13:03] [34m[INFO][0m [test_25_review_subjects.dart] Extracted subject_description: null for subject: agrophysics
-Quizzer: [10:13:03] [34m[INFO][0m [test_25_review_subjects.dart] Set fresh timestamp: 2025-07-17T16:13:03.748947Z
-Quizzer: [10:13:03] [34m[INFO][0m [review_subject_nodes.dart] Updating reviewed subject "agrophysics"...
-Quizzer: [10:13:03] [34m[INFO][0m [user_profile_table.dart] ✅ Returning final subject interests for user
-Quizzer: [10:13:03] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully updated subject "agrophysics"
-Quizzer: [10:13:03] [34m[INFO][0m [test_25_review_subjects.dart] ✅ Successfully updated subject in iteration 3
-Quizzer: [10:13:03] [34m[INFO][0m [test_25_review_subjects.dart] Iteration 4/5
-Quizzer: [10:13:03] [34m[INFO][0m [review_subject_nodes.dart] Fetching subject for review. Cutoff timestamp: 2025-04-18T16:13:03.927671Z
-Quizzer: [10:13:04] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully fetched subject "agrophysics" for review
-Quizzer: [10:13:04] [34m[INFO][0m [test_25_review_subjects.dart] Extracted subject_description: null for subject: agrophysics
-Quizzer: [10:13:04] [34m[INFO][0m [test_25_review_subjects.dart] Set fresh timestamp: 2025-07-17T16:13:04.082507Z
-Quizzer: [10:13:04] [34m[INFO][0m [review_subject_nodes.dart] Updating reviewed subject "agrophysics"...
-Quizzer: [10:13:04] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache addRecord()...
-Quizzer: [10:13:04] [34m[INFO][0m [question_selection_worker.dart] PSW Tracking: Added 2025-07-17T16:05:50.081474Z_49077910-058a-4d80-8506-e9e3d15c240e to recently selected list (5 total)
-Quizzer: [10:13:04] [34m[INFO][0m [question_selection_worker.dart] ✅ PSW Select: Successfully added question 2025-07-17T16:05:50.081474Z_49077910-058a-4d80-8506-e9e3d15c240e to QueueCache.
-Quizzer: [10:13:04] [34m[INFO][0m [sb_question_worker_signals.dart] SwitchBoard: Signaling PresentationSelectionWorker Cycle Complete
-Quizzer: [10:13:04] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully updated subject "agrophysics"
-Quizzer: [10:13:04] [34m[INFO][0m [test_25_review_subjects.dart] ✅ Successfully updated subject in iteration 4
-Quizzer: [10:13:04] [34m[INFO][0m [test_25_review_subjects.dart] Iteration 5/5
-Quizzer: [10:13:04] [34m[INFO][0m [review_subject_nodes.dart] Fetching subject for review. Cutoff timestamp: 2025-04-18T16:13:04.259175Z
-Quizzer: [10:13:04] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully fetched subject "agrophysics" for review
-Quizzer: [10:13:04] [34m[INFO][0m [test_25_review_subjects.dart] Extracted subject_description: null for subject: agrophysics
-Quizzer: [10:13:04] [34m[INFO][0m [test_25_review_subjects.dart] Set fresh timestamp: 2025-07-17T16:13:04.410535Z
-Quizzer: [10:13:04] [34m[INFO][0m [review_subject_nodes.dart] Updating reviewed subject "agrophysics"...
-Quizzer: [10:13:04] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully updated subject "agrophysics"
-Quizzer: [10:13:04] [34m[INFO][0m [test_25_review_subjects.dart] ✅ Successfully updated subject in iteration 5
-Quizzer: [10:13:04] [34m[INFO][0m [test_25_review_subjects.dart] ✅ Completed all 5 iterations of Test 1
-Quizzer: [10:13:04] [34m[INFO][0m [test_25_review_subjects.dart] Test 2: Testing subject review functions through SessionManager with 5 iterations
-Quizzer: [10:13:04] [34m[INFO][0m [test_25_review_subjects.dart] Iteration 1/5
-Quizzer: [10:13:04] [34m[INFO][0m [session_manager.dart] SessionManager: Requesting a subject for review...
-Quizzer: [10:13:04] [34m[INFO][0m [review_subject_nodes.dart] Fetching subject for review. Cutoff timestamp: 2025-04-18T16:13:04.738599Z
-Quizzer: [10:13:04] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully fetched subject "agrophysics" for review
-Quizzer: [10:13:04] [34m[INFO][0m [test_25_review_subjects.dart] Extracted subject_description: null for subject: agrophysics
-Quizzer: [10:13:04] [34m[INFO][0m [test_25_review_subjects.dart] Set fresh timestamp: 2025-07-17T16:13:04.871251Z
-Quizzer: [10:13:04] [34m[INFO][0m [session_manager.dart] SessionManager: Updating reviewed subject with PK: {subject: agrophysics}
-Quizzer: [10:13:04] [34m[INFO][0m [review_subject_nodes.dart] Updating reviewed subject "agrophysics"...
-Quizzer: [10:13:05] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully updated subject "agrophysics"
-Quizzer: [10:13:05] [34m[INFO][0m [test_25_review_subjects.dart] ✅ Successfully updated subject in iteration 1
-Quizzer: [10:13:05] [34m[INFO][0m [test_25_review_subjects.dart] Iteration 2/5
-Quizzer: [10:13:05] [34m[INFO][0m [session_manager.dart] SessionManager: Requesting a subject for review...
-Quizzer: [10:13:05] [34m[INFO][0m [review_subject_nodes.dart] Fetching subject for review. Cutoff timestamp: 2025-04-18T16:13:05.009318Z
-Quizzer: [10:13:05] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully fetched subject "agrophysics" for review
-Quizzer: [10:13:05] [34m[INFO][0m [test_25_review_subjects.dart] Extracted subject_description: null for subject: agrophysics
-Quizzer: [10:13:05] [34m[INFO][0m [test_25_review_subjects.dart] Set fresh timestamp: 2025-07-17T16:13:05.159904Z
-Quizzer: [10:13:05] [34m[INFO][0m [session_manager.dart] SessionManager: Updating reviewed subject with PK: {subject: agrophysics}
-Quizzer: [10:13:05] [34m[INFO][0m [review_subject_nodes.dart] Updating reviewed subject "agrophysics"...
-Quizzer: [10:13:05] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully updated subject "agrophysics"
-Quizzer: [10:13:05] [34m[INFO][0m [test_25_review_subjects.dart] ✅ Successfully updated subject in iteration 2
-Quizzer: [10:13:05] [34m[INFO][0m [test_25_review_subjects.dart] Iteration 3/5
-Quizzer: [10:13:05] [34m[INFO][0m [session_manager.dart] SessionManager: Requesting a subject for review...
-Quizzer: [10:13:05] [34m[INFO][0m [review_subject_nodes.dart] Fetching subject for review. Cutoff timestamp: 2025-04-18T16:13:05.299630Z
-Quizzer: [10:13:05] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully fetched subject "agrophysics" for review
-Quizzer: [10:13:05] [34m[INFO][0m [test_25_review_subjects.dart] Extracted subject_description: null for subject: agrophysics
-Quizzer: [10:13:05] [34m[INFO][0m [test_25_review_subjects.dart] Set fresh timestamp: 2025-07-17T16:13:05.444257Z
-Quizzer: [10:13:05] [34m[INFO][0m [session_manager.dart] SessionManager: Updating reviewed subject with PK: {subject: agrophysics}
-Quizzer: [10:13:05] [34m[INFO][0m [review_subject_nodes.dart] Updating reviewed subject "agrophysics"...
-Quizzer: [10:13:05] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully updated subject "agrophysics"
-Quizzer: [10:13:05] [34m[INFO][0m [test_25_review_subjects.dart] ✅ Successfully updated subject in iteration 3
-Quizzer: [10:13:05] [34m[INFO][0m [test_25_review_subjects.dart] Iteration 4/5
-Quizzer: [10:13:05] [34m[INFO][0m [session_manager.dart] SessionManager: Requesting a subject for review...
-Quizzer: [10:13:05] [34m[INFO][0m [review_subject_nodes.dart] Fetching subject for review. Cutoff timestamp: 2025-04-18T16:13:05.580381Z
-Quizzer: [10:13:05] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully fetched subject "agrophysics" for review
-Quizzer: [10:13:05] [34m[INFO][0m [test_25_review_subjects.dart] Extracted subject_description: null for subject: agrophysics
-Quizzer: [10:13:05] [34m[INFO][0m [test_25_review_subjects.dart] Set fresh timestamp: 2025-07-17T16:13:05.717750Z
-Quizzer: [10:13:05] [34m[INFO][0m [session_manager.dart] SessionManager: Updating reviewed subject with PK: {subject: agrophysics}
-Quizzer: [10:13:05] [34m[INFO][0m [review_subject_nodes.dart] Updating reviewed subject "agrophysics"...
-Quizzer: [10:13:05] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully updated subject "agrophysics"
-Quizzer: [10:13:05] [34m[INFO][0m [test_25_review_subjects.dart] ✅ Successfully updated subject in iteration 4
-Quizzer: [10:13:05] [34m[INFO][0m [test_25_review_subjects.dart] Iteration 5/5
-Quizzer: [10:13:05] [34m[INFO][0m [session_manager.dart] SessionManager: Requesting a subject for review...
-Quizzer: [10:13:05] [34m[INFO][0m [review_subject_nodes.dart] Fetching subject for review. Cutoff timestamp: 2025-04-18T16:13:05.986807Z
-Quizzer: [10:13:06] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully fetched subject "agrophysics" for review
-Quizzer: [10:13:06] [34m[INFO][0m [test_25_review_subjects.dart] Extracted subject_description: null for subject: agrophysics
-Quizzer: [10:13:06] [34m[INFO][0m [test_25_review_subjects.dart] Set fresh timestamp: 2025-07-17T16:13:06.117334Z
-Quizzer: [10:13:06] [34m[INFO][0m [session_manager.dart] SessionManager: Updating reviewed subject with PK: {subject: agrophysics}
-Quizzer: [10:13:06] [34m[INFO][0m [review_subject_nodes.dart] Updating reviewed subject "agrophysics"...
-Quizzer: [10:13:06] [34m[INFO][0m [review_subject_nodes.dart] ✅ Successfully updated subject "agrophysics"
-Quizzer: [10:13:06] [34m[INFO][0m [test_25_review_subjects.dart] ✅ Successfully updated subject in iteration 5
-Quizzer: [10:13:06] [34m[INFO][0m [test_25_review_subjects.dart] ✅ Completed all 5 iterations of Test 2
+Quizzer: [15:47:18] [34m[INFO][0m [<asynchronous suspension>] QuizzerLogger successfully set up file logging to: ./QuizzerAppLogs/quizzer_log.txt
+Quizzer: [15:47:18] [34m[INFO][0m [<asynchronous suspension>] QuizzerLogger: Attempting a SECOND test log message to file.
+Quizzer: [15:47:18] [34m[INFO][0m [switch_board.dart] SwitchBoard initialized.
+Quizzer: [15:47:18] [34m[INFO][0m [file_locations.dart] [PATH] Path provider not available (likely test environment), using current directory for Hive.
+Quizzer: [15:47:18] [34m[INFO][0m [file_locations.dart] [PATH] QuizzerHive path: ./QuizzerAppHive
+Quizzer: [15:47:18] [34m[INFO][0m [session_manager.dart] SessionManager: Initializing Hive at path: ./QuizzerAppHive
+Quizzer: [15:47:18] [34m[INFO][0m [login_initialization.dart] Entering loginInitialization()...
+Quizzer: [15:47:18] [34m[INFO][0m [login_initialization.dart] Entering performLoginProcess()...
+Quizzer: [15:47:18] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Starting login process...
+Quizzer: [15:47:18] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Validating your information...
+Quizzer: [15:47:18] [34m[INFO][0m [login_initialization.dart] Entering _validateLoginForm()...
+Quizzer: [15:47:18] [34m[INFO][0m [login_initialization.dart] Form validation passed for email: test_user_5@example.com
+Quizzer: [15:47:18] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Checking connection...
+Quizzer: [15:47:18] [34m[INFO][0m [utils.dart] Network check successful.
+Quizzer: [15:47:18] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Connecting to your account...
+Quizzer: [15:47:18] [34m[INFO][0m [user_auth.dart] Attempting Supabase authentication for test_user_5@example.com
+Quizzer: [15:47:18] [34m[INFO][0m [user_auth.dart] Attempting Supabase authentication
+Quizzer: [15:47:18] [34m[INFO][0m [user_auth.dart] ✅ Supabase authentication successful for test_user_5@example.com
+Quizzer: [15:47:18] [34m[INFO][0m [session_helper.dart] Entering determineUserRoleFromSupabaseSession()...
+Quizzer: [15:47:18] [34m[INFO][0m [user_auth.dart] Ensuring local profile exists for test_user_5@example.com
+Quizzer: [15:47:18] [34m[INFO][0m [user_profile_table.dart] Fetching all emails from user_profile table.
+Quizzer: [15:47:18] [34m[INFO][0m [file_locations.dart] [PATH] Path provider not available (likely test environment), using current directory.
+Quizzer: [15:47:18] [34m[INFO][0m [file_locations.dart] [PATH] Quizzer database path: ./QuizzerApp/sqlite/quizzer.db
+Quizzer: [15:47:18] [34m[INFO][0m [database_native.dart] [DB_INIT] Starting database initialization. Desktop: true
+Quizzer: [15:47:18] [34m[INFO][0m [database_native.dart] [DB_INIT] Using sqflite FFI factory (Desktop)
+Quizzer: [15:47:18] [34m[INFO][0m [database_native.dart] [DB_INIT] Original target path: ./QuizzerApp/sqlite/quizzer.db
+Quizzer: [15:47:18] [34m[INFO][0m [database_native.dart] [DB_INIT] Absolute target path: /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/./QuizzerApp/sqlite/quizzer.db
+Quizzer: [15:47:18] [34m[INFO][0m [database_native.dart] [DB_INIT] Normalized target path: /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/QuizzerApp/sqlite/quizzer.db
+Quizzer: [15:47:18] [34m[INFO][0m [database_native.dart] [DB_INIT] Checking existence of dbFile at /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/QuizzerApp/sqlite/quizzer.db. Exists: true
+Quizzer: [15:47:18] [34m[INFO][0m [database_native.dart] [DB_INIT] Existing database found at /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/QuizzerApp/sqlite/quizzer.db. Using it.
+Quizzer: [15:47:18] [34m[INFO][0m [database_native.dart] [DB_INIT] Attempting to open database at /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/QuizzerApp/sqlite/quizzer.db
+Quizzer: [15:47:18] [34m[INFO][0m [database_native.dart] [DB_INIT] Database opened at actual path: /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/QuizzerApp/sqlite/quizzer.db
+Quizzer: [15:47:18] [34m[INFO][0m [database_native.dart] [DB_INIT] Expected path: /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/QuizzerApp/sqlite/quizzer.db
+Quizzer: [15:47:18] [34m[INFO][0m [database_native.dart] [DB_INIT] Paths match: true
+Quizzer: [15:47:18] [34m[INFO][0m [database_native.dart] ✅ [DB_INIT] Database initialized successfully at: /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/QuizzerApp/sqlite/quizzer.db. IsOpen: true
+Quizzer: [15:47:18] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
+Quizzer: [15:47:19] [34m[INFO][0m [user_profile_table.dart] ✅ Successfully fetched 1 emails.
+Quizzer: [15:47:19] [34m[INFO][0m [user_auth.dart] Is user in local profile list -> true
+Quizzer: [15:47:19] [34m[INFO][0m [user_profile_table.dart] Fetching all emails from user_profile table.
+Quizzer: [15:47:19] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
+Quizzer: [15:47:19] [34m[INFO][0m [user_profile_table.dart] ✅ Successfully fetched 1 emails.
+Quizzer: [15:47:19] [34m[INFO][0m [user_auth.dart] Final check - is user in local profile list -> true
+Quizzer: [15:47:19] [34m[INFO][0m [offline_login.dart] Storing offline login data for test_user_5@example.com
+Quizzer: [15:47:19] [34m[INFO][0m [user_profile_table.dart] Getting user ID for email: test_user_5@example.com
+Quizzer: [15:47:19] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
+Quizzer: [15:47:19] [34m[INFO][0m [user_profile_table.dart] ✅ Found user ID: a5ef5d4f-ed4d-4189-a9aa-92308551fb83
+Quizzer: [15:47:19] [34m[INFO][0m [offline_login.dart] ✅ Offline login data stored for test_user_5@example.com
+Quizzer: [15:47:19] [34m[INFO][0m [user_profile_table.dart] Getting user ID for email: test_user_5@example.com
+Quizzer: [15:47:19] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
+Quizzer: [15:47:19] [34m[INFO][0m [user_profile_table.dart] ✅ Found user ID: a5ef5d4f-ed4d-4189-a9aa-92308551fb83
+Quizzer: [15:47:19] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Login successful...
+Quizzer: [15:47:19] [34m[INFO][0m [login_initialization.dart] Supabase login successful, offline login data already stored
+Quizzer: [15:47:19] [34m[INFO][0m [login_initialization.dart] Recording login attempt...
+Quizzer: [15:47:19] [34m[INFO][0m [login_attempts_record.dart] Recording login Attempt test_user_5@example.com with result Login successful
+Quizzer: [15:47:19] [34m[INFO][0m [user_profile_table.dart] Getting user ID for email: test_user_5@example.com
+Quizzer: [15:47:19] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
+Quizzer: [15:47:19] [34m[INFO][0m [user_profile_table.dart] ✅ Found user ID: a5ef5d4f-ed4d-4189-a9aa-92308551fb83
+Quizzer: [15:47:19] [34m[INFO][0m [table_helper.dart] Attempting to get IP address with multiple fallback methods
+Quizzer: [15:47:19] [34m[INFO][0m [table_helper.dart] Trying IP service: https://api.ipify.org
+Quizzer: [15:47:19] [33m[WARNING][0m [table_helper.dart] ⚠️ Failed to get IP from https://api.ipify.org, status code: 403
+Quizzer: [15:47:19] [34m[INFO][0m [table_helper.dart] Trying IP service: https://httpbin.org/ip
+Quizzer: [15:47:19] [33m[WARNING][0m [table_helper.dart] ⚠️ Invalid IP format from https://httpbin.org/ip: {
+  "origin": "150.131.97.94"
+}
+Quizzer: [15:47:19] [34m[INFO][0m [table_helper.dart] Trying IP service: https://icanhazip.com
+Quizzer: [15:47:19] [34m[INFO][0m [table_helper.dart] ✅ Successfully retrieved IP address from https://icanhazip.com: 150.131.97.94
+Quizzer: [15:47:19] [34m[INFO][0m [login_attempts_table.dart] Login attempt recorded successfully: 2025-07-19T21:47:19.680038Za5ef5d4f-ed4d-4189-a9aa-92308551fb83
+Quizzer: [15:47:19] [34m[INFO][0m [login_attempts_record.dart] Login attempt recorded for user: test_user_5@example.com with status: Login successful
+Quizzer: [15:47:19] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Setting up your profile...
+Quizzer: [15:47:19] [34m[INFO][0m [login_initialization.dart] Ensuring local profile exists for online login...
+Quizzer: [15:47:19] [34m[INFO][0m [user_auth.dart] Ensuring local profile exists for test_user_5@example.com
+Quizzer: [15:47:19] [34m[INFO][0m [user_profile_table.dart] Fetching all emails from user_profile table.
+Quizzer: [15:47:19] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
+Quizzer: [15:47:19] [34m[INFO][0m [user_profile_table.dart] ✅ Successfully fetched 1 emails.
+Quizzer: [15:47:19] [34m[INFO][0m [user_auth.dart] Is user in local profile list -> true
+Quizzer: [15:47:19] [34m[INFO][0m [user_profile_table.dart] Fetching all emails from user_profile table.
+Quizzer: [15:47:19] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
+Quizzer: [15:47:19] [34m[INFO][0m [user_profile_table.dart] ✅ Successfully fetched 1 emails.
+Quizzer: [15:47:19] [34m[INFO][0m [user_auth.dart] Final check - is user in local profile list -> true
+Quizzer: [15:47:19] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Syncing your profile...
+Quizzer: [15:47:19] [34m[INFO][0m [login_initialization.dart] Ensuring profile exists in Supabase for online login...
+Quizzer: [15:47:20] [34m[INFO][0m [login_initialization.dart] SessionManager already initialized by attemptSupabaseLogin for online login
+Quizzer: [15:47:20] [34m[INFO][0m [login_initialization.dart] ✅ Login process completed successfully for email: test_user_5@example.com
+Quizzer: [15:47:20] [34m[INFO][0m [login_initialization.dart] Skipping sync workers for test run
+Quizzer: [15:47:20] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Starting question queue server...
+Quizzer: [15:47:20] [34m[INFO][0m [login_initialization.dart] Initializing question queue server...
+Quizzer: [15:47:20] [34m[INFO][0m [queue_server_init.dart] Starting question queue server workers...
+Quizzer: [15:47:20] [34m[INFO][0m [queue_server_init.dart] Starting CirculationWorker...
+Quizzer: [15:47:20] [34m[INFO][0m [circulation_worker.dart] Entering CirculationWorker start()...
+Quizzer: [15:47:20] [34m[INFO][0m [circulation_worker.dart] CirculationWorker: Subscribed to onQuestionAnsweredCorrectly stream.
+Quizzer: [15:47:20] [34m[INFO][0m [circulation_worker.dart] Entering CirculationWorker _runLoop()...
+Quizzer: [15:47:20] [34m[INFO][0m [circulation_worker.dart] Entering CirculationWorker _shouldAddNewQuestion()...
+Quizzer: [15:47:20] [34m[INFO][0m [circulation_worker.dart] Querying database for eligible questions data...
+Quizzer: [15:47:20] [34m[INFO][0m [queue_server_init.dart] Starting PresentationSelectionWorker...
+Quizzer: [15:47:20] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker start()...
+Quizzer: [15:47:20] [34m[INFO][0m [question_selection_worker.dart] Clearing QuestionQueueCache and AnswerHistoryCache...
+Quizzer: [15:47:20] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache clear()...
+Quizzer: [15:47:20] [34m[INFO][0m [answer_history_cache.dart] Entering AnswerHistoryCache clear()...
+Quizzer: [15:47:20] [34m[INFO][0m [question_selection_worker.dart] ✅ ✅ QuestionQueueCache and AnswerHistoryCache cleared
+Quizzer: [15:47:20] [34m[INFO][0m [question_selection_worker.dart] PresentationSelectionWorker started.
+Quizzer: [15:47:20] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _runLoop()...
+Quizzer: [15:47:20] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache getLength()...
+Quizzer: [15:47:20] [34m[INFO][0m [queue_server_init.dart] Question queue server worker startup initiated
+Quizzer: [15:47:20] [34m[INFO][0m [queue_server_init.dart] Found 10 eligible questions - waiting for questions to be added to cache...
+Quizzer: [15:47:20] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache getLength()...
+Quizzer: [15:47:20] [34m[INFO][0m [answer_history_cache.dart] Entering AnswerHistoryCache getLastFiveAnsweredQuestions()...
+Quizzer: [15:47:20] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache peekAllRecords()...
+Quizzer: [15:47:20] [34m[INFO][0m [question_selection_worker.dart] Queue length 0 is below threshold 5. Running 5 cycles of _selectAndQueueQuestion
+Quizzer: [15:47:20] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _selectAndQueueQuestion()...
+Quizzer: [15:47:20] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _selectNextQuestionFromList()...
+Quizzer: [15:47:20] [34m[INFO][0m [circulation_worker.dart] lowRevisionScoreCondition evaluates to -> false (count: 10)
+Quizzer: [15:47:20] [34m[INFO][0m [circulation_worker.dart] shouldAdd evaluates to -> false
+Quizzer: [15:47:20] [34m[INFO][0m [circulation_worker.dart] CirculationWorker: Conditions not met, waiting for question answered correctly signal...
+Quizzer: [15:47:20] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling circulation worker finished
+Quizzer: [15:47:20] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache getLength()...
+Quizzer: [15:47:20] [34m[INFO][0m [question_answer_pairs_table.dart] Found 262 unique subjects
+Quizzer: [15:47:20] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
+Quizzer: [15:47:20] [34m[INFO][0m [user_profile_table.dart] ✅ Returning final subject interests for user
+Quizzer: [15:47:20] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache getLength()...
+Quizzer: [15:47:20] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache addRecord()...
+Quizzer: [15:47:20] [34m[INFO][0m [question_queue_cache.dart] QuestionQueueCache: Added record 2025-07-19T21:44:21.258074Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83 to empty queue.
+Quizzer: [15:47:20] [34m[INFO][0m [sb_cache_signals.dart] SwitchBoard: Signaling Question Queue Added
+Quizzer: [15:47:20] [34m[INFO][0m [question_selection_worker.dart] PSW Tracking: Added 2025-07-19T21:44:21.258074Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83 to recently selected list (1 total)
+Quizzer: [15:47:20] [34m[INFO][0m [question_selection_worker.dart] ✅ PSW Select: Successfully added question 2025-07-19T21:44:21.258074Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83 to QueueCache.
+Quizzer: [15:47:20] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _selectAndQueueQuestion()...
+Quizzer: [15:47:20] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _selectNextQuestionFromList()...
+Quizzer: [15:47:20] [34m[INFO][0m [question_answer_pairs_table.dart] Found 262 unique subjects
+Quizzer: [15:47:20] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
+Quizzer: [15:47:20] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache getLength()...
+Quizzer: [15:47:20] [34m[INFO][0m [queue_server_init.dart] ✅ Questions are now available in cache
+Quizzer: [15:47:20] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Welcome back! You're all set.
+Quizzer: [15:47:20] [34m[INFO][0m [login_initialization.dart] Login initialization completed for email: test_user_5@example.com
+Quizzer: [15:47:20] [34m[INFO][0m [test_26_question_flag_system.dart] ✅ Full login initialization completed successfully
+Quizzer: [15:47:20] [34m[INFO][0m [circulation_worker.dart] Entering CirculationWorker stop()...
+Quizzer: [15:47:20] [34m[INFO][0m [circulation_worker.dart] CirculationWorker: Unsubscribed from all streams.
+Quizzer: [15:47:20] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker stop()...
+Quizzer: [15:47:20] [34m[INFO][0m [question_selection_worker.dart] PresentationSelectionWorker stopping...
+Quizzer: [15:47:20] [34m[INFO][0m [question_selection_worker.dart] Clearing QuestionQueueCache and AnswerHistoryCache on stop...
+Quizzer: [15:47:20] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache clear()...
+Quizzer: [15:47:20] [34m[INFO][0m [sb_cache_signals.dart] SwitchBoard: Signaling Question Queue Removed
+Quizzer: [15:47:20] [34m[INFO][0m [question_queue_cache.dart] QuestionQueueCache cleared.
+Quizzer: [15:47:20] [34m[INFO][0m [answer_history_cache.dart] Entering AnswerHistoryCache clear()...
+Quizzer: [15:47:20] [34m[INFO][0m [question_selection_worker.dart] ✅ Both caches cleared
+Quizzer: [15:47:20] [34m[INFO][0m [user_profile_table.dart] ✅ Returning final subject interests for user
+Quizzer: [15:47:20] [33m[WARNING][0m [question_selection_worker.dart] ⚠️ PSW Select: No question was selected from eligible questions.
+Quizzer: [15:47:20] [34m[INFO][0m [sb_question_worker_signals.dart] SwitchBoard: Signaling PresentationSelectionWorker Cycle Complete
+Quizzer: [15:47:20] [34m[INFO][0m [question_selection_worker.dart] PresentationSelectionWorker loop finished.
+Quizzer: [15:47:20] [34m[INFO][0m [question_selection_worker.dart] PresentationSelectionWorker stopped.
+Quizzer: [15:47:20] [34m[INFO][0m [test_26_question_flag_system.dart] Stopped Circulation Worker and Selection Worker for testing
+Quizzer: [15:47:20] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:20] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table does not exist, creating it
+Quizzer: [15:47:20] [34m[INFO][0m [question_answer_pair_flags_table.dart] ✅ question_answer_pair_flags table created successfully
+Quizzer: [15:47:20] [34m[INFO][0m [test_26_question_flag_system.dart] Cleared question_answer_pair_flags table
+Quizzer: [15:47:20] [34m[INFO][0m [test_26_question_flag_system.dart] Using existing question_id for testing: 2025-07-19T21:44:08.756764Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83
+Quizzer: [15:47:20] [34m[INFO][0m [test_26_question_flag_system.dart] Test 1: Testing rejection of random question_id
+Quizzer: [15:47:20] [34m[INFO][0m [test_26_question_flag_system.dart] ✅ Test 1 passed: Random question_id correctly rejected
+Quizzer: [15:47:20] [31m[ERROR][0m [question_answer_pair_flags_table.dart] ❌ Question ID does not exist: 1752961640876_random_user
+Quizzer: [15:47:20] [31m[ERROR][0m [question_answer_pair_flags_table.dart] ❌ Error adding question answer pair flag - Bad state: Question ID does not exist: 1752961640876_random_user
+Quizzer: [15:47:20] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:20] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:20] [34m[INFO][0m [test_26_question_flag_system.dart] Cleaned up question_answer_pair_flags table
+Quizzer: [15:47:20] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:20] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:20] [34m[INFO][0m [test_26_question_flag_system.dart] Cleared question_answer_pair_flags table
+Quizzer: [15:47:20] [34m[INFO][0m [test_26_question_flag_system.dart] Using existing question_id for testing: 2025-07-19T21:44:14.479010Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83
+Quizzer: [15:47:20] [34m[INFO][0m [test_26_question_flag_system.dart] Test 2: Testing rejection of invalid flag type
+Quizzer: [15:47:20] [31m[ERROR][0m [question_answer_pair_flags_table.dart] ❌ Invalid flag type: invalid_flag_type. Valid types are: factually_incorrect, misleading_information, outdated_content, biased_perspective, confusing_answer_explanation, incorrect_answer, confusing_question, grammar_spelling_errors, violent_content, sexual_content, hate_speech, duplicate_question, poor_quality_image, broken_media, copyright_violation, other
+Quizzer: [15:47:20] [34m[INFO][0m [test_26_question_flag_system.dart] ✅ Test 2 passed: Invalid flag type correctly rejected
+Quizzer: [15:47:20] [31m[ERROR][0m [question_answer_pair_flags_table.dart] ❌ Error adding question answer pair flag - Bad state: Invalid flag type: invalid_flag_type. Valid types are: factually_incorrect, misleading_information, outdated_content, biased_perspective, confusing_answer_explanation, incorrect_answer, confusing_question, grammar_spelling_errors, violent_content, sexual_content, hate_speech, duplicate_question, poor_quality_image, broken_media, copyright_violation, other
+Quizzer: [15:47:20] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:20] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:20] [34m[INFO][0m [test_26_question_flag_system.dart] Cleaned up question_answer_pair_flags table
+Quizzer: [15:47:20] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:20] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:20] [34m[INFO][0m [test_26_question_flag_system.dart] Cleared question_answer_pair_flags table
+Quizzer: [15:47:20] [34m[INFO][0m [test_26_question_flag_system.dart] Using existing question_id for testing: 2025-07-19T21:44:09.855152Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83
+Quizzer: [15:47:20] [34m[INFO][0m [test_26_question_flag_system.dart] Test 3: Testing all valid flag types
+Quizzer: [15:47:20] [34m[INFO][0m [question_answer_pair_flags_table.dart] Adding flag for question: 2025-07-19T21:44:09.855152Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:20] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:20] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] ✅ Added flag for question: 2025-07-19T21:44:09.855152Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:21] [34m[INFO][0m [test_26_question_flag_system.dart] ✅ Successfully added flag type: factually_incorrect
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Adding flag for question: 2025-07-19T21:44:09.855152Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: misleading_information
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] ✅ Added flag for question: 2025-07-19T21:44:09.855152Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: misleading_information
+Quizzer: [15:47:21] [34m[INFO][0m [test_26_question_flag_system.dart] ✅ Successfully added flag type: misleading_information
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Adding flag for question: 2025-07-19T21:44:09.855152Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: outdated_content
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] ✅ Added flag for question: 2025-07-19T21:44:09.855152Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: outdated_content
+Quizzer: [15:47:21] [34m[INFO][0m [test_26_question_flag_system.dart] ✅ Successfully added flag type: outdated_content
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Adding flag for question: 2025-07-19T21:44:09.855152Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: biased_perspective
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] ✅ Added flag for question: 2025-07-19T21:44:09.855152Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: biased_perspective
+Quizzer: [15:47:21] [34m[INFO][0m [test_26_question_flag_system.dart] ✅ Successfully added flag type: biased_perspective
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Adding flag for question: 2025-07-19T21:44:09.855152Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: confusing_answer_explanation
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] ✅ Added flag for question: 2025-07-19T21:44:09.855152Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: confusing_answer_explanation
+Quizzer: [15:47:21] [34m[INFO][0m [test_26_question_flag_system.dart] ✅ Successfully added flag type: confusing_answer_explanation
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Adding flag for question: 2025-07-19T21:44:09.855152Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: incorrect_answer
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] ✅ Added flag for question: 2025-07-19T21:44:09.855152Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: incorrect_answer
+Quizzer: [15:47:21] [34m[INFO][0m [test_26_question_flag_system.dart] ✅ Successfully added flag type: incorrect_answer
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Adding flag for question: 2025-07-19T21:44:09.855152Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: confusing_question
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] ✅ Added flag for question: 2025-07-19T21:44:09.855152Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: confusing_question
+Quizzer: [15:47:21] [34m[INFO][0m [test_26_question_flag_system.dart] ✅ Successfully added flag type: confusing_question
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Adding flag for question: 2025-07-19T21:44:09.855152Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: grammar_spelling_errors
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] ✅ Added flag for question: 2025-07-19T21:44:09.855152Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: grammar_spelling_errors
+Quizzer: [15:47:21] [34m[INFO][0m [test_26_question_flag_system.dart] ✅ Successfully added flag type: grammar_spelling_errors
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Adding flag for question: 2025-07-19T21:44:09.855152Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: violent_content
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] ✅ Added flag for question: 2025-07-19T21:44:09.855152Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: violent_content
+Quizzer: [15:47:21] [34m[INFO][0m [test_26_question_flag_system.dart] ✅ Successfully added flag type: violent_content
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Adding flag for question: 2025-07-19T21:44:09.855152Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: sexual_content
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] ✅ Added flag for question: 2025-07-19T21:44:09.855152Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: sexual_content
+Quizzer: [15:47:21] [34m[INFO][0m [test_26_question_flag_system.dart] ✅ Successfully added flag type: sexual_content
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Adding flag for question: 2025-07-19T21:44:09.855152Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: hate_speech
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] ✅ Added flag for question: 2025-07-19T21:44:09.855152Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: hate_speech
+Quizzer: [15:47:21] [34m[INFO][0m [test_26_question_flag_system.dart] ✅ Successfully added flag type: hate_speech
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Adding flag for question: 2025-07-19T21:44:09.855152Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: duplicate_question
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] ✅ Added flag for question: 2025-07-19T21:44:09.855152Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: duplicate_question
+Quizzer: [15:47:21] [34m[INFO][0m [test_26_question_flag_system.dart] ✅ Successfully added flag type: duplicate_question
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Adding flag for question: 2025-07-19T21:44:09.855152Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: poor_quality_image
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] ✅ Added flag for question: 2025-07-19T21:44:09.855152Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: poor_quality_image
+Quizzer: [15:47:21] [34m[INFO][0m [test_26_question_flag_system.dart] ✅ Successfully added flag type: poor_quality_image
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Adding flag for question: 2025-07-19T21:44:09.855152Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: broken_media
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] ✅ Added flag for question: 2025-07-19T21:44:09.855152Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: broken_media
+Quizzer: [15:47:21] [34m[INFO][0m [test_26_question_flag_system.dart] ✅ Successfully added flag type: broken_media
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Adding flag for question: 2025-07-19T21:44:09.855152Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: copyright_violation
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] ✅ Added flag for question: 2025-07-19T21:44:09.855152Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: copyright_violation
+Quizzer: [15:47:21] [34m[INFO][0m [test_26_question_flag_system.dart] ✅ Successfully added flag type: copyright_violation
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Adding flag for question: 2025-07-19T21:44:09.855152Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: other
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] ✅ Added flag for question: 2025-07-19T21:44:09.855152Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: other
+Quizzer: [15:47:21] [34m[INFO][0m [test_26_question_flag_system.dart] ✅ Successfully added flag type: other
+Quizzer: [15:47:21] [34m[INFO][0m [test_26_question_flag_system.dart] ✅ Test 3 passed: All valid flag types succeeded
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:21] [34m[INFO][0m [test_26_question_flag_system.dart] Cleaned up question_answer_pair_flags table
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:21] [34m[INFO][0m [test_26_question_flag_system.dart] Cleared question_answer_pair_flags table
+Quizzer: [15:47:21] [34m[INFO][0m [test_26_question_flag_system.dart] Using existing question_id for testing: 2025-07-19T21:44:21.947983Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83
+Quizzer: [15:47:21] [34m[INFO][0m [test_26_question_flag_system.dart] Test 4: Testing rejection of empty flag description
+Quizzer: [15:47:21] [31m[ERROR][0m [question_answer_pair_flags_table.dart] ❌ Flag description cannot be empty
+Quizzer: [15:47:21] [34m[INFO][0m [test_26_question_flag_system.dart] ✅ Test 4 passed: Empty flag description correctly rejected
+Quizzer: [15:47:21] [31m[ERROR][0m [question_answer_pair_flags_table.dart] ❌ Error adding question answer pair flag - Bad state: Flag description cannot be empty
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:21] [34m[INFO][0m [test_26_question_flag_system.dart] Cleaned up question_answer_pair_flags table
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:21] [34m[INFO][0m [test_26_question_flag_system.dart] Cleared question_answer_pair_flags table
+Quizzer: [15:47:21] [34m[INFO][0m [test_26_question_flag_system.dart] Test 1: Testing empty table returns empty list
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:21] [34m[INFO][0m [test_26_question_flag_system.dart] ✅ Test 1 passed: Empty table correctly returns empty list
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:21] [34m[INFO][0m [test_26_question_flag_system.dart] Cleaned up question_answer_pair_flags table
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:21] [34m[INFO][0m [test_26_question_flag_system.dart] Cleared question_answer_pair_flags table
+Quizzer: [15:47:21] [34m[INFO][0m [test_26_question_flag_system.dart] Test 2: Testing retrieval of unsynced flags
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Adding flag for question: 2025-07-19T21:44:09.855152Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] ✅ Added flag for question: 2025-07-19T21:44:09.855152Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Adding flag for question: 2025-07-19T21:44:14.406166Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] ✅ Added flag for question: 2025-07-19T21:44:14.406166Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Adding flag for question: 2025-07-19T21:44:07.616246Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] ✅ Added flag for question: 2025-07-19T21:44:07.616246Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Adding flag for question: 2025-07-19T21:44:14.732971Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] ✅ Added flag for question: 2025-07-19T21:44:14.732971Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Adding flag for question: 2025-07-19T21:44:20.054877Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] ✅ Added flag for question: 2025-07-19T21:44:20.054877Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:21] [34m[INFO][0m [test_26_question_flag_system.dart] ✅ Test 2 passed: Successfully retrieved all unsynced flags
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:21] [34m[INFO][0m [test_26_question_flag_system.dart] Cleaned up question_answer_pair_flags table
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:21] [34m[INFO][0m [test_26_question_flag_system.dart] Cleared question_answer_pair_flags table
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Adding flag for question: 2025-07-19T21:44:05.085042Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] ✅ Added flag for question: 2025-07-19T21:44:05.085042Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Adding flag for question: 2025-07-19T21:44:01.991368Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] ✅ Added flag for question: 2025-07-19T21:44:01.991368Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Adding flag for question: 2025-07-19T21:44:07.446268Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] ✅ Added flag for question: 2025-07-19T21:44:07.446268Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Adding flag for question: 2025-07-19T21:44:20.589786Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] ✅ Added flag for question: 2025-07-19T21:44:20.589786Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Adding flag for question: 2025-07-19T21:44:14.927916Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] ✅ Added flag for question: 2025-07-19T21:44:14.927916Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:21] [34m[INFO][0m [test_26_question_flag_system.dart] Added 5 test flag records
+Quizzer: [15:47:21] [34m[INFO][0m [test_26_question_flag_system.dart] Test 1: Testing failure with invalid questionId
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Deleting flag for question: invalid_question_id, type: factually_incorrect
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:21] [33m[WARNING][0m [question_answer_pair_flags_table.dart] ⚠️ Delete operation for flag (question: invalid_question_id, type: factually_incorrect) affected 0 rows. Record might not exist.
+Quizzer: [15:47:21] [34m[INFO][0m [test_26_question_flag_system.dart] ✅ Test 1 passed: Invalid questionId correctly failed
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:21] [34m[INFO][0m [test_26_question_flag_system.dart] Cleaned up question_answer_pair_flags table
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:21] [34m[INFO][0m [test_26_question_flag_system.dart] Cleared question_answer_pair_flags table
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Adding flag for question: 2025-07-19T21:44:16.893195Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:21] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] ✅ Added flag for question: 2025-07-19T21:44:16.893195Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] Adding flag for question: 2025-07-19T21:44:02.459723Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] ✅ Added flag for question: 2025-07-19T21:44:02.459723Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] Adding flag for question: 2025-07-19T21:44:10.895496Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] ✅ Added flag for question: 2025-07-19T21:44:10.895496Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] Adding flag for question: 2025-07-19T21:44:08.603318Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] ✅ Added flag for question: 2025-07-19T21:44:08.603318Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] Adding flag for question: 2025-07-19T21:44:11.893849Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] ✅ Added flag for question: 2025-07-19T21:44:11.893849Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:22] [34m[INFO][0m [test_26_question_flag_system.dart] Added 5 test flag records
+Quizzer: [15:47:22] [34m[INFO][0m [test_26_question_flag_system.dart] Test 2: Testing failure with invalid flagType
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] Deleting flag for question: 2025-07-19T21:44:16.893195Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: invalid_flag_type
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:22] [33m[WARNING][0m [question_answer_pair_flags_table.dart] ⚠️ Delete operation for flag (question: 2025-07-19T21:44:16.893195Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: invalid_flag_type) affected 0 rows. Record might not exist.
+Quizzer: [15:47:22] [34m[INFO][0m [test_26_question_flag_system.dart] ✅ Test 2 passed: Invalid flagType correctly failed
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:22] [34m[INFO][0m [test_26_question_flag_system.dart] Cleaned up question_answer_pair_flags table
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:22] [34m[INFO][0m [test_26_question_flag_system.dart] Cleared question_answer_pair_flags table
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] Adding flag for question: 2025-07-19T21:44:06.066318Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] ✅ Added flag for question: 2025-07-19T21:44:06.066318Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] Adding flag for question: 2025-07-19T21:44:21.745568Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] ✅ Added flag for question: 2025-07-19T21:44:21.745568Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] Adding flag for question: 2025-07-19T21:44:21.047392Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] ✅ Added flag for question: 2025-07-19T21:44:21.047392Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] Adding flag for question: 2025-07-19T21:44:04.499114Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] ✅ Added flag for question: 2025-07-19T21:44:04.499114Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] Adding flag for question: 2025-07-19T21:44:11.207393Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] ✅ Added flag for question: 2025-07-19T21:44:11.207393Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:22] [34m[INFO][0m [test_26_question_flag_system.dart] Added 5 test flag records
+Quizzer: [15:47:22] [34m[INFO][0m [test_26_question_flag_system.dart] Test 3: Testing failure with valid id but invalid flag
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] Deleting flag for question: 2025-07-19T21:44:06.066318Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: invalid_flag_type
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:22] [33m[WARNING][0m [question_answer_pair_flags_table.dart] ⚠️ Delete operation for flag (question: 2025-07-19T21:44:06.066318Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: invalid_flag_type) affected 0 rows. Record might not exist.
+Quizzer: [15:47:22] [34m[INFO][0m [test_26_question_flag_system.dart] ✅ Test 3 passed: Valid id with invalid flag correctly failed
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:22] [34m[INFO][0m [test_26_question_flag_system.dart] Cleaned up question_answer_pair_flags table
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:22] [34m[INFO][0m [test_26_question_flag_system.dart] Cleared question_answer_pair_flags table
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] Adding flag for question: 2025-07-19T21:44:11.503911Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] ✅ Added flag for question: 2025-07-19T21:44:11.503911Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] Adding flag for question: 2025-07-19T21:44:04.146605Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] ✅ Added flag for question: 2025-07-19T21:44:04.146605Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] Adding flag for question: 2025-07-19T21:44:19.732801Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] ✅ Added flag for question: 2025-07-19T21:44:19.732801Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] Adding flag for question: 2025-07-19T21:44:14.479010Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] ✅ Added flag for question: 2025-07-19T21:44:14.479010Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] Adding flag for question: 2025-07-19T21:44:22.326693Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] ✅ Added flag for question: 2025-07-19T21:44:22.326693Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:22] [34m[INFO][0m [test_26_question_flag_system.dart] Added 5 test flag records
+Quizzer: [15:47:22] [34m[INFO][0m [test_26_question_flag_system.dart] Test 4: Testing failure with invalid id but valid flag
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] Deleting flag for question: invalid_question_id, type: factually_incorrect
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:22] [33m[WARNING][0m [question_answer_pair_flags_table.dart] ⚠️ Delete operation for flag (question: invalid_question_id, type: factually_incorrect) affected 0 rows. Record might not exist.
+Quizzer: [15:47:22] [34m[INFO][0m [test_26_question_flag_system.dart] ✅ Test 4 passed: Invalid id with valid flag correctly failed
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:22] [34m[INFO][0m [test_26_question_flag_system.dart] Cleaned up question_answer_pair_flags table
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:22] [34m[INFO][0m [test_26_question_flag_system.dart] Cleared question_answer_pair_flags table
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] Adding flag for question: 2025-07-19T21:44:17.046085Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] ✅ Added flag for question: 2025-07-19T21:44:17.046085Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] Adding flag for question: 2025-07-19T21:44:01.156942Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:22] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:23] [34m[INFO][0m [question_answer_pair_flags_table.dart] ✅ Added flag for question: 2025-07-19T21:44:01.156942Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:23] [34m[INFO][0m [question_answer_pair_flags_table.dart] Adding flag for question: 2025-07-19T21:44:05.085042Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:23] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:23] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:23] [34m[INFO][0m [question_answer_pair_flags_table.dart] ✅ Added flag for question: 2025-07-19T21:44:05.085042Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:23] [34m[INFO][0m [question_answer_pair_flags_table.dart] Adding flag for question: 2025-07-19T21:44:19.553848Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:23] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:23] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:23] [34m[INFO][0m [question_answer_pair_flags_table.dart] ✅ Added flag for question: 2025-07-19T21:44:19.553848Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:23] [34m[INFO][0m [question_answer_pair_flags_table.dart] Adding flag for question: 2025-07-19T21:44:10.428763Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:23] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:23] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:23] [34m[INFO][0m [question_answer_pair_flags_table.dart] ✅ Added flag for question: 2025-07-19T21:44:10.428763Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:23] [34m[INFO][0m [test_26_question_flag_system.dart] Added 5 test flag records
+Quizzer: [15:47:23] [34m[INFO][0m [test_26_question_flag_system.dart] Test 5: Testing successful deletion of all records
+Quizzer: [15:47:23] [34m[INFO][0m [question_answer_pair_flags_table.dart] Deleting flag for question: 2025-07-19T21:44:17.046085Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:23] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:23] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:23] [34m[INFO][0m [question_answer_pair_flags_table.dart] ✅ Deleted flag for question: 2025-07-19T21:44:17.046085Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect (1 row affected).
+Quizzer: [15:47:23] [34m[INFO][0m [question_answer_pair_flags_table.dart] Deleting flag for question: 2025-07-19T21:44:01.156942Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:23] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:23] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:23] [34m[INFO][0m [question_answer_pair_flags_table.dart] ✅ Deleted flag for question: 2025-07-19T21:44:01.156942Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect (1 row affected).
+Quizzer: [15:47:23] [34m[INFO][0m [question_answer_pair_flags_table.dart] Deleting flag for question: 2025-07-19T21:44:05.085042Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:23] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:23] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:23] [34m[INFO][0m [question_answer_pair_flags_table.dart] ✅ Deleted flag for question: 2025-07-19T21:44:05.085042Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect (1 row affected).
+Quizzer: [15:47:23] [34m[INFO][0m [question_answer_pair_flags_table.dart] Deleting flag for question: 2025-07-19T21:44:19.553848Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:23] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:23] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:23] [34m[INFO][0m [question_answer_pair_flags_table.dart] ✅ Deleted flag for question: 2025-07-19T21:44:19.553848Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect (1 row affected).
+Quizzer: [15:47:23] [34m[INFO][0m [question_answer_pair_flags_table.dart] Deleting flag for question: 2025-07-19T21:44:10.428763Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect
+Quizzer: [15:47:23] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:23] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:23] [34m[INFO][0m [question_answer_pair_flags_table.dart] ✅ Deleted flag for question: 2025-07-19T21:44:10.428763Z_a5ef5d4f-ed4d-4189-a9aa-92308551fb83, type: factually_incorrect (1 row affected).
+Quizzer: [15:47:23] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:23] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:23] [34m[INFO][0m [test_26_question_flag_system.dart] ✅ Test 5 passed: Successfully deleted all records
+Quizzer: [15:47:23] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:23] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:23] [34m[INFO][0m [test_26_question_flag_system.dart] Cleaned up question_answer_pair_flags table
+Quizzer: [15:47:23] [34m[INFO][0m [test_26_question_flag_system.dart] Found 5 unflagged test questions for user: a5ef5d4f-ed4d-4189-a9aa-92308551fb83
+Quizzer: [15:47:23] [34m[INFO][0m [test_26_question_flag_system.dart] Test 1: Testing failure with invalid userUuid
+Quizzer: [15:47:23] [34m[INFO][0m [test_26_question_flag_system.dart] ✅ Test 1 passed: Invalid userUuid correctly failed
+Quizzer: [15:47:23] [34m[INFO][0m [test_26_question_flag_system.dart] Found 5 unflagged test questions for user: a5ef5d4f-ed4d-4189-a9aa-92308551fb83
+Quizzer: [15:47:23] [34m[INFO][0m [test_26_question_flag_system.dart] Test 2: Testing failure with invalid questionId
+Quizzer: [15:47:23] [34m[INFO][0m [test_26_question_flag_system.dart] ✅ Test 2 passed: Invalid questionId correctly failed
+Quizzer: [15:47:23] [34m[INFO][0m [test_26_question_flag_system.dart] Found 5 unflagged test questions for user: a5ef5d4f-ed4d-4189-a9aa-92308551fb83
+Quizzer: [15:47:23] [34m[INFO][0m [test_26_question_flag_system.dart] Test 3: Testing failure with both invalid userUuid and questionId
+Quizzer: [15:47:23] [34m[INFO][0m [test_26_question_flag_system.dart] ✅ Test 3 passed: Both invalid arguments correctly failed
+Quizzer: [15:47:23] [34m[INFO][0m [test_26_question_flag_system.dart] Found 5 unflagged test questions for user: a5ef5d4f-ed4d-4189-a9aa-92308551fb83
+Quizzer: [15:47:23] [34m[INFO][0m [test_26_question_flag_system.dart] Test 4: Testing successful toggle of flagged status for multiple questions
+Quizzer: [15:47:23] [34m[INFO][0m [test_26_question_flag_system.dart] ✅ Test 4 passed: Successfully toggled flagged status for all test questions
+Quizzer: [15:47:23] [34m[INFO][0m [test_26_question_flag_system.dart] Found 5 unflagged test questions for user: a5ef5d4f-ed4d-4189-a9aa-92308551fb83
+Quizzer: [15:47:23] [34m[INFO][0m [test_26_question_flag_system.dart] Test 5: Testing that flagged status affects eligibility
+Quizzer: [15:47:23] [34m[INFO][0m [test_26_question_flag_system.dart] Set all user question answer pairs to flagged = 0 for user: a5ef5d4f-ed4d-4189-a9aa-92308551fb83
+Quizzer: [15:47:23] [34m[INFO][0m [test_26_question_flag_system.dart] Selected 5 eligible test questions for flagging
+Quizzer: [15:47:23] [34m[INFO][0m [test_26_question_flag_system.dart] Initial eligible questions count: 10
+Quizzer: [15:47:23] [34m[INFO][0m [test_26_question_flag_system.dart] Verified 5 questions are flagged
+Quizzer: [15:47:23] [34m[INFO][0m [test_26_question_flag_system.dart] Eligible questions count after flagging: 5
+Quizzer: [15:47:23] [34m[INFO][0m [test_26_question_flag_system.dart] Set all user question answer pairs back to flagged = 0 for user: a5ef5d4f-ed4d-4189-a9aa-92308551fb83
+Quizzer: [15:47:23] [34m[INFO][0m [test_26_question_flag_system.dart] ✅ Test 5 passed: Flagged status correctly affects eligibility
+Quizzer: [15:47:23] [34m[INFO][0m [test_26_question_flag_system.dart] Test 1: Testing null response when supabase table is empty
+Quizzer: [15:47:23] [34m[INFO][0m [handle_question_flags.dart] Fetching flagged question for review from Supabase...
+Quizzer: [15:47:24] [34m[INFO][0m [handle_question_flags.dart] No unreviewed flagged questions available for review.
+Quizzer: [15:47:24] [34m[INFO][0m [test_26_question_flag_system.dart] ✅ Test 1 passed: Correctly returned null for empty table
+Quizzer: [15:47:24] [34m[INFO][0m [test_26_question_flag_system.dart] Test 2: Testing complete question flag record retrieval
+Quizzer: [15:47:24] [34m[INFO][0m [test_26_question_flag_system.dart] Verify response: [{question_id: 2025-05-04T12:44:37.531130_7465dce6-abcf-4963-92a1-30dd7118c23a, flag_type: factually_incorrect, flag_description: Test flag 0, created_at: 2025-07-19T21:47:24.248475+00:00, is_reviewed: 0, decision: null, old_data_record: null, flag_id: test_flag_0}, {question_id: 2025-05-04T12:44:37.569039_7465dce6-abcf-4963-92a1-30dd7118c23a, flag_type: factually_incorrect, flag_description: Test flag 1, created_at: 2025-07-19T21:47:24.339842+00:00, is_reviewed: 0, decision: null, old_data_record: null, flag_id: test_flag_1}, {question_id: 2025-05-04T12:44:37.590622_7465dce6-abcf-4963-92a1-30dd7118c23a, flag_type: factually_incorrect, flag_description: Test flag 2, created_at: 2025-07-19T21:47:24.3988+00:00, is_reviewed: 0, decision: null, old_data_record: null, flag_id: test_flag_2}, {question_id: 2025-05-04T12:44:37.644110_7465dce6-abcf-4963-92a1-30dd7118c23a, flag_type: factually_incorrect, flag_description: Test flag 5, created_at: 2025-07-19T21:47:24.42221+00:00, is_reviewed: 0, decision: null, old_data_record: null, flag_id: test_flag_5}, {question_id: 2025-05-04T12:44:37.608816_7465dce6-abcf-4963-92a1-30dd7118c23a, flag_type: factually_incorrect, flag_description: Test flag 3, created_at: 2025-07-19T21:47:24.423573+00:00, is_reviewed: 0, decision: null, old_data_record: null, flag_id: test_flag_3}, {question_id: 2025-05-04T12:44:37.698729_7465dce6-abcf-4963-92a1-30dd7118c23a, flag_type: factually_incorrect, flag_description: Test flag 8, created_at: 2025-07-19T21:47:24.425184+00:00, is_reviewed: 0, decision: null, old_data_record: null, flag_id: test_flag_8}, {question_id: 2025-05-04T12:44:37.662438_7465dce6-abcf-4963-92a1-30dd7118c23a, flag_type: factually_incorrect, flag_description: Test flag 6, created_at: 2025-07-19T21:47:24.426398+00:00, is_reviewed: 0, decision: null, old_data_record: null, flag_id: test_flag_6}, {question_id: 2025-05-04T12:44:37.625994_7465dce6-abcf-4963-92a1-30dd7118c23a, flag_type: factually_incorrect, flag_description: Test flag 4, created_at: 2025-07-19T21:47:24.43811+00:00, is_reviewed: 0, decision: null, old_data_record: null, flag_id: test_flag_4}, {question_id: 2025-05-04T12:44:37.680610_7465dce6-abcf-4963-92a1-30dd7118c23a, flag_type: factually_incorrect, flag_description: Test flag 7, created_at: 2025-07-19T21:47:24.439312+00:00, is_reviewed: 0, decision: null, old_data_record: null, flag_id: test_flag_7}, {question_id: 2025-05-04T12:44:37.715264_7465dce6-abcf-4963-92a1-30dd7118c23a, flag_type: factually_incorrect, flag_description: Test flag 9, created_at: 2025-07-19T21:47:24.439781+00:00, is_reviewed: 0, decision: null, old_data_record: null, flag_id: test_flag_9}]
+Quizzer: [15:47:24] [34m[INFO][0m [handle_question_flags.dart] Fetching flagged question for review from Supabase...
+Quizzer: [15:47:24] [34m[INFO][0m [handle_question_flags.dart] Found flag for question: 2025-05-04T12:44:37.644110_7465dce6-abcf-4963-92a1-30dd7118c23a, type: factually_incorrect
+Quizzer: [15:47:24] [34m[INFO][0m [handle_question_flags.dart] Fetching question data for question_id: 2025-05-04T12:44:37.644110_7465dce6-abcf-4963-92a1-30dd7118c23a
+Quizzer: [15:47:24] [34m[INFO][0m [handle_question_flags.dart] Successfully fetched question data for question_id: 2025-05-04T12:44:37.644110_7465dce6-abcf-4963-92a1-30dd7118c23a
+Quizzer: [15:47:24] [34m[INFO][0m [handle_question_flags.dart] Preparing response structure for question_id: 2025-05-04T12:44:37.644110_7465dce6-abcf-4963-92a1-30dd7118c23a
+Quizzer: [15:47:24] [34m[INFO][0m [handle_question_flags.dart] ✅ Successfully fetched flagged question for review: 2025-05-04T12:44:37.644110_7465dce6-abcf-4963-92a1-30dd7118c23a
+Quizzer: [15:47:24] [34m[INFO][0m [test_26_question_flag_system.dart] ✅ Test 2 passed: Successfully retrieved complete question flag record
+Quizzer: [15:47:24] [34m[INFO][0m [test_26_question_flag_system.dart] Test 3: Testing randomness of returned records
+Quizzer: [15:47:24] [34m[INFO][0m [handle_question_flags.dart] Fetching flagged question for review from Supabase...
+Quizzer: [15:47:24] [34m[INFO][0m [handle_question_flags.dart] Found flag for question: 2025-05-04T12:44:37.698729_7465dce6-abcf-4963-92a1-30dd7118c23a, type: factually_incorrect
+Quizzer: [15:47:24] [34m[INFO][0m [handle_question_flags.dart] Fetching question data for question_id: 2025-05-04T12:44:37.698729_7465dce6-abcf-4963-92a1-30dd7118c23a
+Quizzer: [15:47:24] [34m[INFO][0m [handle_question_flags.dart] Successfully fetched question data for question_id: 2025-05-04T12:44:37.698729_7465dce6-abcf-4963-92a1-30dd7118c23a
+Quizzer: [15:47:24] [34m[INFO][0m [handle_question_flags.dart] Preparing response structure for question_id: 2025-05-04T12:44:37.698729_7465dce6-abcf-4963-92a1-30dd7118c23a
+Quizzer: [15:47:24] [34m[INFO][0m [handle_question_flags.dart] ✅ Successfully fetched flagged question for review: 2025-05-04T12:44:37.698729_7465dce6-abcf-4963-92a1-30dd7118c23a
+Quizzer: [15:47:24] [34m[INFO][0m [handle_question_flags.dart] Fetching flagged question for review from Supabase...
+Quizzer: [15:47:25] [34m[INFO][0m [handle_question_flags.dart] Found flag for question: 2025-05-04T12:44:37.625994_7465dce6-abcf-4963-92a1-30dd7118c23a, type: factually_incorrect
+Quizzer: [15:47:25] [34m[INFO][0m [handle_question_flags.dart] Fetching question data for question_id: 2025-05-04T12:44:37.625994_7465dce6-abcf-4963-92a1-30dd7118c23a
+Quizzer: [15:47:25] [34m[INFO][0m [handle_question_flags.dart] Successfully fetched question data for question_id: 2025-05-04T12:44:37.625994_7465dce6-abcf-4963-92a1-30dd7118c23a
+Quizzer: [15:47:25] [34m[INFO][0m [handle_question_flags.dart] Preparing response structure for question_id: 2025-05-04T12:44:37.625994_7465dce6-abcf-4963-92a1-30dd7118c23a
+Quizzer: [15:47:25] [34m[INFO][0m [handle_question_flags.dart] ✅ Successfully fetched flagged question for review: 2025-05-04T12:44:37.625994_7465dce6-abcf-4963-92a1-30dd7118c23a
+Quizzer: [15:47:25] [34m[INFO][0m [handle_question_flags.dart] Fetching flagged question for review from Supabase...
+Quizzer: [15:47:25] [34m[INFO][0m [handle_question_flags.dart] Found flag for question: 2025-05-04T12:44:37.531130_7465dce6-abcf-4963-92a1-30dd7118c23a, type: factually_incorrect
+Quizzer: [15:47:25] [34m[INFO][0m [handle_question_flags.dart] Fetching question data for question_id: 2025-05-04T12:44:37.531130_7465dce6-abcf-4963-92a1-30dd7118c23a
+Quizzer: [15:47:25] [34m[INFO][0m [handle_question_flags.dart] Successfully fetched question data for question_id: 2025-05-04T12:44:37.531130_7465dce6-abcf-4963-92a1-30dd7118c23a
+Quizzer: [15:47:25] [34m[INFO][0m [handle_question_flags.dart] Preparing response structure for question_id: 2025-05-04T12:44:37.531130_7465dce6-abcf-4963-92a1-30dd7118c23a
+Quizzer: [15:47:25] [34m[INFO][0m [handle_question_flags.dart] ✅ Successfully fetched flagged question for review: 2025-05-04T12:44:37.531130_7465dce6-abcf-4963-92a1-30dd7118c23a
+Quizzer: [15:47:25] [34m[INFO][0m [handle_question_flags.dart] Fetching flagged question for review from Supabase...
+Quizzer: [15:47:25] [34m[INFO][0m [handle_question_flags.dart] Found flag for question: 2025-05-04T12:44:37.715264_7465dce6-abcf-4963-92a1-30dd7118c23a, type: factually_incorrect
+Quizzer: [15:47:25] [34m[INFO][0m [handle_question_flags.dart] Fetching question data for question_id: 2025-05-04T12:44:37.715264_7465dce6-abcf-4963-92a1-30dd7118c23a
+Quizzer: [15:47:25] [34m[INFO][0m [handle_question_flags.dart] Successfully fetched question data for question_id: 2025-05-04T12:44:37.715264_7465dce6-abcf-4963-92a1-30dd7118c23a
+Quizzer: [15:47:25] [34m[INFO][0m [handle_question_flags.dart] Preparing response structure for question_id: 2025-05-04T12:44:37.715264_7465dce6-abcf-4963-92a1-30dd7118c23a
+Quizzer: [15:47:25] [34m[INFO][0m [handle_question_flags.dart] ✅ Successfully fetched flagged question for review: 2025-05-04T12:44:37.715264_7465dce6-abcf-4963-92a1-30dd7118c23a
+Quizzer: [15:47:25] [34m[INFO][0m [handle_question_flags.dart] Fetching flagged question for review from Supabase...
+Quizzer: [15:47:25] [34m[INFO][0m [handle_question_flags.dart] Found flag for question: 2025-05-04T12:44:37.644110_7465dce6-abcf-4963-92a1-30dd7118c23a, type: factually_incorrect
+Quizzer: [15:47:25] [34m[INFO][0m [handle_question_flags.dart] Fetching question data for question_id: 2025-05-04T12:44:37.644110_7465dce6-abcf-4963-92a1-30dd7118c23a
+Quizzer: [15:47:25] [34m[INFO][0m [handle_question_flags.dart] Successfully fetched question data for question_id: 2025-05-04T12:44:37.644110_7465dce6-abcf-4963-92a1-30dd7118c23a
+Quizzer: [15:47:25] [34m[INFO][0m [handle_question_flags.dart] Preparing response structure for question_id: 2025-05-04T12:44:37.644110_7465dce6-abcf-4963-92a1-30dd7118c23a
+Quizzer: [15:47:25] [34m[INFO][0m [handle_question_flags.dart] ✅ Successfully fetched flagged question for review: 2025-05-04T12:44:37.644110_7465dce6-abcf-4963-92a1-30dd7118c23a
+Quizzer: [15:47:25] [34m[INFO][0m [test_26_question_flag_system.dart] ✅ Test 3 passed: Records returned are random
+Quizzer: [15:47:25] [34m[INFO][0m [test_26_question_flag_system.dart] Test 4: Testing specific record fetch by primary key
+Quizzer: [15:47:25] [34m[INFO][0m [handle_question_flags.dart] Fetching flagged question for review from Supabase...
+Quizzer: [15:47:25] [34m[INFO][0m [handle_question_flags.dart] Found flag for question: 2025-05-04T12:44:37.531130_7465dce6-abcf-4963-92a1-30dd7118c23a, type: factually_incorrect
+Quizzer: [15:47:25] [34m[INFO][0m [handle_question_flags.dart] Fetching question data for question_id: 2025-05-04T12:44:37.531130_7465dce6-abcf-4963-92a1-30dd7118c23a
+Quizzer: [15:47:25] [34m[INFO][0m [handle_question_flags.dart] Successfully fetched question data for question_id: 2025-05-04T12:44:37.531130_7465dce6-abcf-4963-92a1-30dd7118c23a
+Quizzer: [15:47:25] [34m[INFO][0m [handle_question_flags.dart] Preparing response structure for question_id: 2025-05-04T12:44:37.531130_7465dce6-abcf-4963-92a1-30dd7118c23a
+Quizzer: [15:47:25] [34m[INFO][0m [handle_question_flags.dart] ✅ Successfully fetched flagged question for review: 2025-05-04T12:44:37.531130_7465dce6-abcf-4963-92a1-30dd7118c23a
+Quizzer: [15:47:25] [34m[INFO][0m [test_26_question_flag_system.dart] ✅ Test 4 passed: Successfully fetched specific record by primary key
+Quizzer: [15:47:25] [34m[INFO][0m [test_26_question_flag_system.dart] Test 5: Cleaning up all test records and verifying
+Quizzer: [15:47:25] [34m[INFO][0m [test_26_question_flag_system.dart] Cleaned up all test flag records from supabase
+Quizzer: [15:47:26] [34m[INFO][0m [test_26_question_flag_system.dart] ✅ Test 5 passed: All test records successfully cleaned up and verified
+Quizzer: [15:47:26] [34m[INFO][0m [test_26_question_flag_system.dart] Test 1: Testing edit request for submitQuestionReview
+Quizzer: [15:47:26] [34m[INFO][0m [handle_question_flags.dart] Fetching flagged question for review from Supabase...
+Quizzer: [15:47:26] [34m[INFO][0m [handle_question_flags.dart] Found flag for question: test_question_1752961646753, type: factually_incorrect
+Quizzer: [15:47:26] [34m[INFO][0m [handle_question_flags.dart] Fetching question data for question_id: test_question_1752961646753
+Quizzer: [15:47:27] [34m[INFO][0m [handle_question_flags.dart] Successfully fetched question data for question_id: test_question_1752961646753
+Quizzer: [15:47:27] [34m[INFO][0m [handle_question_flags.dart] Preparing response structure for question_id: test_question_1752961646753
+Quizzer: [15:47:27] [34m[INFO][0m [handle_question_flags.dart] ✅ Successfully fetched flagged question for review: test_question_1752961646753
+Quizzer: [15:47:27] [34m[INFO][0m [handle_question_flags.dart] Submitting review for question: test_question_1752961646753, action: edit
+Quizzer: [15:47:27] [34m[INFO][0m [handle_question_flags.dart] ✅ Successfully processed review for question: test_question_1752961646753
+Quizzer: [15:47:27] [34m[INFO][0m [test_26_question_flag_system.dart] ✅ Test 1 passed: Edit request successfully processed
+Quizzer: [15:47:27] [34m[INFO][0m [test_26_question_flag_system.dart] Test 2: Testing delete request for submitQuestionReview
+Quizzer: [15:47:27] [34m[INFO][0m [handle_question_flags.dart] Fetching flagged question for review from Supabase...
+Quizzer: [15:47:28] [34m[INFO][0m [handle_question_flags.dart] Found flag for question: test_question_delete_1752961647794, type: factually_incorrect
+Quizzer: [15:47:28] [34m[INFO][0m [handle_question_flags.dart] Fetching question data for question_id: test_question_delete_1752961647794
+Quizzer: [15:47:28] [34m[INFO][0m [handle_question_flags.dart] Successfully fetched question data for question_id: test_question_delete_1752961647794
+Quizzer: [15:47:28] [34m[INFO][0m [handle_question_flags.dart] Preparing response structure for question_id: test_question_delete_1752961647794
+Quizzer: [15:47:28] [34m[INFO][0m [handle_question_flags.dart] ✅ Successfully fetched flagged question for review: test_question_delete_1752961647794
+Quizzer: [15:47:28] [34m[INFO][0m [handle_question_flags.dart] Submitting review for question: test_question_delete_1752961647794, action: delete
+Quizzer: [15:47:28] [34m[INFO][0m [handle_question_flags.dart] ✅ Successfully processed review for question: test_question_delete_1752961647794
+Quizzer: [15:47:28] [34m[INFO][0m [test_26_question_flag_system.dart] ✅ Test 2 passed: Delete request successfully processed
+Quizzer: [15:47:28] [34m[INFO][0m [test_26_question_flag_system.dart] Test 3: Testing rejection of invalid action
+Quizzer: [15:47:28] [34m[INFO][0m [handle_question_flags.dart] Submitting review for question: test_question, action: invalid_action
+Quizzer: [15:47:28] [31m[ERROR][0m [handle_question_flags.dart] ❌ Invalid action: invalid_action. Must be "edit" or "delete"
+Quizzer: [15:47:28] [31m[ERROR][0m [handle_question_flags.dart] ❌ Error submitting question review: Invalid argument(s): Action must be "edit" or "delete"
+Quizzer: [15:47:28] [34m[INFO][0m [test_26_question_flag_system.dart] ✅ Test 3 passed: Invalid action correctly rejected
+Quizzer: [15:47:28] [34m[INFO][0m [test_26_question_flag_system.dart] Test 1: Testing successful addQuestionFlag API call
+Quizzer: [15:47:28] [34m[INFO][0m [session_manager.dart] Entering addQuestionFlag()...
+Quizzer: [15:47:28] [34m[INFO][0m [question_answer_pair_flags_table.dart] Adding flag for question: test_question_api_1752961648725, type: factually_incorrect
+Quizzer: [15:47:28] [34m[INFO][0m [question_answer_pair_flags_table.dart] Verifying question_answer_pair_flags table existence
+Quizzer: [15:47:28] [34m[INFO][0m [question_answer_pair_flags_table.dart] question_answer_pair_flags table exists
+Quizzer: [15:47:28] [34m[INFO][0m [question_answer_pair_flags_table.dart] ✅ Added flag for question: test_question_api_1752961648725, type: factually_incorrect
+Quizzer: [15:47:28] [34m[INFO][0m [session_manager.dart] Successfully added question flag for QID: test_question_api_1752961648725, type: factually_incorrect and marked as flagged
+Quizzer: [15:47:28] [34m[INFO][0m [test_26_question_flag_system.dart] Cleaned up local database records
+Quizzer: [15:47:28] [34m[INFO][0m [test_26_question_flag_system.dart] ✅ Test 1 passed: addQuestionFlag API successfully added flag to local DB and marked question as flagged
+Quizzer: [15:47:28] [34m[INFO][0m [test_26_question_flag_system.dart] Test 2: Testing addQuestionFlag API failure when user not logged in
+Quizzer: [15:47:28] [34m[INFO][0m [session_manager.dart] Entering addQuestionFlag()...
+Quizzer: [15:47:28] [31m[ERROR][0m [question_answer_pair_flags_table.dart] ❌ Question ID does not exist: test_question
+Quizzer: [15:47:28] [31m[ERROR][0m [question_answer_pair_flags_table.dart] ❌ Error adding question answer pair flag - Bad state: Question ID does not exist: test_question
+Quizzer: [15:47:28] [31m[ERROR][0m [session_manager.dart] ❌ Error in addQuestionFlag - Bad state: Question ID does not exist: test_question
+Quizzer: [15:47:28] [34m[INFO][0m [test_26_question_flag_system.dart] ✅ Test 2 passed: addQuestionFlag API correctly fails when user not logged in
+Quizzer: [15:47:29] [34m[INFO][0m [test_26_question_flag_system.dart] Test 3: Testing addQuestionFlag API failure when flag addition fails
+Quizzer: [15:47:29] [34m[INFO][0m [session_manager.dart] Entering addQuestionFlag()...
+Quizzer: [15:47:29] [31m[ERROR][0m [question_answer_pair_flags_table.dart] ❌ Question ID does not exist: non_existent_question_id
+Quizzer: [15:47:29] [31m[ERROR][0m [question_answer_pair_flags_table.dart] ❌ Error adding question answer pair flag - Bad state: Question ID does not exist: non_existent_question_id
+Quizzer: [15:47:29] [31m[ERROR][0m [session_manager.dart] ❌ Error in addQuestionFlag - Bad state: Question ID does not exist: non_existent_question_id
+Quizzer: [15:47:29] [34m[INFO][0m [test_26_question_flag_system.dart] ✅ Test 3 passed: addQuestionFlag API correctly returns false when flag addition fails

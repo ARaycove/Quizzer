@@ -6,7 +6,7 @@ import 'dart:async';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/table_helper.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_profile_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pairs_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pair_management/question_answer_pairs_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
 
 Future<void> _verifyUserStatsNonCirculatingQuestionsTable(Database db) async {

@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:quizzer/UI_systems/color_wheel.dart';
 import 'package:quizzer/UI_systems/global_widgets/widget_global_app_bar.dart';
-import 'package:quizzer/UI_systems/06_admin_panel/widget_categorization_panel.dart';
 import 'package:quizzer/UI_systems/06_admin_panel/widget_review_panel.dart';
 import 'package:quizzer/UI_systems/06_admin_panel/widget_review_subjects_panel.dart';
 
-enum AdminPanel { none, review, categorize, reviewSubjects }
+enum AdminPanel { none, review, reviewSubjects }
 
 class AdminPanelPage extends StatefulWidget {
   const AdminPanelPage({super.key});
@@ -41,13 +40,6 @@ class _AdminPanelPageState extends State<AdminPanelPage> {
                   child: _buildPanelButton(
                     label: 'Review add/edit',
                     panel: AdminPanel.review,
-                  ),
-                ),
-                const SizedBox(width: ColorWheel.standardPaddingValue / 2),
-                Expanded(
-                  child: _buildPanelButton(
-                    label: 'Categorize',
-                    panel: AdminPanel.categorize,
                   ),
                 ),
                 const SizedBox(width: ColorWheel.standardPaddingValue / 2),
@@ -93,8 +85,6 @@ class _AdminPanelPageState extends State<AdminPanelPage> {
     switch (_selectedPanel) {
       case AdminPanel.review:
         return const ReviewPanelWidget();
-      case AdminPanel.categorize:
-        return const CategorizationPanelWidget();
       case AdminPanel.reviewSubjects:
         return const ReviewSubjectsPanelWidget();
       case AdminPanel.none:

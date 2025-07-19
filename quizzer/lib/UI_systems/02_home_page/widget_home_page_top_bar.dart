@@ -25,6 +25,7 @@ class HomePageTopBar extends StatefulWidget implements PreferredSizeWidget {
 class _HomePageTopBarState extends State<HomePageTopBar> {
   final TextEditingController _flagController = TextEditingController();
   final SessionManager _session = SessionManager(); // Get session instance
+  String _selectedFlagType = 'other'; // Default flag type
 
   @override
   void dispose() {
@@ -32,29 +33,65 @@ class _HomePageTopBarState extends State<HomePageTopBar> {
     super.dispose();
   }
 
-  void _handleSubmitFlag(BuildContext context, String reason) {
+  Future<void> _handleSubmitFlag(BuildContext context, String reason) async {
     // Basic validation: do nothing if reason is empty
     if (reason.trim().isEmpty) {
       QuizzerLogger.logWarning('Attempted to submit flag with empty reason.');
-      // Optionally show a subtle message, but avoid noisy errors for simple validation
-      // ScaffoldMessenger.of(context).showSnackBar(
-      //   const SnackBar(content: Text('Please provide a reason for flagging.')),
-      // );
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please provide a reason for flagging.'),
+          backgroundColor: ColorWheel.warning,
+        ),
+      );
       return; 
     }
     
-    QuizzerLogger.logMessage('Submitting flag for question: ${_session.currentQuestionId}, Reason: $reason');
-
-    // TODO: Implement the actual flagging logic in SessionManager or a dedicated service
-    // Example: await _session.flagCurrentQuestion(reason: reason);
+    final String currentQuestionId = _session.currentQuestionId;
+    if (currentQuestionId.isEmpty || currentQuestionId == "dummy_no_questions") {
+      QuizzerLogger.logWarning('Attempted to flag question but no valid question is active.');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No active question to flag.'),
+          backgroundColor: ColorWheel.warning,
+        ),
+      );
+      return;
+    }
     
-    // For now, just log and show a confirmation snackbar
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Question flagged (placeholder).'),
-        backgroundColor: ColorWheel.buttonSuccess, // Or another appropriate color
-      ),
-    );
+    QuizzerLogger.logMessage('Submitting flag for question: $currentQuestionId, Reason: $reason');
+
+    try {
+      // Call the addQuestionFlag API
+      final bool success = await _session.addQuestionFlag(
+        questionId: currentQuestionId,
+        flagType: _selectedFlagType,
+        flagDescription: reason.trim(),
+      );
+      
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Question flagged successfully.'),
+            backgroundColor: ColorWheel.buttonSuccess,
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to flag question. Please try again.'),
+            backgroundColor: ColorWheel.buttonError,
+          ),
+        );
+      }
+    } catch (e) {
+      QuizzerLogger.logError('Error flagging question: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error flagging question: $e'),
+          backgroundColor: ColorWheel.buttonError,
+        ),
+      );
+    }
 
     // Clear the controller and close the dialog
     _flagController.clear();
@@ -197,6 +234,40 @@ class _HomePageTopBarState extends State<HomePageTopBar> {
                 "Flag Question",
                 textAlign: TextAlign.center,
                 style: ColorWheel.titleText, // Use title style
+              ),
+              const SizedBox(height: ColorWheel.standardPaddingValue),
+              // Flag Type Dropdown
+              DropdownButtonFormField<String>(
+                value: _selectedFlagType,
+                decoration: InputDecoration(
+                  labelText: "Flag Type",
+                  labelStyle: ColorWheel.hintTextStyle,
+                  filled: true,
+                  fillColor: ColorWheel.textInputBackground,
+                  border: OutlineInputBorder(
+                    borderRadius: ColorWheel.textFieldBorderRadius,
+                    borderSide: BorderSide.none,
+                  ),
+                  contentPadding: ColorWheel.inputFieldPadding,
+                ),
+                style: ColorWheel.defaultText.copyWith(color: ColorWheel.inputText),
+                items: const [
+                  DropdownMenuItem(value: 'factually_incorrect', child: Text('Factually Incorrect')),
+                  DropdownMenuItem(value: 'misleading_information', child: Text('Misleading Information')),
+                  DropdownMenuItem(value: 'outdated_content', child: Text('Outdated Content')),
+                  DropdownMenuItem(value: 'confusing_question', child: Text('Confusing Question')),
+                  DropdownMenuItem(value: 'incorrect_answer', child: Text('Incorrect Answer')),
+                  DropdownMenuItem(value: 'grammar_spelling_errors', child: Text('Grammar/Spelling Errors')),
+                  DropdownMenuItem(value: 'duplicate_question', child: Text('Duplicate Question')),
+                  DropdownMenuItem(value: 'other', child: Text('Other')),
+                ],
+                onChanged: (String? newValue) {
+                  if (newValue != null) {
+                    setState(() {
+                      _selectedFlagType = newValue;
+                    });
+                  }
+                },
               ),
               const SizedBox(height: ColorWheel.standardPaddingValue),
               TextField(

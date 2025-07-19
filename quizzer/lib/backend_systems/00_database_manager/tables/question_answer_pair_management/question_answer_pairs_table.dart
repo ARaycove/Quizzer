@@ -1,7 +1,7 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'dart:convert';
-import 'table_helper.dart'; // Import the new helper file
+import '../table_helper.dart'; // Import the new helper file
 import 'package:quizzer/backend_systems/10_switch_board/sb_sync_worker_signals.dart'; // Import sync signals
 import 'package:quizzer/backend_systems/00_database_manager/tables/media_sync_status_table.dart'; // Added import
 import 'package:path/path.dart' as path; // Changed alias to path

@@ -7,7 +7,7 @@ import 'package:quizzer/backend_systems/10_switch_board/switch_board.dart';
 import 'package:quizzer/backend_systems/10_switch_board/sb_sync_worker_signals.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/media_sync_status_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pairs_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pair_management/question_answer_pairs_table.dart';
 import 'package:supabase/supabase.dart'; // For Supabase storage operations
 import 'package:quizzer/backend_systems/00_helper_utils/file_locations.dart';
 

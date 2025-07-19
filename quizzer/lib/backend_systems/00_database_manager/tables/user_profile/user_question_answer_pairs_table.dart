@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
-import 'table_helper.dart'; // Import the helper file
-import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pairs_table.dart'; // Import for _verifyQuestionAnswerPairTable
+import '../table_helper.dart'; // Import the helper file
+import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pair_management/question_answer_pairs_table.dart'; // Import for _verifyQuestionAnswerPairTable
 import 'package:quizzer/backend_systems/10_switch_board/sb_sync_worker_signals.dart'; // Import sync signals
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_module_activation_status_table.dart';
@@ -26,6 +26,7 @@ Future<void> _verifyUserQuestionAnswerPairTable(dynamic db) async {
         average_times_shown_per_day REAL,
         in_circulation INTEGER,
         total_attempts INTEGER NOT NULL DEFAULT 0,
+        flagged INTEGER DEFAULT 0,
         -- Sync Fields --
         has_been_synced INTEGER DEFAULT 0,
         edits_are_synced INTEGER DEFAULT 0,
@@ -48,6 +49,12 @@ Future<void> _verifyUserQuestionAnswerPairTable(dynamic db) async {
        QuizzerLogger.logWarning('Adding missing column: total_attempts');
       // Add with default 0 for existing rows
       await db.execute("ALTER TABLE user_question_answer_pairs ADD COLUMN total_attempts INTEGER NOT NULL DEFAULT 0");
+    }
+
+    // Check for flagged column
+    if (!columnNames.contains('flagged')) {
+      QuizzerLogger.logMessage('Adding flagged column to user_question_answer_pairs table.');
+      await db.execute('ALTER TABLE user_question_answer_pairs ADD COLUMN flagged INTEGER DEFAULT 0');
     }
 
     // Add checks for new sync columns
@@ -101,6 +108,7 @@ Future<int> addUserQuestionAnswerPair({
       'average_times_shown_per_day': averageTimesShownPerDay,
       'in_circulation': false,
       'total_attempts': 0,
+      'flagged': 0,
       // Sync Fields
       'has_been_synced': 0,
       'edits_are_synced': 0,
@@ -680,6 +688,7 @@ Future<List<Map<String, dynamic>>> getEligibleUserQuestionAnswerPairs(String use
       WHERE user_question_answer_pairs.user_uuid = ?
         AND user_question_answer_pairs.in_circulation = 1
         AND user_question_answer_pairs.next_revision_due < ?
+        AND user_question_answer_pairs.flagged = 0
     ''';
     
     List<dynamic> whereArgs = [userUuid, now];
@@ -712,8 +721,8 @@ Future<List<Map<String, dynamic>>> getEligibleUserQuestionAnswerPairs(String use
   }
 }
 
-/// Gets the count of eligible questions with low revision streak (≤ 2) for a specific user.
-/// Stops counting once it reaches 20 results for performance optimization.
+/// Gets the count of eligible questions with revision_score == 0 for a specific user.
+/// Stops counting once it reaches 10 results for performance optimization.
 /// Uses the same eligibility logic as getEligibleUserQuestionAnswerPairs.
 Future<int> getLowRevisionStreakEligibleCount(String userUuid) async {
   try {
@@ -726,12 +735,12 @@ Future<int> getLowRevisionStreakEligibleCount(String userUuid) async {
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    QuizzerLogger.logMessage('Counting low revision streak eligible questions for user: $userUuid...');
+    QuizzerLogger.logMessage('Counting revision_score == 0 eligible questions for user: $userUuid...');
     await _verifyUserQuestionAnswerPairTable(db);
 
     final String now = DateTime.now().toUtc().toIso8601String();
     
-    // Build the query with proper joins and conditions, limiting to 20 results
+    // Build the query with proper joins and conditions, limiting to 10 results
     String sql = '''
       SELECT COUNT(*) as count
       FROM (
@@ -741,7 +750,8 @@ Future<int> getLowRevisionStreakEligibleCount(String userUuid) async {
         WHERE user_question_answer_pairs.user_uuid = ?
           AND user_question_answer_pairs.in_circulation = 1
           AND user_question_answer_pairs.next_revision_due < ?
-          AND user_question_answer_pairs.revision_streak <= 2
+          AND user_question_answer_pairs.revision_streak = 0
+          AND user_question_answer_pairs.flagged = 0
     ''';
     
     List<dynamic> whereArgs = [userUuid, now];
@@ -754,16 +764,16 @@ Future<int> getLowRevisionStreakEligibleCount(String userUuid) async {
     }
     
     // Add ORDER BY and LIMIT for consistent results
-    sql += ' ORDER BY user_question_answer_pairs.next_revision_due ASC LIMIT 20) as subquery';
+    sql += ' ORDER BY user_question_answer_pairs.next_revision_due ASC LIMIT 10) as subquery';
     
-    QuizzerLogger.logMessage('Executing low revision streak count query with ${activeModuleNames.length} active modules');
+    QuizzerLogger.logMessage('Executing revision_score == 0 count query with ${activeModuleNames.length} active modules');
     final List<Map<String, dynamic>> results = await db.rawQuery(sql, whereArgs);
     
     final int count = results.isNotEmpty ? (results.first['count'] as int) : 0;
-    QuizzerLogger.logSuccess('Found $count low revision streak eligible questions for user: $userUuid.');
+    QuizzerLogger.logSuccess('Found $count revision_score == 0 eligible questions for user: $userUuid.');
     return count;
   } catch (e) {
-    QuizzerLogger.logError('Error counting low revision streak eligible questions - $e');
+    QuizzerLogger.logError('Error counting revision_score == 0 eligible questions - $e');
     rethrow;
   } finally {
     getDatabaseMonitor().releaseDatabaseAccess();
@@ -799,6 +809,7 @@ Future<int> getTotalEligibleCount(String userUuid) async {
         WHERE user_question_answer_pairs.user_uuid = ?
           AND user_question_answer_pairs.in_circulation = 1
           AND user_question_answer_pairs.next_revision_due < ?
+          AND user_question_answer_pairs.flagged = 0
     ''';
     
     List<dynamic> whereArgs = [userUuid, now];
@@ -863,6 +874,66 @@ Future<List<Map<String, dynamic>>> getNonCirculatingQuestionsWithDetails(String 
     rethrow;
   } finally {
     getDatabaseMonitor().releaseDatabaseAccess();
+  }
+}
+
+/// Toggles the flagged status of a user question answer pair.
+/// Returns true if the operation was successful, false otherwise.
+Future<bool> toggleUserQuestionFlaggedStatus({
+  required String userUuid,
+  required String questionId,
+  bool disableOutboundSync = false,
+}) async {
+  try {
+    QuizzerLogger.logMessage('Toggling flagged status for User: $userUuid, Q: $questionId');
+    
+    // Get current flagged status (this function handles its own database access)
+    final Map<String, dynamic> currentRecord = await getUserQuestionAnswerPairById(userUuid, questionId);
+    final int currentFlagged = currentRecord['flagged'] as int? ?? 0;
+    final bool newFlaggedStatus = currentFlagged == 0; // Toggle: 0 -> 1, 1 -> 0
+
+    // Get database access for the update operation
+    final db = await getDatabaseMonitor().requestDatabaseAccess();
+    if (db == null) {
+      throw Exception('Failed to acquire database access');
+    }
+    
+    try {
+      await _verifyUserQuestionAnswerPairTable(db);
+
+      // Update the flagged status
+      final Map<String, dynamic> values = {
+        'flagged': newFlaggedStatus ? 1 : 0,
+        'edits_are_synced': 0,
+        'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
+      };
+
+      final int result = await updateRawData(
+        'user_question_answer_pairs',
+        values,
+        'user_uuid = ? AND question_id = ?',
+        [userUuid, questionId],
+        db,
+      );
+
+      // Log based on result
+      if (result > 0) {
+        QuizzerLogger.logSuccess('Toggled flagged status for User: $userUuid, Q: $questionId to ${newFlaggedStatus ? 'flagged' : 'unflagged'} ($result row affected).');
+        // Signal SwitchBoard conditionally
+        if (!disableOutboundSync) {
+          signalOutboundSyncNeeded();
+        }
+        return true;
+      } else {
+        QuizzerLogger.logError('Toggle flagged operation for User: $userUuid, Q: $questionId affected 0 rows. Record might not exist.');
+        return false;
+      }
+    } finally {
+      getDatabaseMonitor().releaseDatabaseAccess();
+    }
+  } catch (e) {
+    QuizzerLogger.logError('Error toggling user question flagged status - $e');
+    return false;
   }
 }
 

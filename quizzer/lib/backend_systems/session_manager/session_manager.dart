@@ -1,6 +1,6 @@
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_profile_table.dart';
 import 'package:quizzer/backend_systems/07_user_question_management/user_question_processes.dart' show validateAllModuleQuestions;
-import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pairs_table.dart' as q_pairs_table;
+import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pair_management/question_answer_pairs_table.dart' as q_pairs_table;
 import 'package:quizzer/backend_systems/03_account_creation/new_user_signup.dart' as account_creation;
 import 'package:quizzer/backend_systems/04_module_management/module_management.dart' as module_management;
 import 'package:quizzer/backend_systems/04_module_management/rename_modules.dart' as rename_modules;
@@ -23,10 +23,11 @@ import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/ou
 import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/media_sync_worker.dart'; // Added import for MediaSyncWorker
 import 'package:quizzer/backend_systems/00_database_manager/review_system/get_send_postgre.dart';
 import 'package:quizzer/backend_systems/00_database_manager/review_system/review_subject_nodes.dart' as subject_review;
+import 'package:quizzer/backend_systems/00_database_manager/review_system/handle_question_flags.dart' as flag_review;
 import 'package:quizzer/backend_systems/00_database_manager/tables/system_data/error_logs_table.dart'; // Direct import
 import 'package:quizzer/backend_systems/00_database_manager/tables/system_data/user_feedback_table.dart'; // Removed alias
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_settings_table.dart' as user_settings_table;
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_question_answer_pairs_table.dart'; // Added for direct access
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_question_answer_pairs_table.dart'; // Added for direct access
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/stat_update_aggregator.dart'; // do not use aliases in the import statements
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_eligible_questions_table.dart'; // Added import for user_stats_eligible_questions_table
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_non_circulating_questions_table.dart'; // Added import for user_stats_non_circulating_questions_table
@@ -39,6 +40,7 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/us
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_average_daily_questions_learned_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_days_left_until_questions_exhaust_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_module_activation_status_table.dart'; // Added import for the new table
+import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pair_management/question_answer_pair_flags_table.dart'; // Added import for flags table
 import 'package:quizzer/backend_systems/00_helper_utils/file_locations.dart';
 import 'package:quizzer/backend_systems/00_database_manager/custom_queries.dart';
 
@@ -1014,6 +1016,53 @@ class SessionManager {
     }
   }
 
+  /// Adds a flag for a question answer pair.
+  /// This creates a temporary local record that will be synced to the server and then deleted.
+  /// Also marks the user's question as flagged to prevent it from being shown until reviewed.
+  /// Returns true if successful, false otherwise.
+  Future<bool> addQuestionFlag({
+    required String questionId,
+    required String flagType,
+    required String flagDescription,
+  }) async {
+    // TODO Write Unit tests for this API
+    try {
+      QuizzerLogger.logMessage('Entering addQuestionFlag()...');
+      
+      // Fail fast if not logged in
+      assert(userId != null, 'User must be logged in to add a question flag.');
+      
+      // Table function handles its own database access and validation
+      final int result = await addQuestionAnswerPairFlag(
+        questionId: questionId,
+        flagType: flagType,
+        flagDescription: flagDescription,
+      );
+      
+      final bool flagAdded = result > 0;
+      if (flagAdded) {
+        // Also toggle the flagged status in the user_question_answer_pairs table
+        final bool flaggedToggled = await toggleUserQuestionFlaggedStatus(
+          userUuid: userId!,
+          questionId: questionId,
+        );
+        
+        if (flaggedToggled) {
+          QuizzerLogger.logMessage('Successfully added question flag for QID: $questionId, type: $flagType and marked as flagged');
+          return true;
+        } else {
+          QuizzerLogger.logWarning('Flag was added but failed to mark question as flagged for QID: $questionId');
+          return false;
+        }
+      } else {
+        QuizzerLogger.logMessage('Failed to add question flag for QID: $questionId, type: $flagType');
+        return false;
+      }
+    } catch (e) {
+      QuizzerLogger.logError('Error in addQuestionFlag - $e');
+      return false;
+    }
+  }
 
 
   // =====================================================================
@@ -1179,6 +1228,79 @@ class SessionManager {
     } else {
       // Call the deny function without the alias
       return denyQuestion(sourceTable, primaryKey);
+    }
+  }
+
+  /// Fetches a flagged question for review from Supabase.
+  /// 
+  /// Returns a map containing both the question data and the flag record.
+  /// The returned map has the following structure:
+  /// {
+  ///   'question_data': {
+  ///     'question_id': String,
+  ///     'question_type': String,
+  ///     'question_elements': List<Map<String, dynamic>>,
+  ///     'answer_elements': List<Map<String, dynamic>>,
+  ///     'options': List<Map<String, dynamic>>?,
+  ///     'correct_option_index': int?,
+  ///     'index_options_that_apply': List<int>?,
+  ///     'correct_order': List<Map<String, dynamic>>?,
+  ///     'module_name': String,
+  ///     'citation': String?,
+  ///     'concepts': String?,
+  ///     'subjects': String?,
+  ///     // ... other question fields
+  ///   },
+  ///   'report': {
+  ///     'question_id': String,
+  ///     'flag_type': String,
+  ///     'flag_description': String?
+  ///   }
+  /// }
+  /// 
+  /// Returns null if no flagged questions are available for review.
+  Future<Map<String, dynamic>?> getFlaggedQuestionForReview() async {
+    try {
+      QuizzerLogger.logMessage('SessionManager: Requesting a flagged question for review...');
+      
+      final result = await flag_review.getFlaggedQuestionForReview();
+      
+      QuizzerLogger.logMessage('SessionManager: Successfully fetched flagged question for review');
+      return result;
+    } catch (e) {
+      QuizzerLogger.logError('SessionManager: Error fetching flagged question for review - $e');
+      rethrow;
+    }
+  }
+
+  /// Submits a review decision for a flagged question.
+  /// 
+  /// Args:
+  ///   questionId: The ID of the question being reviewed
+  ///   action: Either 'edit' or 'delete'
+  ///   updatedQuestionData: Required for both edit and delete actions. For edit actions, contains the updated question data. For delete actions, contains the original question data to be stored in the old_data_record field.
+  /// 
+  /// Returns:
+  ///   true if the review was successfully submitted, false otherwise
+  Future<bool> submitQuestionFlagReview({
+    required String questionId,
+    required String action, // 'edit' or 'delete'
+    required Map<String, dynamic> updatedQuestionData,
+  }) async {
+    try {
+      QuizzerLogger.logMessage('SessionManager: Submitting question flag review for question: $questionId, action: $action');
+      
+      final result = await flag_review.submitQuestionReview(
+        questionId: questionId,
+        action: action,
+        updatedQuestionData: updatedQuestionData,
+      );
+      
+      QuizzerLogger.logMessage('SessionManager: Successfully submitted question flag review');
+      return result;
+    } catch (e) {
+      QuizzerLogger.logError('SessionManager: Error submitting question flag review - $e');
+      rethrow;
     }
   }
 

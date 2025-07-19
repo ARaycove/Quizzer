@@ -5,7 +5,7 @@ import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/in
 import 'package:quizzer/backend_systems/10_switch_board/switch_board.dart';
 import 'package:quizzer/backend_systems/10_switch_board/sb_sync_worker_signals.dart';
 import 'package:quizzer/backend_systems/02_login_authentication/login_initialization.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pairs_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pair_management/question_answer_pairs_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/academic_archive.dart/subject_details_table.dart';
 import '../test_helpers.dart';
 import 'dart:io';

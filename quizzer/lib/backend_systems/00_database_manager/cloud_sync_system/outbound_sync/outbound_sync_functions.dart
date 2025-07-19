@@ -1,9 +1,10 @@
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart'; // To get Supabase client
-import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pairs_table.dart'; // Import for table functions
+import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pair_management/question_answer_pairs_table.dart'; // Import for table functions
 import 'package:quizzer/backend_systems/00_database_manager/tables/system_data/login_attempts_table.dart'; // Import for login attempts table functions
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_attempts_table.dart'; // Import for attempt table functions
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_profile_table.dart'; // Import for user profile table functions
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_question_answer_pairs_table.dart'; // Import for UserQuestionAnswerPairs table functions
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_question_answer_pairs_table.dart'; // Import for UserQuestionAnswerPairs table functions
+import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pair_management/question_answer_pair_flags_table.dart'; // Import for flags table functions
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart'; // Import Logger
 import 'package:supabase/supabase.dart'; // Import for PostgrestException & SupabaseClient
 import 'package:quizzer/backend_systems/00_database_manager/tables/system_data/error_logs_table.dart'; // Added for syncErrorLogs
@@ -1494,6 +1495,56 @@ Future<void> syncUserModuleActivationStatus() async {
     QuizzerLogger.logMessage('Finished sync attempt for UserModuleActivationStatus.');
   } catch (e) {
     QuizzerLogger.logError('syncUserModuleActivationStatus: Error - $e');
+    rethrow;
+  }
+}
+
+// ==========================================
+// Outbound Sync - Question Answer Pair Flags
+// ==========================================
+
+/// Fetches unsynced question answer pair flags, pushes them to Supabase, and deletes them locally on success.
+Future<void> syncQuestionAnswerPairFlags() async {
+  try {
+    QuizzerLogger.logMessage('Starting sync for QuestionAnswerPairFlags...');
+
+    // Fetch records needing sync
+    final List<Map<String, dynamic>> unsyncedRecords = await getUnsyncedQuestionAnswerPairFlags();
+
+    if (unsyncedRecords.isEmpty) {
+      QuizzerLogger.logMessage('No unsynced QuestionAnswerPairFlags found to sync.');
+      return;
+    }
+
+    QuizzerLogger.logMessage('Found ${unsyncedRecords.length} unsynced QuestionAnswerPairFlags to process.');
+
+    const String tableName = 'question_answer_pair_flags';
+
+    for (final record in unsyncedRecords) {
+      final String? questionId = record['question_id'] as String?;
+      final String? flagType = record['flag_type'] as String?;
+
+      if (questionId == null || flagType == null) {
+        QuizzerLogger.logError('Skipping unsynced question answer pair flag record due to missing primary key components: $record');
+        continue;
+      }
+
+      // Attempt to push the record to Supabase
+      QuizzerLogger.logValue('Preparing to push QuestionAnswerPairFlag (Question: $questionId, Type: $flagType) to $tableName');
+      final bool pushSuccess = await pushRecordToSupabase(tableName, record);
+
+      if (pushSuccess) {
+        QuizzerLogger.logSuccess('Push successful for QuestionAnswerPairFlag (Question: $questionId, Type: $flagType). Deleting local record...');
+        // If Supabase push succeeds, delete the local record (sync-and-delete workflow)
+        await deleteQuestionAnswerPairFlag(questionId, flagType);
+      } else {
+        QuizzerLogger.logWarning('Push FAILED for QuestionAnswerPairFlag (Question: $questionId, Type: $flagType). Record will remain for next sync attempt.');
+      }
+    }
+
+    QuizzerLogger.logMessage('Finished sync attempt for QuestionAnswerPairFlags.');
+  } catch (e) {
+    QuizzerLogger.logError('syncQuestionAnswerPairFlags: Error - $e');
     rethrow;
   }
 }

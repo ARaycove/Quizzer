@@ -111,6 +111,8 @@ class OutboundSyncWorker {
   // --- Core Sync Logic (Refactored) ---
   /// The core synchronization logic.
   Future<void> _performSync() async {
+    // TODO Performance Refactor
+    // All sync functions should be grouped, get all records that need synced and group them into one long list, then using the unified push record function, group the pushes and send them all in batches ASYNC style.
     QuizzerLogger.logMessage('OutboundSyncWorker: Starting sync cycle.');
 
     // 1. Check connectivity
@@ -134,49 +136,52 @@ class OutboundSyncWorker {
     // 6. Check and Sync UserQuestionAnswerPairs
     await syncUserQuestionAnswerPairs();
     
-    // 7. Check and Sync Error Logs
+    // 7. Check and Sync Question Answer Pair Flags
+    await syncQuestionAnswerPairFlags();
+    
+    // 8. Check and Sync Error Logs
     await syncErrorLogs();
     
-    // 8. Check and Sync User Settings
+    // 9. Check and Sync User Settings
     await syncUserSettings();
     
-    // 9. Check and Sync Modules
+    // 10. Check and Sync Modules
     await syncModules();
 
-    // 10. Check and Sync User Module Activation Status
+    // 11. Check and Sync User Module Activation Status
     await syncUserModuleActivationStatus();
 
-    // 11. Check and Sync User Feedback
+    // 12. Check and Sync User Feedback
     await syncUserFeedback();
     
-    // 12. Check and Sync User Stats Eligible Questions
+    // 13. Check and Sync User Stats Eligible Questions
     await syncUserStatsEligibleQuestions();
 
-    // 13. Check and Sync User Stats Non-Circulating Questions
+    // 14. Check and Sync User Stats Non-Circulating Questions
     await syncUserStatsNonCirculatingQuestions();
 
-    // 14. Check and Sync User Stats In Circulation Questions
+    // 15. Check and Sync User Stats In Circulation Questions
     await syncUserStatsInCirculationQuestions();
 
-    // 15. Check and Sync User Stats Revision Streak Sum
+    // 16. Check and Sync User Stats Revision Streak Sum
     await syncUserStatsRevisionStreakSum();
     
-    // 16. Check and Sync User Stats Total User Question Answer Pairs
+    // 17. Check and Sync User Stats Total User Question Answer Pairs
     await syncUserStatsTotalUserQuestionAnswerPairs();
 
-    // 17. Check and Sync User Stats Average Questions Shown Per Day
+    // 18. Check and Sync User Stats Average Questions Shown Per Day
     await syncUserStatsAverageQuestionsShownPerDay();
 
-    // 18. Check and Sync User Stats Total Questions Answered
+    // 19. Check and Sync User Stats Total Questions Answered
     await syncUserStatsTotalQuestionsAnswered();
 
-    // 19. Check and Sync User Stats Daily Questions Answered
+    // 20. Check and Sync User Stats Daily Questions Answered
     await syncUserStatsDailyQuestionsAnswered();
 
-    // 20. Check and Sync User Stats Days Left Until Questions Exhaust
+    // 21. Check and Sync User Stats Days Left Until Questions Exhaust
     await syncUserStatsDaysLeftUntilQuestionsExhaust();
 
-    // 21. Check and Sync User Stats Average Daily Questions Learned
+    // 22. Check and Sync User Stats Average Daily Questions Learned
     await syncUserStatsAverageDailyQuestionsLearned();
 
     QuizzerLogger.logMessage('All outbound sync functions completed.');

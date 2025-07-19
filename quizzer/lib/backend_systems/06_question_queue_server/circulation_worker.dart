@@ -4,8 +4,8 @@ import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 // Caches
 // Table Access
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_question_answer_pairs_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pairs_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_question_answer_pairs_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pair_management/question_answer_pairs_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_profile_table.dart';
 // Workers
 import 'package:quizzer/backend_systems/10_switch_board/switch_board.dart'; // Import SwitchBoard
@@ -131,20 +131,15 @@ class CirculationWorker {
         return false;
       }
 
-      // Use the two optimized database queries
-      final int lowStreakCount = await getLowRevisionStreakEligibleCount(userId);
-      final int totalEligibleCount = await getTotalEligibleCount(userId);
+      // Use the optimized database query for revision_score == 0 questions
+      final int revisionScoreZeroCount = await getLowRevisionStreakEligibleCount(userId);
 
-      // Condition 1: Less than 20 eligible questions with revision streak ≤ 2
-      final bool lowStreakCondition = lowStreakCount < 20;
-      QuizzerLogger.logMessage("lowStreakCondition evaluates to -> $lowStreakCondition (count: $lowStreakCount)");
-
-      // Condition 2: Less than 100 total eligible questions
-      final bool lowTotalCondition = totalEligibleCount < 100;
-      QuizzerLogger.logMessage("lowTotalCondition evaluates to -> $lowTotalCondition (count: $totalEligibleCount)");
+      // Condition: Less than 10 eligible questions with revision_score == 0
+      final bool lowRevisionScoreCondition = revisionScoreZeroCount < 10;
+      QuizzerLogger.logMessage("lowRevisionScoreCondition evaluates to -> $lowRevisionScoreCondition (count: $revisionScoreZeroCount)");
       
-      // Return true if either condition is met (we need more questions in circulation)
-      final bool shouldAdd = lowStreakCondition || lowTotalCondition;
+      // Return true if condition is met (we need more questions in circulation)
+      final bool shouldAdd = lowRevisionScoreCondition;
       QuizzerLogger.logMessage("shouldAdd evaluates to -> $shouldAdd");
       return shouldAdd;
     } catch (e) {

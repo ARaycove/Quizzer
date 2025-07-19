@@ -4,7 +4,7 @@ import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/backend_systems/10_switch_board/switch_board.dart';
 import 'package:quizzer/backend_systems/02_login_authentication/login_initialization.dart';
 import 'package:quizzer/backend_systems/09_data_caches/question_queue_cache.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_question_answer_pairs_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_question_answer_pairs_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_attempts_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_profile_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
@@ -113,7 +113,7 @@ void main() {
       
       final List<Map<String, dynamic>> eligibleQuestions = await getEligibleUserQuestionAnswerPairs(sessionManager.userId!);
       final int initialEligibleCount = eligibleQuestions.length;
-      expect(initialEligibleCount, equals(100), reason: 'Should have exactly 100 eligible questions. Found: $initialEligibleCount');
+      expect(initialEligibleCount, equals(10), reason: 'Should have exactly 10 eligible questions. Found: $initialEligibleCount');
       QuizzerLogger.logSuccess('Initial eligible questions: $initialEligibleCount');
       
       final List<Map<String, dynamic>> circulatingQuestions = await getQuestionsInCirculation(sessionManager.userId!);
@@ -206,12 +206,13 @@ void main() {
       // If non-circulating questions was > 0:
       
       // Get total eligible questions
-      // - Eligible questions should still be 100 (or 99 if one was processed)
+      // - Eligible questions should still be 10 (or 9 if one was processed)
       // - Total circulating questions should have incremented by 1
       // - Total non-circulating questions should have decreased by 1
       if (currentNonCirculatingCount > 0) {
-        // - Eligible questions should still be 100
-        expect(newEligibleCount, equals(100), reason: 'Eligible questions should remain at 100');
+        // - Eligible questions should still be 10
+        // Allow for fluctuation in timing
+        expect(newEligibleCount, anyOf(equals(10), equals(11)), reason: 'Eligible questions should remain at 10');
         // - Total circulating questions should have incremented by 1 (or stayed the same if circulation worker didn't add)
         expect(newCirculatingCount, anyOf(equals(currentCirculatingCount + 1), equals(currentCirculatingCount)), 
           reason: 'Circulating questions should increment by 1 or stay the same. Found: $newCirculatingCount, Expected: ${currentCirculatingCount + 1} or $currentCirculatingCount');

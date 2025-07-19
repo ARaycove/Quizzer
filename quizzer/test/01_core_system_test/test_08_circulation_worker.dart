@@ -7,7 +7,7 @@ import 'package:quizzer/backend_systems/06_question_queue_server/circulation_wor
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/modules_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_module_activation_status_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_question_answer_pairs_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_question_answer_pairs_table.dart';
 import '../test_helpers.dart';
 import 'dart:io';
 
@@ -130,17 +130,17 @@ void main() {
         await switchBoard.onCirculationWorkerFinished.first;
         QuizzerLogger.logSuccess('CirculationWorker finished signal received');
 
-        // There should be exactly 100 eligible questions in the user_question_answer_pairs table
+        // There should be exactly 10 eligible questions in the user_question_answer_pairs table
         QuizzerLogger.logMessage('Checking eligible questions count...');
         final List<Map<String, dynamic>> eligibleQuestions = await getEligibleUserQuestionAnswerPairs(sessionManager.userId!);
         QuizzerLogger.logMessage('DEBUG: Found ${eligibleQuestions.length} eligible questions');
-        expect(eligibleQuestions.length, equals(100), reason: 'Should have exactly 100 eligible questions');
+        expect(eligibleQuestions.length, equals(10), reason: 'Should have exactly 10 eligible questions');
 
-        // Total number of circulating questions should be 100
+        // Total number of circulating questions should be 10
         QuizzerLogger.logMessage('Checking circulating questions count...');
         final List<Map<String, dynamic>> circulatingQuestions = await getQuestionsInCirculation(sessionManager.userId!);
         QuizzerLogger.logMessage('DEBUG: Found ${circulatingQuestions.length} circulating questions');
-        expect(circulatingQuestions.length, equals(100), reason: 'Should have exactly 100 circulating questions');
+        expect(circulatingQuestions.length, equals(10), reason: 'Should have exactly 10 circulating questions');
         
         // Stop the CirculationWorker
         QuizzerLogger.logMessage('Stopping CirculationWorker...');
@@ -187,14 +187,14 @@ void main() {
         
         // Log test expectations vs actual results
         QuizzerLogger.logMessage('🎯 TEST EXPECTATIONS:');
-        QuizzerLogger.logMessage('   • Expected Eligible Questions: 100');
-        QuizzerLogger.logMessage('   • Expected Circulating Questions: 100');
+        QuizzerLogger.logMessage('   • Expected Eligible Questions: 10');
+        QuizzerLogger.logMessage('   • Expected Circulating Questions: 10');
         QuizzerLogger.logMessage('   • Actual Eligible Questions: ${finalEligibleQuestions.length}');
         QuizzerLogger.logMessage('   • Actual Circulating Questions: ${finalCirculatingQuestions.length}');
         
         // Determine test success
-        final bool eligibleQuestionsCorrect = finalEligibleQuestions.length == 100;
-        final bool circulatingQuestionsCorrect = finalCirculatingQuestions.length == 100;
+        final bool eligibleQuestionsCorrect = finalEligibleQuestions.length == 10;
+        final bool circulatingQuestionsCorrect = finalCirculatingQuestions.length == 10;
         final bool allModulesActive = activeModules == totalModules;
         
         if (eligibleQuestionsCorrect && circulatingQuestionsCorrect && allModulesActive) {
@@ -202,10 +202,10 @@ void main() {
         } else {
           QuizzerLogger.logError('❌ TEST FAILED: Some expectations not met');
           if (!eligibleQuestionsCorrect) {
-            QuizzerLogger.logError('   • Eligible questions count mismatch: expected 100, got ${finalEligibleQuestions.length}');
+            QuizzerLogger.logError('   • Eligible questions count mismatch: expected 10, got ${finalEligibleQuestions.length}');
           }
           if (!circulatingQuestionsCorrect) {
-            QuizzerLogger.logError('   • Circulating questions count mismatch: expected 100, got ${finalCirculatingQuestions.length}');
+            QuizzerLogger.logError('   • Circulating questions count mismatch: expected 10, got ${finalCirculatingQuestions.length}');
           }
           if (!allModulesActive) {
             QuizzerLogger.logError('   • Not all modules are active: $activeModules/$totalModules');

@@ -2,7 +2,7 @@ import 'package:quizzer/backend_systems/06_question_queue_server/circulation_wor
 import 'package:quizzer/backend_systems/06_question_queue_server/question_selection_worker.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/09_data_caches/question_queue_cache.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_question_answer_pairs_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_question_answer_pairs_table.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 
 /// Starts all question queue server workers in the correct order
