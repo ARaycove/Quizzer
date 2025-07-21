@@ -29,37 +29,43 @@ class _AdminPanelPageState extends State<AdminPanelPage> {
         title: 'Admin Panel',
         showHomeButton: true,
       ),
-      body: Column(
+      body: Stack(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Expanded(
-                child: _buildPanelButton(
-                  label: 'Review add/edit',
-                  panel: AdminPanel.review,
+          // Main content area
+          Positioned.fill(
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Expanded(
+                      child: _buildPanelButton(
+                        label: 'Review add/edit',
+                        panel: AdminPanel.review,
+                      ),
+                    ),
+                    AppTheme.sizedBoxSml,
+                    Expanded(
+                      child: _buildPanelButton(
+                        label: 'Review Reported Questions',
+                        panel: AdminPanel.reviewReported,
+                      ),
+                    ),
+                    AppTheme.sizedBoxSml,
+                    Expanded(
+                      child: _buildPanelButton(
+                        label: 'Review Subjects',
+                        panel: AdminPanel.reviewSubjects,
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-              AppTheme.sizedBoxSml,
-              Expanded(
-                child: _buildPanelButton(
-                  label: 'Review Reported Questions',
-                  panel: AdminPanel.reviewReported,
+                const Divider(),
+                Expanded(
+                  child: _buildCurrentPanelWidget(),
                 ),
-              ),
-              AppTheme.sizedBoxSml,
-              Expanded(
-                child: _buildPanelButton(
-                  label: 'Review Subjects',
-                  panel: AdminPanel.reviewSubjects,
-                ),
-              ),
-            ],
-          ),
-          const Divider(),
-
-          Expanded(
-            child: _buildCurrentPanelWidget(),
+              ],
+            ),
           ),
         ],
       ),

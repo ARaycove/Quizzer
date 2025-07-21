@@ -13,6 +13,7 @@ class ReviewReportedQuestionsPanelWidget extends StatefulWidget {
 
 class _ReviewReportedQuestionsPanelWidgetState extends State<ReviewReportedQuestionsPanelWidget> {
   final SessionManager _session = SessionManager();
+  final ScrollController _scrollController = ScrollController();
   bool _isLoading = true;
   String? _errorMessage;
   Map<String, dynamic>? _flaggedQuestion;
@@ -22,6 +23,12 @@ class _ReviewReportedQuestionsPanelWidgetState extends State<ReviewReportedQuest
   void initState() {
     super.initState();
     _fetchFlaggedQuestion();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   Future<void> _fetchFlaggedQuestion() async {
@@ -103,83 +110,86 @@ class _ReviewReportedQuestionsPanelWidgetState extends State<ReviewReportedQuest
     final questionType = questionData['question_type'] as String? ?? 'error';
     final correctOptionIndex = questionData['correct_option_index'] as int?;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        // Top Row: flag_type and flag_description
-        IntrinsicHeight(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return SingleChildScrollView(
+      controller: _scrollController,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Top Row: flag_type and flag_description
+          IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  flex: 1,
+                  child: Card(
+                    child: Container(
+                      alignment: Alignment.centerLeft,
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                      child: Text('Type: ${report['flag_type']}'),
+                    ),
+                  ),
+                ),
+                AppTheme.sizedBoxMed,
+                Expanded(
+                  flex: 3,
+                  child: Card(
+                    child: Container(
+                      alignment: Alignment.centerLeft,
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                      child: Text('Description: ${report['flag_description'] ?? ""}'),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Edit button row (aligned right)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              Expanded(
-                flex: 1,
-                child: Card(
-                  child: Container(
-                    alignment: Alignment.centerLeft,
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-                    child: Text('Type: ${report['flag_type']}'),
-                  ),
-                ),
-              ),
-              AppTheme.sizedBoxMed,
-              Expanded(
-                flex: 3,
-                child: Card(
-                  child: Container(
-                    alignment: Alignment.centerLeft,
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-                    child: Text('Description: ${report['flag_description'] ?? ""}'),
-                  ),
-                ),
+              IconButton(
+                icon: const Icon(Icons.edit),
+                tooltip: 'Edit Question',
+                onPressed: _handleEdit,
               ),
             ],
           ),
-        ),
-        // Edit button row (aligned right)
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            IconButton(
-              icon: const Icon(Icons.edit),
-              tooltip: 'Edit Question',
-              onPressed: _handleEdit,
-            ),
-          ],
-        ),
-        AppTheme.sizedBoxMed,
-        // Live Preview
-        LivePreviewWidget(
-          questionType: questionType,
-          questionElements: (questionData['question_elements'] as List<dynamic>? ?? []).map((e) => Map<String, dynamic>.from(e as Map)).toList(),
-          answerElements: (questionData['answer_elements'] as List<dynamic>? ?? []).map((e) => Map<String, dynamic>.from(e as Map)).toList(),
-          options: (questionData['options'] as List<dynamic>? ?? []).map((e) => Map<String, dynamic>.from(e as Map)).toList(),
-          correctOptionIndexMC: questionData['correct_option_index'],
-          correctIndicesSATA: (questionData['index_options_that_apply'] as List<dynamic>? ?? []).map((e) => e as int).toList(),
-          isCorrectAnswerTrueTF: (questionType == 'true_false')
-              ? (questionData['correct_option_index'] == 0)
-              : null,
-        ),
-        AppTheme.sizedBoxMed,
-        // Bottom Row: skip, delete, submit edit
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            ElevatedButton(
-              onPressed: _handleSkip,
-              child: const Text('Skip'),
-            ),
-            ElevatedButton(
-              onPressed: () => _handleDecision('delete'),
-              child: const Text('Delete'),
-            ),
-            ElevatedButton(
-              onPressed: () => _handleDecision('edit'),
-              child: const Text('Submit Edit'),
-            ),
-          ],
-        ),
-        AppTheme.sizedBoxLrg,
-      ],
+          AppTheme.sizedBoxMed,
+          // Live Preview
+          LivePreviewWidget(
+            questionType: questionType,
+            questionElements: (questionData['question_elements'] as List<dynamic>? ?? []).map((e) => Map<String, dynamic>.from(e as Map)).toList(),
+            answerElements: (questionData['answer_elements'] as List<dynamic>? ?? []).map((e) => Map<String, dynamic>.from(e as Map)).toList(),
+            options: (questionData['options'] as List<dynamic>? ?? []).map((e) => Map<String, dynamic>.from(e as Map)).toList(),
+            correctOptionIndexMC: questionData['correct_option_index'],
+            correctIndicesSATA: (questionData['index_options_that_apply'] as List<dynamic>? ?? []).map((e) => e as int).toList(),
+            isCorrectAnswerTrueTF: (questionType == 'true_false')
+                ? (questionData['correct_option_index'] == 0)
+                : null,
+          ),
+          AppTheme.sizedBoxMed,
+          // Bottom Row: skip, delete, submit edit
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              ElevatedButton(
+                onPressed: _handleSkip,
+                child: const Text('Skip'),
+              ),
+              ElevatedButton(
+                onPressed: () => _handleDecision('delete'),
+                child: const Text('Delete'),
+              ),
+              ElevatedButton(
+                onPressed: () => _handleDecision('edit'),
+                child: const Text('Edit'),
+              ),
+            ],
+          ),
+          AppTheme.sizedBoxLrg,
+        ],
+      ),
     );
   }
 }

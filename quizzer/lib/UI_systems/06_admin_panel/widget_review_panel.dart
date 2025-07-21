@@ -218,10 +218,14 @@ class _ReviewPanelWidgetState extends State<ReviewPanelWidget> {
         ),
         // --- END ADDED ---
         AppTheme.sizedBoxMed,
-        // Bottom Bar: Deny/Approve Buttons
+        // Bottom Bar: Skip/Deny/Approve Buttons
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
+            ElevatedButton(
+              onPressed: _fetchNextQuestion,
+              child: const Text("Skip"),
+            ),
             ElevatedButton(
               // Use internal _denyQuestion method
               onPressed: _denyQuestion,
