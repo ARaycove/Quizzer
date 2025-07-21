@@ -104,7 +104,7 @@ class AppTheme {
     ),
     
     // Card Theme
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       color: const Color(0xFF1E2A3A), // Keep dark for contrast
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12.0),
@@ -113,7 +113,7 @@ class AppTheme {
     ),
     
     // Dialog Theme
-    dialogTheme: DialogTheme(
+    dialogTheme: DialogThemeData(
       backgroundColor: const Color(0xFF1E2A3A),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12.0),
