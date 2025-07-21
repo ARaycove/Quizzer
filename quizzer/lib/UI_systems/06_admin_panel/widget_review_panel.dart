@@ -16,6 +16,7 @@ class ReviewPanelWidget extends StatefulWidget {
 
 class _ReviewPanelWidgetState extends State<ReviewPanelWidget> {
   final SessionManager _session = SessionManager();
+  final ScrollController _scrollController = ScrollController();
 
   // Internal state variables
   Map<String, dynamic>? _currentData;
@@ -30,6 +31,12 @@ class _ReviewPanelWidgetState extends State<ReviewPanelWidget> {
   void initState() {
     super.initState();
     _fetchNextQuestion();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   Future<void> _fetchNextQuestion() async {
@@ -174,71 +181,90 @@ class _ReviewPanelWidgetState extends State<ReviewPanelWidget> {
     // Key for LivePreviewWidget to force rebuilds
     final previewKey = ValueKey('review-preview-${displayData['question_id']}-$_previewRebuildCounter');
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        // Top Bar: Title + Edit Button
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text("Live Preview"),
-            ElevatedButton(
-              // Use internal _editQuestion method
-              onPressed: _editQuestion, 
-              child: const Text("Edit"),
-            ),
-          ],
-        ),
-        AppTheme.sizedBoxMed,
-        // Live Preview Area
-        LivePreviewWidget(
-          key: previewKey,
-          questionType: displayData['question_type'] as String? ?? 'error',
-          questionElements: (displayData['question_elements'] as List<dynamic>? ?? []).map((e) => Map<String, dynamic>.from(e as Map)).toList(),
-          answerElements: (displayData['answer_elements'] as List<dynamic>? ?? []).map((e) => Map<String, dynamic>.from(e as Map)).toList(),
-          options: (displayData['options'] as List<dynamic>? ?? []).map((e) => Map<String, dynamic>.from(e as Map)).toList(),
-          correctOptionIndexMC: displayData['correct_option_index'] as int?,
-          correctIndicesSATA: (displayData['index_options_that_apply'] as List<dynamic>? ?? []).map((e) => e as int).toList(),
-          isCorrectAnswerTrueTF: (displayData['question_type'] == 'true_false')
-              ? (displayData['correct_option_index'] == 0)
-              : null,
-        ),
-        // --- ADDED: Display Module Name ---
-        AppTheme.sizedBoxSml,
-        Row(
-          children: [
-            const Text('Module Name: '),
-            Expanded(
-              child: Text(
-                displayData['module_name'] as String? ?? 'N/A',
-                overflow: TextOverflow.ellipsis,
+    return SingleChildScrollView(
+      controller: _scrollController,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Top Bar: Title + Edit Button
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text("Live Preview"),
+              ElevatedButton(
+                // Use internal _editQuestion method
+                onPressed: _editQuestion, 
+                child: const Text("Edit"),
               ),
-            ),
-          ],
-        ),
-        // --- END ADDED ---
-        AppTheme.sizedBoxMed,
-        // Bottom Bar: Skip/Deny/Approve Buttons
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            ElevatedButton(
-              onPressed: _fetchNextQuestion,
-              child: const Text("Skip"),
-            ),
-            ElevatedButton(
-              // Use internal _denyQuestion method
-              onPressed: _denyQuestion,
-              child: const Text("Deny"),
-            ),
-            ElevatedButton(
-              // Use internal _approveQuestion method
-              onPressed: _approveQuestion, 
-              child: const Text("Approve"),
-            ),
-          ],
-        ),
-      ],
+            ],
+          ),
+          AppTheme.sizedBoxMed,
+          // Live Preview Area
+          LivePreviewWidget(
+            key: previewKey,
+            questionType: displayData['question_type'] as String? ?? 'error',
+            questionElements: (displayData['question_elements'] as List<dynamic>? ?? []).map((e) => Map<String, dynamic>.from(e as Map)).toList(),
+            answerElements: (displayData['answer_elements'] as List<dynamic>? ?? []).map((e) => Map<String, dynamic>.from(e as Map)).toList(),
+            options: (displayData['options'] as List<dynamic>? ?? []).map((e) => Map<String, dynamic>.from(e as Map)).toList(),
+            correctOptionIndexMC: displayData['correct_option_index'] as int?,
+            correctIndicesSATA: (displayData['index_options_that_apply'] as List<dynamic>? ?? []).map((e) => e as int).toList(),
+            isCorrectAnswerTrueTF: (displayData['question_type'] == 'true_false')
+                ? (displayData['correct_option_index'] == 0)
+                : null,
+          ),
+          // --- ADDED: Display Module Name ---
+          AppTheme.sizedBoxSml,
+          Row(
+            children: [
+              const Text('Module Name: '),
+              Expanded(
+                child: Text(
+                  displayData['module_name'] as String? ?? 'N/A',
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          // --- END ADDED ---
+          AppTheme.sizedBoxMed,
+          // Bottom Bar: Skip/Deny/Approve Buttons
+          Row(
+            children: [
+              Expanded(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 100),
+                  child: ElevatedButton(
+                    onPressed: _fetchNextQuestion,
+                    child: const Text("Skip"),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 100),
+                  child: ElevatedButton(
+                    // Use internal _denyQuestion method
+                    onPressed: _denyQuestion,
+                    child: const Text("Deny"),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 100),
+                  child: ElevatedButton(
+                    // Use internal _approveQuestion method
+                    onPressed: _approveQuestion, 
+                    child: const Text("Approve"),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

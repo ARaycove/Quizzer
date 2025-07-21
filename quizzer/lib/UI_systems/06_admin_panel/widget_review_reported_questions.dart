@@ -171,19 +171,35 @@ class _ReviewReportedQuestionsPanelWidgetState extends State<ReviewReportedQuest
           AppTheme.sizedBoxMed,
           // Bottom Row: skip, delete, submit edit
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              ElevatedButton(
-                onPressed: _handleSkip,
-                child: const Text('Skip'),
+              Expanded(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 100),
+                  child: ElevatedButton(
+                    onPressed: _handleSkip,
+                    child: const Text('Skip'),
+                  ),
+                ),
               ),
-              ElevatedButton(
-                onPressed: () => _handleDecision('delete'),
-                child: const Text('Delete'),
+              const SizedBox(width: 8),
+              Expanded(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 100),
+                  child: ElevatedButton(
+                    onPressed: () => _handleDecision('delete'),
+                    child: const Text('Delete'),
+                  ),
+                ),
               ),
-              ElevatedButton(
-                onPressed: () => _handleDecision('edit'),
-                child: const Text('Edit'),
+              const SizedBox(width: 8),
+              Expanded(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 100),
+                  child: ElevatedButton(
+                    onPressed: () => _handleDecision('edit'),
+                    child: const Text('Edit'),
+                  ),
+                ),
               ),
             ],
           ),
