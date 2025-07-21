@@ -16,7 +16,7 @@ import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:logging/logging.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart'; // Import logging package
 import 'package:quizzer/UI_systems/10_stats_page/stats_page.dart';
-import 'package:quizzer/UI_systems/color_wheel.dart';
+import 'package:quizzer/app_theme.dart';
 
 // Global Key for NavigatorState - MOVED HERE
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -241,24 +241,7 @@ class _QuizzerAppState extends State<QuizzerApp> {
     return MaterialApp(
       navigatorKey: widget.navigatorKey,
       title: 'Quizzer',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        useMaterial3: true,
-        brightness: Brightness.dark,
-        scaffoldBackgroundColor: ColorWheel.primaryBackground,
-        textTheme: const TextTheme(
-          bodyLarge: ColorWheel.defaultText,
-          bodyMedium: ColorWheel.defaultText,
-          bodySmall: ColorWheel.defaultText,
-        ),
-        inputDecorationTheme: const InputDecorationTheme(
-          filled: true,
-          fillColor: ColorWheel.secondaryBackground,
-        ),
-        textSelectionTheme: const TextSelectionThemeData(
-          cursorColor: Colors.white,
-        ),
-      ),
+      theme: AppTheme.darkTheme,
       debugShowCheckedModeBanner: false,
       initialRoute: '/login',
       routes: {

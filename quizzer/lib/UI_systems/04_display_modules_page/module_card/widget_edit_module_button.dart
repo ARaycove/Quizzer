@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:quizzer/UI_systems/color_wheel.dart';
 
 /// A custom button for editing module metadata
 class EditModuleButton extends StatelessWidget {
@@ -19,14 +18,8 @@ class EditModuleButton extends StatelessWidget {
       height: elementHeight25px, // Apply max height
       child: IconButton(
         onPressed: onPressed,
-        icon: const Icon(
-          Icons.edit_outlined,
-          color: ColorWheel.primaryText, // Use ColorWheel
-        ),
+        icon: const Icon(Icons.edit_outlined),
         tooltip: 'Edit Module',
-        padding: EdgeInsets.zero,
-        constraints: const BoxConstraints(),
-        splashRadius: 20,
       ),
     );
   }

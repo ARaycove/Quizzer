@@ -3,8 +3,8 @@ import 'dart:math';
 import 'package:collection/collection.dart'; // For ListEquality
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
-import 'package:quizzer/UI_systems/color_wheel.dart';
 import 'package:quizzer/UI_systems/global_widgets/question_answer_element.dart';
+import 'package:quizzer/app_theme.dart';
 
 // ==========================================
 //      Sort Order Question Widget
@@ -229,7 +229,7 @@ class _SortOrderQuestionWidgetState extends State<SortOrderQuestionWidget> {
        }); 
        if(mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error submitting: ${e.toString()}'), backgroundColor: ColorWheel.buttonError),
+            SnackBar(content: Text('Error submitting: ${e.toString()}')),
           );
        }
     }
@@ -250,217 +250,178 @@ class _SortOrderQuestionWidgetState extends State<SortOrderQuestionWidget> {
 
     // Removed isLoading check as data is passed in constructor
      if (_currentUserOrderedOptions.isEmpty && questionElements.isEmpty) {
-        return const Center(child: Text("No question data provided.", style: ColorWheel.secondaryTextStyle));
+        return const Center(child: Text("No question data provided."));
     }
     
     // Determine if interactions should be enabled
     final bool interactionsEnabled = !widget.isDisabled && !_isAnswerSubmitted;
 
+    // PRESERVE functional feedback colors for correctness states
+    const Color correctColor = Colors.green;
+    const Color incorrectColor = Colors.red;
+    final Color hoverColor = Theme.of(context).colorScheme.primary;
+
     return SingleChildScrollView(
-      child: Padding(
-        padding: ColorWheel.standardPadding,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // --- Question Elements --- (Uses passed-in data)
-            Container(
-              padding: ColorWheel.standardPadding,
-              decoration: BoxDecoration(color: ColorWheel.secondaryBackground, borderRadius: ColorWheel.cardBorderRadius),
-              child: ElementRenderer(elements: questionElements),
-            ),
-            const SizedBox(height: ColorWheel.majorSectionSpacing),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // --- Question Elements --- (Uses passed-in data)
+          ElementRenderer(elements: questionElements),
+          AppTheme.sizedBoxLrg,
 
-            // --- Reorderable Options List --- (Uses local state)
-            ReorderableListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(), // Prevent nested scrolling
-              itemCount: _currentUserOrderedOptions.length,
-              buildDefaultDragHandles: false, // Use custom handle logic
-              onReorder: interactionsEnabled ? _handleReorder : (int o, int n) {}, // Conditionally enable reorder 
-              itemBuilder: (context, index) {
-                final optionData = _currentUserOrderedOptions[index];
-                // final currentOriginalIndex = _originalIndices[index];
-                // bool isCorrectPosition = false;
-                // if(_isAnswerSubmitted && index < correctOrderOptions.length) {
-                //     // Item is in correct final position if its original index matches the current display index
-                //    isCorrectPosition = currentOriginalIndex == index; 
-                // }
-                
-                final bool isHovered = index == _hoveredIndex;
-                
-                Color tileColor = ColorWheel.secondaryBackground;
-                // Use BorderSide for the Card's shape
-                BorderSide borderSide = BorderSide.none; 
-                IconData? feedbackIcon;
-                Color? feedbackColor;
-
-                // Determine feedback based on submitted state and correctness
-                if (_isAnswerSubmitted && _isOverallCorrect != null) {
-                  bool isItemInCorrectPosition = _originalIndices[index] == index;
-            
-                  if (_isOverallCorrect!) { // Overall correct
-                    feedbackIcon = Icons.check_circle;
-                    feedbackColor = ColorWheel.buttonSuccess;
-                    tileColor = ColorWheel.buttonSuccess.withAlpha(26); // 0.1 opacity
-                    // Set BorderSide for Card shape
-                    borderSide = BorderSide(color: feedbackColor, width: 1.5); 
-                  } else { // Overall incorrect
-                    feedbackIcon = isItemInCorrectPosition
-                        ? Icons.check_circle_outline // Correct position, wrong overall
-                        : Icons.cancel_outlined; // Wrong position
-                        
-                    feedbackColor = isItemInCorrectPosition
-                        ? ColorWheel.buttonSuccess // Correct item = FULL green
-                        : ColorWheel.buttonError;   // Incorrect item = FULL red
-                        
-                    tileColor = isItemInCorrectPosition
-                        ? tileColor 
-                        : ColorWheel.buttonError.withAlpha(13); // 0.05 opacity
-                        
-                    // Set BorderSide for Card shape
-                    borderSide = BorderSide( 
-                      color: feedbackColor, 
-                      width: 1.5
-                    );
-                  }
-                  // Trailing widget uses the determined icon and color
-                  feedbackColor = feedbackColor; // Explicitly use feedbackColor for icon
-                } else if (interactionsEnabled && isHovered) {
-                  // Hover state 
-                  tileColor = Color.lerp(ColorWheel.secondaryBackground, ColorWheel.accent, 0.1)!;
-                }
-                
-                // Determine trailing widget AFTER feedback logic
-                Widget? trailingWidget = _isAnswerSubmitted
-                                  ? (feedbackIcon != null ? Icon(feedbackIcon, color: feedbackColor) : null)
-                                  : null; // No explicit drag handle needed
-
-                // Build the Card containing the ListTile
-                final cardItem = Card(
-                   color: tileColor,
-                   margin: const EdgeInsets.symmetric(vertical: 4.0),
-                   elevation: _isAnswerSubmitted ? 0 : (interactionsEnabled && isHovered ? 4 : 1), 
-                   shape: RoundedRectangleBorder(
-                     borderRadius: ColorWheel.buttonBorderRadius,
-                     // Use the determined BorderSide here
-                     side: borderSide, 
-                   ),
-                   child: ListTile(
-                    title: ElementRenderer(elements: [optionData]), 
-                    trailing: trailingWidget, // Assign the final trailing widget
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  ),
-                );
-
-                // Determine the key (try content first)
-                final key = ValueKey(optionData['content']?.toString() ?? 'item_$index'); 
-
-                // Wrap with drag listener only if interactions are enabled
-                Widget itemWidget = interactionsEnabled
-                    ? ReorderableDragStartListener(index: index, child: cardItem)
-                    : cardItem;
-
-                // Wrap the item with MouseRegion for hover detection (only if interactions enabled)
-                return MouseRegion(
-                  key: key,
-                  onEnter: (_) {
-                    if (interactionsEnabled) {
-                       setState(() => _hoveredIndex = index);
-                    }
-                  },
-                  onExit: (_) {
-                    if (_hoveredIndex == index) {
-                       setState(() => _hoveredIndex = null);
-                    }
-                  },
-                  child: itemWidget,
-                );
-              },
-               // Modified proxyDecorator for visual feedback during drag
-              proxyDecorator: (Widget child, int index, Animation<double> animation) {
-                  return Material(
-                     color: Colors.transparent, 
-                     elevation: 6.0, 
-                     shadowColor: Colors.black.withAlpha(77),
-                     child: child, 
-                  );
-               },
-            ),
-            const SizedBox(height: ColorWheel.majorSectionSpacing),
-
-            // --- Overall Feedback (Show After Submission) ---
-            if (_isAnswerSubmitted && _isOverallCorrect != null)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                child: Text(
-                  _isOverallCorrect! ? "Correct Order!" : "Incorrect Order",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: _isOverallCorrect! ? ColorWheel.buttonSuccess : ColorWheel.buttonError,
-                    fontSize: 18, 
-                    fontWeight: FontWeight.bold
-                  ),
-                ),
-              ),
-
-            // --- Answer Elements / Correct Order Explanation (Show After Submission) ---
-            if (_isAnswerSubmitted)
-              Padding(
-                padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
-                child: Container(
-                   padding: ColorWheel.standardPadding,
-                   decoration: BoxDecoration(color: ColorWheel.secondaryBackground.withAlpha(179), borderRadius: ColorWheel.cardBorderRadius),
-                   child: Column(
-                     crossAxisAlignment: CrossAxisAlignment.start,
-                     children: [
-                       const Text("Correct Order Explanation:", style: ColorWheel.titleText), 
-                       const SizedBox(height: ColorWheel.relatedElementSpacing),
-                       // Display the Answer Elements 
-                       if (answerElements.isNotEmpty)
-                          ElementRenderer(elements: answerElements)
-                       else // Fallback if no specific answer elements
-                       ListView.builder(
-                         shrinkWrap: true,
-                         physics: const NeverScrollableScrollPhysics(),
-                            itemCount: correctOrderOptions.length,
-                         itemBuilder: (context, index) {
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 2.0),
-                              child: Row(
-                                children: [
-                                  Text("${index + 1}. ", style: ColorWheel.secondaryTextStyle),
-                                      Expanded(child: ElementRenderer(elements: [correctOrderOptions[index]])),
-                                ],
-                              ),
-                            );
-                         }),
-                     ],
-                   ),
-                 ),
-              ),
-
-            // --- Submit / Next Question Buttons ---
-            if (interactionsEnabled) // Show Submit only if enabled and not submitted
-              Padding(
-                 padding: const EdgeInsets.only(top: 8.0),
-                 child: ElevatedButton(
-                   style: ElevatedButton.styleFrom(backgroundColor: ColorWheel.buttonSuccess),
-                   onPressed: _handleSubmitAnswer,
-                   child: const Text('Submit Answer', style: ColorWheel.buttonTextBold),
-                 ),
-              ),
+          // --- Reorderable Options List --- (Uses local state)
+          ReorderableListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(), // Prevent nested scrolling
+            itemCount: _currentUserOrderedOptions.length,
+            buildDefaultDragHandles: false, // Use custom handle logic
+            onReorder: interactionsEnabled ? _handleReorder : (int o, int n) {}, // Conditionally enable reorder 
+            itemBuilder: (context, index) {
+              final optionData = _currentUserOrderedOptions[index];
+              final bool isHovered = index == _hoveredIndex;
               
-            if (_isAnswerSubmitted) // Show Next only after submission
-               Padding(
-                 padding: const EdgeInsets.only(top: 8.0),
-                 child: ElevatedButton(
-                   style: ElevatedButton.styleFrom(backgroundColor: ColorWheel.buttonSuccess),
-                   onPressed: widget.isDisabled ? null : _handleNextQuestion, // Respect isDisabled
-                   child: const Text('Next Question', style: ColorWheel.buttonText),
+              Color tileColor = Theme.of(context).colorScheme.surface;
+              BorderSide borderSide = BorderSide.none; 
+              IconData? feedbackIcon;
+              Color? feedbackColor;
+
+              // Determine feedback based on submitted state and correctness
+              if (_isAnswerSubmitted && _isOverallCorrect != null) {
+                bool isItemInCorrectPosition = _originalIndices[index] == index;
+          
+                if (_isOverallCorrect!) { // Overall correct
+                  feedbackIcon = Icons.check_circle;
+                  feedbackColor = correctColor;
+                  tileColor = correctColor.withValues(alpha: 0.1); // 0.1 opacity
+                  borderSide = BorderSide(color: feedbackColor); 
+                } else { // Overall incorrect
+                  feedbackIcon = isItemInCorrectPosition
+                      ? Icons.check_circle_outline // Correct position, wrong overall
+                      : Icons.cancel_outlined; // Wrong position
+                      
+                  feedbackColor = isItemInCorrectPosition
+                      ? correctColor // Correct item = FULL green
+                      : incorrectColor;   // Incorrect item = FULL red
+                      
+                  tileColor = isItemInCorrectPosition
+                      ? tileColor 
+                      : incorrectColor.withValues(alpha: 0.05); // 0.05 opacity
+                      
+                  borderSide = BorderSide( 
+                    color: feedbackColor, 
+                    width: 1.5
+                  );
+                }
+                feedbackColor = feedbackColor; // Explicitly use feedbackColor for icon
+              } else if (interactionsEnabled && isHovered) {
+                // Hover state 
+                tileColor = Color.lerp(Theme.of(context).colorScheme.surface, hoverColor, 0.1)!;
+              }
+              
+              // Determine trailing widget AFTER feedback logic
+              Widget? trailingWidget = _isAnswerSubmitted
+                                ? (feedbackIcon != null ? Icon(feedbackIcon, color: feedbackColor) : null)
+                                : null; // No explicit drag handle needed
+
+              // Build the Card containing the ListTile
+              final cardItem = Card(
+                 color: tileColor,
+                 elevation: _isAnswerSubmitted ? 0 : (interactionsEnabled && isHovered ? 4 : 1), 
+                 shape: RoundedRectangleBorder(
+                   side: borderSide, 
                  ),
+                 child: ListTile(
+                  title: ElementRenderer(elements: [optionData]), 
+                  trailing: trailingWidget, // Assign the final trailing widget
+                ),
+              );
+
+              // Determine the key (try content first)
+              final key = ValueKey(optionData['content']?.toString() ?? 'item_$index'); 
+
+              // Wrap with drag listener only if interactions are enabled
+              Widget itemWidget = interactionsEnabled
+                  ? ReorderableDragStartListener(index: index, child: cardItem)
+                  : cardItem;
+
+              // Wrap the item with MouseRegion for hover detection (only if interactions enabled)
+              return MouseRegion(
+                key: key,
+                onEnter: (_) {
+                  if (interactionsEnabled) {
+                     setState(() => _hoveredIndex = index);
+                  }
+                },
+                onExit: (_) {
+                  if (_hoveredIndex == index) {
+                     setState(() => _hoveredIndex = null);
+                  }
+                },
+                child: itemWidget,
+              );
+            },
+             // Modified proxyDecorator for visual feedback during drag
+            proxyDecorator: (Widget child, int index, Animation<double> animation) {
+                return Material(
+                   color: Colors.transparent, 
+                   elevation: 6.0, 
+                   shadowColor: Colors.black.withAlpha(77),
+                   child: child, 
+                );
+             },
+          ),
+          AppTheme.sizedBoxLrg,
+
+          // --- Overall Feedback (Show After Submission) ---
+          if (_isAnswerSubmitted && _isOverallCorrect != null)
+            Text(
+              _isOverallCorrect! ? "Correct Order!" : "Incorrect Order",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: _isOverallCorrect! ? correctColor : incorrectColor,
+                fontWeight: FontWeight.bold
               ),
-          ],
-        ),
+            ),
+
+          // --- Answer Elements / Correct Order Explanation (Show After Submission) ---
+          if (_isAnswerSubmitted)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text("Correct Order Explanation:", style: TextStyle(fontWeight: FontWeight.bold)), 
+                AppTheme.sizedBoxSml,
+                // Display the Answer Elements 
+                if (answerElements.isNotEmpty)
+                   ElementRenderer(elements: answerElements)
+                else // Fallback if no specific answer elements
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                     itemCount: correctOrderOptions.length,
+                  itemBuilder: (context, index) {
+                     return Row(
+                       children: [
+                         Text("${index + 1}. "),
+                             Expanded(child: ElementRenderer(elements: [correctOrderOptions[index]])),
+                       ],
+                     );
+                  }),
+              ],
+            ),
+
+          // --- Submit / Next Question Buttons ---
+          if (interactionsEnabled) // Show Submit only if enabled and not submitted
+            ElevatedButton(
+              onPressed: _handleSubmitAnswer,
+              child: const Text('Submit Answer'),
+            ),
+              
+          if (_isAnswerSubmitted) // Show Next only after submission
+             ElevatedButton(
+               onPressed: widget.isDisabled ? null : _handleNextQuestion, // Respect isDisabled
+               child: const Text('Next Question'),
+             ),
+        ],
       ),
     );
   }

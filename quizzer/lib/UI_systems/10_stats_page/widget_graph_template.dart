@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:quizzer/UI_systems/color_wheel.dart';
 
 class StatLineSeries {
   final String legendLabel;
@@ -96,129 +95,87 @@ class StatLineGraph extends StatelessWidget {
     final double yMax = maxValue == 0 ? 1 : (maxValue * 1.02);
     return SizedBox(
       height: 220,
-      child: Stack(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(right: 60, left: 12, top: 0, bottom: 0),
-            child: LineChart(
-              LineChartData(
-                lineBarsData: lines,
-                titlesData: FlTitlesData(
-                  leftTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      reservedSize: 40,
-                      getTitlesWidget: (value, meta) {
-                        if (value % 1 != 0) return const SizedBox.shrink();
-                        return Text(
-                          value.toInt().toString(),
-                          style: ColorWheel.defaultText.copyWith(fontSize: 10),
+      child: LineChart(
+        LineChartData(
+          lineBarsData: lines,
+          titlesData: FlTitlesData(
+            leftTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                reservedSize: 40,
+                getTitlesWidget: (value, meta) {
+                  if (value % 1 != 0) return const SizedBox.shrink();
+                  return Text(value.toInt().toString());
+                },
+              ),
+              axisNameWidget: Text(yAxisLabel),
+              axisNameSize: 24,
+            ),
+            bottomTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                getTitlesWidget: (value, meta) {
+                  int idx = value.toInt();
+                  if (idx < 0 || idx >= xLabels.length) return const SizedBox.shrink();
+                  if (uniqueXLabels.length == 1) {
+                    if (idx == 0) {
+                      return Transform.rotate(
+                        angle: -0.7,
+                        child: Text(xLabels[0]),
+                      );
+                    } else {
+                      return const SizedBox.shrink();
+                    }
+                  }
+                  if (xLabels.length == 1) {
+                    return Transform.rotate(
+                      angle: -0.7,
+                      child: Text(xLabels[0]),
+                    );
+                  }
+                  if (idx == 0 || idx == xLabels.length - 1) {
+                    return Transform.rotate(
+                      angle: -0.7,
+                      child: Text(xLabels[idx]),
+                    );
+                  }
+                  if (xLabels.length > 2) {
+                    int interval = (xLabels.length / 4).ceil();
+                    if (interval > 0 && idx % interval == 0 && idx != 0 && idx != xLabels.length - 1) {
+                      int shown = 2;
+                      for (int i = 1; i < xLabels.length - 1; i++) {
+                        if (i % interval == 0) shown++;
+                      }
+                      if (shown <= 5) {
+                        return Transform.rotate(
+                          angle: -0.7,
+                          child: Text(xLabels[idx]),
                         );
-                      },
-                    ),
-                    axisNameWidget: Padding(
-                      padding: const EdgeInsets.only(right: 8.0),
-                      child: Text(yAxisLabel, style: ColorWheel.defaultText.copyWith(fontSize: 12)),
-                    ),
-                    axisNameSize: 24,
-                  ),
-                  bottomTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      getTitlesWidget: (value, meta) {
-                        int idx = value.toInt();
-                        if (idx < 0 || idx >= xLabels.length) return const SizedBox.shrink();
-                        if (uniqueXLabels.length == 1) {
-                          if (idx == 0) {
-                            return Transform.rotate(
-                              angle: -0.7,
-                              child: Text(xLabels[0], style: ColorWheel.defaultText.copyWith(fontSize: 10)),
-                            );
-                          } else {
-                            return const SizedBox.shrink();
-                          }
-                        }
-                        if (xLabels.length == 1) {
-                          return Transform.rotate(
-                            angle: -0.7,
-                            child: Text(xLabels[0], style: ColorWheel.defaultText.copyWith(fontSize: 10)),
-                          );
-                        }
-                        if (idx == 0 || idx == xLabels.length - 1) {
-                          return Transform.rotate(
-                            angle: -0.7,
-                            child: Text(xLabels[idx], style: ColorWheel.defaultText.copyWith(fontSize: 10)),
-                          );
-                        }
-                        if (xLabels.length > 2) {
-                          int interval = (xLabels.length / 4).ceil();
-                          if (interval > 0 && idx % interval == 0 && idx != 0 && idx != xLabels.length - 1) {
-                            int shown = 2;
-                            for (int i = 1; i < xLabels.length - 1; i++) {
-                              if (i % interval == 0) shown++;
-                            }
-                            if (shown <= 5) {
-                              return Transform.rotate(
-                                angle: -0.7,
-                                child: Text(xLabels[idx], style: ColorWheel.defaultText.copyWith(fontSize: 10)),
-                              );
-                            }
-                          }
-                        }
-                        return const SizedBox.shrink();
-                      },
-                      reservedSize: 32,
-                    ),
-                    axisNameWidget: Padding(
-                      padding: const EdgeInsets.only(top: 8.0),
-                      child: Text(xAxisLabel, style: ColorWheel.defaultText.copyWith(fontSize: 12)),
-                    ),
-                    axisNameSize: 24,
-                  ),
-                  topTitles: AxisTitles(
-                    axisNameWidget: Text(
-                      chartName,
-                      style: ColorWheel.titleText.copyWith(fontSize: 16),
-                      textAlign: TextAlign.center,
-                    ),
-                    axisNameSize: 32,
-                    sideTitles: const SideTitles(showTitles: false),
-                  ),
-                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                ),
-                gridData: const FlGridData(show: true),
-                borderData: FlBorderData(show: true),
-                minY: 0,
-                maxY: yMax
+                      }
+                    }
+                  }
+                  return const SizedBox.shrink();
+                },
+                reservedSize: 32,
               ),
+              axisNameWidget: Text(xAxisLabel),
+              axisNameSize: 24,
             ),
+            topTitles: AxisTitles(
+              axisNameWidget: Text(
+                chartName,
+                textAlign: TextAlign.center,
+              ),
+              axisNameSize: 32,
+              sideTitles: const SideTitles(showTitles: false),
+            ),
+            rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
           ),
-          if (showLegend)
-            Positioned(
-              top: 0,
-              right: 0,
-              child: Wrap(
-                spacing: 16,
-                children: [
-                  for (final s in seriesList)
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(width: 16, height: 4, color: s.lineColor),
-                        const SizedBox(width: 8),
-                        Text(
-                          s.legendLabel,
-                          style: ColorWheel.defaultText.copyWith(
-                            color: ColorWheel.primaryText,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                ],
-              ),
-            ),
-        ],
+          gridData: const FlGridData(show: true),
+          borderData: FlBorderData(show: true),
+          minY: 0,
+          maxY: yMax
+        ),
       ),
     );
   }

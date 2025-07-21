@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:quizzer/UI_systems/color_wheel.dart';
 
 /// A custom button for activating or deactivating a module
 class ActivateOrDeactivateModuleButton extends StatefulWidget {
@@ -46,14 +45,8 @@ class _ActivateOrDeactivateModuleButtonState extends State<ActivateOrDeactivateM
         onPressed: _handlePress,
         icon: Icon(
           _isActivated ? Icons.check_circle : Icons.add_circle_outline,
-          color: _isActivated 
-            ? ColorWheel.accent // Use ColorWheel
-            : ColorWheel.primaryText, // Use ColorWheel
         ),
         tooltip: _isActivated ? 'Module Activated' : 'Activate Module',
-        padding: EdgeInsets.zero,
-        constraints: const BoxConstraints(),
-        splashRadius: 20,
       ),
     );
   }

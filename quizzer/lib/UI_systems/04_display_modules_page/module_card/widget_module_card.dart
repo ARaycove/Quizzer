@@ -5,7 +5,7 @@ import 'package:quizzer/UI_systems/04_display_modules_page/module_card/widget_ed
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/04_module_management/module_management.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
-import 'package:quizzer/UI_systems/color_wheel.dart';
+import 'package:quizzer/app_theme.dart';
 
 class ModuleCard extends StatefulWidget {
   final Map<String, dynamic> moduleData;
@@ -94,11 +94,13 @@ class _ModuleCardState extends State<ModuleCard> {
   Widget _buildMetadataItem(IconData icon, String text) {
     return Row(
       children: [
-        Icon(icon, size: 16, color: ColorWheel.secondaryText),
-        const SizedBox(width: ColorWheel.iconHorizontalSpacing / 2),
-        Text(
-          text,
-          style: ColorWheel.secondaryTextStyle.copyWith(fontSize: 14),
+        Icon(icon),
+        AppTheme.sizedBoxSml,
+        Expanded(
+          child: Text(
+            text,
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
       ],
     );
@@ -134,66 +136,63 @@ class _ModuleCardState extends State<ModuleCard> {
       return const SizedBox.shrink();
     }
     return Card(
-      color: ColorWheel.secondaryBackground,
-      margin: const EdgeInsets.only(bottom: ColorWheel.standardPaddingValue),
-      shape: RoundedRectangleBorder(
-        borderRadius: ColorWheel.cardBorderRadius,
-      ),
-      child: Padding(
-        padding: ColorWheel.standardPadding,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    moduleName,
-                    style: ColorWheel.titleText,
-                  ),
-                ),
-                Row(
-                  children: [
-                    ActivateOrDeactivateModuleButton(
-                      onPressed: _handleActivationToggle,
-                      isActive: _isActivated,
-                    ),
-                    const SizedBox(width: 8),
-                    EditModuleButton(
-                      onPressed: _handleEditModule,
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            const SizedBox(height: ColorWheel.formFieldSpacing),
-            Visibility(
-              visible: description.isNotEmpty,
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: ColorWheel.formFieldSpacing),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
                 child: Text(
-                  description,
-                  style: ColorWheel.secondaryTextStyle.copyWith(fontSize: 14),
+                  moduleName,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
-            ),
-            Row(
+              // Remove Expanded from the button row
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ActivateOrDeactivateModuleButton(
+                    onPressed: _handleActivationToggle,
+                    isActive: _isActivated,
+                  ),
+                  AppTheme.sizedBoxSml,
+                  EditModuleButton(
+                    onPressed: _handleEditModule,
+                  ),
+                ],
+              ),
+            ],
+          ),
+          AppTheme.sizedBoxMed,
+          Visibility(
+            visible: description.isNotEmpty,
+            child: Column(
               children: [
-                _buildMetadataItem(
+                Text(description),
+                AppTheme.sizedBoxMed,
+              ],
+            ),
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: _buildMetadataItem(
                   Icons.question_answer,
                   '$totalQuestions questions',
                 ),
-                const SizedBox(width: ColorWheel.standardPaddingValue),
-                if (primarySubject.isNotEmpty)
-                  _buildMetadataItem(
+              ),
+              AppTheme.sizedBoxMed,
+              if (primarySubject.isNotEmpty)
+                Expanded(
+                  child: _buildMetadataItem(
                     Icons.category,
                     primarySubject,
                   ),
-              ],
-            ),
-          ],
-        ),
+                ),
+            ],
+          ),
+        ],
       ),
     );
   }

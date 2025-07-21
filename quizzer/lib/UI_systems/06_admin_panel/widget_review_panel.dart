@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:quizzer/UI_systems/color_wheel.dart';
+import 'package:quizzer/app_theme.dart';
 import 'package:quizzer/UI_systems/03_add_question_page/widgets/widget_live_preview.dart';
 import 'package:quizzer/UI_systems/global_widgets/widget_edit_question_dialogue.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
@@ -155,134 +155,86 @@ class _ReviewPanelWidgetState extends State<ReviewPanelWidget> {
     final Map<String, dynamic>? displayData = _editedData ?? _currentData;
 
     if (_isLoading) {
-      return const Center(child: CircularProgressIndicator(color: ColorWheel.accent));
+      return const Center(child: CircularProgressIndicator());
     }
 
     if (_errorMessage != null) {
       return Center(
-         child: Padding(
-           padding: const EdgeInsets.all(16.0),
-           child: Text('Error: $_errorMessage', style: const TextStyle(color: ColorWheel.warning)),
-         )
+         child: Text('Error: $_errorMessage'),
       );
     }
 
     if (displayData == null) {
        // This case might occur if fetch fails silently or returns null data without error
        return const Center(
-          child: Padding(
-            padding: EdgeInsets.all(16.0),
-            child: Text('No question data available.', style: ColorWheel.secondaryTextStyle),
-          )
+          child: Text('No question data available.'),
        );
     }
 
     // Key for LivePreviewWidget to force rebuilds
     final previewKey = ValueKey('review-preview-${displayData['question_id']}-$_previewRebuildCounter');
 
-    return Container(
-      padding: const EdgeInsets.all(ColorWheel.standardPaddingValue),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Top Bar: Title + Edit Button
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text("Live Preview", style: ColorWheel.titleText),
-              ElevatedButton(
-                // Use internal _editQuestion method
-                onPressed: _editQuestion, 
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: ColorWheel.buttonSecondary,
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                  minimumSize: Size.zero,
-                  shape: RoundedRectangleBorder(borderRadius: ColorWheel.buttonBorderRadius),
-                ),
-                child: const Text("Edit", style: ColorWheel.buttonText),
-              ),
-            ],
-          ),
-          const SizedBox(height: ColorWheel.formFieldSpacing),
-          // Live Preview Area (Expanded)
-          Expanded(
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                border: Border.all(color: ColorWheel.secondaryText.withValues(alpha: 0.5)),
-                borderRadius: ColorWheel.cardBorderRadius,
-              ),
-              child: LivePreviewWidget(
-                key: previewKey,
-                questionType: displayData['question_type'] as String? ?? 'error',
-                questionElements: (displayData['question_elements'] as List<dynamic>? ?? []).map((e) => Map<String, dynamic>.from(e as Map)).toList(),
-                answerElements: (displayData['answer_elements'] as List<dynamic>? ?? []).map((e) => Map<String, dynamic>.from(e as Map)).toList(),
-                options: (displayData['options'] as List<dynamic>? ?? []).map((e) => Map<String, dynamic>.from(e as Map)).toList(),
-                correctOptionIndexMC: displayData['correct_option_index'] as int?,
-                correctIndicesSATA: (displayData['index_options_that_apply'] as List<dynamic>? ?? []).map((e) => e as int).toList(),
-                isCorrectAnswerTrueTF: (displayData['question_type'] == 'true_false')
-                    ? (displayData['correct_option_index'] == 0)
-                    : null,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // Top Bar: Title + Edit Button
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text("Live Preview"),
+            ElevatedButton(
+              // Use internal _editQuestion method
+              onPressed: _editQuestion, 
+              child: const Text("Edit"),
+            ),
+          ],
+        ),
+        AppTheme.sizedBoxMed,
+        // Live Preview Area
+        LivePreviewWidget(
+          key: previewKey,
+          questionType: displayData['question_type'] as String? ?? 'error',
+          questionElements: (displayData['question_elements'] as List<dynamic>? ?? []).map((e) => Map<String, dynamic>.from(e as Map)).toList(),
+          answerElements: (displayData['answer_elements'] as List<dynamic>? ?? []).map((e) => Map<String, dynamic>.from(e as Map)).toList(),
+          options: (displayData['options'] as List<dynamic>? ?? []).map((e) => Map<String, dynamic>.from(e as Map)).toList(),
+          correctOptionIndexMC: displayData['correct_option_index'] as int?,
+          correctIndicesSATA: (displayData['index_options_that_apply'] as List<dynamic>? ?? []).map((e) => e as int).toList(),
+          isCorrectAnswerTrueTF: (displayData['question_type'] == 'true_false')
+              ? (displayData['correct_option_index'] == 0)
+              : null,
+        ),
+        // --- ADDED: Display Module Name ---
+        AppTheme.sizedBoxSml,
+        Row(
+          children: [
+            const Text('Module Name: '),
+            Expanded(
+              child: Text(
+                displayData['module_name'] as String? ?? 'N/A',
+                overflow: TextOverflow.ellipsis,
               ),
             ),
-          ),
-          // --- ADDED: Display Module Name ---
-          const SizedBox(height: ColorWheel.standardPaddingValue / 2), // Add some space
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0), // Align slightly with preview padding
-            child: Row(
-              children: [
-                const Text(
-                  'Module Name: ',
-                  style: ColorWheel.secondaryTextStyle, // Use secondary style
-                ),
-                Expanded( // Allow name to wrap if long
-                  child: Text(
-                    displayData['module_name'] as String? ?? 'N/A', // Get module name safely
-                    style: ColorWheel.defaultText, // Use default style for the value
-                    overflow: TextOverflow.ellipsis, // Prevent overflow issues
-                  ),
-                ),
-              ],
+          ],
+        ),
+        // --- END ADDED ---
+        AppTheme.sizedBoxMed,
+        // Bottom Bar: Deny/Approve Buttons
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            ElevatedButton(
+              // Use internal _denyQuestion method
+              onPressed: _denyQuestion,
+              child: const Text("Deny"),
             ),
-          ),
-          // --- END ADDED ---
-          const SizedBox(height: ColorWheel.standardPaddingValue),
-          // Bottom Bar: Deny/Approve Buttons
-          Container(
-            padding: const EdgeInsets.only(top: ColorWheel.standardPaddingValue / 2),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton(
-                  // Use internal _denyQuestion method
-                  onPressed: _denyQuestion,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: ColorWheel.buttonError,
-                    foregroundColor: ColorWheel.primaryText,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: ColorWheel.buttonBorderRadius,
-                    ),
-                  ),
-                  child: const Text("Deny", style: ColorWheel.buttonText),
-                ),
-                ElevatedButton(
-                  // Use internal _approveQuestion method
-                  onPressed: _approveQuestion, 
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: ColorWheel.buttonSuccess,
-                    foregroundColor: ColorWheel.primaryText,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: ColorWheel.buttonBorderRadius,
-                    ),
-                  ),
-                  child: const Text("Approve", style: ColorWheel.buttonText),
-                ),
-              ],
+            ElevatedButton(
+              // Use internal _approveQuestion method
+              onPressed: _approveQuestion, 
+              child: const Text("Approve"),
             ),
-          ),
-        ],
-      ),
+          ],
+        ),
+      ],
     );
   }
 }

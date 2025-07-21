@@ -3,7 +3,7 @@ import 'package:quizzer/UI_systems/global_widgets/widget_global_app_bar.dart';
 import 'package:quizzer/UI_systems/04_display_modules_page/widget_module_page_main_body_list.dart';
 import 'package:quizzer/UI_systems/04_display_modules_page/widget_scroll_to_top_button.dart';
 import 'package:quizzer/UI_systems/04_display_modules_page/widget_module_filter_button.dart';
-import 'package:quizzer/UI_systems/color_wheel.dart';
+import 'package:quizzer/app_theme.dart';
 
 class DisplayModulesPage extends StatelessWidget {
   const DisplayModulesPage({super.key});
@@ -29,23 +29,37 @@ class DisplayModulesPage extends StatelessWidget {
     }
 
     return Scaffold(
-      backgroundColor: ColorWheel.primaryBackground,
       appBar: const GlobalAppBar(
         title: 'Modules',
         showHomeButton: true,
       ),
       body: Stack(
         children: [
-          // Main content (module cards list)
+          // Main content (module cards list) with error isolation
           Positioned.fill(
-            child: ModulePageMainBodyList(
-              scrollController: scrollController,
+            child: Builder(
+              builder: (context) {
+                try {
+                  return ModulePageMainBodyList(
+                    scrollController: scrollController,
+                  );
+                } catch (e, stack) {
+                  // Log the error if needed
+                  debugPrint('ModulePageMainBodyList error: $e\n$stack');
+                  return const Center(
+                    child: Text(
+                      'An error occurred in the main body widget.',
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  );
+                }
+              },
             ),
           ),
           // Top action buttons (always visible)
           Positioned(
-            top: ColorWheel.standardPaddingValue,
-            right: ColorWheel.standardPaddingValue,
+            top: 0,
+            right: 0,
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -58,7 +72,7 @@ class DisplayModulesPage extends StatelessWidget {
                     );
                   },
                 ),
-                const SizedBox(width: ColorWheel.formFieldSpacing),
+                AppTheme.sizedBoxMed,
                 ModuleFilterButton(
                   onFilterPressed: handleFilter,
                 ),

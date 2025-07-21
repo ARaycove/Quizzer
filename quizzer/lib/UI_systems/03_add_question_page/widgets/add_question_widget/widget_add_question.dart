@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:quizzer/UI_systems/color_wheel.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/UI_systems/global_widgets/question_answer_element.dart';
+import 'package:quizzer/app_theme.dart';
 
 // ==========================================
 //       Add/Edit Question Controls Widget
@@ -229,39 +229,13 @@ class _AddQuestionWidgetState extends State<AddQuestionWidget> {
   // --- Helper to build True/False ChoiceChips ---
   // Renamed to reflect change to Button
   Widget _buildTrueFalseButton({required String label, required int index}) {
-     final bool isSelected = widget.correctOptionIndex == index;
-     // return ChoiceChip(...);
      return ElevatedButton(
         onPressed: () {
           // Always trigger the callback when a button is pressed
           widget.onSetCorrectOptionIndex(index);
         },
-        style: ElevatedButton.styleFrom(
-          // Background: Green if selected, standard secondary background if not
-          backgroundColor: isSelected ? ColorWheel.buttonSuccess : ColorWheel.secondaryBackground,
-          // Text: White if selected, grey if not
-          foregroundColor: isSelected ? ColorWheel.primaryText : ColorWheel.secondaryText,
-          // Shape: Consistent rounded rectangle
-          shape: RoundedRectangleBorder(
-            borderRadius: ColorWheel.buttonBorderRadius, // Use consistent radius
-          ),
-          // Border: Green and thicker if selected, subtle grey otherwise
-          side: BorderSide(
-            color: isSelected ? ColorWheel.buttonSuccess : ColorWheel.secondaryText.withAlpha(128),
-            width: isSelected ? 1.5 : 1.0, 
-          ),
-          // Padding: Adjust for visual balance
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-          // Ensure minimum height/tap target size if needed (can be added)
-          // minimumSize: const Size(0, 40), // Example minimum height
-          elevation: isSelected ? 2.0 : 1.0, // Slightly raise selected button
-        ),
         child: Text(
           label,
-          style: TextStyle(
-            // Explicitly set font weight for clarity
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-          ),
         ), 
      );
   }
@@ -291,14 +265,14 @@ class _AddQuestionWidgetState extends State<AddQuestionWidget> {
       return Column(
          crossAxisAlignment: CrossAxisAlignment.start,
          children: [
-           const Text("Correct Answer", style: ColorWheel.titleText),
-           const SizedBox(height: 8),
+           const Text("Correct Answer"),
+           AppTheme.sizedBoxMed,
            Row(
              children: [
                Expanded(
                  child: _buildTrueFalseButton(label: "True", index: 0),
                ),
-               const SizedBox(width: 8),
+               AppTheme.sizedBoxMed,
                Expanded(
                  child: _buildTrueFalseButton(label: "False", index: 1),
                ),
@@ -312,8 +286,8 @@ class _AddQuestionWidgetState extends State<AddQuestionWidget> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text("Options", style: ColorWheel.titleText),
-        const SizedBox(height: 8),
+        const Text("Options"),
+        AppTheme.sizedBoxMed,
         // --- Option Entry Row ---
         Row(
           children: [
@@ -338,24 +312,18 @@ class _AddQuestionWidgetState extends State<AddQuestionWidget> {
                 },
               ),
             ),
-            const SizedBox(width: 8),
+            AppTheme.sizedBoxMed,
             ElevatedButton.icon(
-              icon: const Icon(Icons.add_photo_alternate_outlined, size: 18),
+              icon: const Icon(Icons.add_photo_alternate_outlined),
               label: const Text('Image'),
               onPressed: () {
                 widget.onAddOption({'type': 'image', 'content': ''}); // Trigger image add
                  QuizzerLogger.logWarning("Image Option Add - Picker Not Implemented");
               },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: ColorWheel.primaryBackground,
-                foregroundColor: ColorWheel.primaryText,
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                textStyle: const TextStyle(fontSize: 13)
-              ),
             ),
           ],
         ),
-        const SizedBox(height: 8),
+        AppTheme.sizedBoxMed,
         // --- List of Existing Options (Now Reorderable) ---
         ReorderableListView.builder(
           shrinkWrap: true,
@@ -365,7 +333,7 @@ class _AddQuestionWidgetState extends State<AddQuestionWidget> {
           itemBuilder: (context, index) {
             final option = widget.options[index];
             // Assign key based on content or index
-            final key = ValueKey(option['content']?.toString() ?? 'option_$index');
+            final key = ValueKey('option_${identityHashCode(option)}_$index');
             
             // Build the actual option item UI using the existing helper
             final optionCard = _buildOptionItem(option, index);
@@ -396,9 +364,6 @@ class _AddQuestionWidgetState extends State<AddQuestionWidget> {
           // Optional: Add proxy decorator
           proxyDecorator: (Widget child, int index, Animation<double> animation) {
             return Material(
-                color: Colors.transparent,
-                elevation: 6.0,
-                shadowColor: ColorWheel.secondaryBackground.withAlpha(150),
                 child: child,
             );
           },
@@ -437,8 +402,8 @@ class _AddQuestionWidgetState extends State<AddQuestionWidget> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: ColorWheel.titleText),
-        const SizedBox(height: 8),
+        Text(title),
+        AppTheme.sizedBoxMed,
         // --- Element Entry Row ---
         Row(
           children: [
@@ -465,25 +430,19 @@ class _AddQuestionWidgetState extends State<AddQuestionWidget> {
                 },
               ),
             ),
-            const SizedBox(width: 8),
+            AppTheme.sizedBoxMed,
             ElevatedButton.icon(
-              icon: const Icon(Icons.add_photo_alternate_outlined, size: 18),
+              icon: const Icon(Icons.add_photo_alternate_outlined),
               label: const Text('Image'),
               onPressed: () {
                   // Parent needs to handle image picking and element creation
                   onAddElementCallback('image', category);
                   QuizzerLogger.logWarning("Image Element Add - Picker Not Implemented by parent");
               },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: ColorWheel.primaryBackground,
-                foregroundColor: ColorWheel.primaryText,
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                 textStyle: const TextStyle(fontSize: 13)
-              ),
             ),
           ],
         ),
-        const SizedBox(height: 8),
+        AppTheme.sizedBoxMed,
         // --- List of Existing Elements (Now Reorderable) ---
         ReorderableListView.builder(
           shrinkWrap: true,
@@ -493,66 +452,56 @@ class _AddQuestionWidgetState extends State<AddQuestionWidget> {
           itemBuilder: (context, index) {
             final element = elements[index];
             // Each item needs a unique key for reordering
-            final key = ValueKey('${category}_element_${element.hashCode}_$index'); // Composite key
+            final key = ValueKey('${category}_element_${identityHashCode(element)}_$index'); // Composite key
 
             // Determine if this specific element is being edited
             final bool isEditingThisElement = _editingElementIndex == index && _editingElementCategory == category;
 
             // Build the visual item (Card with ListTile)
-             final elementCard = Card(
-               margin: const EdgeInsets.symmetric(vertical: 4.0),
-               color: isEditingThisElement ? ColorWheel.accent.withAlpha(50) : ColorWheel.secondaryBackground,
-               elevation: 1.0,
-               shape: RoundedRectangleBorder(borderRadius: ColorWheel.buttonBorderRadius),
-               child: GestureDetector(
-                  onDoubleTap: () {
-                    if (element['type'] == 'text') {
-                       QuizzerLogger.logMessage("Starting edit for $category element at index $index");
-                       _startEditing(index, category, element['content']);
-                    } else if (element['type'] == 'image') {
-                       QuizzerLogger.logWarning("Double-tap image edit (replacement) not implemented yet.");
-                    }
-                  },
-                  child: ListTile(
-                    dense: true,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
-                    title: isEditingThisElement
-                        ? TextField(
-                             controller: _editController,
-                             focusNode: _editFocusNode,
-                             autofocus: true,
-                             style: const TextStyle(color: ColorWheel.primaryText, fontSize: 16.0),
-                             cursorColor: ColorWheel.primaryText,
-                             maxLines: null,
-                             keyboardType: TextInputType.multiline,
-                             decoration: const InputDecoration(
-                                contentPadding: EdgeInsets.symmetric(vertical: 8.0), // Adjust padding
-                                isDense: true,
-                                border: InputBorder.none, // Minimal decoration
-                                focusedBorder: UnderlineInputBorder( // Add underline when focused
-                                  borderSide: BorderSide(color: ColorWheel.accent),
-                                ),
-                             ),
-                             onSubmitted: (_) => _submitEdit(),
-                          )
-                        : ElementRenderer(elements: [element]), // Normal view
-                    trailing: IconButton(
-                      icon: const Icon(Icons.remove_circle_outline, size: 20, color: ColorWheel.buttonError),
-                      tooltip: 'Remove Element',
-                      onPressed: () => onRemoveElementCallback(index, category),
-                      visualDensity: VisualDensity.compact,
-                      padding: EdgeInsets.zero,
-                    ),
-                    onTap: () {}, // Prevent tile tap interfering with drag/edit
-                 ),
-               ),
-             );
-             // Wrap the card for drag start, similar to SortOrder widget
-             return ReorderableDragStartListener(
-               key: key,
-               index: index,
-               child: elementCard,
-             );
+            final elementCard = Card(
+              child: GestureDetector(
+                 onDoubleTap: () {
+                   if (element['type'] == 'text') {
+                      QuizzerLogger.logMessage("Starting edit for $category element at index $index");
+                      _startEditing(index, category, element['content']);
+                   } else if (element['type'] == 'image') {
+                      QuizzerLogger.logWarning("Double-tap image edit (replacement) not implemented yet.");
+                   }
+                 },
+                 child: ListTile(
+                   dense: true,
+                   title: isEditingThisElement
+                       ? TextField(
+                            controller: _editController,
+                            focusNode: _editFocusNode,
+                            autofocus: true,
+                            maxLines: null,
+                            keyboardType: TextInputType.multiline,
+                            style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+                            decoration: const InputDecoration(
+                               isDense: true,
+                               border: InputBorder.none,
+                            ),
+                            onSubmitted: (_) => _submitEdit(),
+                         )
+                       : ElementRenderer(elements: [element]), // Normal view
+                   trailing: IconButton(
+                     icon: const Icon(Icons.remove_circle_outline),
+                     tooltip: 'Remove Element',
+                     onPressed: () => onRemoveElementCallback(index, category),
+                     visualDensity: VisualDensity.compact,
+                     padding: EdgeInsets.zero,
+                   ),
+                   onTap: () {}, // Prevent tile tap interfering with drag/edit
+                ),
+              ),
+            );
+            // Wrap the card for drag start, similar to SortOrder widget
+            return ReorderableDragStartListener(
+              key: key,
+              index: index,
+              child: elementCard,
+            );
           },
           onReorder: (int oldIndex, int newIndex) {
               QuizzerLogger.logMessage("Reordering $category element from $oldIndex to $newIndex");
@@ -570,15 +519,12 @@ class _AddQuestionWidgetState extends State<AddQuestionWidget> {
               // Call the parent's callback with the newly ordered list
               onReorderElementsCallback(mutableElements, category);
           },
-          // Optional: Add proxy decorator like SortOrderWidget
-          proxyDecorator: (Widget child, int index, Animation<double> animation) {
-            return Material(
-                color: Colors.transparent,
-                elevation: 6.0,
-                shadowColor: ColorWheel.secondaryBackground.withAlpha(150),
-                child: child,
-            );
-          },
+                     // Optional: Add proxy decorator like SortOrderWidget
+           proxyDecorator: (Widget child, int index, Animation<double> animation) {
+             return Material(
+                 child: child,
+             );
+           },
         ),
       ],
     );
@@ -594,35 +540,14 @@ class _AddQuestionWidgetState extends State<AddQuestionWidget> {
     return TextField(
       controller: controller,
       focusNode: focusNode,
-      // Explicitly set TextStyle with primaryText color
-      style: const TextStyle(
-        color: ColorWheel.primaryText, 
-        fontSize: 16.0, // Match defaultText size or adjust as needed
-      ),
-      cursorColor: ColorWheel.primaryText, // Set caret color explicitly
+      style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+
       // Allow multiple lines for text wrapping
       maxLines: null,
       keyboardType: TextInputType.multiline, // Improve keyboard for multiline
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: ColorWheel.defaultText.copyWith(color: ColorWheel.secondaryText),
         filled: true,
-        fillColor: ColorWheel.secondaryBackground,
-        // Use border settings consistent with selection widgets
-        border: OutlineInputBorder(
-          borderRadius: ColorWheel.cardBorderRadius, // Match selection widget container radius
-          borderSide: BorderSide(color: ColorWheel.accent.withAlpha(128), width: 1.0), // Match border
-        ),
-        // Also ensure enabled/focused borders match if needed, or use the main border
-        enabledBorder: OutlineInputBorder(
-          borderRadius: ColorWheel.cardBorderRadius,
-          borderSide: BorderSide(color: ColorWheel.accent.withAlpha(128), width: 1.0),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: ColorWheel.cardBorderRadius,
-          borderSide: const BorderSide(color: ColorWheel.accent, width: 1.5), // Slightly thicker focus border
-        ),
-        contentPadding: ColorWheel.inputFieldPadding, 
         isDense: true,
       ),
       onSubmitted: onSubmitted,
@@ -661,15 +586,6 @@ class _AddQuestionWidgetState extends State<AddQuestionWidget> {
 
     // TODO: Add GestureDetector for double-tap edit (point 2)
     return Card(
-      margin: const EdgeInsets.symmetric(vertical: 4.0),
-      color: isEditingThisOption 
-              ? ColorWheel.accent.withAlpha(50) 
-              : (isCorrect ? ColorWheel.buttonSuccess.withAlpha(26) : ColorWheel.secondaryBackground),
-      elevation: 1.0,
-      shape: RoundedRectangleBorder(
-        borderRadius: ColorWheel.buttonBorderRadius,
-        side: BorderSide(color: isCorrect ? ColorWheel.buttonSuccess : Colors.transparent, width: 1.0)
-      ),
       // Use GestureDetector for double-tap edit
       child: GestureDetector(
         onDoubleTap: () {
@@ -689,7 +605,7 @@ class _AddQuestionWidgetState extends State<AddQuestionWidget> {
           // Conditionally build the leading icon button
           leading: onTogglePressed != null 
             ? IconButton(
-                icon: Icon(toggleIcon, color: isCorrect ? ColorWheel.buttonSuccess : ColorWheel.secondaryText),
+                icon: Icon(toggleIcon),
                 tooltip: 'Toggle Correctness', // Tooltip only relevant if button exists
                 onPressed: onTogglePressed,
                 visualDensity: VisualDensity.compact,
@@ -702,28 +618,22 @@ class _AddQuestionWidgetState extends State<AddQuestionWidget> {
                    controller: _editController,
                    focusNode: _editFocusNode,
                    autofocus: true,
-                   style: const TextStyle(color: ColorWheel.primaryText, fontSize: 16.0),
-                   cursorColor: ColorWheel.primaryText,
                    maxLines: null,
                    keyboardType: TextInputType.multiline,
+                   style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
                    decoration: const InputDecoration(
-                      contentPadding: EdgeInsets.symmetric(vertical: 8.0),
                       isDense: true,
                       border: InputBorder.none,
-                      focusedBorder: UnderlineInputBorder(
-                         borderSide: BorderSide(color: ColorWheel.accent),
-                      ),
                    ),
                    onSubmitted: (_) => _submitEdit(),
                   )
               : ElementRenderer(elements: [option]), // Normal view
           trailing: IconButton(
-            icon: const Icon(Icons.remove_circle_outline, size: 20, color: ColorWheel.buttonError),
+            icon: const Icon(Icons.remove_circle_outline),
             tooltip: 'Remove Option',
             onPressed: () => widget.onRemoveOption(index),
             visualDensity: VisualDensity.compact,
             padding: EdgeInsets.zero,
-            color: ColorWheel.buttonError,
           ),
           // Prevent normal tap action if editing
           onTap: isEditingThisOption ? () {} : null,
@@ -739,9 +649,9 @@ class _AddQuestionWidgetState extends State<AddQuestionWidget> {
     return Column(
       children: [
         _buildQuestionElementsSection(),
-        const SizedBox(height: 20),
+        AppTheme.sizedBoxLrg,
         _buildOptionsSection(),
-        const SizedBox(height: 20),
+        AppTheme.sizedBoxLrg,
         _buildAnswerElementsSection(),
       ],
     );

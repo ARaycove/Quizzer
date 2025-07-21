@@ -3,7 +3,7 @@ import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/UI_systems/global_widgets/widget_global_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer' as developer;
-import 'package:quizzer/UI_systems/color_wheel.dart';
+import 'package:quizzer/app_theme.dart';
 /*
 Menu Page Description:
 The menu serves as the central navigation hub for Quizzer, providing access to various behavioral task interfaces and settings.
@@ -36,15 +36,14 @@ class _MenuPageState extends State<MenuPage> {
     QuizzerLogger.logValue("Building MenuPage for user role: $userRole");
 
     return Scaffold(
-      backgroundColor: ColorWheel.primaryBackground,
       appBar: const GlobalAppBar(
         title: 'Quizzer Menu',
         showHomeButton: true,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(ColorWheel.standardPaddingValue),
         child: Column(
           children: [
+            AppTheme.sizedBoxMed, // Spacer for app bar
             // --- Conditional Admin Panel Button (Moved to Top) ---
             if (userRole == 'admin' || userRole == 'contributor') ...[
               _buildMenuButton(
@@ -55,7 +54,7 @@ class _MenuPageState extends State<MenuPage> {
                   Navigator.pushNamed(context, '/admin_panel'); 
                 },
               ),
-              const SizedBox(height: ColorWheel.standardPaddingValue),
+              AppTheme.sizedBoxMed,
             ],
             // --- End Conditional Button ---
 
@@ -67,7 +66,7 @@ class _MenuPageState extends State<MenuPage> {
                 Navigator.pushNamed(context, '/add_question');
               },
             ),
-            const SizedBox(height: ColorWheel.standardPaddingValue),
+            AppTheme.sizedBoxMed,
 
             // Display Modules Button
             _buildMenuButton(
@@ -77,7 +76,7 @@ class _MenuPageState extends State<MenuPage> {
                 Navigator.pushNamed(context, '/display_modules');
               },
             ),
-            const SizedBox(height: ColorWheel.standardPaddingValue),
+            AppTheme.sizedBoxMed,
 
             // My Profile Button
             _buildMenuButton(
@@ -88,7 +87,7 @@ class _MenuPageState extends State<MenuPage> {
                 developer.log('My Profile page not implemented yet');
               },
             ),
-            const SizedBox(height: ColorWheel.standardPaddingValue),
+            AppTheme.sizedBoxMed,
 
             // Settings Button
             _buildMenuButton(
@@ -99,7 +98,7 @@ class _MenuPageState extends State<MenuPage> {
                 Navigator.pushNamed(context, '/settings_page');
               },
             ),
-            const SizedBox(height: ColorWheel.standardPaddingValue),
+            AppTheme.sizedBoxMed,
 
             // Stats Button
             _buildMenuButton(
@@ -110,7 +109,7 @@ class _MenuPageState extends State<MenuPage> {
                 Navigator.pushNamed(context, '/stats');
               },
             ),
-            const SizedBox(height: ColorWheel.standardPaddingValue),
+            AppTheme.sizedBoxMed,
 
             // Feedback & Bug Reports Button
             _buildMenuButton(
@@ -121,7 +120,7 @@ class _MenuPageState extends State<MenuPage> {
                 Navigator.pushNamed(context, '/feedback');
               },
             ),
-            const SizedBox(height: ColorWheel.standardPaddingValue),
+            AppTheme.sizedBoxMed,
 
             // Logout Button
             _buildMenuButton(
@@ -154,15 +153,8 @@ class _MenuPageState extends State<MenuPage> {
       width: double.infinity,
       child: ElevatedButton.icon(
         onPressed: onPressed,
-        icon: Icon(icon, color: ColorWheel.primaryText),
-        label: Text(label, style: ColorWheel.buttonText),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: isLogoutButton ? ColorWheel.buttonError : ColorWheel.buttonSuccess,
-          padding: const EdgeInsets.symmetric(vertical: ColorWheel.standardPaddingValue),
-          shape: RoundedRectangleBorder(
-            borderRadius: ColorWheel.buttonBorderRadius,
-          ),
-        ),
+        icon: Icon(icon),
+        label: Text(label),
       ),
     );
   }

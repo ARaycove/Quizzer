@@ -2,6 +2,7 @@ import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:supabase/supabase.dart';
 import 'dart:math'; // Added for Random
+import 'package:quizzer/backend_systems/00_database_manager/review_system/get_send_postgre.dart' show decodeValueFromDB;
 
 /// Fetches a flagged question record for review from Supabase.
 /// Returns a map containing both the question data and the flag record.
@@ -31,10 +32,11 @@ Future<Map<String, dynamic>?> getFlaggedQuestionForReview({
           .eq('flag_type', primaryKey['flag_type']!)
           .or('is_reviewed.is.null,is_reviewed.eq.0');
     } else {
-      // Query random unreviewed flag
+      // Query random unreviewed flag - only get records with flag_id = 0 (unreviewed)
       response = await supabase
           .from('question_answer_pair_flags')
           .select('*')
+          .eq('flag_id', '0')
           .or('is_reviewed.is.null,is_reviewed.eq.0');
     }
     
@@ -61,11 +63,17 @@ Future<Map<String, dynamic>?> getFlaggedQuestionForReview({
         .eq('question_id', questionId)
         .single();
     QuizzerLogger.logMessage('Successfully fetched question data for question_id: $questionId');
-    
+
+    // Properly decode the question data using the same pattern as get_send_postgre.dart
+    final Map<String, dynamic> decodedQuestionData = {};
+    for (final entry in questionResponse.entries) {
+      decodedQuestionData[entry.key] = decodeValueFromDB(entry.value);
+    }
+
     // Prepare the response structure
     QuizzerLogger.logMessage('Preparing response structure for question_id: $questionId');
     final Map<String, dynamic> reviewData = {
-      'question_data': questionResponse,
+      'question_data': decodedQuestionData,
       'report': {
         'question_id': questionId,
         'flag_type': flagType,
@@ -104,23 +112,7 @@ Future<bool> submitQuestionReview({
   required String action, // 'edit' or 'delete'
   required Map<String, dynamic> updatedQuestionData,
 }) async {
-  // TODO Write unit tests for this function
-  // Test 1: Edit request
-  // create 1 flag record and 1 question_answer_pair record pushing both to supabase
-  // use api to get flag record
-  // using the return data from the api, submit an edit request
-  // query supabase for the test question_answer_pair
-  // confirm edit was made
-  // delete both test records
-
-  // Test 2: Delete request
-  // create 1 flag record and 1 question_answer_pair record pushing both to supabase
-  // use api to get flag record 
-  // submit delete request
-  // validate flag exists
-  // validate old record was deleted
-  // delete flag
-  
+  // [x] Write unit tests for this function
 
   try {
     QuizzerLogger.logMessage('Submitting review for question: $questionId, action: $action');

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
-import 'package:quizzer/UI_systems/color_wheel.dart';
 import 'package:quizzer/UI_systems/10_stats_page/widget_combined_bar_line_template.dart';
+import 'package:quizzer/app_theme.dart';
 
 class DailyQuestionsAnsweredStatWidget extends StatefulWidget {
   const DailyQuestionsAnsweredStatWidget({super.key});
@@ -30,7 +30,7 @@ class _DailyQuestionsAnsweredStatWidgetState extends State<DailyQuestionsAnswere
         }
         final history = snapshot.data ?? [];
         if (history.isEmpty) {
-          return const Center(child: Text('No daily questions answered data available.', style: ColorWheel.defaultText));
+          return const Center(child: Text('No daily questions answered data available.'));
         }
         final latest = history.last;
         final int correct = latest['correct_questions_answered'] ?? 0;
@@ -47,16 +47,15 @@ class _DailyQuestionsAnsweredStatWidgetState extends State<DailyQuestionsAnswere
           children: [
             Text(
               'Today: $total answered (Correct: $correct, Incorrect: $incorrect)',
-              style: ColorWheel.titleText,
             ),
-            const SizedBox(height: 8),
+            AppTheme.sizedBoxSml,
             CombinedBarLineChart(
               data: chartData,
               chartName: 'Daily Questions Answered (Correct/Incorrect/Total)',
               xAxisLabel: 'Date',
               yAxisLabel: 'Questions',
             ),
-            const SizedBox(height: 32),
+            AppTheme.sizedBoxLrg,
           ],
         );
       },

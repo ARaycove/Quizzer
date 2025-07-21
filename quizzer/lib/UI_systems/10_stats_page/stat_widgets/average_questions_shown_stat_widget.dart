@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/UI_systems/10_stats_page/widget_graph_template.dart';
+import 'package:quizzer/app_theme.dart';
 
 class AverageQuestionsShownStatWidget extends StatefulWidget {
   const AverageQuestionsShownStatWidget({super.key});
@@ -37,15 +38,10 @@ class _AverageQuestionsShownStatWidgetState extends State<AverageQuestionsShownS
             final double avgShown = stat != null ? (stat['average_questions_shown_per_day'] as double? ?? 0.0) : 0.0;
             return Text(
               'Current Average Questions Shown Per Day: ${avgShown.toStringAsFixed(2)}',
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 18.0,
-                fontWeight: FontWeight.bold,
-              ),
             );
           },
         ),
-        const SizedBox(height: 8),
+        AppTheme.sizedBoxSml,
 
         // Historical Average Questions Shown Per Day Graph
         FutureBuilder<List<Map<String, dynamic>>>(
@@ -70,7 +66,7 @@ class _AverageQuestionsShownStatWidgetState extends State<AverageQuestionsShownS
             );
           },
         ),
-        const SizedBox(height: 32),
+        AppTheme.sizedBoxLrg,
       ],
     );
   }

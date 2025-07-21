@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io'; // For File operations (non-web)
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:quizzer/UI_systems/color_wheel.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 
@@ -56,7 +55,7 @@ class _BulkAddButtonState extends State<BulkAddButton> {
        QuizzerLogger.logError('Bulk Add: File path is null. This method currently only supports non-web platforms.');
         if (!context.mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-         const SnackBar(content: Text('Error: File path not available (Web platform not fully supported by this method yet).'), backgroundColor: ColorWheel.buttonError),
+         const SnackBar(content: Text('Error: File path not available (Web platform not fully supported by this method yet).')),
         );
         setState(() => _isLoading = false);
         return;
@@ -201,7 +200,6 @@ class _BulkAddButtonState extends State<BulkAddButton> {
       ScaffoldMessenger.of(this.context).showSnackBar(
         SnackBar(
           content: Text('Bulk add finished for $selectedFileName. Added $itemsAdded, Skipped $itemsSkipped.'),
-          backgroundColor: itemsSkipped > 0 ? ColorWheel.buttonError : ColorWheel.buttonSuccess,
         ),
       );
     }
@@ -338,42 +336,11 @@ class _BulkAddButtonState extends State<BulkAddButton> {
   Widget build(BuildContext context) {
     return ElevatedButton.icon(
             icon: _isLoading 
-                  ? const SizedBox( // Replace icon with progress indicator
-                      width: 18, height: 18, // Smaller size for button
-                      child: CircularProgressIndicator(
-                        color: ColorWheel.primaryText, // Text color for contrast
-                        strokeWidth: 2.0,
-                      )
-                    )
-                  : const Icon(Icons.upload_file, size: 18.0), // Standard icon
+                  ? const CircularProgressIndicator()
+                  : const Icon(Icons.upload_file), // Standard icon
             label: const Text('Bulk Add'),
-            style: ElevatedButton.styleFrom(
-               backgroundColor: ColorWheel.secondaryBackground, // Use secondary background for gray
-               foregroundColor: ColorWheel.primaryText, // Text/Icon color
-               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-               shape: RoundedRectangleBorder(borderRadius: ColorWheel.buttonBorderRadius),
-            ),
             // Disable button while loading, otherwise call handler
             onPressed: _isLoading ? null : () => _handleBulkAdd(context), 
           );
   }
-} 
-
-
-        /* Expected JSON format for each question object in the list:
-         {
-           "moduleName": "string",
-           "questionType": "string (e.g., 'multiple_choice', 'text_entry')",
-           "questionElements": [
-             {"type": "text", "content": "string"},
-             {"type": "image", "content": "relative/path/to/image.png"} 
-             // ... more elements
-           ],
-           "answerElements": [
-             {"type": "text", "content": "string"}
-             // ... more elements
-           ],
-           "options": ["string", "string"], // Optional: Only for 'multiple_choice'
-           "correctOptionIndex": 0 // Optional: Only for 'multiple_choice' (0-indexed)
-         }
-        */
+}

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
-import 'package:quizzer/UI_systems/color_wheel.dart';
-import '../widget_graph_template.dart';
-import '../widget_bar_chart_template.dart';
+import 'package:quizzer/UI_systems/10_stats_page/widget_graph_template.dart';
+import 'package:quizzer/UI_systems/10_stats_page/widget_bar_chart_template.dart';
+import 'package:quizzer/app_theme.dart';
 
 // Custom StatLineGraph specifically for revision scores with sorted tooltips
 class RevisionScoreLineGraph extends StatelessWidget {
@@ -82,180 +82,159 @@ class RevisionScoreLineGraph extends StatelessWidget {
       children: [
         SizedBox(
           height: 220,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12.0),
-            child: LineChart(
-              LineChartData(
-                lineBarsData: lines,
-                titlesData: FlTitlesData(
-                  leftTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      reservedSize: 40,
-                      getTitlesWidget: (value, meta) {
-                        if (value % 1 != 0) return const SizedBox.shrink();
-                        return Text(
-                          value.toInt().toString(),
-                          style: ColorWheel.defaultText.copyWith(fontSize: 10),
-                        );
-                      },
-                    ),
-                    axisNameWidget: Padding(
-                      padding: const EdgeInsets.only(right: 8.0),
-                      child: Text(yAxisLabel, style: ColorWheel.defaultText.copyWith(fontSize: 12)),
-                    ),
-                    axisNameSize: 24,
+          child: LineChart(
+            LineChartData(
+              lineBarsData: lines,
+              titlesData: FlTitlesData(
+                leftTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: true,
+                    reservedSize: 40,
+                    getTitlesWidget: (value, meta) {
+                      if (value % 1 != 0) return const SizedBox.shrink();
+                      return Text(
+                        value.toInt().toString(),
+                      );
+                    },
                   ),
-                  bottomTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      getTitlesWidget: (value, meta) {
-                        int idx = value.toInt();
-                        if (idx < 0 || idx >= xLabels.length) return const SizedBox.shrink();
-                        if (uniqueXLabels.length == 1) {
-                          if (idx == 0) {
+                  axisNameWidget: Text(yAxisLabel),
+                  axisNameSize: 24,
+                ),
+                bottomTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: true,
+                    getTitlesWidget: (value, meta) {
+                      int idx = value.toInt();
+                      if (idx < 0 || idx >= xLabels.length) return const SizedBox.shrink();
+                      if (uniqueXLabels.length == 1) {
+                        if (idx == 0) {
+                          return Transform.rotate(
+                            angle: -0.7,
+                            child: Text(xLabels[0]),
+                          );
+                        } else {
+                          return const SizedBox.shrink();
+                        }
+                      }
+                      if (xLabels.length == 1) {
+                        return Transform.rotate(
+                          angle: -0.7,
+                          child: Text(xLabels[0]),
+                        );
+                      }
+                      if (idx == 0 || idx == xLabels.length - 1) {
+                        return Transform.rotate(
+                          angle: -0.7,
+                          child: Text(xLabels[idx]),
+                        );
+                      }
+                      if (xLabels.length > 2) {
+                        int interval = (xLabels.length / 4).ceil();
+                        if (interval > 0 && idx % interval == 0 && idx != 0 && idx != xLabels.length - 1) {
+                          int shown = 2;
+                          for (int i = 1; i < xLabels.length - 1; i++) {
+                            if (i % interval == 0) shown++;
+                          }
+                          if (shown <= 5) {
                             return Transform.rotate(
                               angle: -0.7,
-                              child: Text(xLabels[0], style: ColorWheel.defaultText.copyWith(fontSize: 10)),
+                              child: Text(xLabels[idx]),
                             );
-                          } else {
-                            return const SizedBox.shrink();
                           }
                         }
-                        if (xLabels.length == 1) {
-                          return Transform.rotate(
-                            angle: -0.7,
-                            child: Text(xLabels[0], style: ColorWheel.defaultText.copyWith(fontSize: 10)),
-                          );
-                        }
-                        if (idx == 0 || idx == xLabels.length - 1) {
-                          return Transform.rotate(
-                            angle: -0.7,
-                            child: Text(xLabels[idx], style: ColorWheel.defaultText.copyWith(fontSize: 10)),
-                          );
-                        }
-                        if (xLabels.length > 2) {
-                          int interval = (xLabels.length / 4).ceil();
-                          if (interval > 0 && idx % interval == 0 && idx != 0 && idx != xLabels.length - 1) {
-                            int shown = 2;
-                            for (int i = 1; i < xLabels.length - 1; i++) {
-                              if (i % interval == 0) shown++;
-                            }
-                            if (shown <= 5) {
-                              return Transform.rotate(
-                                angle: -0.7,
-                                child: Text(xLabels[idx], style: ColorWheel.defaultText.copyWith(fontSize: 10)),
-                              );
-                            }
-                          }
-                        }
-                        return const SizedBox.shrink();
-                      },
-                      reservedSize: 32,
-                    ),
-                    axisNameWidget: Padding(
-                      padding: const EdgeInsets.only(top: 8.0),
-                      child: Text(xAxisLabel, style: ColorWheel.defaultText.copyWith(fontSize: 12)),
-                    ),
-                    axisNameSize: 24,
-                  ),
-                  topTitles: AxisTitles(
-                    axisNameWidget: Text(
-                      chartName,
-                      style: ColorWheel.titleText.copyWith(fontSize: 16),
-                      textAlign: TextAlign.center,
-                    ),
-                    axisNameSize: 32,
-                    sideTitles: const SideTitles(showTitles: false),
-                  ),
-                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                ),
-                gridData: const FlGridData(show: true),
-                borderData: FlBorderData(show: true),
-                minY: 0,
-                maxY: yMax,
-                lineTouchData: LineTouchData(
-                  enabled: true,
-                  touchTooltipData: LineTouchTooltipData(
-                    getTooltipItems: (touchedSpots) {
-                      final sorted = touchedSpots.toList()
-                        ..sort((a, b) {
-                          int scoreA = 0;
-                          int scoreB = 0;
-                          if (seriesList[a.barIndex].legendLabel.contains('Score')) {
-                            scoreA = int.tryParse(seriesList[a.barIndex].legendLabel.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
-                          }
-                          if (seriesList[b.barIndex].legendLabel.contains('Score')) {
-                            scoreB = int.tryParse(seriesList[b.barIndex].legendLabel.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
-                          }
-                          return scoreA.compareTo(scoreB);
-                        });
-                      return sorted.map((spot) {
-                        final series = seriesList[spot.barIndex];
-                        const double shadowCircleOffset = 1.5;
-                        const double shadowCircleOffsetNegative = -1.5;
-                        const double blurRadius = 2;
-                        return LineTooltipItem(
-                          "",
-                          const TextStyle(fontWeight: FontWeight.normal, height: 1.5),
-                          children: [
-                            TextSpan(
-                              text: "\u25CF  ",
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: series.lineColor, 
-                                shadows: const [
-                                  Shadow(offset: Offset(shadowCircleOffsetNegative, shadowCircleOffset), blurRadius: blurRadius, color: Colors.white),
-                                  Shadow(offset: Offset(shadowCircleOffset, shadowCircleOffsetNegative), blurRadius: blurRadius, color: Colors.white),
-                                  Shadow(offset: Offset(shadowCircleOffset, shadowCircleOffset), blurRadius: blurRadius, color: Colors.white),
-                                  Shadow(offset: Offset(shadowCircleOffsetNegative, shadowCircleOffsetNegative), blurRadius: blurRadius, color: Colors.white),
-                                ],
-                              ),
-                            ),
-                            TextSpan(
-                              text: "${series.legendLabel}: ${spot.y.toInt()}",
-                              style: const TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ],
-                        );
-                      }).toList();
+                      }
+                      return const SizedBox.shrink();
                     },
-                    fitInsideHorizontally: true,
-                    fitInsideVertically: true,
+                    reservedSize: 32,
                   ),
+                  axisNameWidget: Text(xAxisLabel),
+                  axisNameSize: 24,
+                ),
+                topTitles: AxisTitles(
+                  axisNameWidget: Text(
+                    chartName,
+                    textAlign: TextAlign.center,
+                  ),
+                  axisNameSize: 32,
+                  sideTitles: const SideTitles(showTitles: false),
+                ),
+                rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              ),
+              gridData: const FlGridData(show: true),
+              borderData: FlBorderData(show: true),
+              minY: 0,
+              maxY: yMax,
+              lineTouchData: LineTouchData(
+                enabled: true,
+                touchTooltipData: LineTouchTooltipData(
+                  getTooltipItems: (touchedSpots) {
+                    final sorted = touchedSpots.toList()
+                      ..sort((a, b) {
+                        int scoreA = 0;
+                        int scoreB = 0;
+                        if (seriesList[a.barIndex].legendLabel.contains('Score')) {
+                          scoreA = int.tryParse(seriesList[a.barIndex].legendLabel.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
+                        }
+                        if (seriesList[b.barIndex].legendLabel.contains('Score')) {
+                          scoreB = int.tryParse(seriesList[b.barIndex].legendLabel.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
+                        }
+                        return scoreA.compareTo(scoreB);
+                      });
+                    return sorted.map((spot) {
+                      final series = seriesList[spot.barIndex];
+                      const double shadowCircleOffset = 1.5;
+                      const double shadowCircleOffsetNegative = -1.5;
+                      const double blurRadius = 2;
+                      return LineTooltipItem(
+                        "",
+                        const TextStyle(fontWeight: FontWeight.normal, height: 1.5),
+                        children: [
+                          TextSpan(
+                            text: "\u25CF  ",
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: series.lineColor, 
+                              shadows: const [
+                                Shadow(offset: Offset(shadowCircleOffsetNegative, shadowCircleOffset), blurRadius: blurRadius, color: Colors.white),
+                                Shadow(offset: Offset(shadowCircleOffset, shadowCircleOffsetNegative), blurRadius: blurRadius, color: Colors.white),
+                                Shadow(offset: Offset(shadowCircleOffset, shadowCircleOffset), blurRadius: blurRadius, color: Colors.white),
+                                Shadow(offset: Offset(shadowCircleOffsetNegative, shadowCircleOffsetNegative), blurRadius: blurRadius, color: Colors.white),
+                              ],
+                            ),
+                          ),
+                          TextSpan(
+                            text: "${series.legendLabel}: ${spot.y.toInt()}",
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      );
+                    }).toList();
+                  },
+                  fitInsideHorizontally: true,
+                  fitInsideVertically: true,
                 ),
               ),
             ),
           ),
         ),
         if (showLegend)
-          Positioned(
-            right: 0,
-            top: 0,
-            child: Wrap(
-              spacing: 16,
-              children: [
-                for (final s in seriesList)
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(width: 16, height: 4, color: s.lineColor),
-                      const SizedBox(width: 8),
-                      Text(
-                        s.legendLabel,
-                        style: ColorWheel.defaultText.copyWith(
-                          color: ColorWheel.primaryText,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-              ],
-            ),
+          Wrap(
+            spacing: 16,
+            children: [
+              for (final s in seriesList)
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(width: 16, height: 4, color: s.lineColor),
+                    AppTheme.sizedBoxSml,
+                    Text(s.legendLabel),
+                  ],
+                ),
+            ],
           ),
       ],
     );
@@ -294,7 +273,7 @@ class _RevisionScoreStatWidgetState extends State<RevisionScoreStatWidget> {
               return const Center(child: CircularProgressIndicator());
             }
             if (snapshot.hasError || snapshot.data == null || snapshot.data!.isEmpty) {
-              return const Center(child: Text('No current revision streak data available.', style: ColorWheel.defaultText));
+              return const Center(child: Text('No current revision streak data available.'));
             }
             final stats = snapshot.data!;
             // Transform data for the bar chart
@@ -309,10 +288,9 @@ class _RevisionScoreStatWidgetState extends State<RevisionScoreStatWidget> {
               children: [
                 const Text(
                   'Current Question Distribution by Revision Score',
-                  style: ColorWheel.titleText,
                   textAlign: TextAlign.left,
                 ),
-                const SizedBox(height: 8),
+                AppTheme.sizedBoxSml,
                 StatBarChart(
                   data: barChartData,
                   chartName: '', // Title handled above
@@ -324,7 +302,7 @@ class _RevisionScoreStatWidgetState extends State<RevisionScoreStatWidget> {
             );
           },
         ),
-        const SizedBox(height: 32),
+        AppTheme.sizedBoxLrg,
 
         // Historical Revision Streak Stats Line Graph
         FutureBuilder<List<Map<String, dynamic>>>(
@@ -334,7 +312,7 @@ class _RevisionScoreStatWidgetState extends State<RevisionScoreStatWidget> {
               return const Center(child: CircularProgressIndicator());
             }
             if (snapshot.hasError || snapshot.data == null || snapshot.data!.isEmpty) {
-              return const Center(child: Text('No historical revision streak data available.', style: ColorWheel.defaultText));
+              return const Center(child: Text('No historical revision streak data available.'));
             }
             final history = snapshot.data!;
             
@@ -386,7 +364,7 @@ class _RevisionScoreStatWidgetState extends State<RevisionScoreStatWidget> {
             }
 
             if (seriesList.isEmpty) {
-              return const Center(child: Text('Not enough data to display historical streak graph.', style: ColorWheel.defaultText));
+              return const Center(child: Text('Not enough data to display historical streak graph.'));
             }
 
             return RevisionScoreLineGraph(
@@ -399,7 +377,7 @@ class _RevisionScoreStatWidgetState extends State<RevisionScoreStatWidget> {
             );
           },
         ),
-        const SizedBox(height: 32),
+        AppTheme.sizedBoxLrg,
       ],
     );
   }

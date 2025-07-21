@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
-import 'package:quizzer/UI_systems/color_wheel.dart';
 import 'dart:math';
 import 'package:quizzer/UI_systems/global_widgets/question_answer_element.dart';
 import 'package:collection/collection.dart';
+import 'package:quizzer/app_theme.dart';
 
 // ==========================================
 //  Select All That Apply Question Widget
@@ -222,7 +222,7 @@ class _SelectAllThatApplyQuestionWidgetState
        QuizzerLogger.logError('Sync error submitting answer (Select All): $e');
        setState(() { _isAnswerSubmitted = false; }); // Revert only submission flag
        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error submitting: ${e.toString()}'), backgroundColor: ColorWheel.buttonError),
+          SnackBar(content: Text('Error submitting: ${e.toString()}')),
         );
     }
   }
@@ -239,152 +239,148 @@ class _SelectAllThatApplyQuestionWidgetState
     final Set<int> correctOriginalIndices = widget.correctIndices.toSet();
 
     if (questionElements.isEmpty && _shuffledOptions.isEmpty) {
-        return const Center(child: Text("No question data provided.", style: ColorWheel.secondaryTextStyle));
+        return const Center(child: Text("No question data provided."));
     }
 
     // Determine if submit button should be shown (only when enabled)
     final bool canSubmit = !widget.isDisabled && _selectedShuffledIndices.isNotEmpty && !_isAnswerSubmitted;
 
+    // PRESERVE four-color functional feedback system for complex multiple-answer states
+    const Color correctColor = Colors.green;
+    const Color incorrectColor = Colors.red;
+    const Color lighterCorrectColor = Color.fromRGBO(0, 255, 0, 0.1); // Lighter green background
+    const Color lighterIncorrectColor = Color.fromRGBO(255, 0, 0, 0.1); // Lighter red background
+    final Color selectedOptionBorderColor = Theme.of(context).colorScheme.primary;
+
     return SingleChildScrollView(
-      child: Padding(
-        padding: ColorWheel.standardPadding,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // --- Question Elements --- (Uses passed-in questionElements)
-            Container(
-              padding: ColorWheel.standardPadding,
-              decoration: BoxDecoration(color: ColorWheel.secondaryBackground, borderRadius: ColorWheel.cardBorderRadius),
-              child: ElementRenderer(elements: questionElements),
-            ),
-            const SizedBox(height: ColorWheel.majorSectionSpacing),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // --- Question Elements --- (Uses passed-in questionElements)
+          ElementRenderer(elements: questionElements),
+          AppTheme.sizedBoxLrg,
 
-            // --- Options --- (Uses internal state, but takes correctIndices from widget)
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: _shuffledOptions.length,
-              itemBuilder: (context, index) {
-                final optionData = _shuffledOptions[index];
-                final int currentOriginalIndex = _originalIndices[index];
-                final bool isSelected = _selectedShuffledIndices.contains(index);
-                // Use passed-in correctOriginalIndices
-                final bool isCorrect = correctOriginalIndices.contains(currentOriginalIndex);
-                
-                // Declare variables outside the if blocks for broader scope
-                IconData? icon;
-                Color iconColor = Colors.transparent; // Default to transparent
-                Color borderColor = Colors.transparent;
-                Color? checkboxColor; // Color for the check mark itself
+          // --- Options --- (Uses internal state, but takes correctIndices from widget)
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: _shuffledOptions.length,
+            itemBuilder: (context, index) {
+              final optionData = _shuffledOptions[index];
+              final int currentOriginalIndex = _originalIndices[index];
+              final bool isSelected = _selectedShuffledIndices.contains(index);
+              // Use passed-in correctOriginalIndices
+              final bool isCorrect = correctOriginalIndices.contains(currentOriginalIndex);
+              
+              // Declare variables outside the if blocks for broader scope
+              IconData? icon;
+              Color iconColor = Colors.transparent; // Default to transparent
+              Color borderColor = Colors.transparent;
+              Color? backgroundColor;
+              Color? checkboxColor; // Color for the check mark itself
 
-                if (_isAnswerSubmitted) {
-                   // Feedback phase
-                   if (isSelected) {
-                      // Correct & Selected: Green border, green check icon
-                      borderColor = ColorWheel.buttonSuccess;
-                      checkboxColor = ColorWheel.buttonSuccess;
-                   } else if (isCorrect) {
-                      // Correct & NOT Selected: Mark with RED border as an error
-                      borderColor = ColorWheel.buttonError; 
-                   } else {
-                      // Incorrect & NOT Selected: Keep neutral
-                      borderColor = Colors.transparent;
-                   }
-                   // Separate logic for the trailing icon based on all states
-                   if (isCorrect && isSelected) {
-                     icon = Icons.check_circle; 
-                     iconColor = ColorWheel.buttonSuccess;
-                   } else if (isCorrect && !isSelected) {
-                     // Correct but not selected - User Error - Show something? Maybe outline?
-                     icon = Icons.check_circle_outline; // Keep outline check to show it *was* correct
-                     iconColor = ColorWheel.buttonError; // But make the icon RED
-                   } else if (!isCorrect && isSelected) {
-                     icon = Icons.cancel; 
-                     iconColor = ColorWheel.buttonError;
-                   }
-                   // else: !isCorrect && !isSelected -> icon = null, iconColor = transparent (handled by default)
-                } else if (isSelected && !widget.isDisabled) {
-                   // Selection phase (before submit)
-                   borderColor = ColorWheel.accent;
-                   checkboxColor = ColorWheel.accent;
-                }
+              if (_isAnswerSubmitted) {
+                 // Feedback phase - PRESERVE four-color functional feedback system
+                 if (isSelected) {
+                    // Correct & Selected: Green border, lighter green background, green check icon
+                    borderColor = correctColor;
+                    backgroundColor = lighterCorrectColor;
+                    checkboxColor = correctColor;
+                 } else if (isCorrect) {
+                    // Correct & NOT Selected: Mark with RED border as an error (no background)
+                    borderColor = incorrectColor; 
+                 } else if (isSelected) {
+                    // Incorrect & Selected: Red border, lighter red background, red cancel icon
+                    borderColor = incorrectColor;
+                    backgroundColor = lighterIncorrectColor;
+                    checkboxColor = incorrectColor;
+                 } else {
+                    // Incorrect & NOT Selected: Keep neutral
+                    borderColor = Colors.transparent;
+                 }
+                 // Separate logic for the trailing icon based on all states
+                 if (isCorrect && isSelected) {
+                   icon = Icons.check_circle; 
+                   iconColor = correctColor;
+                 } else if (isCorrect && !isSelected) {
+                   // Correct but not selected - User Error - Show something? Maybe outline?
+                   icon = Icons.check_circle_outline; // Keep outline check to show it *was* correct
+                   iconColor = incorrectColor; // But make the icon RED
+                 } else if (!isCorrect && isSelected) {
+                   icon = Icons.cancel; 
+                   iconColor = incorrectColor;
+                 }
+                 // else: !isCorrect && !isSelected -> icon = null, iconColor = transparent (handled by default)
+              } else if (isSelected && !widget.isDisabled) {
+                 // Selection phase (before submit)
+                 borderColor = selectedOptionBorderColor;
+                 backgroundColor = selectedOptionBorderColor.withValues(alpha: 0.1);
+                 checkboxColor = selectedOptionBorderColor;
+              }
 
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4.0),
-                  child: InkWell(
-                    // Disable onTap if isDisabled or submitted
-                    onTap: (widget.isDisabled || _isAnswerSubmitted) ? null : () => _handleOptionToggled(index),
-                    borderRadius: ColorWheel.buttonBorderRadius,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
-                      decoration: BoxDecoration(
-                        color: ColorWheel.secondaryBackground, 
-                        borderRadius: ColorWheel.buttonBorderRadius,
-                        border: Border.all(color: borderColor, width: 1.5),
-                      ),
-                      child: Row(
-                        children: [
-                          Checkbox(
-                            value: isSelected,
-                            // Disable onChanged if isDisabled or submitted
-                            onChanged: (widget.isDisabled || _isAnswerSubmitted) ? null : (bool? value) => _handleOptionToggled(index),
-                            activeColor: checkboxColor ?? ColorWheel.accent, 
-                            checkColor: ColorWheel.primaryText, 
-                            side: BorderSide(color: _isAnswerSubmitted ? borderColor : ColorWheel.secondaryText), 
-                          ),
-                          const SizedBox(width: ColorWheel.relatedElementSpacing / 2),
-                          Expanded(child: ElementRenderer(elements: [optionData])), 
-                          // Use the icon determined by the logic above
-                           if (_isAnswerSubmitted && icon != null)
-                             Icon(icon, color: iconColor, size: 20)
-                           else if (_isAnswerSubmitted) // Ensure alignment if no icon is shown
-                             const SizedBox(width: 20), 
-                        ],
-                      ),
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4.0),
+                child: InkWell(
+                  // Disable onTap if isDisabled or submitted
+                  onTap: (widget.isDisabled || _isAnswerSubmitted) ? null : () => _handleOptionToggled(index),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                    decoration: BoxDecoration(
+                      color: backgroundColor,
+                      border: borderColor != Colors.transparent ? Border.all(color: borderColor, width: 1.5) : null,
+                    ),
+                    child: Row(
+                      children: [
+                        Checkbox(
+                          value: isSelected,
+                          // Disable onChanged if isDisabled or submitted
+                          onChanged: (widget.isDisabled || _isAnswerSubmitted) ? null : (bool? value) => _handleOptionToggled(index),
+                          activeColor: checkboxColor ?? Theme.of(context).colorScheme.primary, 
+                          side: BorderSide(color: _isAnswerSubmitted ? (borderColor != Colors.transparent ? borderColor : Theme.of(context).colorScheme.outline) : Theme.of(context).colorScheme.outline), 
+                        ),
+                        AppTheme.sizedBoxSml,
+                        Expanded(child: ElementRenderer(elements: [optionData])), 
+                        // Use the icon determined by the logic above
+                         if (_isAnswerSubmitted && icon != null)
+                           Icon(icon, color: iconColor)
+                         else if (_isAnswerSubmitted) // Ensure alignment if no icon is shown
+                           const SizedBox(width: 24), 
+                      ],
                     ),
                   ),
-                );
-              },
-            ),
-            const SizedBox(height: ColorWheel.majorSectionSpacing / 2),
-            
-            // --- Answer Elements --- (Uses passed-in answerElements)
-            if (_isAnswerSubmitted)
-              Padding(
-                padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
-                child: Container(
-                   padding: ColorWheel.standardPadding,
-                   decoration: BoxDecoration(color: ColorWheel.secondaryBackground.withAlpha(128), borderRadius: ColorWheel.cardBorderRadius),
-                   child: ElementRenderer(elements: widget.answerElements),
-                 ),
-              ),
+                ),
+              );
+            },
+          ),
+          AppTheme.sizedBoxMed,
+          
+          // --- Answer Elements --- (Uses passed-in answerElements)
+          if (_isAnswerSubmitted)
+            ElementRenderer(elements: widget.answerElements),
 
-            // --- Submit / Next Question Buttons --- 
-            // Only show Submit if it *can* be submitted (enabled, options selected, not submitted)
-            if (canSubmit) 
-              Padding(
-                 padding: const EdgeInsets.only(top: 8.0),
-                 child: ElevatedButton(
-                   style: ElevatedButton.styleFrom(backgroundColor: ColorWheel.buttonSuccess), 
-                   // onPressed is implicitly enabled because `canSubmit` is true
-                   onPressed: _handleSubmitAnswer, 
-                   child: const Text('Submit Answer', style: ColorWheel.buttonTextBold),
-                 ),
-              ),
+          // --- Submit / Next Question Buttons --- 
+          // Only show Submit if it *can* be submitted (enabled, options selected, not submitted)
+          if (canSubmit) 
+            Padding(
+               padding: const EdgeInsets.only(top: 8.0),
+               child: ElevatedButton(
+                 // onPressed is implicitly enabled because `canSubmit` is true
+                 onPressed: _handleSubmitAnswer, 
+                 child: const Text('Submit Answer'),
+               ),
+             ),
               
-            // Only show Next if submitted (isDisabled doesn't affect Next button display, only onPressed)
-            if (_isAnswerSubmitted) 
-               Padding(
-                 padding: const EdgeInsets.only(top: 8.0),
-                 child: ElevatedButton(
-                   style: ElevatedButton.styleFrom(backgroundColor: ColorWheel.buttonSuccess),
-                   // Disable onPressed if isDisabled
-                   onPressed: widget.isDisabled ? null : _handleNextQuestion,
-                   child: const Text('Next Question', style: ColorWheel.buttonText),
-                 ),
-              ),
-          ],
-        ),
+          // Only show Next if submitted (isDisabled doesn't affect Next button display, only onPressed)
+          if (_isAnswerSubmitted) 
+             Padding(
+               padding: const EdgeInsets.only(top: 8.0),
+               child: ElevatedButton(
+                 // Disable onPressed if isDisabled
+                 onPressed: widget.isDisabled ? null : _handleNextQuestion,
+                 child: const Text('Next Question'),
+               ),
+             ),
+        ],
       ),
     );
   }

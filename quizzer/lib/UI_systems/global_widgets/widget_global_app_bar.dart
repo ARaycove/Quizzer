@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:quizzer/UI_systems/color_wheel.dart';
 
 class GlobalAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
@@ -19,14 +18,9 @@ class GlobalAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: Text(
-        title,
-        style: ColorWheel.titleText,
-      ),
-      backgroundColor: ColorWheel.secondaryBackground,
-      elevation: 0,
+      title: Text(title),
       leading: IconButton(
-        icon: const Icon(Icons.arrow_back, color: ColorWheel.primaryText),
+        icon: const Icon(Icons.arrow_back),
         tooltip: 'Back',
         onPressed: () {
           Navigator.of(context).pop();
@@ -35,7 +29,7 @@ class GlobalAppBar extends StatelessWidget implements PreferredSizeWidget {
       actions: [
         if (showHomeButton)
           IconButton(
-            icon: const Icon(Icons.home, color: ColorWheel.primaryText),
+            icon: const Icon(Icons.home),
             tooltip: 'Home',
             onPressed: () {
               Navigator.of(context).pushReplacementNamed('/home');
@@ -43,6 +37,7 @@ class GlobalAppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
         if (additionalActions != null) ...additionalActions!,
       ],
+
     );
   }
 } 

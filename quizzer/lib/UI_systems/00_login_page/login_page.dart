@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
-import 'package:quizzer/UI_systems/color_wheel.dart';
+import 'package:quizzer/app_theme.dart';
 import 'dart:async'; // Import for StreamSubscription
 
 class LoginPage extends StatefulWidget {
@@ -75,7 +75,6 @@ class _LoginPageState extends State<LoginPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(results['message'] ?? 'Login failed'),
-          backgroundColor: ColorWheel.buttonError,
         ),
       );
       // Reset loading state on login failure
@@ -125,7 +124,6 @@ class _LoginPageState extends State<LoginPage> {
     final elementHeight25px = elementHeight > 25.0 ? 25.0 : elementHeight;
     
     return Scaffold(
-      backgroundColor: ColorWheel.primaryBackground,
       body: Center(child: SingleChildScrollView(child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -134,7 +132,7 @@ class _LoginPageState extends State<LoginPage> {
                 "images/quizzer_assets/quizzer_logo.png",
                 width: logoWidth,
               ),
-              const SizedBox(height: ColorWheel.majorSectionSpacing),
+              AppTheme.sizedBoxLrg,
               
               // Email Field
               SizedBox(
@@ -142,22 +140,14 @@ class _LoginPageState extends State<LoginPage> {
                 child: TextField(
                   controller: _emailController,
                   enabled: !_isLoading,
-                  style: const TextStyle(color: Colors.black),
-                  decoration: InputDecoration(
+                  style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+                  decoration: const InputDecoration(
                     labelText: "Email Address",
                     hintText: "Enter your email address to login",
-                    contentPadding: ColorWheel.inputFieldPadding,
-                    filled: true,
-                    fillColor: ColorWheel.textInputBackground,
-                    labelStyle: ColorWheel.inputLabelText,
-                    hintStyle: ColorWheel.hintTextStyle,
-                    border: OutlineInputBorder(
-                      borderRadius: ColorWheel.textFieldBorderRadius,
-                    ),
                   ),
                 ),
               ),
-              const SizedBox(height: ColorWheel.relatedElementSpacing),
+              AppTheme.sizedBoxMed,
               
               // Password Field
               SizedBox(
@@ -166,108 +156,62 @@ class _LoginPageState extends State<LoginPage> {
                   controller: _passwordController,
                   obscureText: true,
                   enabled: !_isLoading,
-                  style: const TextStyle(color: Colors.black),
-                  decoration: InputDecoration(
+                  style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+                  decoration: const InputDecoration(
                     labelText: "Password",
                     hintText: "Enter your account password to login",
-                    contentPadding: ColorWheel.inputFieldPadding,
-                    filled: true,
-                    fillColor: ColorWheel.textInputBackground,
-                    labelStyle: ColorWheel.inputLabelText,
-                    hintStyle: ColorWheel.hintTextStyle,
-                    border: OutlineInputBorder(
-                      borderRadius: ColorWheel.textFieldBorderRadius,
-                    ),
                   ),
                 ),
               ),
-              const SizedBox(height: ColorWheel.majorSectionSpacing),
+              AppTheme.sizedBoxLrg,
               
               // Submit Button
               SizedBox(
-                width: _isLoading ? fieldWidth : buttonWidth,
+                width: _isLoading ? fieldWidth : buttonWidth, // Expand to full width when loading
                 height: elementHeight25px,
                 child: ElevatedButton(
                   onPressed: _isLoading ? null : submitLogin,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: ColorWheel.buttonSuccess,
-                    minimumSize: Size(100, elementHeight25px),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: ColorWheel.buttonBorderRadius,
-                    ),
-                    disabledBackgroundColor: ColorWheel.buttonSecondary,
-                  ),
                   child: _isLoading 
                       ? Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                color: ColorWheel.primaryText,
-                                strokeWidth: 2,
-                              ),
-                            ),
-                            const SizedBox(width: 10),
+                            const CircularProgressIndicator(),
+                            AppTheme.sizedBoxMed,
                             Expanded(
-                              child: Text(
-                                _loginProgressMessage, 
-                                style: ColorWheel.buttonTextBold,
-                                textAlign: TextAlign.center,
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 2,
-                              ),
+                                child: Text(
+                                  _loginProgressMessage, 
+                                  textAlign: TextAlign.center,
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 2,
+                                ),
                             )
                           ],
                         ) 
-                      : const Text(
-                          "Login", // Or _loginProgressMessage if you want it to persist last known state
-                          style: ColorWheel.buttonTextBold,
-                        ),
+                        : const Text("Login"),
                 ),
               ),
               
               // Space for Social Login buttons
-              const SizedBox(height: ColorWheel.majorSectionSpacing + 10),
+              AppTheme.sizedBoxLrg,
               
               // Social Login Grid
-              SizedBox(
-                width: fieldWidth,
-                child: Wrap(
-                  alignment: WrapAlignment.center,
-                  spacing: ColorWheel.relatedElementSpacing,
-                  runSpacing: ColorWheel.relatedElementSpacing,
-                  children: [
-                    // These would be replaced with actual social login buttons
-                    _buildSocialLoginButton(Icons.g_mobiledata, "Google"),
-                    _buildSocialLoginButton(Icons.facebook, "Facebook"),
-                    _buildSocialLoginButton(Icons.code, "GitHub"),
-                    _buildSocialLoginButton(Icons.code_outlined, "GitLab"),
-                  ],
-                ),
+              Wrap(
+                alignment: WrapAlignment.center,
+                children: [
+                  // These would be replaced with actual social login buttons
+                  _buildSocialLoginButton(Icons.g_mobiledata, "Google"),
+                  _buildSocialLoginButton(Icons.facebook, "Facebook"),
+                  _buildSocialLoginButton(Icons.code, "GitHub"),
+                  _buildSocialLoginButton(Icons.code_outlined, "GitLab"),
+                ],
               ),
               
-              const SizedBox(height: ColorWheel.majorSectionSpacing + 10),
+              AppTheme.sizedBoxLrg,
               
               // New User Sign Up Button
-              SizedBox(
-                width: buttonWidth,
-                height: elementHeight25px,
-                child: ElevatedButton(
-                  onPressed: _isLoading ? null : newUserSignUp,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: ColorWheel.buttonSuccess,
-                    minimumSize: Size(100, elementHeight25px),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: ColorWheel.buttonBorderRadius,
-                    ),
-                  ),
-                  child: const Text(
-                    "New User",
-                    style: ColorWheel.buttonTextBold,
-                  ),
-                ),
+              ElevatedButton(
+                onPressed: _isLoading ? null : newUserSignUp,
+                child: const Text("New User"),
               ),
             ],
           ),
@@ -279,25 +223,12 @@ class _LoginPageState extends State<LoginPage> {
   // Helper method to build social login buttons
   // TODO Finish Social login integration, BAAS
   Widget _buildSocialLoginButton(IconData icon, String service) {
-    return Container(
-      width: 25,
-      height: 25,
-      decoration: BoxDecoration(
-        color: ColorWheel.secondaryBackground,
-        borderRadius: BorderRadius.circular(5),
-        border: Border.all(
-          color: ColorWheel.buttonSuccess,
-          width: 1,
-        ),
-      ),
-      child: IconButton(
-        padding: EdgeInsets.zero,
-        icon: Icon(icon, size: 20, color: ColorWheel.primaryText),
-        onPressed: () {
-          // This would later call the appropriate social login function
-          QuizzerLogger.logWarning('Social login ($service) not implemented yet.');
-        },
-      ),
+    return IconButton(
+      icon: Icon(icon),
+      onPressed: () {
+        // This would later call the appropriate social login function
+        QuizzerLogger.logWarning('Social login ($service) not implemented yet.');
+      },
     );
   }
 }

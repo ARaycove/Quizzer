@@ -790,7 +790,6 @@ void main() {
       
       // Create 1 flag record and 1 question_answer_pair record pushing both to supabase
       final testQuestionId = 'test_question_${DateTime.now().millisecondsSinceEpoch}';
-      final testFlagId = 'test_flag_${DateTime.now().millisecondsSinceEpoch}';
       
       // Create test question record
       final testQuestionRecord = {
@@ -893,7 +892,6 @@ void main() {
       
       // Create 1 flag record and 1 question_answer_pair record pushing both to supabase
       final testQuestionId = 'test_question_delete_${DateTime.now().millisecondsSinceEpoch}';
-      final testFlagId = 'test_flag_delete_${DateTime.now().millisecondsSinceEpoch}';
       
       // Create test question record
       final testQuestionRecord = {

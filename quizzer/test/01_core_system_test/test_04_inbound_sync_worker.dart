@@ -362,7 +362,7 @@ void main() {
                 {'type': 'text', 'content': 'Option D'}
               ]),
               'correct_option_index': 0,
-              'question_id': '${timestamp}_large_$i\_$userId',
+              'question_id': '${timestamp}_large_$i$userId',
               'correct_order': null,
               'index_options_that_apply': null,
               'has_been_synced': 1, // Prevent outbound sync

@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:quizzer/UI_systems/03_add_question_page/widgets/widget_module_selection.dart';
 import 'package:quizzer/UI_systems/03_add_question_page/widgets/add_question_widget/widget_add_question.dart';
 import 'package:quizzer/UI_systems/03_add_question_page/widgets/widget_live_preview.dart';
-import 'package:quizzer/UI_systems/color_wheel.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
+import 'package:quizzer/app_theme.dart';
 
 
 class EditQuestionDialog extends StatefulWidget {
@@ -206,7 +206,7 @@ class _EditQuestionDialogState extends State<EditQuestionDialog> {
       QuizzerLogger.logWarning('Validation failed: Please fill all required fields.');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Validation failed: Please fill all required fields.'), backgroundColor: ColorWheel.buttonError),
+          const SnackBar(content: Text('Validation failed: Please fill all required fields.')),
         );
       }
       return;
@@ -255,128 +255,78 @@ class _EditQuestionDialogState extends State<EditQuestionDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-    final dialogWidth = screenWidth * 0.85 > 460 ? 460.0 : screenWidth * 0.85;
-    final maxDialogHeight = screenHeight * 0.8;
-
     if (_isLoading) {
-      return Dialog(
-        backgroundColor: ColorWheel.secondaryBackground,
-        shape: RoundedRectangleBorder(borderRadius: ColorWheel.cardBorderRadius),
-        child: SizedBox(
-          width: dialogWidth,
-          child: const Padding(
-            padding: ColorWheel.standardPadding,
-            child: Center(
-              child: CircularProgressIndicator(color: ColorWheel.primaryText),
-            ),
-          ),
+      return const Dialog(
+        child: Center(
+          child: CircularProgressIndicator(),
         ),
       );
     }
 
     if (_errorMessage != null) {
       return Dialog(
-        backgroundColor: ColorWheel.secondaryBackground,
-        shape: RoundedRectangleBorder(borderRadius: ColorWheel.cardBorderRadius),
-        child: SizedBox(
-          width: dialogWidth,
-          child: Padding(
-            padding: ColorWheel.standardPadding,
-                         child: Center(
-               child: Text(_errorMessage!, style: ColorWheel.titleText),
-             ),
-          ),
+        child: Center(
+          child: Text(_errorMessage!),
         ),
       );
     }
 
     return Dialog(
-      backgroundColor: ColorWheel.secondaryBackground,
-      shape: RoundedRectangleBorder(borderRadius: ColorWheel.cardBorderRadius),
-      child: SizedBox(
-        width: dialogWidth,
-        child: Padding(
-          padding: ColorWheel.standardPadding,
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              maxHeight: maxDialogHeight,
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Edit Question'),
+            AppTheme.sizedBoxLrg,
+            ModuleSelection(controller: _moduleController),
+            AppTheme.sizedBoxMed,
+            AddQuestionWidget(
+              questionType: _questionType,
+              questionElements: _questionElements,
+              answerElements: _answerElements,
+              options: _options,
+              correctOptionIndex: _correctOptionIndex,
+              correctIndicesSATA: _correctIndicesSATA,
+              onAddElement: _handleAddElement,
+              onRemoveElement: _handleRemoveElement,
+              onEditElement: _handleEditElement,
+              onAddOption: _handleAddOption,
+              onRemoveOption: _handleRemoveOption,
+              onEditOption: _handleEditOption,
+              onSetCorrectOptionIndex: _handleSetCorrectOptionIndex,
+              onToggleCorrectOptionSATA: _handleToggleCorrectOptionSATA,
+              onReorderElements: _handleReorderElements,
+              onReorderOptions: _handleReorderOptions,
             ),
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Text('Edit Question', style: ColorWheel.titleText),
-                  const SizedBox(height: ColorWheel.majorSectionSpacing),
-                  ModuleSelection(controller: _moduleController),
-                  const SizedBox(height: ColorWheel.formFieldSpacing),
-                  AddQuestionWidget(
-                    questionType: _questionType,
-                    questionElements: _questionElements,
-                    answerElements: _answerElements,
-                    options: _options,
-                    correctOptionIndex: _correctOptionIndex,
-                    correctIndicesSATA: _correctIndicesSATA,
-                    onAddElement: _handleAddElement,
-                    onRemoveElement: _handleRemoveElement,
-                    onEditElement: _handleEditElement,
-                    onAddOption: _handleAddOption,
-                    onRemoveOption: _handleRemoveOption,
-                    onEditOption: _handleEditOption,
-                    onSetCorrectOptionIndex: _handleSetCorrectOptionIndex,
-                    onToggleCorrectOptionSATA: _handleToggleCorrectOptionSATA,
-                    onReorderElements: _handleReorderElements,
-                    onReorderOptions: _handleReorderOptions,
-                  ),
-                  const SizedBox(height: ColorWheel.majorSectionSpacing),
-                  const Text('Live Preview:', style: ColorWheel.titleText),
-                  const SizedBox(height: 8),
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: ColorWheel.secondaryText.withValues(alpha: 0.5)),
-                      borderRadius: ColorWheel.cardBorderRadius,
-                    ),
-                    child: LivePreviewWidget(
-                      key: ValueKey('live-preview-$_previewRebuildCounter'),
-                      questionType: _questionType,
-                      questionElements: _questionElements,
-                      answerElements: _answerElements,
-                      options: _options,
-                      correctOptionIndexMC: _correctOptionIndex,
-                      correctIndicesSATA: _correctIndicesSATA,
-                      isCorrectAnswerTrueTF: (_questionType == 'true_false') ? (_correctOptionIndex == 0) : null,
-                    ),
-                  ),
-                  const SizedBox(height: ColorWheel.majorSectionSpacing),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      TextButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        style: TextButton.styleFrom(
-                          foregroundColor: ColorWheel.buttonError,
-                        ),
-                        child: const Text('Cancel'),
-                      ),
-                      const SizedBox(width: ColorWheel.buttonHorizontalSpacing),
-                      ElevatedButton(
-                        onPressed: _handleSubmit,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: ColorWheel.buttonSuccess,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: ColorWheel.buttonBorderRadius,
-                          ),
-                        ),
-                        child: const Text('Submit', style: ColorWheel.buttonText),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+            AppTheme.sizedBoxLrg,
+            const Text('Live Preview:'),
+            AppTheme.sizedBoxSml,
+            LivePreviewWidget(
+              key: ValueKey('live-preview-$_previewRebuildCounter'),
+              questionType: _questionType,
+              questionElements: _questionElements,
+              answerElements: _answerElements,
+              options: _options,
+              correctOptionIndexMC: _correctOptionIndex,
+              correctIndicesSATA: _correctIndicesSATA,
+              isCorrectAnswerTrueTF: (_questionType == 'true_false') ? (_correctOptionIndex == 0) : null,
             ),
-          ),
+            AppTheme.sizedBoxLrg,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('Cancel'),
+                ),
+                AppTheme.sizedBoxMed,
+                ElevatedButton(
+                  onPressed: _handleSubmit,
+                  child: const Text('Submit'),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );

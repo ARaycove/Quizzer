@@ -1,8 +1,8 @@
 import 'dart:async'; // Added for Timer
 import 'package:flutter/material.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
-import 'package:quizzer/UI_systems/color_wheel.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
+import 'package:quizzer/app_theme.dart';
 import 'widget_home_page_top_bar.dart'; // Import the refactored Top Bar
 // Corrected package imports for MOVED question widgets
 import 'package:quizzer/UI_systems/question_widgets/widget_multiple_choice_question.dart'; 
@@ -58,18 +58,47 @@ class _HomePageState extends State<HomePage> { // State class
     }
   }
 
+  // --- ADDED: Method to handle question flagging ---
+  void _handleQuestionFlagged(Map<String, dynamic> flagResult) {
+    QuizzerLogger.logMessage('HomePage: Question flagged - ${flagResult['message']}');
+    
+    // Check if the flag was successful
+    final bool success = flagResult['success'] as bool? ?? false;
+    
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(flagResult['message']),
+          duration: const Duration(seconds: 3),
+        ),
+      );
+    }
+    
+    // Only request next question if the flag was successful
+    if (success) {
+      _requestNextQuestion();
+    }
+  }
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ColorWheel.primaryBackground,
       appBar: HomePageTopBar( 
         onMenuPressed: () {
           Navigator.pushNamed(context, '/menu');
         },
         onQuestionEdited: _handleQuestionEdited,
+        onQuestionFlagged: _handleQuestionFlagged,
       ),
       // Directly build the body, assuming SessionManager handles its initialization
-      body: _buildQuestionBody(), 
+      body: Column(
+        children: [
+          AppTheme.sizedBoxMed, // Spacer from app bar
+          Expanded(child: _buildQuestionBody()),
+        ],
+      ), 
     );
   }
 
@@ -171,13 +200,9 @@ class _HomePageState extends State<HomePage> { // State class
       QuizzerLogger.logError("HomePage - Building Error Widget: $message");
       return Center(
          key: key, 
-         child: Padding(
-           padding: const EdgeInsets.all(16.0),
-           child: Text(
-             'Error: $message',
-             style: const TextStyle(color: ColorWheel.warning, fontSize: 16),
-             textAlign: TextAlign.center,
-           ),
+         child: Text(
+           'Error: $message',
+           textAlign: TextAlign.center,
          ),
        );
   }

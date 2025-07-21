@@ -9,7 +9,6 @@ Key features:
 */ 
 
 import 'package:flutter/material.dart';
-import 'package:quizzer/UI_systems/color_wheel.dart';
 import 'package:quizzer/UI_systems/global_widgets/widget_global_app_bar.dart';
 import 'stat_widgets/eligible_questions_stat_widget.dart';
 import 'stat_widgets/circulation_status_stat_widget.dart';
@@ -37,27 +36,23 @@ class _StatsPageState extends State<StatsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ColorWheel.primaryBackground,
       appBar: const GlobalAppBar(
         title: 'Stats',
         showHomeButton: true,
       ),
-      body: Padding(
-        padding: ColorWheel.standardPadding,
-        child: ListView(
-          physics: const BouncingScrollPhysics(),
-          children: const [
-            AverageDailyQuestionsLearnedStatWidget(),
-            DailyQuestionsAnsweredStatWidget(),
-            TotalQuestionsAnsweredStatWidget(),
-            RevisionScoreStatWidget(),
-            CirculationStatusStatWidget(),
-            TotalQuestionPairsStatWidget(),
-            EligibleQuestionsStatWidget(),
-            AverageQuestionsShownStatWidget(),
-            DaysLeftUntilExhaustStatWidget(),
-          ],
-        ),
+      body: ListView(
+        physics: const BouncingScrollPhysics(),
+        children: const [
+          AverageDailyQuestionsLearnedStatWidget(),
+          DailyQuestionsAnsweredStatWidget(),
+          TotalQuestionsAnsweredStatWidget(),
+          RevisionScoreStatWidget(),
+          CirculationStatusStatWidget(),
+          TotalQuestionPairsStatWidget(),
+          EligibleQuestionsStatWidget(),
+          AverageQuestionsShownStatWidget(),
+          DaysLeftUntilExhaustStatWidget(),
+        ],
       ),
     );
   }

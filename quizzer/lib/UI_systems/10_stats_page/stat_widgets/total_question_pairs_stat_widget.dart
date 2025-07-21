@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
-import 'package:quizzer/UI_systems/color_wheel.dart';
-import '../widget_graph_template.dart';
+import 'package:quizzer/UI_systems/10_stats_page/widget_graph_template.dart';
+import 'package:quizzer/app_theme.dart';
 
 class TotalQuestionPairsStatWidget extends StatefulWidget {
   const TotalQuestionPairsStatWidget({super.key});
@@ -37,11 +37,10 @@ class _TotalQuestionPairsStatWidgetState extends State<TotalQuestionPairsStatWid
             final int total = snapshot.data ?? 0;
             return Text(
               'Total User Question Answer Pairs: $total',
-              style: ColorWheel.titleText,
             );
           },
         ),
-        const SizedBox(height: 8),
+        AppTheme.sizedBoxSml,
 
         // Historical Total User Question Answer Pairs Line Graph
         FutureBuilder<List<Map<String, dynamic>>>(
@@ -51,7 +50,7 @@ class _TotalQuestionPairsStatWidgetState extends State<TotalQuestionPairsStatWid
               return const Center(child: CircularProgressIndicator());
             }
             if (snapshot.hasError || snapshot.data == null || snapshot.data!.isEmpty) {
-              return const Center(child: Text('No historical total user question answer pairs data available.', style: ColorWheel.defaultText));
+              return const Center(child: Text('No historical total user question answer pairs data available.'));
             }
             final history = snapshot.data!;
             final graphData = history.map((e) => {
@@ -69,7 +68,7 @@ class _TotalQuestionPairsStatWidgetState extends State<TotalQuestionPairsStatWid
             );
           },
         ),
-        const SizedBox(height: 32),
+        AppTheme.sizedBoxLrg,
       ],
     );
   }

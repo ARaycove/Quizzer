@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
-import '../widget_graph_template.dart';
+import 'package:quizzer/UI_systems/10_stats_page/widget_graph_template.dart';
+import 'package:quizzer/app_theme.dart';
 
 class CirculationStatusStatWidget extends StatefulWidget {
   const CirculationStatusStatWidget({super.key});
@@ -72,22 +73,12 @@ class _CirculationStatusStatWidgetState extends State<CirculationStatusStatWidge
               children: [
                 Text(
                   'Current Non-Circulating Questions: $currentNonCirc',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 18.0,
-                    fontWeight: FontWeight.bold,
-                  ),
                 ),
-                const SizedBox(height: 4),
+                AppTheme.sizedBoxSml,
                 Text(
                   'Current In Circulation Questions: $currentInCirc',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 18.0,
-                    fontWeight: FontWeight.bold,
-                  ),
                 ),
-                const SizedBox(height: 8),
+                AppTheme.sizedBoxSml,
                 StatLineGraph.multi(
                   seriesList: [nonCircSeries, inCircSeries],
                   title: 'Circulation Status Over Time',
@@ -96,7 +87,7 @@ class _CirculationStatusStatWidgetState extends State<CirculationStatusStatWidge
                   xAxisLabel: 'Date',
                   showLegend: true,
                 ),
-                const SizedBox(height: 32),
+                AppTheme.sizedBoxLrg,
               ],
             );
           },

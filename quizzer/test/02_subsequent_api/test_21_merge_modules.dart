@@ -100,7 +100,7 @@ void main() {
           };
           
           modulesWithQuestionCounts.add(moduleWithCount);
-          QuizzerLogger.logMessage('Module $i: $moduleName (${questionCount} questions)');
+          QuizzerLogger.logMessage('Module $i: $moduleName ($questionCount questions)');
         }
         
         // Step 4: Store in global variable for use by subsequent tests
@@ -130,8 +130,8 @@ void main() {
         final int expectedTotalQuestions = sourceQuestionCount + targetQuestionCount;
         
         QuizzerLogger.logMessage('Step 1: Merging modules');
-        QuizzerLogger.logValue('  Source module: $sourceModuleName (${sourceQuestionCount} questions)');
-        QuizzerLogger.logValue('  Target module: $targetModuleName (${targetQuestionCount} questions)');
+        QuizzerLogger.logValue('  Source module: $sourceModuleName ($sourceQuestionCount questions)');
+        QuizzerLogger.logValue('  Target module: $targetModuleName ($targetQuestionCount questions)');
         QuizzerLogger.logValue('  Expected total after merge: $expectedTotalQuestions questions');
         
         // Step 2: Perform the merge
@@ -185,8 +185,8 @@ void main() {
         final int expectedFinalTotal = sourceQuestionCount + targetQuestionCount;
         
         QuizzerLogger.logMessage('Step 1: Merging target module with remaining module');
-        QuizzerLogger.logValue('  Source module: $sourceModuleName (${sourceQuestionCount} questions)');
-        QuizzerLogger.logValue('  Target module: $targetModuleName (${targetQuestionCount} questions)');
+        QuizzerLogger.logValue('  Source module: $sourceModuleName ($sourceQuestionCount questions)');
+        QuizzerLogger.logValue('  Target module: $targetModuleName ($targetQuestionCount questions)');
         QuizzerLogger.logValue('  Expected final total: $expectedFinalTotal questions');
         
         // Step 2: Perform the merge

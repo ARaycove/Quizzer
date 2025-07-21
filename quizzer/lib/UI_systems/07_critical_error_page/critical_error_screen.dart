@@ -1,7 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:quizzer/backend_systems/logger/global_error_handler.dart'; 
-import 'package:quizzer/UI_systems/color_wheel.dart';
+import 'package:quizzer/app_theme.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart'; // Added for placeholder logging
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart'; // Import SessionManager
 
@@ -95,7 +95,6 @@ class _CriticalErrorScreenState extends State<CriticalErrorScreen> { // State cl
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Initial error report still processing, please wait...'),
-              backgroundColor: ColorWheel.warning,
             ),
           );
         }
@@ -107,7 +106,6 @@ class _CriticalErrorScreenState extends State<CriticalErrorScreen> { // State cl
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Please enter your feedback before submitting.'),
-              backgroundColor: ColorWheel.warning,
             ),
           );
         }
@@ -139,7 +137,6 @@ class _CriticalErrorScreenState extends State<CriticalErrorScreen> { // State cl
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Feedback sent. Thank you!'),
-            backgroundColor: ColorWheel.buttonSuccess,
           ),
         );
       }
@@ -159,7 +156,6 @@ class _CriticalErrorScreenState extends State<CriticalErrorScreen> { // State cl
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(randomMessage),
-            backgroundColor: ColorWheel.secondaryBackground, 
           ),
         );
       }
@@ -169,7 +165,7 @@ class _CriticalErrorScreenState extends State<CriticalErrorScreen> { // State cl
 
   Color _getPokeButtonColor() {
     if (!_feedbackSubmitted) {
-      return ColorWheel.buttonSuccess; // Green before submission
+      return Colors.green; // Green before submission
     }
 
     // After submission (_feedbackSubmitted is true)
@@ -178,12 +174,12 @@ class _CriticalErrorScreenState extends State<CriticalErrorScreen> { // State cl
     const double hueStepForCycle = 30.0;
 
     if (_pokeCount == 0) {
-      return ColorWheel.secondaryText; // Neutral grey immediately after submission, before any prokes
+      return Colors.grey; // Neutral grey immediately after submission, before any pokes
     } else if (_pokeCount > 0 && _pokeCount <= maxPokesForRedEffect) {
       // Transition to Neon Red
       // _pokeCount starts at 1 for the first poke after submission
       final double intensity = (_pokeCount.toDouble() / maxPokesForRedEffect.toDouble()).clamp(0.0, 1.0);
-      return Color.lerp(ColorWheel.secondaryText, neonRed, intensity) ?? neonRed;
+      return Color.lerp(Colors.grey, neonRed, intensity) ?? neonRed;
     } else {
       // Cycle colors after reaching max red intensity
       final int pokesIntoCycle = _pokeCount - maxPokesForRedEffect;
@@ -204,10 +200,7 @@ class _CriticalErrorScreenState extends State<CriticalErrorScreen> { // State cl
                 spacing: 2.0, 
                 runSpacing: 2.0, 
                 children: List.generate(_emojiOverlayCount, (index) {
-                  return const Text(
-                    '👉', 
-                    style: TextStyle(fontSize: 20), 
-                  );
+                  return const Text('👉');
                 }),
               ),
             ),
@@ -220,10 +213,8 @@ class _CriticalErrorScreenState extends State<CriticalErrorScreen> { // State cl
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ColorWheel.primaryBackground,
       appBar: AppBar(
         title: const Text('Critical Application Error'),
-        backgroundColor: ColorWheel.buttonError,
         automaticallyImplyLeading: false, // No back button
       ),
       body: Stack( // Changed to Stack
@@ -231,139 +222,71 @@ class _CriticalErrorScreenState extends State<CriticalErrorScreen> { // State cl
           // Original content layer
           Center(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  const Padding( // Add padding to ensure centering and space around the main title
-                    padding: EdgeInsets.only(bottom: 20.0), // Space below the title
-                    child: Center( // Center the main title
-                      child: Text(
-                        'A CRITICAL ERROR HAS OCCURRED AND THE APPLICATION CANNOT CONTINUE.', // ALL CAPS
-                        style: TextStyle(
-                          color: ColorWheel.primaryText,
-                          fontSize: 22, // Increased font size
-                          fontWeight: FontWeight.bold,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
-                  // --- New Detailed Message --- 
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 20.0), // Space below this new message
+                  const Center(
                     child: Text(
-                      'We take errors very seriously. In an effort to create an awesome user experience, we choose to tackle internal errors aggressively. Providing good feedback on these errors helps Quizzer do better, faster. Thank you for your patience.',
-                      style: TextStyle(
-                        color: ColorWheel.primaryText.withAlpha((0.85 * 255).round()), // Corrected use of withAlpha
-                        fontSize: 16, 
-                      ),
-                      textAlign: TextAlign.center, // Center this message as well
+                      'A CRITICAL ERROR HAS OCCURRED AND THE APPLICATION CANNOT CONTINUE.',
+                      textAlign: TextAlign.center,
                     ),
                   ),
-                  // --- End New Detailed Message ---
+                  AppTheme.sizedBoxLrg,
+                  // --- New Detailed Message --- 
                   const Text(
-                    'Error Message:',
-                    style: TextStyle(
-                      color: ColorWheel.secondaryText,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    'We take errors very seriously. In an effort to create an awesome user experience, we choose to tackle internal errors aggressively. Providing good feedback on these errors helps Quizzer do better, faster. Thank you for your patience.',
+                    textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 5),
-                  Text(
-                    widget.errorDetails.message, // Use widget.errorDetails
-                    style: const TextStyle(color: ColorWheel.primaryText, fontSize: 16),
-                  ),
-                  const SizedBox(height: 20),
-                  if (widget.errorDetails.error != null) ...[ // Use widget.errorDetails
-                    const Text(
-                      'Exception:',
-                      style: TextStyle(
-                        color: ColorWheel.secondaryText,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 5),
-                    Text(
-                      widget.errorDetails.error.toString(), // Use widget.errorDetails
-                      style: const TextStyle(color: ColorWheel.primaryText, fontSize: 14),
-                    ),
-                    const SizedBox(height: 20),
+                  AppTheme.sizedBoxLrg,
+                  const Text('Error Message:'),
+                  AppTheme.sizedBoxSml,
+                  Text(widget.errorDetails.message),
+                  AppTheme.sizedBoxLrg,
+                  if (widget.errorDetails.error != null) ...[
+                    const Text('Exception:'),
+                    AppTheme.sizedBoxSml,
+                    Text(widget.errorDetails.error.toString()),
+                    AppTheme.sizedBoxLrg,
                   ],
-                  if (widget.errorDetails.stackTrace != null) ...[ // Use widget.errorDetails
-                    const Text(
-                      'Stack Trace:',
-                      style: TextStyle(
-                        color: ColorWheel.secondaryText,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 5),
-                    // Allow stack trace to take up available space but be scrollable
-                    // If other content is minimal, this could be large. Consider a maxHeight.
-                    ConstrainedBox( // Wrap with ConstrainedBox
-                      constraints: const BoxConstraints(
-                        maxHeight: 150, // Set maxHeight here
-                      ),
-                      child: SizedBox( // SizedBox can still be useful for width or if other constraints are needed
-                        child: SingleChildScrollView(
-                          child: Text(
-                            widget.errorDetails.stackTrace.toString(), // Use widget.errorDetails
-                            style: const TextStyle(color: ColorWheel.secondaryText, fontSize: 12),
-                          ),
-                        ),
+                  if (widget.errorDetails.stackTrace != null) ...[
+                    const Text('Stack Trace:'),
+                    AppTheme.sizedBoxSml,
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxHeight: 150),
+                      child: SingleChildScrollView(
+                        child: Text(widget.errorDetails.stackTrace.toString()),
                       ),
                     ),
                   ],
-                  const SizedBox(height: 20),
+                  AppTheme.sizedBoxLrg,
                   const Text(
                     'We apologize for the inconvenience. To help us fix this, please provide any additional details you can and do your best to describe what you were doing before the error occurred:\n providing this feedback ensures we can provide a quick and targeted fix so this doesn\'t happen again',
-                    style: TextStyle(color: ColorWheel.primaryText, fontSize: 16),
                     textAlign: TextAlign.left,
                   ),
-                  const SizedBox(height: 10),
+                  AppTheme.sizedBoxMed,
                   TextField(
                     controller: _feedbackController,
                     maxLines: 3,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       hintText: 'e.g., "I was trying to __________ when the app crashed."',
-                      hintStyle: TextStyle(color: ColorWheel.hintText.withAlpha((0.7 * 255).round())),
-                      filled: true,
-                      fillColor: ColorWheel.textInputBackground,
-                      border: OutlineInputBorder(
-                        borderRadius: ColorWheel.buttonBorderRadius,
-                        borderSide: BorderSide.none,
-                      ),
                     ),
-                    style: const TextStyle(color: ColorWheel.inputText),
                   ),
-                  const SizedBox(height: 15),
-                  Center( // Center the button
+                  AppTheme.sizedBoxMed,
+                  Center(
                     child: ElevatedButton(
-                      onPressed: (_isReportingInitialError || _isSubmittingFeedback) ? null : _handleButtonPress, // Unified handler
+                      onPressed: (_isReportingInitialError || _isSubmittingFeedback) ? null : _handleButtonPress,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: _getPokeButtonColor(), // Dynamic color
-                        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: ColorWheel.buttonBorderRadius,
-                        ),
+                        backgroundColor: _getPokeButtonColor(),
                       ),
                       child: _isSubmittingFeedback 
-                          ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: ColorWheel.primaryText, strokeWidth: 2.0))
-                          : Text(
-                              _feedbackSubmitted ? 'Feedback Sent' : 'Submit Feedback', // Subtle text
-                              style: ColorWheel.buttonText
-                            ),
+                          ? const CircularProgressIndicator()
+                          : Text(_feedbackSubmitted ? 'Feedback Sent' : 'Submit Feedback'),
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  AppTheme.sizedBoxLrg,
                   const Text(
                     'Please restart the application. If the problem persists, contact support or submit a bug report through the menu.',
-                    style: TextStyle(color: ColorWheel.warning, fontSize: 14),
                     textAlign: TextAlign.center,
                   ),
                 ],

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
-import 'package:quizzer/UI_systems/color_wheel.dart';
 import 'package:quizzer/UI_systems/10_stats_page/widget_combined_bar_line_template.dart';
+import 'package:quizzer/app_theme.dart';
 
 class TotalQuestionsAnsweredStatWidget extends StatefulWidget {
   const TotalQuestionsAnsweredStatWidget({super.key});
@@ -37,11 +37,10 @@ class _TotalQuestionsAnsweredStatWidgetState extends State<TotalQuestionsAnswere
             final int total = snapshot.data ?? 0;
             return Text(
               'Total Questions Answered: $total',
-              style: ColorWheel.titleText,
             );
           },
         ),
-        const SizedBox(height: 8),
+        AppTheme.sizedBoxSml,
 
         // Historical Total Questions Answered Combined Bar/Line Chart
         FutureBuilder<List<Map<String, dynamic>>>(
@@ -51,7 +50,7 @@ class _TotalQuestionsAnsweredStatWidgetState extends State<TotalQuestionsAnswere
               return const Center(child: CircularProgressIndicator());
             }
             if (snapshot.hasError || snapshot.data == null || snapshot.data!.isEmpty) {
-              return const Center(child: Text('No historical total questions answered data available.', style: ColorWheel.defaultText));
+              return const Center(child: Text('No historical total questions answered data available.'));
             }
             final history = snapshot.data!;
             final chartData = history.map((e) => CombinedBarLineData(
@@ -68,7 +67,7 @@ class _TotalQuestionsAnsweredStatWidgetState extends State<TotalQuestionsAnswere
             );
           },
         ),
-        const SizedBox(height: 32),
+        AppTheme.sizedBoxLrg,
       ],
     );
   }

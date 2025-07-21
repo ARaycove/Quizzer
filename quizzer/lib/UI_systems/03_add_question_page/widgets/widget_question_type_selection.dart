@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
-import 'package:quizzer/UI_systems/color_wheel.dart';
+import 'package:quizzer/app_theme.dart';
 
 // Question types mapping
 const Map<String, String> _questionTypes = {
@@ -28,45 +28,27 @@ class QuestionTypeSelection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Question Type',
-          style: ColorWheel.titleText,
-        ),
-        const SizedBox(height: ColorWheel.formFieldSpacing),
-        Container(
+        const Text('Question Type'),
+        AppTheme.sizedBoxMed,
+        SizedBox(
           width: width,
-          decoration: BoxDecoration(
-            color: ColorWheel.secondaryBackground,
-            borderRadius: ColorWheel.cardBorderRadius,
-            border: Border.all(color: ColorWheel.accent.withAlpha(128)),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: ColorWheel.standardPaddingValue,
-              vertical: ColorWheel.formFieldSpacing,
-            ),
-            child: DropdownButton<String>(
-              value: controller.text.isNotEmpty && _questionTypes.containsKey(controller.text) 
-                      ? controller.text 
-                      : _questionTypes.keys.first,
-              isExpanded: true,
-              dropdownColor: ColorWheel.secondaryBackground,
-              style: ColorWheel.defaultText,
-              icon: const Icon(Icons.arrow_drop_down, color: ColorWheel.primaryText),
-              underline: const SizedBox(),
-              borderRadius: ColorWheel.textFieldBorderRadius,
-              items: _questionTypes.entries.map((entry) {
-                return DropdownMenuItem(
-                  value: entry.key,
-                  child: Text(entry.value),
-                );
-              }).toList(),
-              onChanged: (value) {
-                final newValue = value ?? _questionTypes.keys.first;
-                controller.text = newValue;
-                QuizzerLogger.logMessage('Question type changed to: $newValue');
-              },
-            ),
+          child: DropdownButton<String>(
+            value: controller.text.isNotEmpty && _questionTypes.containsKey(controller.text) 
+                    ? controller.text 
+                    : _questionTypes.keys.first,
+            isExpanded: true,
+            underline: const SizedBox(),
+            items: _questionTypes.entries.map((entry) {
+              return DropdownMenuItem(
+                value: entry.key,
+                child: Text(entry.value),
+              );
+            }).toList(),
+            onChanged: (value) {
+              final newValue = value ?? _questionTypes.keys.first;
+              controller.text = newValue;
+              QuizzerLogger.logMessage('Question type changed to: $newValue');
+            },
           ),
         ),
       ],

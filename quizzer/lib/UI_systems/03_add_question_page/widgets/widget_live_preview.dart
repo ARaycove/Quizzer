@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:quizzer/UI_systems/color_wheel.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 
 // Import Core Question Widgets
-// Adjust path based on the new location relative to question_widgets
-import '../../question_widgets/widget_multiple_choice_question.dart';
-import '../../question_widgets/widget_select_all_that_apply_question.dart';
-import '../../question_widgets/widget_sort_order_question.dart';
-import '../../question_widgets/widget_true_false_question.dart';
+import 'package:quizzer/UI_systems/question_widgets/widget_multiple_choice_question.dart';
+import 'package:quizzer/UI_systems/question_widgets/widget_select_all_that_apply_question.dart';
+import 'package:quizzer/UI_systems/question_widgets/widget_sort_order_question.dart';
+import 'package:quizzer/UI_systems/question_widgets/widget_true_false_question.dart';
 
 // ==========================================
 //         Live Preview Widget
@@ -64,11 +62,12 @@ class LivePreviewWidget extends StatelessWidget {
       'preview_${questionType}_'
       // Include lengths for explicit change detection on add/remove
       'qlen${questionElements.length}_alen${answerElements.length}_olen${options.length}_'
-      '${questionElements.hashCode}_'
-      '${answerElements.hashCode}_'
-      '${options.hashCode}_'
+      // Use identity hash codes for better uniqueness
+      '${identityHashCode(questionElements)}_'
+      '${identityHashCode(answerElements)}_'
+      '${identityHashCode(options)}_'
       '${correctOptionIndexMC}_'
-      '${correctIndicesSATA.hashCode}_'
+      '${identityHashCode(correctIndicesSATA)}_'
       '$isCorrectAnswerTrueTF'
     );
 
@@ -120,18 +119,9 @@ class LivePreviewWidget extends StatelessWidget {
         );
       default:
         QuizzerLogger.logError('LivePreviewWidget: Unknown question type "$questionType"');
-        return Container(
-          padding: ColorWheel.standardPadding,
-          decoration: BoxDecoration(
-            color: ColorWheel.warning.withValues(alpha: 0.1),
-            border: Border.all(color: ColorWheel.warning),
-            borderRadius: ColorWheel.cardBorderRadius,
-          ),
-          child: Center(
-            child: Text(
-              'Error: Unknown question type "$questionType" for preview.',
-              style: const TextStyle(color: ColorWheel.warning),
-            ),
+        return Center(
+          child: Text(
+            'Error: Unknown question type "$questionType" for preview.',
           ),
         );
     }
@@ -141,17 +131,10 @@ class LivePreviewWidget extends StatelessWidget {
   Widget _buildPreviewError(String message) {
      QuizzerLogger.logWarning("LivePreviewWidget: $message");
      return Container(
-       padding: const EdgeInsets.all(16.0),
        alignment: Alignment.center,
-       decoration: BoxDecoration(
-         color: ColorWheel.secondaryBackground.withValues(alpha: 0.5),
-         border: Border.all(color: ColorWheel.warning.withValues(alpha: 0.5)),
-         borderRadius: ColorWheel.cardBorderRadius,
-       ),
        child: Text(
          message,
          textAlign: TextAlign.center,
-         style: ColorWheel.secondaryTextStyle.copyWith(color: ColorWheel.warning),
        ),
      );
   }

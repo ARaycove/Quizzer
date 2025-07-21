@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
-import 'package:quizzer/UI_systems/color_wheel.dart';
 import 'dart:math'; // For shuffling
 // Import the shared ElementRenderer
 import 'package:quizzer/UI_systems/global_widgets/question_answer_element.dart'; 
+import 'package:quizzer/app_theme.dart';
 
 // ==========================================
 //    Multiple Choice Question Widget
@@ -218,7 +218,6 @@ class _MultipleChoiceQuestionWidgetState
          ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Error initiating answer submission: ${e.toString()}'), 
-              backgroundColor: ColorWheel.buttonError,
             ),
           );
        }
@@ -242,135 +241,115 @@ class _MultipleChoiceQuestionWidgetState
     final int? correctOriginalIndex = widget.correctOptionIndex; 
     
     if (_shuffledOptions.isEmpty && questionElements.isEmpty) {
-       return const Center(child: Text("No question data provided.", style: TextStyle(color: ColorWheel.secondaryText)));
+       return const Center(child: Text("No question data provided."));
     }
 
     if (correctOriginalIndex == null && !widget.isDisabled) {
         // Only error out if *not* disabled; disabled preview might not have correct index yet
         QuizzerLogger.logError("MultipleChoiceQuestionWidget build: correctOriginalIndex is null. Cannot determine correctness.");
-        return const Center(child: Text("Error: Question data is incomplete (missing correct index).", style: TextStyle(color: ColorWheel.warning)));
+        return const Center(child: Text("Error: Question data is incomplete (missing correct index)."));
     }
 
     // --- Render UI --- 
-    const Color correctColor = ColorWheel.buttonSuccess;
-    const Color incorrectColor = ColorWheel.buttonError;
-    const Color defaultOptionBgColor = ColorWheel.secondaryBackground;
-    const Color selectedOptionBorderColor = ColorWheel.accent;
+    // PRESERVE functional feedback colors for correct/incorrect states
+    const Color correctColor = Colors.green;
+    const Color incorrectColor = Colors.red;
+    final Color selectedOptionBorderColor = Theme.of(context).colorScheme.primary;
 
     return SingleChildScrollView(
-      child: Padding(
-        padding: ColorWheel.standardPadding,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // --- Question Elements --- (Uses passed-in questionElements)
-            Container(
-              padding: ColorWheel.standardPadding,
-              decoration: BoxDecoration(
-                color: ColorWheel.secondaryBackground,
-                borderRadius: ColorWheel.cardBorderRadius,
-              ),
-              child: ElementRenderer(elements: questionElements), 
-            ),
-            const SizedBox(height: ColorWheel.majorSectionSpacing),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // --- Question Elements --- (Uses passed-in questionElements)
+          ElementRenderer(elements: questionElements), 
+          AppTheme.sizedBoxLrg,
 
-            // --- Options --- 
-            ListView.builder(
-              shrinkWrap: true, 
-              physics: const NeverScrollableScrollPhysics(), 
-              itemCount: _shuffledOptions.length,
-              itemBuilder: (context, index) {
-                final optionData = _shuffledOptions[index]; 
-                final int currentOriginalIndex = _originalIndices.length > index ? _originalIndices[index] : -1; // Safety check
-                
-                final bool isSelected = _selectedOptionIndex == index;
-                // Use passed-in correctOriginalIndex
-                final bool isCorrect = currentOriginalIndex == correctOriginalIndex; 
-                
-                Color optionBgColor = defaultOptionBgColor;
-                Color borderColor = Colors.transparent;
-                IconData? trailingIcon;
-                bool showAnswerForThisOption = false;
+          // --- Options --- 
+          ListView.builder(
+            shrinkWrap: true, 
+            physics: const NeverScrollableScrollPhysics(), 
+            itemCount: _shuffledOptions.length,
+            itemBuilder: (context, index) {
+              final optionData = _shuffledOptions[index]; 
+              final int currentOriginalIndex = _originalIndices.length > index ? _originalIndices[index] : -1; // Safety check
+              
+              final bool isSelected = _selectedOptionIndex == index;
+              // Use passed-in correctOriginalIndex
+              final bool isCorrect = currentOriginalIndex == correctOriginalIndex; 
+              
+              Color? optionBgColor;
+              Color? borderColor;
+              IconData? trailingIcon;
+              bool showAnswerForThisOption = false;
 
-                if (_isAnswerSubmitted) {
-                  if (isSelected) {
-                    borderColor = isCorrect ? correctColor : incorrectColor;
-                    optionBgColor = isCorrect ? correctColor.withValues(alpha: 0.1) : incorrectColor.withValues(alpha: 0.1);
-                    trailingIcon = isCorrect ? Icons.check_circle : Icons.cancel;
-                    if(isCorrect) showAnswerForThisOption = true; 
-                  } else if (isCorrect) {
-                     optionBgColor = correctColor.withValues(alpha: 0.1);
-                     trailingIcon = Icons.check_circle_outline;
-                     showAnswerForThisOption = true; 
-                  }
-                } else if (isSelected && !widget.isDisabled) {
-                  // Only show selection border if enabled and not submitted
-                  borderColor = selectedOptionBorderColor;
-                  optionBgColor = selectedOptionBorderColor.withValues(alpha: 0.1);
+              if (_isAnswerSubmitted) {
+                if (isSelected) {
+                  borderColor = isCorrect ? correctColor : incorrectColor;
+                  optionBgColor = isCorrect ? correctColor.withValues(alpha: 0.1) : incorrectColor.withValues(alpha: 0.1);
+                  trailingIcon = isCorrect ? Icons.check_circle : Icons.cancel;
+                  if(isCorrect) showAnswerForThisOption = true; 
+                } else if (isCorrect) {
+                   optionBgColor = correctColor.withValues(alpha: 0.1);
+                   trailingIcon = Icons.check_circle_outline;
+                   showAnswerForThisOption = true; 
                 }
+              } else if (isSelected && !widget.isDisabled) {
+                // Only show selection border if enabled and not submitted
+                borderColor = selectedOptionBorderColor;
+                optionBgColor = selectedOptionBorderColor.withValues(alpha: 0.1);
+              }
 
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4.0),
-                  child: InkWell(
-                    // Disable onTap if isDisabled or submitted
-                    onTap: (widget.isDisabled || _isAnswerSubmitted) ? null : () => _handleOptionSelected(index), 
-                    borderRadius: ColorWheel.buttonBorderRadius,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-                      decoration: BoxDecoration(
-                        color: optionBgColor,
-                        borderRadius: ColorWheel.buttonBorderRadius,
-                        border: Border.all(color: borderColor, width: 1.5),
-                      ),
-                      child: Column( 
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(
-                                isSelected ? Icons.radio_button_checked : Icons.radio_button_unchecked,
-                                color: _isAnswerSubmitted 
-                                       ? (isCorrect ? correctColor : (isSelected ? incorrectColor : ColorWheel.secondaryText)) 
-                                       : (isSelected && !widget.isDisabled ? selectedOptionBorderColor : ColorWheel.primaryText),
-                                size: 20,
-                              ),
-                              const SizedBox(width: ColorWheel.relatedElementSpacing),
-                              Expanded(child: ElementRenderer(elements: [optionData])), 
-                              if (_isAnswerSubmitted && trailingIcon != null)
-                                Icon(trailingIcon, color: isCorrect ? correctColor : (isSelected ? incorrectColor : ColorWheel.secondaryText)),
-                            ],
-                          ),
-                          // --- Display Answer Elements --- (Uses passed-in answerElements)
-                          if (_isAnswerSubmitted && showAnswerForThisOption)
-                            Padding(
-                              padding: const EdgeInsets.only(top: ColorWheel.relatedElementSpacing, left: 32.0), 
-                              child: ElementRenderer(elements: answerElements), 
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4.0),
+                child: InkWell(
+                  // Disable onTap if isDisabled or submitted
+                  onTap: (widget.isDisabled || _isAnswerSubmitted) ? null : () => _handleOptionSelected(index), 
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                    decoration: BoxDecoration(
+                      color: optionBgColor,
+                      border: borderColor != null ? Border.all(color: borderColor, width: 1.5) : null,
+                    ),
+                    child: Column( 
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              isSelected ? Icons.radio_button_checked : Icons.radio_button_unchecked,
+                              color: _isAnswerSubmitted 
+                                     ? (isCorrect ? correctColor : (isSelected ? incorrectColor : null)) 
+                                     : (isSelected && !widget.isDisabled ? selectedOptionBorderColor : null),
                             ),
-                        ],
-                      ),
+                            AppTheme.sizedBoxMed,
+                            Expanded(child: ElementRenderer(elements: [optionData])), 
+                            if (_isAnswerSubmitted && trailingIcon != null)
+                              Icon(trailingIcon, color: isCorrect ? correctColor : (isSelected ? incorrectColor : null)),
+                          ],
+                        ),
+                        // --- Display Answer Elements --- (Uses passed-in answerElements)
+                        if (_isAnswerSubmitted && showAnswerForThisOption)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8.0, left: 32.0), 
+                            child: ElementRenderer(elements: answerElements), 
+                          ),
+                      ],
                     ),
                   ),
-                );
-              },
-            ),
-            const SizedBox(height: ColorWheel.majorSectionSpacing),
-
-            // --- Next Question Button --- 
-            if (_isAnswerSubmitted)
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: ColorWheel.buttonSuccess,
-                  padding: const EdgeInsets.symmetric(vertical: ColorWheel.standardPaddingValue),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: ColorWheel.buttonBorderRadius,
-                  ),
                 ),
-                // Disable onPressed if isDisabled
-                onPressed: widget.isDisabled ? null : _handleNextQuestion,
-                child: const Text('Next Question', style: ColorWheel.buttonText),
-              ),
-          ],
-        ),
+              );
+            },
+          ),
+          AppTheme.sizedBoxLrg,
+
+          // --- Next Question Button --- 
+          if (_isAnswerSubmitted)
+            ElevatedButton(
+              // Disable onPressed if isDisabled
+              onPressed: widget.isDisabled ? null : _handleNextQuestion,
+              child: const Text('Next Question'),
+            ),
+        ],
       ),
     );
   }

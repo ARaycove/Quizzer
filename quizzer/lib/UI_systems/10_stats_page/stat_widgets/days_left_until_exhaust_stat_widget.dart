@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
-import 'package:quizzer/UI_systems/color_wheel.dart';
 import 'package:quizzer/UI_systems/10_stats_page/widget_graph_template.dart';
+import 'package:quizzer/app_theme.dart';
 
 class DaysLeftUntilExhaustStatWidget extends StatefulWidget {
   const DaysLeftUntilExhaustStatWidget({super.key});
@@ -38,11 +38,10 @@ class _DaysLeftUntilExhaustStatWidgetState extends State<DaysLeftUntilExhaustSta
             final double daysLeft = stat != null ? (stat['days_left_until_questions_exhaust'] as double? ?? 0.0) : 0.0;
             return Text(
               'Current Days Left Until Questions Exhaust: ${daysLeft.toStringAsFixed(2)}',
-              style: ColorWheel.titleText,
             );
           },
         ),
-        const SizedBox(height: 8),
+        AppTheme.sizedBoxSml,
 
         // Historical Days Left Until Questions Exhaust Graph
         FutureBuilder<List<Map<String, dynamic>>>(
@@ -52,7 +51,7 @@ class _DaysLeftUntilExhaustStatWidgetState extends State<DaysLeftUntilExhaustSta
               return const Center(child: CircularProgressIndicator());
             }
             if (snapshot.hasError || snapshot.data == null || snapshot.data!.isEmpty) {
-              return const Center(child: Text('No historical days left until questions exhaust data available.', style: ColorWheel.defaultText));
+              return const Center(child: Text('No historical days left until questions exhaust data available.'));
             }
             final history = snapshot.data!;
             final graphData = history.map((e) => {
@@ -70,7 +69,7 @@ class _DaysLeftUntilExhaustStatWidgetState extends State<DaysLeftUntilExhaustSta
             );
           },
         ),
-        const SizedBox(height: 32),
+        AppTheme.sizedBoxLrg,
       ],
     );
   }

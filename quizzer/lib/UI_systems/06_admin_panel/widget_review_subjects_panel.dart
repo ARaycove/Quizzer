@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:markdown_editor_plus/markdown_editor_plus.dart';
-import 'package:quizzer/UI_systems/color_wheel.dart';
+import 'package:quizzer/app_theme.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -118,24 +118,18 @@ class _ReviewSubjectsPanelWidgetState extends State<ReviewSubjectsPanelWidget> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return const Center(child: CircularProgressIndicator(color: ColorWheel.accent));
+      return const Center(child: CircularProgressIndicator());
     }
 
     if (_errorMessage != null) {
       return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Text('Error: $_errorMessage', style: const TextStyle(color: ColorWheel.warning)),
-        )
+        child: Text('Error: $_errorMessage'),
       );
     }
 
     if (_currentData == null) {
       return const Center(
-        child: Padding(
-          padding: EdgeInsets.all(16.0),
-          child: Text('No subject data available.', style: ColorWheel.secondaryTextStyle),
-        )
+        child: Text('No subject data available.'),
       );
     }
 
@@ -144,144 +138,91 @@ class _ReviewSubjectsPanelWidgetState extends State<ReviewSubjectsPanelWidget> {
     final String parentSubjects = _formatParentSubjects(_currentData!['immediate_parent']);
 
     return SingleChildScrollView(
-      child: Container(
-        padding: const EdgeInsets.all(ColorWheel.standardPaddingValue),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
           // Subject Information Section
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              border: Border.all(color: ColorWheel.secondaryText.withValues(alpha: 0.3)),
-              borderRadius: ColorWheel.cardBorderRadius,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Subject
-                Row(
-                  children: [
-                    const Text(
-                      'Subject: ',
-                      style: ColorWheel.secondaryTextStyle,
-                    ),
-                    Expanded(
-                      child: Text(
-                        capitalizedSubject,
-                        style: ColorWheel.defaultText,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                // Parent Subjects
-                Row(
-                  children: [
-                    const Text(
-                      'Parent Subjects: ',
-                      style: ColorWheel.secondaryTextStyle,
-                    ),
-                    Expanded(
-                      child: Text(
-                        parentSubjects,
-                        style: ColorWheel.defaultText,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Subject
+              Row(
+                children: [
+                  const Text('Subject: '),
+                  Expanded(
+                    child: Text(capitalizedSubject),
+                  ),
+                ],
+              ),
+              AppTheme.sizedBoxSml,
+              // Parent Subjects
+              Row(
+                children: [
+                  const Text('Parent Subjects: '),
+                  Expanded(
+                    child: Text(parentSubjects),
+                  ),
+                ],
+              ),
+            ],
           ),
           
-          const SizedBox(height: ColorWheel.standardPaddingValue),
+          AppTheme.sizedBoxMed,
           
           // Description Section
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              border: Border.all(color: ColorWheel.secondaryText.withValues(alpha: 0.3)),
-              borderRadius: ColorWheel.cardBorderRadius,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Subject Description:',
-                  style: ColorWheel.titleText,
-                ),
-                const SizedBox(height: 8),
-                
-                // Markdown Editor
-                Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(color: ColorWheel.secondaryText.withValues(alpha: 0.3)),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: MarkdownAutoPreview(
-                    controller: _markdownController,
-                    emojiConvert: true,
-                    toolbarBackground: ColorWheel.buttonSecondary,
-                    expandableBackground: ColorWheel.buttonSecondary,
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('Subject Description:'),
+              AppTheme.sizedBoxSml,
+              
+              // Markdown Editor
+              Card(
+                child: MarkdownAutoPreview(
+                  controller: _markdownController,
+                  emojiConvert: true,
+                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                  cursorColor: Theme.of(context).colorScheme.onSurface,
+                  toolbarBackground: Theme.of(context).colorScheme.surface,
+                  expandableBackground: Theme.of(context).colorScheme.surface,
+                  decoration: InputDecoration(
+                    isDense: true,
+                    filled: true,
+                    fillColor: Theme.of(context).colorScheme.surface,
                   ),
                 ),
-                const SizedBox(height: 8),
-                ElevatedButton.icon(
-                  onPressed: () async {
-                    final Uri url = Uri.parse('https://www.markdownguide.org/basic-syntax/');
-                    if (await canLaunchUrl(url)) {
-                      await launchUrl(url);
-                    }
-                  },
-                  icon: const Icon(Icons.help_outline, size: 16),
-                  label: const Text('Markdown Guide', style: TextStyle(fontSize: 12)),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    minimumSize: Size.zero,
-                    shape: RoundedRectangleBorder(borderRadius: ColorWheel.buttonBorderRadius),
-                  ),
-                ),
-              ],
-            ),
+              ),
+              AppTheme.sizedBoxSml,
+              ElevatedButton.icon(
+                onPressed: () async {
+                  final Uri url = Uri.parse('https://www.markdownguide.org/basic-syntax/');
+                  if (await canLaunchUrl(url)) {
+                    await launchUrl(url);
+                  }
+                },
+                icon: const Icon(Icons.help_outline),
+                label: const Text('Markdown Guide'),
+              ),
+            ],
           ),
           
-          const SizedBox(height: ColorWheel.standardPaddingValue),
+          AppTheme.sizedBoxMed,
           
           // Bottom Bar: Skip/Submit Buttons
-          Container(
-            padding: const EdgeInsets.only(top: ColorWheel.standardPaddingValue / 2),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton(
-                  onPressed: _skipSubject,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: ColorWheel.buttonSecondary,
-                    foregroundColor: ColorWheel.primaryText,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: ColorWheel.buttonBorderRadius,
-                    ),
-                  ),
-                  child: const Text("Skip", style: ColorWheel.buttonText),
-                ),
-                ElevatedButton(
-                  onPressed: _submitSubject,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: ColorWheel.buttonSuccess,
-                    foregroundColor: ColorWheel.primaryText,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: ColorWheel.buttonBorderRadius,
-                    ),
-                  ),
-                  child: const Text("Submit", style: ColorWheel.buttonText),
-                ),
-              ],
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              ElevatedButton(
+                onPressed: _skipSubject,
+                child: const Text("Skip"),
+              ),
+              ElevatedButton(
+                onPressed: _submitSubject,
+                child: const Text("Submit"),
+              ),
+            ],
           ),
         ],
-      ),
       ),
     );
   }

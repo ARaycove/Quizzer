@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:quizzer/UI_systems/04_display_modules_page/module_card/widget_module_card.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
-import 'package:quizzer/UI_systems/color_wheel.dart';
+import 'package:quizzer/app_theme.dart';
 
 class ModulePageMainBodyList extends StatefulWidget {
   final ScrollController scrollController;
@@ -37,23 +37,19 @@ class _ModulePageMainBodyListState extends State<ModulePageMainBodyList> {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(
-            child: CircularProgressIndicator(
-              color: ColorWheel.primaryText,
-            ),
+            child: CircularProgressIndicator(),
           );
         } else if (snapshot.hasError) {
           QuizzerLogger.logError('Error loading modules: ${snapshot.error}');
           return const Center(
             child: Text(
               'Error loading modules. Please try again.',
-              style: ColorWheel.secondaryTextStyle,
             ),
           );
         } else if (!snapshot.hasData) {
           return const Center(
             child: Text(
               'No data received',
-              style: ColorWheel.secondaryTextStyle,
             ),
           );
         }
@@ -70,33 +66,25 @@ class _ModulePageMainBodyListState extends State<ModulePageMainBodyList> {
           return const Center(
             child: Text(
               'No modules with questions found',
-              style: ColorWheel.secondaryTextStyle,
             ),
           );
         }
         
-        return SingleChildScrollView(
+        return ListView(
           controller: widget.scrollController,
-          child: Padding(
-            padding: const EdgeInsets.all(ColorWheel.standardPaddingValue),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Add space for floating buttons
-                const SizedBox(height: 48.0),
-                ...modulesWithQuestions
-                    .map((entry) => ModuleCard(
-                          moduleData: entry.value,
-                          onModuleUpdated: () {
-                            // Refresh the modules data when a module is updated
-                            setState(() {
-                              _loadModulesData();
-                            });
-                          },
-                        )),
-              ],
-            ),
-          ),
+          padding: EdgeInsets.zero,
+          children: [
+            // Add extra space at the top for the floating buttons
+            const SizedBox(height: 40), // Adjust height as needed to fit the buttons
+            ...modulesWithQuestions.map((entry) => ModuleCard(
+              moduleData: entry.value,
+              onModuleUpdated: () {
+                setState(() {
+                  _loadModulesData();
+                });
+              },
+            )),
+          ],
         );
       },
     );

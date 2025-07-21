@@ -3,13 +3,13 @@ import 'package:quizzer/UI_systems/03_add_question_page/widgets/widget_module_se
 import 'package:quizzer/UI_systems/03_add_question_page/widgets/widget_question_type_selection.dart';
 import 'package:quizzer/UI_systems/03_add_question_page/widgets/widget_bulk_add_button.dart';
 import 'package:quizzer/UI_systems/global_widgets/widget_global_app_bar.dart';
-import 'package:quizzer/UI_systems/color_wheel.dart';
 import 'package:quizzer/UI_systems/03_add_question_page/widgets/widget_live_preview.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/UI_systems/03_add_question_page/widgets/add_question_widget/widget_add_question.dart';
 import 'package:quizzer/UI_systems/03_add_question_page/widgets/widget_submit_clear_buttons.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/UI_systems/03_add_question_page/helpers/image_picker_helper.dart';
+import 'package:quizzer/app_theme.dart';
 
 // ==========================================
 
@@ -342,7 +342,7 @@ class _AddQuestionAnswerPageState extends State<AddQuestionAnswerPage> {
          QuizzerLogger.logWarning("Question validation failed: $errorMessage");
          if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Validation Failed: $errorMessage'), backgroundColor: ColorWheel.buttonError)
+              SnackBar(content: Text('Validation Failed: $errorMessage'))
             );
          }
       }
@@ -367,7 +367,7 @@ class _AddQuestionAnswerPageState extends State<AddQuestionAnswerPage> {
        QuizzerLogger.logError("Failed to finalize staged images during submit: $e");
        if (mounted) {
          ScaffoldMessenger.of(context).showSnackBar(
-           SnackBar(content: Text('Error processing images: $e'), backgroundColor: ColorWheel.buttonError)
+           SnackBar(content: Text('Error processing images: $e'))
          );
        }
        return; // Stop submission if image finalization fails
@@ -416,7 +416,7 @@ class _AddQuestionAnswerPageState extends State<AddQuestionAnswerPage> {
      
      if (mounted) { // Still check mounted for Snack Bar
     ScaffoldMessenger.of(context).showSnackBar(
-           const SnackBar(content: Text('Question Submitted!'), backgroundColor: ColorWheel.buttonSuccess),
+           const SnackBar(content: Text('Question Submitted!')),
          );
      }
      // Clear the form immediately
@@ -434,89 +434,78 @@ class _AddQuestionAnswerPageState extends State<AddQuestionAnswerPage> {
       appBar: const GlobalAppBar(
         title: 'Add/Edit Question',
       ),
-      backgroundColor: ColorWheel.primaryBackground,
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: ListView(
-          children: [
-            // 2. Module Selection Widget
-            ModuleSelection(controller: _moduleController),
-            const SizedBox(height: 16),
-            // 3. Question Type Selection Widget
-            QuestionTypeSelection(controller: _questionTypeController),
-            const SizedBox(height: 24),
+      body: ListView(
+        children: [
+          // 2. Module Selection Widget
+          ModuleSelection(controller: _moduleController),
+          AppTheme.sizedBoxMed,
+          // 3. Question Type Selection Widget
+          QuestionTypeSelection(controller: _questionTypeController),
+          AppTheme.sizedBoxLrg,
 
-            // --- Editing Controls Area --- (Moved Here)
-            AddQuestionWidget(
-               questionType: _questionTypeController.text,
-               questionElements: _currentQuestionElements,
-               answerElements: _currentAnswerElements,
-               options: _currentOptions,
-               correctOptionIndex: _currentCorrectOptionIndex,
-               correctIndicesSATA: _currentCorrectIndicesSATA,
-               onAddElement: _handleAddElement,
-               onRemoveElement: _handleRemoveElement,
-               onEditElement: _handleEditElement,
-               onAddOption: _handleAddOption,
-               onRemoveOption: _handleRemoveOption,
-               onEditOption: _handleEditOption,
-               onSetCorrectOptionIndex: _handleSetCorrectOptionIndex,
-               onToggleCorrectOptionSATA: _handleToggleCorrectOptionSATA,
-               onReorderElements: _handleReorderElements,
-               onReorderOptions: _handleReorderOptions,
-            ),
-            const SizedBox(height: 24),
+          // --- Editing Controls Area --- (Moved Here)
+          AddQuestionWidget(
+             questionType: _questionTypeController.text,
+             questionElements: _currentQuestionElements,
+             answerElements: _currentAnswerElements,
+             options: _currentOptions,
+             correctOptionIndex: _currentCorrectOptionIndex,
+             correctIndicesSATA: _currentCorrectIndicesSATA,
+             onAddElement: _handleAddElement,
+             onRemoveElement: _handleRemoveElement,
+             onEditElement: _handleEditElement,
+             onAddOption: _handleAddOption,
+             onRemoveOption: _handleRemoveOption,
+             onEditOption: _handleEditOption,
+             onSetCorrectOptionIndex: _handleSetCorrectOptionIndex,
+             onToggleCorrectOptionSATA: _handleToggleCorrectOptionSATA,
+             onReorderElements: _handleReorderElements,
+             onReorderOptions: _handleReorderOptions,
+          ),
+          AppTheme.sizedBoxLrg,
 
-            // 4. Live Preview
-            const Text("Live Preview:", style: ColorWheel.titleText),
-            const SizedBox(height: 8),
-            Container(
-               padding: const EdgeInsets.all(8),
-               decoration: BoxDecoration(
-                  border: Border.all(color: ColorWheel.secondaryText.withValues(alpha: 0.5)),
-                  borderRadius: ColorWheel.cardBorderRadius,
-               ),
-               child: LivePreviewWidget(
-                  key: ValueKey('live-preview-$_previewRebuildCounter'),
-                  questionType: _questionTypeController.text,
-                  questionElements: _currentQuestionElements,
-                  answerElements: _currentAnswerElements,
-                  options: _currentOptions,
-                  correctOptionIndexMC: _currentCorrectOptionIndex,
-                  correctIndicesSATA: _currentCorrectIndicesSATA,
-                  isCorrectAnswerTrueTF: (_questionTypeController.text == 'true_false')
-                                          ? (_currentCorrectOptionIndex == 0)
-                                          : null,
-               ),
-            ),
-            const SizedBox(height: 24),
+          // 4. Live Preview
+          const Text("Live Preview:"),
+          AppTheme.sizedBoxMed,
+          LivePreviewWidget(
+            key: ValueKey('live-preview-$_previewRebuildCounter'),
+            questionType: _questionTypeController.text,
+            questionElements: _currentQuestionElements,
+            answerElements: _currentAnswerElements,
+            options: _currentOptions,
+            correctOptionIndexMC: _currentCorrectOptionIndex,
+            correctIndicesSATA: _currentCorrectIndicesSATA,
+            isCorrectAnswerTrueTF: (_questionTypeController.text == 'true_false')
+                                    ? (_currentCorrectOptionIndex == 0)
+                                    : null,
+          ),
+          AppTheme.sizedBoxLrg,
 
-            // --- Submit/Clear Buttons ---
-            SubmitClearButtons(
-               onSubmit: _handleSubmitQuestion,
-               onClear: _resetQuestionState, // Use existing reset logic for Clear
-            ),
+          // --- Submit/Clear Buttons ---
+          SubmitClearButtons(
+             onSubmit: _handleSubmitQuestion,
+             onClear: _resetQuestionState, // Use existing reset logic for Clear
+          ),
 
-            const SizedBox(height: 24), // Spacing at the bottom
+          AppTheme.sizedBoxLrg, // Spacing at the bottom
 
-            // 5. Divider
-            const Divider(thickness: 1.0, color: ColorWheel.secondaryText),
-            const SizedBox(height: 16),
+          // 5. Divider
+          const Divider(),
+          AppTheme.sizedBoxMed,
 
-            // 6. Bulk Add Widget
-            const Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                BulkAddButton(),
-              ],
-            ),
-            const SizedBox(height: 16),
+          // 6. Bulk Add Widget
+          const Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              BulkAddButton(),
+            ],
+          ),
+          AppTheme.sizedBoxMed,
 
-            // --- Editing Controls Area (Removed from here) ---
-            
-            // --- Live Preview Area (Removed from here) ---
-          ],
-        ),
+          // --- Editing Controls Area (Removed from here) ---
+          
+          // --- Live Preview Area (Removed from here) ---
+        ],
       ),
     );
   }

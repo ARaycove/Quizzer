@@ -1,9 +1,9 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
-import 'package:quizzer/UI_systems/color_wheel.dart';
 import 'package:path/path.dart' as p;
 import 'package:quizzer/backend_systems/00_helper_utils/file_locations.dart';
+import 'package:quizzer/app_theme.dart';
 
 // ==========================================
 //        Element Renderer Widget
@@ -103,17 +103,13 @@ class _ElementRendererState extends State<ElementRenderer> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: List.generate(_renderedWidgets.length, (index) { 
           final widget = _renderedWidgets[index];
-          const elementPadding = EdgeInsets.symmetric(vertical: 4.0);
 
           if (widget != null) {
              // If widget is already rendered (Text or loaded Image/Error), display it
-             return Padding(padding: elementPadding, child: widget);
+             return widget;
           } else {
              // Otherwise, show the loading indicator
-             return const Padding(
-               padding: elementPadding, 
-               child: SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: ColorWheel.accent)),
-             );
+             return const CircularProgressIndicator();
           }
       }),
     );
@@ -130,11 +126,11 @@ Widget _buildStaticWidget(String? type, String? content) {
    }
    switch (type) {
      case 'text': 
-       return Text(content, style: ColorWheel.defaultText.copyWith(color: ColorWheel.primaryText));
+       return Text(content);
      // Add other synchronous types here
      default:
        QuizzerLogger.logWarning('ElementRenderer static build encountered unsupported type: $type');
-       return Text('[Unsupported type: $type]', style: const TextStyle(color: ColorWheel.warning));
+       return Text('[Unsupported type: $type]');
    }
 }
 
@@ -182,17 +178,11 @@ Widget _buildErrorIconRow(String message, {required bool isWarning}) {
      children: [
        Icon(
          isWarning ? Icons.warning_amber_rounded : Icons.image_not_supported,
-         color: isWarning ? ColorWheel.warning : ColorWheel.secondaryText,
-         size: 16, // Smaller icon size
        ),
-       const SizedBox(width: 6),
+       AppTheme.sizedBoxSml,
        Flexible( // Allow text to wrap if needed
          child: Text(
            message, 
-           style: TextStyle(
-             color: isWarning ? ColorWheel.warning : ColorWheel.secondaryText, 
-             fontSize: 12
-           ),
            softWrap: true,
          )
        ),

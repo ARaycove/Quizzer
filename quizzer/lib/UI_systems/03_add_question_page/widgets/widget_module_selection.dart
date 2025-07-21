@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
-import 'package:quizzer/UI_systems/color_wheel.dart';
+import 'package:quizzer/app_theme.dart';
 
 // ==========================================
 // Widget
@@ -58,83 +58,49 @@ class _ModuleSelectionState extends State<ModuleSelection> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Module',
-          style: ColorWheel.titleText,
-        ),
-        const SizedBox(height: ColorWheel.formFieldSpacing),
-        Container(
+        const Text('Module'),
+        AppTheme.sizedBoxMed,
+        SizedBox(
           width: width,
-          decoration: BoxDecoration(
-            color: ColorWheel.secondaryBackground,
-            borderRadius: ColorWheel.cardBorderRadius,
-            border: Border.all(color: ColorWheel.accent.withAlpha(128)),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: ColorWheel.standardPaddingValue,
-              vertical: 4.0,
-            ),
-            child: Column(
-              children: [
-                TextField(
-                  controller: widget.controller,
-                  style: ColorWheel.defaultText,
-                  decoration: InputDecoration(
-                    hintText: 'Enter module name (default: General)',
-                    hintStyle: ColorWheel.defaultText.copyWith(color: ColorWheel.secondaryText),
-                    filled: true,
-                    fillColor: ColorWheel.secondaryBackground,
-                    border: OutlineInputBorder(
-                      borderRadius: ColorWheel.textFieldBorderRadius,
-                      borderSide: BorderSide.none,
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: ColorWheel.standardPaddingValue,
-                      vertical: ColorWheel.standardPaddingValue,
-                    ),
-                  ),
-                  onChanged: (value) {
-                    setState(() {});
-                  },
+          child: Column(
+            children: [
+              TextField(
+                controller: widget.controller,
+                style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+                decoration: const InputDecoration(
+                  hintText: 'Enter module name (default: General)',
                 ),
-                if (_isLoading)
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 8.0),
-                    child: CircularProgressIndicator(color: ColorWheel.primaryText),
-                  )
-                else if (widget.controller.text.isNotEmpty)
-                  Container(
-                    constraints: BoxConstraints(
-                      maxHeight: 200,
-                      maxWidth: width - 2 * ColorWheel.standardPaddingValue,
-                    ),
-                    margin: const EdgeInsets.only(top: ColorWheel.formFieldSpacing),
-                    decoration: BoxDecoration(
-                      color: ColorWheel.secondaryBackground,
-                      borderRadius: ColorWheel.textFieldBorderRadius,
-                      border: Border.all(color: ColorWheel.accent.withAlpha(128)),
-                    ),
-                    child: ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: _getFilteredSuggestions(widget.controller.text).length,
-                      itemBuilder: (context, index) {
-                        final suggestion = _getFilteredSuggestions(widget.controller.text)[index];
-                        return ListTile(
-                          title: Text(
-                            suggestion,
-                            style: ColorWheel.defaultText,
-                          ),
-                          onTap: () {
-                            widget.controller.text = suggestion;
-                            setState(() {});
-                          },
-                        );
-                      },
-                    ),
+                onChanged: (value) {
+                  setState(() {});
+                },
+              ),
+              if (_isLoading)
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 8.0),
+                  child: CircularProgressIndicator(),
+                )
+              else if (widget.controller.text.isNotEmpty)
+                Container(
+                  constraints: BoxConstraints(
+                    maxHeight: 200,
+                    maxWidth: width,
                   ),
-              ],
-            ),
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: _getFilteredSuggestions(widget.controller.text).length,
+                    itemBuilder: (context, index) {
+                      final suggestion = _getFilteredSuggestions(widget.controller.text)[index];
+                      return ListTile(
+                        title: Text(suggestion),
+                        onTap: () {
+                          widget.controller.text = suggestion;
+                          setState(() {});
+                        },
+                      );
+                    },
+                  ),
+                ),
+            ],
           ),
         ),
       ],

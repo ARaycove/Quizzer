@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:quizzer/UI_systems/color_wheel.dart';
 
 class ScrollToTopButton extends StatelessWidget {
   final ScrollController scrollController;
@@ -14,8 +13,8 @@ class ScrollToTopButton extends StatelessWidget {
   void _scrollToTop() {
     scrollController.animateTo(
       0,
-      duration: ColorWheel.standardAnimationDuration,
-      curve: ColorWheel.standardAnimationCurve,
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeInOut,
     );
   }
 
@@ -24,14 +23,9 @@ class ScrollToTopButton extends StatelessWidget {
     return FloatingActionButton(
       heroTag: 'scroll',
       mini: true,
-      backgroundColor: ColorWheel.secondaryBackground,
       onPressed: showScrollToTop ? _scrollToTop : null,
-
       tooltip: 'Scroll to Top',
-            child: Icon(
-        Icons.arrow_upward,
-        color: showScrollToTop ? ColorWheel.primaryText : ColorWheel.primaryText.withAlpha(128),
-      ),
+      child: const Icon(Icons.arrow_upward),
     );
   }
 } 

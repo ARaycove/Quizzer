@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'dart:math';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
-import 'package:quizzer/UI_systems/color_wheel.dart';
 import 'package:quizzer/UI_systems/global_widgets/question_answer_element.dart';
+import 'package:quizzer/app_theme.dart';
 
 // ==========================================
 //     True/False Question Widget
@@ -148,7 +148,7 @@ class _TrueFalseQuestionWidgetState extends State<TrueFalseQuestionWidget> {
         _selectedAnswer = null;
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error submitting: ${e.toString()}'), backgroundColor: ColorWheel.buttonError),
+        SnackBar(content: Text('Error submitting: ${e.toString()}')),
       );
     }
   }
@@ -166,7 +166,7 @@ class _TrueFalseQuestionWidgetState extends State<TrueFalseQuestionWidget> {
     final bool isCorrectAnswerTrue = widget.isCorrectAnswerTrue;
     
     if (questionElements.isEmpty) {
-        return const Center(child: Text("No question data provided.", style: ColorWheel.secondaryTextStyle));
+        return const Center(child: Text("No question data provided."));
     }
 
     // Buttons are built by the helper
@@ -174,64 +174,39 @@ class _TrueFalseQuestionWidgetState extends State<TrueFalseQuestionWidget> {
     final falseButton = _buildOptionButton(context, false, isCorrectAnswerTrue);
 
     return SingleChildScrollView(
-      child: Padding(
-        padding: ColorWheel.standardPadding,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // --- Question Elements --- (Uses passed-in questionElements)
-            Container(
-              padding: ColorWheel.standardPadding,
-              decoration: BoxDecoration(
-                color: ColorWheel.secondaryBackground,
-                borderRadius: ColorWheel.cardBorderRadius,
-              ),
-              child: ElementRenderer(elements: questionElements),
-            ),
-            const SizedBox(height: ColorWheel.majorSectionSpacing),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // --- Question Elements --- (Uses passed-in questionElements)
+          ElementRenderer(elements: questionElements),
+          AppTheme.sizedBoxLrg,
 
-            // --- True/False Buttons --- (Place in a Row)
-            Row(
-              children: [
-                // Use Expanded to make buttons take equal width
-                Expanded(child: _isTrueFirst ? trueButton : falseButton),
-                const SizedBox(width: 16.0), // Spacing between buttons
-                Expanded(child: _isTrueFirst ? falseButton : trueButton),
-              ],
-            ),
-            
-            // --- Answer Elements --- (Uses passed-in answerElements)
-            // Display explanation ONLY under the correct answer button after submission
-            // We achieve this by adding the explanation conditionally *outside* the Row,
-            // checking which button was correct.
-            if (_isAnswerSubmitted && answerElements.isNotEmpty)
-              Padding(
-                  padding: const EdgeInsets.only(top: ColorWheel.relatedElementSpacing),
-                  child: Container(
-                    padding: ColorWheel.standardPadding,
-                    decoration: BoxDecoration(
-                      color: ColorWheel.secondaryBackground.withAlpha(128),
-                      borderRadius: ColorWheel.cardBorderRadius,
-                    ),
-                    child: ElementRenderer(elements: answerElements),
-                  ),
-              ),
+          // --- True/False Buttons --- (Place in a Row)
+          Row(
+            children: [
+              // Use Expanded to make buttons take equal width
+              Expanded(child: _isTrueFirst ? trueButton : falseButton),
+              AppTheme.sizedBoxSml,
+              Expanded(child: _isTrueFirst ? falseButton : trueButton),
+            ],
+          ),
+          
+          // --- Answer Elements --- (Uses passed-in answerElements)
+          // Display explanation ONLY under the correct answer button after submission
+          // We achieve this by adding the explanation conditionally *outside* the Row,
+          // checking which button was correct.
+          if (_isAnswerSubmitted && answerElements.isNotEmpty)
+            ElementRenderer(elements: answerElements),
               
-            const SizedBox(height: ColorWheel.majorSectionSpacing),
+          AppTheme.sizedBoxLrg,
 
-            // --- Next Question Button ---
-            if (_isAnswerSubmitted)
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: ColorWheel.buttonSuccess,
-                  padding: const EdgeInsets.symmetric(vertical: ColorWheel.standardPaddingValue),
-                  shape: RoundedRectangleBorder(borderRadius: ColorWheel.buttonBorderRadius),
-                ),
-                onPressed: widget.isDisabled ? null : _handleNextQuestion, 
-                child: const Text('Next Question', style: ColorWheel.buttonText),
-              ),
-          ],
-        ),
+          // --- Next Question Button ---
+          if (_isAnswerSubmitted)
+            ElevatedButton(
+              onPressed: widget.isDisabled ? null : _handleNextQuestion, 
+              child: const Text('Next Question'),
+            ),
+        ],
       ),
     );
   }
@@ -241,71 +216,57 @@ class _TrueFalseQuestionWidgetState extends State<TrueFalseQuestionWidget> {
     final bool isSelected = _selectedAnswer == value;
     final bool isCorrect = value == isCorrectValue;
     
+    // PRESERVE functional feedback colors for correctness states
+    // These colors communicate correctness to users after submission
+    const Color correctColor = Colors.green;
+    const Color incorrectColor = Colors.red;
+    
     // Determine Styling based on state
-    Color bgColor = ColorWheel.secondaryBackground; // Default background
-    Color fgColor = ColorWheel.primaryText; // Default text/icon color
+    Color bgColor = Colors.transparent; // Default background
+    Color fgColor = Colors.transparent; // Default text/icon color
     Color borderColor = Colors.transparent;
     IconData? icon;
     
     // Determine visual feedback state
      if (_isAnswerSubmitted) {
        if (isSelected) {
-         bgColor = isCorrect ? ColorWheel.buttonSuccess.withAlpha(26) : ColorWheel.buttonError.withAlpha(26);
-         borderColor = isCorrect ? ColorWheel.buttonSuccess : ColorWheel.buttonError;
+         bgColor = isCorrect ? correctColor.withValues(alpha: 0.1) : incorrectColor.withValues(alpha: 0.1);
+         borderColor = isCorrect ? correctColor : incorrectColor;
          icon = isCorrect ? Icons.check_circle : Icons.cancel;
-         fgColor = isCorrect ? ColorWheel.buttonSuccess : ColorWheel.buttonError; // Icon color matches border
+         fgColor = isCorrect ? correctColor : incorrectColor; // Icon color matches border
        } else if (isCorrect) {
          // Highlight the correct answer if it wasn't selected
-         bgColor = ColorWheel.buttonSuccess.withAlpha(13); // 0.05 opacity
-         borderColor = ColorWheel.buttonSuccess.withAlpha(128); // 0.5 opacity
+         bgColor = correctColor.withValues(alpha: 0.05); // 0.05 opacity
+         borderColor = correctColor.withValues(alpha: 0.5); // 0.5 opacity
          icon = Icons.check_circle_outline;
-         fgColor = ColorWheel.buttonSuccess; // Icon color matches border
+         fgColor = correctColor; // Icon color matches border
        } else {
          // Dim incorrect, unselected option
-          bgColor = ColorWheel.secondaryBackground.withAlpha(153); // 0.6 opacity
-          fgColor = ColorWheel.secondaryText;
+          bgColor = Colors.transparent;
+          fgColor = Colors.transparent;
           borderColor = Colors.transparent;
        }
      } else if (isSelected && !widget.isDisabled) { 
          // Highlight selection before submission (if enabled)
-         bgColor = ColorWheel.accent.withAlpha(26);
-         borderColor = ColorWheel.accent;
-         fgColor = ColorWheel.accent; // Icon/text color matches border
+         bgColor = correctColor.withValues(alpha: 0.1);
+         borderColor = correctColor;
+         fgColor = correctColor; // Icon/text color matches border
      } // Add hover effect potentially via MouseRegion later if needed
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0), // Keep vertical padding
-      child: InkWell(
-        onTap: (widget.isDisabled || _isAnswerSubmitted) ? null : () => _handleSelection(value),
-        borderRadius: ColorWheel.buttonBorderRadius,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0), // Consistent padding
-          decoration: BoxDecoration(
-            color: bgColor,
-            borderRadius: ColorWheel.buttonBorderRadius,
-            border: Border.all(color: borderColor, width: 1.5),
-            // boxShadow: elevation > 0 ? [BoxShadow(...)] : null, // Optional shadow
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (icon != null)
-                Padding(
-                  padding: const EdgeInsets.only(right: 8.0),
-                  // Use fgColor for icon color as it's determined by state
-                  child: Icon(icon, size: 20, color: fgColor), 
-                ),
-              Text(
-                value ? 'True' : 'False',
-                // Text color should generally remain readable, not change drastically with feedback
-                style: const TextStyle( 
-                   fontSize: 16,
-                   fontWeight: FontWeight.w500,
-                   color: ColorWheel.primaryText, // Keep text primarily white
-                 ),
-              ),
-            ],
-          ),
+    return InkWell(
+      onTap: (widget.isDisabled || _isAnswerSubmitted) ? null : () => _handleSelection(value),
+      child: Container(
+        decoration: BoxDecoration(
+          color: bgColor,
+          border: borderColor != Colors.transparent ? Border.all(color: borderColor) : null,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (icon != null)
+              Icon(icon, color: fgColor), 
+            Text(value ? 'True' : 'False'),
+          ],
         ),
       ),
     );

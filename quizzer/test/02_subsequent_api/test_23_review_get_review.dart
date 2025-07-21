@@ -57,7 +57,7 @@ void main() {
       
       try {
         for (int i = 1; i <= 10; i++) {
-          QuizzerLogger.logMessage('Call ${i}/10: Calling getReviewQuestion() API...');
+          QuizzerLogger.logMessage('Call $i/10: Calling getReviewQuestion() API...');
           final reviewResult = await sessionManager.getReviewQuestion();
           
           // Ensure we got a response

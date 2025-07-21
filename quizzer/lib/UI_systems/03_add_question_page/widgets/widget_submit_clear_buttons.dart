@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:quizzer/UI_systems/color_wheel.dart';
+import 'package:quizzer/app_theme.dart';
 
 class SubmitClearButtons extends StatelessWidget {
   final VoidCallback onSubmit;
@@ -18,38 +18,12 @@ class SubmitClearButtons extends StatelessWidget {
       children: [
         ElevatedButton(
           onPressed: onSubmit,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: ColorWheel.buttonSuccess,
-            padding: const EdgeInsets.symmetric(
-              horizontal: ColorWheel.standardPaddingValue * 2,
-              vertical: ColorWheel.standardPaddingValue,
-            ),
-            shape: RoundedRectangleBorder(
-              borderRadius: ColorWheel.buttonBorderRadius,
-            ),
-          ),
-          child: const Text(
-            'Submit',
-            style: ColorWheel.buttonTextBold,
-          ),
+          child: const Text('Submit'),
         ),
-        const SizedBox(width: ColorWheel.standardPaddingValue),
+        AppTheme.sizedBoxMed,
         ElevatedButton(
           onPressed: onClear,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: ColorWheel.buttonError,
-            padding: const EdgeInsets.symmetric(
-              horizontal: ColorWheel.standardPaddingValue * 2,
-              vertical: ColorWheel.standardPaddingValue,
-            ),
-            shape: RoundedRectangleBorder(
-              borderRadius: ColorWheel.buttonBorderRadius,
-            ),
-          ),
-          child: const Text(
-            'Clear All',
-            style: ColorWheel.buttonTextBold,
-          ),
+          child: const Text('Clear All'),
         ),
       ],
     );

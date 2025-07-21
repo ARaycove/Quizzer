@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
-import 'package:quizzer/UI_systems/color_wheel.dart';
 import 'package:quizzer/UI_systems/10_stats_page/widget_graph_template.dart';
+import 'package:quizzer/app_theme.dart';
 
 class AverageDailyQuestionsLearnedStatWidget extends StatefulWidget {
   const AverageDailyQuestionsLearnedStatWidget({super.key});
@@ -38,11 +38,10 @@ class _AverageDailyQuestionsLearnedStatWidgetState extends State<AverageDailyQue
             final double avgLearned = stat != null ? (stat['average_daily_questions_learned'] as double? ?? 0.0) : 0.0;
             return Text(
               'Current Average Daily Questions Learned: ${avgLearned.toStringAsFixed(2)}',
-              style: ColorWheel.titleText,
             );
           },
         ),
-        const SizedBox(height: 8),
+        AppTheme.sizedBoxSml,
 
         // Historical Average Daily Questions Learned Graph
         FutureBuilder<List<Map<String, dynamic>>>(
@@ -52,7 +51,7 @@ class _AverageDailyQuestionsLearnedStatWidgetState extends State<AverageDailyQue
               return const Center(child: CircularProgressIndicator());
             }
             if (snapshot.hasError || snapshot.data == null || snapshot.data!.isEmpty) {
-              return const Center(child: Text('No historical average daily questions learned data available.', style: ColorWheel.defaultText));
+              return const Center(child: Text('No historical average daily questions learned data available.'));
             }
             final history = snapshot.data!;
             final graphData = history.map((e) => {
@@ -70,7 +69,7 @@ class _AverageDailyQuestionsLearnedStatWidgetState extends State<AverageDailyQue
             );
           },
         ),
-        const SizedBox(height: 32),
+        AppTheme.sizedBoxLrg,
       ],
     );
   }

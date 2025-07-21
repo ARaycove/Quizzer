@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
-import '../widget_graph_template.dart';
+import 'package:quizzer/UI_systems/10_stats_page/widget_graph_template.dart';
+import 'package:quizzer/app_theme.dart';
 
 class EligibleQuestionsStatWidget extends StatefulWidget {
   const EligibleQuestionsStatWidget({super.key});
@@ -36,13 +37,8 @@ class _EligibleQuestionsStatWidgetState extends State<EligibleQuestionsStatWidge
           children: [
             Text(
               'Current Eligible Questions: $currentEligible',
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 18.0,
-                fontWeight: FontWeight.bold,
-              ),
             ),
-            const SizedBox(height: 8),
+            AppTheme.sizedBoxSml,
             FutureBuilder<List<Map<String, dynamic>>>(
               future: eligibleQuestionsHistoryFuture,
               builder: (context, snapshot) {
@@ -65,7 +61,7 @@ class _EligibleQuestionsStatWidgetState extends State<EligibleQuestionsStatWidge
                 );
               },
             ),
-            const SizedBox(height: 32),
+            AppTheme.sizedBoxLrg,
           ],
         );
       },

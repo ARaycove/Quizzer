@@ -290,9 +290,9 @@ void main() {
         final supabase = sessionManager.supabase;
         
         // Test data
-        final String testSubject = 'Test Subject CRUD';
-        final String testParent = '["Test Parent"]';
-        final String testDescription = 'Initial description';
+        const String testSubject = 'Test Subject CRUD';
+        const String testParent = '["Test Parent"]';
+        const String testDescription = 'Initial description';
         final String updatedDescription = 'Updated description ${DateTime.now().millisecondsSinceEpoch}';
         
         QuizzerLogger.logMessage('Testing CRUD operations for subject: $testSubject');
@@ -390,7 +390,7 @@ void main() {
         QuizzerLogger.logMessage('Checking ${localSubjectNames.length} subjects against Supabase in batches...');
         
         // Create batches of 500 subjects each
-        final int batchSize = 500;
+        const int batchSize = 500;
         final List<List<String>> subjectBatches = [];
         for (int i = 0; i < localSubjectNames.length; i += batchSize) {
           final int endIndex = (i + batchSize < localSubjectNames.length) ? i + batchSize : localSubjectNames.length;
@@ -479,7 +479,7 @@ void main() {
         
         // Push records in parallel batches
         QuizzerLogger.logMessage('Pushing ${recordsToPush.length} records to Supabase...');
-        final int pushBatchSize = 200; // Process 200 records at a time
+        const int pushBatchSize = 200; // Process 200 records at a time
         int successCount = 0;
         int failureCount = 0;
         
