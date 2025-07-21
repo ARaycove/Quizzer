@@ -1,0 +1,28 @@
+{
+  "buildFiles": [
+    "/home/araycove/flutter/packages/flutter_tools/gradle/src/main/groovy/CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/home/araycove/Android/Sdk/cmake/3.22.1/bin/ninja",
+      "-C",
+      "/home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/android/app/.cxx/RelWithDebInfo/vy4pn2u3/arm64-v8a",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/home/araycove/Android/Sdk/cmake/3.22.1/bin/ninja",
+    "-C",
+    "/home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/android/app/.cxx/RelWithDebInfo/vy4pn2u3/arm64-v8a",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {},
+  "toolchains": {
+    "toolchain": {
+      "cCompilerExecutable": "/home/araycove/Android/Sdk/ndk/26.3.11579264/toolchains/llvm/prebuilt/linux-x86_64/bin/clang.lld",
+      "cppCompilerExecutable": "/home/araycove/Android/Sdk/ndk/26.3.11579264/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++.lld"
+    }
+  },
+  "cFileExtensions": [],
+  "cppFileExtensions": []
+}
