@@ -93,10 +93,10 @@ class _AddQuestionAnswerPageState extends State<AddQuestionAnswerPage> {
 
     if (typeOrContent == 'image') {
       // Call the image picker helper
-      final String? stagedImagePath = await pickAndStageImage(); // Await the helper
-      if (stagedImagePath != null) {
-        newElement = {'type': 'image', 'content': stagedImagePath};
-        QuizzerLogger.logMessage("Image element prepared with staged path: $stagedImagePath");
+      final String? stagedImageFilename = await pickAndStageImage(); // Await the helper
+      if (stagedImageFilename != null) {
+        newElement = {'type': 'image', 'content': stagedImageFilename};
+        QuizzerLogger.logMessage("Image element prepared with staged filename: $stagedImageFilename");
       } else {
         QuizzerLogger.logWarning("Image picking failed or was cancelled.");
         return; // Don't add anything if picking failed
@@ -171,7 +171,7 @@ class _AddQuestionAnswerPageState extends State<AddQuestionAnswerPage> {
   }
 
   void _handleAddOption(Map<String, dynamic> newOption) { // Accept the new option map
-    QuizzerLogger.logMessage("Placeholder: Add option ${newOption['content']}");
+    QuizzerLogger.logMessage("Add option ${newOption['content']}");
     setState(() {
         _currentOptions.add(newOption);
         if (_currentOptions.length == 1 && _questionTypeController.text == 'multiple_choice') {
@@ -180,6 +180,8 @@ class _AddQuestionAnswerPageState extends State<AddQuestionAnswerPage> {
         _previewRebuildCounter++; // Increment counter
      });
   }
+
+
 
   void _handleRemoveOption(int index) {
     QuizzerLogger.logMessage("Placeholder: Remove option index $index");

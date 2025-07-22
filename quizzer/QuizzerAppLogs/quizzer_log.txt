@@ -1,61 +1,26 @@
-Quizzer: [18:48:45] [34m[INFO][0m [<asynchronous suspension>] QuizzerLogger successfully set up file logging to: ./QuizzerAppLogs/quizzer_log.txt
-Quizzer: [18:48:45] [34m[INFO][0m [<asynchronous suspension>] QuizzerLogger: Attempting a SECOND test log message to file.
-Quizzer: [18:48:45] [34m[INFO][0m [how_many_lines.dart] Calculating total lines of code...
-Quizzer: [18:48:45] [34m[INFO][0m [how_many_lines.dart] 
---- Line Count Summary ---
-Quizzer: [18:48:45] [34m[INFO][0m [how_many_lines.dart] Total_Backend_Systems: 22611
-Quizzer: [18:48:45] [34m[INFO][0m [how_many_lines.dart] Total_UI_Systems:      9556
-Quizzer: [18:48:45] [34m[INFO][0m [how_many_lines.dart] Total_Test_Lines:      10765
-Quizzer: [18:48:45] [34m[INFO][0m [how_many_lines.dart] --------------------------
-Quizzer: [18:48:45] [34m[INFO][0m [how_many_lines.dart] Total_Lines:           42932
-Quizzer: [18:48:45] [34m[INFO][0m [how_many_lines.dart] --------------------------
-Quizzer: [18:48:45] [34m[INFO][0m [how_many_lines.dart] 
---- Backend Systems Breakdown (recursive, alphabetical) ---
-Quizzer: [18:48:45] [34m[INFO][0m [how_many_lines.dart] 00_database_manager/                      16229
-Quizzer: [18:48:45] [34m[INFO][0m [how_many_lines.dart] ├── cloud_sync_system/                         3342
-Quizzer: [18:48:45] [34m[INFO][0m [how_many_lines.dart] │   ├── inbound_sync/                              1289
-Quizzer: [18:48:45] [34m[INFO][0m [how_many_lines.dart] │   └── outbound_sync/                             1771
-Quizzer: [18:48:45] [34m[INFO][0m [how_many_lines.dart] ├── platform/                                    65
-Quizzer: [18:48:45] [34m[INFO][0m [how_many_lines.dart] ├── review_system/                              656
-Quizzer: [18:48:45] [34m[INFO][0m [how_many_lines.dart] └── tables/                                   11660
-Quizzer: [18:48:45] [34m[INFO][0m [how_many_lines.dart]     ├── academic_archive.dart/                     1834
-Quizzer: [18:48:45] [34m[INFO][0m [how_many_lines.dart]     │   └── relationship_data/                           51
-Quizzer: [18:48:45] [34m[INFO][0m [how_many_lines.dart]     ├── question_answer_pair_management/           1813
-Quizzer: [18:48:45] [34m[INFO][0m [how_many_lines.dart]     ├── system_data/                                931
-Quizzer: [18:48:45] [34m[INFO][0m [how_many_lines.dart]     ├── user_profile/                              2696
-Quizzer: [18:48:45] [34m[INFO][0m [how_many_lines.dart]     └── user_stats/                                3072
-Quizzer: [18:48:45] [34m[INFO][0m [how_many_lines.dart] 00_helper_utils/                            223
-Quizzer: [18:48:45] [34m[INFO][0m [how_many_lines.dart] 02_login_authentication/                    730
-Quizzer: [18:48:45] [34m[INFO][0m [how_many_lines.dart] 03_account_creation/                        134
-Quizzer: [18:48:45] [34m[INFO][0m [how_many_lines.dart] 04_module_management/                       448
-Quizzer: [18:48:45] [34m[INFO][0m [how_many_lines.dart] 06_question_queue_server/                   741
-Quizzer: [18:48:45] [34m[INFO][0m [how_many_lines.dart] 07_user_question_management/                110
-Quizzer: [18:48:45] [34m[INFO][0m [how_many_lines.dart] 08_memory_retention_algo/                    90
-Quizzer: [18:48:45] [34m[INFO][0m [how_many_lines.dart] 09_data_caches/                             361
-Quizzer: [18:48:45] [34m[INFO][0m [how_many_lines.dart] 10_switch_board/                            723
-Quizzer: [18:48:45] [34m[INFO][0m [how_many_lines.dart] 11_ai_management/                           247
-Quizzer: [18:48:45] [34m[INFO][0m [how_many_lines.dart] 12_subject_concept_classifier/                0
-Quizzer: [18:48:45] [34m[INFO][0m [how_many_lines.dart] logger/                                     322
-Quizzer: [18:48:45] [34m[INFO][0m [how_many_lines.dart] session_manager/                           2253
-Quizzer: [18:48:45] [34m[INFO][0m [how_many_lines.dart] 
---- UI Systems Breakdown (recursive, alphabetical) ---
-Quizzer: [18:48:45] [34m[INFO][0m [how_many_lines.dart] 00_login_page/                              264
-Quizzer: [18:48:45] [34m[INFO][0m [how_many_lines.dart] 01_new_user_page/                           267
-Quizzer: [18:48:45] [34m[INFO][0m [how_many_lines.dart] 02_home_page/                               531
-Quizzer: [18:48:45] [34m[INFO][0m [how_many_lines.dart] 03_add_question_page/                      2027
-Quizzer: [18:48:45] [34m[INFO][0m [how_many_lines.dart] ├── helpers/                                    173
-Quizzer: [18:48:45] [34m[INFO][0m [how_many_lines.dart] └── widgets/                                   1342
-Quizzer: [18:48:45] [34m[INFO][0m [how_many_lines.dart]     └── add_question_widget/                        658
-Quizzer: [18:48:45] [34m[INFO][0m [how_many_lines.dart] 04_display_modules_page/                   1069
-Quizzer: [18:48:45] [34m[INFO][0m [how_many_lines.dart] └── module_card/                                848
-Quizzer: [18:48:45] [34m[INFO][0m [how_many_lines.dart] 05_menu_page/                               162
-Quizzer: [18:48:45] [34m[INFO][0m [how_many_lines.dart] 06_admin_panel/                             543
-Quizzer: [18:48:45] [34m[INFO][0m [how_many_lines.dart] 07_critical_error_page/                     303
-Quizzer: [18:48:45] [34m[INFO][0m [how_many_lines.dart] 08_settings_page/                           325
-Quizzer: [18:48:45] [34m[INFO][0m [how_many_lines.dart] └── individual_setting_widgets/                  72
-Quizzer: [18:48:45] [34m[INFO][0m [how_many_lines.dart] 09_feedback_page/                           175
-Quizzer: [18:48:45] [34m[INFO][0m [how_many_lines.dart] 10_stats_page/                             1603
-Quizzer: [18:48:45] [34m[INFO][0m [how_many_lines.dart] └── stat_widgets/                               990
-Quizzer: [18:48:45] [34m[INFO][0m [how_many_lines.dart] global_widgets/                             633
-Quizzer: [18:48:45] [34m[INFO][0m [how_many_lines.dart] pages/                                      106
-Quizzer: [18:48:45] [34m[INFO][0m [how_many_lines.dart] question_widgets/                          1548
+Quizzer: [21:58:38] [34m[INFO][0m [<asynchronous suspension>] QuizzerLogger successfully set up file logging to: ./QuizzerAppLogs/quizzer_log.txt
+Quizzer: [21:58:38] [34m[INFO][0m [<asynchronous suspension>] QuizzerLogger: Attempting a SECOND test log message to file.
+Quizzer: [21:58:38] [34m[INFO][0m [test_27_text_input_validation.dart] Question | Keywords | Terms
+Quizzer: [21:58:38] [34m[INFO][0m [test_27_text_input_validation.dart] ---------|----------|------
+Quizzer: [21:58:38] [34m[INFO][0m [test_27_text_input_validation.dart] What is the capital of France? | capit, franc | What, is, the, capital, of, France
+Quizzer: [21:58:38] [34m[INFO][0m [test_27_text_input_validation.dart] How does photosynthesis work? | photosynthesi work | How, does, photosynthesis, work
+Quizzer: [21:58:38] [34m[INFO][0m [test_27_text_input_validation.dart] When did World War II end? | world war II end | When, did, World, War, II, end
+Quizzer: [21:58:38] [34m[INFO][0m [test_27_text_input_validation.dart] Who wrote Romeo and Juliet? | wrote romeo, juliet | Who, wrote, Romeo, and, Juliet
+Quizzer: [21:58:38] [34m[INFO][0m [test_27_text_input_validation.dart] Where is the Great Wall of China located? | great wall, china locat | Where, is, the, Great, Wall, of, China, located
+Quizzer: [21:58:38] [34m[INFO][0m [test_27_text_input_validation.dart] Why do leaves change color in autumn? | leav chang color, autumn | Why, do, leaves, change, color, in, autumn
+Quizzer: [21:58:38] [34m[INFO][0m [test_27_text_input_validation.dart] Which planet is closest to the sun? | planet, closest, sun | Which, planet, is, closest, to, the, sun
+Quizzer: [21:58:38] [34m[INFO][0m [test_27_text_input_validation.dart] How many bones are in the human body? | bone, human bodi | How, many, bones, are, in, the, human, body
+Quizzer: [21:58:38] [34m[INFO][0m [test_27_text_input_validation.dart] What causes earthquakes? | caus earthquak | What, causes, earthquakes
+Quizzer: [21:58:39] [34m[INFO][0m [test_27_text_input_validation.dart] Who discovered penicillin? | discov penicillin | Who, discovered, penicillin
+Quizzer: [21:58:39] [34m[INFO][0m [test_27_text_input_validation.dart] Word 1 | Word 2 | Similarity Score
+Quizzer: [21:58:39] [34m[INFO][0m [test_27_text_input_validation.dart] --------|--------|----------------
+Quizzer: [21:58:39] [34m[INFO][0m [test_27_text_input_validation.dart] glucose | sugar | 0.0
+Quizzer: [21:58:39] [34m[INFO][0m [test_27_text_input_validation.dart] glucose | carbohydrate | 0.0
+Quizzer: [21:58:39] [34m[INFO][0m [test_27_text_input_validation.dart] glucose | city | 0.0
+Quizzer: [21:58:39] [34m[INFO][0m [test_27_text_input_validation.dart] glucose | metropolis | 0.0
+Quizzer: [21:58:39] [34m[INFO][0m [test_27_text_input_validation.dart] sugar | carbohydrate | 0.13333333333333333
+Quizzer: [21:58:39] [34m[INFO][0m [test_27_text_input_validation.dart] sugar | city | 0.0
+Quizzer: [21:58:39] [34m[INFO][0m [test_27_text_input_validation.dart] sugar | metropolis | 0.0
+Quizzer: [21:58:39] [34m[INFO][0m [test_27_text_input_validation.dart] carbohydrate | city | 0.0
+Quizzer: [21:58:39] [34m[INFO][0m [test_27_text_input_validation.dart] carbohydrate | metropolis | 0.0
+Quizzer: [21:58:39] [34m[INFO][0m [test_27_text_input_validation.dart] city | metropolis | 0.0

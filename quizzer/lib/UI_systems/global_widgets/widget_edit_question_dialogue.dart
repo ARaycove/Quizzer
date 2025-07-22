@@ -5,6 +5,7 @@ import 'package:quizzer/UI_systems/03_add_question_page/widgets/widget_live_prev
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/app_theme.dart';
+import 'package:quizzer/UI_systems/03_add_question_page/helpers/image_picker_helper.dart';
 
 
 class EditQuestionDialog extends StatefulWidget {
@@ -132,6 +133,17 @@ class _EditQuestionDialogState extends State<EditQuestionDialog> {
       }
       _previewRebuildCounter++;
     });
+  }
+
+  void _handleAddImageOption() async {
+    QuizzerLogger.logMessage("Attempting to add image option in edit dialog...");
+    final String? stagedImageFilename = await pickAndStageImage();
+    if (stagedImageFilename != null) {
+      _handleAddOption({'type': 'image', 'content': stagedImageFilename});
+      QuizzerLogger.logMessage("Image option added with staged filename: $stagedImageFilename");
+    } else {
+      QuizzerLogger.logWarning("Image picking failed or was cancelled for option in edit dialog.");
+    }
   }
 
   void _handleRemoveOption(int index) {

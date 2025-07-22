@@ -144,20 +144,34 @@ Future<Widget> _buildAsyncWidgetFuture(String? type, String? content) async {
     }
     try {
       final String filename = content;
-      final String assetsPath = p.join(await getQuizzerMediaPath(), filename);
       
-      File fileToCheck = File(assetsPath);
-      if (await fileToCheck.exists()) {
-        QuizzerLogger.logValue("ElementRenderer: Found image at platform-specific path: $assetsPath");
-        return Image.file(File(assetsPath), fit: BoxFit.contain, 
+      // First check staging path (for images that haven't been submitted yet)
+      final String stagingPath = p.join(await getInputStagingPath(), filename);
+      File stagingFile = File(stagingPath);
+      if (await stagingFile.exists()) {
+        QuizzerLogger.logValue("ElementRenderer: Found image in staging: $stagingPath");
+        return Image.file(stagingFile, fit: BoxFit.contain, 
           errorBuilder: (c, e, s) {
-            QuizzerLogger.logError("ElementRenderer: Error loading image file $assetsPath: $e");
+            QuizzerLogger.logError("ElementRenderer: Error loading staging image $stagingPath: $e");
             return _buildErrorIconRow('Image unavailable', isWarning: true);
           }
         );
       }
       
-      QuizzerLogger.logWarning("ElementRenderer: Image file '$filename' not found at $assetsPath");
+      // Then check media path (for submitted images)
+      final String mediaPath = p.join(await getQuizzerMediaPath(), filename);
+      File mediaFile = File(mediaPath);
+      if (await mediaFile.exists()) {
+        QuizzerLogger.logValue("ElementRenderer: Found image in media: $mediaPath");
+        return Image.file(mediaFile, fit: BoxFit.contain, 
+          errorBuilder: (c, e, s) {
+            QuizzerLogger.logError("ElementRenderer: Error loading media image $mediaPath: $e");
+            return _buildErrorIconRow('Image unavailable', isWarning: true);
+          }
+        );
+      }
+      
+      QuizzerLogger.logWarning("ElementRenderer: Image file '$filename' not found in staging or media paths");
       return _buildErrorIconRow('Image not found', isWarning: false);
     } catch (e) {
       QuizzerLogger.logError("ElementRenderer: Error accessing image '$content' (filename): $e");

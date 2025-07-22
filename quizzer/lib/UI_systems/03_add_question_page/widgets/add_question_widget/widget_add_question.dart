@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/UI_systems/global_widgets/question_answer_element.dart';
 import 'package:quizzer/app_theme.dart';
+import 'package:quizzer/UI_systems/03_add_question_page/helpers/image_picker_helper.dart';
 
 // ==========================================
 //       Add/Edit Question Controls Widget
@@ -316,9 +317,12 @@ class _AddQuestionWidgetState extends State<AddQuestionWidget> {
             ElevatedButton.icon(
               icon: const Icon(Icons.add_photo_alternate_outlined),
               label: const Text('Image'),
-              onPressed: () {
-                widget.onAddOption({'type': 'image', 'content': ''}); // Trigger image add
-                 QuizzerLogger.logWarning("Image Option Add - Picker Not Implemented");
+              onPressed: () async {
+                // Handle image picking for options
+                final String? stagedImageFilename = await pickAndStageImage();
+                if (stagedImageFilename != null) {
+                  widget.onAddOption({'type': 'image', 'content': stagedImageFilename});
+                }
               },
             ),
           ],
@@ -435,9 +439,8 @@ class _AddQuestionWidgetState extends State<AddQuestionWidget> {
               icon: const Icon(Icons.add_photo_alternate_outlined),
               label: const Text('Image'),
               onPressed: () {
-                  // Parent needs to handle image picking and element creation
+                  // Parent handles image picking and element creation
                   onAddElementCallback('image', category);
-                  QuizzerLogger.logWarning("Image Element Add - Picker Not Implemented by parent");
               },
             ),
           ],

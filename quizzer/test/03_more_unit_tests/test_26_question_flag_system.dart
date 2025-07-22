@@ -630,7 +630,8 @@ void main() {
           'flag_description': 'Test flag $i',
           'is_reviewed': 0,
           'decision': null,
-          'flag_id': 'test_flag_$i',
+          'flag_id': '0', // Use '0' for unreviewed flags as per implementation
+          'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
         };
         testFlagRecords.add(testFlagRecord);
         allTestRecords.add(testFlagRecord);
@@ -712,14 +713,14 @@ void main() {
       // Get a specific record from the test data
       if (allTestRecords.isNotEmpty) {
         final specificRecord = allTestRecords.first;
-        final flagId = specificRecord['flag_id'] as String;
         final questionId = specificRecord['question_id'] as String;
         final flagType = specificRecord['flag_type'] as String;
         
         // Call getFlaggedQuestionForReview with specific primary key
+        // Note: flag_id should be '0' for unreviewed records
         final result = await getFlaggedQuestionForReview(
           primaryKey: {
-            'flag_id': flagId,
+            'flag_id': '0', // All unreviewed records have flag_id = '0'
             'question_id': questionId,
             'flag_type': flagType,
           },
@@ -753,7 +754,7 @@ void main() {
           supabaseClient
               .from('question_answer_pair_flags')
               .delete()
-              .eq('flag_id', record['flag_id'])
+              .eq('flag_id', '0') // All test records have flag_id = '0'
               .eq('question_id', record['question_id'])
               .eq('flag_type', record['flag_type'])
         );
@@ -765,12 +766,12 @@ void main() {
           final verifyResponse = await supabaseClient
               .from('question_answer_pair_flags')
               .select('*')
-              .eq('flag_id', record['flag_id'])
+              .eq('flag_id', '0') // All test records have flag_id = '0'
               .eq('question_id', record['question_id'])
               .eq('flag_type', record['flag_type']);
           
           expect(verifyResponse, isEmpty, 
-                 reason: 'Test record should be deleted: ${record['flag_id']}');
+                 reason: 'Test record should be deleted: ${record['question_id']}');
         }
         
         QuizzerLogger.logSuccess('Test 5 passed: All test records successfully cleaned up and verified');
@@ -815,7 +816,8 @@ void main() {
         'flag_description': 'Test flag for edit',
         'is_reviewed': 0,
         'decision': null,
-        'flag_id': 1, // Use integer flag_id
+        'flag_id': '0', // Use '0' for unreviewed flags
+        'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
       };
       
       // Insert both records to supabase
@@ -825,7 +827,7 @@ void main() {
       // Use api to get flag record
       final flagResult = await getFlaggedQuestionForReview(
         primaryKey: {
-          'flag_id': '1', // Convert to string for the API
+          'flag_id': '0', // Use '0' for unreviewed flags
           'question_id': testQuestionId,
           'flag_type': 'factually_incorrect',
         },
@@ -917,7 +919,8 @@ void main() {
         'flag_description': 'Test flag for delete',
         'is_reviewed': 0,
         'decision': null,
-        'flag_id': 2, // Use integer flag_id
+        'flag_id': '0', // Use '0' for unreviewed flags
+        'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
       };
       
       // Insert both records to supabase
@@ -927,7 +930,7 @@ void main() {
       // Use api to get flag record
       final flagResult = await getFlaggedQuestionForReview(
         primaryKey: {
-          'flag_id': '2', // Convert to string for the API
+          'flag_id': '0', // Use '0' for unreviewed flags
           'question_id': testQuestionId,
           'flag_type': 'factually_incorrect',
         },

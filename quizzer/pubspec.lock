@@ -352,6 +352,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.4.1"
+  fuzzywuzzy:
+    dependency: "direct main"
+    description:
+      name: fuzzywuzzy
+      sha256: "3004379ffd6e7f476a0c2091f38f16588dc45f67de7adf7c41aa85dec06b432c"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.2.0"
   gotrue:
     dependency: transitive
     description:
@@ -680,6 +688,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.9.1"
+  porter_2_stemmer:
+    dependency: transitive
+    description:
+      name: porter_2_stemmer
+      sha256: "40374d14165022a700797689eb159bd7baed701fc7c8ca9f39dd0945366b2ed3"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.2"
   posix:
     dependency: transitive
     description:
@@ -885,6 +901,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.4.1"
+  string_similarity:
+    dependency: "direct main"
+    description:
+      name: string_similarity
+      sha256: b4b73ec3af3e4203504b136dfbcdbca29edea4eb373684811b76ded9f40a54b9
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.1.1"
   supabase:
     dependency: "direct main"
     description:
@@ -917,6 +941,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.7.4"
+  text_analysis:
+    dependency: "direct main"
+    description:
+      name: text_analysis
+      sha256: "61c8e8d2b25e651f53f77b0c28a7c91b5058c2cf2ee5617e793490705f12cea0"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0+2"
   typed_data:
     dependency: transitive
     description:

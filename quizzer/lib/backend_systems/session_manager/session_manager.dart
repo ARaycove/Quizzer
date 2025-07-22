@@ -18,7 +18,7 @@ import 'package:quizzer/backend_systems/06_question_queue_server/question_select
 import 'package:quizzer/backend_systems/10_switch_board/switch_board.dart'; // Import SwitchBoard
 import 'package:quizzer/backend_systems/10_switch_board/sb_question_worker_signals.dart';
 import 'package:quizzer/backend_systems/session_manager/session_helper.dart';
-import 'package:quizzer/backend_systems/session_manager/session_answer_validation.dart' as answer_validator;
+import 'package:quizzer/backend_systems/session_manager/answer_validation/session_answer_validation.dart';
 import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/outbound_sync/outbound_sync_worker.dart'; // Import the new worker
 import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/media_sync_worker.dart'; // Added import for MediaSyncWorker
 import 'package:quizzer/backend_systems/00_database_manager/review_system/get_send_postgre.dart';
@@ -707,14 +707,14 @@ class SessionManager {
         switch (_currentQuestionType) {
           case 'multiple_choice':
             final int? correctIndex = currentCorrectOptionIndex;
-            isCorrect = answer_validator.validateMultipleChoiceAnswer(
+            isCorrect = validateMultipleChoiceAnswer(
               userAnswer: userAnswer,
               correctIndex: correctIndex,
             );
             break;
           case 'select_all_that_apply':
             final List<int> correctIndices = currentCorrectIndices; // Use getter
-            isCorrect = answer_validator.validateSelectAllThatApplyAnswer(
+            isCorrect = validateSelectAllThatApplyAnswer(
               userAnswer: userAnswer,
               correctIndices: correctIndices,
             );
@@ -722,7 +722,7 @@ class SessionManager {
           case 'true_false':
             // User answer should be 0 (True) or 1 (False)
             assert(currentCorrectOptionIndex != null);
-            isCorrect = answer_validator.validateTrueFalseAnswer(
+            isCorrect = validateTrueFalseAnswer(
               userAnswer: userAnswer,
               correctIndex: currentCorrectOptionIndex!,
             );
@@ -731,7 +731,7 @@ class SessionManager {
             // Get the correct order (List<Map<String, dynamic>>) using existing getter
             final List<Map<String, dynamic>> correctOrder = currentQuestionOptions;
             // Validate user's answer (expected List<Map<String, dynamic>>)
-            isCorrect = answer_validator.validateSortOrderAnswer(
+            isCorrect = validateSortOrderAnswer(
               userAnswer: userAnswer,
               correctOrder: correctOrder,
             );
