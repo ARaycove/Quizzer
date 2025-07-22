@@ -10,6 +10,8 @@ import 'package:quizzer/backend_systems/10_switch_board/sb_question_worker_signa
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_profile_table.dart' as user_profile_table;
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pair_management/question_answer_pairs_table.dart' as q_pairs_table;
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_question_answer_pairs_table.dart';
+// Data Consistency Import
+import 'package:quizzer/backend_systems/00_database_manager/data_consistency/compare_question.dart';
 
 // ==========================================
 // Presentation Selection Worker
@@ -222,11 +224,21 @@ class PresentationSelectionWorker {
       // 3. Check if worker was stopped before adding to queue
       if (!_isRunning) return false;
 
-      // 4. Add the selected question to the queue cache
+      // 4. Call compare function to clean up bad records (non-blocking)
+      final String questionId = selectedQuestion['question_id'] as String;
+      compareAndUpdateQuestionRecord(questionId).then((result) {
+        if (result['updated']) {
+          QuizzerLogger.logMessage('PSW Data Cleanup: ${result['message']} for question $questionId');
+        }
+      }).catchError((error) {
+        QuizzerLogger.logError('PSW Data Cleanup: Error comparing question $questionId: $error');
+      });
+
+      // 5. Add the selected question to the queue cache
       final bool added = await _queueCache.addRecord(selectedQuestion);
       
       if (added) {
-        // 5. Track the selected question in our internal list
+        // 6. Track the selected question in our internal list
         _trackSelectedQuestion(selectedQuestion['question_id'] as String);
         QuizzerLogger.logSuccess('PSW Select: Successfully added question ${selectedQuestion['question_id']} to QueueCache.');
       } else {

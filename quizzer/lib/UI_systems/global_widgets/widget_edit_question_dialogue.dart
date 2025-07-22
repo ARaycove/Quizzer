@@ -91,13 +91,39 @@ class _EditQuestionDialogState extends State<EditQuestionDialog> {
     }
   }
 
-  void _handleAddElement(String typeOrContent, String category) {
-    final newElement = {'type': 'text', 'content': typeOrContent};
+  void _handleAddElement(String typeOrContent, String category) async {
+    Map<String, dynamic>? newElement;
+
+    if (typeOrContent == 'image') {
+      // Call the image picker helper
+      final String? stagedImageFilename = await pickAndStageImage();
+      if (stagedImageFilename != null) {
+        newElement = {'type': 'image', 'content': stagedImageFilename};
+        QuizzerLogger.logMessage("Image element prepared with staged filename: $stagedImageFilename");
+      } else {
+        QuizzerLogger.logWarning("Image picking failed or was cancelled.");
+        return; // Don't add anything if picking failed
+      }
+    } else if (typeOrContent.isNotEmpty) {
+      // Assume it's text content from the TextField
+      newElement = {'type': 'text', 'content': typeOrContent};
+    } else {
+      QuizzerLogger.logWarning("Attempted to add empty element to $category");
+      return;
+    }
+
+    // If an element was created (either text or image), add it
     setState(() {
       if (category == 'question') {
-        _questionElements.add(newElement);
+        _questionElements.add(newElement!);
+        QuizzerLogger.logMessage("Added question element:");
+        QuizzerLogger.logValue(newElement.toString());
       } else if (category == 'answer') {
-        _answerElements.add(newElement);
+        _answerElements.add(newElement!);
+        QuizzerLogger.logMessage("Added answer element:");
+        QuizzerLogger.logValue(newElement.toString());
+      } else {
+        QuizzerLogger.logError("_handleAddElement: Unknown category '$category'");
       }
       _previewRebuildCounter++;
     });
@@ -224,6 +250,21 @@ class _EditQuestionDialogState extends State<EditQuestionDialog> {
       return;
     }
 
+    // --- ADDED: Finalize Staged Images ---
+    try {
+      // Pass the CURRENT state lists to the helper. It modifies them in place.
+      await finalizeStagedImages(_questionElements, _answerElements);
+    } catch (e) {
+      QuizzerLogger.logError("Failed to finalize staged images during submit: $e");
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error processing images: $e'))
+        );
+      }
+      return; // Stop submission if image finalization fails
+    }
+    // --- END ADDED ---
+
     // Construct the map of data that will be sent for update
     // This is also the data we want to return to the caller
     final Map<String, dynamic> updatedQuestionDataForSession = {
@@ -258,6 +299,21 @@ class _EditQuestionDialogState extends State<EditQuestionDialog> {
       QuizzerLogger.logMessage('EditQuestionDialog: Submission disabled, skipping SessionManager update.');
     }
     // -----------------------------------------------
+
+    // --- ADDED: Cleanup Staging Directory ---
+    // Collect filenames from the submitted elements
+    final Set<String> submittedImageFilenames = { 
+      ..._questionElements.where((e) => e['type'] == 'image').map((e) => e['content'] as String), 
+      ..._answerElements.where((e) => e['type'] == 'image').map((e) => e['content'] as String), 
+    };
+    // Call cleanup asynchronously (don't block UI thread)
+    cleanupStagingDirectory(submittedImageFilenames).then((_) { 
+        QuizzerLogger.logMessage("Async staging cleanup call finished.");
+    }).catchError((error) { 
+       QuizzerLogger.logError("Async staging cleanup failed: $error");
+       // Log error but don't disrupt user flow
+    });
+    // --- END ADDED ---
 
     if (mounted) {
       // Pop with the updated data map regardless of submission status

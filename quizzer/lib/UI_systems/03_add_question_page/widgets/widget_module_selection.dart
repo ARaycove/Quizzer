@@ -68,7 +68,8 @@ class _ModuleSelectionState extends State<ModuleSelection> {
                 controller: widget.controller,
                 style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
                 decoration: const InputDecoration(
-                  hintText: 'Enter module name (default: General)',
+                  hintText: 'Enter module name',
+                  border: OutlineInputBorder(),
                 ),
                 onChanged: (value) {
                   setState(() {});

@@ -27,6 +27,7 @@ class EditDescription extends StatelessWidget {
           controller: descriptionController,
           maxLines: null,
           minLines: 3,
+          style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
           decoration: const InputDecoration(
             hintText: 'Enter module description',
           ),

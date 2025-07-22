@@ -194,6 +194,7 @@ class _ModuleRenameMergeWidgetState extends State<ModuleRenameMergeWidget> {
                 AppTheme.sizedBoxMed,
                 TextField(
                   controller: _renameController,
+                  style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
                   decoration: const InputDecoration(
                     labelText: 'New Module Name',
                     hintText: 'Enter new name...',
@@ -259,7 +260,10 @@ class _ModuleRenameMergeWidgetState extends State<ModuleRenameMergeWidget> {
                         decoration: const InputDecoration(
                           labelText: 'Select Target Module',
                         ),
-                        child: Text(selectedItem ?? ''),
+                        child: Text(
+                          selectedItem ?? '',
+                          style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+                        ),
                       );
                     },
                     popupProps: PopupProps.menu(
@@ -273,13 +277,15 @@ class _ModuleRenameMergeWidgetState extends State<ModuleRenameMergeWidget> {
                             item,
                             style: TextStyle(
                               fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                              color: Theme.of(context).colorScheme.onPrimary,
                             ),
                           ),
                         );
                       },
-                      searchFieldProps: const TextFieldProps(
+                      searchFieldProps: TextFieldProps(
                         autofocus: true,
-                        decoration: InputDecoration(
+                        style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+                        decoration: const InputDecoration(
                           hintText: 'Search modules...',
                         ),
                       ),

@@ -105,8 +105,8 @@ class MediaSyncWorker {
   Future<void> _performSync() async {
     QuizzerLogger.logMessage('MediaSyncWorker: _performSync() called.');
     // Brute-force download all Supabase media files before selective sync
-    await _bruteForceDownloadAllSupabaseMedia();
-    await _processUploads();
+    final List<String> serverFiles = await _bruteForceDownloadAllSupabaseMedia();
+    await _processUploads(serverFiles);
     if (!_isRunning) return; // Check if worker was stopped during uploads
     await _processDownloads();
     
@@ -114,11 +114,12 @@ class MediaSyncWorker {
   }
 
   /// Brute-force download: Download every file in the Supabase bucket if not present locally
-  Future<void> _bruteForceDownloadAllSupabaseMedia() async {
+  /// Returns the list of server file names
+  Future<List<String>> _bruteForceDownloadAllSupabaseMedia() async {
     QuizzerLogger.logMessage('MediaSyncWorker: Starting brute-force download of all Supabase media files.');
     if (!_isRunning) {
       QuizzerLogger.logMessage('MediaSyncWorker (_bruteForceDownloadAllSupabaseMedia): Worker stopped before starting.');
-      return;
+      return [];
     }
     final supabase = _sessionManager.supabase;
     const String bucketName = 'question-answer-pair-assets';
@@ -129,8 +130,10 @@ class MediaSyncWorker {
       files = await supabase.storage.from(bucketName).list();
     } catch (e) {
       QuizzerLogger.logError('MediaSyncWorker: Failed to list files in Supabase bucket: $e');
-      return;
+      return [];
     }
+
+    final List<String> serverFileNames = files.map((obj) => obj.name).toList();
 
     for (final fileObj in files) {
       if (!_isRunning) {
@@ -156,35 +159,55 @@ class MediaSyncWorker {
       }
     }
     QuizzerLogger.logMessage('MediaSyncWorker: Brute-force download complete.');
+    return serverFileNames;
   }
 
-  Future<void> _processUploads() async {
-    QuizzerLogger.logMessage('MediaSyncWorker: Starting _processUploads.');
-
-    List<Map<String, dynamic>> filesToUpload = await getExistingLocallyNotExternally(); 
-    QuizzerLogger.logMessage('MediaSyncWorker (_processUploads): Database access released after reading files to upload.');
-
-    if (filesToUpload.isEmpty) {
-      QuizzerLogger.logMessage('MediaSyncWorker: No files found to upload.');
-      return;
-    }
-    QuizzerLogger.logValue('MediaSyncWorker: Found ${filesToUpload.length} files to upload.');
+  Future<void> _processUploads(List<String> serverFiles) async {
+    QuizzerLogger.logMessage('MediaSyncWorker: Starting brute force _processUploads using provided server file list.');
 
     final supabase = _sessionManager.supabase;
 
-    for (final record in filesToUpload) {
+    // Get list of files in local media directory
+    final String localAssetBasePath = await getQuizzerMediaPath();
+    final Directory localDir = Directory(localAssetBasePath);
+    List<String> localFiles = [];
+    
+    if (await localDir.exists()) {
+      try {
+        final List<FileSystemEntity> localEntities = await localDir.list().toList();
+        localFiles = localEntities
+            .where((entity) => entity is File)
+            .map((entity) => path.basename(entity.path))
+            .toList();
+        QuizzerLogger.logMessage('MediaSyncWorker: Found ${localFiles.length} files locally.');
+      } catch (e) {
+        QuizzerLogger.logError('MediaSyncWorker: Failed to list local files: $e');
+        return;
+      }
+    } else {
+      QuizzerLogger.logMessage('MediaSyncWorker: Local media directory does not exist, no files to upload.');
+      return;
+    }
+
+    // Find files that exist locally but not on server
+    final Set<String> serverFileSet = serverFiles.toSet();
+    final List<String> filesToUpload = localFiles.where((fileName) => !serverFileSet.contains(fileName)).toList();
+
+    if (filesToUpload.isEmpty) {
+      QuizzerLogger.logMessage('MediaSyncWorker: No files found to upload (all local files exist on server).');
+      return;
+    }
+    QuizzerLogger.logValue('MediaSyncWorker: Found ${filesToUpload.length} files to upload: ${filesToUpload.join(', ')}');
+
+    // Upload each file that exists locally but not on server
+    for (final fileName in filesToUpload) {
       if (!_isRunning) break;
-      final String fileName = record['file_name'] as String;
-      final String localAssetBasePath = await getQuizzerMediaPath();
       final String localFilePath = path.join(localAssetBasePath, fileName);
 
       try {
         final File localFile = File(localFilePath);
         if (!await localFile.exists()) {
-            QuizzerLogger.logWarning('MediaSyncWorker: Local file $localFilePath for upload does not exist. Attempting to update DB status.');
-            // Rely on db! for fail-fast if db is null.
-            await updateMediaSyncStatus(fileName: fileName, existsLocally: false);
-            QuizzerLogger.logMessage('MediaSyncWorker (_processUploads): DB access released after updating status for non-existent local file $fileName.');
+            QuizzerLogger.logWarning('MediaSyncWorker: Local file $localFilePath for upload does not exist, skipping.');
             continue; 
         }
         final Uint8List bytes = await localFile.readAsBytes();
@@ -194,10 +217,7 @@ class MediaSyncWorker {
             .from(_supabaseBucketName)
             .uploadBinary(fileName, bytes, fileOptions: const FileOptions(upsert: true));
         
-        QuizzerLogger.logSuccess('MediaSyncWorker: Successfully uploaded $fileName. Attempting to update DB status.');
-        // Rely on db! for fail-fast if db is null.
-        await updateMediaSyncStatus(fileName: fileName, existsExternally: true);
-        QuizzerLogger.logMessage('MediaSyncWorker (_processUploads): DB access released after updating status for uploaded file $fileName.');
+        QuizzerLogger.logSuccess('MediaSyncWorker: Successfully uploaded $fileName.');
 
       } on StorageException catch (e) {
         QuizzerLogger.logError('MediaSyncWorker: Supabase StorageException during upload of $fileName: ${e.message} (Code: ${e.statusCode})');
@@ -206,7 +226,7 @@ class MediaSyncWorker {
         if (e is! IOException) rethrow;
       }
     }
-    QuizzerLogger.logMessage('MediaSyncWorker: Finished _processUploads.');
+    QuizzerLogger.logMessage('MediaSyncWorker: Finished brute force _processUploads.');
   }
 
   Future<void> _processDownloads() async {

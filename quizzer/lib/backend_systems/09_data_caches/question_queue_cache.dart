@@ -3,6 +3,8 @@ import 'dart:math';
 import 'package:synchronized/synchronized.dart';
 import 'package:quizzer/backend_systems/10_switch_board/sb_cache_signals.dart'; // Import cache signals
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart'; // Import for logging
+// Import for checking if record exists
+import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pair_management/question_answer_pairs_table.dart';
 
 // ==========================================
 
@@ -99,25 +101,64 @@ class QuestionQueueCache {
   /// Used to get the next question for presentation.
   /// Ensures thread safety using a lock.
   /// Returns a dummy record if the cache is empty.
+  /// Handles cases where records may have been deleted by the compare function.
   Future<Map<String, dynamic>> getAndRemoveRecord() async {
      try {
        QuizzerLogger.logMessage('Entering QuestionQueueCache getAndRemoveRecord()...');
-       return await _lock.synchronized(() {
+       return await _lock.synchronized(() async {
          if (_cache.isNotEmpty) {
            final int lengthBeforeRemove = _cache.length;
-           // Select a random index
-           final random = Random();
-           final int randomIndex = random.nextInt(_cache.length);
-           final record = _cache.removeAt(randomIndex);
-           final int lengthAfterRemove = _cache.length;
-
-           // Signal that a record was removed
-           signalQuestionQueueRemoved();
-           // Notify if length dropped below the threshold
-           if (lengthBeforeRemove >= queueThreshold && lengthAfterRemove < queueThreshold) {
-              QuizzerLogger.logMessage('QuestionQueueCache: Notifying record removed, length now $lengthAfterRemove.');
+           
+           // Try to find a valid record (one that still exists in the database)
+           Map<String, dynamic>? validRecord;
+           int attempts = 0;
+           const int maxAttempts = 3; // Limit attempts to avoid infinite loop
+           
+           while (attempts < maxAttempts && _cache.isNotEmpty) {
+             // Select a random index
+             final random = Random();
+             final int randomIndex = random.nextInt(_cache.length);
+             final record = _cache.removeAt(randomIndex);
+             final String questionId = record['question_id'] as String;
+             
+             // Check if this record still exists in the database
+             try {
+               final Map<String, dynamic>? existingRecord = await getQuestionAnswerPairById(questionId);
+               if (existingRecord != null && existingRecord.isNotEmpty) {
+                 // Record still exists, use it
+                 validRecord = record;
+                 QuizzerLogger.logMessage('QuestionQueueCache: Found valid record $questionId after $attempts attempts');
+                 break;
+               } else {
+                 // Record was deleted, try another one
+                 QuizzerLogger.logMessage('QuestionQueueCache: Record $questionId was deleted, trying another...');
+                 attempts++;
+               }
+             } catch (e) {
+               // Error checking record, assume it's invalid and try another
+               QuizzerLogger.logWarning('QuestionQueueCache: Error checking record $questionId: $e. Trying another...');
+               attempts++;
+             }
            }
-           return record;
+           
+           // If we found a valid record, return it
+           if (validRecord != null) {
+             final int lengthAfterRemove = _cache.length;
+             
+             // Signal that a record was removed
+             signalQuestionQueueRemoved();
+             // Notify if length dropped below the threshold
+             if (lengthBeforeRemove >= queueThreshold && lengthAfterRemove < queueThreshold) {
+                QuizzerLogger.logMessage('QuestionQueueCache: Notifying record removed, length now $lengthAfterRemove.');
+             }
+             return validRecord;
+           } else {
+             // All records in cache were invalid, clear cache and return dummy
+             QuizzerLogger.logWarning('QuestionQueueCache: All records in cache were invalid/deleted. Clearing cache and returning dummy.');
+             _cache.clear();
+             signalQuestionQueueRemoved();
+             return _buildDummyNoQuestionsRecord();
+           }
          } else {
            // Return a dummy record if the cache is empty
            QuizzerLogger.logWarning('QuestionQueueCache: Cache is empty, returning dummy record');

@@ -243,14 +243,14 @@ Future<bool> hasMediaCheck(Map<String, dynamic> questionRecord) async {
     final Set<String> filenames = _extractMediaFilenames(questionRecord);
 
     if (filenames.isNotEmpty) {
-      QuizzerLogger.logMessage('Extracted ${filenames.length} filenames for $loggingContextSuffix. Downloading if missing.');
+      QuizzerLogger.logMessage('Extracted ${filenames.length} filenames for $loggingContextSuffix. Downloading if missing and registering for sync.');
       for (final filename in filenames) {
         await _fetchAndDownloadMediaIfMissing(filename);
       }
-      // Signal the MediaSyncWorker after downloads
-      signalMediaSyncStatusProcessed();
+      // Signal the MediaSyncWorker to process uploads after downloads
+      signalMediaSyncNeeded();
     } else {
-      signalMediaSyncStatusProcessed();
+      signalMediaSyncNeeded();
       QuizzerLogger.logWarning('Media was indicated as found for $loggingContextSuffix, but no filenames were extracted. This might indicate an issue with _extractMediaFilenames or the data structure.');
     }
   } else {
