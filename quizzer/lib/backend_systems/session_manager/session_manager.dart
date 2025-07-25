@@ -19,6 +19,7 @@ import 'package:quizzer/backend_systems/10_switch_board/switch_board.dart'; // I
 import 'package:quizzer/backend_systems/10_switch_board/sb_question_worker_signals.dart';
 import 'package:quizzer/backend_systems/session_manager/session_helper.dart';
 import 'package:quizzer/backend_systems/session_manager/answer_validation/session_answer_validation.dart';
+import 'package:quizzer/backend_systems/session_manager/answer_validation/text_validation_functionality.dart' as text_validation;
 import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/outbound_sync/outbound_sync_worker.dart'; // Import the new worker
 import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/media_sync_worker.dart'; // Added import for MediaSyncWorker
 import 'package:quizzer/backend_systems/00_database_manager/review_system/get_send_postgre.dart';
@@ -133,6 +134,28 @@ class SessionManager {
     _lastSubmittedIsCorrect = isCorrect;
   }
 
+  /// Validates fill-in-the-blank answers and returns detailed correctness information
+  /// Returns: {"isCorrect": bool, "ind_blanks": List<bool>}
+  Future<Map<String, dynamic>> validateFillInTheBlankAnswer(List<String> userAnswers) async {
+    if (_currentQuestionDetails == null) {
+      throw Exception('No current question loaded');
+    }
+    
+    if (_currentQuestionDetails!['question_type'] != 'fill_in_the_blank') {
+      throw Exception('Current question is not a fill_in_the_blank type');
+    }
+    
+    final List<Map<String, List<String>>> answersToBlanks = this.currentAnswersToBlanks;
+    
+    return await text_validation.validateFillInTheBlank(
+      {
+        'question_type': 'fill_in_the_blank',
+        'answers_to_blanks': answersToBlanks,
+      },
+      userAnswers,
+    );
+  }
+
   /// Clears all submission data for the current question
   void clearCurrentQuestionSubmissionData() {
     _lastSubmittedCustomOrderIndices = null;
@@ -209,6 +232,20 @@ class SessionManager {
 
   String?                     get currentSubjects               => _currentQuestionDetails!['subjects'] 
   as String?;
+
+  // Safely cast List<dynamic> to List<Map<String, List<String>>>
+  List<Map<String, List<String>>> get currentAnswersToBlanks {
+    final dynamic answers = _currentQuestionDetails?['answers_to_blanks'];
+    if (answers is List) {
+      return List<Map<String, List<String>>>.from(answers.map((item) {
+        final Map<String, dynamic> map = Map<String, dynamic>.from(item as Map);
+        return Map<String, List<String>>.from(map.map((key, value) {
+          return MapEntry(key, List<String>.from(value as List));
+        }));
+      }));
+    }
+    return [];
+  }
   // ================================================================================
   // --- Initialization Functionality ---
   // ================================================================================
@@ -614,7 +651,11 @@ class SessionManager {
 
   //  --------------------------------------------------------------------------------
   /// Retrieves the next question, updates state, and makes it available via getters.
-  Future<void> requestNextQuestion() async {
+  /// 
+  /// Args:
+  ///   testDebug: Optional test record to use instead of getting from queue cache.
+  ///              This bypasses the queue cache entirely for testing purposes.
+  Future<void> requestNextQuestion({Map<String, dynamic>? testDebug}) async {
     try {
       QuizzerLogger.logMessage('Entering requestNextQuestion()...');
       
@@ -626,7 +667,8 @@ class SessionManager {
       _clearQuestionState();
 
       // 2. Get next user record from QuestionQueueCache (now handles dummy records internally)
-      final Map<String, dynamic> newUserRecord = await _queueCache.getAndRemoveRecord();
+      // Or use testDebug record if provided for testing
+      final Map<String, dynamic> newUserRecord = testDebug ?? await _queueCache.getAndRemoveRecord();
 
       // Check if this is a dummy record
       final String questionId = newUserRecord['question_id'] as String;
@@ -736,6 +778,11 @@ class SessionManager {
               correctOrder: correctOrder,
             );
             break;
+          case 'fill_in_the_blank':
+            // Validate user's answer (expected List<String>) against the question's answers_to_blanks
+            final Map<String, dynamic> validationResult = await validateFillInTheBlankAnswer(userAnswer as List<String>);
+            isCorrect = validationResult['isCorrect'] as bool;
+            break;
           // case 'text_input':
           //   // Compare userAnswer (String?) with currentQuestionAnswerElements
           //   isCorrect = /* ... comparison logic ... */ ;
@@ -812,9 +859,10 @@ class SessionManager {
     required List<Map<String, dynamic>> answerElements,
     required String moduleName,
     // --- Type-specific --- (Add more as needed)
-    List<Map<String, dynamic>>? options, // For MC & SelectAll
-    int? correctOptionIndex, // For MC & TrueFalse
-    List<int>? indexOptionsThatApply, // For select_all_that_apply
+    List<Map<String, dynamic>>?       options, // For MC & SelectAll
+    int?                              correctOptionIndex, // For MC & TrueFalse
+    List<int>?                        indexOptionsThatApply, // For select_all_that_apply
+    List<Map<String, List<String>>>?  answersToBlanks, // For fill_in_the_blank
     // --- Common Optional/Metadata ---
     String? citation,
     String? concepts,
@@ -910,6 +958,24 @@ class SessionManager {
             questionElements: questionElements,
             answerElements: answerElements,
             options: options, // Pass the validated List<String>
+            qstContrib: qstContrib,
+            citation: citation,
+            concepts: concepts,
+            subjects: subjects,
+          );
+          break;
+
+        case 'fill_in_the_blank':
+          // Validate required fields for this type
+          if (answersToBlanks == null) {
+            throw ArgumentError('Missing required field for fill_in_the_blank: answersToBlanks.');
+          }
+          // Call the specific function for fill_in_the_blank
+          await q_pairs_table.addFillInTheBlankQuestion(
+            moduleName: moduleName,
+            questionElements: questionElements,
+            answerElements: answerElements,
+            answersToBlanks: answersToBlanks,
             qstContrib: qstContrib,
             citation: citation,
             concepts: concepts,

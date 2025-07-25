@@ -48,6 +48,7 @@ void main() {
       supabase: sessionManager.supabase, 
       storage: sessionManager.getBox(testAccessPassword),
       testRun: true, // This bypasses sync workers for faster testing
+      noQueueServer: true
     );
     
     expect(loginResult['success'], isTrue, reason: 'Login initialization should succeed');

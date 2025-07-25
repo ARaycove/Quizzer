@@ -13,36 +13,92 @@ import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dar
 
 // --- Universal Encoding/Decoding Helpers --- Removed, moved to 00_table_helper.dart ---
 
+
 Future<void> verifyQuestionAnswerPairTable(dynamic db) async {
   
   // Check if the table exists
   final List<Map<String, dynamic>> tables = await db.rawQuery(
     "SELECT name FROM sqlite_master WHERE type='table' AND name='question_answer_pairs'"
   );
-  
+  // ALL question_type:
+  // - multiple_choice:       ✅ IMPLEMENTED
+  // - select_all_that_apply: ✅ IMPLEMENTED  
+  // - true_false:            ✅ IMPLEMENTED
+  // - sort_order:            ✅ IMPLEMENTED
+  // - fill_in_the_blank:     TODO / NOT IMPLEMENTED
+  // - short_answer:          TODO / NOT IMPLEMENTED
+  // - matching:              TODO / NOT IMPLEMENTED
+  // - hot_spot:              TODO / NOT IMPLEMENTED
+  // - label_diagram:         TODO / NOT IMPLEMENTED
+  // - math:                  TODO / NOT IMPLEMENTED
+
+
+  // question/answer element format:
+  // List<Map<String, dynamic>> where each element is:
+  // {'type': 'text', 'content': 'text content'} OR
+  // {'type': 'image', 'content': 'filename.ext'} OR
+  // {'type': 'blank', content: '$lengthOfBlank'}
+  // 
+  // Supported element types:
+  // - 'text': Displays text content (content field contains the text)
+  // - 'image': Displays image (content field contains filename from media directory)
+  // 
+  // Element rendering:
+  // - Elements are rendered in order using ElementRenderer widget
+  // - Text elements render synchronously
+  // - Image elements load asynchronously from staging or media paths
+  // - Images are stored as filenames, not full paths
+  // 
+  // Media handling:
+  // - Images are staged in input_staging directory during creation
+  // - Finalized images are moved to question_answer_pair_assets directory
+  // - hasMediaCheck() function detects image elements and updates has_media flag
+  // 
+  // Example question_elements:
+  // [
+  //   {'type': 'text', 'content': 'What is the capital of France?'},
+  //   {'type': 'image', 'content': 'france_map.png'},
+  //   {'type': 'text', 'content': 'Choose the correct answer:'}
+  // ]
+  // 
+  // Example question_elements with blanks (for fill_in_the_blank):
+  // [
+  //   {'type': 'text', 'content': 'The capital of France is'},
+  //   {'type': 'blank', 'content': '10'},
+  //   {'type': 'text', 'content': 'and it is known for the Eiffel Tower.'}
+  // ]
+  // 
+  // Example answer_elements:
+  // [
+  //   {'type': 'text', 'content': 'Paris is the capital of France.'},
+  //   {'type': 'image', 'content': 'paris_landmark.jpg'}
+  // ]
+  //
   if (tables.isEmpty) {
     await db.execute('''
       CREATE TABLE question_answer_pairs (
-        time_stamp TEXT,
-        citation TEXT,
-        question_elements TEXT,  -- CSV of question elements in format: type:content
-        answer_elements TEXT,    -- CSV of answer elements in format: type:content
-        ans_flagged INTEGER,     -- Changed from BOOLEAN to INTEGER
-        ans_contrib TEXT,
-        concepts TEXT,
-        subjects TEXT,
-        qst_contrib TEXT,
-        qst_reviewer TEXT,
-        has_been_reviewed INTEGER,  -- Changed from BOOLEAN to INTEGER
-        flag_for_removal INTEGER,   -- Changed from BOOLEAN to INTEGER
-        completed INTEGER,           -- Changed from BOOLEAN to INTEGER
-        module_name TEXT,
-        question_type TEXT,      -- Added for multiple choice support
-        options TEXT,            -- Added for multiple choice options
-        correct_option_index INTEGER,  -- Added for multiple choice correct answer
-        question_id TEXT UNIQUE, -- Added for unique question identification with UNIQUE constraint
-        correct_order TEXT,      -- Added for sort_order
-        index_options_that_apply TEXT,
+        time_stamp TEXT,                    -- UTC time question was entered
+        citation TEXT,                      -- REDACTED, soon to be removed
+        question_elements TEXT,             -- JSON question elements in format: type:content
+        answer_elements TEXT,               -- JSON of answer elements in format: type:content
+        ans_flagged INTEGER,                -- Changed from BOOLEAN to INTEGER
+        ans_contrib TEXT,                   -- user who entered the answer for this question
+        concepts TEXT,                      -- REDACTED, soon to be removed
+        subjects TEXT,                      -- REDACTED, soon to be removed
+        -- Subjects and concepts will be moved to own table
+        qst_contrib TEXT,                   -- uuid of user who entered question
+        qst_reviewer TEXT,                  -- uuid of admin/contributor
+        has_been_reviewed INTEGER,          -- Changed from BOOLEAN to INTEGER
+        flag_for_removal INTEGER,           -- REDACTED, system in place
+        completed INTEGER,                  -- Bool value, 0/1, indicates has both question and answer elements
+        module_name TEXT,                   -- Name of the module to which question belongs (1 module only)
+        question_type TEXT,                 -- The type of the question (multiple choice, true_false, etc.)
+        options TEXT,                       -- Added for multiple choice options
+        correct_option_index INTEGER,       -- Added for multiple choice correct answer
+        question_id TEXT UNIQUE,            -- Added for unique question identification with UNIQUE constraint
+        correct_order TEXT,                 -- Added for sort_order
+        index_options_that_apply TEXT,      -- Added for select_all_that_apply answer
+        answers_to_blanks TEXT,             -- Added for fill_in_the_blank answers
         has_been_synced INTEGER DEFAULT 0,  -- Added for outbound sync tracking
         edits_are_synced INTEGER DEFAULT 0, -- Added for outbound edit sync tracking
         last_modified_timestamp TEXT,       -- Store as ISO8601 UTC string
@@ -124,6 +180,13 @@ Future<void> verifyQuestionAnswerPairTable(dynamic db) async {
     if (!hasMediaCol) {
       QuizzerLogger.logMessage('Adding has_media column with DEFAULT NULL to question_answer_pairs table.');
       await db.execute('ALTER TABLE question_answer_pairs ADD COLUMN has_media INTEGER DEFAULT NULL');
+    }
+
+    // Check for answers_to_blanks column and add if missing
+    final bool hasAnswersToBlanksCol = columns.any((column) => column['name'] == 'answers_to_blanks');
+    if (!hasAnswersToBlanksCol) {
+      QuizzerLogger.logMessage('Adding answers_to_blanks column to question_answer_pairs table.');
+      await db.execute('ALTER TABLE question_answer_pairs ADD COLUMN answers_to_blanks TEXT');
     }
     
     // Check if question_id has UNIQUE constraint and add it if missing
@@ -1262,11 +1325,106 @@ Future<String> addSortOrderQuestion({
   }
 }
 
-// TODO matching                  isValidationDone [ ]
 
-// TODO fill_in_the_blank         isValidationDone [ ]
+
+// ===============================================================================
+// Fill in the Blank Question Functions
+// ===============================================================================
+
+/// Adds a new fill_in_the_blank question to the database.
+/// 
+/// Args:
+///   moduleName: The name of the module this question belongs to.
+///   questionElements: A list of maps representing the question content (can include 'blank' type elements).
+///   answerElements: A list of maps representing the explanation/answer rationale.
+///   answersToBlanks: A list of maps where each map contains the correct answer and synonyms for each blank.
+///   qstContrib: The contributor ID for this question.
+///   citation: Optional citation string.
+///   concepts: Optional comma-separated concepts string.
+///   subjects: Optional comma-separated subjects string.
+///
+/// Returns:
+///   The unique question_id generated for this question (format: timestamp_qstContrib).
+Future<String> addFillInTheBlankQuestion({
+  required String moduleName,
+  required List<Map<String, dynamic>> questionElements,
+  required List<Map<String, dynamic>> answerElements,
+  required List<Map<String, List<String>>> answersToBlanks,
+  required String qstContrib,
+  String? citation,
+  String? concepts,
+  String? subjects,
+}) async {
+// TODO update element renderer
+//
+// TODO create new question widget
+// 
+// TODO Update home page to utilize new question widget
+//
+// TODO Update add_question widget to support new question type
+//
+// TODO update edit quesiton dialogue to support new question type
+// ----------------------------------------------------------------------------
+  try {
+    final db = await getDatabaseMonitor().requestDatabaseAccess();
+    if (db == null) {
+      throw Exception('Failed to acquire database access');
+    }
+    await verifyQuestionAnswerPairTable(db);
+    final String timeStamp = DateTime.now().toUtc().toIso8601String();
+    final String questionId = '${timeStamp}_$qstContrib';
+
+    // Basic validation: Ensure question_elements has n blank elements where n is the length of answers_to_blanks
+    final int blankCount = questionElements.where((element) => element['type'] == 'blank').length;
+    if (blankCount != answersToBlanks.length) {
+      throw ArgumentError('Number of blank elements ($blankCount) does not match number of answer groups (${answersToBlanks.length})');
+    }
+
+    // Prepare the raw data map
+    final Map<String, dynamic> data = {
+      'time_stamp': timeStamp,
+      'citation': citation,
+      'question_elements': questionElements,
+      'answer_elements': answerElements,
+      'ans_flagged': 0,
+      'ans_contrib': '',
+      'concepts': concepts,
+      'subjects': subjects,
+      'qst_contrib': qstContrib,
+      'qst_reviewer': '',
+      'has_been_reviewed': 0,
+      'flag_for_removal': 0,
+      'completed': checkCompletionStatus(
+          questionElements.isNotEmpty ? json.encode(questionElements) : '',
+          answerElements.isNotEmpty ? json.encode(answerElements) : ''
+      ),
+      'module_name': moduleName,
+      'question_type': 'fill_in_the_blank',
+      'answers_to_blanks': answersToBlanks,
+      'question_id': questionId,
+      'has_been_synced': 0,
+      'edits_are_synced': 0,
+      'last_modified_timestamp': timeStamp,
+    };
+
+    data['has_media'] = await hasMediaCheck(data);
+
+    // Use the universal insert helper
+    await insertRawData('question_answer_pairs', data, db);
+    signalOutboundSyncNeeded();
+
+    return questionId;
+  } catch (e) {
+    QuizzerLogger.logError('Error adding fill in the blank question - $e');
+    rethrow;
+  } finally {
+    getDatabaseMonitor().releaseDatabaseAccess();
+  }
+}
 
 // TODO short_answer              isValidationDone [ ]
+
+// TODO matching                  isValidationDone [ ]
 
 // TODO hot_spot (clicks image)   isValidationDone [ ]
 
@@ -1473,6 +1631,8 @@ Future<void> batchUpsertQuestionAnswerPairs({
 
 /// Gets the most recent last_modified_timestamp from the question_answer_pairs table
 Future<String?> getMostRecentQuestionAnswerPairTimestamp() async {
+  // FIXME sync mechanism relies on this, but if a user adds a question mid login, some new data may be missed.
+  // FIXME We better sync mechanism
   try {
     final db = await getDatabaseMonitor().requestDatabaseAccess();
     if (db == null) {

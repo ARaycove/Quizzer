@@ -761,17 +761,14 @@ Future<dynamic> getCorrectAnswerForQuestion(String questionId) async {
         
       case 'select_all_that_apply':
         // For select all that apply, the correct answers are stored in index_options_that_apply
-        final String? indexOptionsString = questionDetails['index_options_that_apply'] as String?;
-        if (indexOptionsString == null || indexOptionsString.isEmpty) {
+        final List<dynamic> indexOptionsList = questionDetails['index_options_that_apply'] as List;
+        if (indexOptionsList.isEmpty) {
           throw Exception('No index_options_that_apply found for select-all question $questionId');
         }
         
-        // Parse the CSV string into a list of integers
-        final List<int> correctIndices = indexOptionsString
-            .split(',')
-            .map((s) => int.tryParse(s.trim()))
-            .where((i) => i != null)
-            .cast<int>()
+        // Convert the list to List<int>
+        final List<int> correctIndices = indexOptionsList
+            .map((item) => item as int)
             .toList();
             
         if (correctIndices.isEmpty) {
@@ -796,6 +793,20 @@ Future<dynamic> getCorrectAnswerForQuestion(String questionId) async {
             .toList();
         QuizzerLogger.logSuccess('Found correct sort order for question $questionId');
         return correctOrder;
+        
+      case 'fill_in_the_blank':
+        // For fill in the blank, extract the primary answers from answers_to_blanks
+        final List<dynamic> answersToBlanksList = questionDetails['answers_to_blanks'] as List;
+        if (answersToBlanksList.isEmpty) {
+          throw Exception('No answers_to_blanks found for fill_in_the_blank question $questionId');
+        }
+        
+        // Extract the primary answer (key) from each blank's answer group
+        final List<String> correctAnswers = answersToBlanksList
+            .map((blankAnswers) => (blankAnswers as Map<String, dynamic>).keys.first)
+            .toList();
+        QuizzerLogger.logSuccess('Found correct fill_in_the_blank answers for question $questionId');
+        return correctAnswers;
         
       default:
         throw Exception('Unsupported question type: $questionType');

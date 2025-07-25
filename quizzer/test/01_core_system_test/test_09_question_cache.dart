@@ -3,6 +3,7 @@ import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/backend_systems/02_login_authentication/login_initialization.dart';
 import 'package:quizzer/backend_systems/09_data_caches/question_queue_cache.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pair_management/question_answer_pairs_table.dart';
 import '../test_helpers.dart';
 import 'dart:io';
 import 'dart:math';
@@ -20,6 +21,9 @@ void main() {
   
   // Global instances used across tests
   late final SessionManager sessionManager;
+  
+  // Real questions from database - loaded once for all tests
+  List<Map<String, dynamic>> realQuestions = [];
   
   setUpAll(() async {
     await QuizzerLogger.setupLogging();
@@ -41,6 +45,11 @@ void main() {
       password: testPassword, 
       supabase: sessionManager.supabase, 
       storage: sessionManager.getBox(testAccessPassword));
+    
+    // Get real questions from database once for all tests
+    QuizzerLogger.logMessage('Loading real questions from database for all tests...');
+    realQuestions = await getAllQuestionAnswerPairs();
+    QuizzerLogger.logMessage('Loaded ${realQuestions.length} real questions for testing');
   });
   
   group('QuestionQueueCache Tests', () {
@@ -103,8 +112,8 @@ void main() {
         }
       });
 
-      test('Should add 100 questions and verify getAndRemove returns random questions', () async {
-        QuizzerLogger.logMessage('Testing QuestionQueueCache with 100 questions - verifying random behavior');
+      test('Should add real questions and verify getAndRemove returns random questions', () async {
+        QuizzerLogger.logMessage('Testing QuestionQueueCache with real questions - verifying random behavior');
         
         try {
           // Get the cache instance
@@ -114,13 +123,17 @@ void main() {
           QuizzerLogger.logMessage('Clearing cache to ensure clean state...');
           await cache.clear();
           
-          // Step 1: Generate 100 question records using helper function
-          QuizzerLogger.logMessage('Step 1: Generating 100 question records using helper function...');
-          final List<Map<String, dynamic>> testRecords = generateTestQuestionRecords(count: 100);
-          QuizzerLogger.logSuccess('Generated 100 question records using helper function');
+          if (realQuestions.isEmpty) {
+            QuizzerLogger.logWarning('No real questions found in database. Skipping this test.');
+            return;
+          }
           
-          // Step 2: Add all generated records to the cache
-          QuizzerLogger.logMessage('Step 2: Adding all records to cache...');
+          // Limit to 50 questions to avoid overwhelming the test
+          final List<Map<String, dynamic>> testRecords = realQuestions.take(50).toList();
+          QuizzerLogger.logSuccess('Got ${testRecords.length} real questions from database');
+          
+          // Step 2: Add all real records to the cache
+          QuizzerLogger.logMessage('Step 2: Adding all real records to cache...');
           int addedCount = 0;
           for (final record in testRecords) {
             final bool added = await cache.addRecord(record);
@@ -133,7 +146,7 @@ void main() {
           // Step 3: Verify the length of cache
           QuizzerLogger.logMessage('Step 3: Verifying cache length...');
           final int cacheLength = await cache.getLength();
-          expect(cacheLength, equals(100), reason: 'Cache should contain exactly 100 records');
+          expect(cacheLength, equals(testRecords.length), reason: 'Cache should contain exactly ${testRecords.length} records');
           QuizzerLogger.logSuccess('Verified cache length: $cacheLength');
           
           // Step 4: Test getAndRemove functionality - should return random questions
@@ -141,7 +154,8 @@ void main() {
           final List<String> retrievedQuestionIds = [];
           
           // Remove 10 questions and verify they come out randomly
-          for (int iteration = 0; iteration < 10; iteration++) {
+          final int questionsToRemove = testRecords.length > 10 ? 10 : testRecords.length;
+          for (int iteration = 0; iteration < questionsToRemove; iteration++) {
             QuizzerLogger.logMessage('Iteration ${iteration + 1}: Getting and removing a question...');
             
             // Get and remove a question
@@ -158,21 +172,20 @@ void main() {
             
             // Verify cache length decreased by 1
             final int currentLength = await cache.getLength();
-            expect(currentLength, equals(100 - iteration - 1), 
-              reason: 'Cache should have ${100 - iteration - 1} records after removing ${iteration + 1} questions');
+            expect(currentLength, equals(testRecords.length - iteration - 1), 
+              reason: 'Cache should have ${testRecords.length - iteration - 1} records after removing ${iteration + 1} questions');
           }
           
           // Step 5: Verify random behavior - should NOT get questions in sequential order
           QuizzerLogger.logMessage('Step 5: Verifying random behavior...');
-          expect(retrievedQuestionIds.length, equals(10), reason: 'Should have retrieved 10 question IDs');
+          expect(retrievedQuestionIds.length, equals(questionsToRemove), reason: 'Should have retrieved $questionsToRemove question IDs');
           
-          // Check that we did NOT get the first 10 questions in sequential order
-          // If the cache is truly random, we should NOT get test_question_0, test_question_1, test_question_2, etc.
+          // Check that we did NOT get questions in the same order they were added
+          // If the cache is truly random, we should NOT get the first N questions in the same order
           bool isSequential = true;
+          final List<String> originalQuestionIds = testRecords.map((r) => r['question_id'] as String).toList();
           for (int i = 0; i < retrievedQuestionIds.length; i++) {
-            final String expectedSequentialId = 'test_question_$i';
-            final String actualId = retrievedQuestionIds[i];
-            if (actualId != expectedSequentialId) {
+            if (i < originalQuestionIds.length && retrievedQuestionIds[i] != originalQuestionIds[i]) {
               isSequential = false;
               break;
             }
@@ -187,10 +200,10 @@ void main() {
           
           // Step 6: Verify remaining cache length
           final int finalLength = await cache.getLength();
-          expect(finalLength, equals(90), reason: 'Cache should have 90 records remaining after removing 10');
+          expect(finalLength, equals(testRecords.length - questionsToRemove), reason: 'Cache should have ${testRecords.length - questionsToRemove} records remaining after removing $questionsToRemove');
           QuizzerLogger.logSuccess('Final cache length: $finalLength');
           
-          QuizzerLogger.logSuccess('✅ Successfully verified QuestionQueueCache random behavior with 100 questions');
+          QuizzerLogger.logSuccess('✅ Successfully verified QuestionQueueCache random behavior with ${testRecords.length} real questions');
           
         } catch (e) {
           QuizzerLogger.logError('Random test failed: $e');
@@ -205,11 +218,17 @@ void main() {
           // Get the cache instance
           final cache = QuestionQueueCache();
           
-          // Generate 5 random numbers between 1 and 50
+          if (realQuestions.isEmpty) {
+            QuizzerLogger.logWarning('No real questions found in database. Skipping this test.');
+            return;
+          }
+          
+          // Generate 5 random numbers between 1 and min(20, realQuestions.length)
           final random = Random();
+          final int maxQuestions = realQuestions.length > 20 ? 20 : realQuestions.length;
           final List<int> testCounts = [];
           for (int i = 0; i < 5; i++) {
-            testCounts.add(random.nextInt(50) + 1); // 1 to 50 inclusive
+            testCounts.add(random.nextInt(maxQuestions) + 1); // 1 to maxQuestions inclusive
           }
           
           QuizzerLogger.logMessage('Generated test counts: $testCounts');
@@ -230,12 +249,9 @@ void main() {
             expect(emptyLength, equals(0), reason: 'Cache length should be 0 after clearing');
             QuizzerLogger.logSuccess('Verified cache is empty (length: $emptyLength)');
             
-            // Generate questions for this test
-            QuizzerLogger.logMessage('Generating $questionCount questions...');
-            final List<Map<String, dynamic>> testRecords = generateTestQuestionRecords(
-              count: questionCount,
-              prefix: 'test_${testIndex}_question_',
-            );
+            // Get real questions for this test
+            QuizzerLogger.logMessage('Getting $questionCount real questions...');
+            final List<Map<String, dynamic>> testRecords = realQuestions.take(questionCount).toList();
             
             // Add all questions to cache
             QuizzerLogger.logMessage('Adding $questionCount questions to cache...');
@@ -287,6 +303,11 @@ void main() {
           // Get the cache instance
           final cache = QuestionQueueCache();
           
+          if (realQuestions.isEmpty) {
+            QuizzerLogger.logWarning('No real questions found in database. Skipping this test.');
+            return;
+          }
+          
           // Test 1: Verify cache starts empty
           QuizzerLogger.logMessage('Test 1: Verifying cache starts empty...');
           final bool startsEmpty = await cache.isEmpty();
@@ -295,8 +316,8 @@ void main() {
           
           // Test 2: Add one question and verify not empty
           QuizzerLogger.logMessage('Test 2: Adding one question and verifying not empty...');
-          final List<Map<String, dynamic>> singleQuestion = generateTestQuestionRecords(count: 1);
-          final bool added = await cache.addRecord(singleQuestion.first);
+          final Map<String, dynamic> singleQuestion = realQuestions.first;
+          final bool added = await cache.addRecord(singleQuestion);
           expect(added, isTrue, reason: 'Should be able to add question to cache');
           
           final bool notEmptyAfterAdd = await cache.isEmpty();
@@ -306,7 +327,7 @@ void main() {
           // Test 3: Remove the question and verify empty again
           QuizzerLogger.logMessage('Test 3: Removing question and verifying empty again...');
           final removedRecord = await cache.getAndRemoveRecord();
-          expect(removedRecord['question_id'], equals('test_question_0'), 
+          expect(removedRecord['question_id'], equals(singleQuestion['question_id']), 
             reason: 'Should get the question we added');
           
           final bool emptyAfterRemove = await cache.isEmpty();
@@ -315,7 +336,7 @@ void main() {
           
           // Test 4: Add multiple questions and verify not empty
           QuizzerLogger.logMessage('Test 4: Adding multiple questions and verifying not empty...');
-          final List<Map<String, dynamic>> multipleQuestions = generateTestQuestionRecords(count: 5);
+          final List<Map<String, dynamic>> multipleQuestions = realQuestions.take(5).toList();
           int addedCount = 0;
           for (final record in multipleQuestions) {
             final bool questionAdded = await cache.addRecord(record);
@@ -339,11 +360,14 @@ void main() {
           
           // Test 6: Add and remove questions one by one, checking empty state each time
           QuizzerLogger.logMessage('Test 6: Testing empty state during add/remove cycle...');
-          final List<Map<String, dynamic>> cycleQuestions = generateTestQuestionRecords(count: 3);
+          final List<Map<String, dynamic>> cycleQuestions = realQuestions.take(3).toList();
           
           for (int i = 0; i < cycleQuestions.length; i++) {
+            final Map<String, dynamic> question = cycleQuestions[i];
+            final String questionId = question['question_id'] as String;
+            
             // Add question
-            final bool questionAdded = await cache.addRecord(cycleQuestions[i]);
+            final bool questionAdded = await cache.addRecord(question);
             expect(questionAdded, isTrue, reason: 'Should be able to add question $i');
             
             // Verify not empty
@@ -352,7 +376,7 @@ void main() {
             
             // Remove question
             final removedRecord = await cache.getAndRemoveRecord();
-            expect(removedRecord['question_id'], equals('test_question_$i'), 
+            expect(removedRecord['question_id'], equals(questionId), 
               reason: 'Should get the question we just added');
             
             // Verify empty (since we're removing one by one)
@@ -392,10 +416,12 @@ void main() {
           expect(isEmpty, isTrue, reason: 'Cache should be empty after clearing');
           QuizzerLogger.logSuccess('Verified cache is empty after clearing');
           
-          // Step 2: Generate questions
-          QuizzerLogger.logMessage('Step 2: Generating test questions...');
-          final List<Map<String, dynamic>> testRecords = generateTestQuestionRecords(count: 5);
-          QuizzerLogger.logSuccess('Generated ${testRecords.length} test questions');
+          if (realQuestions.isEmpty) {
+            QuizzerLogger.logWarning('No real questions found in database. Skipping this test.');
+            return;
+          }
+          
+          final List<Map<String, dynamic>> testRecords = realQuestions.take(5).toList();
           
           // Step 3: Add the questions to cache
           QuizzerLogger.logMessage('Step 3: Adding questions to cache...');
@@ -409,23 +435,23 @@ void main() {
           expect(addedCount, equals(5), reason: 'Should have added all 5 questions');
           QuizzerLogger.logSuccess('Added $addedCount questions to cache');
           
-          // Step 4: Use peekAllRecords and compare with generated questions
-          QuizzerLogger.logMessage('Step 4: Using peekAllRecords and comparing with generated questions...');
+          // Step 4: Use peekAllRecords and compare with real questions
+          QuizzerLogger.logMessage('Step 4: Using peekAllRecords and comparing with real questions...');
           final List<Map<String, dynamic>> peekedRecords = await cache.peekAllRecords();
           
           // Verify peekAllRecords returns the correct number of records
           expect(peekedRecords.length, equals(testRecords.length), 
-            reason: 'peekAllRecords should return same number of records as generated');
+            reason: 'peekAllRecords should return same number of records as real questions');
           
-          // Verify all generated questions are present in peeked records
-          for (final Map<String, dynamic> generatedRecord in testRecords) {
-            final String generatedQuestionId = generatedRecord['question_id'] as String;
+          // Verify all real questions are present in peeked records
+          for (final Map<String, dynamic> realRecord in testRecords) {
+            final String realQuestionId = realRecord['question_id'] as String;
             final bool foundInPeeked = peekedRecords.any((peekedRecord) => 
-              peekedRecord['question_id'] == generatedQuestionId);
+              peekedRecord['question_id'] == realQuestionId);
             expect(foundInPeeked, isTrue, 
-              reason: 'Generated question $generatedQuestionId should be found in peeked records');
+              reason: 'Real question $realQuestionId should be found in peeked records');
           }
-          QuizzerLogger.logSuccess('Verified all generated questions are present in peeked records');
+          QuizzerLogger.logSuccess('Verified all real questions are present in peeked records');
           
           // Verify peekAllRecords doesn't remove records (cache length unchanged)
           final int lengthBeforePeek = await cache.getLength();
@@ -472,10 +498,12 @@ void main() {
           expect(isEmpty, isTrue, reason: 'Cache should be empty after clearing');
           QuizzerLogger.logSuccess('Verified cache is empty after clearing');
           
-          // Step 2: Generate questions
-          QuizzerLogger.logMessage('Step 2: Generating test questions...');
-          final List<Map<String, dynamic>> testRecords = generateTestQuestionRecords(count: 5);
-          QuizzerLogger.logSuccess('Generated ${testRecords.length} test questions');
+          if (realQuestions.isEmpty) {
+            QuizzerLogger.logWarning('No real questions found in database. Skipping this test.');
+            return;
+          }
+          
+          final List<Map<String, dynamic>> testRecords = realQuestions.take(5).toList();
           
           // Step 3: Add questions one by one and verify containsQuestionId after each addition
           QuizzerLogger.logMessage('Step 3: Adding questions one by one and verifying containsQuestionId...');

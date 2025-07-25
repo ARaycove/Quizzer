@@ -50,17 +50,11 @@ void main() {
       supabase: sessionManager.supabase, 
       storage: sessionManager.getBox(testAccessPassword),
       testRun: true, // This bypasses sync workers for faster testing
+      noQueueServer: true //queueServer not needed for test
     );
     
     expect(loginResult['success'], isTrue, reason: 'Login initialization should succeed');
     QuizzerLogger.logSuccess('Full login initialization completed successfully');
-    
-    // Stop both workers to prevent interference with tests
-    final circulationWorker = CirculationWorker();
-    final selectionWorker = PresentationSelectionWorker();
-    await circulationWorker.stop();
-    await selectionWorker.stop();
-    QuizzerLogger.logMessage('Stopped Circulation Worker and Selection Worker for testing');
   });
   
   group('addQuestionAnswerPairFlag', () {

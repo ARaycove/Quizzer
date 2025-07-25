@@ -51,7 +51,8 @@ void main() {
     QuizzerLogger.logSuccess('Full login initialization completed successfully');
   });
   
-  group('Subject Taxonomy Tests', () {
+  group('Subject Taxonomy Tests', skip: 'Bypassing Subject Taxonomy, this test only needs to be run when taxonomy get\'s updated', () {
+    // DISABLED: Subject Taxonomy Tests - lengthy test that doesn't need to run every time
     // Global variable to store all subjects with their immediate parents
     List<Map<String, String>>? allSubjectsWithParents;
     

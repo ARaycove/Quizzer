@@ -182,11 +182,25 @@ class PresentationSelectionWorker {
         
         // Step 5: Wait for either the submitAnswer signal or circulation worker question added signal
         if (_isRunning) {
-          await Future.any([
-            _switchBoard.onQuestionAnsweredCorrectly.first,
-            _switchBoard.onCirculationWorkerQuestionAdded.first,
-            _switchBoard.onQuestionQueueRemoved.first,
-          ]);
+          // Use a timeout-based approach to allow checking stop condition
+          bool signalReceived = false;
+          while (_isRunning && !signalReceived) {
+            try {
+              await Future.any([
+                _switchBoard.onQuestionAnsweredCorrectly.first,
+                _switchBoard.onCirculationWorkerQuestionAdded.first,
+                _switchBoard.onQuestionQueueRemoved.first,
+              ]).timeout(const Duration(milliseconds: 100));
+              signalReceived = true;
+            } on TimeoutException {
+              // Check if we should stop
+              if (!_isRunning) {
+                QuizzerLogger.logMessage('PresentationSelectionWorker was stopped during signal wait.');
+                break;
+              }
+              // Continue waiting
+            }
+          }
         }
       }
       
@@ -235,7 +249,14 @@ class PresentationSelectionWorker {
       });
 
       // 5. Add the selected question to the queue cache
-      final bool added = await _queueCache.addRecord(selectedQuestion);
+      bool added = false;
+      try {
+        added = await _queueCache.addRecord(selectedQuestion);
+      } catch (e) {
+        // Question was likely deleted by cleanup function between selection and queue addition
+        QuizzerLogger.logWarning('PSW Select: Question ${selectedQuestion['question_id']} was deleted during processing, skipping.');
+        return false;
+      }
       
       if (added) {
         // 6. Track the selected question in our internal list
@@ -319,7 +340,14 @@ class PresentationSelectionWorker {
         final int revisionStreak = question['revision_streak'] ?? 0;
         
         // Fetch full pair directly from DB - table function handles its own database access
-        final Map<String, dynamic> questionDetails = await q_pairs_table.getQuestionAnswerPairById(questionId);
+        Map<String, dynamic> questionDetails;
+        try {
+          questionDetails = await q_pairs_table.getQuestionAnswerPairById(questionId);
+        } catch (e) {
+          // Question was likely deleted by cleanup function, skip this question
+          QuizzerLogger.logWarning('PSW Algo: Question $questionId was deleted during processing, skipping.');
+          continue;
+        }
         if (!_isRunning) return {}; // Abort if worker was stopped after DB call
         
         final String? subjectsCsv = questionDetails['subjects'] as String?;
@@ -362,6 +390,12 @@ class PresentationSelectionWorker {
       // QuizzerLogger.logMessage('PSW Algo: Performing weighted random selection...');
       if (!_isRunning) return {}; // Abort if worker was stopped
       
+      // Check if we have any valid questions after filtering
+      if (scoreMap.isEmpty) {
+        QuizzerLogger.logWarning('PSW Algo: No valid questions remaining after filtering, returning empty result.');
+        return {};
+      }
+      
       final random = Random();
       double randomThreshold = random.nextDouble() * totalScore;
       double cumulativeScore = 0.0;
@@ -370,6 +404,10 @@ class PresentationSelectionWorker {
         if (!_isRunning) return {}; // Abort if worker was stopped
         
         final String questionId = question['question_id'];
+        // Skip questions that weren't successfully processed
+        if (!scoreMap.containsKey(questionId)) {
+          continue;
+        }
         final double score = scoreMap[questionId]!;
         cumulativeScore += score;
         if (cumulativeScore >= randomThreshold) {
@@ -382,9 +420,16 @@ class PresentationSelectionWorker {
       // QuizzerLogger.logError('PSW Algo: Weighted random selection failed! Returning first eligible.'); // Keep this error
       if (!_isRunning) return {}; // Abort if worker was stopped
       
-      if (eligibleQuestions.isNotEmpty) {
-         return eligibleQuestions.first;
+      // Try to find any question that was successfully processed
+      for (final question in eligibleQuestions) {
+        final String questionId = question['question_id'];
+        if (scoreMap.containsKey(questionId)) {
+          return question;
+        }
       }
+      
+      // If no questions were successfully processed, return empty
+      QuizzerLogger.logWarning('PSW Algo: No questions were successfully processed, returning empty result.');
       return {};
     } catch (e) {
       QuizzerLogger.logError('Error in PresentationSelectionWorker _selectNextQuestionFromList - $e');

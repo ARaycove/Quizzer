@@ -240,12 +240,14 @@ Future<Map<String, dynamic>> performLoginProcess({
 /// 6. Return authentication results, which allow the UI to navigate to the home page
 /// 
 /// [testRun] - When true, bypasses sync worker initialization for testing purposes
+/// [noQueueServer] - When true, skips queue server initialization for testing purposes
 Future<Map<String, dynamic>> loginInitialization({
   required String email,
   required String password,
   required SupabaseClient supabase,
   required Box storage,
   bool testRun = false,
+  bool noQueueServer = false,
 }) async {
   try {
     QuizzerLogger.logMessage('Entering loginInitialization()...');
@@ -293,9 +295,13 @@ Future<Map<String, dynamic>> loginInitialization({
     }
 
     // Step 3: Initialize question queue server (circulation and selection workers)
-    signalLoginProgress("Starting question queue server...");
-    QuizzerLogger.logMessage('Initializing question queue server...');
-    await startQuestionQueueServer();
+    if (!noQueueServer) {
+      signalLoginProgress("Starting question queue server...");
+      QuizzerLogger.logMessage('Initializing question queue server...');
+      await startQuestionQueueServer();
+    } else {
+      QuizzerLogger.logMessage('Skipping question queue server initialization for test run');
+    }
 
     // Step 4: Return results
     signalLoginProgress("Welcome back! You're all set.");

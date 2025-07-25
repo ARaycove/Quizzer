@@ -1,15 +1,45 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/session_manager/answer_validation/session_answer_validation.dart' as answer_validator;
+import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pair_management/question_answer_pairs_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_question_answer_pairs_table.dart';
+import 'package:quizzer/backend_systems/02_login_authentication/login_initialization.dart';
+import 'dart:io';
+import '../test_helpers.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   
+  // Manual iteration variable for reusing accounts across tests
+  late int testIteration;
+  
+  // Test credentials - defined once and reused
+  late String testEmail;
+  late String testPassword;
+  late String testAccessPassword;
+  
+  // Global instances used across tests
+  late final SessionManager sessionManager;
+  
   setUpAll(() async {
     await QuizzerLogger.setupLogging();
+    HttpOverrides.global = null;
+    
+    // Load test configuration
+    final config = await getTestConfig();
+    testIteration = config['testIteration'] as int;
+    testPassword = config['testPassword'] as String;
+    testAccessPassword = config['testAccessPassword'] as String;
+    
+    // Set up test credentials
+    testEmail = 'test_user_$testIteration@example.com';
+    
+    sessionManager = getSessionManager();
+    await sessionManager.initializationComplete;
   });
   
-  group('Answer Validation Tests', () {
+  group('Group 1: Answer Validation Unit Tests', () {
     test('Test 1: Multiple Choice Answer Validation', () async {
       QuizzerLogger.logMessage('=== Test 1: Multiple Choice Answer Validation ===');
       
@@ -357,5 +387,111 @@ void main() {
         rethrow;
       }
     });
+  });
+
+  group('Group 2: submitAnswer API tests', () {
+    test('Test 1: SubmitAnswer API with real questions from database', () async {
+      QuizzerLogger.logMessage('=== Test 1: SubmitAnswer API with real questions from database ===');
+      
+      // Step 1: Initialize login without sync and queue server
+      QuizzerLogger.logMessage('Step 1: Initializing login...');
+      final SessionManager sessionManager = getSessionManager();
+      final loginResult = await loginInitialization(
+        email: testEmail,
+        password: testPassword,
+        supabase: sessionManager.supabase,
+        storage: sessionManager.getBox(testAccessPassword),
+        testRun: true,
+        noQueueServer: true,
+      );
+      
+      // Step 2: Get questions from database (created by test_18)
+      QuizzerLogger.logMessage('Step 2: Getting questions from database...');
+      final List<Map<String, dynamic>> allQuestions = await getAllQuestionAnswerPairs();
+      expect(allQuestions.length, greaterThan(0), reason: 'Should have questions in database from test_18');
+      
+      // Group questions by type
+      final Map<String, Map<String, dynamic>> questionsByType = {};
+      for (final question in allQuestions) {
+        final String questionType = question['question_type'] as String;
+        if (!questionsByType.containsKey(questionType)) {
+          questionsByType[questionType] = question;
+        }
+      }
+      
+      QuizzerLogger.logMessage('Found question types: ${questionsByType.keys.join(', ')}');
+      
+      // Step 3: Test each question type
+      for (final questionType in questionsByType.keys) {
+        QuizzerLogger.logMessage('Testing submitAnswer for question type: $questionType');
+        
+        final Map<String, dynamic> question = questionsByType[questionType]!;
+        final String questionId = question['question_id'] as String;
+        
+        // Step 4: Use the global SessionManager and create a real user question record in the database
+        final String userId = sessionManager.userId!;
+        
+        // Create user question record using the proper function
+        QuizzerLogger.logMessage('Creating user question record for question $questionId...');
+        await insertOrUpdateUserQuestionAnswerPair(
+          userUuid: userId,
+          questionId: questionId,
+          revisionStreak: 0,
+          lastRevised: DateTime.now().toUtc().toIso8601String(),
+          predictedRevisionDueHistory: '[]',
+          nextRevisionDue: DateTime.now().toUtc().toIso8601String(),
+          timeBetweenRevisions: 1.0,
+          averageTimesShownPerDay: 1.0,
+        );
+        QuizzerLogger.logMessage('User question record created successfully');
+        
+        // Step 5: Use requestNextQuestion with testDebug to bypass queue cache
+        
+        // Create a test record that combines question data with user record
+        final Map<String, dynamic> testRecord = Map<String, dynamic>.from(question);
+        testRecord.addAll({
+          'user_uuid': userId,
+          'question_id': questionId,
+          'revision_streak': 0,
+          'last_revised': DateTime.now().toUtc().toIso8601String(),
+          'next_revision_due': DateTime.now().toUtc().toIso8601String(),
+          'time_between_revisions': 1.0,
+          'average_times_shown_per_day': 1.0,
+          'total_attempts': 0,
+          'is_eligible': 1,
+          'in_circulation': 1,
+        });
+        
+        // Use the testDebug parameter to bypass queue cache
+        QuizzerLogger.logMessage('Calling requestNextQuestion with testDebug for question $questionId...');
+        await sessionManager.requestNextQuestion(testDebug: testRecord);
+        QuizzerLogger.logMessage('requestNextQuestion completed successfully');
+        
+        // Verify the question is loaded
+        expect(sessionManager.currentQuestionId, equals(questionId), 
+          reason: 'SessionManager should have loaded the test question');
+        
+        // Step 6: Get correct answer for this question type
+        QuizzerLogger.logMessage('Getting correct answer for question $questionId...');
+        final dynamic correctAnswer = await getCorrectAnswerForQuestion(questionId);
+        expect(correctAnswer, isNotNull, reason: 'Should be able to get correct answer for question $questionId');
+        QuizzerLogger.logMessage('Correct answer retrieved successfully');
+        
+        // Step 7: Test submitAnswer API with correct answer
+        QuizzerLogger.logMessage('Testing correct answer for $questionType question...');
+        final Map<String, dynamic> correctResult = await sessionManager.submitAnswer(userAnswer: correctAnswer);
+        expect(correctResult['success'], isTrue, reason: 'submitAnswer should succeed for correct $questionType answer');
+        
+                      // Step 8: Test submitAnswer API with incorrect answer
+        QuizzerLogger.logMessage('Testing incorrect answer for $questionType question...');
+        final dynamic incorrectAnswer = 999; // Just some junk value
+        final Map<String, dynamic> incorrectResult = await sessionManager.submitAnswer(userAnswer: incorrectAnswer);
+        expect(incorrectResult['success'], isFalse, reason: 'submitAnswer should fail for incorrect $questionType answer');
+        
+        QuizzerLogger.logSuccess('submitAnswer API test passed for $questionType (correct and incorrect)');
+      }
+      
+      QuizzerLogger.logSuccess('✅ All submitAnswer API tests completed successfully');
+    }, timeout: const Timeout(Duration(minutes: 5)));
   });
 } 

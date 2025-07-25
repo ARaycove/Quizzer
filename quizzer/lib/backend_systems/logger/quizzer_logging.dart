@@ -52,7 +52,8 @@ class QuizzerLogger {
     "user_stats_non_circulating_questions_table.dart",
     "user_stats_daily_questions_answered_table.dart",
     "user_stats_average_questions_shown_per_day_table.dart",
-    "user_stats_revision_streak_sum_table.dart"
+    "user_stats_revision_streak_sum_table.dart",
+    "session_manager.dart"
   ]; // List of source filenames to exclude
 
   /// Sets the list of source filenames (e.g., 'my_table.dart') to exclude from logging.

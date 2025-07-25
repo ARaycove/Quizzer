@@ -577,8 +577,123 @@ void main() {
       QuizzerLogger.logSuccess('=== Test 5 completed successfully ===');
     }, timeout: const Timeout(Duration(minutes: 3)));
     
-    test('Test 6: Performance and functionality report', () async {
-      QuizzerLogger.logMessage('=== Test 6: Performance and functionality report ===');
+    test('Test 6: Add fill_in_the_blank questions and verify', () async {
+      QuizzerLogger.logMessage('=== Test 6: Add fill_in_the_blank questions and verify ===');
+      
+      // Step 1: Add fill_in_the_blank questions with new module name
+      final String testModule = 'BiologyModule_${DateTime.now().millisecondsSinceEpoch}';
+      QuizzerLogger.logMessage('Using new biology module: $testModule');
+      
+      // Step 2: Add fill_in_the_blank questions
+      QuizzerLogger.logMessage('Step 2: Adding fill_in_the_blank questions...');
+      final stopwatch = Stopwatch()..start();
+      
+      // Question 1: Cell Biology
+      final Map<String, dynamic> addResult1 = await sessionManager.addNewQuestion(
+        questionType: 'fill_in_the_blank',
+        questionElements: [
+          {'type': 'text', 'content': 'The powerhouse of the cell is the'},
+          {'type': 'blank', 'content': '15'},
+          {'type': 'text', 'content': 'and it produces energy through cellular respiration.'}
+        ],
+        answerElements: [
+          {'type': 'text', 'content': 'Mitochondria is the powerhouse of the cell and produces ATP through cellular respiration.'}
+        ],
+        moduleName: testModule,
+        answersToBlanks: [
+          {"mitochondria": ["powerhouse", "energy factory", "cellular power plant"]}
+        ],
+        citation: 'Biology Textbook',
+        concepts: 'Biology, Cell Biology',
+        subjects: 'Science',
+      );
+      
+      // Question 2: Photosynthesis
+      final Map<String, dynamic> addResult2 = await sessionManager.addNewQuestion(
+        questionType: 'fill_in_the_blank',
+        questionElements: [
+          {'type': 'text', 'content': 'Plants use'},
+          {'type': 'blank', 'content': '12'},
+          {'type': 'text', 'content': 'to convert sunlight into glucose.'}
+        ],
+        answerElements: [
+          {'type': 'text', 'content': 'Photosynthesis is the process by which plants convert sunlight into glucose.'}
+        ],
+        moduleName: testModule,
+        answersToBlanks: [
+          {"photosynthesis": ["light reaction", "solar energy conversion", "plant food making"]}
+        ],
+        citation: 'Biology Textbook',
+        concepts: 'Biology, Photosynthesis',
+        subjects: 'Science',
+      );
+      
+      // Question 3: DNA Structure
+      final Map<String, dynamic> addResult3 = await sessionManager.addNewQuestion(
+        questionType: 'fill_in_the_blank',
+        questionElements: [
+          {'type': 'text', 'content': 'The double helix structure of'},
+          {'type': 'blank', 'content': '3'},
+          {'type': 'text', 'content': 'was discovered by Watson and Crick.'}
+        ],
+        answerElements: [
+          {'type': 'text', 'content': 'DNA has a double helix structure discovered by Watson and Crick in 1953.'}
+        ],
+        moduleName: testModule,
+        answersToBlanks: [
+          {"dna": ["deoxyribonucleic acid", "genetic material", "hereditary molecule"]}
+        ],
+        citation: 'Biology Textbook',
+        concepts: 'Biology, Genetics',
+        subjects: 'Science',
+      );
+      
+      stopwatch.stop();
+      final int elapsedMilliseconds = stopwatch.elapsedMilliseconds;
+      
+      expect(addResult1, isNotNull, reason: 'Add question 1 should return a result');
+      expect(addResult2, isNotNull, reason: 'Add question 2 should return a result');
+      expect(addResult3, isNotNull, reason: 'Add question 3 should return a result');
+      QuizzerLogger.logMessage('Add fill_in_the_blank questions API calls took ${elapsedMilliseconds}ms');
+      
+      // Step 3: Verify questions were added
+      QuizzerLogger.logMessage('Step 3: Verifying fill_in_the_blank questions were added...');
+      final List<Map<String, dynamic>> questionsAfterAdd = await getAllQuestionAnswerPairs();
+      final int afterAddCount = questionsAfterAdd.length;
+      expect(afterAddCount, equals(15), reason: 'Should have exactly 15 questions after adding (3 MC + 3 TF + 3 SA + 3 SO + 3 FIB)');
+      
+      // Step 4: Verify question details
+      final List<Map<String, dynamic>> moduleQuestions = questionsAfterAdd.where((q) => q['module_name'] == testModule).toList();
+      expect(moduleQuestions.length, equals(3), reason: 'Should have 3 questions in the biology module');
+      
+      // Verify all questions are fill_in_the_blank
+      for (final question in moduleQuestions) {
+        expect(question['question_type'], equals('fill_in_the_blank'), 
+          reason: 'All questions should be fill_in_the_blank type');
+        expect(question['module_name'], equals(testModule), 
+          reason: 'All questions should be in correct module');
+      }
+      
+      // Step 5: Verify module was created
+      QuizzerLogger.logMessage('Step 5: Verifying module was created...');
+      final List<Map<String, dynamic>> modulesAfterAdd = await getAllModules();
+      final int moduleCount = modulesAfterAdd.length;
+      expect(moduleCount, equals(5), reason: 'Should have exactly 5 modules after adding questions');
+      
+      final bool moduleExists = modulesAfterAdd.any((m) => m['module_name'] == testModule);
+      expect(moduleExists, isTrue, reason: 'Biology module should exist in modules table');
+      
+      // Store results for final report
+      testResults['fill_in_the_blank_added'] = true;
+      testResults['fill_in_the_blank_count'] = 3;
+      testResults['fill_in_the_blank_performance_ms'] = elapsedMilliseconds;
+      
+      QuizzerLogger.logSuccess('Fill-in-the-blank questions added and module created successfully');
+      QuizzerLogger.logSuccess('=== Test 6 completed successfully ===');
+    }, timeout: const Timeout(Duration(minutes: 3)));
+
+    test('Test 7: Performance and functionality report', () async {
+      QuizzerLogger.logMessage('=== Test 7: Performance and functionality report ===');
       
       // Get final counts
       final List<Map<String, dynamic>> finalQuestions = await getAllQuestionAnswerPairs();
@@ -592,6 +707,7 @@ void main() {
         testResults['true_false_performance_ms'] ?? 0,
         testResults['select_all_performance_ms'] ?? 0,
         testResults['sort_order_performance_ms'] ?? 0,
+        testResults['fill_in_the_blank_performance_ms'] ?? 0,
       ];
       final double averagePerformance = performanceTimes.reduce((a, b) => a + b) / performanceTimes.length;
       
@@ -608,7 +724,8 @@ void main() {
       QuizzerLogger.logMessage('True/False Questions: ${testResults['true_false_added'] == true ? 'PASS' : 'FAIL'} (${testResults['true_false_count'] ?? 0} questions)');
       QuizzerLogger.logMessage('Select All That Apply Questions: ${testResults['select_all_added'] == true ? 'PASS' : 'FAIL'} (${testResults['select_all_count'] ?? 0} questions)');
       QuizzerLogger.logMessage('Sort Order Questions: ${testResults['sort_order_added'] == true ? 'PASS' : 'FAIL'} (${testResults['sort_order_count'] ?? 0} questions)');
-      QuizzerLogger.logMessage('Module Creation: ${testResults['module_created'] == true ? 'PASS' : 'FAIL'} (4 modules created)');
+      QuizzerLogger.logMessage('Fill-in-the-Blank Questions: ${testResults['fill_in_the_blank_added'] == true ? 'PASS' : 'FAIL'} (${testResults['fill_in_the_blank_count'] ?? 0} questions)');
+      QuizzerLogger.logMessage('Module Creation: ${testResults['module_created'] == true ? 'PASS' : 'FAIL'} (5 modules created)');
       QuizzerLogger.logMessage('');
       QuizzerLogger.printHeader('=== PERFORMANCE METRICS ===');
       QuizzerLogger.logMessage('Average Add Question Time: ${averagePerformance.toStringAsFixed(1)}ms');
@@ -616,13 +733,18 @@ void main() {
       QuizzerLogger.logMessage('True/False Performance: ${testResults['true_false_performance_ms']}ms');
       QuizzerLogger.logMessage('Select All Performance: ${testResults['select_all_performance_ms']}ms');
       QuizzerLogger.logMessage('Sort Order Performance: ${testResults['sort_order_performance_ms']}ms');
+      QuizzerLogger.logMessage('Fill-in-the-Blank Performance: ${testResults['fill_in_the_blank_performance_ms']}ms');
       QuizzerLogger.printHeader('=== END COMPREHENSIVE REPORT ===');
       
-      QuizzerLogger.logSuccess('=== Test 6 completed successfully ===');
+      QuizzerLogger.logSuccess('=== Test 7 completed successfully ===');
     }, timeout: const Timeout(Duration(minutes: 3)));
-    
-    test('Test 7: Bulk question creation - 5 modules with 50 questions each', () async {
-      QuizzerLogger.logMessage('=== Test 7: Bulk question creation - 5 modules with 50 questions each ===');
+
+
+
+
+
+    test('Test 8: Bulk question creation - 5 modules with 50 questions each', () async {
+      QuizzerLogger.logMessage('=== Test 8: Bulk question creation - 5 modules with 50 questions each ===');
       
       // Step 1: Get current counts before bulk creation
       QuizzerLogger.logMessage('Step 1: Getting current counts...');
@@ -662,7 +784,7 @@ void main() {
         // Add 50 questions to this module
         for (int questionIndex = 0; questionIndex < 50; questionIndex++) {
           // Cycle through question types
-          final String questionType = ['multiple_choice', 'true_false', 'select_all_that_apply', 'sort_order'][questionIndex % 4];
+          final String questionType = ['multiple_choice', 'true_false', 'select_all_that_apply', 'sort_order', 'fill_in_the_blank'][questionIndex % 5];
           
           Map<String, dynamic> addResult;
           
@@ -752,6 +874,27 @@ void main() {
               );
               break;
               
+            case 'fill_in_the_blank':
+              addResult = await sessionManager.addNewQuestion(
+                questionType: 'fill_in_the_blank',
+                questionElements: [
+                  {'type': 'text', 'content': 'Bulk question ${questionIndex + 1} for $moduleName: The answer is'},
+                  {'type': 'blank', 'content': '10'},
+                  {'type': 'text', 'content': 'and it is important.'}
+                ],
+                answerElements: [
+                  {'type': 'text', 'content': 'This is the explanation for bulk question ${questionIndex + 1}.'}
+                ],
+                moduleName: moduleName,
+                answersToBlanks: [
+                  {"answer": ["correct", "right", "proper"]}
+                ],
+                citation: 'Bulk Test Citation ${questionIndex + 1}',
+                concepts: concept,
+                subjects: subject,
+              );
+              break;
+              
             default:
               throw Exception('Unknown question type: $questionType');
           }
@@ -801,14 +944,16 @@ void main() {
         }
         
         // Should have roughly equal distribution of question types
-        expect(typeCounts['multiple_choice'], greaterThan(10), 
+        expect(typeCounts['multiple_choice'], greaterThan(8), 
           reason: 'Module $moduleName should have multiple choice questions');
-        expect(typeCounts['true_false'], greaterThan(10), 
+        expect(typeCounts['true_false'], greaterThan(8), 
           reason: 'Module $moduleName should have true/false questions');
-        expect(typeCounts['select_all_that_apply'], greaterThan(10), 
+        expect(typeCounts['select_all_that_apply'], greaterThan(8), 
           reason: 'Module $moduleName should have select all questions');
-        expect(typeCounts['sort_order'], greaterThan(10), 
+        expect(typeCounts['sort_order'], greaterThan(8), 
           reason: 'Module $moduleName should have sort order questions');
+        expect(typeCounts['fill_in_the_blank'], greaterThan(8), 
+          reason: 'Module $moduleName should have fill-in-the-blank questions');
       }
       
       // Store results for final report
@@ -826,8 +971,8 @@ void main() {
       QuizzerLogger.logSuccess('=== Test 7 completed successfully ===');
     }, timeout: const Timeout(Duration(minutes: 15)));
     
-    test('Test 8: Final comprehensive report with bulk data', () async {
-      QuizzerLogger.logMessage('=== Test 8: Final comprehensive report with bulk data ===');
+    test('Test 9: Final comprehensive report with bulk data', () async {
+      QuizzerLogger.logMessage('=== Test 9: Final comprehensive report with bulk data ===');
       
       // Get final counts
       final List<Map<String, dynamic>> finalQuestions = await getAllQuestionAnswerPairs();
@@ -841,6 +986,7 @@ void main() {
         testResults['true_false_performance_ms'] ?? 0,
         testResults['select_all_performance_ms'] ?? 0,
         testResults['sort_order_performance_ms'] ?? 0,
+        testResults['fill_in_the_blank_performance_ms'] ?? 0,
       ];
       final double averagePerformance = performanceTimes.reduce((a, b) => a + b) / performanceTimes.length;
       
@@ -859,7 +1005,8 @@ void main() {
       QuizzerLogger.logMessage('True/False Questions: ${testResults['true_false_added'] == true ? 'PASS' : 'FAIL'} (${testResults['true_false_count'] ?? 0} questions)');
       QuizzerLogger.logMessage('Select All That Apply Questions: ${testResults['select_all_added'] == true ? 'PASS' : 'FAIL'} (${testResults['select_all_count'] ?? 0} questions)');
       QuizzerLogger.logMessage('Sort Order Questions: ${testResults['sort_order_added'] == true ? 'PASS' : 'FAIL'} (${testResults['sort_order_count'] ?? 0} questions)');
-      QuizzerLogger.logMessage('Module Creation: ${testResults['module_created'] == true ? 'PASS' : 'FAIL'} (4 initial modules created)');
+      QuizzerLogger.logMessage('Fill-in-the-Blank Questions: ${testResults['fill_in_the_blank_added'] == true ? 'PASS' : 'FAIL'} (${testResults['fill_in_the_blank_count'] ?? 0} questions)');
+      QuizzerLogger.logMessage('Module Creation: ${testResults['module_created'] == true ? 'PASS' : 'FAIL'} (5 initial modules created)');
       QuizzerLogger.logMessage('Bulk Question Creation: ${testResults['bulk_questions_added'] == true ? 'PASS' : 'FAIL'} (${testResults['bulk_questions_count'] ?? 0} questions)');
       QuizzerLogger.logMessage('Bulk Module Creation: ${testResults['bulk_modules_count'] == true ? 'PASS' : 'FAIL'} (${testResults['bulk_modules_count'] ?? 0} modules)');
       QuizzerLogger.logMessage('');
@@ -871,9 +1018,10 @@ void main() {
       QuizzerLogger.logMessage('True/False Performance: ${testResults['true_false_performance_ms']}ms');
       QuizzerLogger.logMessage('Select All Performance: ${testResults['select_all_performance_ms']}ms');
       QuizzerLogger.logMessage('Sort Order Performance: ${testResults['sort_order_performance_ms']}ms');
+      QuizzerLogger.logMessage('Fill-in-the-Blank Performance: ${testResults['fill_in_the_blank_performance_ms']}ms');
       QuizzerLogger.printHeader('=== END FINAL COMPREHENSIVE REPORT ===');
       
-      QuizzerLogger.logSuccess('=== Test 8 completed successfully ===');
+      QuizzerLogger.logSuccess('=== Test 9 completed successfully ===');
     }, timeout: const Timeout(Duration(minutes: 3)));
   });
 }

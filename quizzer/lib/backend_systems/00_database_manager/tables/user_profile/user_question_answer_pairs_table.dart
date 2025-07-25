@@ -539,6 +539,7 @@ Future<int> insertOrUpdateUserQuestionAnswerPair({
     if (existing.isEmpty) {
       // No existing record, use add
       QuizzerLogger.logMessage('No existing record found, using addUserQuestionAnswerPair...');
+      getDatabaseMonitor().releaseDatabaseAccess(); // Release before calling add
       return await addUserQuestionAnswerPair(
         userUuid: userUuid,
         questionAnswerReference: questionId,
@@ -552,6 +553,7 @@ Future<int> insertOrUpdateUserQuestionAnswerPair({
     } else {
       // Record exists, use edit
       QuizzerLogger.logMessage('Existing record found, using editUserQuestionAnswerPair...');
+      getDatabaseMonitor().releaseDatabaseAccess(); // Release before calling edit
       return await editUserQuestionAnswerPair(
         userUuid: userUuid,
         questionId: questionId,
@@ -565,9 +567,8 @@ Future<int> insertOrUpdateUserQuestionAnswerPair({
     }
   } catch (e) {
     QuizzerLogger.logError('Error inserting or updating user question answer pair - $e');
+    getDatabaseMonitor().releaseDatabaseAccess(); // Release in case of error
     rethrow;
-  } finally {
-    getDatabaseMonitor().releaseDatabaseAccess();
   }
 }
 
