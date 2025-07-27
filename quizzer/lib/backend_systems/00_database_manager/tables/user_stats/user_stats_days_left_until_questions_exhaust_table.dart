@@ -6,9 +6,9 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/table_helper.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_non_circulating_questions_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_in_circulation_questions_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_average_daily_questions_learned_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_question_answer_pairs_table.dart';
 
 Future<void> _verifyUserStatsDaysLeftUntilQuestionsExhaustTable(Database db) async {
   final List<Map<String, dynamic>> tables = await db.rawQuery(
@@ -51,51 +51,32 @@ Future<void> _verifyUserStatsDaysLeftUntilQuestionsExhaustTable(Database db) asy
 /// Updates the days_left_until_questions_exhaust stat for a user for today (YYYY-MM-DD).
 /// This is calculated as:
 ///   current non_circulating_questions (whose modules are active)
-///   divided by the average number of questions entering circulation daily (over a period, e.g., 365 days)
-Future<void> updateDaysLeftUntilQuestionsExhaustStat(String userId, {int periodDays = 365}) async {
+///   divided by the average number of questions entering circulation daily
+Future<void> updateDaysLeftUntilQuestionsExhaustStat(String userId) async {
   try {
-    final String today = DateTime.now().toUtc().toIso8601String().substring(0, 10);
-    final Map<String, dynamic> nonCircStat = await getUserStatsNonCirculatingQuestionsRecordByDate(userId, today);
-    final List<Map<String, dynamic>> inCircHistory = await getUserStatsInCirculationQuestionsRecordsByUser(userId);
-
-    final db = await getDatabaseMonitor().requestDatabaseAccess();
+    // Get the current count of non-circulating questions (active modules only)
+    final List<Map<String, dynamic>> nonCirculatingQuestions = await getNonCirculatingQuestionsWithDetails(userId);
+    final int nonCirculatingCount = nonCirculatingQuestions.length;
     
-    // Fetch today's non_circulating_questions_count from the stat table
-    int nonCirculatingCount = 0;
-    
-    nonCirculatingCount = nonCircStat['non_circulating_questions_count'] as int? ?? 0;
-
-    QuizzerLogger.logWarning('No non_circulating stat found for user $userId on $today, defaulting to 0.');
-    nonCirculatingCount = 0;
-
-    // Get historical in_circulation questions stat records (sorted by date asc)
-    
-    if (inCircHistory.isEmpty) {
-      QuizzerLogger.logWarning('No in_circulation history found for user $userId, cannot calculate average.');
-      return;
+    // Get today's average daily questions learned stat (learning rate)
+    double avgDailyLearned = 0.0;
+    try {
+      final Map<String, dynamic> avgLearnedRecord = await getTodayUserStatsAverageDailyQuestionsLearnedRecord(userId);
+      avgDailyLearned = avgLearnedRecord['average_daily_questions_learned'] as double? ?? 0.0;
+    } catch (e) {
+      // If record doesn't exist, use default value of 0
+      QuizzerLogger.logMessage('No average daily questions learned record found for user: $userId. Using default value of 0.');
+      avgDailyLearned = 0.0;
     }
-    inCircHistory.sort((a, b) => (a['record_date'] as String).compareTo(b['record_date'] as String));
-
-    // Only consider the last [periodDays] days
-    final List<Map<String, dynamic>> periodHistory = inCircHistory.length > periodDays
-        ? inCircHistory.sublist(inCircHistory.length - periodDays)
-        : inCircHistory;
-
-    // Calculate average daily increase in in_circulation questions
-    double avgDailyIncrease = 0.0;
-    if (periodHistory.length > 1) {
-      final int start = periodHistory.first['in_circulation_questions_count'] as int? ?? 0;
-      final int end = periodHistory.last['in_circulation_questions_count'] as int? ?? 0;
-      final int days = periodHistory.length - 1;
-      avgDailyIncrease = days > 0 ? (end - start) / days : 0.0;
-    }
-
-    // Avoid division by zero
+    
+    // Calculate days left: non_circulating_count / average_daily_learned
     double daysLeft = 0.0;
-    if (avgDailyIncrease > 0) {
-      daysLeft = nonCirculatingCount / avgDailyIncrease;
+    if (avgDailyLearned > 0) {
+      daysLeft = nonCirculatingCount / avgDailyLearned;
     }
-
+    
+    final db = await getDatabaseMonitor().requestDatabaseAccess();
+    final String today = DateTime.now().toUtc().toIso8601String().substring(0, 10);
     await _verifyUserStatsDaysLeftUntilQuestionsExhaustTable(db!);
 
     // Overwrite (insert or update) the record for today
@@ -114,7 +95,7 @@ Future<void> updateDaysLeftUntilQuestionsExhaustStat(String userId, {int periodD
         'edits_are_synced': 0,
         'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
       };
-      await insertRawData('user_stats_days_left_until_questions_exhaust', data, db);
+      await insertRawData('user_stats_days_left_until_questions_exhaust', data, db, conflictAlgorithm: ConflictAlgorithm.replace);
     } else {
       final Map<String, dynamic> values = {
         'days_left_until_questions_exhaust': daysLeft,
@@ -130,7 +111,7 @@ Future<void> updateDaysLeftUntilQuestionsExhaustStat(String userId, {int periodD
         db,
       );
     }
-    QuizzerLogger.logSuccess('Updated days_left_until_questions_exhaust stat for user $userId on $today: $daysLeft');
+    QuizzerLogger.logSuccess('Updated days_left_until_questions_exhaust stat for user $userId on $today: $daysLeft (non_circulating: $nonCirculatingCount, avg_daily_learned: $avgDailyLearned)');
   } catch (e) {
     QuizzerLogger.logError('Error updating days left until questions exhaust stat for user ID: $userId - $e');
     rethrow;

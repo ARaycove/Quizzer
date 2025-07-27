@@ -5,9 +5,8 @@ import 'package:sqflite/sqflite.dart';
 import 'dart:async';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/table_helper.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_profile_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pair_management/question_answer_pairs_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_question_answer_pairs_table.dart';
 
 Future<void> _verifyUserStatsInCirculationQuestionsTable(Database db) async {
   final List<Map<String, dynamic>> tables = await db.rawQuery(
@@ -49,36 +48,16 @@ Future<void> _verifyUserStatsInCirculationQuestionsTable(Database db) async {
 
 /// Updates the in-circulation questions stat for a user for today (YYYY-MM-DD).
 Future<void> updateInCirculationQuestionsStat(String userId) async {
-  final String today = DateTime.now().toUtc().toIso8601String().substring(0, 10);
-  
-  // Get the user's module activation status (handles its own db access)
-  final Map<String, bool> moduleActivationStatus = await getModuleActivationStatus(userId);
-
-  // Get all question IDs in circulation for this user (handles its own db access)
-  final List<String> questionIdsInCirculation = await _getQuestionIdsInCirculation(userId);
-  
-  // Count questions that are in circulation and from active modules
-  int inCirculationCount = 0;
-  
-  if (questionIdsInCirculation.isNotEmpty) {
-    // Get module names for all question IDs in a single query
-    final Map<String, String> questionIdToModuleName = await getModuleNamesForQuestionIds(questionIdsInCirculation);
-    
-  for (final String questionId in questionIdsInCirculation) {
-      final String moduleName = questionIdToModuleName[questionId] ?? 'Unknown Module';
-    if (moduleActivationStatus[moduleName] == true) {
-      inCirculationCount++;
-      }
-    }
-  }
-
-  // Update the database record
   try {
+    // Get the count of active questions in circulation using the proper function
+    final List<Map<String, dynamic>> activeQuestionsInCirculation = await getActiveQuestionsInCirculation(userId);
+    final int inCirculationCount = activeQuestionsInCirculation.length;
+    
     final db = await getDatabaseMonitor().requestDatabaseAccess();
-    if (db == null) {
-      throw Exception('Failed to acquire database access');
-    }
-    await _verifyUserStatsInCirculationQuestionsTable(db);
+    final String today = DateTime.now().toUtc().toIso8601String().substring(0, 10);
+    await _verifyUserStatsInCirculationQuestionsTable(db!);
+    
+    // Overwrite (insert or update) the record for today
     final List<Map<String, dynamic>> existing = await queryAndDecodeDatabase(
       'user_stats_in_circulation_questions',
       db,
@@ -94,7 +73,7 @@ Future<void> updateInCirculationQuestionsStat(String userId) async {
         'edits_are_synced': 0,
         'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
       };
-      await insertRawData('user_stats_in_circulation_questions', data, db);
+      await insertRawData('user_stats_in_circulation_questions', data, db, conflictAlgorithm: ConflictAlgorithm.replace);
     } else {
       final Map<String, dynamic> values = {
         'in_circulation_questions_count': inCirculationCount,
@@ -113,26 +92,6 @@ Future<void> updateInCirculationQuestionsStat(String userId) async {
     QuizzerLogger.logSuccess('Updated in-circulation questions stat for user $userId on $today: $inCirculationCount');
   } catch (e) {
     QuizzerLogger.logError('Error updating in-circulation questions stat for user ID: $userId - $e');
-    rethrow;
-  } finally {
-    getDatabaseMonitor().releaseDatabaseAccess();
-  }
-}
-
-/// Helper function to get question IDs in circulation for a user (handles its own db access)
-Future<List<String>> _getQuestionIdsInCirculation(String userId) async {
-  try {
-    final db = await getDatabaseMonitor().requestDatabaseAccess();
-    if (db == null) {
-      throw Exception('Failed to acquire database access');
-    }
-    final List<Map<String, dynamic>> result = await db.rawQuery(
-      'SELECT question_id FROM user_question_answer_pairs WHERE user_uuid = ? AND in_circulation = 1',
-      [userId],
-    );
-    return result.map((row) => row['question_id'] as String).toList();
-  } catch (e) {
-    QuizzerLogger.logError('Error getting question IDs in circulation for user ID: $userId - $e');
     rethrow;
   } finally {
     getDatabaseMonitor().releaseDatabaseAccess();

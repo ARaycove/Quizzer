@@ -3,6 +3,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/table_helper.dart';
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_question_answer_pairs_table.dart';
 
 Future<void> _verifyUserStatsRevisionStreakSumTable(Database db) async {
   QuizzerLogger.logMessage('user_stats_revision_streak_sum_table: Starting table verification...');
@@ -60,24 +61,31 @@ Future<void> _verifyUserStatsRevisionStreakSumTable(Database db) async {
 /// Updates the revision streak sum stat for a user for today (YYYY-MM-DD).
 Future<void> updateRevisionStreakSumStat(String userId) async {
   try {
-    final db = await getDatabaseMonitor().requestDatabaseAccess();
-    if (db == null) {
-      throw Exception('Failed to acquire database access');
+    // Get active questions in circulation using the proper function
+    final List<Map<String, dynamic>> activeQuestionsInCirculation = await getActiveQuestionsInCirculation(userId);
+    
+    // Group by revision_streak and count
+    final Map<int, int> revisionStreakCounts = {};
+    for (final question in activeQuestionsInCirculation) {
+      final int revisionStreak = question['revision_streak'] as int? ?? 0;
+      revisionStreakCounts[revisionStreak] = (revisionStreakCounts[revisionStreak] ?? 0) + 1;
     }
+    
+    final db = await getDatabaseMonitor().requestDatabaseAccess();
     final String today = DateTime.now().toUtc().toIso8601String().substring(0, 10);
-    final List<Map<String, dynamic>> result = await db.rawQuery(
-      'SELECT revision_streak, COUNT(*) as count FROM user_question_answer_pairs WHERE user_uuid = ? GROUP BY revision_streak',
-      [userId],
-    );
-    await _verifyUserStatsRevisionStreakSumTable(db);
+    await _verifyUserStatsRevisionStreakSumTable(db!);
+    
+    // Delete existing records for today
     await db.delete(
       'user_stats_revision_streak_sum',
       where: 'user_id = ? AND record_date = ?',
       whereArgs: [userId, today],
     );
-    for (final row in result) {
-      final int revisionStreak = row['revision_streak'] as int;
-      final int count = row['count'] as int;
+    
+    // Insert new records for each revision streak
+    for (final entry in revisionStreakCounts.entries) {
+      final int revisionStreak = entry.key;
+      final int count = entry.value;
       final Map<String, dynamic> data = {
         'user_id': userId,
         'record_date': today,
@@ -87,9 +95,9 @@ Future<void> updateRevisionStreakSumStat(String userId) async {
         'edits_are_synced': 0,
         'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
       };
-      await insertRawData('user_stats_revision_streak_sum', data, db);
+      await insertRawData('user_stats_revision_streak_sum', data, db, conflictAlgorithm: ConflictAlgorithm.replace);
     }
-    QuizzerLogger.logSuccess('Updated revision streak sum stat for user $userId on $today');
+    QuizzerLogger.logSuccess('Updated revision streak sum stat for user $userId on $today with ${revisionStreakCounts.length} streak levels');
   } catch (e) {
     QuizzerLogger.logError('Error updating revision streak sum stat for user ID: $userId - $e');
     rethrow;

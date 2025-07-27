@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:quizzer/UI_systems/04_display_modules_page/module_card/widget_module_card.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
-import 'package:quizzer/app_theme.dart';
-
 class ModulePageMainBodyList extends StatefulWidget {
   final ScrollController scrollController;
 

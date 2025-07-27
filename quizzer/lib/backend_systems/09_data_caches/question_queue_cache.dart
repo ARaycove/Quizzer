@@ -123,8 +123,8 @@ class QuestionQueueCache {
              
              // Check if this record still exists in the database
              try {
-               final Map<String, dynamic>? existingRecord = await getQuestionAnswerPairById(questionId);
-               if (existingRecord != null && existingRecord.isNotEmpty) {
+               final Map<String, dynamic> existingRecord = await getQuestionAnswerPairById(questionId);
+               if (existingRecord.isNotEmpty) {
                  // Record still exists, use it
                  validRecord = record;
                  QuizzerLogger.logMessage('QuestionQueueCache: Found valid record $questionId after $attempts attempts');

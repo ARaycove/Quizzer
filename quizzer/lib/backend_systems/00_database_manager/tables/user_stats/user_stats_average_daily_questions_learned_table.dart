@@ -49,18 +49,18 @@ Future<void> _verifyUserStatsAverageDailyQuestionsLearnedTable(Database db) asyn
 
 /// Updates the average_daily_questions_learned stat for a user for today (YYYY-MM-DD).
 /// This is calculated as:
-///   (most recent in_circulation_questions_count) / (number of days between first and last in_circulation stat, inclusive)
+///   (increase in active in_circulation questions over time period) / (number of days in that period)
 Future<void> updateAverageDailyQuestionsLearnedStat(String userId) async {
   try {
+    // Get historical data BEFORE requesting database access
     final List<Map<String, dynamic>> inCircHistory = await getUserStatsInCirculationQuestionsRecordsByUser(userId);
-    final db = await getDatabaseMonitor().requestDatabaseAccess();
-    final String today = DateTime.now().toUtc().toIso8601String().substring(0, 10);
-    await _verifyUserStatsAverageDailyQuestionsLearnedTable(db!);
-
-    // Get all in_circulation stat records for this user, sorted by date asc
     
     if (inCircHistory.length < 2) {
-      // Not enough data to calculate
+      // Not enough data to calculate increase
+      final db = await getDatabaseMonitor().requestDatabaseAccess();
+      final String today = DateTime.now().toUtc().toIso8601String().substring(0, 10);
+      await _verifyUserStatsAverageDailyQuestionsLearnedTable(db!);
+      
       final Map<String, dynamic> data = {
         'user_id': userId,
         'record_date': today,
@@ -69,68 +69,50 @@ Future<void> updateAverageDailyQuestionsLearnedStat(String userId) async {
         'edits_are_synced': 0,
         'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
       };
-      // Check if record exists
-      final List<Map<String, dynamic>> existing = await queryAndDecodeDatabase(
-        'user_stats_average_daily_questions_learned',
-        db,
-        where: 'user_id = ? AND record_date = ?',
-        whereArgs: [userId, today],
-      );
-      if (existing.isEmpty) {
-        await insertRawData('user_stats_average_daily_questions_learned', data, db);
-      } else {
-        await updateRawData(
-          'user_stats_average_daily_questions_learned',
-          data,
-          'user_id = ? AND record_date = ?',
-          [userId, today],
-          db,
-        );
-      }
+      await insertRawData('user_stats_average_daily_questions_learned', data, db, conflictAlgorithm: ConflictAlgorithm.replace);
       QuizzerLogger.logSuccess('Updated average_daily_questions_learned stat for user $userId on $today: 0.0 (not enough data)');
       return;
     }
+    
+    // Sort by date to get oldest and newest records
     inCircHistory.sort((a, b) => (a['record_date'] as String).compareTo(b['record_date'] as String));
     final String firstDate = inCircHistory.first['record_date'] as String;
     final String lastDate = inCircHistory.last['record_date'] as String;
-    // final int firstCount = inCircHistory.first['in_circulation_questions_count'] as int? ?? 0;
-    final int lastCount = inCircHistory.last['in_circulation_questions_count'] as int? ?? 0;
     final int days = DateTime.parse(lastDate).difference(DateTime.parse(firstDate)).inDays + 1;
-    final double avgLearned = days > 0 ? (lastCount / days) : 0.0;
+    
+    // Determine starting count based on time period
+    int firstCount;
+    if (days < 365) {
+      // Less than a year: assume starting from 0
+      firstCount = 0;
+    } else {
+      // Full year or more: use actual first count
+      firstCount = inCircHistory.first['in_circulation_questions_count'] as int? ?? 0;
+    }
+    
+    final int lastCount = inCircHistory.last['in_circulation_questions_count'] as int? ?? 0;
+    
+    // Calculate the increase and time period
+    final int increase = lastCount - firstCount;
+    
+    // Calculate average learning rate: increase / days
+    final double avgLearned = days > 0 ? (increase / days) : 0.0;
+    
+    final db = await getDatabaseMonitor().requestDatabaseAccess();
+    final String today = DateTime.now().toUtc().toIso8601String().substring(0, 10);
+    await _verifyUserStatsAverageDailyQuestionsLearnedTable(db!);
 
     // Overwrite (insert or update) the record for today
-    final List<Map<String, dynamic>> existing = await queryAndDecodeDatabase(
-      'user_stats_average_daily_questions_learned',
-      db,
-      where: 'user_id = ? AND record_date = ?',
-      whereArgs: [userId, today],
-    );
-    if (existing.isEmpty) {
-      final Map<String, dynamic> data = {
-        'user_id': userId,
-        'record_date': today,
-        'average_daily_questions_learned': avgLearned,
-        'has_been_synced': 0,
-        'edits_are_synced': 0,
-        'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
-      };
-      await insertRawData('user_stats_average_daily_questions_learned', data, db);
-    } else {
-      final Map<String, dynamic> values = {
-        'average_daily_questions_learned': avgLearned,
-        'has_been_synced': 0,
-        'edits_are_synced': 0,
-        'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
-      };
-      await updateRawData(
-        'user_stats_average_daily_questions_learned',
-        values,
-        'user_id = ? AND record_date = ?',
-        [userId, today],
-        db,
-      );
-    }
-    QuizzerLogger.logSuccess('Updated average_daily_questions_learned stat for user $userId on $today: $avgLearned');
+    final Map<String, dynamic> data = {
+      'user_id': userId,
+      'record_date': today,
+      'average_daily_questions_learned': avgLearned,
+      'has_been_synced': 0,
+      'edits_are_synced': 0,
+      'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
+    };
+    await insertRawData('user_stats_average_daily_questions_learned', data, db, conflictAlgorithm: ConflictAlgorithm.replace);
+    QuizzerLogger.logSuccess('Updated average_daily_questions_learned stat for user $userId on $today: $avgLearned (increase: $increase, days: $days, first: $firstCount, last: $lastCount)');
   } catch (e) {
     QuizzerLogger.logError('Error updating average daily questions learned stat for user ID: $userId - $e');
     rethrow;

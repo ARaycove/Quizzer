@@ -35,11 +35,30 @@ class _AddQuestionAnswerPageState extends State<AddQuestionAnswerPage> {
   List<Map<String, dynamic>> _currentOptions = [];
   int?      _currentCorrectOptionIndex;       // For MC, TF
   List<int> _currentCorrectIndicesSATA = [];  // For SATA
+  List<Map<String, List<String>>> _currentAnswersToBlanks = []; // For fill-in-the-blank
   // Note: _currentIsCorrectAnswerTrueTF is redundant, use _currentCorrectOptionIndex (0/1) for TF
   // --- End State Variables ---
 
   // --- Counter to force preview rebuild ---
   int _previewRebuildCounter = 0;
+
+  // --- Debug Helper: Log entire question data ---
+  void _logQuestionData(String operation) {
+    final questionData = {
+      'questionType': _questionTypeController.text,
+      'moduleName': _moduleController.text,
+      'questionElements': _currentQuestionElements,
+      'answerElements': _currentAnswerElements,
+      'options': _currentOptions,
+      'correctOptionIndex': _currentCorrectOptionIndex,
+      'correctIndicesSATA': _currentCorrectIndicesSATA,
+      'answersToBlanks': _currentAnswersToBlanks,
+    };
+    
+    QuizzerLogger.logMessage("=== QUESTION DATA UPDATE: $operation ===");
+    QuizzerLogger.logValue("Full question data: $questionData");
+    QuizzerLogger.logMessage("=== END QUESTION DATA ===");
+  }
 
   @override
   void initState() {
@@ -73,10 +92,12 @@ class _AddQuestionAnswerPageState extends State<AddQuestionAnswerPage> {
           final type = _questionTypeController.text;
           _currentCorrectOptionIndex = (type == 'true_false') ? 0 : null; // Default TF to True
           _currentCorrectIndicesSATA = [];
+          _currentAnswersToBlanks = [];
           _previewRebuildCounter++; // Increment counter
           
           QuizzerLogger.logMessage("Resetting question state for type: $type (EMPTY)");
       });
+    _logQuestionData("Reset Question State");
   }
 
   // Listener for question type changes
@@ -101,6 +122,10 @@ class _AddQuestionAnswerPageState extends State<AddQuestionAnswerPage> {
         QuizzerLogger.logWarning("Image picking failed or was cancelled.");
         return; // Don't add anything if picking failed
       }
+    } else if (typeOrContent.startsWith('blank:')) {
+      // Handle blank elements with custom width: 'blank:width'
+      final width = typeOrContent.substring(6); // Remove 'blank:' prefix
+      newElement = {'type': 'blank', 'content': width};
     } else if (typeOrContent.isNotEmpty) {
       // Assume it's text content from the TextField
       newElement = {'type': 'text', 'content': typeOrContent};
@@ -124,6 +149,7 @@ class _AddQuestionAnswerPageState extends State<AddQuestionAnswerPage> {
       }
       _previewRebuildCounter++; // Increment counter
     });
+    _logQuestionData("Add Element");
   }
   void _handleRemoveElement(int index, String category) {
     QuizzerLogger.logMessage("Attempting to remove element index $index from $category");
@@ -146,6 +172,7 @@ class _AddQuestionAnswerPageState extends State<AddQuestionAnswerPage> {
           QuizzerLogger.logWarning("_handleRemoveElement: Invalid index $index for $category list (length ${targetList.length})");
        }
     });
+    _logQuestionData("Remove Element");
   }
   void _handleEditElement(int index, String category, Map<String, dynamic> updatedElement) {
     QuizzerLogger.logMessage("Updating $category element at index $index");
@@ -168,6 +195,7 @@ class _AddQuestionAnswerPageState extends State<AddQuestionAnswerPage> {
         QuizzerLogger.logWarning("_handleEditElement: Invalid index $index for $category list (length ${targetList.length})");
       }
     });
+    _logQuestionData("Edit Element");
   }
 
   void _handleAddOption(Map<String, dynamic> newOption) { // Accept the new option map
@@ -179,10 +207,8 @@ class _AddQuestionAnswerPageState extends State<AddQuestionAnswerPage> {
         }
         _previewRebuildCounter++; // Increment counter
      });
+    _logQuestionData("Add Option");
   }
-
-
-
   void _handleRemoveOption(int index) {
     QuizzerLogger.logMessage("Placeholder: Remove option index $index");
     setState(() {
@@ -199,8 +225,8 @@ class _AddQuestionAnswerPageState extends State<AddQuestionAnswerPage> {
           QuizzerLogger.logWarning("_handleRemoveOption: Invalid index $index");
         }
     });
+    _logQuestionData("Remove Option");
   }
-
   void _handleEditOption(int index, Map<String, dynamic> updatedOption) {
     QuizzerLogger.logMessage("Updating option at index $index");
     setState(() {
@@ -212,8 +238,9 @@ class _AddQuestionAnswerPageState extends State<AddQuestionAnswerPage> {
          QuizzerLogger.logWarning("_handleEditOption: Invalid index $index for options list (length ${_currentOptions.length})");
        }
     });
+    _logQuestionData("Edit Option");
   }
-  
+
   void _handleSetCorrectOptionIndex(int index) {
     QuizzerLogger.logMessage("Placeholder: Set single correct index to $index");
     setState(() {
@@ -225,7 +252,9 @@ class _AddQuestionAnswerPageState extends State<AddQuestionAnswerPage> {
        }
        _previewRebuildCounter++; // Increment counter
     });
+    _logQuestionData("Set Correct Option Index");
   }
+  
   void _handleToggleCorrectOptionSATA(int index) {
      QuizzerLogger.logMessage("Placeholder: Toggle SATA correct for $index");
     setState(() {
@@ -237,11 +266,178 @@ class _AddQuestionAnswerPageState extends State<AddQuestionAnswerPage> {
          _currentCorrectIndicesSATA.sort();
          _previewRebuildCounter++; // Increment counter
      });
+    _logQuestionData("Toggle Correct Option SATA");
   }
+
+       // --- Handle Answers to Blanks Changes ---
+    void _handleAnswersToBlanksChanged(List<Map<String, List<String>>> answersToBlanks) {
+       QuizzerLogger.logMessage("Handling answers to blanks change");
+       setState(() {
+         _currentAnswersToBlanks = answersToBlanks;
+         _previewRebuildCounter++; // Increment counter for preview update
+       });
+    _logQuestionData("Answers to Blanks Changed");
+    }
+
+   // --- Handle Blank Creation from Text Selection ---
+   void _handleCreateBlank(int textElementIndex, String selectedText) {
+     QuizzerLogger.logMessage("Creating blank from text: '$selectedText' at index $textElementIndex");
+     
+     if (textElementIndex < 0 || textElementIndex >= _currentQuestionElements.length) {
+       QuizzerLogger.logError("Invalid text element index: $textElementIndex");
+       return;
+     }
+     
+     final originalElement = _currentQuestionElements[textElementIndex];
+     if (originalElement['type'] != 'text') {
+       QuizzerLogger.logError("Cannot create blank from non-text element");
+       return;
+     }
+     
+     final originalText = originalElement['content'] as String;
+     final selectionStart = originalText.indexOf(selectedText);
+     if (selectionStart == -1) {
+       QuizzerLogger.logError("Selected text not found in original text");
+       return;
+     }
+     
+     final selectionEnd = selectionStart + selectedText.length;
+     
+     // Split the text into three parts
+     final beforeText = originalText.substring(0, selectionStart);
+     final afterText = originalText.substring(selectionEnd);
+     
+     QuizzerLogger.logMessage("Splitting text: before='$beforeText', selected='$selectedText', after='$afterText'");
+     
+     setState(() {
+       // 1. Remove the original text element
+       _currentQuestionElements.removeAt(textElementIndex);
+       QuizzerLogger.logMessage("Removed original text element at index $textElementIndex");
+       
+       // 2. Add the three new elements in order
+       final newElements = <Map<String, dynamic>>[];
+       
+       // Add before text if not empty
+       if (beforeText.isNotEmpty) {
+         newElements.add({'type': 'text', 'content': beforeText});
+         QuizzerLogger.logMessage("Added before text element: '$beforeText'");
+       }
+       
+       // Add the blank element with unique identifier
+       final blankId = DateTime.now().millisecondsSinceEpoch.toString();
+       newElements.add({'type': 'blank', 'content': selectedText.length + 2, 'blankId': blankId});
+       QuizzerLogger.logMessage("Added blank element with width: ${selectedText.length + 2}, answer: '$selectedText', blankId: $blankId");
+       
+       // Add after text if not empty
+       if (afterText.isNotEmpty) {
+         newElements.add({'type': 'text', 'content': afterText});
+         QuizzerLogger.logMessage("Added after text element: '$afterText'");
+       }
+       
+       // Insert the new elements at the original position
+       _currentQuestionElements.insertAll(textElementIndex, newElements);
+       QuizzerLogger.logMessage("Inserted ${newElements.length} new elements at index $textElementIndex");
+       
+       // 3. Update answers_to_blanks to add a new answer group for this blank
+       final newAnswerGroup = <String, List<String>>{};
+       newAnswerGroup[selectedText] = []; // Primary answer with empty synonyms list
+       _currentAnswersToBlanks.add(newAnswerGroup);
+       QuizzerLogger.logMessage("Added new answer group for: '$selectedText'");
+       
+       _previewRebuildCounter++; // Increment counter for preview update
+       
+       QuizzerLogger.logSuccess("Created blank from text '$selectedText'. Added ${newElements.length} new elements and 1 answer group.");
+       QuizzerLogger.logMessage("Current question elements count: ${_currentQuestionElements.length}");
+     });
+   }
+   
+   // --- Handle Answer Text Updates for Blanks ---
+   void _handleUpdateAnswerText(int blankIndex, String newAnswerText) {
+     QuizzerLogger.logMessage("Updating answer text for blank $blankIndex to: '$newAnswerText'");
+     
+     if (blankIndex < 0 || blankIndex >= _currentAnswersToBlanks.length) {
+       QuizzerLogger.logError("Invalid blank index: $blankIndex");
+       return;
+     }
+     
+     setState(() {
+       // Get the current answer group
+       final currentAnswerGroup = _currentAnswersToBlanks[blankIndex];
+       
+       // Create a new answer group with the updated primary answer
+       final updatedAnswerGroup = <String, List<String>>{};
+       updatedAnswerGroup[newAnswerText] = currentAnswerGroup.values.first; // Keep existing synonyms
+       
+       // Replace the answer group
+       _currentAnswersToBlanks[blankIndex] = updatedAnswerGroup;
+       
+       _previewRebuildCounter++; // Increment counter for preview update
+       
+       QuizzerLogger.logSuccess("Updated answer text for blank $blankIndex to: '$newAnswerText'");
+     });
+    _logQuestionData("Update Answer Text");
+   }
+
+   // --- Handle Synonyms Updates for Blanks ---
+   void _handleUpdateSynonyms(int blankIndex, String primaryAnswer, List<String> synonyms) {
+     QuizzerLogger.logMessage("Updating synonyms for blank $blankIndex: primary='$primaryAnswer', synonyms=$synonyms");
+     
+     setState(() {
+       // Create a new answer group with the updated primary answer and synonyms
+       final updatedAnswerGroup = <String, List<String>>{};
+       updatedAnswerGroup[primaryAnswer] = synonyms;
+       
+       // Ensure the list is long enough
+       while (_currentAnswersToBlanks.length <= blankIndex) {
+         _currentAnswersToBlanks.add({});
+       }
+       
+       // Replace the answer group
+       _currentAnswersToBlanks[blankIndex] = updatedAnswerGroup;
+       
+       _previewRebuildCounter++; // Increment counter for preview update
+       
+       QuizzerLogger.logSuccess("Updated synonyms for blank $blankIndex: primary='$primaryAnswer', synonyms=$synonyms");
+     });
+    _logQuestionData("Update Synonyms");
+   }
+
    void _handleReorderElements(List<Map<String, dynamic>> reorderedElements, String category) {
-      QuizzerLogger.logMessage("Placeholder: Reorder $category elements");
+      QuizzerLogger.logMessage("Handling reorder for $category elements");
       setState(() {
          if (category == 'question') {
+             // For question elements, we need to handle fill-in-the-blank reordering
+             if (_questionTypeController.text == 'fill_in_the_blank') {
+               // Find the old and new order of blank elements
+               final List<String> oldBlankIds = _currentQuestionElements
+                   .where((e) => e['type'] == 'blank')
+                   .map((e) => e['blankId'] as String)
+                   .toList();
+               
+               final List<String> newBlankIds = reorderedElements
+                   .where((e) => e['type'] == 'blank')
+                   .map((e) => e['blankId'] as String)
+                   .toList();
+               
+               // Reorder answers_to_blanks to match the new blank order
+               if (oldBlankIds.length == newBlankIds.length && 
+                   oldBlankIds.length == _currentAnswersToBlanks.length) {
+                 final List<Map<String, List<String>>> reorderedAnswers = [];
+                 
+                 for (String newBlankId in newBlankIds) {
+                   final int oldIndex = oldBlankIds.indexOf(newBlankId);
+                   if (oldIndex >= 0 && oldIndex < _currentAnswersToBlanks.length) {
+                     reorderedAnswers.add(_currentAnswersToBlanks[oldIndex]);
+                   }
+                 }
+                 
+                 if (reorderedAnswers.length == _currentAnswersToBlanks.length) {
+                   _currentAnswersToBlanks = reorderedAnswers;
+                   QuizzerLogger.logMessage("Reordered answers_to_blanks to match new blank order");
+                 }
+               }
+             }
+             
              _currentQuestionElements = reorderedElements;
          } else if (category == 'answer') {
              _currentAnswerElements = reorderedElements;
@@ -250,6 +446,7 @@ class _AddQuestionAnswerPageState extends State<AddQuestionAnswerPage> {
          }
          _previewRebuildCounter++; // Increment counter
       });
+    _logQuestionData("Reorder Elements");
    }
 
    // --- Handle Option Reordering ---
@@ -306,8 +503,8 @@ class _AddQuestionAnswerPageState extends State<AddQuestionAnswerPage> {
 
         _previewRebuildCounter++; // Increment counter
       });
+    _logQuestionData("Reorder Options");
    }
-
    // --- Validation Logic ---
    bool _validateQuestionData() {
       final String currentType = _questionTypeController.text;
@@ -337,6 +534,39 @@ class _AddQuestionAnswerPageState extends State<AddQuestionAnswerPage> {
       else if (currentType == 'select_all_that_apply' && _currentCorrectIndicesSATA.isEmpty) {
          errorMessage = "At least one correct answer must be selected for Select All That Apply.";
          isValid = false;
+      }
+      // 5. Fill-in-the-blank validation
+      else if (currentType == 'fill_in_the_blank') {
+         // Count blank elements in question elements
+         final int blankCount = _currentQuestionElements.where((element) => element['type'] == 'blank').length;
+         
+         // Validate that we have answers_to_blanks data
+         if (_currentAnswersToBlanks.isEmpty) {
+            errorMessage = "Fill-in-the-blank questions require at least one answer group.";
+            isValid = false;
+         }
+         // Validate that number of blank elements matches number of answer groups
+         else if (blankCount != _currentAnswersToBlanks.length) {
+            errorMessage = "Number of blank elements ($blankCount) does not match number of answer groups (${_currentAnswersToBlanks.length}).";
+            isValid = false;
+         }
+         // Validate that each answer group has a primary answer
+         else {
+            for (int i = 0; i < _currentAnswersToBlanks.length; i++) {
+               final answerGroup = _currentAnswersToBlanks[i];
+               if (answerGroup.isEmpty) {
+                  errorMessage = "Answer group ${i + 1} is empty. Each blank must have at least one correct answer.";
+                  isValid = false;
+                  break;
+               }
+               final primaryAnswer = answerGroup.keys.first;
+               if (primaryAnswer.isEmpty) {
+                  errorMessage = "Answer group ${i + 1} has an empty primary answer.";
+                  isValid = false;
+                  break;
+               }
+            }
+         }
       }
 
       // Log and show SnackBar if invalid
@@ -379,13 +609,23 @@ class _AddQuestionAnswerPageState extends State<AddQuestionAnswerPage> {
      // --- 1. Gather Data & Call SessionManager (Fire and Forget) ---
      QuizzerLogger.logMessage("Validation passed. Calling SessionManager.addNewQuestion (no await)... ");
 
+     // Strip out blankId from question elements before submission (blankId is only for edit tools)
+     final List<Map<String, dynamic>> cleanedQuestionElements = _currentQuestionElements.map((element) {
+       if (element['type'] == 'blank') {
+         final cleanedElement = Map<String, dynamic>.from(element);
+         cleanedElement.remove('blankId'); // Remove blankId before submission
+         return cleanedElement;
+       }
+       return element;
+     }).toList();
+
      // Call without await and remove try-catch
      // Use the potentially modified element lists
      _session.addNewQuestion(
        // Required parameters
        moduleName: _moduleController.text,
        questionType: _questionTypeController.text,
-       questionElements: _currentQuestionElements, // Use list potentially updated by finalizeStagedImages
+       questionElements: cleanedQuestionElements, // Use cleaned list without blankId
        answerElements: _currentAnswerElements,   // Use list potentially updated by finalizeStagedImages
        // Optional / Type-specific parameters (pass null if not applicable/empty)
        options: _currentOptions.isNotEmpty ? _currentOptions : null,
@@ -453,6 +693,7 @@ class _AddQuestionAnswerPageState extends State<AddQuestionAnswerPage> {
              options: _currentOptions,
              correctOptionIndex: _currentCorrectOptionIndex,
              correctIndicesSATA: _currentCorrectIndicesSATA,
+             answersToBlanks: _currentAnswersToBlanks,
              onAddElement: _handleAddElement,
              onRemoveElement: _handleRemoveElement,
              onEditElement: _handleEditElement,
@@ -463,6 +704,10 @@ class _AddQuestionAnswerPageState extends State<AddQuestionAnswerPage> {
              onToggleCorrectOptionSATA: _handleToggleCorrectOptionSATA,
              onReorderElements: _handleReorderElements,
              onReorderOptions: _handleReorderOptions,
+             onAnswersToBlanksChanged: _handleAnswersToBlanksChanged,
+             onCreateBlank: _handleCreateBlank,
+             onUpdateAnswerText: _handleUpdateAnswerText,
+             onUpdateSynonyms: _handleUpdateSynonyms,
           ),
           AppTheme.sizedBoxLrg,
 
@@ -472,7 +717,14 @@ class _AddQuestionAnswerPageState extends State<AddQuestionAnswerPage> {
           LivePreviewWidget(
             key: ValueKey('live-preview-$_previewRebuildCounter'),
             questionType: _questionTypeController.text,
-            questionElements: _currentQuestionElements,
+            questionElements: _currentQuestionElements.map((element) {
+              if (element['type'] == 'blank') {
+                final cleanedElement = Map<String, dynamic>.from(element);
+                cleanedElement.remove('blankId'); // Remove blankId for preview
+                return cleanedElement;
+              }
+              return element;
+            }).toList(),
             answerElements: _currentAnswerElements,
             options: _currentOptions,
             correctOptionIndexMC: _currentCorrectOptionIndex,
@@ -480,6 +732,7 @@ class _AddQuestionAnswerPageState extends State<AddQuestionAnswerPage> {
             isCorrectAnswerTrueTF: (_questionTypeController.text == 'true_false')
                                     ? (_currentCorrectOptionIndex == 0)
                                     : null,
+            answersToBlanks: _currentAnswersToBlanks,
           ),
           AppTheme.sizedBoxLrg,
 

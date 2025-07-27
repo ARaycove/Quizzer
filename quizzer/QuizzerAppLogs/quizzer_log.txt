@@ -1,99 +1,95 @@
-Quizzer: [15:48:15] [34m[INFO][0m [<asynchronous suspension>] QuizzerLogger successfully set up file logging to: ./QuizzerAppLogs/quizzer_log.txt
-Quizzer: [15:48:15] [34m[INFO][0m [<asynchronous suspension>] QuizzerLogger: Attempting a SECOND test log message to file.
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] enzyme Sim Score: 0.4
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] Sim score below threshold, additional checks required
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] enzyme => enyzme; Levenshteing_ratio: 83.0
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] mitochondria Sim Score: 0.7272727272727273
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] photosynthesis Sim Score: 0.88
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] chlorophyll Sim Score: 0.9473684210526315
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] nucleus Sim Score: 0.6666666666666666
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] cytoplasm Sim Score: 0.8235294117647058
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] ribosome Sim Score: 0.7692307692307693
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] endoplasmic Sim Score: 0.8421052631578947
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] reticulum Sim Score: 0.8
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] lysosome Sim Score: 0.7692307692307693
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] vacuole Sim Score: 0.9090909090909091
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] chromosome Sim Score: 0.8235294117647058
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] deoxyribonucleic Sim Score: 0.896551724137931
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] adenosine Sim Score: 0.8
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] triphosphate Sim Score: 0.8571428571428571
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] glycolysis Sim Score: 0.8235294117647058
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] fermentation Sim Score: 0.7
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] respiration Sim Score: 0.8
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] metabolism Sim Score: 0.9411764705882353
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] catalysis Sim Score: 0.8
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] substrate Sim Score: 0.8
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] activation Sim Score: 0.8235294117647058
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] inhibition Sim Score: 0.625
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] diffusion Sim Score: 0.9333333333333333
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] osmosis Sim Score: 0.9090909090909091
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] enzyme Sim Score: 1.0
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] mitochondria Sim Score: 1.0
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] photosynthesis Sim Score: 1.0
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] nucleus Sim Score: 1.0
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] cytoplasm Sim Score: 1.0
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] ✅ validateFillInTheBlank: All blanks correct
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] enyzme Sim Score: 0.4
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] Sim score below threshold, additional checks required
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] enyzme => enzyme; Levenshteing_ratio: 83.0
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] mitochondira Sim Score: 0.7272727272727273
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] photosyntheis Sim Score: 0.88
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] nucleas Sim Score: 0.6666666666666666
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] cytoplasam Sim Score: 0.8235294117647058
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] ✅ validateFillInTheBlank: All blanks correct
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] catalyze Sim Score: 0.0
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] Sim score below threshold, additional checks required
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] catalyze => enzyme; Levenshteing_ratio: 29.0
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] catalyze Sim Score: 1.0
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] powerhouse Sim Score: 0.1
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] Sim score below threshold, additional checks required
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] powerhouse => mitochondria; Levenshteing_ratio: 27.0
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] powerhouse Sim Score: 1.0
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] light reaction Sim Score: 0.0
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] Sim score below threshold, additional checks required
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] light reaction => photosynthesis; Levenshteing_ratio: 29.0
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] light reaction Sim Score: 1.0
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] control center Sim Score: 0.0
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] Sim score below threshold, additional checks required
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] control center => nucleus; Levenshteing_ratio: 29.0
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] control center Sim Score: 1.0
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] cell fluid Sim Score: 0.0
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] Sim score below threshold, additional checks required
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] cell fluid => cytoplasm; Levenshteing_ratio: 21.0
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] cell fluid Sim Score: 1.0
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] ✅ validateFillInTheBlank: All blanks correct
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] protein Sim Score: 0.0
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] Sim score below threshold, additional checks required
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] protein => enzyme; Levenshteing_ratio: 31.0
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] protein Sim Score: 0.0
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] Sim score below threshold, additional checks required
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] protein => catalyze; Levenshteing_ratio: 27.0
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] protein Sim Score: 0.0
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] Sim score below threshold, additional checks required
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] protein => catalyzes; Levenshteing_ratio: 25.0
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] protein Sim Score: 0.13333333333333333
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] Sim score below threshold, additional checks required
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] protein => catalyzing; Levenshteing_ratio: 35.0
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] validateFillInTheBlank: Blank 0 incorrect. User: "protein", Expected: enzyme, catalyze, catalyzes, catalyzing
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] ribosome Sim Score: 0.1111111111111111
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] Sim score below threshold, additional checks required
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] ribosome => mitochondria; Levenshteing_ratio: 30.0
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] ribosome Sim Score: 0.0
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] Sim score below threshold, additional checks required
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] ribosome => powerhouse; Levenshteing_ratio: 44.0
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] ribosome Sim Score: 0.0
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] Sim score below threshold, additional checks required
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] ribosome => energy factory; Levenshteing_ratio: 18.0
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] ribosome Sim Score: 0.0
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] Sim score below threshold, additional checks required
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] ribosome => cellular power plant; Levenshteing_ratio: 21.0
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] validateFillInTheBlank: Blank 1 incorrect. User: "ribosome", Expected: mitochondria, powerhouse, energy factory, cellular power plant
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] respiration Sim Score: 0.08695652173913043
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] Sim score below threshold, additional checks required
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] respiration => photosynthesis; Levenshteing_ratio: 32.0
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] respiration Sim Score: 0.36363636363636365
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] Sim score below threshold, additional checks required
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] respiration => light reaction; Levenshteing_ratio: 56.0
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] respiration Sim Score: 0.2
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] Sim score below threshold, additional checks required
-Quizzer: [15:48:15] [34m[INFO][0m [text_validation_functionality.dart] respiration => solar energy conversion; Levenshteing_ratio: 35.0
+Quizzer: [11:49:31] [34m[INFO][0m [<asynchronous suspension>] QuizzerLogger successfully set up file logging to: ./QuizzerAppLogs/quizzer_log.txt
+Quizzer: [11:49:31] [34m[INFO][0m [<asynchronous suspension>] QuizzerLogger: Attempting a SECOND test log message to file.
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] enzyme Sim Score: 0.4
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] Sim score below threshold, additional checks required
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] enzyme => enyzme; Levenshteing_ratio: 83.0
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] mitochondria Sim Score: 0.7272727272727273
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] photosynthesis Sim Score: 0.88
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] chlorophyll Sim Score: 0.9473684210526315
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] nucleus Sim Score: 0.6666666666666666
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] cytoplasm Sim Score: 0.8235294117647058
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] ribosome Sim Score: 0.7692307692307693
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] endoplasmic Sim Score: 0.8421052631578947
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] reticulum Sim Score: 0.8
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] lysosome Sim Score: 0.7692307692307693
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] vacuole Sim Score: 0.9090909090909091
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] chromosome Sim Score: 0.8235294117647058
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] deoxyribonucleic Sim Score: 0.896551724137931
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] adenosine Sim Score: 0.8
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] triphosphate Sim Score: 0.8571428571428571
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] glycolysis Sim Score: 0.8235294117647058
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] fermentation Sim Score: 0.7
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] respiration Sim Score: 0.8
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] metabolism Sim Score: 0.9411764705882353
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] catalysis Sim Score: 0.8
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] substrate Sim Score: 0.8
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] activation Sim Score: 0.8235294117647058
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] inhibition Sim Score: 0.625
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] diffusion Sim Score: 0.9333333333333333
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] osmosis Sim Score: 0.9090909090909091
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] enzyme Sim Score: 1.0
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] mitochondria Sim Score: 1.0
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] photosynthesis Sim Score: 1.0
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] nucleus Sim Score: 1.0
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] cytoplasm Sim Score: 1.0
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] ✅ validateFillInTheBlank: All blanks correct
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] enyzme Sim Score: 0.4
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] Sim score below threshold, additional checks required
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] enyzme => enzyme; Levenshteing_ratio: 83.0
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] mitochondira Sim Score: 0.7272727272727273
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] photosyntheis Sim Score: 0.88
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] nucleas Sim Score: 0.6666666666666666
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] cytoplasam Sim Score: 0.8235294117647058
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] ✅ validateFillInTheBlank: All blanks correct
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] catalyze Sim Score: 0.0
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] Sim score below threshold, additional checks required
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] catalyze => enzyme; Levenshteing_ratio: 29.0
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] catalyze Sim Score: 1.0
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] powerhouse Sim Score: 0.1
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] Sim score below threshold, additional checks required
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] powerhouse => mitochondria; Levenshteing_ratio: 27.0
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] powerhouse Sim Score: 1.0
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] light reaction Sim Score: 0.0
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] Sim score below threshold, additional checks required
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] light reaction => photosynthesis; Levenshteing_ratio: 29.0
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] light reaction Sim Score: 1.0
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] control center Sim Score: 0.0
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] Sim score below threshold, additional checks required
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] control center => nucleus; Levenshteing_ratio: 29.0
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] control center Sim Score: 1.0
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] cell fluid Sim Score: 0.0
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] Sim score below threshold, additional checks required
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] cell fluid => cytoplasm; Levenshteing_ratio: 21.0
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] cell fluid Sim Score: 1.0
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] ✅ validateFillInTheBlank: All blanks correct
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] protein Sim Score: 0.0
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] Sim score below threshold, additional checks required
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] protein => enzyme; Levenshteing_ratio: 31.0
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] protein Sim Score: 0.0
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] Sim score below threshold, additional checks required
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] protein => catalyze; Levenshteing_ratio: 27.0
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] protein Sim Score: 0.0
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] Sim score below threshold, additional checks required
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] protein => catalyzes; Levenshteing_ratio: 25.0
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] protein Sim Score: 0.13333333333333333
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] Sim score below threshold, additional checks required
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] protein => catalyzing; Levenshteing_ratio: 35.0
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] validateFillInTheBlank: Blank 0 incorrect. User: "protein", Expected: enzyme, catalyze, catalyzes, catalyzing
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] ribosome Sim Score: 0.1111111111111111
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] Sim score below threshold, additional checks required
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] ribosome => mitochondria; Levenshteing_ratio: 30.0
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] ribosome Sim Score: 0.0
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] Sim score below threshold, additional checks required
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] ribosome => powerhouse; Levenshteing_ratio: 44.0
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] ribosome Sim Score: 0.0
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] Sim score below threshold, additional checks required
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] ribosome => energy factory; Levenshteing_ratio: 18.0
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] ribosome Sim Score: 0.0
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] Sim score below threshold, additional checks required
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] ribosome => cellular power plant; Levenshteing_ratio: 21.0
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] validateFillInTheBlank: Blank 1 incorrect. User: "ribosome", Expected: mitochondria, powerhouse, energy factory, cellular power plant
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] respiration Sim Score: 0.08695652173913043
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] Sim score below threshold, additional checks required
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] respiration => photosynthesis; Levenshteing_ratio: 32.0
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] respiration Sim Score: 0.36363636363636365
+Quizzer: [11:49:31] [34m[INFO][0m [text_validation_functionality.dart] Sim score below threshold, additional checks required

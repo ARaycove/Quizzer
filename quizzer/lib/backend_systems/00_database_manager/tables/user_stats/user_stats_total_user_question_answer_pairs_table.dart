@@ -5,6 +5,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/table_helper.dart';
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_question_answer_pairs_table.dart';
 
 Future<void> _verifyUserStatsTotalUserQuestionAnswerPairsTable(Database db) async {
   final List<Map<String, dynamic>> tables = await db.rawQuery(
@@ -47,17 +48,15 @@ Future<void> _verifyUserStatsTotalUserQuestionAnswerPairsTable(Database db) asyn
 /// Updates the total user question answer pairs stat for a user for today (YYYY-MM-DD).
 Future<void> updateTotalUserQuestionAnswerPairsStat(String userId) async {
   try {
+    // Get the count of active questions in circulation using the proper function
+    final List<Map<String, dynamic>> activeQuestionsInCirculation = await getActiveQuestionsInCirculation(userId);
+    final int totalCount = activeQuestionsInCirculation.length;
+    
     final db = await getDatabaseMonitor().requestDatabaseAccess();
-    if (db == null) {
-      throw Exception('Failed to acquire database access');
-    }
     final String today = DateTime.now().toUtc().toIso8601String().substring(0, 10);
-    final List<Map<String, dynamic>> result = await db.rawQuery(
-      'SELECT COUNT(*) as count FROM user_question_answer_pairs WHERE user_uuid = ?',
-      [userId],
-    );
-    final int totalCount = result.isNotEmpty ? (result.first['count'] as int) : 0;
-    await _verifyUserStatsTotalUserQuestionAnswerPairsTable(db);
+    await _verifyUserStatsTotalUserQuestionAnswerPairsTable(db!);
+    
+    // Overwrite (insert or update) the record for today
     final List<Map<String, dynamic>> existing = await queryAndDecodeDatabase(
       'user_stats_total_user_question_answer_pairs',
       db,
@@ -73,7 +72,7 @@ Future<void> updateTotalUserQuestionAnswerPairsStat(String userId) async {
         'edits_are_synced': 0,
         'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
       };
-      await insertRawData('user_stats_total_user_question_answer_pairs', data, db);
+      await insertRawData('user_stats_total_user_question_answer_pairs', data, db, conflictAlgorithm: ConflictAlgorithm.replace);
     } else {
       final Map<String, dynamic> values = {
         'total_question_answer_pairs': totalCount,

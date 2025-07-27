@@ -291,6 +291,7 @@ void main() {
         'is_active',
         'total_questions',
         'questions',
+        'question_count_by_type',
       ];
       
       for (final field in requiredFields) {
@@ -315,8 +316,42 @@ void main() {
       
       QuizzerLogger.logSuccess('Verified all field values match between individual and getAll data');
       
-      // Step 6: Verify questions structure and count
-      QuizzerLogger.logMessage('Step 6: Verifying questions structure and count...');
+      // Step 6: Verify question_count_by_type structure
+      QuizzerLogger.logMessage('Step 6: Verifying question_count_by_type structure...');
+      
+      // Verify question_count_by_type is a Map<String, int>
+      expect(individualModuleData['question_count_by_type'], isA<Map<String, int>>(), 
+        reason: 'question_count_by_type should be a Map<String, int>');
+      expect(getAllModuleData['question_count_by_type'], isA<Map<String, int>>(), 
+        reason: 'question_count_by_type should be a Map<String, int>');
+      
+      final Map<String, int> individualCountByType = Map<String, int>.from(individualModuleData['question_count_by_type'] as Map);
+      final Map<String, int> getAllCountByType = Map<String, int>.from(getAllModuleData['question_count_by_type'] as Map);
+      
+      // Verify both have the same question type keys
+      final Set<String> individualTypes = individualCountByType.keys.toSet();
+      final Set<String> getAllTypes = getAllCountByType.keys.toSet();
+      expect(individualTypes, equals(getAllTypes), 
+        reason: 'Question type keys should match between individual and getAll data');
+      
+      // Verify counts match between individual and getAll
+      for (final questionType in individualTypes) {
+        final int individualCount = individualCountByType[questionType] ?? 0;
+        final int getAllCount = getAllCountByType[questionType] ?? 0;
+        expect(individualCount, equals(getAllCount), 
+          reason: 'Count for question type $questionType should match between individual and getAll data');
+      }
+      
+      // Verify the sum of all question type counts equals total_questions
+      final int sumOfTypeCounts = individualCountByType.values.fold(0, (sum, count) => sum + count);
+      final int totalQuestions = individualModuleData['total_questions'] as int;
+      expect(sumOfTypeCounts, equals(totalQuestions), 
+        reason: 'Sum of question type counts ($sumOfTypeCounts) should equal total_questions ($totalQuestions)');
+      
+      QuizzerLogger.logSuccess('Verified question_count_by_type structure and consistency');
+      
+      // Step 7: Verify questions structure and count
+      QuizzerLogger.logMessage('Step 7: Verifying questions structure and count...');
       final List<Map<String, dynamic>> individualQuestions = List<Map<String, dynamic>>.from(individualModuleData['questions'] as List);
       final List<Map<String, dynamic>> getAllQuestions = List<Map<String, dynamic>>.from(getAllModuleData['questions'] as List);
       // --- NEW: Validate question fields are Dart types for both sources ---
@@ -334,14 +369,14 @@ void main() {
       expect(individualQuestions.length, equals(getAllQuestions.length), 
         reason: 'Question count should match between individual and getAll data');
       
-      final int totalQuestions = individualModuleData['total_questions'] as int;
-      expect(individualQuestions.length, equals(totalQuestions), 
+      final int questionsTotalCount = individualModuleData['total_questions'] as int;
+      expect(individualQuestions.length, equals(questionsTotalCount), 
         reason: 'Question count should match total_questions field');
       
       QuizzerLogger.logSuccess('Verified questions structure and count consistency');
       
-      // Step 7: Performance comparison
-      QuizzerLogger.logMessage('Step 7: Performance comparison...');
+      // Step 8: Performance comparison
+      QuizzerLogger.logMessage('Step 8: Performance comparison...');
       
       final stopwatch = Stopwatch()..start();
       await getIndividualModuleData(sessionManager.userId!, testModuleName);

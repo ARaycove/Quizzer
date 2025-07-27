@@ -296,9 +296,9 @@ Future<Map<String, dynamic>> loginInitialization({
 
     // Step 3: Initialize question queue server (circulation and selection workers)
     if (!noQueueServer) {
-      signalLoginProgress("Starting question queue server...");
-      QuizzerLogger.logMessage('Initializing question queue server...');
-      await startQuestionQueueServer();
+    signalLoginProgress("Starting question queue server...");
+    QuizzerLogger.logMessage('Initializing question queue server...');
+    await startQuestionQueueServer();
     } else {
       QuizzerLogger.logMessage('Skipping question queue server initialization for test run');
     }

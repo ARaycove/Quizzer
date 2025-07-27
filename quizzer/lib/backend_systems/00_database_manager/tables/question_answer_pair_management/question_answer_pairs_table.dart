@@ -25,7 +25,7 @@ Future<void> verifyQuestionAnswerPairTable(dynamic db) async {
   // - select_all_that_apply: ✅ IMPLEMENTED  
   // - true_false:            ✅ IMPLEMENTED
   // - sort_order:            ✅ IMPLEMENTED
-  // - fill_in_the_blank:     TODO / NOT IMPLEMENTED
+  // - fill_in_the_blank:     ✅ IMPLEMENTED
   // - short_answer:          TODO / NOT IMPLEMENTED
   // - matching:              TODO / NOT IMPLEMENTED
   // - hot_spot:              TODO / NOT IMPLEMENTED
@@ -447,7 +447,9 @@ Future<int> editQuestionAnswerPair({
   // Specific field for Multiple Choice/True False - expecting int
   int? correctOptionIndex,
   // Specific field for Sort Order - expecting List<Map<String, dynamic>>
-  List<Map<String, dynamic>>? correctOrderElements, 
+  List<Map<String, dynamic>>? correctOrderElements,
+  // Specific field for Fill in the Blank - expecting List<Map<String, List<String>>>
+  List<Map<String, List<String>>>? answersToBlanks,
 }) async {
   try {
     // Fetch the existing record first
@@ -480,6 +482,7 @@ Future<int> editQuestionAnswerPair({
     if (options != null) valuesToUpdate['options'] = options;
     if (correctOptionIndex != null) valuesToUpdate['correct_option_index'] = correctOptionIndex;
     if (correctOrderElements != null) valuesToUpdate['correct_order'] = correctOrderElements;
+    if (answersToBlanks != null) valuesToUpdate['answers_to_blanks'] = answersToBlanks;
 
     // If no values were provided to update, log and return 0 rows affected.
     if (valuesToUpdate.isEmpty) {
@@ -1355,15 +1358,33 @@ Future<String> addFillInTheBlankQuestion({
   String? concepts,
   String? subjects,
 }) async {
-// TODO update element renderer
+// [x] design data structure and answer validation for question type
+
+// [x] update pair table with new fields
+
+// [x] finish designing and writing answer validation function under session_manager directory
+
+// [x] unit tests for answer validation function(s)
+
+// [x] write add*Question function for type
+
+// [x] update SessionManager to utilize new add*Question Type
+
+// [x] update unit tests for addQuestionAPI
+
+// [x] update SessionManager submitAnswer to support new validation function
+
+// [x] update unit tests for submitAnswer API
 //
-// TODO create new question widget
+// [x] update element renderer
+//
+// [x] create new question widget
 // 
-// TODO Update home page to utilize new question widget
+// [x] Update home page to utilize new question widget
+// [x] Update live Preview widget to utilize widget
+// [x] Update add_question widget to support new question type
 //
-// TODO Update add_question widget to support new question type
-//
-// TODO update edit quesiton dialogue to support new question type
+// [x] update edit quesiton dialogue to support new question type
 // ----------------------------------------------------------------------------
   try {
     final db = await getDatabaseMonitor().requestDatabaseAccess();

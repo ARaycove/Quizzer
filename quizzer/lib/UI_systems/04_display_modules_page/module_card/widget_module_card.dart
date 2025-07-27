@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:quizzer/UI_systems/04_display_modules_page/module_card/widget_activation_button.dart';
 import 'package:quizzer/UI_systems/04_display_modules_page/module_card/widget_edit_module_button.dart';
 import 'package:quizzer/UI_systems/04_display_modules_page/module_card/widget_edit_module_dialog.dart';
+import 'package:quizzer/UI_systems/04_display_modules_page/module_card/widget_question_type_counts.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/04_module_management/module_management.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
@@ -175,19 +176,35 @@ class _ModuleCardState extends State<ModuleCard> {
             ),
           ),
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Left side: Total Questions
               Expanded(
-                child: _buildMetadataItem(
-                  Icons.question_answer,
-                  '$totalQuestions questions',
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('Total Questions'),
+                    _buildMetadataItem(
+                      Icons.question_answer,
+                      '$totalQuestions questions',
+                    ),
+                  ],
                 ),
               ),
               AppTheme.sizedBoxMed,
-              if (primarySubject.isNotEmpty)
+              // Right side: Total By Type
+              if (moduleData.containsKey('question_count_by_type'))
                 Expanded(
-                  child: _buildMetadataItem(
-                    Icons.category,
-                    primarySubject,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('Total By Type'),
+                      QuestionTypeCountsWidget(
+                        questionCountByType: Map<String, int>.from(
+                          moduleData['question_count_by_type'] as Map? ?? {}
+                        ),
+                      ),
+                    ],
                   ),
                 ),
             ],

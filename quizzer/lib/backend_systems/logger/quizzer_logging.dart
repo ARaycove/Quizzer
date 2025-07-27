@@ -49,12 +49,40 @@ class QuizzerLogger {
     "user_module_activation_status_table.dart",
     "stat_update_aggregator.dart",
     "user_stats_days_left_until_questions_exhaust_table.dart",
+    "user_stats_in_circulation_questions_table.dart",
     "user_stats_non_circulating_questions_table.dart",
     "user_stats_daily_questions_answered_table.dart",
     "user_stats_average_questions_shown_per_day_table.dart",
     "user_stats_revision_streak_sum_table.dart",
-    "session_manager.dart"
+    "user_stats_average_daily_questions_learned_table.dart",
+    "user_stats_total_questions_answered_table.dart",
+    "user_stats_total_user_question_answer_pairs_table.dart",
+    "user_stats_eligible_questions_table.dart",
+    "session_manager.dart",
+    "question_answer_attempts_table.dart"
   ]; // List of source filenames to exclude
+
+  // --- Level-Specific Source Lists ---
+  static List<String> _debugLevelSources = [
+
+  ]; // Files that only log DEBUG and above
+  static List<String> _infoLevelSources = [
+
+  ]; // Files that only log INFO and above
+  static List<String> _successLevelSources = [
+
+  ]; // Files that only log SUCCESS and above
+  static List<String> _warningLevelSources = [
+    "outbound_sync_functions.dart",
+    "user_feedback_table.dart",
+    "error_logs_table.dart",
+    "question_answer_attempts_table.dart",
+    "question_answer_pairs_table.dart",
+    "question_selection_worker.dart"
+  ]; // Files that only log WARNING and above
+  static List<String> _errorLevelSources = [
+
+  ]; // Files that only log ERROR
 
   /// Sets the list of source filenames (e.g., 'my_table.dart') to exclude from logging.
   static void setExcludedSources(List<String> sources) {
@@ -64,6 +92,59 @@ class QuizzerLogger {
     if (!_excludedSources.contains(source)) {
       _logger.info('[$source] Logger exclusion list updated: $_excludedSources');
     }
+  }
+
+  /// Sets the list of source filenames that should only log DEBUG level and above.
+  static void setDebugLevelSources(List<String> sources) {
+    _debugLevelSources = sources;
+  }
+
+  /// Sets the list of source filenames that should only log INFO level and above.
+  static void setInfoLevelSources(List<String> sources) {
+    _infoLevelSources = sources;
+  }
+
+  /// Sets the list of source filenames that should only log SUCCESS level and above.
+  static void setSuccessLevelSources(List<String> sources) {
+    _successLevelSources = sources;
+  }
+
+  /// Sets the list of source filenames that should only log WARNING level and above.
+  static void setWarningLevelSources(List<String> sources) {
+    _warningLevelSources = sources;
+  }
+
+  /// Sets the list of source filenames that should only log ERROR level.
+  static void setErrorLevelSources(List<String> sources) {
+    _errorLevelSources = sources;
+  }
+
+  /// Helper method to check if a source should be logged at a given level
+  static bool _shouldLogAtLevel(String source, LogLevel level) {
+    // First check if source is completely excluded
+    if (_excludedSources.contains(source)) {
+      return false;
+    }
+
+    // Check level-specific restrictions
+    if (_errorLevelSources.contains(source)) {
+      return level == LogLevel.error;
+    }
+    if (_warningLevelSources.contains(source)) {
+      return level == LogLevel.warning || level == LogLevel.error;
+    }
+    if (_successLevelSources.contains(source)) {
+      return level == LogLevel.success || level == LogLevel.warning || level == LogLevel.error;
+    }
+    if (_infoLevelSources.contains(source)) {
+      return level == LogLevel.info || level == LogLevel.success || level == LogLevel.warning || level == LogLevel.error;
+    }
+    if (_debugLevelSources.contains(source)) {
+      return level == LogLevel.debug || level == LogLevel.info || level == LogLevel.success || level == LogLevel.warning || level == LogLevel.error;
+    }
+
+    // If not in any restricted list, log everything
+    return true;
   }
   // ----------------------
 
@@ -217,31 +298,31 @@ class QuizzerLogger {
   // Logging functions using the standard logger
   static void logValue(String message) {
     final source = _getCallerInfo();
-    if (_excludedSources.contains(source)) return; // Check exclusion
+    if (!_shouldLogAtLevel(source, LogLevel.debug)) return;
     _logger.fine('[$source] $message'); // Map logValue to FINE level (like DEBUG)
   }
 
   static void logMessage(String message) {
     final source = _getCallerInfo();
-    if (_excludedSources.contains(source)) return; // Check exclusion
+    if (!_shouldLogAtLevel(source, LogLevel.info)) return;
     _logger.info('[$source] $message');
   }
 
   static void logError(String message) {
     final source = _getCallerInfo();
-    if (_excludedSources.contains(source)) return; // Check exclusion
+    if (!_shouldLogAtLevel(source, LogLevel.error)) return;
     _logger.severe('[$source] ❌ $message'); // Map logError to SEVERE level with X emoji
   }
 
   static void logWarning(String message) {
     final source = _getCallerInfo();
-    if (_excludedSources.contains(source)) return; // Check exclusion
+    if (!_shouldLogAtLevel(source, LogLevel.warning)) return;
     _logger.warning('[$source] ⚠️ $message');
   }
 
   static void logSuccess(String message) {
     final source = _getCallerInfo();
-    if (_excludedSources.contains(source)) return; // Check exclusion
+    if (!_shouldLogAtLevel(source, LogLevel.success)) return;
     _logger.info('[$source] ✅ $message'); // Use INFO level for success with checkmark emoji
   }
 

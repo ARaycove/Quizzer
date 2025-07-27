@@ -11,10 +11,12 @@
             "id": "d47008925d227bd1",
             "type": "leaf",
             "state": {
-              "type": "graph",
-              "state": {},
-              "icon": "lucide-git-fork",
-              "title": "Graph view"
+              "type": "excalidraw",
+              "state": {
+                "file": "Diagrams/Quizzer_Flow_Chart.md"
+              },
+              "icon": "excalidraw-icon",
+              "title": "Quizzer_Flow_Chart"
             }
           },
           {

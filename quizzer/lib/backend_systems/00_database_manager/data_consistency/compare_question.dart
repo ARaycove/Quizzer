@@ -33,6 +33,11 @@ Future<Map<String, dynamic>> compareAndUpdateQuestionRecord(String questionId) a
     final Map<String, dynamic> localRecord = _normalizeRecord(localResult.first);
     getDatabaseMonitor().releaseDatabaseAccess();
     
+    // Check if this question was created by the current user
+    final String? qstContrib = localRecord['qst_contrib'] as String?;
+    final String currentUserId = getSessionManager().userId ?? '';
+    final bool isUserCreated = qstContrib == currentUserId;
+    
     // Get cloud record with raw query
     final supabase = getSessionManager().supabase;
     final List<dynamic> cloudResponse = await supabase
@@ -41,17 +46,24 @@ Future<Map<String, dynamic>> compareAndUpdateQuestionRecord(String questionId) a
         .eq('question_id', questionId)
         .limit(1);
     
-    // Question doesn't exist in Supabase - delete local record
+    // Question doesn't exist in Supabase - delete local record ONLY if not user-created
     if (cloudResponse.isEmpty) {
-      final db = await getDatabaseMonitor().requestDatabaseAccess();
-      if (db != null) {
-        await db.delete('question_answer_pairs', where: 'question_id = ?', whereArgs: [questionId]);
-        getDatabaseMonitor().releaseDatabaseAccess();
+      if (isUserCreated) {
+        return {
+          'updated': false,
+          'message': 'Question not found in cloud database but was created by current user - preserving local record'
+        };
+      } else {
+        final db = await getDatabaseMonitor().requestDatabaseAccess();
+        if (db != null) {
+          await db.delete('question_answer_pairs', where: 'question_id = ?', whereArgs: [questionId]);
+          getDatabaseMonitor().releaseDatabaseAccess();
+        }
+        return {
+          'updated': true,
+          'message': 'Question not found in cloud database - deleted local record'
+        };
       }
-      return {
-        'updated': true,
-        'message': 'Question not found in cloud database - deleted local record'
-      };
     }
     
     // Convert cloud record and normalize types

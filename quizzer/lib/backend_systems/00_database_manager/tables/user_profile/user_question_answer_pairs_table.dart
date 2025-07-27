@@ -270,6 +270,62 @@ Future<List<Map<String, dynamic>>> getUserQuestionAnswerPairsByUser(String userU
   }
 }
 
+/// Gets questions in circulation with active modules for a specific user.
+/// Returns questions that are in circulation (in_circulation = 1) and from active modules.
+/// Automatically excludes orphaned records (user records that reference non-existent questions).
+Future<List<Map<String, dynamic>>> getActiveQuestionsInCirculation(String userUuid) async {
+  try {
+    // Get all active module names for the user
+    final List<String> activeModuleNames = await getActiveModuleNames(userUuid);
+    
+    final db = await getDatabaseMonitor().requestDatabaseAccess();
+    if (db == null) {
+      throw Exception('Failed to acquire database access');
+    }
+    QuizzerLogger.logMessage('Fetching active questions in circulation for user: $userUuid...');
+    await _verifyUserQuestionAnswerPairTable(db);
+
+    // Build the query with proper joins and conditions
+    String sql = '''
+      SELECT user_question_answer_pairs.*
+      FROM user_question_answer_pairs
+      INNER JOIN question_answer_pairs ON user_question_answer_pairs.question_id = question_answer_pairs.question_id
+      WHERE user_question_answer_pairs.user_uuid = ?
+        AND user_question_answer_pairs.in_circulation = 1
+    ''';
+    
+    List<dynamic> whereArgs = [userUuid];
+    
+    // Add module filter if there are active modules
+    if (activeModuleNames.isNotEmpty) {
+      final placeholders = List.filled(activeModuleNames.length, '?').join(',');
+      sql += ' AND question_answer_pairs.module_name IN ($placeholders)';
+      whereArgs.addAll(activeModuleNames);
+    }
+    
+    // Add ORDER BY for consistent results
+    sql += ' ORDER BY user_question_answer_pairs.next_revision_due ASC';
+    
+    QuizzerLogger.logMessage('Executing active questions in circulation query with ${activeModuleNames.length} active modules');
+    
+    // Use the proper table_helper system for encoding/decoding
+    final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
+      'user_question_answer_pairs', // Use the main table name for the helper
+      db,
+      customQuery: sql,
+      whereArgs: whereArgs,
+    );
+    
+    QuizzerLogger.logSuccess('Found ${results.length} active questions in circulation for user: $userUuid.');
+    return results;
+  } catch (e) {
+    QuizzerLogger.logError('Error getting active questions in circulation - $e');
+    rethrow;
+  } finally {
+    getDatabaseMonitor().releaseDatabaseAccess();
+  }
+}
+
 Future<List<Map<String, dynamic>>> getQuestionsInCirculation(String userUuid) async {
   try {
     final db = await getDatabaseMonitor().requestDatabaseAccess();

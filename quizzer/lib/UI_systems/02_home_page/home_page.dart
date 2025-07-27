@@ -8,7 +8,8 @@ import 'widget_home_page_top_bar.dart'; // Import the refactored Top Bar
 import 'package:quizzer/UI_systems/question_widgets/widget_multiple_choice_question.dart'; 
 import 'package:quizzer/UI_systems/question_widgets/widget_select_all_that_apply_question.dart'; 
 import 'package:quizzer/UI_systems/question_widgets/widget_true_false_question.dart'; 
-import 'package:quizzer/UI_systems/question_widgets/widget_sort_order_question.dart'; 
+import 'package:quizzer/UI_systems/question_widgets/widget_sort_order_question.dart';
+import 'package:quizzer/UI_systems/question_widgets/widget_fill_in_the_blank.dart'; 
 /// HomePage acts as the main container, displaying the appropriate question widget.
 class HomePage extends StatefulWidget { // Change to StatefulWidget
   const HomePage({super.key});
@@ -105,6 +106,13 @@ class _HomePageState extends State<HomePage> { // State class
   // TODO Add in "read question" button, that reads the question and it's answer, first need to build that service into the API.
   /// Selects and returns the appropriate widget based on the current question type.
   Widget _buildQuestionBody() {
+    // Check if there's a current question loaded
+    if (session.currentQuestionStaticData == null) {
+      return const Center(
+        child: Text('No question loaded. Please wait...'),
+      );
+    }
+    
     // Use ValueKey with currentQuestionId to ensure widget state resets for new questions
     final String currentQuestionId = session.currentQuestionId;
     final key = ValueKey(currentQuestionId);
@@ -117,6 +125,7 @@ class _HomePageState extends State<HomePage> { // State class
     final List<Map<String, dynamic>> options = (dataSource?['options'] as List<dynamic>? ?? session.currentQuestionOptions).map((e) => Map<String, dynamic>.from(e as Map)).toList();
     final int? correctOptionIndex = dataSource?['correct_option_index'] as int? ?? session.currentCorrectOptionIndex;
     final List<int> correctIndices = (dataSource?['index_options_that_apply'] as List<dynamic>? ?? session.currentCorrectIndices).map((e) => e as int).toList();
+    final List<Map<String, List<String>>> answersToBlanks = (dataSource?['answers_to_blanks'] as List<dynamic>? ?? session.currentAnswersToBlanks).map((e) => Map<String, List<String>>.from(e as Map)).toList();
 
     // Check if we have submission data for answered state reconstruction
     final bool hasSubmissionData = session.lastSubmittedUserAnswer != null;
@@ -182,6 +191,20 @@ class _HomePageState extends State<HomePage> { // State class
           autoSubmitAnswer: shouldAutoSubmit, // Pass auto-submit flag
           customOrderIndices: customOrderIndices, // Pass custom order indices
           customUserOrder: submittedUserAnswer as List<Map<String, dynamic>>?, // Pass custom user order
+        );
+
+      case 'fill_in_the_blank':
+        return FillInTheBlankQuestionWidget(
+          key: key,
+          onNextQuestion: _requestNextQuestion,
+          questionElements: questionElements, // Use local variable
+          answerElements: answerElements, // Use local variable
+          questionData: dataSource ?? {
+            'question_type': questionType,
+            'answers_to_blanks': answersToBlanks,
+          }, // Pass full question data for validation
+          autoSubmitAnswer: shouldAutoSubmit, // Pass auto-submit flag
+          customUserAnswers: submittedUserAnswer as List<String>?, // Pass custom user answers
         );
 
       // --- Add placeholders for other known types ---

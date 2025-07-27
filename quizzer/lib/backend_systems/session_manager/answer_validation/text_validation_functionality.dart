@@ -12,7 +12,6 @@
 // Based on docks from string_similarity healed and sealed are higher sim than france and FrancE
 // We could maybe use this by normalizing, but It doesn't appear to be what we're looking for. . .
 
-import 'package:path/path.dart';
 import 'package:text_analysis/text_analysis.dart';
 import 'package:string_similarity/string_similarity.dart';
 import 'package:http/http.dart' as http;

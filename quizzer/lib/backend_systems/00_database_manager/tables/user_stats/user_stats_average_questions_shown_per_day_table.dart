@@ -5,6 +5,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/table_helper.dart';
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_question_answer_pairs_table.dart';
 
 Future<void> _verifyUserStatsAverageQuestionsShownPerDayTable(Database db) async {
   final List<Map<String, dynamic>> tables = await db.rawQuery(
@@ -47,14 +48,28 @@ Future<void> _verifyUserStatsAverageQuestionsShownPerDayTable(Database db) async
 /// Updates the average questions shown per day stat for a user for today (YYYY-MM-DD).
 Future<void> updateAverageQuestionsShownPerDayStat(String userId) async {
   try {
+    // Get active questions in circulation using the proper function
+    final List<Map<String, dynamic>> activeQuestionsInCirculation = await getActiveQuestionsInCirculation(userId);
+    
+    // Calculate the sum with revision score correction
+    double totalShown = 0.0;
+    for (final question in activeQuestionsInCirculation) {
+      double avgShown = (question['average_times_shown_per_day'] as num?)?.toDouble() ?? 0.0;
+      final int revisionStreak = question['revision_streak'] as int? ?? 0;
+      
+      // Apply revision score correction: if revision_streak = 0, add 1 to the average
+      if (revisionStreak == 0) {
+        avgShown += 1.0;
+      }
+      
+      totalShown += avgShown;
+    }
+    
     final db = await getDatabaseMonitor().requestDatabaseAccess();
     final String today = DateTime.now().toUtc().toIso8601String().substring(0, 10);
-    final List<Map<String, dynamic>> result = await db!.rawQuery(
-      'SELECT SUM(average_times_shown_per_day) as total FROM user_question_answer_pairs WHERE user_uuid = ? AND in_circulation = 1',
-      [userId],
-    );
-    final double avgShown = result.isNotEmpty && result.first['total'] != null ? (result.first['total'] as num).toDouble() : 0.0;
-    await _verifyUserStatsAverageQuestionsShownPerDayTable(db);
+    await _verifyUserStatsAverageQuestionsShownPerDayTable(db!);
+    
+    // Overwrite (insert or update) the record for today
     final List<Map<String, dynamic>> existing = await queryAndDecodeDatabase(
       'user_stats_average_questions_shown_per_day',
       db,
@@ -65,15 +80,15 @@ Future<void> updateAverageQuestionsShownPerDayStat(String userId) async {
       final Map<String, dynamic> data = {
         'user_id': userId,
         'record_date': today,
-        'average_questions_shown_per_day': avgShown,
+        'average_questions_shown_per_day': totalShown,
         'has_been_synced': 0,
         'edits_are_synced': 0,
         'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
       };
-      await insertRawData('user_stats_average_questions_shown_per_day', data, db);
+      await insertRawData('user_stats_average_questions_shown_per_day', data, db, conflictAlgorithm: ConflictAlgorithm.replace);
     } else {
       final Map<String, dynamic> values = {
-        'average_questions_shown_per_day': avgShown,
+        'average_questions_shown_per_day': totalShown,
         'has_been_synced': 0,
         'edits_are_synced': 0,
         'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
@@ -86,7 +101,7 @@ Future<void> updateAverageQuestionsShownPerDayStat(String userId) async {
         db,
       );
     }
-    QuizzerLogger.logSuccess('Updated average questions shown per day stat for user $userId on $today: $avgShown');
+    QuizzerLogger.logSuccess('Updated average questions shown per day stat for user $userId on $today: $totalShown (from ${activeQuestionsInCirculation.length} active questions)');
   } catch (e) {
     QuizzerLogger.logError('Error updating average questions shown per day stat for user ID: $userId - $e');
     rethrow;

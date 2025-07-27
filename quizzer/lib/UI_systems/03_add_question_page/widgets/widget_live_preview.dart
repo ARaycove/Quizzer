@@ -6,6 +6,7 @@ import 'package:quizzer/UI_systems/question_widgets/widget_multiple_choice_quest
 import 'package:quizzer/UI_systems/question_widgets/widget_select_all_that_apply_question.dart';
 import 'package:quizzer/UI_systems/question_widgets/widget_sort_order_question.dart';
 import 'package:quizzer/UI_systems/question_widgets/widget_true_false_question.dart';
+import 'package:quizzer/UI_systems/question_widgets/widget_fill_in_the_blank.dart';
 
 // ==========================================
 //         Live Preview Widget
@@ -21,6 +22,7 @@ class LivePreviewWidget extends StatelessWidget {
   final int? correctOptionIndexMC;
   final List<int> correctIndicesSATA;
   final bool? isCorrectAnswerTrueTF; // Correct answer for True/False
+  final List<Map<String, List<String>>> answersToBlanks; // For fill-in-the-blank
 
   const LivePreviewWidget({
     super.key,
@@ -32,6 +34,7 @@ class LivePreviewWidget extends StatelessWidget {
     this.correctOptionIndexMC,
     required this.correctIndicesSATA,
     this.isCorrectAnswerTrueTF,
+    required this.answersToBlanks,
   });
 
   @override
@@ -48,7 +51,6 @@ class LivePreviewWidget extends StatelessWidget {
         && options.isEmpty) {
        return _buildPreviewError('Preview requires at least one option for type $questionType.');
     } 
-    // TODO: Add validation for correct index requirements if needed
 
     // --- Original Build Logic ---
     // Dummy callback for disabled widgets
@@ -69,6 +71,7 @@ class LivePreviewWidget extends StatelessWidget {
       '${correctOptionIndexMC}_'
       '${identityHashCode(correctIndicesSATA)}_'
       '$isCorrectAnswerTrueTF'
+      '_${identityHashCode(answersToBlanks)}'
     );
 
 
@@ -114,6 +117,18 @@ class LivePreviewWidget extends StatelessWidget {
           questionElements: questionElements,
           answerElements: answerElements,
           isCorrectAnswerTrue: isCorrectAnswerTrueTF ?? true, // Default if null
+          onNextQuestion: dummyOnNext,
+          isDisabled: true, // ALWAYS disabled in preview
+        );
+      case 'fill_in_the_blank':
+        return FillInTheBlankQuestionWidget(
+          key: previewKey,
+          questionElements: questionElements,
+          answerElements: answerElements,
+          questionData: {
+            'question_type': questionType,
+            'answers_to_blanks': answersToBlanks,
+          }, // Pass full question data for validation
           onNextQuestion: dummyOnNext,
           isDisabled: true, // ALWAYS disabled in preview
         );

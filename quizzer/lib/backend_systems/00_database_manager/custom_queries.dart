@@ -47,7 +47,14 @@ Future<Map<String, Map<String, dynamic>>> getOptimizedModuleData(String userId) 
             'correct_order', question_answer_pairs.correct_order,
             'index_options_that_apply', question_answer_pairs.index_options_that_apply
           )
-        ) as questions_json
+        ) as questions_json,
+        json_object(
+          'multiple_choice', SUM(CASE WHEN question_answer_pairs.question_type = 'multiple_choice' THEN 1 ELSE 0 END),
+          'true_false', SUM(CASE WHEN question_answer_pairs.question_type = 'true_false' THEN 1 ELSE 0 END),
+          'select_all_that_apply', SUM(CASE WHEN question_answer_pairs.question_type = 'select_all_that_apply' THEN 1 ELSE 0 END),
+          'fill_in_the_blank', SUM(CASE WHEN question_answer_pairs.question_type = 'fill_in_the_blank' THEN 1 ELSE 0 END),
+          'sort_order', SUM(CASE WHEN question_answer_pairs.question_type = 'sort_order' THEN 1 ELSE 0 END)
+        ) as question_count_by_type
       FROM modules
       LEFT JOIN user_module_activation_status 
         ON modules.module_name = user_module_activation_status.module_name 
@@ -99,6 +106,18 @@ Future<Map<String, Map<String, dynamic>>> getOptimizedModuleData(String userId) 
         }
       }
       
+      // Parse question count by type
+      Map<String, int> questionCountByType = {};
+      final String? questionCountByTypeJson = row['question_count_by_type'] as String?;
+      if (questionCountByTypeJson != null && questionCountByTypeJson.isNotEmpty) {
+        try {
+          final Map<String, dynamic> countData = jsonDecode(questionCountByTypeJson);
+          questionCountByType = Map<String, int>.from(countData);
+        } catch (e) {
+          QuizzerLogger.logError('Error parsing question count by type JSON for module $moduleName: $e');
+        }
+      }
+      
       final Map<String, dynamic> module = {
         'module_name': moduleName,
         'description': row['description'],
@@ -110,6 +129,7 @@ Future<Map<String, Map<String, dynamic>>> getOptimizedModuleData(String userId) 
         'is_active': (row['is_active'] as int? ?? 0) == 1,
         'total_questions': totalQuestionsForModule,
         'questions': questions,
+        'question_count_by_type': questionCountByType,
       };
       
       result[moduleName] = module;
@@ -166,7 +186,14 @@ Future<Map<String, dynamic>?> getIndividualModuleData(String userId, String modu
             'correct_order', question_answer_pairs.correct_order,
             'index_options_that_apply', question_answer_pairs.index_options_that_apply
           )
-        ) as questions_json
+        ) as questions_json,
+        json_object(
+          'multiple_choice', SUM(CASE WHEN question_answer_pairs.question_type = 'multiple_choice' THEN 1 ELSE 0 END),
+          'true_false', SUM(CASE WHEN question_answer_pairs.question_type = 'true_false' THEN 1 ELSE 0 END),
+          'select_all_that_apply', SUM(CASE WHEN question_answer_pairs.question_type = 'select_all_that_apply' THEN 1 ELSE 0 END),
+          'fill_in_the_blank', SUM(CASE WHEN question_answer_pairs.question_type = 'fill_in_the_blank' THEN 1 ELSE 0 END),
+          'sort_order', SUM(CASE WHEN question_answer_pairs.question_type = 'sort_order' THEN 1 ELSE 0 END)
+        ) as question_count_by_type
       FROM modules
       LEFT JOIN user_module_activation_status 
         ON modules.module_name = user_module_activation_status.module_name 
@@ -218,6 +245,18 @@ Future<Map<String, dynamic>?> getIndividualModuleData(String userId, String modu
       }
     }
     
+    // Parse question count by type
+    Map<String, int> questionCountByType = {};
+    final String? questionCountByTypeJson = row['question_count_by_type'] as String?;
+    if (questionCountByTypeJson != null && questionCountByTypeJson.isNotEmpty) {
+      try {
+        final Map<String, dynamic> countData = jsonDecode(questionCountByTypeJson);
+        questionCountByType = Map<String, int>.from(countData);
+      } catch (e) {
+        QuizzerLogger.logError('Error parsing question count by type JSON for module $moduleName: $e');
+      }
+    }
+    
     final Map<String, dynamic> module = {
       'module_name': moduleName,
       'description': row['description'],
@@ -229,6 +268,7 @@ Future<Map<String, dynamic>?> getIndividualModuleData(String userId, String modu
       'is_active': (row['is_active'] as int? ?? 0) == 1,
       'total_questions': totalQuestionsForModule,
       'questions': questions,
+      'question_count_by_type': questionCountByType,
     };
     
     QuizzerLogger.logSuccess('Individual module data query completed for module: $moduleName with $totalQuestionsForModule questions for user: $userId');
@@ -240,3 +280,5 @@ Future<Map<String, dynamic>?> getIndividualModuleData(String userId, String modu
     getDatabaseMonitor().releaseDatabaseAccess();
   }
 }
+
+

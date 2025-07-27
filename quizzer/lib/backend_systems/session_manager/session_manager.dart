@@ -145,7 +145,7 @@ class SessionManager {
       throw Exception('Current question is not a fill_in_the_blank type');
     }
     
-    final List<Map<String, List<String>>> answersToBlanks = this.currentAnswersToBlanks;
+    final List<Map<String, List<String>>> answersToBlanks = currentAnswersToBlanks;
     
     return await text_validation.validateFillInTheBlank(
       {
@@ -154,6 +154,20 @@ class SessionManager {
       },
       userAnswers,
     );
+  }
+
+  /// Gets synonym suggestions for a given word using the Datamuse API
+  /// Returns a list of suggested synonyms
+  Future<List<String>> getSynonymSuggestions(String word) async {
+    try {
+      QuizzerLogger.logMessage('Getting synonym suggestions for word: $word');
+      final synonyms = await text_validation.callSynonymAPI(word);
+      QuizzerLogger.logSuccess('Retrieved ${synonyms.length} synonym suggestions for "$word"');
+      return synonyms;
+    } catch (e) {
+      QuizzerLogger.logError('Error getting synonym suggestions for "$word": $e');
+      rethrow;
+    }
   }
 
   /// Clears all submission data for the current question
@@ -1045,6 +1059,7 @@ class SessionManager {
     List<Map<String, dynamic>>? options,
     int? correctOptionIndex,
     List<Map<String, dynamic>>? correctOrderElements,
+    List<Map<String, List<String>>>? answersToBlanks, // Added for fill-in-the-blank
     String? originalModuleName, // NEW optional parameter
   }) async {
     try {
@@ -1072,6 +1087,7 @@ class SessionManager {
         options: options,
         correctOptionIndex: correctOptionIndex,
         correctOrderElements: correctOrderElements,
+        answersToBlanks: answersToBlanks,
       );
       
       QuizzerLogger.logMessage('Successfully updated existing question with QID: $questionId, rows affected: $result');
@@ -1500,10 +1516,23 @@ class SessionManager {
       }
 
       final String dateString = (date ?? DateTime.now().toUtc()).toIso8601String().substring(0, 10);
-      // Table function handles its own database access
-      final record = await getUserStatsEligibleQuestionsRecordByDate(userId!, dateString);
-      QuizzerLogger.logMessage('Successfully retrieved eligible questions stats for date: $dateString, user: $userId');
-      return record;
+      try {
+        // Table function handles its own database access
+        final record = await getUserStatsEligibleQuestionsRecordByDate(userId!, dateString);
+        QuizzerLogger.logMessage('Successfully retrieved eligible questions stats for date: $dateString, user: $userId');
+        return record;
+      } catch (e) {
+        // If record doesn't exist, return a default record
+        QuizzerLogger.logMessage('No eligible questions record found for date: $dateString, user: $userId. Returning default.');
+        return {
+          'user_id': userId,
+          'record_date': dateString,
+          'eligible_questions_count': 0,
+          'has_been_synced': 0,
+          'edits_are_synced': 0,
+          'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
+        };
+      }
     } catch (e) {
       QuizzerLogger.logError('Error in getEligibleQuestionsStats - $e');
       rethrow;
@@ -1529,10 +1558,23 @@ class SessionManager {
       }
 
       final String dateString = (date ?? DateTime.now().toUtc()).toIso8601String().substring(0, 10);
-      // Table function handles its own database access
-      final record = await getUserStatsNonCirculatingQuestionsRecordByDate(userId!, dateString);
-      QuizzerLogger.logMessage('Successfully retrieved non-circulating questions stats for date: $dateString, user: $userId');
-      return record;
+      try {
+        // Table function handles its own database access
+        final record = await getUserStatsNonCirculatingQuestionsRecordByDate(userId!, dateString);
+        QuizzerLogger.logMessage('Successfully retrieved non-circulating questions stats for date: $dateString, user: $userId');
+        return record;
+      } catch (e) {
+        // If record doesn't exist, return a default record
+        QuizzerLogger.logMessage('No non-circulating questions record found for date: $dateString, user: $userId. Returning default.');
+        return {
+          'user_id': userId,
+          'record_date': dateString,
+          'non_circulating_questions_count': 0,
+          'has_been_synced': 0,
+          'edits_are_synced': 0,
+          'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
+        };
+      }
     } catch (e) {
       QuizzerLogger.logError('Error in getNonCirculatingQuestionsStats - $e');
       rethrow;
@@ -1558,10 +1600,23 @@ class SessionManager {
       }
 
       final String dateString = (date ?? DateTime.now().toUtc()).toIso8601String().substring(0, 10);
-      // Table function handles its own database access
-      final record = await getUserStatsInCirculationQuestionsRecordByDate(userId!, dateString);
-      QuizzerLogger.logMessage('Successfully retrieved in-circulating questions stats for date: $dateString, user: $userId');
-      return record;
+      try {
+        // Table function handles its own database access
+        final record = await getUserStatsInCirculationQuestionsRecordByDate(userId!, dateString);
+        QuizzerLogger.logMessage('Successfully retrieved in-circulating questions stats for date: $dateString, user: $userId');
+        return record;
+      } catch (e) {
+        // If record doesn't exist, return a default record
+        QuizzerLogger.logMessage('No in-circulating questions record found for date: $dateString, user: $userId. Returning default.');
+        return {
+          'user_id': userId,
+          'record_date': dateString,
+          'in_circulation_questions_count': 0,
+          'has_been_synced': 0,
+          'edits_are_synced': 0,
+          'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
+        };
+      }
     } catch (e) {
       QuizzerLogger.logError('Error in getInCirculationQuestionsStats - $e');
       rethrow;
@@ -1578,11 +1633,17 @@ class SessionManager {
         return [];
       }
 
-      // Table function handles its own database access
-      final List<Map<String, dynamic>> result = await getTodayUserStatsRevisionStreakSumRecords(userId!);
-      
-      QuizzerLogger.logMessage('Successfully retrieved current revision streak sum stats for user: $userId');
-      return result;
+      try {
+        // Table function handles its own database access
+        final List<Map<String, dynamic>> result = await getTodayUserStatsRevisionStreakSumRecords(userId!);
+        
+        QuizzerLogger.logMessage('Successfully retrieved current revision streak sum stats for user: $userId');
+        return result;
+      } catch (e) {
+        // If record doesn't exist, return empty list
+        QuizzerLogger.logMessage('No revision streak sum records found for user: $userId. Returning empty list.');
+        return [];
+      }
     } catch (e) {
       QuizzerLogger.logError('Error in getCurrentRevisionStreakSumStats - $e');
       rethrow;
@@ -1620,12 +1681,18 @@ class SessionManager {
         return 0;
       }
 
-      // Table function handles its own database access
-      final Map<String, dynamic> record = await getTodayUserStatsTotalUserQuestionAnswerPairsRecord(userId!);
-      
-      final int count = record['total_question_answer_pairs'] as int? ?? 0;
-      QuizzerLogger.logMessage('Successfully retrieved current total user question answer pairs count: $count for user: $userId');
-      return count;
+      try {
+        // Table function handles its own database access
+        final Map<String, dynamic> record = await getTodayUserStatsTotalUserQuestionAnswerPairsRecord(userId!);
+        
+        final int count = record['total_question_answer_pairs'] as int? ?? 0;
+        QuizzerLogger.logMessage('Successfully retrieved current total user question answer pairs count: $count for user: $userId');
+        return count;
+      } catch (e) {
+        // If record doesn't exist, return 0
+        QuizzerLogger.logMessage('No total user question answer pairs record found for user: $userId. Returning 0.');
+        return 0;
+      }
     } catch (e) {
       QuizzerLogger.logError('Error in getCurrentTotalUserQuestionAnswerPairsCount - $e');
       rethrow;
@@ -1705,12 +1772,18 @@ class SessionManager {
         return 0;
       }
 
-      // Table function handles its own database access
-      final Map<String, dynamic> record = await getTodayUserStatsTotalQuestionsAnsweredRecord(userId!);
-      
-      final int count = record['total_questions_answered'] as int? ?? 0;
-      QuizzerLogger.logMessage('Successfully retrieved current total questions answered count: $count for user: $userId');
-      return count;
+      try {
+        // Table function handles its own database access
+        final Map<String, dynamic> record = await getTodayUserStatsTotalQuestionsAnsweredRecord(userId!);
+        
+        final int count = record['total_questions_answered'] as int? ?? 0;
+        QuizzerLogger.logMessage('Successfully retrieved current total questions answered count: $count for user: $userId');
+        return count;
+      } catch (e) {
+        // If record doesn't exist, return 0
+        QuizzerLogger.logMessage('No total questions answered record found for user: $userId. Returning 0.');
+        return 0;
+      }
     } catch (e) {
       QuizzerLogger.logError('Error in getCurrentTotalQuestionsAnsweredCount - $e');
       rethrow;

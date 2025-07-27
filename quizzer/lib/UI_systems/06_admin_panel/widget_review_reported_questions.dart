@@ -108,7 +108,6 @@ class _ReviewReportedQuestionsPanelWidgetState extends State<ReviewReportedQuest
     final report = _flaggedQuestion!['report'] as Map<String, dynamic>;
     final questionData = _editedQuestionData ?? _flaggedQuestion!['question_data'] as Map<String, dynamic>;
     final questionType = questionData['question_type'] as String? ?? 'error';
-    final correctOptionIndex = questionData['correct_option_index'] as int?;
 
     return SingleChildScrollView(
       controller: _scrollController,
@@ -167,6 +166,7 @@ class _ReviewReportedQuestionsPanelWidgetState extends State<ReviewReportedQuest
             isCorrectAnswerTrueTF: (questionType == 'true_false')
                 ? (questionData['correct_option_index'] == 0)
                 : null,
+            answersToBlanks: (questionData['answers_to_blanks'] as List<dynamic>? ?? []).map((e) => Map<String, List<String>>.from(e as Map)).toList(),
           ),
           AppTheme.sizedBoxMed,
           // Bottom Row: skip, delete, submit edit

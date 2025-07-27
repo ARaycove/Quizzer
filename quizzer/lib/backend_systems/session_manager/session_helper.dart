@@ -250,6 +250,43 @@ Map<String, dynamic> updateUserQuestionRecordOnAnswer({
     updatedRecord['last_revised'] = now.toIso8601String();
     updatedRecord['last_updated'] = updatedRecord['last_revised']; // Use same 'now' timestamp
 
+    // --------------------------------------------------
+    // CONDITIONAL REMOVAL FROM CIRCULATION
+    // --------------------------------------------------
+    // Purpose: Remove questions from circulation that users consistently struggle with
+    // 
+    // Rationale: If a user has attempted a question n+ times and still has a 
+    // revision_streak of 0, they are likely struggling with the concept and need
+    // a break from seeing this question repeatedly. This prevents frustration and
+    // allows the user to focus on other questions they can learn from.
+    //
+    // Criteria: revision_streak still 0 AND total_attempts >= n
+    // This handles patterns like:
+    // - Incorrect → Incorrect → ... (triggers on nth attempt)
+    // - Correct → Incorrect → Incorrect → ... (triggers on nth attempt)  
+    // - Any back-and-forth where they can't consistently get it right
+    //
+    // Secondary criteria: revision_streak = 1 AND total_attempts >= m
+    // This catches inconsistent back-and-forth patterns like:
+    // - Correct → Incorrect → Correct → Incorrect → ... (many attempts, low streak)
+    // Where someone occasionally gets it right but struggles overall
+    //
+    // Action: Reset attempts to 0 and remove from circulation
+    // This gives the question a "fresh start" when it eventually returns
+    final int finalAttempts = updatedRecord['total_attempts'] as int;
+    final int finalRevisionStreak = updatedRecord['revision_streak'] as int;
+    
+    if ((finalAttempts >= 2 && finalRevisionStreak == 0) || 
+        (finalAttempts >= 4 && finalRevisionStreak == 1)) {
+      QuizzerLogger.logMessage('Removing question from circulation: n+ attempts with revision_streak still 0, or m+ attempts with revision_streak = 1');
+      
+      // Reset attempts to 0 and remove from circulation
+      updatedRecord['total_attempts'] = 0;
+      updatedRecord['in_circulation'] = 0; // SQL boolean as integer
+      
+      QuizzerLogger.logSuccess('Question removed from circulation and attempts reset to 0');
+    }
+
     QuizzerLogger.logMessage('Successfully updated user question record with new SRS values');
     
     return updatedRecord;

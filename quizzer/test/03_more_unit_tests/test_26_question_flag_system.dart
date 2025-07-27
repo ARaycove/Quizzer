@@ -6,8 +6,6 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/question_answ
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pair_management/question_answer_pairs_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_question_answer_pairs_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
-import 'package:quizzer/backend_systems/06_question_queue_server/circulation_worker.dart';
-import 'package:quizzer/backend_systems/06_question_queue_server/question_selection_worker.dart';
 import 'package:quizzer/backend_systems/00_database_manager/review_system/handle_question_flags.dart';
 import '../test_helpers.dart';
 import 'dart:io';

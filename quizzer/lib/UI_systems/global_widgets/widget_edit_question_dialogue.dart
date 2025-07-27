@@ -35,6 +35,7 @@ class _EditQuestionDialogState extends State<EditQuestionDialog> {
   late List<Map<String, dynamic>> _options;
   int? _correctOptionIndex;
   List<int> _correctIndicesSATA = [];
+  List<Map<String, List<String>>> _answersToBlanks = [];
   int _previewRebuildCounter = 0;
 
   late final String _originalModuleName; // Track the original module name
@@ -75,6 +76,21 @@ class _EditQuestionDialogState extends State<EditQuestionDialog> {
           _options = (data['options'] as List<dynamic>?)?.map((e) => Map<String, dynamic>.from(e as Map)).toList() ?? [];
           _correctOptionIndex = data['correct_option_index'] as int?;
           _correctIndicesSATA = (data['index_options_that_apply'] as List<dynamic>?)?.map((e) => e as int).toList() ?? [];
+          
+          // Load answers_to_blanks for fill-in-the-blank questions
+          if (data['answers_to_blanks'] != null) {
+            final List<dynamic> rawAnswersToBlanks = data['answers_to_blanks'] as List<dynamic>;
+            _answersToBlanks = rawAnswersToBlanks.map((item) {
+              final Map<String, dynamic> map = Map<String, dynamic>.from(item as Map);
+              final String key = map.keys.first;
+              final List<dynamic> synonyms = map[key] as List<dynamic>;
+              return {key: synonyms.map((s) => s.toString()).toList()};
+            }).toList();
+            QuizzerLogger.logMessage('EditQuestionDialog: Loaded ${_answersToBlanks.length} answer groups for fill-in-the-blank');
+          } else {
+            _answersToBlanks = [];
+          }
+          
           _isLoading = false;
         });
         
@@ -161,17 +177,6 @@ class _EditQuestionDialogState extends State<EditQuestionDialog> {
     });
   }
 
-  void _handleAddImageOption() async {
-    QuizzerLogger.logMessage("Attempting to add image option in edit dialog...");
-    final String? stagedImageFilename = await pickAndStageImage();
-    if (stagedImageFilename != null) {
-      _handleAddOption({'type': 'image', 'content': stagedImageFilename});
-      QuizzerLogger.logMessage("Image option added with staged filename: $stagedImageFilename");
-    } else {
-      QuizzerLogger.logWarning("Image picking failed or was cancelled for option in edit dialog.");
-    }
-  }
-
   void _handleRemoveOption(int index) {
     setState(() {
       if (index >= 0 && index < _options.length) {
@@ -230,12 +235,70 @@ class _EditQuestionDialogState extends State<EditQuestionDialog> {
     });
   }
 
+  void _handleAnswersToBlanksChanged(List<Map<String, List<String>>> answersToBlanks) {
+    QuizzerLogger.logMessage("Handling answers to blanks change in edit dialogue");
+    setState(() {
+      _answersToBlanks = answersToBlanks;
+      _previewRebuildCounter++;
+    });
+  }
+
+  void _handleUpdateAnswerText(int blankIndex, String newAnswerText) {
+    QuizzerLogger.logMessage("Updating answer text for blank $blankIndex to: '$newAnswerText' in edit dialogue");
+    
+    if (blankIndex < 0 || blankIndex >= _answersToBlanks.length) {
+      QuizzerLogger.logError("Invalid blank index: $blankIndex");
+      return;
+    }
+    
+    setState(() {
+      // Get the current answer group
+      final currentAnswerGroup = _answersToBlanks[blankIndex];
+      
+      // Create a new answer group with the updated primary answer
+      final updatedAnswerGroup = <String, List<String>>{};
+      updatedAnswerGroup[newAnswerText] = currentAnswerGroup.values.first; // Keep existing synonyms
+      
+      // Replace the answer group
+      _answersToBlanks[blankIndex] = updatedAnswerGroup;
+      
+      _previewRebuildCounter++; // Increment counter for preview update
+      
+      QuizzerLogger.logSuccess("Updated answer text for blank $blankIndex to: '$newAnswerText' in edit dialogue");
+    });
+  }
+
   bool _validateQuestionData() {
     if (_questionElements.isEmpty) return false;
     if (_answerElements.isEmpty) return false;
-    if ((_questionType == 'multiple_choice' || _questionType == 'select_all_that_apply' || _questionType == 'sort_order') && _options.length < 2) return false;
-    if ((_questionType == 'multiple_choice' || _questionType == 'true_false') && _correctOptionIndex == null) return false;
-    if (_questionType == 'select_all_that_apply' && _correctIndicesSATA.isEmpty) return false;
+    
+    // Validate based on question type
+    switch (_questionType) {
+      case 'multiple_choice':
+        if (_options.length < 2) return false;
+        if (_correctOptionIndex == null) return false;
+        break;
+      case 'select_all_that_apply':
+        if (_options.length < 2) return false;
+        if (_correctIndicesSATA.isEmpty) return false;
+        break;
+      case 'sort_order':
+        if (_options.length < 2) return false;
+        break;
+      case 'true_false':
+        if (_correctOptionIndex == null) return false;
+        break;
+      case 'fill_in_the_blank':
+        // For fill-in-the-blank, validate that we have answers_to_blanks
+        // and that the number of blanks matches the number of answer groups
+        final int blankCount = _questionElements.where((element) => element['type'] == 'blank').length;
+        if (_answersToBlanks.isEmpty || blankCount != _answersToBlanks.length) {
+          QuizzerLogger.logWarning('Fill-in-the-blank validation failed: blankCount=$blankCount, answerGroups=${_answersToBlanks.length}');
+          return false;
+        }
+        break;
+    }
+    
     return true;
   }
 
@@ -276,10 +339,12 @@ class _EditQuestionDialogState extends State<EditQuestionDialog> {
       'correct_option_index': _correctOptionIndex,
       'index_options_that_apply': _correctIndicesSATA.isNotEmpty ? _correctIndicesSATA : null,
       'question_type': _questionType,
+      'answers_to_blanks': _answersToBlanks.isNotEmpty ? _answersToBlanks : null,
       // Include other fields that SessionManager might need or that UI might use directly
       // For example, if the dialog modifies 'subjects' or 'concepts', add them here.
       // For now, keeping it to what's explicitly handled by _session.updateExistingQuestion
     };
+    
 
     // --- Conditionally call updateExistingQuestion --- 
     if (!widget.disableSubmission) {
@@ -293,6 +358,7 @@ class _EditQuestionDialogState extends State<EditQuestionDialog> {
         correctOptionIndex: _correctOptionIndex,
         indexOptionsThatApply: _correctIndicesSATA.isNotEmpty ? _correctIndicesSATA : null,
         questionType: _questionType,
+        answersToBlanks: _answersToBlanks.isNotEmpty ? _answersToBlanks : null,
         originalModuleName: _originalModuleName, // Pass the original module name
       );
     } else {
@@ -355,6 +421,7 @@ class _EditQuestionDialogState extends State<EditQuestionDialog> {
               options: _options,
               correctOptionIndex: _correctOptionIndex,
               correctIndicesSATA: _correctIndicesSATA,
+              answersToBlanks: _answersToBlanks, // Use the actual answers_to_blanks data
               onAddElement: _handleAddElement,
               onRemoveElement: _handleRemoveElement,
               onEditElement: _handleEditElement,
@@ -365,6 +432,13 @@ class _EditQuestionDialogState extends State<EditQuestionDialog> {
               onToggleCorrectOptionSATA: _handleToggleCorrectOptionSATA,
               onReorderElements: _handleReorderElements,
               onReorderOptions: _handleReorderOptions,
+              onAnswersToBlanksChanged: _handleAnswersToBlanksChanged,
+              onCreateBlank: (index, selectedText) {
+                // Handle blank creation for edit dialogue
+                // For now, just log the action
+                QuizzerLogger.logMessage("Create blank from text: '$selectedText' at index $index (edit dialogue)");
+              },
+              onUpdateAnswerText: _handleUpdateAnswerText,
             ),
             AppTheme.sizedBoxLrg,
             const Text('Live Preview:'),
@@ -378,6 +452,7 @@ class _EditQuestionDialogState extends State<EditQuestionDialog> {
               correctOptionIndexMC: _correctOptionIndex,
               correctIndicesSATA: _correctIndicesSATA,
               isCorrectAnswerTrueTF: (_questionType == 'true_false') ? (_correctOptionIndex == 0) : null,
+              answersToBlanks: _answersToBlanks, // Use the actual answers_to_blanks data
             ),
             AppTheme.sizedBoxLrg,
             Row(

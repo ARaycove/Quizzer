@@ -57,16 +57,16 @@ Future<void> updateAllUserDailyStats(String userId, {bool? isCorrect}) async {
     await incrementDailyQuestionsAnsweredStat(userId, isCorrect);
     QuizzerLogger.logSuccess('StatUpdateAggregator: Successfully incremented daily questions answered stat for user: $userId');
   }
+  // Update average daily questions learned stat
+  QuizzerLogger.logMessage('StatUpdateAggregator: Updating average daily questions learned stat for user: $userId');
+  await updateAverageDailyQuestionsLearnedStat(userId);
+  QuizzerLogger.logSuccess('StatUpdateAggregator: Successfully triggered average daily questions learned stat update for user: $userId');
 
   // Update days left until questions exhaust stat
   QuizzerLogger.logMessage('StatUpdateAggregator: Updating days left until questions exhaust stat for user: $userId');
   await updateDaysLeftUntilQuestionsExhaustStat(userId);
   QuizzerLogger.logSuccess('StatUpdateAggregator: Successfully triggered days left until questions exhaust stat update for user: $userId');
 
-  // Update average daily questions learned stat
-  QuizzerLogger.logMessage('StatUpdateAggregator: Updating average daily questions learned stat for user: $userId');
-  await updateAverageDailyQuestionsLearnedStat(userId);
-  QuizzerLogger.logSuccess('StatUpdateAggregator: Successfully triggered average daily questions learned stat update for user: $userId');
 
   // Add calls to other daily stat update functions here as they are created.
   // For example:

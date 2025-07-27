@@ -78,7 +78,7 @@ Future<void> updateEligibleQuestionsStat(String userId) async {
         'edits_are_synced': 0,
         'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
       };
-      await insertRawData('user_stats_eligible_questions', data, db);
+      await insertRawData('user_stats_eligible_questions', data, db, conflictAlgorithm: ConflictAlgorithm.replace);
     } else {
       final Map<String, dynamic> values = {
         'eligible_questions_count': eligibleCount,

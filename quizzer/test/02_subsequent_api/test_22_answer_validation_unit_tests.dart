@@ -396,7 +396,7 @@ void main() {
       // Step 1: Initialize login without sync and queue server
       QuizzerLogger.logMessage('Step 1: Initializing login...');
       final SessionManager sessionManager = getSessionManager();
-      final loginResult = await loginInitialization(
+      await loginInitialization(
         email: testEmail,
         password: testPassword,
         supabase: sessionManager.supabase,
@@ -484,7 +484,7 @@ void main() {
         
                       // Step 8: Test submitAnswer API with incorrect answer
         QuizzerLogger.logMessage('Testing incorrect answer for $questionType question...');
-        final dynamic incorrectAnswer = 999; // Just some junk value
+        const dynamic incorrectAnswer = 999; // Just some junk value
         final Map<String, dynamic> incorrectResult = await sessionManager.submitAnswer(userAnswer: incorrectAnswer);
         expect(incorrectResult['success'], isFalse, reason: 'submitAnswer should fail for incorrect $questionType answer');
         

@@ -211,6 +211,7 @@ class _ReviewPanelWidgetState extends State<ReviewPanelWidget> {
             isCorrectAnswerTrueTF: (displayData['question_type'] == 'true_false')
                 ? (displayData['correct_option_index'] == 0)
                 : null,
+            answersToBlanks: (displayData['answers_to_blanks'] as List<dynamic>? ?? []).map((e) => Map<String, List<String>>.from(e as Map)).toList(),
           ),
           // --- ADDED: Display Module Name ---
           AppTheme.sizedBoxSml,

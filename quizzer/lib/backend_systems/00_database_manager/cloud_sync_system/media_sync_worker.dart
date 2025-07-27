@@ -176,7 +176,7 @@ class MediaSyncWorker {
       try {
         final List<FileSystemEntity> localEntities = await localDir.list().toList();
         localFiles = localEntities
-            .where((entity) => entity is File)
+            .whereType<File>()
             .map((entity) => path.basename(entity.path))
             .toList();
         QuizzerLogger.logMessage('MediaSyncWorker: Found ${localFiles.length} files locally.');

@@ -49,27 +49,44 @@ class CombinedBarLineChart extends StatelessWidget {
           child: LayoutBuilder(
             builder: (context, constraints) {
               final barsSpace = 4.0 * constraints.maxWidth / 400;
-              final barsWidth = 14.0 * constraints.maxWidth / 400;
+              // CHANGING WIDTH DOES NOT CHANGE THE SHAPE OF THE BARS 
+              // FUCKING DUMB ASS IDIOT
+              final barsWidth = 8.0 * constraints.maxWidth / 400; // Reasonable width for rectangular bars
               // Prepare bar groups: one bar per date, stacked (incorrect on bottom, correct on top)
               final barGroups = <BarChartGroupData>[];
               for (int i = 0; i < data.length; i++) {
                 final d = data[i];
-                barGroups.add(
-                  BarChartGroupData(
-                    x: i,
-                    barsSpace: barsSpace,
-                    barRods: [
-                      BarChartRodData(
-                        toY: (d.correct + d.incorrect).toDouble(),
-                        rodStackItems: [
-                          BarChartRodStackItem(0, d.incorrect.toDouble(), incorrectColor),
-                          BarChartRodStackItem(d.incorrect.toDouble(), (d.correct + d.incorrect).toDouble(), correctColor),
-                        ],
-                        width: barsWidth,
-                      ),
-                    ],
-                  ),
-                );
+                final total = d.correct + d.incorrect;
+                
+                // Only create bars if there's actual data
+                if (total > 0) {
+                  barGroups.add(
+                    BarChartGroupData(
+                      x: i,
+                      barsSpace: barsSpace,
+                      barRods: [
+                        BarChartRodData(
+                          toY: total.toDouble(),
+                          rodStackItems: [
+                            BarChartRodStackItem(0, d.incorrect.toDouble(), incorrectColor),
+                            BarChartRodStackItem(d.incorrect.toDouble(), total.toDouble(), correctColor),
+                          ],
+                          width: barsWidth,
+                          borderRadius: BorderRadius.zero, // Make bars rectangular instead of circular
+                        ),
+                      ],
+                    ),
+                  );
+                } else {
+                  // Add empty bar group to maintain spacing - NO VISUAL BAR
+                  barGroups.add(
+                    BarChartGroupData(
+                      x: i,
+                      barsSpace: barsSpace,
+                      barRods: [], // Empty array means no visual bar
+                    ),
+                  );
+                }
               }
               // Prepare x axis labels (dates)
               final xLabels = data.map((d) => d.date.length >= 10 ? d.date.substring(5) : d.date).toList();

@@ -55,67 +55,67 @@ class StatBarChart extends StatelessWidget {
     return SizedBox(
       height: 220,
       child: BarChart(
-        BarChartData(
-          alignment: BarChartAlignment.spaceAround,
-          maxY: maxY,
-          barTouchData: BarTouchData(
-            enabled: true,
-            touchTooltipData: BarTouchTooltipData(
-              getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                final item = data[group.x];
-                return BarTooltipItem(
-                  '${item['x_label']}: ${rod.toY.toStringAsFixed(1)}',
-                  const TextStyle(color: Colors.white),
-                );
-              },
-            ),
-          ),
-          titlesData: FlTitlesData(
-            show: true,
-            topTitles: AxisTitles(
-              sideTitles: const SideTitles(showTitles: false),
-              axisNameWidget: chartName.isNotEmpty ? Text(chartName) : null,
-              axisNameSize: 40,
-            ),
-            bottomTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                getTitlesWidget: (double value, TitleMeta meta) {
-                  final index = value.toInt();
-                  if (index >= 0 && index < data.length) {
-                    return Text(data[index]['x_label'] as String);
-                  }
-                  return const Text('');
-                },
-                reservedSize: 30,
-              ),
-              axisNameWidget: Text(xAxisLabel),
-              axisNameSize: 30,
-            ),
-            leftTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                reservedSize: 40,
-                getTitlesWidget: (double value, TitleMeta meta) {
-                   if (value % 1 == 0) { // Only show integer values
-                      return Text(value.toInt().toString());
-                   }
-                   return const Text('');
+          BarChartData(
+            alignment: BarChartAlignment.spaceAround,
+            maxY: maxY,
+            barTouchData: BarTouchData(
+              enabled: true,
+              touchTooltipData: BarTouchTooltipData(
+                getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                  final item = data[group.x];
+                  return BarTooltipItem(
+                    '${item['x_label']}: ${rod.toY.toStringAsFixed(1)}',
+                    const TextStyle(),
+                  );
                 },
               ),
-              axisNameWidget: Text(yAxisLabel),
-              axisNameSize: 40,
             ),
-            rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            titlesData: FlTitlesData(
+              show: true,
+              topTitles: AxisTitles(
+                sideTitles: const SideTitles(showTitles: false),
+                axisNameWidget: chartName.isNotEmpty ? Text(chartName) : null,
+                axisNameSize: 40,
+              ),
+              bottomTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  getTitlesWidget: (double value, TitleMeta meta) {
+                    final index = value.toInt();
+                    if (index >= 0 && index < data.length) {
+                      return Text(data[index]['x_label'] as String);
+                    }
+                    return const Text('');
+                  },
+                  reservedSize: 30,
+                ),
+                axisNameWidget: Text(xAxisLabel),
+                axisNameSize: 30,
+              ),
+              leftTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  reservedSize: 40,
+                  getTitlesWidget: (double value, TitleMeta meta) {
+                     if (value % 1 == 0) { // Only show integer values
+                        return Text(value.toInt().toString());
+                     }
+                     return const Text('');
+                  },
+                ),
+                axisNameWidget: Text(yAxisLabel),
+                axisNameSize: 40,
+              ),
+              rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            ),
+            borderData: FlBorderData(show: true),
+            gridData: const FlGridData(
+              show: true,
+              drawVerticalLine: false,
+            ),
+            barGroups: barGroups,
           ),
-          borderData: FlBorderData(show: true),
-          gridData: const FlGridData(
-            show: true,
-            drawVerticalLine: false,
-          ),
-          barGroups: barGroups,
         ),
-      ),
     );
   }
 }
