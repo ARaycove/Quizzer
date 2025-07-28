@@ -132,7 +132,6 @@ class _ModuleCardState extends State<ModuleCard> {
     final moduleName = moduleData['module_name'] ?? 'Unnamed Module';
     final description = moduleData['description'] ?? '';
     final totalQuestions = moduleData['total_questions'] ?? 0;
-    final primarySubject = moduleData['primary_subject'] ?? '';
     if (totalQuestions == 0) {
       return const SizedBox.shrink();
     }

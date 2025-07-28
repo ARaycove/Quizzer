@@ -642,22 +642,9 @@ Future<void> batchUpsertUserQuestionAnswerPairs({
     QuizzerLogger.logMessage('Starting TRUE batch upsert for user_question_answer_pairs: ${records.length} records');
     await _verifyUserQuestionAnswerPairTable(db);
 
-    // List of all columns in the table
-    final columns = [
-      'user_uuid',
-      'question_id',
-      'revision_streak',
-      'last_revised',
-      'predicted_revision_due_history',
-      'next_revision_due',
-      'time_between_revisions',
-      'average_times_shown_per_day',
-      'in_circulation',
-      'total_attempts',
-      'has_been_synced',
-      'edits_are_synced',
-      'last_modified_timestamp',
-    ];
+    // Get all columns dynamically from the table
+    final List<Map<String, dynamic>> columnInfo = await db.rawQuery("PRAGMA table_info(user_question_answer_pairs)");
+    final List<String> columns = columnInfo.map((col) => col['name'] as String).toList();
 
     // Helper to get value or null/default
     dynamic getVal(Map<String, dynamic> r, String k, dynamic def) => r[k] ?? def;
