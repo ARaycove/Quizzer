@@ -6,6 +6,7 @@ import 'package:quizzer/backend_systems/00_helper_utils/file_locations.dart';
 import 'package:quizzer/app_theme.dart';
 import 'package:quizzer/UI_systems/global_widgets/widget_blank.dart';
 
+
 // ==========================================
 //        Element Renderer Widget
 // ==========================================
@@ -315,6 +316,8 @@ class _ElementRendererState extends State<ElementRenderer> {
      }
      switch (type) {
        case 'text': 
+         // REMINDER: Only override text color for TextField backgrounds, not regular text display
+         // Use default text color for normal text rendering
          return Text(content.toString());
        case 'blank':
          // Parse content as width for the blank widget

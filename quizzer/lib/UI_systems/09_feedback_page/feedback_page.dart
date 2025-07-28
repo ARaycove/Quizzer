@@ -140,6 +140,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
             AppTheme.sizedBoxMed,
             TextField(
               controller: _feedbackController,
+              style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
               decoration: const InputDecoration(
                 labelText: 'What are you thinking?',
                 hintText: 'Enter your feedback here...',

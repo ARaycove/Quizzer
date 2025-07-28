@@ -41,7 +41,7 @@ class _StatsPageState extends State<StatsPage> {
         showHomeButton: true,
       ),
       body: ListView(
-        physics: const BouncingScrollPhysics(),
+        physics: const AlwaysScrollableScrollPhysics(),
         // padding 16 is more than enough do not increase. . . 
         padding: const EdgeInsets.only(right: 16.0), // Add right padding to prevent scroll bar overlap
         children: const [

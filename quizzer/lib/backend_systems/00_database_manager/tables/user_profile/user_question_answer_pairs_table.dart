@@ -883,7 +883,7 @@ Future<int> getTotalEligibleCount(String userUuid) async {
 }
 
 /// Gets non-circulating questions with full question details for a specific user.
-/// Returns questions that are not in circulation (in_circulation = 0) with their complete details.
+/// Returns questions that are not in circulation (in_circulation = 0) and not flagged (flagged = 0) with their complete details.
 /// Automatically excludes orphaned records (user records that reference non-existent questions).
 Future<List<Map<String, dynamic>>> getNonCirculatingQuestionsWithDetails(String userUuid) async {
   try {
@@ -903,6 +903,7 @@ Future<List<Map<String, dynamic>>> getNonCirculatingQuestionsWithDetails(String 
       INNER JOIN question_answer_pairs ON user_question_answer_pairs.question_id = question_answer_pairs.question_id
       WHERE user_question_answer_pairs.user_uuid = ?
         AND user_question_answer_pairs.in_circulation = 0
+        AND user_question_answer_pairs.flagged = 0
       ORDER BY user_question_answer_pairs.next_revision_due ASC
     ''';
     
@@ -945,9 +946,10 @@ Future<bool> toggleUserQuestionFlaggedStatus({
     try {
       await _verifyUserQuestionAnswerPairTable(db);
 
-      // Update the flagged status
+      // Update the flagged status and circulation status
       final Map<String, dynamic> values = {
         'flagged': newFlaggedStatus ? 1 : 0,
+        'in_circulation': newFlaggedStatus ? 0 : currentRecord['in_circulation'], // Remove from circulation when flagged
         'edits_are_synced': 0,
         'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
       };
@@ -962,7 +964,7 @@ Future<bool> toggleUserQuestionFlaggedStatus({
 
       // Log based on result
       if (result > 0) {
-        QuizzerLogger.logSuccess('Toggled flagged status for User: $userUuid, Q: $questionId to ${newFlaggedStatus ? 'flagged' : 'unflagged'} ($result row affected).');
+        QuizzerLogger.logSuccess('Toggled flagged status for User: $userUuid, Q: $questionId to ${newFlaggedStatus ? 'flagged' : 'unflagged'}${newFlaggedStatus ? ' and removed from circulation' : ''} ($result row affected).');
         // Signal SwitchBoard conditionally
         if (!disableOutboundSync) {
           signalOutboundSyncNeeded();
