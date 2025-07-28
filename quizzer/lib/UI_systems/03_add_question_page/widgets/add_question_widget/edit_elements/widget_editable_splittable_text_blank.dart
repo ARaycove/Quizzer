@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
-import 'package:latext/latext.dart';
-
 // ==========================================
 //    Editable Splittable Text Element Widget
 // ==========================================

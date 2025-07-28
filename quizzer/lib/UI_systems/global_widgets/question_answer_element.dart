@@ -5,6 +5,7 @@ import 'package:path/path.dart' as p;
 import 'package:quizzer/backend_systems/00_helper_utils/file_locations.dart';
 import 'package:quizzer/app_theme.dart';
 import 'package:quizzer/UI_systems/global_widgets/widget_blank.dart';
+import 'package:quizzer/UI_systems/global_widgets/widget_latext_renderer.dart';
 
 
 // ==========================================
@@ -308,6 +309,21 @@ class _ElementRendererState extends State<ElementRenderer> {
     );
   }
 
+  // Helper method that reuses the exact LaTeX detection logic from LaTexT widget
+  bool _hasLatexDelimiters(String text) {
+    const String delimiter = r'$';
+    const String displayDelimiter = r'$$';
+    
+    final String escapedDelimiter = delimiter.replaceAll(r'$', r'\$');
+    final String escapedDisplayDelimiter = displayDelimiter.replaceAll(r'$', r'\$');
+
+    final String rawRegExp =
+        '(($escapedDelimiter)([^$escapedDelimiter]*[^\\\\\\$escapedDelimiter])($escapedDelimiter)|($escapedDisplayDelimiter)([^$escapedDisplayDelimiter]*[^\\\\\\$escapedDisplayDelimiter])($escapedDisplayDelimiter))';
+    
+    final matches = RegExp(rawRegExp, dotAll: true).allMatches(text).toList();
+    return matches.isNotEmpty;
+  }
+
   // Builds widgets that DO NOT require async loading (e.g., Text, unsupported types)
   Widget _buildStaticWidget(String? type, dynamic content, int index) {
      if (content == null) {
@@ -318,7 +334,14 @@ class _ElementRendererState extends State<ElementRenderer> {
        case 'text': 
          // REMINDER: Only override text color for TextField backgrounds, not regular text display
          // Use default text color for normal text rendering
-         return Text(content.toString());
+         final textContent = content.toString();
+         // Use the same LaTeX detection logic as LaTexT widget
+         if (_hasLatexDelimiters(textContent)) {
+           return LaTexT(laTeXCode: Text(textContent));
+         } else {
+           // Use regular Text widget for plain text to handle newlines properly
+           return Text(textContent);
+         }
        case 'blank':
          // Parse content as width for the blank widget
          int width;

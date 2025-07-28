@@ -104,7 +104,7 @@ class _AddOptionsState extends State<AddOptions> {
         isDense: true,
       ),
       onSubmitted: onSubmitted,
-      textInputAction: TextInputAction.done, // Use 'done' instead of 'newline'
+      textInputAction: TextInputAction.newline, // Allow newlines with Shift+Enter
     );
   }
 

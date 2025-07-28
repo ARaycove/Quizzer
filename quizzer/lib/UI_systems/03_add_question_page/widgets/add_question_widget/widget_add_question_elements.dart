@@ -107,7 +107,7 @@ class _AddQuestionElementsState extends State<AddQuestionElements> {
         isDense: true,
       ),
       onSubmitted: onSubmitted,
-      textInputAction: TextInputAction.done, // Use 'done' instead of 'newline'
+      textInputAction: TextInputAction.newline, // Allow newlines with Shift+Enter
     );
   }
 

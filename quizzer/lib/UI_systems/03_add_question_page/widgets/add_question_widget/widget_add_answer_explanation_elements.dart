@@ -92,7 +92,7 @@ class _AddAnswerExplanationElementsState extends State<AddAnswerExplanationEleme
         isDense: true,
       ),
       onSubmitted: onSubmitted,
-      textInputAction: TextInputAction.done, // Use 'done' instead of 'newline'
+      textInputAction: TextInputAction.newline, // Allow newlines with Shift+Enter
     );
   }
 

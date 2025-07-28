@@ -165,7 +165,28 @@ class _AddQuestionAnswerPageState extends State<AddQuestionAnswerPage> {
        }
 
        if (index >= 0 && index < targetList.length) {
+          final removedElement = targetList[index];
           targetList.removeAt(index);
+          
+          // If removing a blank element from question, also remove the corresponding answer
+          if (category == 'question' && removedElement['type'] == 'blank') {
+            // Count how many blank elements come before this one to get the correct answer index
+            int blankIndex = 0;
+            for (int i = 0; i < index; i++) {
+              if (_currentQuestionElements[i]['type'] == 'blank') {
+                blankIndex++;
+              }
+            }
+            
+            // Remove the corresponding answer from answers_to_blanks
+            if (blankIndex < _currentAnswersToBlanks.length) {
+              _currentAnswersToBlanks.removeAt(blankIndex);
+              QuizzerLogger.logSuccess("Removed corresponding answer at index $blankIndex from answers_to_blanks");
+            } else {
+              QuizzerLogger.logWarning("Blank index $blankIndex out of range for answers_to_blanks (length ${_currentAnswersToBlanks.length})");
+            }
+          }
+          
           _previewRebuildCounter++; // Increment counter
           QuizzerLogger.logSuccess("Removed element index $index from $category");
        } else {
