@@ -251,10 +251,9 @@ class _AddQuestionElementsState extends State<AddQuestionElements> {
             // Build the element widget
             final elementWidget = _buildElementWidget(element, index);
 
-            // Wrap the widget for drag start
-            return ReorderableDragStartListener(
+            // Return the element widget directly - let each element handle its own drag functionality
+            return KeyedSubtree(
               key: key,
-              index: index,
               child: elementWidget,
             );
           },
@@ -273,12 +272,6 @@ class _AddQuestionElementsState extends State<AddQuestionElements> {
 
               // Call the parent's callback with the newly ordered list
               widget.onReorderElements(mutableElements, 'question');
-          },
-          // Optional: Add proxy decorator
-          proxyDecorator: (Widget child, int index, Animation<double> animation) {
-            return Material(
-                child: child,
-            );
           },
         ),
       ],

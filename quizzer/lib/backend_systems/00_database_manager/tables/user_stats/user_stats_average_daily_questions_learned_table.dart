@@ -7,6 +7,7 @@ import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/table_helper.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_in_circulation_questions_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
+import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 
 /// Verifies the user_stats_average_daily_questions_learned table exists, creates if not.
 Future<void> _verifyUserStatsAverageDailyQuestionsLearnedTable(Database db) async {
@@ -112,6 +113,11 @@ Future<void> updateAverageDailyQuestionsLearnedStat(String userId) async {
       'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
     };
     await insertRawData('user_stats_average_daily_questions_learned', data, db, conflictAlgorithm: ConflictAlgorithm.replace);
+    
+    // Update SessionManager cache with the current value
+    final SessionManager sessionManager = SessionManager();
+    sessionManager.setCachedAverageDailyQuestionsLearned(double.parse(avgLearned.toStringAsFixed(2)));
+    
     QuizzerLogger.logSuccess('Updated average_daily_questions_learned stat for user $userId on $today: $avgLearned (increase: $increase, days: $days, first: $firstCount, last: $lastCount)');
   } catch (e) {
     QuizzerLogger.logError('Error updating average daily questions learned stat for user ID: $userId - $e');

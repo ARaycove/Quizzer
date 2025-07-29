@@ -267,6 +267,11 @@ class _EditableSplittableTextElementState extends State<EditableSplittableTextEl
                         visualDensity: VisualDensity.compact,
                         padding: EdgeInsets.zero,
                       ),
+                      // Drag handle for reordering
+                      ReorderableDragStartListener(
+                        index: widget.index,
+                        child: const Icon(Icons.drag_handle),
+                      ),
                     ],
                   ),
                 ),

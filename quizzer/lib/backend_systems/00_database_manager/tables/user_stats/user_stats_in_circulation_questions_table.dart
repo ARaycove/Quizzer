@@ -7,6 +7,7 @@ import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/table_helper.dart';
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_question_answer_pairs_table.dart';
+import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 
 Future<void> _verifyUserStatsInCirculationQuestionsTable(Database db) async {
   final List<Map<String, dynamic>> tables = await db.rawQuery(
@@ -89,6 +90,11 @@ Future<void> updateInCirculationQuestionsStat(String userId) async {
         db,
       );
     }
+    
+    // Update SessionManager cache with the current value
+    final SessionManager sessionManager = SessionManager();
+    sessionManager.setCachedInCirculationQuestionsCount(inCirculationCount);
+    
     QuizzerLogger.logSuccess('Updated in-circulation questions stat for user $userId on $today: $inCirculationCount');
   } catch (e) {
     QuizzerLogger.logError('Error updating in-circulation questions stat for user ID: $userId - $e');

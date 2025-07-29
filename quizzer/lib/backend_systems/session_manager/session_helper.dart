@@ -5,6 +5,17 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/question_answ
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart'; // Logger needed for debugging
 import 'package:supabase/supabase.dart'; // For supabase.Session type
 import 'package:jwt_decode/jwt_decode.dart'; // For decoding JWT
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_eligible_questions_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_in_circulation_questions_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_non_circulating_questions_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_total_questions_answered_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_daily_questions_answered_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_average_daily_questions_learned_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_average_questions_shown_per_day_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_days_left_until_questions_exhaust_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_revision_streak_sum_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_question_answer_pairs_table.dart';
+import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 
 // ==========================================
 // Helper Function for Recording Answer Attempt
@@ -182,6 +193,75 @@ Map<String, dynamic> _calculateNextRevisionDate({
 // ==========================================
 // Public Helper Function
 // ==========================================
+
+/// Manually queries for stat data and fills the SessionManager caches.
+/// This function bypasses the normal stat update flow to directly populate caches.
+Future<void> fillSessionManagerStatCaches(String userId) async {
+  try {
+    QuizzerLogger.logMessage('Entering fillSessionManagerStatCaches()...');
+    
+    final SessionManager sessionManager = SessionManager();
+    
+    // Query and cache each stat
+    final List<Map<String, dynamic>> eligibleQuestions = await getEligibleUserQuestionAnswerPairs(userId);
+    final int eligibleCount = eligibleQuestions.length;
+    sessionManager.setCachedEligibleQuestionsCount(eligibleCount);
+    
+    final List<Map<String, dynamic>> inCirculationQuestions = await getQuestionsInCirculation(userId);
+    final int inCirculationCount = inCirculationQuestions.length;
+    sessionManager.setCachedInCirculationQuestionsCount(inCirculationCount);
+    
+    final List<Map<String, dynamic>> nonCirculatingQuestions = await getNonCirculatingQuestionsWithDetails(userId);
+    final int nonCirculatingCount = nonCirculatingQuestions.length;
+    sessionManager.setCachedNonCirculatingQuestionsCount(nonCirculatingCount);
+    
+    final Map<String, dynamic> totalAnsweredRecord = await getTodayUserStatsTotalQuestionsAnsweredRecord(userId);
+    final int lifetimeTotal = totalAnsweredRecord['total_questions_answered'] as int? ?? 0;
+    sessionManager.setCachedLifetimeTotalQuestionsAnswered(lifetimeTotal);
+    
+    final Map<String, dynamic> dailyAnsweredRecord = await getTodayUserStatsDailyQuestionsAnsweredRecord(userId);
+    final int dailyTotal = dailyAnsweredRecord['daily_questions_answered'] as int? ?? 0;
+    sessionManager.setCachedDailyQuestionsAnswered(dailyTotal);
+    
+    final Map<String, dynamic> avgLearnedRecord = await getTodayUserStatsAverageDailyQuestionsLearnedRecord(userId);
+    final double avgLearned = avgLearnedRecord['average_daily_questions_learned'] as double? ?? 0.0;
+    sessionManager.setCachedAverageDailyQuestionsLearned(avgLearned);
+    
+    final Map<String, dynamic> avgShownRecord = await getTodayUserStatsAverageQuestionsShownPerDayRecord(userId);
+    final double avgShown = avgShownRecord['average_questions_shown_per_day'] as double? ?? 0.0;
+    sessionManager.setCachedAverageQuestionsShownPerDay(avgShown);
+    
+    final Map<String, dynamic> daysLeftRecord = await getTodayUserStatsDaysLeftUntilQuestionsExhaustRecord(userId);
+    final double daysLeft = daysLeftRecord['days_left_until_questions_exhaust'] as double? ?? 0.0;
+    sessionManager.setCachedDaysLeftUntilQuestionsExhaust(daysLeft);
+    
+    final List<Map<String, dynamic>> revisionStreakRecords = await getTodayUserStatsRevisionStreakSumRecords(userId);
+    final int revisionStreak = revisionStreakRecords.isNotEmpty ? (revisionStreakRecords.first['revision_streak_sum'] as int? ?? 0) : 0;
+    sessionManager.setCachedRevisionStreakScore(revisionStreak);
+    
+    // Get last reviewed from user question answer pairs
+    final List<Map<String, dynamic>> userPairs = await getUserQuestionAnswerPairsByUser(userId);
+    DateTime? lastReviewed;
+    if (userPairs.isNotEmpty) {
+      // Find the most recent last_revised date
+      for (final pair in userPairs) {
+        final String? lastRevisedStr = pair['last_revised'] as String?;
+        if (lastRevisedStr != null) {
+          final DateTime lastRevised = DateTime.parse(lastRevisedStr);
+          if (lastReviewed == null || lastRevised.isAfter(lastReviewed)) {
+            lastReviewed = lastRevised;
+          }
+        }
+      }
+    }
+    sessionManager.setCachedLastReviewed(lastReviewed);
+    
+    QuizzerLogger.logSuccess('Successfully filled SessionManager stat caches for user: $userId');
+  } catch (e) {
+    QuizzerLogger.logError('Error in fillSessionManagerStatCaches - $e');
+    rethrow;
+  }
+}
 
 /// Updates the user-specific question record based on the answer correctness.
 /// Calculates new SRS values and returns the updated record.

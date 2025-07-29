@@ -6,6 +6,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/table_helper.dart';
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
+import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 
 Future<void> _verifyUserStatsDailyQuestionsAnsweredTable(Database db) async {
   final List<Map<String, dynamic>> tables = await db.rawQuery(
@@ -128,6 +129,11 @@ Future<void> incrementDailyQuestionsAnsweredStat(String userId, bool isCorrect) 
         [userId, today],
         db,
       );
+      
+      // Update SessionManager cache with the new daily total
+      final SessionManager sessionManager = SessionManager();
+      sessionManager.setCachedDailyQuestionsAnswered(current + 1);
+      
       QuizzerLogger.logSuccess('Incremented daily questions answered stat for user $userId on $today');
       return;
     }
@@ -163,6 +169,11 @@ Future<void> incrementDailyQuestionsAnsweredStat(String userId, bool isCorrect) 
         'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
       };
       await insertRawData('user_stats_daily_questions_answered', todayData, db);
+      
+      // Update SessionManager cache with the new daily total
+      final SessionManager sessionManager = SessionManager();
+      sessionManager.setCachedDailyQuestionsAnswered(1);
+      
       QuizzerLogger.logSuccess('Incremented daily questions answered stat for user $userId on $today (filled $daysGap skipped days)');
       return;
     }

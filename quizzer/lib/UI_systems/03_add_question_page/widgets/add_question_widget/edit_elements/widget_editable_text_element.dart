@@ -124,12 +124,22 @@ class _EditableTextElementState extends State<EditableTextElement> {
                    onSubmitted: (_) => _submitEdit(),
                 )
               : ElementRenderer(elements: [widget.element]), // Normal view
-          trailing: IconButton(
-            icon: const Icon(Icons.remove_circle_outline),
-            tooltip: 'Remove Element',
-            onPressed: () => widget.onRemoveElement(widget.index, widget.category),
-            visualDensity: VisualDensity.compact,
-            padding: EdgeInsets.zero,
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.remove_circle_outline),
+                tooltip: 'Remove Element',
+                onPressed: () => widget.onRemoveElement(widget.index, widget.category),
+                visualDensity: VisualDensity.compact,
+                padding: EdgeInsets.zero,
+              ),
+              // Drag handle for reordering
+              ReorderableDragStartListener(
+                index: widget.index,
+                child: const Icon(Icons.drag_handle),
+              ),
+            ],
           ),
           onTap: () {}, // Prevent tile tap interfering with drag/edit
         ),

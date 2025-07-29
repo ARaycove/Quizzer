@@ -216,10 +216,9 @@ class _AddOptionsState extends State<AddOptions> {
             // Build the actual option item UI using the modular widget
             final optionCard = _buildElementWidget(option, index);
 
-            // Wrap the card for drag start
-            return ReorderableDragStartListener(
-              key: key, // Apply key to the listener
-              index: index,
+            // Return the option card directly - let each option handle its own drag functionality
+            return KeyedSubtree(
+              key: key,
               child: optionCard,
             );
           },
@@ -238,12 +237,6 @@ class _AddOptionsState extends State<AddOptions> {
 
               // Call the parent's callback
               widget.onReorderOptions(mutableOptions);
-          },
-          // Optional: Add proxy decorator
-          proxyDecorator: (Widget child, int index, Animation<double> animation) {
-            return Material(
-                child: child,
-            );
           },
         )
       ],

@@ -2,18 +2,98 @@ import 'package:sqflite/sqflite.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/10_switch_board/sb_sync_worker_signals.dart';
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
-import '../table_helper.dart'; // Universal DB helpers
+import 'package:quizzer/backend_systems/00_database_manager/tables/table_helper.dart'; // Universal DB helpers
 
 // --- Application-Defined Settings ---
 // Defines the settings that must exist for every user and their initial values.
 const List<Map<String, dynamic>> _applicationSettings = [
+  // Group admin seetings first
+  // ADMIN SETTINGS:
+  // =====================================
   {
     'name': 'geminiApiKey',
     'default_value': null, // Initial value is null, user needs to input their key
     'is_admin_setting': true,
   },
-  // Add other application-defined settings here
+  // GENERAL USER SETTINGS:
+  // =====================================
+  // Home page display settings for stats
+  // Show eligible questions count on home page
+  {
+    'name': 'home_display_eligible_questions',
+    'default_value': false,
+    'is_admin_setting': false,
+  },
+  // Show in circulation questions count on home page
+  {
+    'name': 'home_display_in_circulation_questions',
+    'default_value': false,
+    'is_admin_setting': false,
+  },
+  // Show non-circulating questions count on home page
+  {
+    'name': 'home_display_non_circulating_questions',
+    'default_value': false,
+    'is_admin_setting': false,
+  },
+  // Show lifetime total questions answered on home page
+  {
+    'name': 'home_display_lifetime_total_questions_answered',
+    'default_value': false,
+    'is_admin_setting': false,
+  },
+  // Show daily questions answered on home page
+  {
+    'name': 'home_display_daily_questions_answered',
+    'default_value': false,
+    'is_admin_setting': false,
+  },
+  // Show average daily questions learned on home page
+  {
+    'name': 'home_display_average_daily_questions_learned',
+    'default_value': false,
+    'is_admin_setting': false,
+  },
+  // Show average questions shown per day on home page
+  {
+    'name': 'home_display_average_questions_shown_per_day',
+    'default_value': false,
+    'is_admin_setting': false,
+  },
+  // Show days left until questions exhaust on home page
+  {
+    'name': 'home_display_days_left_until_questions_exhaust',
+    'default_value': false,
+    'is_admin_setting': false,
+  },
+  // Show current revision streak score on home page
+  {
+    'name': 'home_display_revision_streak_score',
+    'default_value': false,
+    'is_admin_setting': false,
+  },
+  // Show last reviewed date on home page
+  {
+    'name': 'home_display_last_reviewed',
+    'default_value': false,
+    'is_admin_setting': false,
+  },
 ];
+// TODO Designing a stat/info display for home page
+// Add the following settings 
+// [x] one for each stat
+// [x] Update settings page to allow toggling of these boolean settings added
+// settings page should not use the field names directly and should be user readable. BECAUSE THERES A FUCKING DIFFERENCE BETWEEN REGULAR HUMAN READABLE TEXT AND CAMEL CASE AND SNAKE CASE non-technical users don't want to see that bullshit
+
+// [x] update SessionManager to store current stats in memory
+// [x] For each display setting, create a private variable and getter for that variable in the SessionManager, should be clean and organized in it's own section to make the now very Large SessionManager object more readable. 
+// [x] setup how the SessionManager will get that information
+// - update after any stat update call
+// - closer to the source, have each individual update stat function do the update in the sessionmanager itself rather than additional queries. Thus while that function has the current value in memory, it will store it in the session manager in addition to writing it to the DB through the sql update
+
+// TODO Design a stat_block widget for each display setting (use a template, that handles different data types and displays accordingly)
+
+// TODO Design a stat_display widget to place in the home_page
 
 const String _tableName = 'user_settings';
 

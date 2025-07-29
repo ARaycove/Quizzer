@@ -145,12 +145,22 @@ class _EditableMultipleChoiceOptionState extends State<EditableMultipleChoiceOpt
                    onSubmitted: (_) => _submitEdit(),
                   )
               : ElementRenderer(elements: [widget.element]), // Normal view
-          trailing: IconButton(
-            icon: const Icon(Icons.remove_circle_outline),
-            tooltip: 'Remove Option',
-            onPressed: () => widget.onRemoveElement(widget.index),
-            visualDensity: VisualDensity.compact,
-            padding: EdgeInsets.zero,
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.remove_circle_outline),
+                tooltip: 'Remove Option',
+                onPressed: () => widget.onRemoveElement(widget.index),
+                visualDensity: VisualDensity.compact,
+                padding: EdgeInsets.zero,
+              ),
+              // Drag handle for reordering
+              ReorderableDragStartListener(
+                index: widget.index,
+                child: const Icon(Icons.drag_handle),
+              ),
+            ],
           ),
           // Prevent normal tap action if editing
           onTap: _isEditing ? () {} : null,

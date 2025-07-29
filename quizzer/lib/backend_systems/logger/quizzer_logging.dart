@@ -46,8 +46,8 @@ class QuizzerLogger {
     "user_question_processes.dart",
     "database_monitor.dart",
     "sb_sync_worker_signals.dart",
+    "sb_cache_signals.dart",
     "user_module_activation_status_table.dart",
-    "stat_update_aggregator.dart",
     "user_stats_days_left_until_questions_exhaust_table.dart",
     "user_stats_in_circulation_questions_table.dart",
     "user_stats_non_circulating_questions_table.dart",
@@ -58,8 +58,11 @@ class QuizzerLogger {
     "user_stats_total_questions_answered_table.dart",
     "user_stats_total_user_question_answer_pairs_table.dart",
     "user_stats_eligible_questions_table.dart",
-    "session_manager.dart",
-    "question_answer_attempts_table.dart"
+    "question_answer_attempts_table.dart",
+    "media_sync_worker.dart",
+    "login_attempts_table.dart",
+    "question_answer_pair_flags_table.dart",
+    "widget_multiple_choice_question.dart"
   ]; // List of source filenames to exclude
 
   // --- Level-Specific Source Lists ---
@@ -229,9 +232,9 @@ class QuizzerLogger {
         case Level.INFO:
           levelColor = _blue;
           break;
-        case Level.CONFIG: // Treat config like info for color
+        case Level.CONFIG: // Treat config like success for color
            levelColor = _blue;
-           levelName = 'INFO';
+           levelName = 'SUCCESS';
            break;
         case Level.WARNING:
           levelColor = _yellow;
@@ -323,7 +326,7 @@ class QuizzerLogger {
   static void logSuccess(String message) {
     final source = _getCallerInfo();
     if (!_shouldLogAtLevel(source, LogLevel.success)) return;
-    _logger.info('[$source] ✅ $message'); // Use INFO level for success with checkmark emoji
+    _logger.config('[$source] ✅ $message'); // Use CONFIG level for success with checkmark emoji
   }
 
   // Formatting functions (kept separate, still using stdout)

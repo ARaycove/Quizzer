@@ -51,7 +51,7 @@ class SessionManager {
   factory SessionManager() => _instance;
   // Secure Storage
   // Hive storage for offline persistence
-  late Box                                    _storage;
+  late        Box                             _storage;
   // Completer to signal when async initialization (like storage) is done
   final       Completer<void>                 _initializationCompleter = Completer<void>();
   /// Future that completes when asynchronous initialization is finished.
@@ -64,6 +64,134 @@ class SessionManager {
   final       QuestionQueueCache              _queueCache;
   final       AnswerHistoryCache              _historyCache;
   final       SwitchBoard                     _switchBoard; // Add SwitchBoard instance
+
+  // ================================================================================
+  // --- Home Page Stat Display Cache ---
+  // ================================================================================
+  // Cached values for home page stat display settings
+  // These are updated when stats are calculated and cached for quick access
+  int?                                        _cachedEligibleQuestionsCount;
+  int?                                        _cachedInCirculationQuestionsCount;
+  int?                                        _cachedNonCirculatingQuestionsCount;
+  int?                                        _cachedLifetimeTotalQuestionsAnswered;
+  int?                                        _cachedDailyQuestionsAnswered;
+  double?                                     _cachedAverageDailyQuestionsLearned;
+  double?                                     _cachedAverageQuestionsShownPerDay;
+  double?                                     _cachedDaysLeftUntilQuestionsExhaust;
+  int?                                        _cachedRevisionStreakScore;
+  DateTime?                                   _cachedLastReviewed;
+
+  // ================================================================================
+  // --- User Settings Cache ---
+  // ================================================================================
+  // Cached values for user settings
+  // These are updated when settings are fetched or updated
+  Map<String, dynamic>                       _cachedUserSettings = {};
+
+  // --- Getters for User Settings Cache ---
+  Map<String, dynamic> get cachedUserSettings => _cachedUserSettings;
+
+  // --- Setters for User Settings Cache ---
+  void setCachedUserSettings(Map<String, dynamic> settings) => _cachedUserSettings = settings;
+
+  void updateCachedUserSetting(String settingName, dynamic value) {
+    _cachedUserSettings[settingName] = value;
+  }
+
+  void clearCachedUserSettings() => _cachedUserSettings.clear();
+
+  // --- Getters for Home Page Stat Display Cache ---
+  int?      get cachedEligibleQuestionsCount 
+  => _cachedEligibleQuestionsCount;
+
+  int?      get cachedInCirculationQuestionsCount 
+  => _cachedInCirculationQuestionsCount;
+
+  int?      get cachedNonCirculatingQuestionsCount 
+  => _cachedNonCirculatingQuestionsCount;
+
+  int?      get cachedLifetimeTotalQuestionsAnswered 
+  => _cachedLifetimeTotalQuestionsAnswered;
+
+  int?      get cachedDailyQuestionsAnswered 
+  => _cachedDailyQuestionsAnswered;
+
+  double?   get cachedAverageDailyQuestionsLearned 
+  => _cachedAverageDailyQuestionsLearned;
+
+  double?   get cachedAverageQuestionsShownPerDay 
+  => _cachedAverageQuestionsShownPerDay;
+
+  double?   get cachedDaysLeftUntilQuestionsExhaust
+  => _cachedDaysLeftUntilQuestionsExhaust;
+
+  // Get revision streak from current question record if available, otherwise from cache
+  int? get cachedRevisionStreakScore {
+    if (_currentQuestionRecord != null) {
+      return _currentQuestionRecord!['revision_streak'] as int?;
+    }
+    return _cachedRevisionStreakScore;
+  }
+
+  // Get last reviewed from current question record if available, otherwise from cache
+  DateTime? get cachedLastReviewed {
+    if (_currentQuestionRecord != null) {
+      final String? lastRevisedStr = _currentQuestionRecord!['last_revised'] as String?;
+      if (lastRevisedStr != null && lastRevisedStr.isNotEmpty) {
+        try {
+          return DateTime.parse(lastRevisedStr);
+        } catch (e) {
+          QuizzerLogger.logWarning('Failed to parse last_revised date: $lastRevisedStr');
+        }
+      }
+    }
+    return _cachedLastReviewed;
+  }
+
+  // --- Setters for Home Page Stat Display Cache ---
+  void setCachedEligibleQuestionsCount(int? value) 
+  => _cachedEligibleQuestionsCount = value;
+
+  void setCachedInCirculationQuestionsCount(int? value) 
+  => _cachedInCirculationQuestionsCount = value;
+
+  void setCachedNonCirculatingQuestionsCount(int? value) 
+  => _cachedNonCirculatingQuestionsCount = value;
+
+  void setCachedLifetimeTotalQuestionsAnswered(int? value) 
+  => _cachedLifetimeTotalQuestionsAnswered = value;
+
+  void setCachedDailyQuestionsAnswered(int? value) 
+  => _cachedDailyQuestionsAnswered = value;
+
+  void setCachedAverageDailyQuestionsLearned(double? value) 
+  => _cachedAverageDailyQuestionsLearned = value;
+
+  void setCachedAverageQuestionsShownPerDay(double? value) 
+  => _cachedAverageQuestionsShownPerDay = value;
+
+  void setCachedDaysLeftUntilQuestionsExhaust(double? value)
+  => _cachedDaysLeftUntilQuestionsExhaust = value;
+
+  void setCachedRevisionStreakScore(int? value) 
+
+  => _cachedRevisionStreakScore = value;
+  void setCachedLastReviewed(DateTime? value) 
+  => _cachedLastReviewed = value;
+
+  // --- Clear all cached stats ---
+  void clearCachedStats() {
+    _cachedEligibleQuestionsCount = null;
+    _cachedInCirculationQuestionsCount = null;
+    _cachedNonCirculatingQuestionsCount = null;
+    _cachedLifetimeTotalQuestionsAnswered = null;
+    _cachedDailyQuestionsAnswered = null;
+    _cachedAverageDailyQuestionsLearned = null;
+    _cachedAverageQuestionsShownPerDay = null;
+    _cachedDaysLeftUntilQuestionsExhaust = null;
+    _cachedRevisionStreakScore = null;
+    _cachedLastReviewed = null;
+  }
 
   // user State
               bool                            userLoggedIn = false;
@@ -85,13 +213,19 @@ class SessionManager {
   // MetaData
               DateTime?                       sessionStartTime;
   
+          // Cached user role to avoid repeated JWT decoding
+              String?                         _cachedUserRole;
+  
           
   // --- Public Getters for UI State ---
   Map<String, dynamic>? get currentQuestionUserRecord => _currentQuestionRecord;
   Map<String, dynamic>? get currentQuestionStaticData => _currentQuestionDetails;
   String?               get initialProfileLastModified => _initialProfileLastModified;
-  // ADDED: Getter that dynamically determines user role from JWT
-  String                get userRole => determineUserRoleFromSupabaseSession(supabase.auth.currentSession);
+  // ADDED: Getter that uses cached user role to avoid repeated JWT decoding
+  String get userRole {
+    _cachedUserRole ??= determineUserRoleFromSupabaseSession(supabase.auth.currentSession);
+    return _cachedUserRole!;
+  }
   
   // --- Public Method for Testing (Password Protected) ---
   Box getBox(String password) {
@@ -337,6 +471,7 @@ class SessionManager {
       userId = null;
       userEmail = null;
       sessionStartTime = null;
+      _cachedUserRole = null; // Clear cached user role
       _clearQuestionState(); // Clear current question state
       // Note: Does not stop workers or clear persistent storage, assumes logout function handles that.
       
@@ -1162,6 +1297,9 @@ class SessionManager {
       // Table function handles its own database access
       await user_settings_table.updateUserSetting(userId!, settingName, newValue);
       
+      // Update the cache if it exists
+      updateCachedUserSetting(settingName, newValue);
+      
       QuizzerLogger.logMessage('Successfully updated user setting: $settingName');
     } catch (e) {
       QuizzerLogger.logError('Error in updateUserSetting - $e');
@@ -1218,6 +1356,8 @@ class SessionManager {
               filteredSettings[key] = settingDetails['value'];
             }
           });
+          // Cache the results
+          setCachedUserSettings(filteredSettings);
           resultToReturn = filteredSettings;
           break;
         case "single":
@@ -1228,6 +1368,8 @@ class SessionManager {
             final bool isAdminSetting = (settingDetails['is_admin_setting'] as int? ?? 0) == 1;
             if (!isAdminSetting || currentUserRole == 'admin' || currentUserRole == 'contributor') {
               resultToReturn = settingDetails['value'];
+              // Always update cache for single setting
+              _cachedUserSettings[settingName] = resultToReturn;
             } else {
               resultToReturn = null; // Admin setting, non-admin/contributor user
               QuizzerLogger.logWarning('SessionManager: Access denied for user $userId (Role: $currentUserRole) to admin/contributor setting "$settingName".');
@@ -1249,13 +1391,15 @@ class SessionManager {
               }
               // If it's an admin setting and user is not admin/contributor, we simply don't add it to the map for listedResults.
             }
-            // If settingDetails is null (not found), it's also not added.
           }
           resultToReturn = listedResults;
+          // Always update cache for list of settings
+          _cachedUserSettings.addAll(listedResults);
           break;
       }
 
       QuizzerLogger.logMessage('Successfully retrieved user settings for operation mode: $operationMode');
+      QuizzerLogger.logMessage('$resultToReturn');
       return resultToReturn;
     } catch (e) {
       QuizzerLogger.logError('Error in getUserSettings - $e');
@@ -1913,6 +2057,26 @@ class SessionManager {
     } catch (e) {
       QuizzerLogger.logWarning('SessionManager.getHistoricalDaysLeftUntilQuestionsExhaustStats: $e');
       return [];
+    }
+  }
+  /// Updates the caches by manually querying for stat data.
+  /// This method bypasses the normal stat update flow to directly populate caches.
+  Future<void> updateCaches() async {
+    try {
+      QuizzerLogger.logMessage('SessionManager: Updating caches...');
+      
+      if (userId == null) {
+        QuizzerLogger.logWarning('SessionManager.updateCaches: User ID is null.');
+        return;
+      }
+
+      // Call the helper function
+      await fillSessionManagerStatCaches(userId!);
+      
+      QuizzerLogger.logMessage('SessionManager: Successfully updated caches.');
+    } catch (e) {
+      QuizzerLogger.logError('SessionManager.updateCaches: Error updating caches - $e');
+      rethrow;
     }
   }
 }

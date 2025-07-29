@@ -337,7 +337,12 @@ class _ElementRendererState extends State<ElementRenderer> {
          final textContent = content.toString();
          // Use the same LaTeX detection logic as LaTexT widget
          if (_hasLatexDelimiters(textContent)) {
-           return LaTexT(laTeXCode: Text(textContent));
+           return LaTexT(
+             laTeXCode: Text(textContent),
+             equationStyle: const TextStyle(
+               fontSize: 24.0, // Increase font size for LaTeX equations
+             ),
+           );
          } else {
            // Use regular Text widget for plain text to handle newlines properly
            return Text(textContent);

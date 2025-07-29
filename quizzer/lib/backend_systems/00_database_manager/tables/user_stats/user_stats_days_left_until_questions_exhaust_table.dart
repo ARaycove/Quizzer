@@ -8,6 +8,7 @@ import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/table_helper.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_average_daily_questions_learned_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
+import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_question_answer_pairs_table.dart';
 
 Future<void> _verifyUserStatsDaysLeftUntilQuestionsExhaustTable(Database db) async {
@@ -111,6 +112,11 @@ Future<void> updateDaysLeftUntilQuestionsExhaustStat(String userId) async {
         db,
       );
     }
+    
+    // Update SessionManager cache with the current value
+    final SessionManager sessionManager = SessionManager();
+    sessionManager.setCachedDaysLeftUntilQuestionsExhaust(double.parse(daysLeft.toStringAsFixed(2)));
+    
     QuizzerLogger.logSuccess('Updated days_left_until_questions_exhaust stat for user $userId on $today: $daysLeft (non_circulating: $nonCirculatingCount, avg_daily_learned: $avgDailyLearned)');
   } catch (e) {
     QuizzerLogger.logError('Error updating days left until questions exhaust stat for user ID: $userId - $e');

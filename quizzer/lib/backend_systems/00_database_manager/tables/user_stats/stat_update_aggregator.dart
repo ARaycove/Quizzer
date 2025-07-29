@@ -9,6 +9,7 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/us
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_daily_questions_answered_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_days_left_until_questions_exhaust_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_average_daily_questions_learned_table.dart';
+import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 
 
 
@@ -72,6 +73,19 @@ Future<void> updateAllUserDailyStats(String userId, {bool? isCorrect}) async {
   // For example:
   // await user_streak_stats.updateDailyStreakStat(userId, db);
   // getDatabaseMonitor().releaseDatabaseAccess();
+
+  // Log all cached stat values
+  final SessionManager sessionManager = SessionManager();
+  QuizzerLogger.logMessage('${'eligible_questions_count'.padRight(30)}: ${sessionManager.cachedEligibleQuestionsCount.toString().padRight(10)} (${sessionManager.cachedEligibleQuestionsCount.runtimeType})');
+  QuizzerLogger.logMessage('${'in_circulation_questions_count'.padRight(30)}: ${sessionManager.cachedInCirculationQuestionsCount.toString().padRight(10)} (${sessionManager.cachedInCirculationQuestionsCount.runtimeType})');
+  QuizzerLogger.logMessage('${'non_circulating_questions_count'.padRight(30)}: ${sessionManager.cachedNonCirculatingQuestionsCount.toString().padRight(10)} (${sessionManager.cachedNonCirculatingQuestionsCount.runtimeType})');
+  QuizzerLogger.logMessage('${'lifetime_total_questions_answered'.padRight(30)}: ${sessionManager.cachedLifetimeTotalQuestionsAnswered.toString().padRight(10)} (${sessionManager.cachedLifetimeTotalQuestionsAnswered.runtimeType})');
+  QuizzerLogger.logMessage('${'daily_questions_answered'.padRight(30)}: ${sessionManager.cachedDailyQuestionsAnswered.toString().padRight(10)} (${sessionManager.cachedDailyQuestionsAnswered.runtimeType})');
+  QuizzerLogger.logMessage('${'average_daily_questions_learned'.padRight(30)}: ${sessionManager.cachedAverageDailyQuestionsLearned.toString().padRight(10)} (${sessionManager.cachedAverageDailyQuestionsLearned.runtimeType})');
+  QuizzerLogger.logMessage('${'average_questions_shown_per_day'.padRight(30)}: ${sessionManager.cachedAverageQuestionsShownPerDay.toString().padRight(10)} (${sessionManager.cachedAverageQuestionsShownPerDay.runtimeType})');
+  QuizzerLogger.logMessage('${'days_left_until_questions_exhaust'.padRight(30)}: ${sessionManager.cachedDaysLeftUntilQuestionsExhaust.toString().padRight(10)} (${sessionManager.cachedDaysLeftUntilQuestionsExhaust.runtimeType})');
+  QuizzerLogger.logMessage('${'revision_streak_score'.padRight(30)}: ${sessionManager.cachedRevisionStreakScore.toString().padRight(10)} (${sessionManager.cachedRevisionStreakScore.runtimeType})');
+  QuizzerLogger.logMessage('${'last_reviewed'.padRight(30)}: ${sessionManager.cachedLastReviewed.toString().padRight(10)} (${sessionManager.cachedLastReviewed.runtimeType})');
 
   QuizzerLogger.logSuccess('StatUpdateAggregator: All daily stat updates completed for user: $userId');
 }

@@ -4,6 +4,7 @@ import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/app_theme.dart';
 import 'widget_home_page_top_bar.dart'; // Import the refactored Top Bar
+import 'stat_display_section/stat_section_widget.dart'; // Import the stat section widget
 // Corrected package imports for MOVED question widgets
 import 'package:quizzer/UI_systems/question_widgets/widget_multiple_choice_question.dart'; 
 import 'package:quizzer/UI_systems/question_widgets/widget_select_all_that_apply_question.dart'; 
@@ -21,6 +22,7 @@ class HomePage extends StatefulWidget { // Change to StatefulWidget
 class _HomePageState extends State<HomePage> { // State class
   final SessionManager session = SessionManager(); // Get session instance once
   Map<String, dynamic>? _editedQuestionData; // <-- ADDED State variable for callback data
+  final GlobalKey _statSectionKey = GlobalKey();
 
   @override
   void initState() {
@@ -44,7 +46,7 @@ class _HomePageState extends State<HomePage> { // State class
     await session.requestNextQuestion();
     // Ensure widget is still mounted before calling setState
     if (mounted) { 
-      setState(() {}); // Trigger rebuild to show the new question
+      setState(() {}); // Trigger rebuild to show the new question and updated stats
     }
   }
 
@@ -97,6 +99,14 @@ class _HomePageState extends State<HomePage> { // State class
       body: Column(
         children: [
           AppTheme.sizedBoxMed, // Spacer from app bar
+          StatSectionWidget(
+            key: _statSectionKey,
+            onRefresh: () {
+              // Trigger rebuild of StatSectionWidget to re-read cached values
+              setState(() {});
+            },
+          ), // Add stat display section
+          AppTheme.sizedBoxSml, // Spacer between stats and question
           Expanded(child: _buildQuestionBody()),
         ],
       ), 
