@@ -343,8 +343,7 @@ Future<void> syncUserSettingsInbound(
         () => supabaseClient
             .from('user_settings') // Target table
             .select('*') // Select all columns
-            .eq('user_id', userId) // Filter by user_id
-            .gt('last_modified_timestamp', initialTimestamp ?? DateTime(1970).toIso8601String()) // Filter by timestamp
+            .eq('user_id', userId) // Filter by user_id only - sync ALL settings regardless of timestamp
             .then((response) => List<dynamic>.from(response as List)),
         logContext: 'syncUserSettingsInbound: Fetching for user $userId',
       );
