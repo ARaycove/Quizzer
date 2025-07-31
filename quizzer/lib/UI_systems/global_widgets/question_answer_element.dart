@@ -158,8 +158,8 @@ class _ElementRendererState extends State<ElementRenderer> {
          // Handle blank elements synchronously (content is int)
          _renderedWidgets[i] = _buildStaticWidget(type, content, i);
       } else if (type == 'image') { 
-        // Images should always be rendered statically to prevent rebuilding
-        _renderedWidgets[i] = _buildStaticImageWidget(content);
+        // Pre-load images immediately and cache them
+        _preloadAndCacheImage(content, i);
       } else {
          // Handle other potential synchronous types here if needed
          _renderedWidgets[i] = _buildStaticWidget(type, content, i);
@@ -366,29 +366,65 @@ class _ElementRendererState extends State<ElementRenderer> {
      }
   }
 
-  // Builds static image widget without async loading
-  Widget _buildStaticImageWidget(dynamic content) {
+  // Pre-loads and caches images immediately
+  void _preloadAndCacheImage(dynamic content, int index) {
     if (content == null) {
-      return _buildErrorIconRow('Missing image path', isWarning: true);
+      _renderedWidgets[index] = _buildErrorIconRow('Missing image path', isWarning: true);
+      return;
     }
     
     final String filename = content.toString();
     
     // Check if image is already cached
     if (_imageCache.containsKey(filename)) {
-      return _imageCache[filename]!;
+      _renderedWidgets[index] = _imageCache[filename]!;
+      return;
     }
     
-    // Load the image once and cache it
-    _buildAsyncWidgetFuture('image', content, 0).then((widget) {
+    // Try to load the image immediately using a synchronous approach
+    _loadImageImmediately(filename, index);
+  }
+
+  // Loads image immediately if possible
+  void _loadImageImmediately(String filename, int index) {
+    // Try common paths first
+    final List<String> possiblePaths = [
+      'QuizzerAppMedia/input_staging/$filename',
+      'QuizzerAppMedia/question_answer_pair_assets/$filename',
+      '.local/share/com.example.quizzer/QuizzerAppMedia/input_staging/$filename',
+      '.local/share/com.example.quizzer/QuizzerAppMedia/question_answer_pair_assets/$filename',
+    ];
+    
+    for (String path in possiblePaths) {
+      final file = File(path);
+      if (file.existsSync()) {
+        try {
+          final widget = Image.file(file, fit: BoxFit.contain,
+            errorBuilder: (c, e, s) {
+              return _buildErrorIconRow('Image unavailable', isWarning: true);
+            }
+          );
+          _imageCache[filename] = widget;
+          _renderedWidgets[index] = widget;
+          return;
+        } catch (e) {
+          // Continue to next path
+        }
+      }
+    }
+    
+    // If not found, fall back to async loading
+    _buildAsyncWidgetFuture('image', filename, 0).then((widget) {
       _imageCache[filename] = widget;
       if (mounted) {
-        setState(() {}); // Trigger rebuild to show the loaded image
+        setState(() {
+          _renderedWidgets[index] = widget;
+        });
       }
     });
     
-    // Return a stable placeholder that won't cause layout shifts
-    return const Icon(Icons.image);
+    // Set a placeholder initially
+    _renderedWidgets[index] = const Icon(Icons.image);
   }
 
   // Builds widgets that REQUIRE async loading (e.g., Image)
