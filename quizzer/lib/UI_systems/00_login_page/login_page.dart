@@ -119,9 +119,6 @@ class _LoginPageState extends State<LoginPage> {
     final logoWidth         = screenWidth > 600 ? 460.0 : screenWidth * 0.85;
     final fieldWidth        = logoWidth;
     final buttonWidth       = logoWidth / 2;
-    // Define uniform height for UI elements (max 25px, scaled to screen)
-    final elementHeight     = MediaQuery.of(context).size.height * 0.04;
-    final elementHeight25px = elementHeight > 25.0 ? 25.0 : elementHeight;
     
     return Scaffold(
       body: Center(child: SingleChildScrollView(child: Column(
@@ -168,7 +165,6 @@ class _LoginPageState extends State<LoginPage> {
               // Submit Button
               SizedBox(
                 width: _isLoading ? fieldWidth : buttonWidth, // Expand to full width when loading
-                height: elementHeight25px,
                 child: ElevatedButton(
                   onPressed: _isLoading ? null : submitLogin,
                   child: _isLoading 

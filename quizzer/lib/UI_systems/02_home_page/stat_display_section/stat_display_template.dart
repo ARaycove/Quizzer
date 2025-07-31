@@ -17,15 +17,25 @@ class StatDisplayTemplate extends StatelessWidget {
     final content = SizedBox(
       width: 100,
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          if (display is IconData) ...[
-            Icon(display),
-          ],
-          if (display is String) ...[
-            Text(display),
-          ],
-          Text(value),
+          // Fixed width for icon (20px)
+          SizedBox(
+            width: 20,
+            child: display is IconData 
+              ? Icon(display)
+              : display is String 
+                ? Text(display)
+                : const SizedBox.shrink(),
+          ),
+          const SizedBox(width: 4), // Small gap between icon and value
+          // Remaining space for the value (76px)
+          Expanded(
+            child: Text(
+              value,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
         ],
       ),
     );

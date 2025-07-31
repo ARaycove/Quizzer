@@ -226,12 +226,9 @@ class _AddQuestionElementsState extends State<AddQuestionElements> {
             ElevatedButton.icon(
               icon: const Icon(Icons.add_photo_alternate_outlined),
               label: const Text('Image'),
-              onPressed: () async {
-                // Handle image picking for question elements
-                final String? stagedImageFilename = await pickAndStageImage();
-                if (stagedImageFilename != null) {
-                  widget.onAddElement('image', 'question');
-                }
+              onPressed: () {
+                // Let the parent handler do the image picking
+                widget.onAddElement('image', 'question');
               },
             ),
           ],

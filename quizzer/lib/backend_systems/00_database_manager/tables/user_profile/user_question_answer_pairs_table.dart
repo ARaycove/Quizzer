@@ -292,6 +292,7 @@ Future<List<Map<String, dynamic>>> getActiveQuestionsInCirculation(String userUu
       INNER JOIN question_answer_pairs ON user_question_answer_pairs.question_id = question_answer_pairs.question_id
       WHERE user_question_answer_pairs.user_uuid = ?
         AND user_question_answer_pairs.in_circulation = 1
+        AND user_question_answer_pairs.flagged = 0
     ''';
     
     List<dynamic> whereArgs = [userUuid];

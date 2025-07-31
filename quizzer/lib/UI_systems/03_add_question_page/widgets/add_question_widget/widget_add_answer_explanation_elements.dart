@@ -170,12 +170,9 @@ class _AddAnswerExplanationElementsState extends State<AddAnswerExplanationEleme
             ElevatedButton.icon(
               icon: const Icon(Icons.add_photo_alternate_outlined),
               label: const Text('Image'),
-              onPressed: () async {
-                // Handle image picking for answer elements
-                final String? stagedImageFilename = await pickAndStageImage();
-                if (stagedImageFilename != null) {
-                  widget.onAddElement('image', 'answer');
-                }
+              onPressed: () {
+                // Let the parent handler do the image picking
+                widget.onAddElement('image', 'answer');
               },
             ),
           ],
