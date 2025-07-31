@@ -3,7 +3,7 @@ import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/app_theme.dart';
 import 'package:quizzer/UI_systems/03_add_question_page/widgets/add_question_widget/edit_elements/widget_editable_text_element.dart';
 import 'package:quizzer/UI_systems/03_add_question_page/widgets/add_question_widget/edit_elements/widget_editable_image_element.dart';
-import 'package:quizzer/UI_systems/03_add_question_page/helpers/image_picker_helper.dart';
+import 'package:quizzer/UI_systems/global_widgets/question_answer_element.dart';
 
 // ==========================================
 //    Add Answer Explanation Elements Widget
@@ -186,8 +186,8 @@ class _AddAnswerExplanationElementsState extends State<AddAnswerExplanationEleme
           buildDefaultDragHandles: false, // Use custom handle (implicit via Listener)
           itemBuilder: (context, index) {
             final element = widget.answerElements[index];
-            // Each item needs a unique key for reordering
-            final key = ValueKey('answer_element_${identityHashCode(element)}_$index'); // Composite key
+            // Use a stable key based only on the element's identity, not its position
+            final key = ValueKey('answer_element_${identityHashCode(element)}');
 
             // Build the element widget
             final elementWidget = _buildElementWidget(element, index);
@@ -214,6 +214,7 @@ class _AddAnswerExplanationElementsState extends State<AddAnswerExplanationEleme
               // Call the parent's callback with the newly ordered list
               widget.onReorderElements(mutableElements, 'answer');
           },
+
         ),
       ],
     );

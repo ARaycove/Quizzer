@@ -111,6 +111,8 @@ class ElementRenderer extends StatefulWidget {
     this.individualBlankResults,
   });
 
+
+
   @override
   State<ElementRenderer> createState() => _ElementRendererState();
 }
@@ -119,6 +121,9 @@ class _ElementRendererState extends State<ElementRenderer> {
   
   // Store the final rendered widgets (or null if loading)
   late List<Widget?> _renderedWidgets;
+  
+  // Static cache for loaded images to prevent rebuilding
+  static final Map<String, Widget> _imageCache = {};
 
   @override
   void initState() {
@@ -153,42 +158,14 @@ class _ElementRendererState extends State<ElementRenderer> {
          // Handle blank elements synchronously (content is int)
          _renderedWidgets[i] = _buildStaticWidget(type, content, i);
       } else if (type == 'image') { 
-        // For images (or other async types), initiate loading but store null initially
-        // The async function will call setState later to update the list
-         _renderedWidgets[i] = null; // Placeholder until loaded
-        _loadAndSetWidget(i, type, content); 
+        // Images should always be rendered statically to prevent rebuilding
+        _renderedWidgets[i] = _buildStaticImageWidget(content);
       } else {
          // Handle other potential synchronous types here if needed
          _renderedWidgets[i] = _buildStaticWidget(type, content, i);
       }
     }
-    // Initial synchronous widgets are set, trigger a build if state hasn't been set by async calls yet
-    // Using addPostFrameCallback ensures this happens after the current build cycle if called from initState
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) { // Check if the widget is still in the tree
-             // We only need to trigger a rebuild if synchronous widgets were added
-             // or if the list was initially empty. Async updates handle their own setState.
-             // A simple check: if any widget is non-null, ensure build runs.
-             if (_renderedWidgets.any((w) => w != null)) {
-                 setState(() {}); 
-             }
-        }
-    });
-  }
-
-  // Async helper to load widget and update state
-  Future<void> _loadAndSetWidget(int index, String? type, dynamic content) async {
-    final Widget loadedWidget = await _buildAsyncWidgetFuture(type, content, index);
-    if (mounted) { // Check if the widget is still mounted before calling setState
-      setState(() {
-        // Ensure the list index is still valid (elements might have changed)
-        if (index < _renderedWidgets.length) {
-             _renderedWidgets[index] = loadedWidget;
-        } else {
-             QuizzerLogger.logWarning("ElementRenderer: Index out of bounds when setting async widget. Elements may have changed rapidly.");
-        }
-      });
-    }
+    // Since all widgets are now static (including images), no need for post-frame callback
   }
 
   // Groups elements according to the specified rules
@@ -199,9 +176,10 @@ class _ElementRendererState extends State<ElementRenderer> {
     while (i < _renderedWidgets.length) {
       final currentWidget = _renderedWidgets[i];
       
+      // Since images are now static, there should never be null widgets
       if (currentWidget == null) {
-        // Show loading indicator for async widgets
-        groupedWidgets.add(const CircularProgressIndicator());
+        QuizzerLogger.logWarning("ElementRenderer: Unexpected null widget at index $i");
+        groupedWidgets.add(const Text('[Error: Null widget]'));
         i++;
         continue;
       }
@@ -388,6 +366,31 @@ class _ElementRendererState extends State<ElementRenderer> {
      }
   }
 
+  // Builds static image widget without async loading
+  Widget _buildStaticImageWidget(dynamic content) {
+    if (content == null) {
+      return _buildErrorIconRow('Missing image path', isWarning: true);
+    }
+    
+    final String filename = content.toString();
+    
+    // Check if image is already cached
+    if (_imageCache.containsKey(filename)) {
+      return _imageCache[filename]!;
+    }
+    
+    // Load the image once and cache it
+    _buildAsyncWidgetFuture('image', content, 0).then((widget) {
+      _imageCache[filename] = widget;
+      if (mounted) {
+        setState(() {}); // Trigger rebuild to show the loaded image
+      }
+    });
+    
+    // Return a stable placeholder that won't cause layout shifts
+    return const Icon(Icons.image);
+  }
+
   // Builds widgets that REQUIRE async loading (e.g., Image)
   // Returns a Future containing the final widget (Image or error display)
   Future<Widget> _buildAsyncWidgetFuture(String? type, dynamic content, int index) async { 
@@ -458,3 +461,5 @@ Widget _buildErrorIconRow(String message, {required bool isWarning}) {
      ]
    ); 
 }
+
+

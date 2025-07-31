@@ -5,7 +5,7 @@ import 'package:quizzer/UI_systems/03_add_question_page/widgets/add_question_wid
 import 'package:quizzer/UI_systems/03_add_question_page/widgets/add_question_widget/edit_elements/widget_editable_image_element.dart';
 import 'package:quizzer/UI_systems/03_add_question_page/widgets/add_question_widget/edit_elements/widget_editable_splittable_text_blank.dart';
 import 'package:quizzer/UI_systems/03_add_question_page/widgets/add_question_widget/edit_elements/widget_editable_blank_element.dart';
-import 'package:quizzer/UI_systems/03_add_question_page/helpers/image_picker_helper.dart';
+import 'package:quizzer/UI_systems/global_widgets/question_answer_element.dart';
 
 // ==========================================
 //    Add Question Elements Widget
@@ -242,8 +242,8 @@ class _AddQuestionElementsState extends State<AddQuestionElements> {
           buildDefaultDragHandles: false, // Use custom handle (implicit via Listener)
           itemBuilder: (context, index) {
             final element = widget.questionElements[index];
-            // Each item needs a unique key for reordering
-            final key = ValueKey('question_element_${identityHashCode(element)}_$index'); // Composite key
+            // Use a stable key based only on the element's identity, not its position
+            final key = ValueKey('question_element_${identityHashCode(element)}');
 
             // Build the element widget
             final elementWidget = _buildElementWidget(element, index);
@@ -270,6 +270,7 @@ class _AddQuestionElementsState extends State<AddQuestionElements> {
               // Call the parent's callback with the newly ordered list
               widget.onReorderElements(mutableElements, 'question');
           },
+
         ),
       ],
     );

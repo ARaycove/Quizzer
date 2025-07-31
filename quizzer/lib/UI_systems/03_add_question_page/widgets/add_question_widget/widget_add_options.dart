@@ -6,6 +6,7 @@ import 'package:quizzer/UI_systems/03_add_question_page/widgets/add_question_wid
 import 'package:quizzer/UI_systems/03_add_question_page/widgets/add_question_widget/edit_elements/widget_editable_sort_order_option.dart';
 import 'package:quizzer/UI_systems/03_add_question_page/widgets/add_question_widget/edit_elements/widget_editable_true_false_option.dart';
 import 'package:quizzer/UI_systems/03_add_question_page/helpers/image_picker_helper.dart';
+import 'package:quizzer/UI_systems/global_widgets/question_answer_element.dart';
 
 // ==========================================
 //    Add Options Widget
@@ -210,8 +211,8 @@ class _AddOptionsState extends State<AddOptions> {
           buildDefaultDragHandles: false, // Use custom handle (implicit via Listener)
           itemBuilder: (context, index) {
             final option = widget.options[index];
-            // Assign key based on content or index
-            final key = ValueKey('option_${identityHashCode(option)}_$index');
+            // Use a stable key based only on the option's identity, not its position
+            final key = ValueKey('option_${identityHashCode(option)}');
             
             // Build the actual option item UI using the modular widget
             final optionCard = _buildElementWidget(option, index);
@@ -238,6 +239,7 @@ class _AddOptionsState extends State<AddOptions> {
               // Call the parent's callback
               widget.onReorderOptions(mutableOptions);
           },
+
         )
       ],
     );

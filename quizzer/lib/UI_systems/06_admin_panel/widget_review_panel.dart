@@ -26,6 +26,7 @@ class _ReviewPanelWidgetState extends State<ReviewPanelWidget> {
   String? _errorMessage;
   bool _isLoading = true;
   int _previewRebuildCounter = 0; // Internal counter for preview refresh
+  bool _moduleNameVerified = false; // Track module name verification
 
   @override
   void initState() {
@@ -44,6 +45,7 @@ class _ReviewPanelWidgetState extends State<ReviewPanelWidget> {
       _isLoading = true;
       _errorMessage = null;
       _editedData = null; // Clear edits when fetching new question
+      _moduleNameVerified = false; // Reset module verification for new question
     });
 
     final result = await _session.getReviewQuestion();
@@ -213,20 +215,38 @@ class _ReviewPanelWidgetState extends State<ReviewPanelWidget> {
                 : null,
             answersToBlanks: (displayData['answers_to_blanks'] as List<dynamic>? ?? []).map((e) => Map<String, List<String>>.from(e as Map)).toList(),
           ),
-          // --- ADDED: Display Module Name ---
+          // --- Module Name Verification Card ---
           AppTheme.sizedBoxSml,
-          Row(
-            children: [
-              const Text('Module Name: '),
-              Expanded(
-                child: Text(
-                  displayData['module_name'] as String? ?? 'N/A',
-                  overflow: TextOverflow.ellipsis,
-                ),
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Module Name: ${displayData['module_name'] as String? ?? 'N/A'}',
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Row(
+                    children: [
+                      const Text('Is this correct? '),
+                      Checkbox(
+                        value: _moduleNameVerified,
+                        onChanged: (bool? value) {
+                          setState(() {
+                            _moduleNameVerified = value ?? false;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-          // --- END ADDED ---
+          // --- END Module Name Verification Card ---
           AppTheme.sizedBoxMed,
           // Bottom Bar: Skip/Deny/Approve Buttons
           Row(
@@ -257,7 +277,7 @@ class _ReviewPanelWidgetState extends State<ReviewPanelWidget> {
                   constraints: const BoxConstraints(maxWidth: 100),
                   child: ElevatedButton(
                     // Use internal _approveQuestion method
-                    onPressed: _approveQuestion, 
+                    onPressed: _moduleNameVerified ? _approveQuestion : null, 
                     child: const Text("Approve"),
                   ),
                 ),
