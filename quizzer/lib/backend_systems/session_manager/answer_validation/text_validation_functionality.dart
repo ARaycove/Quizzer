@@ -141,7 +141,7 @@ TextAnalyzer analyzer = English.analyzer;
 
 // Normalize the input 
 Future<String> normalizeString(String input) async{
-  String output = input.trim().toLowerCase();
+  String output = input.trim().toLowerCase().replaceAll('_', ' ');
   return output;
 }
 

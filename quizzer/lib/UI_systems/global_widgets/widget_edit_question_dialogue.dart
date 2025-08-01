@@ -228,9 +228,45 @@ class _EditQuestionDialogState extends State<EditQuestionDialog> {
     });
   }
 
-  void _handleReorderOptions(List<Map<String, dynamic>> reordered) {
+  void _handleReorderOptions(List<Map<String, dynamic>> reordered, int oldIndex, int newIndex) {
     setState(() {
       _options = List<Map<String, dynamic>>.from(reordered);
+      
+      // Update correct indices based on the reorder
+      if (_correctOptionIndex != null) {
+        final int currentCorrectIndex = _correctOptionIndex!;
+        if (currentCorrectIndex == oldIndex) {
+          // The correct option was moved, update to new position
+          _correctOptionIndex = newIndex;
+        } else if (currentCorrectIndex > oldIndex && currentCorrectIndex <= newIndex) {
+          // An option was moved from before the correct option to after it, shift down
+          _correctOptionIndex = currentCorrectIndex - 1;
+        } else if (currentCorrectIndex < oldIndex && currentCorrectIndex >= newIndex) {
+          // An option was moved from after the correct option to before it, shift up
+          _correctOptionIndex = currentCorrectIndex + 1;
+        }
+      }
+      
+      // Update SATA correct indices
+      List<int> newCorrectIndicesSATA = [];
+      for (int correctIndex in _correctIndicesSATA) {
+        if (correctIndex == oldIndex) {
+          // This correct option was moved, update to new position
+          newCorrectIndicesSATA.add(newIndex);
+        } else if (correctIndex > oldIndex && correctIndex <= newIndex) {
+          // An option was moved from before this correct option to after it, shift down
+          newCorrectIndicesSATA.add(correctIndex - 1);
+        } else if (correctIndex < oldIndex && correctIndex >= newIndex) {
+          // An option was moved from after this correct option to before it, shift up
+          newCorrectIndicesSATA.add(correctIndex + 1);
+        } else {
+          // This correct option wasn't affected by the move
+          newCorrectIndicesSATA.add(correctIndex);
+        }
+      }
+      newCorrectIndicesSATA.sort(); // Keep sorted
+      _correctIndicesSATA = newCorrectIndicesSATA;
+      
       _previewRebuildCounter++;
     });
   }

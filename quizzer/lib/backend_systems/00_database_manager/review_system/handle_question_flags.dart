@@ -3,6 +3,7 @@ import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:supabase/supabase.dart';
 import 'dart:math'; // Added for Random
 import 'package:quizzer/backend_systems/00_database_manager/review_system/get_send_postgre.dart' show decodeValueFromDB;
+import 'package:quizzer/backend_systems/session_manager/answer_validation/text_validation_functionality.dart';
 
 /// Fetches a flagged question record for review from Supabase.
 /// Returns a map containing both the question data and the flag record.
@@ -129,6 +130,13 @@ Future<bool> submitQuestionReview({
     final String flagId = await _generateIncrementalFlagId(supabase, questionId);
     
     if (action == 'edit') {
+      // Normalize module name if present before updating
+      if (updatedQuestionData['module_name'] != null && updatedQuestionData['module_name'] is String) {
+        final String normalizedModuleName = await normalizeString(updatedQuestionData['module_name'] as String);
+        updatedQuestionData['module_name'] = normalizedModuleName;
+        QuizzerLogger.logMessage('Normalized module name for question $questionId: $normalizedModuleName');
+      }
+      
       // Edit the question record in question_answer_pairs table
       await supabase
         .from('question_answer_pairs')

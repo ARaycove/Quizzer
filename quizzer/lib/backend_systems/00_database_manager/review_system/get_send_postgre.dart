@@ -3,7 +3,8 @@ import 'dart:math'; // For random selection
 import 'package:supabase/supabase.dart'; // Corrected Supabase import again
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pair_management/question_answer_pairs_table.dart'; 
+import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pair_management/question_answer_pairs_table.dart';
+import 'package:quizzer/backend_systems/session_manager/answer_validation/text_validation_functionality.dart'; 
 // ======================================================
 // duplicate private helper functions here, the AI is fucking dumb and tried to use them instead of the main function in table_helper
 // Like seriously, it doesn't matter how many times you tell this stupid assistant it will consistently try to rewrite existing functionality instead of just using whats already there 
@@ -234,6 +235,13 @@ Future<bool> approveQuestion(Map<String, dynamic> questionDetails, String source
   } else {
     QuizzerLogger.logError('Critical: Could not set qst_reviewer - no valid session userId found for question $questionId. Aborting approval.');
     throw StateError('Cannot approve question $questionId: No valid session userId found for reviewer.');
+  }
+
+  // Normalize module name if present
+  if (questionDetails['module_name'] != null && questionDetails['module_name'] is String) {
+    final String normalizedModuleName = await normalizeString(questionDetails['module_name'] as String);
+    questionDetails['module_name'] = normalizedModuleName;
+    QuizzerLogger.logMessage('Normalized module name for question $questionId: ${questionDetails['module_name']}');
   }
 
   // 1. Encode the data for upsert into the main table

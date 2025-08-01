@@ -8,3 +8,5 @@ alwaysApply: true
 2. Do not leave unused imports in my code, you find one, remove it
 
 3. All UI elements are to be primarily governed by the theme, this means no styling parameters are to be passed to widgets (the ONLY exception to this rule is for Textfields which should call to the theme to use .onPrimary, this is because textfields by default have cyan backgrounds with .onSurface as the default which is white)
+
+4. All logging will use the Logger found in quizzer_logging.dart file. When using the logger in test scripts you must initialize the logger for it to work.

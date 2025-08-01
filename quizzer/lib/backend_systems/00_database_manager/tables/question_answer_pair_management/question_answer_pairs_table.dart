@@ -10,6 +10,7 @@ import 'dart:typed_data';
 import 'dart:io';
 import 'package:quizzer/backend_systems/00_helper_utils/file_locations.dart';
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
+import 'package:quizzer/backend_systems/session_manager/answer_validation/text_validation_functionality.dart';
 
 // --- Universal Encoding/Decoding Helpers --- Removed, moved to 00_table_helper.dart ---
 
@@ -477,7 +478,11 @@ Future<int> editQuestionAnswerPair({
     if (qstReviewer != null) valuesToUpdate['qst_reviewer'] = qstReviewer;
     if (hasBeenReviewed != null) valuesToUpdate['has_been_reviewed'] = hasBeenReviewed ? 1 : 0;
     if (flagForRemoval != null) valuesToUpdate['flag_for_removal'] = flagForRemoval ? 1 : 0;
-    if (moduleName != null) valuesToUpdate['module_name'] = moduleName;
+    if (moduleName != null) {
+      // Normalize the module name before updating
+      final String normalizedModuleName = await normalizeString(moduleName);
+      valuesToUpdate['module_name'] = normalizedModuleName;
+    }
     if (questionType != null) valuesToUpdate['question_type'] = questionType;
     if (options != null) valuesToUpdate['options'] = options;
     if (correctOptionIndex != null) valuesToUpdate['correct_option_index'] = correctOptionIndex;
@@ -1068,6 +1073,9 @@ Future<String> addQuestionMultipleChoice({
     final String timeStamp = DateTime.now().toUtc().toIso8601String();
     final String questionId = '${timeStamp}_$qstContrib';
 
+    // Normalize the module name
+    final String normalizedModuleName = await normalizeString(moduleName);
+
     // Prepare the raw data map (values will be encoded by the helper)
     final Map<String, dynamic> data = {
       'time_stamp': timeStamp,
@@ -1087,7 +1095,7 @@ Future<String> addQuestionMultipleChoice({
           questionElements.isNotEmpty ? json.encode(questionElements) : '', // Check if list is not empty before encoding for check
           answerElements.isNotEmpty ? json.encode(answerElements) : ''
       ),
-      'module_name': moduleName,
+      'module_name': normalizedModuleName,
       'question_type': 'multiple_choice',
       'options': options,
       'correct_option_index': correctOptionIndex,
@@ -1133,6 +1141,9 @@ Future<String> addQuestionSelectAllThatApply({
     final String timeStamp = DateTime.now().toUtc().toIso8601String();
     final String questionId = '${timeStamp}_$qstContrib';
 
+    // Normalize the module name
+    final String normalizedModuleName = await normalizeString(moduleName);
+
     // Prepare the raw data map
     final Map<String, dynamic> data = {
       'time_stamp': timeStamp,
@@ -1151,7 +1162,7 @@ Future<String> addQuestionSelectAllThatApply({
           questionElements.isNotEmpty ? json.encode(questionElements) : '',
           answerElements.isNotEmpty ? json.encode(answerElements) : ''
       ),
-      'module_name': moduleName,
+      'module_name': normalizedModuleName,
       'question_type': 'select_all_that_apply',
       'options': options,
       'index_options_that_apply': indexOptionsThatApply,
@@ -1196,6 +1207,9 @@ Future<String> addQuestionTrueFalse({
     final String timeStamp = DateTime.now().toUtc().toIso8601String();
     final String questionId = '${timeStamp}_$qstContrib';
 
+    // Normalize the module name
+    final String normalizedModuleName = await normalizeString(moduleName);
+
     // Prepare the raw data map
     final Map<String, dynamic> data = {
       'time_stamp': timeStamp,
@@ -1214,7 +1228,7 @@ Future<String> addQuestionTrueFalse({
           questionElements.isNotEmpty ? json.encode(questionElements) : '',
           answerElements.isNotEmpty ? json.encode(answerElements) : ''
       ),
-      'module_name': moduleName,
+      'module_name': normalizedModuleName,
       'question_type': 'true_false',
       'correct_option_index': correctOptionIndex,
       'question_id': questionId,
@@ -1277,6 +1291,9 @@ Future<String> addSortOrderQuestion({
     final String timeStamp = DateTime.now().toUtc().toIso8601String();
     final String questionId = '${timeStamp}_$qstContrib';
 
+    // Normalize the module name
+    final String normalizedModuleName = await normalizeString(moduleId);
+
     // Prepare the raw data map - matching fields and defaults from other add functions
     final Map<String, dynamic> rawData = {
       'time_stamp': timeStamp, // Part of legacy primary key and used for ID
@@ -1296,7 +1313,7 @@ Future<String> addSortOrderQuestion({
           questionElements.isNotEmpty ? json.encode(questionElements) : '',
           answerElements.isNotEmpty ? json.encode(answerElements) : ''
       ),
-      'module_name': moduleId,
+      'module_name': normalizedModuleName,
       'question_type': 'sort_order', // Use string literal
       'options': options, // Store correctly ordered list, will be JSON encoded by helper
       'question_id': questionId, // Store the generated ID
@@ -1395,6 +1412,9 @@ Future<String> addFillInTheBlankQuestion({
     final String timeStamp = DateTime.now().toUtc().toIso8601String();
     final String questionId = '${timeStamp}_$qstContrib';
 
+    // Normalize the module name
+    final String normalizedModuleName = await normalizeString(moduleName);
+
     // Basic validation: Ensure question_elements has n blank elements where n is the length of answers_to_blanks
     final int blankCount = questionElements.where((element) => element['type'] == 'blank').length;
     if (blankCount != answersToBlanks.length) {
@@ -1419,7 +1439,7 @@ Future<String> addFillInTheBlankQuestion({
           questionElements.isNotEmpty ? json.encode(questionElements) : '',
           answerElements.isNotEmpty ? json.encode(answerElements) : ''
       ),
-      'module_name': moduleName,
+      'module_name': normalizedModuleName,
       'question_type': 'fill_in_the_blank',
       'answers_to_blanks': answersToBlanks,
       'question_id': questionId,

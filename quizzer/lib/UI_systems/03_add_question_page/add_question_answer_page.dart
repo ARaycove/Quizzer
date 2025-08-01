@@ -471,54 +471,51 @@ class _AddQuestionAnswerPageState extends State<AddQuestionAnswerPage> {
    }
 
    // --- Handle Option Reordering ---
-   void _handleReorderOptions(List<Map<String, dynamic>> reorderedOptions) {
-      QuizzerLogger.logMessage("Handling option reorder");
+   void _handleReorderOptions(List<Map<String, dynamic>> reorderedOptions, int oldIndex, int newIndex) {
+      QuizzerLogger.logMessage("Handling option reorder from $oldIndex to $newIndex");
       setState(() {
-        // Find the original indices before updating the list
-        final int? oldCorrectIndexMC = _currentCorrectOptionIndex;
-        final List<int> oldCorrectIndicesSATA = List.from(_currentCorrectIndicesSATA);
-        final List<Map<String, dynamic>> oldOptions = List.from(_currentOptions);
-
         // Update the options list
         _currentOptions = reorderedOptions;
 
         // --- Adjust Correct Indices --- 
-        // If the item(s) marked as correct have moved, update their indices.
-        
-        // For MC/TF: Find where the previously correct item moved to.
-        if (oldCorrectIndexMC != null && oldCorrectIndexMC >= 0 && oldCorrectIndexMC < oldOptions.length) {
-          final Map<String, dynamic> previouslyCorrectItem = oldOptions[oldCorrectIndexMC];
-          // Find its new index in the reordered list
-          final int newCorrectIndexMC = _currentOptions.indexWhere(
-            (option) => option == previouslyCorrectItem // Simple identity check might suffice if objects are same
-                      // Or compare content if necessary:
-                      // option['type'] == previouslyCorrectItem['type'] && option['content'] == previouslyCorrectItem['content']
-          );
-          if (newCorrectIndexMC != -1) {
-            _currentCorrectOptionIndex = newCorrectIndexMC;
-             QuizzerLogger.logValue("MC correct index updated from $oldCorrectIndexMC to $newCorrectIndexMC after reorder.");
-          } else {
-             QuizzerLogger.logWarning("Could not find previously correct MC option after reorder. Index reset.");
-             _currentCorrectOptionIndex = null; // Or default? Handle error case.
+        // For MC/TF: Update correct index if the correct option was moved
+        if (_currentCorrectOptionIndex != null) {
+          final int currentCorrectIndex = _currentCorrectOptionIndex!;
+          if (currentCorrectIndex == oldIndex) {
+            // The correct option was moved, update to new position
+            _currentCorrectOptionIndex = newIndex;
+            QuizzerLogger.logValue("MC correct index updated from $oldIndex to $newIndex after reorder.");
+          } else if (currentCorrectIndex > oldIndex && currentCorrectIndex <= newIndex) {
+            // An option was moved from before the correct option to after it, shift down
+            _currentCorrectOptionIndex = currentCorrectIndex - 1;
+            QuizzerLogger.logValue("MC correct index shifted down from $currentCorrectIndex to $_currentCorrectOptionIndex after reorder.");
+          } else if (currentCorrectIndex < oldIndex && currentCorrectIndex >= newIndex) {
+            // An option was moved from after the correct option to before it, shift up
+            _currentCorrectOptionIndex = currentCorrectIndex + 1;
+            QuizzerLogger.logValue("MC correct index shifted up from $currentCorrectIndex to $_currentCorrectOptionIndex after reorder.");
           }
         }
 
-        // For SATA: Find the new indices for all previously correct items.
-        if (oldCorrectIndicesSATA.isNotEmpty) {
-          List<int> newCorrectIndicesSATA = [];
-          for (int oldIndex in oldCorrectIndicesSATA) {
-             if (oldIndex >= 0 && oldIndex < oldOptions.length) {
-               final Map<String, dynamic> previouslyCorrectItem = oldOptions[oldIndex];
-               final int newIndex = _currentOptions.indexWhere((option) => option == previouslyCorrectItem);
-               if (newIndex != -1) {
-                 newCorrectIndicesSATA.add(newIndex);
-               }
-             }
+        // For SATA: Update all correct indices
+        List<int> newCorrectIndicesSATA = [];
+        for (int correctIndex in _currentCorrectIndicesSATA) {
+          if (correctIndex == oldIndex) {
+            // This correct option was moved, update to new position
+            newCorrectIndicesSATA.add(newIndex);
+          } else if (correctIndex > oldIndex && correctIndex <= newIndex) {
+            // An option was moved from before this correct option to after it, shift down
+            newCorrectIndicesSATA.add(correctIndex - 1);
+          } else if (correctIndex < oldIndex && correctIndex >= newIndex) {
+            // An option was moved from after this correct option to before it, shift up
+            newCorrectIndicesSATA.add(correctIndex + 1);
+          } else {
+            // This correct option wasn't affected by the move
+            newCorrectIndicesSATA.add(correctIndex);
           }
-          newCorrectIndicesSATA.sort(); // Keep sorted
-          _currentCorrectIndicesSATA = newCorrectIndicesSATA;
-          QuizzerLogger.logValue("SATA correct indices updated from $oldCorrectIndicesSATA to $newCorrectIndicesSATA after reorder.");
         }
+        newCorrectIndicesSATA.sort(); // Keep sorted
+        _currentCorrectIndicesSATA = newCorrectIndicesSATA;
+        QuizzerLogger.logValue("SATA correct indices updated to $newCorrectIndicesSATA after reorder.");
 
         // --- End Adjust Correct Indices ---
 

@@ -679,7 +679,10 @@ class SessionManager {
       QuizzerLogger.logMessage('Entering getModuleDataByName()...');
       
       assert(userId != null);
-      final result = await getIndividualModuleData(userId!, moduleName);
+      
+      // Normalize the module name before lookup
+      final String normalizedModuleName = await text_validation.normalizeString(moduleName);
+      final result = await getIndividualModuleData(userId!, normalizedModuleName);
       
       QuizzerLogger.logMessage('Successfully loaded individual module data for module: $moduleName');
       return result;
@@ -697,8 +700,11 @@ class SessionManager {
       
       assert(userId != null);
       
+      // Normalize the module name before processing
+      final String normalizedModuleName = await text_validation.normalizeString(moduleName);
+      
       // Update module activation status using the new table function
-      final bool result = await updateModuleActivationStatus(userId!, moduleName, activate);
+      final bool result = await updateModuleActivationStatus(userId!, normalizedModuleName, activate);
       
       if (!result) {
         throw Exception('Failed to update module activation status for module: $moduleName');
@@ -723,8 +729,11 @@ class SessionManager {
       
       assert(userId != null);
       
+      // Normalize the module name before processing
+      final String normalizedModuleName = await text_validation.normalizeString(moduleName);
+      
       final result = await module_management.handleUpdateModuleDescription({
-        'moduleName': moduleName,
+        'moduleName': normalizedModuleName,
         'description': newDescription,
       });
       
@@ -744,10 +753,14 @@ class SessionManager {
       
       assert(userId != null);
       
+      // Normalize both module names before processing
+      final String normalizedOldModuleName = await text_validation.normalizeString(oldModuleName);
+      final String normalizedNewModuleName = await text_validation.normalizeString(newModuleName);
+      
       // Call the rename function from the module management layer
       final result = await rename_modules.renameModule(
-        oldModuleName: oldModuleName,
-        newModuleName: newModuleName,
+        oldModuleName: normalizedOldModuleName,
+        newModuleName: normalizedNewModuleName,
       );
       
       if (result) {
@@ -773,10 +786,14 @@ class SessionManager {
       
       assert(userId != null);
       
+      // Normalize both module names before processing
+      final String normalizedSourceModuleName = await text_validation.normalizeString(sourceModuleName);
+      final String normalizedTargetModuleName = await text_validation.normalizeString(targetModuleName);
+      
       // Call the merge function from the module management layer
       final result = await merge_modules.mergeModules(
-        sourceModuleName: sourceModuleName,
-        targetModuleName: targetModuleName,
+        sourceModuleName: normalizedSourceModuleName,
+        targetModuleName: normalizedTargetModuleName,
       );
       
       if (result) {

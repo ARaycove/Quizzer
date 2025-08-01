@@ -30,7 +30,7 @@ class AddQuestionWidget extends StatefulWidget {
   final Function(int index) onSetCorrectOptionIndex; // For MC/TF
   final Function(int index) onToggleCorrectOptionSATA;
   final Function(List<Map<String, dynamic>> reorderedElements, String category) onReorderElements;
-  final Function(List<Map<String, dynamic>> reorderedOptions) onReorderOptions;
+  final Function(List<Map<String, dynamic>> reorderedOptions, int oldIndex, int newIndex) onReorderOptions;
   final Function(List<Map<String, List<String>>> answersToBlanks) onAnswersToBlanksChanged;
   final Function(int index, String selectedText) onCreateBlank; // For fill-in-the-blank
   final Function(int blankIndex, String newAnswerText)? onUpdateAnswerText; // For editing blank answers

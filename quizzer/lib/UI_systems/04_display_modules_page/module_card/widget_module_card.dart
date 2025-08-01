@@ -7,6 +7,7 @@ import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/04_module_management/module_management.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/app_theme.dart';
+import 'package:quizzer/UI_systems/UI_Utils/ui_helper_functions.dart';
 
 class ModuleCard extends StatefulWidget {
   final Map<String, dynamic> moduleData;
@@ -130,6 +131,7 @@ class _ModuleCardState extends State<ModuleCard> {
   Widget build(BuildContext context) {
     final moduleData = widget.moduleData;
     final moduleName = moduleData['module_name'] ?? 'Unnamed Module';
+    final formattedModuleName = formatModuleNameForDisplay(moduleName);
     final description = moduleData['description'] ?? '';
     final totalQuestions = moduleData['total_questions'] ?? 0;
     if (totalQuestions == 0) {
@@ -144,7 +146,7 @@ class _ModuleCardState extends State<ModuleCard> {
             children: [
               Expanded(
                 child: Text(
-                  moduleName,
+                  formattedModuleName,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),

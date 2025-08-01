@@ -21,7 +21,7 @@ class AddOptions extends StatefulWidget {
   final Function(Map<String, dynamic> option) onAddOption;
   final Function(int index) onRemoveOption;
   final Function(int index, Map<String, dynamic> updatedOption) onEditOption;
-  final Function(List<Map<String, dynamic>> reorderedOptions) onReorderOptions;
+  final Function(List<Map<String, dynamic>> reorderedOptions, int oldIndex, int newIndex) onReorderOptions;
   final Function(int index) onSetCorrectOptionIndex;
   final Function(int index) onToggleCorrectOptionSATA;
 
@@ -236,8 +236,8 @@ class _AddOptionsState extends State<AddOptions> {
               final Map<String, dynamic> item = mutableOptions.removeAt(oldIndex);
               mutableOptions.insert(newIndex, item);
 
-              // Call the parent's callback
-              widget.onReorderOptions(mutableOptions);
+              // Call the parent's callback with reorder information
+              widget.onReorderOptions(mutableOptions, oldIndex, newIndex);
           },
 
         )

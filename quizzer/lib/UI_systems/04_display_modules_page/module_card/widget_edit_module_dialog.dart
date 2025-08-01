@@ -5,6 +5,7 @@ import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/backend_systems/00_helper_utils/file_locations.dart';
 import 'package:quizzer/UI_systems/04_display_modules_page/module_card/widget_rename_merge.dart';
 import 'package:quizzer/app_theme.dart';
+import 'package:quizzer/UI_systems/UI_Utils/ui_helper_functions.dart';
 import 'dart:io';
 
 
@@ -203,7 +204,7 @@ class _EditModuleDialogState extends State<EditModuleDialog> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 // Header
-                Text('Edit Module: $_moduleName'),
+                Text('Edit Module: ${formatModuleNameForDisplay(_moduleName)}'),
                 const Divider(),
                 // Rename and Merge Widget (only for admin/contributor users)
                 if (_session.userRole == 'admin' || _session.userRole == 'contributor') ...[

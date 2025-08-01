@@ -1,58 +1,55 @@
-Quizzer: [16:30:51] [34m[INFO][0m [<asynchronous suspension>] QuizzerLogger successfully set up file logging to: ./QuizzerAppLogs/quizzer_log.txt
-Quizzer: [16:30:51] [34m[INFO][0m [<asynchronous suspension>] QuizzerLogger: Attempting a SECOND test log message to file.
-Quizzer: [16:30:51] [34m[INFO][0m [how_many_lines.dart] Calculating total lines of code...
-Quizzer: [16:30:51] [34m[INFO][0m [how_many_lines.dart] 
---- Line Count Summary ---
-Quizzer: [16:30:51] [34m[INFO][0m [how_many_lines.dart] Total_Backend_Systems: 23971
-Quizzer: [16:30:51] [34m[INFO][0m [how_many_lines.dart] Total_UI_Systems:      14223
-Quizzer: [16:30:51] [34m[INFO][0m [how_many_lines.dart] Total_Test_Lines:      11410
-Quizzer: [16:30:51] [34m[INFO][0m [how_many_lines.dart] --------------------------
-Quizzer: [16:30:51] [34m[INFO][0m [how_many_lines.dart] Total_Lines:           49604
-Quizzer: [16:30:51] [34m[INFO][0m [how_many_lines.dart] --------------------------
-Quizzer: [16:30:51] [34m[INFO][0m [how_many_lines.dart] 
---- Backend Systems Breakdown (recursive, alphabetical) ---
-Quizzer: [16:30:51] [34m[INFO][0m [how_many_lines.dart] 00_database_manager/                      16689
-Quizzer: [16:30:51] [34m[INFO][0m [how_many_lines.dart] ├── cloud_sync_system/                         3361
-Quizzer: [16:30:51] [34m[INFO][0m [how_many_lines.dart] │   ├── inbound_sync/                              1288
-Quizzer: [16:30:51] [34m[INFO][0m [how_many_lines.dart] │   └── outbound_sync/                             1771
-Quizzer: [16:30:51] [34m[INFO][0m [how_many_lines.dart] ├── data_consistency/                           142
-Quizzer: [16:30:51] [34m[INFO][0m [how_many_lines.dart] ├── platform/                                    65
-Quizzer: [16:30:51] [34m[INFO][0m [how_many_lines.dart] ├── review_system/                              648
-Quizzer: [16:30:51] [34m[INFO][0m [how_many_lines.dart] └── tables/                                   11925
-Quizzer: [16:30:51] [34m[INFO][0m [how_many_lines.dart]     ├── academic_archive.dart/                     2040
-Quizzer: [16:30:51] [34m[INFO][0m [how_many_lines.dart]     │   └── relationship_data/                          214
-Quizzer: [16:30:51] [34m[INFO][0m [how_many_lines.dart]     ├── question_answer_pair_management/           1994
-Quizzer: [16:30:51] [34m[INFO][0m [how_many_lines.dart]     ├── system_data/                                931
-Quizzer: [16:30:51] [34m[INFO][0m [how_many_lines.dart]     ├── user_profile/                              2593
-Quizzer: [16:30:51] [34m[INFO][0m [how_many_lines.dart]     └── user_stats/                                3053
-Quizzer: [16:30:51] [34m[INFO][0m [how_many_lines.dart] 00_helper_utils/                            223
-Quizzer: [16:30:51] [34m[INFO][0m [how_many_lines.dart] 02_login_authentication/                    736
-Quizzer: [16:30:51] [34m[INFO][0m [how_many_lines.dart] 03_account_creation/                        134
-Quizzer: [16:30:51] [34m[INFO][0m [how_many_lines.dart] 04_module_management/                       448
-Quizzer: [16:30:51] [34m[INFO][0m [how_many_lines.dart] 06_question_queue_server/                   798
-Quizzer: [16:30:51] [34m[INFO][0m [how_many_lines.dart] 07_user_question_management/                110
-Quizzer: [16:30:51] [34m[INFO][0m [how_many_lines.dart] 08_memory_retention_algo/                    90
-Quizzer: [16:30:51] [34m[INFO][0m [how_many_lines.dart] 09_data_caches/                             402
-Quizzer: [16:30:51] [34m[INFO][0m [how_many_lines.dart] 10_switch_board/                            723
-Quizzer: [16:30:51] [34m[INFO][0m [how_many_lines.dart] 11_ai_management/                           247
-Quizzer: [16:30:51] [34m[INFO][0m [how_many_lines.dart] 12_subject_concept_classifier/                0
-Quizzer: [16:30:51] [34m[INFO][0m [how_many_lines.dart] logger/                                     407
-Quizzer: [16:30:51] [34m[INFO][0m [how_many_lines.dart] session_manager/                           2964
-Quizzer: [16:30:51] [34m[INFO][0m [how_many_lines.dart] └── answer_validation/                          446
-Quizzer: [16:30:51] [34m[INFO][0m [how_many_lines.dart] 
---- UI Systems Breakdown (recursive, alphabetical) ---
-Quizzer: [16:30:51] [34m[INFO][0m [how_many_lines.dart] 00_login_page/                              266
-Quizzer: [16:30:51] [34m[INFO][0m [how_many_lines.dart] 01_new_user_page/                           271
-Quizzer: [16:30:51] [34m[INFO][0m [how_many_lines.dart] 02_home_page/                               894
-Quizzer: [16:30:51] [34m[INFO][0m [how_many_lines.dart] └── stat_display_section/                       331
-Quizzer: [16:30:51] [34m[INFO][0m [how_many_lines.dart] 03_add_question_page/                      4155
-Quizzer: [16:30:51] [34m[INFO][0m [how_many_lines.dart] ├── helpers/                                    173
-Quizzer: [16:30:51] [34m[INFO][0m [how_many_lines.dart] └── widgets/                                   3194
-Quizzer: [16:30:51] [34m[INFO][0m [how_many_lines.dart]     └── add_question_widget/                       2493
-Quizzer: [16:30:51] [34m[INFO][0m [how_many_lines.dart]         └── edit_elements/                             1630
-Quizzer: [16:30:51] [34m[INFO][0m [how_many_lines.dart] 04_display_modules_page/                   1205
-Quizzer: [16:30:51] [34m[INFO][0m [how_many_lines.dart] └── module_card/                                975
-Quizzer: [16:30:51] [34m[INFO][0m [how_many_lines.dart] 05_menu_page/                               163
-Quizzer: [16:30:51] [34m[INFO][0m [how_many_lines.dart] 06_admin_panel/                             811
-Quizzer: [16:30:51] [34m[INFO][0m [how_many_lines.dart] 07_critical_error_page/                     303
-Quizzer: [16:30:51] [34m[INFO][0m [how_many_lines.dart] 08_settings_page/                          1150
+Quizzer: [12:46:37] [34m[INFO][0m [<asynchronous suspension>] QuizzerLogger successfully set up file logging to: ./QuizzerAppLogs/quizzer_log.txt
+Quizzer: [12:46:37] [34m[INFO][0m [<asynchronous suspension>] QuizzerLogger: Attempting a SECOND test log message to file.
+Quizzer: [12:46:38] [36m[DEBUG][0m Saving session
+Quizzer: [12:46:38] [34m[SUCCESS][0m [fix_module_names.dart] ✅ Successfully authenticated as: aacra0820@gmail.com
+Quizzer: [12:46:38] [34m[INFO][0m [fix_module_names.dart] 
+Quizzer: [12:46:38] [34m[SUCCESS][0m [fix_module_names.dart] ✅ Successfully connected to Supabase
+Quizzer: [12:46:38] [34m[INFO][0m [fix_module_names.dart] 
+Quizzer: [12:46:38] [34m[INFO][0m [fix_module_names.dart] Starting to fix module names in question_answer_pairs table...
+Quizzer: [12:46:38] [34m[INFO][0m [test_helpers.dart] Fetching ALL records from table: question_answer_pairs
+Quizzer: [12:46:38] [34m[INFO][0m [switch_board.dart] SwitchBoard initialized.
+Quizzer: [12:46:38] [34m[SUCCESS][0m Initialize GoTrueClient v2.11.1 with url: https://yruvxuvzztnahuuiqxit.supabase.co/auth/v1, autoRefreshToken: true, flowType: AuthFlowType.implicit, tickDuration: 0:00:10.000000, tickThreshold: 3
+Quizzer: [12:46:38] [36m[DEBUG][0m Stopping auto refresh
+Quizzer: [12:46:38] [36m[DEBUG][0m Starting auto refresh
+Quizzer: [12:46:38] [34m[SUCCESS][0m Initialize PostgrestClient with url: https://yruvxuvzztnahuuiqxit.supabase.co/rest/v1, schema: public
+Quizzer: [12:46:38] [34m[SUCCESS][0m Initialize FunctionsClient v2.4.1 with url: https://yruvxuvzztnahuuiqxit.supabase.co/functions/v1
+Quizzer: [12:46:38] [34m[SUCCESS][0m Initialize SupabaseStorageClient v2.3.1 with url: https://yruvxuvzztnahuuiqxit.supabase.co/storage/v1, retryAttempts: 0
+Quizzer: [12:46:38] [34m[SUCCESS][0m Initialize RealtimeClient with endpoint: wss://yruvxuvzztnahuuiqxit.supabase.co/realtime/v1, timeout: 0:00:10.000000, heartbeatIntervalMs: 25000, longpollerTimeout: 20000, logLevel: null
+Quizzer: [12:46:38] [34m[SUCCESS][0m Initialize SupabaseClient v2.6.3 with no custom access token
+Quizzer: [12:46:38] [34m[INFO][0m [file_locations.dart] [PATH] Path provider not available (likely test environment), using current directory for Hive.
+Quizzer: [12:46:38] [34m[INFO][0m [file_locations.dart] [PATH] QuizzerHive path: ./QuizzerAppHive
+Quizzer: [12:46:38] [34m[INFO][0m [session_manager.dart] SessionManager: Initializing Hive at path: ./QuizzerAppHive
+Quizzer: [12:46:38] [34m[INFO][0m [test_helpers.dart] Total records in table: 3092
+Quizzer: [12:46:38] [34m[INFO][0m [test_helpers.dart] Fetching page starting at offset: 0
+Quizzer: [12:46:39] [34m[INFO][0m [test_helpers.dart] Fetched 500 records
+Quizzer: [12:46:39] [34m[INFO][0m [test_helpers.dart] Fetching page starting at offset: 500
+Quizzer: [12:46:39] [34m[INFO][0m [test_helpers.dart] Fetched 500 records
+Quizzer: [12:46:39] [34m[INFO][0m [test_helpers.dart] Fetching page starting at offset: 1000
+Quizzer: [12:46:40] [34m[INFO][0m [test_helpers.dart] Fetched 500 records
+Quizzer: [12:46:40] [34m[INFO][0m [test_helpers.dart] Fetching page starting at offset: 1500
+Quizzer: [12:46:40] [34m[INFO][0m [test_helpers.dart] Fetched 500 records
+Quizzer: [12:46:40] [34m[INFO][0m [test_helpers.dart] Fetching page starting at offset: 2000
+Quizzer: [12:46:41] [34m[INFO][0m [test_helpers.dart] Fetched 500 records
+Quizzer: [12:46:41] [34m[INFO][0m [test_helpers.dart] Fetching page starting at offset: 2500
+Quizzer: [12:46:41] [34m[INFO][0m [test_helpers.dart] Fetched 500 records
+Quizzer: [12:46:41] [34m[INFO][0m [test_helpers.dart] Fetching page starting at offset: 3000
+Quizzer: [12:46:41] [34m[INFO][0m [test_helpers.dart] Fetched 92 records
+Quizzer: [12:46:41] [34m[SUCCESS][0m [test_helpers.dart] ✅ Successfully fetched ALL 3092 records from table: question_answer_pairs
+Quizzer: [12:46:41] [34m[INFO][0m [fix_module_names.dart] Processing 3092 records from question_answer_pairs table
+Quizzer: [12:46:41] [34m[INFO][0m [fix_module_names.dart] No module names needed updating in question_answer_pairs table
+Quizzer: [12:46:41] [34m[INFO][0m [fix_module_names.dart] 
+Quizzer: [12:46:41] [34m[INFO][0m [fix_module_names.dart] Starting to fix module names in modules table...
+Quizzer: [12:46:41] [34m[INFO][0m [test_helpers.dart] Fetching ALL records from table: modules
+Quizzer: [12:46:42] [34m[INFO][0m [test_helpers.dart] Total records in table: 0
+Quizzer: [12:46:42] [34m[SUCCESS][0m [test_helpers.dart] ✅ Successfully fetched ALL 0 records from table: modules
+Quizzer: [12:46:42] [34m[INFO][0m [fix_module_names.dart] Processing 0 records from modules table
+Quizzer: [12:46:42] [34m[INFO][0m [fix_module_names.dart] No module names needed updating in modules table
+Quizzer: [12:46:42] [34m[INFO][0m [fix_module_names.dart] 
+Quizzer: [12:46:42] [34m[INFO][0m [fix_module_names.dart] Starting to fix module names in user_module_activation_status table...
+Quizzer: [12:46:42] [34m[INFO][0m [test_helpers.dart] Fetching ALL records from table: user_module_activation_status
+Quizzer: [12:46:42] [34m[INFO][0m [test_helpers.dart] Total records in table: 0
+Quizzer: [12:46:42] [34m[SUCCESS][0m [test_helpers.dart] ✅ Successfully fetched ALL 0 records from table: user_module_activation_status
+Quizzer: [12:46:42] [34m[INFO][0m [fix_module_names.dart] Processing 0 records from user_module_activation_status table
+Quizzer: [12:46:42] [34m[INFO][0m [fix_module_names.dart] No module names needed updating in user_module_activation_status table
+Quizzer: [12:46:42] [34m[INFO][0m [fix_module_names.dart] 
+Quizzer: [12:46:42] [34m[SUCCESS][0m [fix_module_names.dart] ✅ Module name normalization cleanup completed successfully!

@@ -371,7 +371,7 @@ Future<void> updateUserSettingSyncFlags({
 // --- Function to Insert or Update from Cloud ---
 /// Inserts a new user setting or updates an existing one from data fetched from the cloud.
 /// Sets sync flags to indicate the record is synced and edits are synced.
-Future<void> upsertFromSupabase(Map<String, dynamic> settingData) async {
+Future<void> upsertUserSettingsFromSupabase(Map<String, dynamic> settingData) async {
   try {
     // Ensure all required fields are present in the incoming data
     final String? userId = settingData['user_id'] as String?;

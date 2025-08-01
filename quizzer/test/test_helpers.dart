@@ -998,3 +998,119 @@ Future<int> getUniqueSubjectCountFromTaxonomy() async {
     rethrow;
   }
 }
+
+// ==========================================
+// Supabase Pagination Helper Functions
+// ==========================================
+
+/// Fetches ALL records from a Supabase table using proper pagination.
+/// 
+/// Parameters:
+/// - tableName: The name of the table to fetch records from
+/// 
+/// Returns:
+/// - List<Map<String, dynamic>> containing ALL records from the table
+Future<List<Map<String, dynamic>>> fetchAllRecordsFromTable(String tableName) async {
+  QuizzerLogger.logMessage('Fetching ALL records from table: $tableName');
+  
+  try {
+    final sessionManager = getSessionManager();
+    final supabase = sessionManager.supabase;
+    
+    // First get the total count
+    final int totalCount = await supabase
+        .from(tableName)
+        .count(CountOption.exact);
+    
+    QuizzerLogger.logMessage('Total records in table: $totalCount');
+    
+    final List<Map<String, dynamic>> allRecords = [];
+    int offset = 0;
+    const int pageSize = 500;
+    
+    while (allRecords.length < totalCount) {
+      QuizzerLogger.logMessage('Fetching page starting at offset: $offset');
+      
+      // Execute the query with range
+      final List<Map<String, dynamic>> pageData = await supabase
+          .from(tableName)
+          .select()
+          .range(offset, offset + pageSize - 1);
+      
+      QuizzerLogger.logMessage('Fetched ${pageData.length} records');
+      
+      // Add the page data to our accumulated results
+      allRecords.addAll(pageData);
+      
+      // Move to next page
+      offset += pageSize;
+    }
+    
+    QuizzerLogger.logSuccess('Successfully fetched ALL ${allRecords.length} records from table: $tableName');
+    return allRecords;
+    
+  } catch (e) {
+    QuizzerLogger.logError('Error fetching all records from table $tableName: $e');
+    rethrow;
+  }
+}
+
+/// Sends a batch of records to Supabase using async gather functionality.
+/// Processes updates in chunks of 100 to avoid flooding the server.
+/// 
+/// Parameters:
+/// - tableName: The name of the table to update
+/// - batchUpdates: List of update operations, each containing the data to update
+/// - updateFunction: Function that performs the actual update operation
+/// - chunkSize: Number of updates to process at once (default: 100)
+/// 
+/// Returns:
+/// - Number of successful updates
+Future<int> batchUpdateRecords<T>({
+  required String tableName,
+  required List<T> batchUpdates,
+  required Future<bool> Function(T update) updateFunction,
+  int chunkSize = 100,
+}) async {
+  QuizzerLogger.logMessage('Processing batch of ${batchUpdates.length} updates for table: $tableName in chunks of $chunkSize');
+  
+  try {
+    int totalSuccessfulUpdates = 0;
+    int totalFailedUpdates = 0;
+    
+    // Process updates in chunks
+    for (int i = 0; i < batchUpdates.length; i += chunkSize) {
+      final int endIndex = (i + chunkSize < batchUpdates.length) ? i + chunkSize : batchUpdates.length;
+      final List<T> chunk = batchUpdates.sublist(i, endIndex);
+      
+      QuizzerLogger.logMessage('Processing chunk ${(i ~/ chunkSize) + 1}: ${chunk.length} updates (${i + 1}-$endIndex of ${batchUpdates.length})');
+      
+      // Use Future.wait to process this chunk concurrently
+      final List<Future<bool>> updateFutures = chunk.map(updateFunction).toList();
+      final List<bool> results = await Future.wait(updateFutures);
+      
+      // Count successful updates in this chunk
+      final int successfulUpdates = results.where((result) => result).length;
+      final int failedUpdates = results.length - successfulUpdates;
+      
+      totalSuccessfulUpdates += successfulUpdates;
+      totalFailedUpdates += failedUpdates;
+      
+      QuizzerLogger.logMessage('Chunk ${(i ~/ chunkSize) + 1} completed: $successfulUpdates successful, $failedUpdates failed');
+      
+      // Add a small delay between chunks to be nice to the server
+      if (endIndex < batchUpdates.length) {
+        await Future.delayed(Duration(milliseconds: 100));
+      }
+    }
+    
+    QuizzerLogger.logSuccess('Batch update completed: $totalSuccessfulUpdates successful, $totalFailedUpdates failed');
+    
+    return totalSuccessfulUpdates;
+    
+  } catch (e) {
+    QuizzerLogger.logError('Error in batch update for table $tableName: $e');
+    rethrow;
+  }
+}
+
