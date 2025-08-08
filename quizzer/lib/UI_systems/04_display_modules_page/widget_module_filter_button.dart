@@ -14,7 +14,6 @@ class ModuleFilterButton extends StatelessWidget {
       heroTag: 'filter',
       mini: true,
       onPressed: onFilterPressed ?? () {
-        // TODO: Implement default filter functionality
       },
       tooltip: 'Filter Modules',
       child: const Icon(Icons.filter_list),

@@ -1307,7 +1307,7 @@ void main() {
         final String originalTimestamp = (await getQuestionAnswerPairById(multipleChoiceQuestionId))['last_modified_timestamp'] as String;
         
         // Wait a moment to ensure timestamp difference
-        await Future.delayed(Duration(milliseconds: 100));
+        await Future.delayed(const Duration(milliseconds: 100));
         
         final int result = await editQuestionAnswerPair(questionId: multipleChoiceQuestionId, questionElements: [{'type': 'text', 'content': 'Timestamp test question'}], debugDisableOutboundSyncCall: true);
         
@@ -2196,7 +2196,7 @@ void main() {
         final originalTimestamp = originalQuestion['last_modified_timestamp'] as String;
 
         // Wait a moment to ensure timestamp difference
-        await Future.delayed(Duration(milliseconds: 100));
+        await Future.delayed(const Duration(milliseconds: 100));
 
         await updateQuestionSyncFlags(
           questionId: testQuestionId,

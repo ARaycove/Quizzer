@@ -217,7 +217,6 @@ class _LoginPageState extends State<LoginPage> {
   }
   
   // Helper method to build social login buttons
-  // TODO Finish Social login integration, BAAS
   Widget _buildSocialLoginButton(IconData icon, String service) {
     return IconButton(
       icon: Icon(icon),

@@ -37,7 +37,6 @@ class QuizzerLogger {
   static final _logger = Logger('QuizzerApp');
   static IOSink? _logFileSink; // Sink for writing to file
   static const String _logFileName = 'quizzer_log.txt';
-  static const String _logDir = 'runtime_cache';
 
   // --- Source Filtering --- 
   static List<String> _excludedSources = [
@@ -195,25 +194,7 @@ class QuizzerLogger {
   }
   // -------------------------------------
 
-  // --- Helper to Get App Directory ---
-  static Future<String> _getAppDirectory() async {
-    if (Platform.isAndroid || Platform.isIOS) { // Added iOS for completeness
-      final logsDir = await getQuizzerLogsPath();
-      // Log this path using the logger; it will go to console via the listener's print.
-      QuizzerLogger.logMessage('QuizzerLogger: Using centralized logs directory: $logsDir');
-      print('QuizzerLogger: Using centralized logs directory: $logsDir');
-      return logsDir;
-    } else if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-      final logsDir = await getQuizzerLogsPath();
-      // Log this path using the logger.
-      QuizzerLogger.logMessage('QuizzerLogger: Using centralized logs directory: $logsDir'); 
-      print('QuizzerLogger: Using centralized logs directory: $logsDir');
-      return logsDir; // Return the path to the 'QuizzerAppLogs' directory
-    }
-    // Fallback for other platforms or if none of the above (should not happen for supported platforms)
-    QuizzerLogger.logWarning('_getAppDirectory: Unsupported platform or environment, defaulting to local $_logDir');
-    return _logDir; 
-  }
+
 
   // Configure the root logger (call this from main.dart)
   static Future<void> setupLogging({Level level = Level.INFO}) async {
@@ -269,10 +250,10 @@ class QuizzerLogger {
 
     // --- File Setup --- 
     try {
-      final String baseDir = await _getAppDirectory();
+      final String baseDir = await getQuizzerLogsPath();
       final String logFilePath = p.join(baseDir, _logFileName);
       
-      // Ensure baseDir (e.g., QuizzerAppLogs) exists. _getAppDirectory should handle this, but as a safeguard:
+      // Ensure baseDir (e.g., QuizzerAppLogs) exists. getQuizzerLogsPath should handle this, but as a safeguard:
       final Directory dir = Directory(baseDir);
       if (!await dir.exists()) { // Use await for exists()
         print('Quizzer: Safeguard: Log directory $baseDir not found, attempting to create it.');

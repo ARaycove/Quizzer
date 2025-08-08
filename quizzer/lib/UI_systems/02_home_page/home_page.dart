@@ -113,7 +113,6 @@ class _HomePageState extends State<HomePage> { // State class
     );
   }
 
-  // TODO Add in "read question" button, that reads the question and it's answer, first need to build that service into the API.
   /// Selects and returns the appropriate widget based on the current question type.
   Widget _buildQuestionBody() {
     // Check if there's a current question loaded

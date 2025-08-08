@@ -1191,8 +1191,6 @@ class SessionManager {
     }
   }
 
-  // TODO Need a service feature that enables text to speech, take in String input, send to service, return audio recording. UI will use this api call to get an audio recording, receive it, then play it.
-  // To test in isolation we will generate a few sentences and then pass to service, save the audio recording to a file, then use a different software to play it.
 
   /// Fetches the full details of a question by its ID (for UI preview, editing, etc.)
   Future<Map<String, dynamic>> fetchQuestionDetailsById(String questionId) async {
@@ -1279,7 +1277,6 @@ class SessionManager {
     required String flagType,
     required String flagDescription,
   }) async {
-    // TODO Write Unit tests for this API
     try {
       QuizzerLogger.logMessage('Entering addQuestionFlag()...');
       

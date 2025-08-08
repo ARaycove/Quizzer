@@ -30,23 +30,6 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/question_answ
 
 // [x] Review call that handles both edit and delete scenarios
 
-
-
-
-
-
-
-// [x] Write review system API calls
-
-// TODO Write unit tests to ensure valid input/output. Unit tests should clear any records they push immediately
-
-// TODO Update flag questions widget to API
-
-// TODO Write admin_panel widget to allow admins to access and address ticketed questions, account for not retrieving questions that don't exist in db.
-
-// TODO Admin panel should allow for deletion of existing question answer pairs
-
-
 // ==========================================
 // Question Answer Pair Flags Table
 // ==========================================
@@ -249,7 +232,6 @@ Future<List<Map<String, dynamic>>> getUnsyncedQuestionAnswerPairFlags() async {
 
 /// Deletes a specific flag
 Future<int> deleteQuestionAnswerPairFlag(String questionId, String flagType) async {
-  // TODO Write unit tests for this function
   // Set Up:
   // Clear Table
 

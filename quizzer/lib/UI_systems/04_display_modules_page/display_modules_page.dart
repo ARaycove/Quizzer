@@ -25,7 +25,7 @@ class DisplayModulesPage extends StatelessWidget {
     scrollController.addListener(scrollListener);
     
     void handleFilter() {
-      // TODO: Implement filter functionality
+
     }
 
     void showInfoDialog() {

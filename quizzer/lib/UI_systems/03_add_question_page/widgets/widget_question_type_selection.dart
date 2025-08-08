@@ -9,7 +9,7 @@ const Map<String, String> _questionTypes = {
   'true_false': 'True/False',
   'sort_order': 'Sort Order',
   'fill_in_the_blank': 'Fill in the Blank',
-  // TODO: Add other question types here as they become available (10 in total planned)
+  // Add other question types here as they become available
 };
 
 class QuestionTypeSelection extends StatelessWidget {

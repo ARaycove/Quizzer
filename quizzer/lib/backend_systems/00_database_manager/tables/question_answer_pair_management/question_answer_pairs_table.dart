@@ -42,15 +42,16 @@ Future<void> verifyQuestionAnswerPairTable(dynamic db) async {
   );
   // ALL question_type:
   // - multiple_choice:       ✅ IMPLEMENTED
-  // - select_all_that_apply: ✅ IMPLEMENTED  
+  // - select_all_that_apply: ✅ IMPLEMENTED
   // - true_false:            ✅ IMPLEMENTED
   // - sort_order:            ✅ IMPLEMENTED
   // - fill_in_the_blank:     ✅ IMPLEMENTED
-  // - short_answer:          TODO / NOT IMPLEMENTED
-  // - matching:              TODO / NOT IMPLEMENTED
-  // - hot_spot:              TODO / NOT IMPLEMENTED
-  // - label_diagram:         TODO / NOT IMPLEMENTED
-  // - math:                  TODO / NOT IMPLEMENTED
+  // - short_answer:          NOT IMPLEMENTED
+  // - matching:              NOT IMPLEMENTED
+  // - hot_spot:              NOT IMPLEMENTED
+  // - label_diagram:         NOT IMPLEMENTED
+  // - math:                  NOT IMPLEMENTED
+  // - speech:                NOT IMPLEMENTED
 
 
   // question/answer element format:
@@ -1935,15 +1936,17 @@ Future<String> addFillInTheBlankQuestion({
   }
 }
 
-// TODO short_answer              isValidationDone [ ]
+// short_answer              isValidationDone [ ]
 
-// TODO matching                  isValidationDone [ ]
+// matching                  isValidationDone [ ]
 
-// TODO hot_spot (clicks image)   isValidationDone [ ]
+// hot_spot (clicks image)   isValidationDone [ ]
 
-// TODO label_diagram             isValidationDone [ ]
+// label_diagram             isValidationDone [ ]
 
-// TODO math                      isValidationDone [ ]
+// math                      isValidationDone [ ]
+
+// speech                    isValidationDone [ ]
 
 // =====================================================================================
 // Media Status Housekeeping Functions

@@ -9,18 +9,6 @@ import 'package:quizzer/backend_systems/session_manager/answer_validation/text_v
 // duplicate private helper functions here, the AI is fucking dumb and tried to use them instead of the main function in table_helper
 // Like seriously, it doesn't matter how many times you tell this stupid assistant it will consistently try to rewrite existing functionality instead of just using whats already there 
 
-// TODO Need to update the approved questions with the reviewer user_id. When a reviewer clicks approve question the question record will be deleted from the review table(s) and then added to the main question answer pairs table. Currently the qst_reviewer field is not filled at this step. Please update the approve function so that it inserts the currently logged in user_id as the qst_reviewer.
-
-// TODO subscribe to user question functionality
-
-// TODO badge and acheivement system needs to be built out, track question contributors and contribution by subject matter 
-// - Question performance badges
-// - Contribution badges
-
-
-
-
-
 
 // ==========================================
 // Constants

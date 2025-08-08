@@ -79,22 +79,6 @@ const List<Map<String, dynamic>> _applicationSettings = [
     'is_admin_setting': false,
   },
 ];
-// TODO Designing a stat/info display for home page
-// Add the following settings 
-// [x] one for each stat
-// [x] Update settings page to allow toggling of these boolean settings added
-// settings page should not use the field names directly and should be user readable. BECAUSE THERES A FUCKING DIFFERENCE BETWEEN REGULAR HUMAN READABLE TEXT AND CAMEL CASE AND SNAKE CASE non-technical users don't want to see that bullshit
-
-// [x] update SessionManager to store current stats in memory
-// [x] For each display setting, create a private variable and getter for that variable in the SessionManager, should be clean and organized in it's own section to make the now very Large SessionManager object more readable. 
-// [x] setup how the SessionManager will get that information
-// - update after any stat update call
-// - closer to the source, have each individual update stat function do the update in the sessionmanager itself rather than additional queries. Thus while that function has the current value in memory, it will store it in the session manager in addition to writing it to the DB through the sql update
-
-// TODO Design a stat_block widget for each display setting (use a template, that handles different data types and displays accordingly)
-
-// TODO Design a stat_display widget to place in the home_page
-
 const String _tableName = 'user_settings';
 
 // --- Internal Helper: Ensure Setting Rows Exist ---

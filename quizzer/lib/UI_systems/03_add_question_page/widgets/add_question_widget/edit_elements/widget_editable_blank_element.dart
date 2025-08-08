@@ -57,9 +57,9 @@ class EditableBlankElement extends StatefulWidget {
 class _EditableBlankElementState extends State<EditableBlankElement> {
   late TextEditingController _primaryAnswerController;
   late FocusNode _primaryAnswerFocusNode;
-  List<TextEditingController> _synonymControllers = [];
-  List<FocusNode> _synonymFocusNodes = [];
-  List<bool> _isEditingSynonyms = [];
+  final List<TextEditingController> _synonymControllers = [];
+  final List<FocusNode> _synonymFocusNodes = [];
+  final List<bool> _isEditingSynonyms = [];
   bool _isEditingPrimary = false;
   
   // Cache for synonym suggestions to avoid duplicate API calls

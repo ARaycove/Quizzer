@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-// TODO: This widget is broken and needs to be fixed
 class SelectableLaTexT extends StatefulWidget {
   /// The text to display with LaTeX support
   final String data;
