@@ -5,7 +5,6 @@ import 'package:quizzer/UI_systems/03_add_question_page/widgets/add_question_wid
 import 'package:quizzer/UI_systems/03_add_question_page/widgets/add_question_widget/edit_elements/widget_editable_image_element.dart';
 import 'package:quizzer/UI_systems/03_add_question_page/widgets/add_question_widget/edit_elements/widget_editable_splittable_text_blank.dart';
 import 'package:quizzer/UI_systems/03_add_question_page/widgets/add_question_widget/edit_elements/widget_editable_blank_element.dart';
-import 'package:quizzer/UI_systems/global_widgets/question_answer_element.dart';
 
 // ==========================================
 //    Add Question Elements Widget

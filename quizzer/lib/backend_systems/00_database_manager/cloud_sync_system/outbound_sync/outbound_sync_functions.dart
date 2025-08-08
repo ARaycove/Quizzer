@@ -11,16 +11,16 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/system_data/e
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_settings_table.dart'; // Added for user settings table
 import 'package:quizzer/backend_systems/00_database_manager/tables/modules_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/system_data/user_feedback_table.dart'; // Added for user feedback
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_eligible_questions_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_non_circulating_questions_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_in_circulation_questions_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_revision_streak_sum_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_total_user_question_answer_pairs_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_average_questions_shown_per_day_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_total_questions_answered_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_daily_questions_answered_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_days_left_until_questions_exhaust_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_average_daily_questions_learned_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_eligible_questions_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_non_circulating_questions_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_in_circulation_questions_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_revision_streak_sum_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_total_user_question_answer_pairs_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_average_questions_shown_per_day_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_total_questions_answered_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_daily_questions_answered_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_days_left_until_questions_exhaust_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_average_daily_questions_learned_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_module_activation_status_table.dart';
 import 'dart:io'; // For SocketException
 
@@ -348,8 +348,9 @@ Future<void> syncQuestionAnswerPairs() async {
         failureCount++;
         continue;
       }
-      QuizzerLogger.logValue('Pushing to $reviewTable. Payload: $record');
+      QuizzerLogger.logMessage('About to push to $reviewTable. Payload: $record');
       final bool pushSuccess = await pushRecordToSupabase(reviewTable, record);
+      QuizzerLogger.logMessage('pushRecordToSupabase returned: $pushSuccess for table: $reviewTable');
       if (pushSuccess) {
         successCount++;
         await updateQuestionSyncFlags(
@@ -814,7 +815,7 @@ Future<void> syncUserSettings() async {
     // If not, this will need an import: import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_settings_table.dart' as user_settings_tbl;
     // Then call: user_settings_tbl.getUnsyncedUserSettings(currentUserId, db);
     // For this edit, I'll assume direct availability. It will be caught if not.
-    final List<Map<String, dynamic>> unsyncedRecords = await getUnsyncedUserSettings(currentUserId); // from user_settings_table.dart
+    final List<Map<String, dynamic>> unsyncedRecords = await getUnsyncedUserSettings(currentUserId, skipEnsureRows: true); // from user_settings_table.dart
 
     if (unsyncedRecords.isEmpty) {
       QuizzerLogger.logMessage('No unsynced UserSettings found for user $currentUserId.');

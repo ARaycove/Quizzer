@@ -602,57 +602,53 @@ class _AddQuestionAnswerPageState extends State<AddQuestionAnswerPage> {
 
    // --- Save/Submit Logic using SessionManager ---
    void _handleSubmitQuestion() async {
-     QuizzerLogger.logMessage("Attempting to submit question via SessionManager...");
+      QuizzerLogger.logMessage("Attempting to submit question via SessionManager...");
 
-     // --- 0. Validation ---
-     if (!_validateQuestionData()) {
-       return; // Stop if validation fails
-     }
+      // --- 0. Validation ---
+      if (!_validateQuestionData()) {
+        return; // Stop if validation fails
+      }
 
-     // --- ADDED: 0.5. Finalize Staged Images ---
-     try {
-       // Pass the CURRENT state lists to the helper. It modifies them in place.
-       await finalizeStagedImages(_currentQuestionElements, _currentAnswerElements);
-     } catch (e) {
-       QuizzerLogger.logError("Failed to finalize staged images during submit: $e");
-       if (mounted) {
-         ScaffoldMessenger.of(context).showSnackBar(
-           SnackBar(content: Text('Error processing images: $e'))
-         );
-       }
-       return; // Stop submission if image finalization fails
-     }
-     // --- END ADDED ---
+      // --- ADDED: 0.5. Finalize Staged Images ---
+      try {
+        // Pass the CURRENT state lists to the helper. It modifies them in place.
+        await finalizeStagedImages(_currentQuestionElements, _currentAnswerElements);
+      } catch (e) {
+        QuizzerLogger.logError("Failed to finalize staged images during submit: $e");
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error processing images: $e'))
+          );
+        }
+        return; // Stop submission if image finalization fails
+      }
+      // --- END ADDED ---
 
-     // --- 1. Gather Data & Call SessionManager (Fire and Forget) ---
-     QuizzerLogger.logMessage("Validation passed. Calling SessionManager.addNewQuestion (no await)... ");
+      // --- 1. Gather Data & Call SessionManager (Fire and Forget) ---
+      QuizzerLogger.logMessage("Validation passed. Calling SessionManager.addNewQuestion (no await)... ");
 
-     // Strip out blankId from question elements before submission (blankId is only for edit tools)
-     final List<Map<String, dynamic>> cleanedQuestionElements = _currentQuestionElements.map((element) {
-       if (element['type'] == 'blank') {
-         final cleanedElement = Map<String, dynamic>.from(element);
-         cleanedElement.remove('blankId'); // Remove blankId before submission
-         return cleanedElement;
-       }
-       return element;
-     }).toList();
+      // Strip out blankId from question elements before submission (blankId is only for edit tools)
+      final List<Map<String, dynamic>> cleanedQuestionElements = _currentQuestionElements.map((element) {
+      if (element['type'] == 'blank') {
+      final cleanedElement = Map<String, dynamic>.from(element);
+      cleanedElement.remove('blankId'); // Remove blankId before submission
+      return cleanedElement;
+      }
+      return element;
+      }).toList();
 
-     // Call without await and remove try-catch
-     // Use the potentially modified element lists
-     _session.addNewQuestion(
-       // Required parameters
-       moduleName: _moduleController.text,
-       questionType: _questionTypeController.text,
-       questionElements: cleanedQuestionElements, // Use cleaned list without blankId
-       answerElements: _currentAnswerElements,   // Use list potentially updated by finalizeStagedImages
-       // Optional / Type-specific parameters (pass null if not applicable/empty)
-       options: _currentOptions.isNotEmpty ? _currentOptions : null,
-       correctOptionIndex: _currentCorrectOptionIndex,
-       indexOptionsThatApply: _currentCorrectIndicesSATA.isNotEmpty ? _currentCorrectIndicesSATA : null,
-       // Optional Metadata (pass null if not collected/available)
-       citation: null,
-       concepts: null,
-       subjects: null,
+      // Call without await and remove try-catch
+      // Use the potentially modified element lists
+      _session.addNewQuestion(
+      // Required parameters
+      moduleName: _moduleController.text,
+      questionType: _questionTypeController.text,
+      questionElements: cleanedQuestionElements, // Use cleaned list without blankId
+      answerElements: _currentAnswerElements,   // Use list potentially updated by finalizeStagedImages
+      // Optional / Type-specific parameters (pass null if not applicable/empty)
+      options: _currentOptions.isNotEmpty ? _currentOptions : null,
+      correctOptionIndex: _currentCorrectOptionIndex,
+      indexOptionsThatApply: _currentCorrectIndicesSATA.isNotEmpty ? _currentCorrectIndicesSATA : null,
      );
 
      // --- 2. Assume Success Immediately (UI Update) ---

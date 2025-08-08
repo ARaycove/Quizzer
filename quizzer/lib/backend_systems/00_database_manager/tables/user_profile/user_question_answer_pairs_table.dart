@@ -719,7 +719,6 @@ Future<List<Map<String, dynamic>>> getEligibleUserQuestionAnswerPairs(String use
         user_question_answer_pairs.average_times_shown_per_day,
         user_question_answer_pairs.in_circulation,
         user_question_answer_pairs.total_attempts,
-        question_answer_pairs.citation,
         question_answer_pairs.question_elements,
         question_answer_pairs.answer_elements,
         question_answer_pairs.module_name,

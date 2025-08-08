@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
-import 'package:quizzer/app_theme.dart';
 
 class WidgetBooleanSettingTemplate extends StatefulWidget {
   final String settingName;

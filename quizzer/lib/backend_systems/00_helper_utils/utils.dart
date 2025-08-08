@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/00_helper_utils/file_locations.dart';
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/table_helper.dart' show decodeValueFromDB;
 
 /// Moves an image from the staging directory to the final assets directory
 /// Returns just the filename for storage in the database
@@ -71,4 +72,33 @@ Future<bool> checkConnectivity() async {
     QuizzerLogger.logError('Unexpected error during network check: $e');
     return false;
   }
+}
+
+/// Trims whitespace from content fields in question/answer elements and options
+/// Takes either a JSON string or List<Map<String, dynamic>> where each element is {'type': 'text|image|blank', 'content': 'string_value'}
+/// Returns the trimmed List<Map<String, dynamic>>
+List<Map<String, dynamic>> trimContentFields(dynamic elements) {
+  List<Map<String, dynamic>> decodedElements;
+  
+  if (elements is String) {
+    // Use table helper to decode and validate JSON string
+    final decoded = decodeValueFromDB(elements);
+    if (decoded is! List) {
+      throw ArgumentError('JSON string must decode to a List, got ${decoded.runtimeType}');
+    }
+    decodedElements = List<Map<String, dynamic>>.from(decoded);
+  } else if (elements is List) {
+    // Already decoded list
+    decodedElements = List<Map<String, dynamic>>.from(elements);
+  } else {
+    throw ArgumentError('Input must be either a JSON string or List<Map<String, dynamic>>');
+  }
+  
+  return decodedElements.map((element) {
+    final newElement = Map<String, dynamic>.from(element);
+    if (newElement.containsKey('content') && newElement['content'] is String) {
+      newElement['content'] = newElement['content'].toString().trim();
+    }
+    return newElement;
+  }).toList();
 }

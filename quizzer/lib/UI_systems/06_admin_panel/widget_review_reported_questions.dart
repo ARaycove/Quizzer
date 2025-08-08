@@ -197,7 +197,7 @@ class _ReviewReportedQuestionsPanelWidgetState extends State<ReviewReportedQuest
                   constraints: const BoxConstraints(maxWidth: 100),
                   child: ElevatedButton(
                     onPressed: () => _handleDecision('edit'),
-                    child: const Text('Edit'),
+                    child: const Text('Save and Approve'),
                   ),
                 ),
               ),

@@ -175,12 +175,14 @@ Future<Map<String, dynamic>> performLoginProcess({
     }
 
     // Step 6: Ensure local profile exists
+    bool hasLocalProfile = false; // Track if local profile exists
+    
     if (loginResult['offline_mode']) {
       // Offline login - check if we have a local profile
       signalLoginProgress("Checking your local profile...");
       QuizzerLogger.logMessage('Checking local profile for offline login...');
       final emailList = await getAllUserEmails();
-      final hasLocalProfile = emailList.contains(email);
+      hasLocalProfile = emailList.contains(email);
       
       if (!hasLocalProfile) {
         signalLoginProgress("Offline access requires online login first.");
@@ -277,13 +279,13 @@ Future<Map<String, dynamic>> loginInitialization({
         // Fresh database - await sync workers to populate initial data
         signalLoginProgress("Setting up your data for the first time...");
         QuizzerLogger.logMessage('Database is fresh, awaiting sync workers to populate initial data...');
-        await initializeSyncWorkers();
+        await initializeSyncWorkers(isDatabaseFresh: isDatabaseFresh);
         QuizzerLogger.logSuccess('Sync workers completed for fresh database');
       } else {
         // Not fresh - start sync workers in background
         signalLoginProgress("Starting background synchronization...");
         QuizzerLogger.logMessage('Database has existing data, starting sync workers in background...');
-        initializeSyncWorkers(); // Don't await - let them run in background
+        initializeSyncWorkers(isDatabaseFresh: isDatabaseFresh); // Don't await - let them run in background
         QuizzerLogger.logSuccess('Sync workers started in background for existing database');
       }
     } else {

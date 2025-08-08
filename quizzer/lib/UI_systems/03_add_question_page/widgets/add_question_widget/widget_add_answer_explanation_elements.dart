@@ -3,7 +3,6 @@ import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/app_theme.dart';
 import 'package:quizzer/UI_systems/03_add_question_page/widgets/add_question_widget/edit_elements/widget_editable_text_element.dart';
 import 'package:quizzer/UI_systems/03_add_question_page/widgets/add_question_widget/edit_elements/widget_editable_image_element.dart';
-import 'package:quizzer/UI_systems/global_widgets/question_answer_element.dart';
 
 // ==========================================
 //    Add Answer Explanation Elements Widget

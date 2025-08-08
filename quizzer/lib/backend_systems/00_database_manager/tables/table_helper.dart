@@ -10,7 +10,7 @@ import 'package:package_info_plus/package_info_plus.dart'; // Import the plugin
 /// Handles Strings, ints, doubles, booleans, Lists, and Maps.
 /// Lists and Maps are encoded as JSON TEXT. Booleans are stored as INTEGER (1/0).
 /// Throws StateError for unsupported types.
-_encodeValueForDB(dynamic value) {
+dynamic encodeValueForDB(dynamic value) {
   if (value == null) {
     return null; // Store nulls directly
   } else if (value is String || value is int || value is double) {
@@ -31,9 +31,9 @@ _encodeValueForDB(dynamic value) {
 /// Assumes that TEXT fields starting with '[' or '{' are JSON strings representing Lists/Maps.
 /// Other TEXT fields are returned as Strings. INTEGER, REAL, and NULL are returned directly.
 // Callers must manually interpret integer fields intended as booleans.
-_decodeValueFromDB(dynamic dbValue) {
-  if (dbValue == null || dbValue is int || dbValue is double) {
-    return dbValue; // Return nulls, integers, and doubles directly
+dynamic decodeValueFromDB(dynamic dbValue) {
+  if (dbValue == null || dbValue is int || dbValue is double || dbValue is bool) {
+    return dbValue; // Return nulls, integers, doubles, and booleans directly
   } else if (dbValue is String) {
     // Trim whitespace before checking brackets/braces
     final trimmedValue = dbValue.trim();
@@ -80,7 +80,7 @@ Future<int> insertRawData(
   for (final entry in data.entries) {
     final key = entry.key;
     final rawValue = entry.value;
-    encodedData[key] = _encodeValueForDB(rawValue);
+    encodedData[key] = encodeValueForDB(rawValue);
   }
 
   // QuizzerLogger.logValue('Performing insert into $tableName with encoded data: ${encodedData.keys.join(', ')}');
@@ -150,7 +150,7 @@ Future<List<Map<String, dynamic>>> queryAndDecodeDatabase(
   for (final rawRow in rawResults) {
     final Map<String, dynamic> decodedRow = {};
     for (final entry in rawRow.entries) {
-      decodedRow[entry.key] = _decodeValueFromDB(entry.value);
+      decodedRow[entry.key] = decodeValueFromDB(entry.value);
     }
     decodedResults.add(decodedRow);
   }
@@ -187,11 +187,9 @@ Future<int> updateRawData(
   for (final entry in data.entries) {
     final key = entry.key;
     final rawValue = entry.value;
-    encodedData[key] = _encodeValueForDB(rawValue);
+    encodedData[key] = encodeValueForDB(rawValue);
   }
 
-  // QuizzerLogger.logValue('Performing update on $tableName with encoded data: ${encodedData.keys.join(', ')}');
-  
   // Perform the actual database update with the encoded data
   final result = await db.update(
     tableName,
@@ -201,7 +199,6 @@ Future<int> updateRawData(
     conflictAlgorithm: conflictAlgorithm,
   );
   
-  // QuizzerLogger.logValue('Update on $tableName affected $result rows.');
   return result;
 }
 

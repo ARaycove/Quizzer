@@ -2,6 +2,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'table_helper.dart'; // Import the helper file
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
+import 'package:quizzer/backend_systems/10_switch_board/sb_sync_worker_signals.dart';
 
 // Table name and field constants
 const String modulesTableName = 'modules';
@@ -12,22 +13,52 @@ const String subjectsField = 'subjects';
 const String relatedConceptsField = 'related_concepts';
 const String creationDateField = 'creation_date';
 const String creatorIdField = 'creator_id';
+const String categoriesField = 'categories';
+
+// Allowed category values
+const List<String> allowedCategories = [
+  'other', 
+  'mathematics', 
+  'mcat', 
+  'clep'
+  ];
+
+// Get all available categories
+List<String> getAvailableCategories() {
+  return List.from(allowedCategories);
+}
+
+// Helper function to validate and normalize categories
+List<String> validateAndNormalizeCategories(List<String> categories) {
+  final List<String> validatedCategories = [];
+  for (final category in categories) {
+    final normalizedCategory = category.toLowerCase();
+    if (allowedCategories.contains(normalizedCategory)) {
+      validatedCategories.add(normalizedCategory);
+    }
+  }
+  // If no valid categories found, default to 'other'
+  return validatedCategories.isNotEmpty ? validatedCategories : ['other'];
+}
 
 // Create table SQL
-const String createModulesTableSQL = '''
-  CREATE TABLE IF NOT EXISTS $modulesTableName (
-    $moduleNameField TEXT PRIMARY KEY,
-    $descriptionField TEXT,
-    $primarySubjectField TEXT,
-    $subjectsField TEXT,
-    $relatedConceptsField TEXT,
-    $creationDateField TEXT,
-    $creatorIdField TEXT,
-    has_been_synced INTEGER DEFAULT 0,
-    edits_are_synced INTEGER DEFAULT 0,
-    last_modified_timestamp TEXT
-  )
-''';
+String createModulesTableSQL() {
+  return '''
+    CREATE TABLE IF NOT EXISTS $modulesTableName (
+      $moduleNameField TEXT PRIMARY KEY,
+      $descriptionField TEXT,
+      $primarySubjectField TEXT,
+      $subjectsField TEXT,
+      $relatedConceptsField TEXT,
+      $creationDateField TEXT,
+      $creatorIdField TEXT,
+      $categoriesField TEXT DEFAULT '["other"]',
+      has_been_synced INTEGER DEFAULT 0,
+      edits_are_synced INTEGER DEFAULT 0,
+      last_modified_timestamp TEXT
+    )
+  ''';
+}
 
 // Verify table exists and create if needed
 Future<void> verifyModulesTable(dynamic db) async {
@@ -38,7 +69,7 @@ Future<void> verifyModulesTable(dynamic db) async {
   
   if (tables.isEmpty) {
     QuizzerLogger.logMessage('Modules table does not exist, creating it');
-    await db.execute(createModulesTableSQL);
+    await db.execute(createModulesTableSQL());
     QuizzerLogger.logSuccess('Modules table created successfully');
     // Build modules from question-answer pairs when table is first created
     QuizzerLogger.logMessage('Building initial modules from question-answer pairs');
@@ -71,7 +102,8 @@ Future<void> verifyModulesTable(dynamic db) async {
     final newFields = {
       'has_been_synced': 'INTEGER DEFAULT 0',
       'edits_are_synced': 'INTEGER DEFAULT 0',
-      'last_modified_timestamp': 'TEXT'
+      'last_modified_timestamp': 'TEXT',
+      categoriesField: 'TEXT DEFAULT \'["other"]\''
     };
 
     for (final entry in newFields.entries) {
@@ -93,6 +125,7 @@ Future<void> insertModule({
   required List<String> subjects,
   required List<String> relatedConcepts,
   required String creatorId,
+  List<String> categories = const ['other'],
 }) async {
   try {
     final db = await getDatabaseMonitor().requestDatabaseAccess();
@@ -103,6 +136,9 @@ Future<void> insertModule({
     await verifyModulesTable(db);
     final now = DateTime.now().toUtc().toIso8601String();
     
+    // Validate and normalize categories
+    categories = validateAndNormalizeCategories(categories);
+    
     // Prepare the raw data map - join lists into strings as needed by schema
     final Map<String, dynamic> data = {
       moduleNameField: name,
@@ -112,6 +148,7 @@ Future<void> insertModule({
       relatedConceptsField: relatedConcepts, // Pass raw list for JSON encoding
       creationDateField: now,
       creatorIdField: creatorId,
+      categoriesField: categories,
       'has_been_synced': 0,
       'edits_are_synced': 0,
       'last_modified_timestamp': DateTime.now().toUtc().toIso8601String()
@@ -148,6 +185,7 @@ Future<void> updateModule({
   String? primarySubject,
   List<String>? subjects,
   List<String>? relatedConcepts,
+  List<String>? categories,
 }) async {
   try {
     final db = await getDatabaseMonitor().requestDatabaseAccess();
@@ -173,6 +211,10 @@ Future<void> updateModule({
     if (primarySubject != null) updates[primarySubjectField] = primarySubject;
     if (subjects != null) updates[subjectsField] = subjects; // Pass raw list
     if (relatedConcepts != null) updates[relatedConceptsField] = relatedConcepts; // Pass raw list
+    if (categories != null) {
+      updates[categoriesField] = validateAndNormalizeCategories(categories);
+      updates['edits_are_synced'] = 0; // Mark as needing sync when categories change
+    }
     
     // Add fields that are always updated
     updates['last_modified_timestamp'] = DateTime.now().toUtc().toIso8601String();
@@ -193,6 +235,9 @@ Future<void> updateModule({
       } else {
         QuizzerLogger.logSuccess('Module $name updated successfully ($result row affected).');
       }
+      
+      // Trigger outbound sync for module updates
+      signalOutboundSyncNeeded();
     } else {
       QuizzerLogger.logWarning('Update operation for module $name affected 0 rows. Module might not exist or data was unchanged.');
     }
@@ -245,6 +290,7 @@ Future<Map<String, dynamic>?> getModule(String name) async {
       relatedConceptsField: decodedModule[relatedConceptsField], // Already decoded
       creationDateField: decodedModule[creationDateField], // Keep as string, no conversion needed
       creatorIdField: decodedModule[creatorIdField],
+      categoriesField: decodedModule[categoriesField],
     };
     
     QuizzerLogger.logValue('Retrieved and processed module: $finalResult');
@@ -309,6 +355,7 @@ Future<List<Map<String, dynamic>>> getAllModules() async {
           relatedConceptsField: decodedModule[relatedConceptsField],
           creationDateField: decodedModule[creationDateField], // Keep as string, no conversion needed
           creatorIdField: decodedModule[creatorIdField],
+          categoriesField: decodedModule[categoriesField],
         };
         finalResults.add(processedModule);
     }
@@ -317,6 +364,102 @@ Future<List<Map<String, dynamic>>> getAllModules() async {
     return finalResults;
   } catch (e) {
     QuizzerLogger.logError('Error getting all modules - $e');
+    rethrow;
+  } finally {
+    getDatabaseMonitor().releaseDatabaseAccess();
+  }
+}
+
+/// Retrieves all modules that belong to a specific category.
+/// 
+/// This function performs a case-insensitive search for modules containing the specified
+/// category in their categories field. If an invalid category is provided, it automatically
+/// defaults to searching for modules in the 'other' category.
+/// 
+/// **Parameters:**
+/// - `category`: The category name to search for (case-insensitive)
+/// 
+/// **Returns:**
+/// A `Future<List<Map<String, dynamic>>>` containing all modules that have the specified
+/// category in their categories list. Each map contains the complete module data including:
+/// - `module_name`: The unique identifier/name of the module
+/// - `description`: Module description
+/// - `primary_subject`: The primary subject area
+/// - `subjects`: List of related subjects (decoded from JSON)
+/// - `related_concepts`: List of related concepts (decoded from JSON)
+/// - `creation_date`: When the module was created (ISO8601 string)
+/// - `creator_id`: ID of the user who created the module
+/// - `categories`: List of categories the module belongs to (decoded from JSON)
+/// 
+/// **Behavior:**
+/// - Input is normalized to lowercase for case-insensitive matching
+/// - Invalid categories automatically default to 'other'
+/// - Uses SQL LIKE operator to match categories within the JSON array
+/// - Returns empty list if no modules found for the category
+/// - All returned data is properly decoded from database storage format
+/// 
+/// **Example:**
+/// ```dart
+/// // Get all mathematics modules
+/// List<Map<String, dynamic>> mathModules = await getModulesByCategory('mathematics');
+/// 
+/// // Case-insensitive - these are equivalent
+/// List<Map<String, dynamic>> mcatModules1 = await getModulesByCategory('MCAT');
+/// List<Map<String, dynamic>> mcatModules2 = await getModulesByCategory('mcat');
+/// 
+/// // Invalid category defaults to 'other'
+/// List<Map<String, dynamic>> otherModules = await getModulesByCategory('invalid');
+/// ```
+Future<List<Map<String, dynamic>>> getModulesByCategory(String category) async {
+  try {
+    final db = await getDatabaseMonitor().requestDatabaseAccess();
+    if (db == null) {
+      throw Exception('Failed to acquire database access');
+    }
+    QuizzerLogger.logMessage('Fetching modules by category: $category');
+    await verifyModulesTable(db);
+    
+    // Validate and normalize category
+    final normalizedCategory = category.toLowerCase();
+    final validatedCategory = allowedCategories.contains(normalizedCategory) ? normalizedCategory : 'other';
+    
+    // Use the universal query helper
+    final List<Map<String, dynamic>> decodedModules = await queryAndDecodeDatabase(
+      modulesTableName,
+      db,
+      where: '$categoriesField LIKE ?',
+      whereArgs: ['%$validatedCategory%'],
+    );
+
+    // Process the decoded results to perform final type conversions
+    final List<Map<String, dynamic>> finalResults = [];
+    for (final decodedModule in decodedModules) {
+      // Check if module_name is missing (essential)
+      if (decodedModule[moduleNameField] == null) {
+        QuizzerLogger.logError(
+          'Skipping module due to missing essential field: $moduleNameField. Module data: $decodedModule'
+        );
+        continue;
+      }
+
+      // Perform the same type conversions as in getModule
+      final Map<String, dynamic> processedModule = {
+        moduleNameField: decodedModule[moduleNameField],
+        descriptionField: decodedModule[descriptionField],
+        primarySubjectField: decodedModule[primarySubjectField],
+        subjectsField: decodedModule[subjectsField],
+        relatedConceptsField: decodedModule[relatedConceptsField],
+        creationDateField: decodedModule[creationDateField],
+        creatorIdField: decodedModule[creatorIdField],
+        categoriesField: decodedModule[categoriesField],
+      };
+      finalResults.add(processedModule);
+    }
+
+    QuizzerLogger.logValue('Retrieved and processed ${finalResults.length} modules for category: $validatedCategory');
+    return finalResults;
+  } catch (e) {
+    QuizzerLogger.logError('Error getting modules by category - $e');
     rethrow;
   } finally {
     getDatabaseMonitor().releaseDatabaseAccess();
@@ -396,6 +539,7 @@ Future<void> updateModuleSyncFlags({
 Future<void> upsertModuleFromInboundSync({
   required String moduleName,
   required String description,
+  required String categories,
 }) async {
   try {
     final db = await getDatabaseMonitor().requestDatabaseAccess();
@@ -410,6 +554,7 @@ Future<void> upsertModuleFromInboundSync({
     final Map<String, dynamic> data = {
       'module_name': moduleName,
       'description': description,
+      'categories': categories,
       'has_been_synced': 1,
       'edits_are_synced': 1,
       'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
@@ -429,4 +574,84 @@ Future<void> upsertModuleFromInboundSync({
   } finally {
     getDatabaseMonitor().releaseDatabaseAccess();
   }
+}
+
+/// Ensures that all unique module names from question_answer_pairs table have corresponding module records
+/// Creates missing modules with default values
+Future<void> ensureAllQuestionModuleNamesHaveCorrespondingModuleRecords() async {
+  List<String> missingModuleNames = [];
+  
+  try {
+    QuizzerLogger.logMessage('Validating modules table - checking for missing modules...');
+    
+    final db = await getDatabaseMonitor().requestDatabaseAccess();
+    if (db == null) {
+      throw Exception('Failed to acquire database access');
+    }
+    
+    await verifyModulesTable(db);
+    
+    // Get all unique module names from question_answer_pairs table
+    final List<Map<String, dynamic>> moduleNamesResult = await db.rawQuery(
+      'SELECT DISTINCT module_name FROM question_answer_pairs WHERE module_name IS NOT NULL AND module_name != ""'
+    );
+    
+    if (moduleNamesResult.isEmpty) {
+      QuizzerLogger.logMessage('No module names found in question_answer_pairs table');
+      return;
+    }
+    
+    final List<String> questionModuleNames = moduleNamesResult
+        .map((row) => row['module_name'] as String)
+        .where((name) => name.isNotEmpty)
+        .toList();
+    
+    QuizzerLogger.logMessage('Found ${questionModuleNames.length} unique module names in question_answer_pairs table');
+    
+    // Get all existing module names from modules table
+    final List<Map<String, dynamic>> existingModulesResult = await db.rawQuery(
+      'SELECT module_name FROM modules'
+    );
+    
+    final Set<String> existingModuleNames = existingModulesResult
+        .map((row) => row['module_name'] as String)
+        .toSet();
+    
+    QuizzerLogger.logMessage('Found ${existingModuleNames.length} existing modules in modules table');
+    
+    // Find missing modules
+    missingModuleNames = questionModuleNames
+        .where((name) => !existingModuleNames.contains(name))
+        .toList();
+    
+    if (missingModuleNames.isEmpty) {
+      QuizzerLogger.logMessage('All module names have corresponding module records');
+      return;
+    }
+    
+    QuizzerLogger.logMessage('Found ${missingModuleNames.length} missing modules: ${missingModuleNames.join(', ')}');
+    
+  } catch (e) {
+    QuizzerLogger.logError('Error validating modules table - $e');
+    rethrow;
+  } finally {
+    getDatabaseMonitor().releaseDatabaseAccess();
+  }
+  
+  // Create missing modules OUTSIDE the database access wrapper
+  for (final moduleName in missingModuleNames) {
+    QuizzerLogger.logMessage('Creating missing module: $moduleName');
+    
+    await insertModule(
+      name: moduleName,
+      description: 'Auto-generated module for $moduleName',
+      primarySubject: 'General',
+      subjects: [],
+      relatedConcepts: [],
+      creatorId: 'system',
+      categories: ['other'], // Default category for auto-generated modules
+    );
+  }
+  
+  QuizzerLogger.logSuccess('Successfully created ${missingModuleNames.length} missing modules');
 }

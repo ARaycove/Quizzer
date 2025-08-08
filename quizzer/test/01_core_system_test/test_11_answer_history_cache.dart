@@ -77,7 +77,7 @@ void main() {
         await cache.clear();
         
         // Generate test question IDs using helper
-        final List<Map<String, dynamic>> testRecords = generateTestQuestionRecords(count: 5);
+        final List<Map<String, dynamic>> testRecords = generateCompleteQuestionAnswerPairRecord(numberOfQuestions: 5);
         final List<String> testQuestionIds = testRecords.map((r) => r['question_id'] as String).toList();
         
         QuizzerLogger.logMessage('Generated test question IDs: $testQuestionIds');
@@ -141,7 +141,7 @@ void main() {
         
         // Test 2: Add 3 questions and check recent history
         QuizzerLogger.logMessage('Test 2: Adding 3 questions and checking recent history...');
-        final List<Map<String, dynamic>> testRecords = generateTestQuestionRecords(count: 3);
+        final List<Map<String, dynamic>> testRecords = generateCompleteQuestionAnswerPairRecord(numberOfQuestions: 3);
         final List<String> testQuestionIds = testRecords.map((r) => r['question_id'] as String).toList();
         
         for (final String questionId in testQuestionIds) {
@@ -157,7 +157,7 @@ void main() {
         
         // Test 3: Add 2 more questions (total 5) and check recent history
         QuizzerLogger.logMessage('Test 3: Adding 2 more questions (total 5) and checking recent history...');
-        final List<Map<String, dynamic>> additionalRecords = generateTestQuestionRecords(count: 2, prefix: 'additional_question_');
+        final List<Map<String, dynamic>> additionalRecords = generateCompleteQuestionAnswerPairRecord(numberOfQuestions: 2);
         final List<String> additionalQuestionIds = additionalRecords.map((r) => r['question_id'] as String).toList();
         
         for (final String questionId in additionalQuestionIds) {
@@ -174,7 +174,7 @@ void main() {
         
         // Test 4: Add 3 more questions (total 8) and check that oldest 3 are not in recent history
         QuizzerLogger.logMessage('Test 4: Adding 3 more questions (total 8) and checking recent history...');
-        final List<Map<String, dynamic>> moreRecords = generateTestQuestionRecords(count: 3, prefix: 'more_question_');
+        final List<Map<String, dynamic>> moreRecords = generateCompleteQuestionAnswerPairRecord(numberOfQuestions: 3);
         final List<String> moreQuestionIds = moreRecords.map((r) => r['question_id'] as String).toList();
         
         for (final String questionId in moreQuestionIds) {
@@ -222,7 +222,7 @@ void main() {
         
         // Test 2: Add 3 questions and get last five
         QuizzerLogger.logMessage('Test 2: Adding 3 questions and getting last five...');
-        final List<Map<String, dynamic>> testRecords = generateTestQuestionRecords(count: 3);
+        final List<Map<String, dynamic>> testRecords = generateCompleteQuestionAnswerPairRecord(numberOfQuestions: 3);
         final List<String> testQuestionIds = testRecords.map((r) => r['question_id'] as String).toList();
         
         for (final String questionId in testQuestionIds) {
@@ -236,7 +236,7 @@ void main() {
         
         // Test 3: Add 2 more questions (total 5) and get last five
         QuizzerLogger.logMessage('Test 3: Adding 2 more questions (total 5) and getting last five...');
-        final List<Map<String, dynamic>> additionalRecords = generateTestQuestionRecords(count: 2, prefix: 'additional_question_');
+        final List<Map<String, dynamic>> additionalRecords = generateCompleteQuestionAnswerPairRecord(numberOfQuestions: 2);
         final List<String> additionalQuestionIds = additionalRecords.map((r) => r['question_id'] as String).toList();
         
         for (final String questionId in additionalQuestionIds) {
@@ -253,7 +253,7 @@ void main() {
         
         // Test 4: Add 3 more questions (total 8) and get last five
         QuizzerLogger.logMessage('Test 4: Adding 3 more questions (total 8) and getting last five...');
-        final List<Map<String, dynamic>> moreRecords = generateTestQuestionRecords(count: 3, prefix: 'more_question_');
+        final List<Map<String, dynamic>> moreRecords = generateCompleteQuestionAnswerPairRecord(numberOfQuestions: 3);
         final List<String> moreQuestionIds = moreRecords.map((r) => r['question_id'] as String).toList();
         
         for (final String questionId in moreQuestionIds) {
@@ -293,7 +293,7 @@ void main() {
         
         // Test 2: Add questions and then clear
         QuizzerLogger.logMessage('Test 2: Adding questions and then clearing...');
-        final List<Map<String, dynamic>> testRecords = generateTestQuestionRecords(count: 5);
+        final List<Map<String, dynamic>> testRecords = generateCompleteQuestionAnswerPairRecord(numberOfQuestions: 5);
         final List<String> testQuestionIds = testRecords.map((r) => r['question_id'] as String).toList();
         
         for (final String questionId in testQuestionIds) {
@@ -348,7 +348,7 @@ void main() {
         
         // Test 2: Add questions and peek
         QuizzerLogger.logMessage('Test 2: Adding questions and peeking...');
-        final List<Map<String, dynamic>> testRecords = generateTestQuestionRecords(count: 3);
+        final List<Map<String, dynamic>> testRecords = generateCompleteQuestionAnswerPairRecord(numberOfQuestions: 3);
         final List<String> testQuestionIds = testRecords.map((r) => r['question_id'] as String).toList();
         
         for (final String questionId in testQuestionIds) {
@@ -369,7 +369,7 @@ void main() {
         
         // Test 4: Add more questions and verify peek reflects changes
         QuizzerLogger.logMessage('Test 4: Adding more questions and verifying peek reflects changes...');
-        final List<Map<String, dynamic>> additionalRecords = generateTestQuestionRecords(count: 2, prefix: 'additional_question_');
+        final List<Map<String, dynamic>> additionalRecords = generateCompleteQuestionAnswerPairRecord(numberOfQuestions: 2);
         final List<String> additionalQuestionIds = additionalRecords.map((r) => r['question_id'] as String).toList();
         
         for (final String questionId in additionalQuestionIds) {
@@ -415,7 +415,7 @@ void main() {
         
         // Test 2: Rapid add/remove cycles
         QuizzerLogger.logMessage('Test 2: Testing rapid add/remove cycles...');
-        final List<Map<String, dynamic>> testRecords = generateTestQuestionRecords(count: 10);
+        final List<Map<String, dynamic>> testRecords = generateCompleteQuestionAnswerPairRecord(numberOfQuestions: 10);
         final List<String> testQuestionIds = testRecords.map((r) => r['question_id'] as String).toList();
         
         // Add questions rapidly

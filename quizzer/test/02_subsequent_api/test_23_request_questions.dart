@@ -43,29 +43,29 @@ void main() {
     test('Test 1: Clear state, login setup, and activate two modules', () async {
       QuizzerLogger.logMessage('=== Test 1: Clear state, login setup, and activate two modules ===');
       
-      // Step 1: Clear the user question answer pairs table
-      QuizzerLogger.logMessage('Step 1: Clearing user question answer pairs table...');
-      final resetSuccess = await resetUserQuestionAnswerPairsTable();
-      expect(resetSuccess, isTrue, reason: 'Failed to reset user question answer pairs table');
-      QuizzerLogger.logSuccess('User question answer pairs table cleared successfully');
-      
-      // Step 2: Deactivate all modules (before login)
-      QuizzerLogger.logMessage('Step 2: Deactivating all modules...');
-      final deactivationResult = await resetUserModuleActivationStatusTable();
-      expect(deactivationResult, isTrue, reason: 'Failed to deactivate all modules');
-      QuizzerLogger.logSuccess('All modules deactivated successfully');
-      
-      // Step 3: Login initialization (moved from setUpAll)
-      QuizzerLogger.logMessage('Step 3: Calling loginInitialization with testRun=true...');
+      // Step 1: Login initialization (must happen first to get userId)
+      QuizzerLogger.logMessage('Step 1: Calling loginInitialization with testRun=true...');
       final loginResult = await loginInitialization(
-      email: testEmail, 
-      password: testPassword, 
-      supabase: sessionManager.supabase, 
+        email: testEmail, 
+        password: testPassword, 
+        supabase: sessionManager.supabase, 
         storage: sessionManager.getBox(testAccessPassword),
         testRun: true, // This bypasses sync workers
       );
       expect(loginResult['success'], isTrue, reason: 'Login initialization should succeed');
       QuizzerLogger.logSuccess('Login initialization completed successfully');
+      
+      // Step 2: Clear the user question answer pairs table (after login)
+      QuizzerLogger.logMessage('Step 2: Clearing user question answer pairs table...');
+      final resetSuccess = await deleteAllRecordsFromTable('user_question_answer_pairs', userId: sessionManager.userId!);
+      expect(resetSuccess, isTrue, reason: 'Failed to reset user question answer pairs table');
+      QuizzerLogger.logSuccess('User question answer pairs table cleared successfully');
+      
+      // Step 3: Deactivate all modules (after login)
+      QuizzerLogger.logMessage('Step 3: Deactivating all modules...');
+      final deactivationResult = await deleteAllRecordsFromTable('user_module_activation_status', userId: sessionManager.userId!, userIdColumn: 'user_id');
+      expect(deactivationResult, isTrue, reason: 'Failed to deactivate all modules');
+      QuizzerLogger.logSuccess('All modules deactivated successfully');
       
       // Step 4: Activate modules to get 101-150 questions total
       QuizzerLogger.logMessage('Step 4: Finding and activating modules to get 101-150 questions total...');

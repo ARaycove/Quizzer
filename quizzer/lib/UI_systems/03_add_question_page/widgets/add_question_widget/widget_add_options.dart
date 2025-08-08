@@ -6,7 +6,6 @@ import 'package:quizzer/UI_systems/03_add_question_page/widgets/add_question_wid
 import 'package:quizzer/UI_systems/03_add_question_page/widgets/add_question_widget/edit_elements/widget_editable_sort_order_option.dart';
 import 'package:quizzer/UI_systems/03_add_question_page/widgets/add_question_widget/edit_elements/widget_editable_true_false_option.dart';
 import 'package:quizzer/UI_systems/03_add_question_page/helpers/image_picker_helper.dart';
-import 'package:quizzer/UI_systems/global_widgets/question_answer_element.dart';
 
 // ==========================================
 //    Add Options Widget

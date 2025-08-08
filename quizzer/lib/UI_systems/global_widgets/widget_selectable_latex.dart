@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_math_fork/flutter_math.dart';
 
 // TODO: This widget is broken and needs to be fixed
 class SelectableLaTexT extends StatefulWidget {
@@ -107,89 +106,5 @@ class _SelectableLaTexTState extends State<SelectableLaTexT> {
       semanticsLabel: widget.semanticsLabel,
       onSelectionChanged: widget.onSelectionChanged,
     );
-  }
-
-  List<TextSpan> _extractTextSpans(String text) {
-    final texts = text.split(widget.breakDelimiter);
-    final List<TextSpan> textSpans = [];
-    for (int i = 0; i < texts.length; i++) {
-      if (i != 0) {
-        textSpans.add(
-          const TextSpan(
-            text: '\n',
-          ),
-        );
-      }
-
-      final subTexts = texts[i].split('${widget.breakDelimiter} ');
-      for (int j = 0; j < subTexts.length; j++) {
-        if (j != 0) {
-          textSpans.add(
-            const TextSpan(
-              text: ' ',
-            ),
-          );
-        }
-        textSpans.add(
-          TextSpan(
-            text: subTexts[j],
-          ),
-        );
-      }
-    }
-    return textSpans;
-  }
-
-  List<InlineSpan> _extractWidgetSpans(String text, bool align) {
-    final texts = text.split(widget.breakDelimiter);
-    final List<InlineSpan> widgetSpans = [];
-    for (int i = 0; i < texts.length; i++) {
-      if (i != 0) {
-        widgetSpans.add(
-          const TextSpan(
-            text: '\n',
-          ),
-        );
-      }
-
-      final subTexts = texts[i].split('${widget.breakDelimiter} ');
-
-      for (int j = 0; j < subTexts.length; j++) {
-        if (j != 0) {
-          widgetSpans.add(
-            const TextSpan(
-              text: ' ',
-            ),
-          );
-        }
-
-        Widget tex = SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Math.tex(
-            subTexts[j].trim(),
-            textStyle: widget.equationStyle ?? widget.style,
-            onErrorFallback: (exception) =>
-                widget.onErrorFallback?.call(subTexts[j].trim()) ??
-                Math.defaultOnErrorFallback(exception),
-          ),
-        );
-
-        if (align) {
-          tex = Align(
-            alignment: Alignment.center,
-            child: tex,
-          );
-        }
-
-        widgetSpans.add(
-          WidgetSpan(
-            alignment: PlaceholderAlignment.middle,
-            child: tex,
-          ),
-        );
-      }
-    }
-
-    return widgetSpans;
   }
 }

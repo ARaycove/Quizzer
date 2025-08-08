@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/UI_systems/global_widgets/question_answer_element.dart';
-import 'package:quizzer/UI_systems/global_widgets/widget_latext_renderer.dart';
 // ==========================================
 //    Editable Text Element Widget
 // ==========================================

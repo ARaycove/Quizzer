@@ -26,11 +26,17 @@ class _ModuleRenameMergeWidgetState extends State<ModuleRenameMergeWidget> {
   List<Map<String, dynamic>> _availableModules = [];
   bool _isLoading = false;
   bool _showRenameField = false;
+  
+  // Category management
+  List<String> _availableCategories = [];
+  List<String> _selectedCategories = [];
 
   @override
   void initState() {
     super.initState();
     _loadAvailableModules();
+    _loadAvailableCategories();
+    _loadCurrentCategories();
     _searchController.addListener(_filterModules);
   }
 
@@ -72,6 +78,35 @@ class _ModuleRenameMergeWidgetState extends State<ModuleRenameMergeWidget> {
       setState(() {
         _isLoading = false;
       });
+    }
+  }
+
+  Future<void> _loadAvailableCategories() async {
+    try {
+      final sessionManager = getSessionManager();
+      final categories = sessionManager.getAvailableModuleCategories();
+      setState(() {
+        _availableCategories = categories;
+      });
+    } catch (e) {
+      QuizzerLogger.logError('Error loading available categories: $e');
+    }
+  }
+
+  Future<void> _loadCurrentCategories() async {
+    try {
+      final sessionManager = getSessionManager();
+      final moduleData = await sessionManager.getModuleDataByName(widget.currentModuleName);
+      if (moduleData != null && moduleData.containsKey('categories')) {
+        final categories = moduleData['categories'];
+        if (categories is List) {
+          setState(() {
+            _selectedCategories = categories.cast<String>();
+          });
+        }
+      }
+    } catch (e) {
+      QuizzerLogger.logError('Error loading current categories: $e');
     }
   }
 
@@ -137,6 +172,31 @@ class _ModuleRenameMergeWidgetState extends State<ModuleRenameMergeWidget> {
     } catch (e) {
       QuizzerLogger.logError('Error merging module: $e');
       _showErrorSnackBar('Error merging module: $e');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _updateCategories() async {
+    try {
+      setState(() {
+        _isLoading = true;
+      });
+      
+      final sessionManager = getSessionManager();
+      final result = await sessionManager.updateModuleCategories(widget.currentModuleName, _selectedCategories);
+      
+      if (result) {
+        _showSuccessSnackBar('Categories updated successfully');
+        widget.onModuleUpdated?.call();
+      } else {
+        _showErrorSnackBar('Failed to update categories');
+      }
+    } catch (e) {
+      QuizzerLogger.logError('Error updating categories: $e');
+      _showErrorSnackBar('Failed to update categories');
     } finally {
       setState(() {
         _isLoading = false;
@@ -211,6 +271,56 @@ class _ModuleRenameMergeWidgetState extends State<ModuleRenameMergeWidget> {
                   ),
                 ),
               ],
+            ],
+          ),
+        ),
+        AppTheme.sizedBoxMed,
+        Card(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Row(
+                children: [
+                  Icon(Icons.category),
+                  AppTheme.sizedBoxSml,
+                  Text('Edit Categories'),
+                ],
+              ),
+              AppTheme.sizedBoxMed,
+              const Text(
+                'Select which categories this module belongs to. Modules can belong to multiple categories.',
+              ),
+              AppTheme.sizedBoxMed,
+              Wrap(
+                spacing: 8.0,
+                runSpacing: 8.0,
+                children: _availableCategories.map((category) {
+                  final isSelected = _selectedCategories.contains(category);
+                  return FilterChip(
+                    label: Text(category.toUpperCase()),
+                    selected: isSelected,
+                    onSelected: (selected) {
+                      setState(() {
+                        if (selected) {
+                          _selectedCategories.add(category);
+                        } else {
+                          _selectedCategories.remove(category);
+                        }
+                      });
+                    },
+                  );
+                }).toList(),
+              ),
+              AppTheme.sizedBoxMed,
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: _isLoading ? null : _updateCategories,
+                  child: _isLoading
+                      ? const CircularProgressIndicator()
+                      : const Text('Update Categories'),
+                ),
+              ),
             ],
           ),
         ),

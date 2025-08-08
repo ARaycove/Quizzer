@@ -1,6 +1,59 @@
 import 'package:supabase/supabase.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_profile_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
+
+/// Calculates the effective initial timestamp for inbound sync filtering.
+/// This is a complex decision that balances data completeness vs performance.
+/// 
+/// Parameters:
+/// - supabase: The Supabase client instance
+/// - tableName: The name of the table to sync
+/// - userId: The user ID (or null for global tables)
+/// - useLastLogin: Whether to use last login date for filtering (default: true, set to false for global tables)
+/// 
+/// Returns:
+/// - String timestamp in ISO8601 format to use as the effective initial timestamp
+Future<String> calculateEffectiveInitialTimestamp({
+  required SupabaseClient supabase,
+  required String tableName,
+  String? userId,
+  bool useLastLogin = true,
+}) async {
+  QuizzerLogger.logMessage('Calculating effective initial timestamp for $tableName (user: $userId)');
+  
+  try {
+    // Check if the specific table is empty for this user/context
+    bool isTableEmpty = await _isTableEmpty(tableName, userId);
+    
+    if (isTableEmpty) {
+      // Table is empty - use 1970 to get all records for this specific table
+      final timestamp = DateTime(1970, 1, 1).toUtc().toIso8601String();
+      QuizzerLogger.logMessage('Table $tableName is empty - using 1970 timestamp: $timestamp');
+      return timestamp;
+    }
+    
+    // Table has data - use lastLogin timestamp for incremental sync
+    if (useLastLogin && userId != null) {
+      final String? lastLogin = await getLastLoginForUser(userId);
+      final timestamp = lastLogin ?? DateTime(1970, 1, 1).toUtc().toIso8601String();
+      QuizzerLogger.logMessage('Table $tableName has data - using last login timestamp: $timestamp');
+      return timestamp;
+    } else {
+      // For global tables or when not using last login, use 1970 to ensure we get all records
+      final timestamp = DateTime(1970, 1, 1).toUtc().toIso8601String();
+      QuizzerLogger.logMessage('Global table or no last login - using 1970 timestamp: $timestamp');
+      return timestamp;
+    }
+    
+  } catch (e) {
+    QuizzerLogger.logError('Error calculating effective initial timestamp for $tableName: $e');
+    // Fallback to 1970 timestamp to ensure we don't miss data
+    final fallbackTimestamp = DateTime(1970, 1, 1).toUtc().toIso8601String();
+    QuizzerLogger.logMessage('Using fallback timestamp: $fallbackTimestamp');
+    return fallbackTimestamp;
+  }
+}
 
 /// Fetches ALL records from a Supabase table that are newer than the last login date
 /// using proper pagination to ensure we get everything.
@@ -13,6 +66,7 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/
 /// - pageSize: Number of records per page (default: 500)
 /// - additionalFilters: Map of column names to filter values (e.g., {'user_uuid': '123'})
 /// - useLastLogin: Whether to use last login date for filtering (default: true, set to false for global tables)
+/// - effectiveLastLogin: Optional timestamp to use instead of fetching from profile (for fresh device scenarios)
 /// 
 /// Returns:
 /// - List<Map<String, dynamic>> containing ALL records newer than the last login date
@@ -24,24 +78,28 @@ Future<List<Map<String, dynamic>>> fetchAllRecordsOlderThanLastLogin({
   int pageSize = 500,
   Map<String, dynamic>? additionalFilters,
   bool useLastLogin = true,
+  String? effectiveLastLogin,
 }) async {
   QuizzerLogger.logMessage('Fetching ALL records from $tableName newer than last login for user: $userId');
   
   try {
-    String effectiveLastLogin;
+    String finalEffectiveLastLogin;
     
-    if (useLastLogin && userId != null) {
-      // Get the last login timestamp for the user
-      final String? lastLogin = await getLastLoginForUser(userId);
-      
-      // If lastLogin is null, set it to 20 years ago to ensure we get all records
-      effectiveLastLogin = lastLogin ?? DateTime.now().subtract(const Duration(days: 365 * 20)).toUtc().toIso8601String();
+    if (effectiveLastLogin != null) {
+      // Use the provided timestamp (e.g., 1970 for fresh devices)
+      finalEffectiveLastLogin = effectiveLastLogin;
+      QuizzerLogger.logMessage('Using provided effective last login timestamp: $finalEffectiveLastLogin');
     } else {
-      // For global tables or when not using last login, use a very old timestamp
-      effectiveLastLogin = DateTime.now().subtract(const Duration(days: 365 * 20)).toUtc().toIso8601String();
+      // Calculate the effective initial timestamp using the new function
+      finalEffectiveLastLogin = await calculateEffectiveInitialTimestamp(
+        supabase: supabase,
+        tableName: tableName,
+        userId: userId,
+        useLastLogin: useLastLogin,
+      );
     }
     
-    QuizzerLogger.logMessage('Using effective last login timestamp: $effectiveLastLogin');
+    QuizzerLogger.logMessage('Using effective last login timestamp: $finalEffectiveLastLogin');
     
     final List<Map<String, dynamic>> allRecords = [];
     int offset = 0;
@@ -54,7 +112,7 @@ Future<List<Map<String, dynamic>>> fetchAllRecordsOlderThanLastLogin({
       var query = supabase
           .from(tableName)
           .select('*')
-          .gt(timestampColumn, effectiveLastLogin);
+          .gt(timestampColumn, finalEffectiveLastLogin);
       
       // Apply additional filters if provided
       if (additionalFilters != null) {
@@ -87,5 +145,44 @@ Future<List<Map<String, dynamic>>> fetchAllRecordsOlderThanLastLogin({
   } catch (e) {
     QuizzerLogger.logError('Error fetching records from $tableName newer than last login: $e');
     rethrow;
+  }
+}
+
+/// Helper function to check if a specific table is empty
+Future<bool> _isTableEmpty(String tableName, String? userId) async {
+  try {
+    final db = await getDatabaseMonitor().requestDatabaseAccess();
+    if (db == null) {
+      QuizzerLogger.logError('Cannot check if table is empty: database access denied');
+      return true;
+    }
+    
+    try {
+      // Check if table exists first
+      final List<Map<String, dynamic>> tables = await db.rawQuery(
+        "SELECT name FROM sqlite_master WHERE type='table' AND name=?",
+        [tableName]
+      );
+      
+      if (tables.isEmpty) {
+        QuizzerLogger.logMessage('Table $tableName does not exist - treating as empty');
+        return true;
+      }
+      
+      final List<Map<String, dynamic>> results = await db.query(
+        tableName,
+        limit: 1,
+      );
+      
+      final bool isEmpty = results.isEmpty;
+      QuizzerLogger.logMessage('Table $tableName is ${isEmpty ? 'empty' : 'not empty'}');
+      return isEmpty;
+      
+    } finally {
+      getDatabaseMonitor().releaseDatabaseAccess();
+    }
+  } catch (e) {
+    QuizzerLogger.logError('Error checking if table $tableName is empty: $e');
+    return true;
   }
 }

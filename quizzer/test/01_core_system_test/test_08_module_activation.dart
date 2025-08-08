@@ -433,7 +433,7 @@ void main() {
       try {
         // Step 1: Reset user question answer pairs table
         QuizzerLogger.logMessage('Step 1: Resetting user_question_answer_pairs table...');
-        final bool resetSuccess = await resetUserQuestionAnswerPairsTable();
+        final bool resetSuccess = await deleteAllRecordsFromTable('user_question_answer_pairs');
         expect(resetSuccess, isTrue, reason: 'Failed to reset user question answer pairs table');
         QuizzerLogger.logSuccess('user_question_answer_pairs table reset');
         
@@ -511,7 +511,6 @@ void main() {
         
         // Define expected fields from question_answer_pairs table (excluding removed fields)
         final List<String> expectedQuestionFields = [
-          'citation',
           'question_elements',
           'answer_elements',
           'module_name',

@@ -138,9 +138,18 @@ class _ModuleCardState extends State<ModuleCard> {
       return const SizedBox.shrink();
     }
     return Card(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12.0),
+        side: BorderSide(
+          color: Theme.of(context).colorScheme.secondary,
+          width: 1.0,
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.only(left: 8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -211,6 +220,7 @@ class _ModuleCardState extends State<ModuleCard> {
             ],
           ),
         ],
+        ),
       ),
     );
   }

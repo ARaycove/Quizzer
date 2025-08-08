@@ -137,7 +137,7 @@ void main() {
       try {
         // Step 1: Reset user question answer pairs table
         QuizzerLogger.logMessage('Step 1: Resetting user_question_answer_pairs table...');
-        final bool resetSuccess = await resetUserQuestionAnswerPairsTable();
+        final bool resetSuccess = await deleteAllRecordsFromTable('user_question_answer_pairs', userId: sessionManager.userId!);
         expect(resetSuccess, isTrue, reason: 'Failed to reset user question answer pairs table');
         QuizzerLogger.logSuccess('user_question_answer_pairs table reset');
         
@@ -233,7 +233,7 @@ void main() {
       try {
         // Step 1: Reset user question answer pairs table
         QuizzerLogger.logMessage('Step 1: Resetting user_question_answer_pairs table...');
-        final bool resetSuccess = await resetUserQuestionAnswerPairsTable();
+        final bool resetSuccess = await deleteAllRecordsFromTable('user_question_answer_pairs', userId: sessionManager.userId!);
         expect(resetSuccess, isTrue, reason: 'Failed to reset user question answer pairs table');
         QuizzerLogger.logSuccess('user_question_answer_pairs table reset');
         
@@ -296,7 +296,7 @@ void main() {
       try {
         // Step 1: Reset and prepare some eligible questions
         QuizzerLogger.logMessage('Step 1: Preparing test environment...');
-        final bool resetSuccess = await resetUserQuestionAnswerPairsTable();
+        final bool resetSuccess = await deleteAllRecordsFromTable('user_question_answer_pairs', userId: sessionManager.userId!);
         expect(resetSuccess, isTrue, reason: 'Failed to reset user question answer pairs table');
         
         final QuestionQueueCache queueCache = QuestionQueueCache();
@@ -381,7 +381,7 @@ void main() {
       try {
         // Step 1: Prepare eligible questions
         QuizzerLogger.logMessage('Step 1: Preparing eligible questions...');
-        final bool resetSuccess = await resetUserQuestionAnswerPairsTable();
+        final bool resetSuccess = await deleteAllRecordsFromTable('user_question_answer_pairs', userId: sessionManager.userId!);
         expect(resetSuccess, isTrue, reason: 'Failed to reset user question answer pairs table');
         
         final QuestionQueueCache queueCache = QuestionQueueCache();

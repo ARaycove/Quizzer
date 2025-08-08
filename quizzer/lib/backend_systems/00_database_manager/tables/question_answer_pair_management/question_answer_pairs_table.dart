@@ -3,7 +3,7 @@ import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'dart:convert';
 import '../table_helper.dart'; // Import the new helper file
 import 'package:quizzer/backend_systems/10_switch_board/sb_sync_worker_signals.dart'; // Import sync signals
-import 'package:quizzer/backend_systems/00_database_manager/tables/media_sync_status_table.dart'; // Added import
+import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pair_management/media_sync_status_table.dart'; // Added import
 import 'package:path/path.dart' as path; // Changed alias to path
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart'; // For Supabase client
 import 'dart:typed_data';
@@ -11,10 +11,29 @@ import 'dart:io';
 import 'package:quizzer/backend_systems/00_helper_utils/file_locations.dart';
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
 import 'package:quizzer/backend_systems/session_manager/answer_validation/text_validation_functionality.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/modules_table.dart';
+import 'package:quizzer/backend_systems/00_helper_utils/utils.dart';
 
 // --- Universal Encoding/Decoding Helpers --- Removed, moved to 00_table_helper.dart ---
 
 
+/// Verifies that the question_answer_pairs table exists and creates it if it doesn't.
+/// This function handles table creation, column additions, and index creation for the
+/// question_answer_pairs table. It also manages database schema migrations for new
+/// columns and constraints.
+/// 
+/// Args:
+///   db: The database instance to verify and potentially modify.
+/// 
+/// The function performs the following operations:
+/// - Creates the table if it doesn't exist with all required columns
+/// - Adds missing columns for new features (question_id, correct_order, etc.)
+/// - Creates indexes for performance optimization
+/// - Handles unique constraint management
+/// - Manages sync-related columns and flags
+/// 
+/// This function is called by all other functions in this file to ensure
+/// the table structure is up-to-date before performing operations.
 Future<void> verifyQuestionAnswerPairTable(dynamic db) async {
   
   // Check if the table exists
@@ -79,19 +98,14 @@ Future<void> verifyQuestionAnswerPairTable(dynamic db) async {
     await db.execute('''
       CREATE TABLE question_answer_pairs (
         time_stamp TEXT,                    -- UTC time question was entered
-        citation TEXT,                      -- REDACTED, soon to be removed
         question_elements TEXT,             -- JSON question elements in format: type:content
         answer_elements TEXT,               -- JSON of answer elements in format: type:content
         ans_flagged INTEGER,                -- Changed from BOOLEAN to INTEGER
         ans_contrib TEXT,                   -- user who entered the answer for this question
-        concepts TEXT,                      -- REDACTED, soon to be removed
-        subjects TEXT,                      -- REDACTED, soon to be removed
-        -- Subjects and concepts will be moved to own table
         qst_contrib TEXT,                   -- uuid of user who entered question
         qst_reviewer TEXT,                  -- uuid of admin/contributor
         has_been_reviewed INTEGER,          -- Changed from BOOLEAN to INTEGER
         flag_for_removal INTEGER,           -- REDACTED, system in place
-        completed INTEGER,                  -- Bool value, 0/1, indicates has both question and answer elements
         module_name TEXT,                   -- Name of the module to which question belongs (1 module only)
         question_type TEXT,                 -- The type of the question (multiple choice, true_false, etc.)
         options TEXT,                       -- Added for multiple choice options
@@ -264,8 +278,65 @@ Future<void> verifyQuestionAnswerPairTable(dynamic db) async {
   }
 }
 
+/// Checks if a question-answer pair is complete and valid based on its elements.
+/// This function validates that both question and answer elements are provided,
+/// non-empty, and contain valid content after trimming whitespace.
+/// 
+/// Args:
+///   questionElements: JSON string representation of question elements.
+///   answerElements: JSON string representation of answer elements.
+/// 
+/// Returns:
+///   int: 1 if the question-answer pair is complete and valid, 0 if incomplete or invalid.
+/// 
+/// The function performs the following validations:
+/// - Checks that both strings are non-empty and not whitespace-only
+/// - Validates JSON parsing of both element lists
+/// - Ensures each element has non-empty content after trimming
+/// - Returns 0 for any parsing errors or validation failures
+/// 
+/// This function is used by add*Question functions to validate input before
+/// attempting to insert records into the database.
 int checkCompletionStatus(String questionElements, String answerElements) {
-  return (questionElements.isNotEmpty && answerElements.isNotEmpty) ? 1 : 0;
+  try {
+    // Check if strings are empty or whitespace-only
+    if (questionElements.trim().isEmpty || answerElements.trim().isEmpty) {
+      return 0;
+    }
+    
+    // Parse and validate question elements
+    final List<dynamic> questionList = json.decode(questionElements);
+    if (questionList.isEmpty) return 0;
+    
+    // Check that each question element has non-empty content
+    for (final element in questionList) {
+      if (element is Map<String, dynamic>) {
+        final content = element['content'] as String?;
+        if (content == null || content.trim().isEmpty) {
+          return 0;
+        }
+      }
+    }
+    
+    // Parse and validate answer elements
+    final List<dynamic> answerList = json.decode(answerElements);
+    if (answerList.isEmpty) return 0;
+    
+    // Check that each answer element has non-empty content
+    for (final element in answerList) {
+      if (element is Map<String, dynamic>) {
+        final content = element['content'] as String?;
+        if (content == null || content.trim().isEmpty) {
+          return 0;
+        }
+      }
+    }
+    
+    return 1;
+  } catch (e) {
+    // If JSON parsing fails, return 0 (incomplete)
+    return 0;
+  }
 }
 // =============================================================
 // Media Sync Helper functionality
@@ -294,17 +365,54 @@ Future<void> _fetchAndDownloadMediaIfMissing(String fileName) async {
 
 /// Processes a given question record to check for media, extract filenames if present,
 /// register those filenames in the media_sync_status table, and returns whether media was found.
-Future<bool> hasMediaCheck(Map<String, dynamic> questionRecord) async {
+/// 
+/// This function can handle both encoded JSON strings and decoded data structures.
+/// If it receives JSON strings, it will decode them before processing.
+Future<bool> hasMediaCheck(dynamic questionRecord) async {
+  // Handle both Map and String input
+  if (questionRecord is! Map<String, dynamic>) {
+    QuizzerLogger.logError('hasMediaCheck received invalid input type: ${questionRecord.runtimeType}');
+    return false;
+  }
+  
   final String? recordQuestionId = questionRecord['question_id'] as String?;
   final String loggingContextSuffix = recordQuestionId != null ? '(Question ID: $recordQuestionId)' : '(Question ID: unknown)';
   QuizzerLogger.logMessage('Processing media for question record $loggingContextSuffix');
 
-  // Check for media using the existing internal helper
-  final bool mediaFound = _internalHasMediaCheck(questionRecord);
+  // Create a copy of the record for media checking
+  final Map<String, dynamic> processedRecord = Map<String, dynamic>.from(questionRecord);
+  
+  // Decode JSON strings for complex fields only if they are strings
+  try {
+    if (processedRecord['question_elements'] is String) {
+      processedRecord['question_elements'] = decodeValueFromDB(processedRecord['question_elements']);
+    }
+    if (processedRecord['answer_elements'] is String) {
+      processedRecord['answer_elements'] = decodeValueFromDB(processedRecord['answer_elements']);
+    }
+    if (processedRecord['options'] is String) {
+      processedRecord['options'] = decodeValueFromDB(processedRecord['options']);
+    }
+    if (processedRecord['correct_order'] is String) {
+      processedRecord['correct_order'] = decodeValueFromDB(processedRecord['correct_order']);
+    }
+    if (processedRecord['index_options_that_apply'] is String) {
+      processedRecord['index_options_that_apply'] = decodeValueFromDB(processedRecord['index_options_that_apply']);
+    }
+    if (processedRecord['answers_to_blanks'] is String) {
+      processedRecord['answers_to_blanks'] = decodeValueFromDB(processedRecord['answers_to_blanks']);
+    }
+  } catch (e) {
+    QuizzerLogger.logError('Error processing data in question record $loggingContextSuffix: $e');
+    return false;
+  }
+
+  // Check for media using the existing internal helper with processed data
+  final bool mediaFound = _internalHasMediaCheck(processedRecord);
 
   if (mediaFound) {
     QuizzerLogger.logMessage('Media found in record $loggingContextSuffix. Extracting filenames.');
-    final Set<String> filenames = _extractMediaFilenames(questionRecord);
+    final Set<String> filenames = _extractMediaFilenames(processedRecord);
 
     if (filenames.isNotEmpty) {
       QuizzerLogger.logMessage('Extracted ${filenames.length} filenames for $loggingContextSuffix. Downloading if missing and registering for sync.');
@@ -327,13 +435,12 @@ Future<bool> hasMediaCheck(Map<String, dynamic> questionRecord) async {
 
 bool _internalHasMediaCheck(dynamic data) {
   if (data is Map<String, dynamic>) {
-    // Check for direct image specification: {'image': 'file_name.ext'}
-    if (data.containsKey('image') && data['image'] is String && (data['image'] as String).isNotEmpty) {
-      return true;
-    }
     // Check for element style: {'type': 'image', 'content': 'file_name.ext'}
     if (data['type'] == 'image' && data.containsKey('content') && data['content'] is String && (data['content'] as String).isNotEmpty) {
-      return true;
+      final String imagePath = data['content'] as String;
+      if (_isValidImageFilename(imagePath)) {
+        return true;
+      }
     }
     // Recursively check values in the map
     for (var value in data.values) {
@@ -352,6 +459,35 @@ bool _internalHasMediaCheck(dynamic data) {
   return false;
 }
 
+/// Validates that an image filename is a simple filename without path separators or URLs
+bool _isValidImageFilename(String filename) {
+  if (filename.trim().isEmpty) {
+    return false;
+  }
+  
+  // Reject paths with directory separators
+  if (filename.contains('/') || filename.contains('\\')) {
+    return false;
+  }
+  
+  // Reject URLs (http, https, ftp, etc.)
+  if (filename.toLowerCase().startsWith('http://') || 
+      filename.toLowerCase().startsWith('https://') ||
+      filename.toLowerCase().startsWith('ftp://') ||
+      filename.toLowerCase().startsWith('file://')) {
+    return false;
+  }
+  
+  // Reject absolute paths (Windows or Unix)
+  if (filename.startsWith('/') || 
+      (filename.length > 1 && filename[1] == ':') || // Windows drive letter
+      filename.startsWith('\\')) {
+    return false;
+  }
+  
+  return true;
+}
+
 Set<String> _extractMediaFilenames(dynamic data) {
   final Set<String> filenames = {};
   _recursiveExtractFilenames(data, filenames);
@@ -360,10 +496,11 @@ Set<String> _extractMediaFilenames(dynamic data) {
 
 void _recursiveExtractFilenames(dynamic data, Set<String> filenames) {
   if (data is Map<String, dynamic>) {
-    if (data.containsKey('image') && data['image'] is String && (data['image'] as String).isNotEmpty) {
-      filenames.add(data['image'] as String);
-    } else if (data['type'] == 'image' && data.containsKey('content') && data['content'] is String && (data['content'] as String).isNotEmpty) {
-      filenames.add(data['content'] as String);
+    if (data['type'] == 'image' && data.containsKey('content') && data['content'] is String && (data['content'] as String).isNotEmpty) {
+      final String imagePath = data['content'] as String;
+      if (_isValidImageFilename(imagePath)) {
+        filenames.add(imagePath);
+      }
     }
     // Recursively check values in the map
     for (var value in data.values) {
@@ -427,17 +564,51 @@ Future<void> registerMediaFiles(Set<String> filenames, {String? qidForLogging}) 
   QuizzerLogger.logMessage('Finished attempting to register media files $logCtx.');
 }
 
+/// Edits an existing question-answer pair by updating specified fields.
+/// This function allows partial updates of question records, automatically
+/// handling encoding, validation, and sync flag management.
+/// 
+/// Args:
+///   questionId: The unique identifier of the question to edit.
+///   questionElements: Optional updated question elements.
+///   answerElements: Optional updated answer elements.
+///   indexOptionsThatApply: Optional updated indices for select-all-that-apply questions.
+///   ansFlagged: Optional flag indicating if the answer has been flagged.
+///   ansContrib: Optional contributor of the answer.
+///   qstReviewer: Optional reviewer of the question.
+///   hasBeenReviewed: Optional flag indicating if the question has been reviewed.
+///   flagForRemoval: Optional flag indicating if the question should be removed.
+///   moduleName: Optional updated module name (will be normalized).
+///   questionType: Optional updated question type.
+///   options: Optional updated options for multiple choice/select questions.
+///   correctOptionIndex: Optional updated correct option index.
+///   correctOrderElements: Optional updated correct order for sort questions.
+///   answersToBlanks: Optional updated answers for fill-in-the-blank questions.
+///   debugDisableOutboundSyncCall: When true, prevents signaling the outbound sync system.
+///     This is useful for testing to avoid triggering sync operations during test execution.
+///     Defaults to false (sync is signaled normally).
+/// 
+/// Returns:
+///   int: Number of rows affected by the update operation.
+/// 
+/// The function performs the following operations:
+/// - Fetches the existing record to validate it exists
+/// - Normalizes and validates all provided fields
+/// - Updates media status based on new content
+/// - Marks the record as needing sync
+/// - Updates the last modified timestamp
+/// - Handles all encoding/decoding automatically
+/// 
+/// Throws:
+///   Exception: If the question ID is not found or validation fails.
 Future<int> editQuestionAnswerPair({
   required String questionId,
-  String? citation,
   List<Map<String, dynamic>>? questionElements,
   List<Map<String, dynamic>>? answerElements,
   // Specific field for Select All That Apply - expecting List<int>
   List<int>? indexOptionsThatApply,
   bool? ansFlagged,
   String? ansContrib,
-  String? concepts,
-  String? subjects,
   String? qstReviewer,
   bool? hasBeenReviewed,
   bool? flagForRemoval,
@@ -451,6 +622,7 @@ Future<int> editQuestionAnswerPair({
   List<Map<String, dynamic>>? correctOrderElements,
   // Specific field for Fill in the Blank - expecting List<Map<String, List<String>>>
   List<Map<String, List<String>>>? answersToBlanks,
+  bool debugDisableOutboundSyncCall = false,
 }) async {
   try {
     // Fetch the existing record first
@@ -467,14 +639,11 @@ Future<int> editQuestionAnswerPair({
     Map<String, dynamic> valuesToUpdate = {};
     
     // Add non-null fields to the map without encoding here
-    if (citation != null) valuesToUpdate['citation'] = citation;
     if (questionElements != null) valuesToUpdate['question_elements'] = questionElements;
     if (answerElements != null) valuesToUpdate['answer_elements'] = answerElements;
     if (indexOptionsThatApply != null) valuesToUpdate['index_options_that_apply'] = indexOptionsThatApply;
     if (ansFlagged != null) valuesToUpdate['ans_flagged'] = ansFlagged ? 1 : 0;
     if (ansContrib != null) valuesToUpdate['ans_contrib'] = ansContrib;
-    if (concepts != null) valuesToUpdate['concepts'] = concepts;
-    if (subjects != null) valuesToUpdate['subjects'] = subjects;
     if (qstReviewer != null) valuesToUpdate['qst_reviewer'] = qstReviewer;
     if (hasBeenReviewed != null) valuesToUpdate['has_been_reviewed'] = hasBeenReviewed ? 1 : 0;
     if (flagForRemoval != null) valuesToUpdate['flag_for_removal'] = flagForRemoval ? 1 : 0;
@@ -521,13 +690,20 @@ Future<int> editQuestionAnswerPair({
       [questionId],      // whereArgs
       db,
     );
-    signalOutboundSyncNeeded(); // Signal after successful update
+    
+    if (!debugDisableOutboundSyncCall) {
+      signalOutboundSyncNeeded(); // Signal after successful update
+    }
+    
     return result;
   } catch (e) {
     QuizzerLogger.logError('Error editing question answer pair - $e');
     rethrow;
   } finally {
     getDatabaseMonitor().releaseDatabaseAccess();
+    
+    // Validate modules table after editing a question (after db access is released)
+    await ensureAllQuestionModuleNamesHaveCorrespondingModuleRecords();
   }
 }
 
@@ -585,103 +761,29 @@ Future<Map<String, dynamic>> getQuestionAnswerPairById(String questionId) async 
   }
 }
 
-Future<List<Map<String, dynamic>>>  getQuestionAnswerPairsBySubject(String subject) async {
-  try {
-    final db = await getDatabaseMonitor().requestDatabaseAccess();
-    if (db == null) {
-      throw Exception('Failed to acquire database access');
-    }
-    // First verify that the table exists
-    await verifyQuestionAnswerPairTable(db);
-    // Use the helper function to query and decode the list of rows
-    return await queryAndDecodeDatabase(
-      'question_answer_pairs',
-      db,
-      where: 'subjects LIKE ?',
-      whereArgs: ['%$subject%'],
-    );
-  } catch (e) {
-    QuizzerLogger.logError('Error getting question answer pairs by subject - $e');
-    rethrow;
-  } finally {
-    getDatabaseMonitor().releaseDatabaseAccess();
-  }
-}
-
-Future<List<Map<String, dynamic>>>  getQuestionAnswerPairsByConcept(String concept) async {
-  try {
-    final db = await getDatabaseMonitor().requestDatabaseAccess();
-    if (db == null) {
-      throw Exception('Failed to acquire database access');
-    }
-    // First verify that the table exists
-    await verifyQuestionAnswerPairTable(db);
-    // Use the helper function to query and decode the list of rows
-    return await queryAndDecodeDatabase(
-      'question_answer_pairs',
-      db,
-      where: 'concepts LIKE ?',
-      whereArgs: ['%$concept%'],
-    );
-  } catch (e) {
-    QuizzerLogger.logError('Error getting question answer pairs by concept - $e');
-    rethrow;
-  } finally {
-    getDatabaseMonitor().releaseDatabaseAccess();
-  }
-}
-
-Future<List<Map<String, dynamic>>>  getQuestionAnswerPairsBySubjectAndConcept(String subject, String concept) async {
-  try {
-    final db = await getDatabaseMonitor().requestDatabaseAccess();
-    if (db == null) {
-      throw Exception('Failed to acquire database access');
-    }
-    // First verify that the table exists
-    await verifyQuestionAnswerPairTable(db);
-    // Use the helper function to query and decode the list of rows
-    return await queryAndDecodeDatabase(
-      'question_answer_pairs',
-      db,
-      where: 'subjects LIKE ? AND concepts LIKE ?',
-      whereArgs: ['%$subject%', '%$concept%'],
-    );
-  } catch (e) {
-    QuizzerLogger.logError('Error getting question answer pairs by subject and concept - $e');
-    rethrow;
-  } finally {
-    getDatabaseMonitor().releaseDatabaseAccess();
-  }
-}
-
-Future<Map<String, dynamic>?> getRandomQuestionAnswerPair() async {
-  try {
-    final db = await getDatabaseMonitor().requestDatabaseAccess();
-    if (db == null) {
-      throw Exception('Failed to acquire database access');
-    }
-    // First verify that the table exists
-    await verifyQuestionAnswerPairTable(db);
-
-    final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
-      'question_answer_pairs', // tableName is still useful for context/logging if helper uses it
-      db,
-      customQuery: 'SELECT * FROM question_answer_pairs ORDER BY RANDOM() LIMIT 1',
-      // whereArgs are not needed for this specific custom query
-    );
-    
-    if (results.isEmpty) {
-      return null;
-    }
-    return results.first; // queryAndDecodeDatabase now handles the decoding
-  } catch (e) {
-    QuizzerLogger.logError('Error getting random question answer pair - $e');
-    rethrow;
-  } finally {
-    getDatabaseMonitor().releaseDatabaseAccess();
-  }
-}
-
+/// Retrieves all question-answer pairs from the database.
+/// This function returns every question record in the database,
+/// automatically decoded and ready for use.
+/// 
+/// Returns:
+///   List<Map<String, dynamic>>: A list of all question-answer pair records
+///   from the database. Returns an empty list if no questions exist.
+/// 
+/// The function performs the following operations:
+/// - Queries all records from the question_answer_pairs table
+/// - Automatically decodes all complex fields (JSON, etc.)
+/// - Returns an empty list if the database is empty
+/// - Handles all database access and cleanup automatically
+/// 
+/// Each record in the returned list includes all fields from the
+/// question_answer_pairs table with proper decoding of JSON fields
+/// like question_elements, answer_elements, options, etc.
+/// 
+/// Note: This function should be used carefully with large datasets
+/// as it loads all records into memory at once.
+/// 
+/// Throws:
+///   Exception: If database access fails or other database errors occur.
 Future<List<Map<String, dynamic>>>  getAllQuestionAnswerPairs() async {
   try {
     final db = await getDatabaseMonitor().requestDatabaseAccess();
@@ -700,6 +802,28 @@ Future<List<Map<String, dynamic>>>  getAllQuestionAnswerPairs() async {
   }
 }
 
+/// Removes a question-answer pair from the database using composite key.
+/// This function deletes a specific question record based on its timestamp
+/// and contributor ID (the composite primary key).
+/// 
+/// Args:
+///   timeStamp: The timestamp when the question was created (part of composite key).
+///   qstContrib: The contributor ID who created the question (part of composite key).
+/// 
+/// Returns:
+///   int: Number of rows deleted (should be 1 if successful, 0 if not found).
+/// 
+/// The function performs the following operations:
+/// - Uses the composite primary key (time_stamp, qst_contrib) to identify the record
+/// - Deletes the record if found
+/// - Returns the number of affected rows
+/// - Handles all database access and cleanup automatically
+/// 
+/// Note: This function uses the legacy composite key approach. For new code,
+/// consider using question_id-based deletion if available.
+/// 
+/// Throws:
+///   Exception: If database access fails or other database errors occur.
 Future<int> removeQuestionAnswerPair(String timeStamp, String qstContrib) async {
   try {
     final db = await getDatabaseMonitor().requestDatabaseAccess();
@@ -762,6 +886,7 @@ Future<String> getModuleNameForQuestionId(String questionId) async {
 
 /// Fetches all question records for a specific module name.
 /// Returns an empty list if no questions are found for the module.
+/// The module name is automatically normalized (lowercase, underscores to spaces) for matching.
 Future<List<Map<String, dynamic>>> getQuestionRecordsForModule(String moduleName) async {
   try {
     final db = await getDatabaseMonitor().requestDatabaseAccess();
@@ -770,14 +895,17 @@ Future<List<Map<String, dynamic>>> getQuestionRecordsForModule(String moduleName
     }
     await verifyQuestionAnswerPairTable(db);
     
+    // Normalize the module name for consistent matching
+    final String normalizedModuleName = await normalizeString(moduleName);
+    
     final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
       'question_answer_pairs',
       db,
       where: 'module_name = ?',
-      whereArgs: [moduleName],
+      whereArgs: [normalizedModuleName],
     );
     
-    QuizzerLogger.logMessage('Found ${results.length} questions for module: $moduleName');
+    QuizzerLogger.logMessage('Found ${results.length} questions for module: $moduleName (normalized: $normalizedModuleName)');
     return results;
   } catch (e) {
     QuizzerLogger.logError('Error getting question records for module - $e');
@@ -837,6 +965,7 @@ Future<Map<String, String>> getModuleNamesForQuestionIds(List<String> questionId
 
 /// Fetches all question IDs for a specific module name.
 /// Returns an empty list if no questions are found for the module.
+/// The module name is automatically normalized (lowercase, underscores to spaces) for matching.
 Future<List<String>> getQuestionIdsForModule(String moduleName) async {
   try {
     final db = await getDatabaseMonitor().requestDatabaseAccess();
@@ -845,12 +974,15 @@ Future<List<String>> getQuestionIdsForModule(String moduleName) async {
     }
     await verifyQuestionAnswerPairTable(db);
     
+    // Normalize the module name for consistent matching
+    final String normalizedModuleName = await normalizeString(moduleName);
+    
     final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
       'question_answer_pairs',
       db,
       columns: ['question_id'],
       where: 'module_name = ?',
-      whereArgs: [moduleName],
+      whereArgs: [normalizedModuleName],
     );
     
     final List<String> questionIds = results
@@ -858,7 +990,7 @@ Future<List<String>> getQuestionIdsForModule(String moduleName) async {
         .where((id) => id.isNotEmpty)
         .toList();
     
-    QuizzerLogger.logMessage('Found ${questionIds.length} question IDs for module: $moduleName');
+    QuizzerLogger.logMessage('Found ${questionIds.length} question IDs for module: $moduleName (normalized: $normalizedModuleName)');
     return questionIds;
   } catch (e) {
     QuizzerLogger.logError('Error getting question IDs for module - $e');
@@ -868,66 +1000,30 @@ Future<List<String>> getQuestionIdsForModule(String moduleName) async {
   }
 }
 
-/// Fetches all unique subjects from the question_answer_pairs table.
-/// Returns an empty list if no subjects are found.
-Future<List<String>> getUniqueSubjects() async {
-  try {
-    final db = await getDatabaseMonitor().requestDatabaseAccess();
-    if (db == null) {
-      throw Exception('Failed to acquire database access');
-    }
-    await verifyQuestionAnswerPairTable(db);
-    
-    final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
-      'question_answer_pairs',
-      db,
-      columns: ['subjects'],
-    );
-    
-    final Set<String> uniqueSubjects = <String>{};
-    for (final row in results) {
-      final String? subjects = row['subjects'] as String?;
-      if (subjects != null && subjects.isNotEmpty) {
-        // Split subjects by comma and add each one to the set
-        final List<String> subjectList = subjects.split(',').map((s) => s.trim()).where((s) => s.isNotEmpty).toList();
-        uniqueSubjects.addAll(subjectList);
-      }
-    }
-    
-    final List<String> sortedSubjects = uniqueSubjects.toList()..sort();
-    QuizzerLogger.logMessage('Found ${sortedSubjects.length} unique subjects');
-    return sortedSubjects;
-  } catch (e) {
-    QuizzerLogger.logError('Error getting unique subjects - $e');
-    rethrow;
-  } finally {
-    getDatabaseMonitor().releaseDatabaseAccess();
-  }
-}
-
-/// Returns a set of all unique concepts present in the question_answer_pairs table
-/// This is useful for populating concept filters in the UI
-Future<Set<String>> getUniqueConcepts(dynamic db) async {
-  QuizzerLogger.logMessage('Fetching unique concepts from question_answer_pairs table');
-  // First verify that the table exists
-  await verifyQuestionAnswerPairTable(db);
-  
-  // Query the database for all distinct concept values
-  final List<Map<String, dynamic>> result = await db.rawQuery(
-    'SELECT DISTINCT concept FROM question_answer_pairs WHERE concept IS NOT NULL AND concept != ""'
-  );
-  
-  // Convert the result to a set of strings
-  final Set<String> concepts = result
-      .map((row) => row['concept'] as String)
-      .toSet();
-  
-  QuizzerLogger.logSuccess('Retrieved ${concepts.length} unique concepts');
-  return concepts;
-}
-
-/// Updates the synchronization flags for a specific question.
-/// This function is used by the sync system to mark questions as synced.
+/// Updates the synchronization flags for a specific question-answer pair.
+/// 
+/// This function is used by the cloud synchronization system to track the sync status
+/// of questions between local and remote databases. It updates two critical sync flags:
+/// 
+/// - `has_been_synced`: Indicates whether the question has ever been successfully
+///   synchronized to the remote database. Set to true (1) when the question is first
+///   uploaded to the cloud, false (0) when it exists only locally.
+/// 
+/// - `edits_are_synced`: Indicates whether any local modifications to the question
+///   have been synchronized to the remote database. Set to true (1) when all local
+///   changes have been uploaded, false (0) when there are pending local edits that
+///   need to be synced.
+/// 
+/// The function also automatically updates the `last_modified_timestamp` to the current
+/// UTC time whenever sync flags are changed, ensuring proper change tracking.
+/// 
+/// Parameters:
+/// - `questionId`: The unique identifier of the question to update
+/// - `hasBeenSynced`: Whether the question has been synchronized to the remote database
+/// - `editsAreSynced`: Whether all local edits have been synchronized
+/// 
+/// The function handles non-existent question IDs gracefully by logging a warning
+/// rather than throwing an exception, as this is expected behavior during sync operations.
 Future<void> updateQuestionSyncFlags({
   required String questionId,
   required bool hasBeenSynced,
@@ -1005,7 +1101,10 @@ Future<List<Map<String, dynamic>>> getUnsyncedQuestionAnswerPairs() async {
 
 /// Inserts a new question-answer pair or updates an existing one from inbound sync.
 /// Sets sync flags to indicate the record is synced and edits are synced.
-Future<void> insertOrUpdateQuestionAnswerPair(Map<String, dynamic> questionData) async {
+/// 
+/// Returns:
+///   bool: true if the operation was successful, false if validation failed.
+Future<bool> insertOrUpdateQuestionAnswerPair(Map<String, dynamic> questionData) async {
   try {
     final db = await getDatabaseMonitor().requestDatabaseAccess();
     if (db == null) {
@@ -1018,14 +1117,54 @@ Future<void> insertOrUpdateQuestionAnswerPair(Map<String, dynamic> questionData)
     final String? timeStamp = questionData['time_stamp'] as String?;
     final String? qstContrib = questionData['qst_contrib'] as String?;
     final String? lastModifiedTimestamp = questionData['last_modified_timestamp'] as String?;
+    final String? moduleName = questionData['module_name'] as String?;
+    final String? questionType = questionData['question_type'] as String?;
+    final String? questionElementsJson = questionData['question_elements'] as String?;
+    final String? answerElementsJson = questionData['answer_elements'] as String?;
 
     assert(questionId != null, 'insertOrUpdateQuestionAnswerPair: question_id cannot be null. Data: $questionData');
     assert(timeStamp != null, 'insertOrUpdateQuestionAnswerPair: time_stamp cannot be null. Data: $questionData');
     assert(qstContrib != null, 'insertOrUpdateQuestionAnswerPair: qst_contrib cannot be null. Data: $questionData');
     assert(lastModifiedTimestamp != null, 'insertOrUpdateQuestionAnswerPair: last_modified_timestamp cannot be null. Data: $questionData');
+    assert(moduleName != null, 'insertOrUpdateQuestionAnswerPair: module_name cannot be null. Data: $questionData');
+    assert(questionType != null, 'insertOrUpdateQuestionAnswerPair: question_type cannot be null. Data: $questionData');
+    assert(questionElementsJson != null, 'insertOrUpdateQuestionAnswerPair: question_elements cannot be null. Data: $questionData');
+    assert(answerElementsJson != null, 'insertOrUpdateQuestionAnswerPair: answer_elements cannot be null. Data: $questionData');
 
-    // Prepare the data map with sync flags set to indicate synced status
+    // Validate the data using the same validation as addQuestion functions
+    try {
+      _validateQuestionEntry(
+        moduleName: moduleName!,
+        questionElements: List<Map<String, dynamic>>.from(decodeValueFromDB(questionElementsJson!)),
+        answerElements: List<Map<String, dynamic>>.from(decodeValueFromDB(answerElementsJson!)),
+      );
+
+      // Validate options if present (for question types that use them)
+      if (questionType == 'multiple_choice' || questionType == 'select_all_that_apply' || questionType == 'sort_order') {
+        final optionsJson = questionData['options'] as String?;
+        if (optionsJson != null) {
+          final options = List<Map<String, dynamic>>.from(decodeValueFromDB(optionsJson));
+          _validateQuestionOptions(options);
+        }
+      }
+    } catch (e) {
+      QuizzerLogger.logError('Validation failed for question $questionId: $e');
+      return false; // Return early if validation fails
+    }
+
+    // Prepare the data map, stripping out legacy fields that don't exist in local table
     final Map<String, dynamic> dataToInsertOrUpdate = Map<String, dynamic>.from(questionData);
+    
+    // Remove legacy fields that don't exist in local table schema
+    dataToInsertOrUpdate.remove('citation');
+    dataToInsertOrUpdate.remove('concepts');
+    dataToInsertOrUpdate.remove('subjects');
+    dataToInsertOrUpdate.remove('completed');
+    
+    // Normalize the module name
+    dataToInsertOrUpdate['module_name'] = await normalizeString(moduleName);
+    
+    // Set sync flags to indicate synced status
     dataToInsertOrUpdate['has_been_synced'] = 1;
     dataToInsertOrUpdate['edits_are_synced'] = 1;
 
@@ -1039,8 +1178,10 @@ Future<void> insertOrUpdateQuestionAnswerPair(Map<String, dynamic> questionData)
 
     if (rowId > 0) {
       QuizzerLogger.logSuccess('Successfully inserted/updated question-answer pair with ID: $questionId from inbound sync.');
+      return true;
     } else {
       QuizzerLogger.logWarning('insertOrUpdateQuestionAnswerPair: insertRawData with replace returned 0 for question ID: $questionId. Data: $dataToInsertOrUpdate');
+      return false;
     }
   } catch (e) {
     QuizzerLogger.logError('Error inserting or updating question answer pair - $e');
@@ -1052,17 +1193,94 @@ Future<void> insertOrUpdateQuestionAnswerPair(Map<String, dynamic> questionData)
 
 // ===============================================================================
 // --- Add Question Functions ---
+// ===============================================================================
 
+/// Private helper function to validate general question entry requirements
+/// This validation applies to all question types and complements checkCompletionStatus
+void _validateQuestionEntry({
+  required String moduleName,
+  required List<Map<String, dynamic>> questionElements,
+  required List<Map<String, dynamic>> answerElements,
+}) {
+  // Validate module name (not done by checkCompletionStatus)
+  if (moduleName.isEmpty) {
+    throw Exception('Module name cannot be empty or whitespace-only.');
+  }
+
+  // Validate question elements structure (not done by checkCompletionStatus)
+  for (int i = 0; i < questionElements.length; i++) {
+    final element = questionElements[i];
+    if (!element.containsKey('type')) {
+      throw Exception('Question element at index $i is missing required "type" field.');
+    }
+    if (!element.containsKey('content')) {
+      throw Exception('Question element at index $i is missing required "content" field.');
+    }
+    if (element['type'] != 'text' && element['type'] != 'image' && element['type'] != 'blank') {
+      throw Exception('Question element at index $i has invalid type "${element['type']}". Valid types are: text, image, blank.');
+    }
+  }
+
+  // Validate answer elements structure (not done by checkCompletionStatus)
+  for (int i = 0; i < answerElements.length; i++) {
+    final element = answerElements[i];
+    if (!element.containsKey('type')) {
+      throw Exception('Answer element at index $i is missing required "type" field.');
+    }
+    if (!element.containsKey('content')) {
+      throw Exception('Answer element at index $i is missing required "content" field.');
+    }
+    if (element['type'] != 'text' && element['type'] != 'image' && element['type'] != 'blank') {
+      throw Exception('Answer element at index $i has invalid type "${element['type']}". Valid types are: text, image, blank.');
+    }
+  }
+}
+
+/// Private helper function to validate question options
+/// This validation applies to question types that use options (multiple choice, select all that apply, sort order, etc.)
+void _validateQuestionOptions(List<Map<String, dynamic>> options) {
+  if (options.isEmpty) {
+    throw Exception('Options list cannot be empty.');
+  }
+  
+  for (int i = 0; i < options.length; i++) {
+    final option = options[i];
+    if (!option.containsKey('type')) {
+      throw Exception('Option at index $i is missing required "type" field.');
+    }
+    if (!option.containsKey('content')) {
+      throw Exception('Option at index $i is missing required "content" field.');
+    }
+    if (option['type'] != 'text' && option['type'] != 'image' && option['type'] != 'blank') {
+      throw Exception('Option at index $i has invalid type "${option['type']}". Valid types are: text, image, blank.');
+    }
+    if (option['content'].toString().isEmpty) {
+      throw Exception('Option at index $i has empty content.');
+    }
+  }
+}
+
+/// Adds a new multiple choice question to the database.
+/// 
+/// Args:
+///   moduleName: The name of the module this question belongs to.
+///   questionElements: A list of maps representing the question content.
+///   answerElements: A list of maps representing the explanation/answer rationale.
+///   options: A list of maps representing the multiple choice options.
+///   correctOptionIndex: The index of the correct option (0-based).
+///   debugDisableOutboundSyncCall: When true, prevents signaling the outbound sync system.
+///     This is useful for testing to avoid triggering sync operations during test execution.
+///     Defaults to false (sync is signaled normally).
+///
+/// Returns:
+///   The unique question_id generated for this question (format: timestamp_userId).
 Future<String> addQuestionMultipleChoice({
   required String moduleName,
   required List<Map<String, dynamic>> questionElements,
   required List<Map<String, dynamic>> answerElements,
   required List<Map<String, dynamic>> options,
   required int correctOptionIndex,
-  required String qstContrib, // Added contributor ID
-  String? citation,
-  String? concepts,
-  String? subjects,
+  bool debugDisableOutboundSyncCall = false,
 }) async {
   try {
     final db = await getDatabaseMonitor().requestDatabaseAccess();
@@ -1070,67 +1288,129 @@ Future<String> addQuestionMultipleChoice({
       throw Exception('Failed to acquire database access');
     }
     await verifyQuestionAnswerPairTable(db);
+    
+    // Get current user ID from session manager
+    final String? userId = getSessionManager().userId;
+    if (userId == null) {
+      throw Exception('User must be logged in to add a question');
+    }
+    
     final String timeStamp = DateTime.now().toUtc().toIso8601String();
-    final String questionId = '${timeStamp}_$qstContrib';
 
-    // Normalize the module name
-    final String normalizedModuleName = await normalizeString(moduleName);
+    // Normalize the module name and trim content fields in place
+    moduleName = await normalizeString(moduleName);
+    questionElements = trimContentFields(questionElements);
+    answerElements = trimContentFields(answerElements);
+    options = trimContentFields(options);
 
-    // Prepare the raw data map (values will be encoded by the helper)
-    final Map<String, dynamic> data = {
+    // Check completion status before proceeding
+    final int completionStatus = checkCompletionStatus(
+        questionElements.isNotEmpty ? json.encode(questionElements) : '',
+        answerElements.isNotEmpty ? json.encode(answerElements) : ''
+    );
+    
+    if (completionStatus == 0) {
+      throw Exception('Question is incomplete. Both question and answer elements must be provided and valid.');
+    }
+
+    // Additional Validation here:
+    
+    // Validate general question entry requirements
+    _validateQuestionEntry(
+      moduleName: moduleName,
+      questionElements: questionElements,
+      answerElements: answerElements,
+    );
+
+    // Validate options using helper function
+    _validateQuestionOptions(options);
+
+    // Multiple choice specific validation
+    if (correctOptionIndex < 0) {
+      throw Exception('Correct option index cannot be negative.');
+    }
+    if (correctOptionIndex >= options.length) {
+      throw Exception('Correct option index $correctOptionIndex is out of range. Options list has ${options.length} elements.');
+    }
+    
+
+    // Use the universal insert helper
+    await insertRawData('question_answer_pairs', {
       'time_stamp': timeStamp,
-      'citation': citation,
-      'question_elements': questionElements,
-      'answer_elements': answerElements,
+      'question_elements': encodeValueForDB(questionElements),
+      'answer_elements': encodeValueForDB(answerElements),
       'ans_flagged': 0, // Changed from false to 0
       'ans_contrib': '', // Default empty
-      'concepts': concepts,
-      'subjects': subjects,
-      'qst_contrib': qstContrib,
+      'qst_contrib': userId,
       'qst_reviewer': '', // Default empty
       'has_been_reviewed': 0, // Changed from false to 0
       'flag_for_removal': 0, // Changed from false to 0
-      // Check completion based on raw lists before encoding
-      'completed': checkCompletionStatus(
-          questionElements.isNotEmpty ? json.encode(questionElements) : '', // Check if list is not empty before encoding for check
-          answerElements.isNotEmpty ? json.encode(answerElements) : ''
-      ),
-      'module_name': normalizedModuleName,
+      'module_name': moduleName,
       'question_type': 'multiple_choice',
-      'options': options,
+      'options': encodeValueForDB(options),
       'correct_option_index': correctOptionIndex,
-      'question_id': questionId,
+      'question_id': '${timeStamp}_$userId',
       'has_been_synced': 0, // Initialize sync flags
       'edits_are_synced': 0,
       'last_modified_timestamp': timeStamp, // Use creation timestamp
-    };
+      'has_media': await hasMediaCheck({
+        'time_stamp': timeStamp,
+        'question_elements': encodeValueForDB(questionElements),
+        'answer_elements': encodeValueForDB(answerElements),
+        'ans_flagged': 0,
+        'ans_contrib': '',
+        'qst_contrib': userId,
+        'qst_reviewer': '',
+        'has_been_reviewed': 0,
+        'flag_for_removal': 0,
+        'module_name': moduleName,
+        'question_type': 'multiple_choice',
+        'options': encodeValueForDB(options),
+        'correct_option_index': correctOptionIndex,
+        'question_id': '${timeStamp}_$userId',
+        'has_been_synced': 0,
+        'edits_are_synced': 0,
+        'last_modified_timestamp': timeStamp,
+      }),
+    }, db);
+    
+    if (!debugDisableOutboundSyncCall) {
+      signalOutboundSyncNeeded(); // Signal after successful insert
+    }
 
-
-    data['has_media'] = await hasMediaCheck(data);
-
-    // Use the universal insert helper
-    await insertRawData('question_answer_pairs', data, db);
-    signalOutboundSyncNeeded(); // Signal after successful insert
-
-    return questionId; // Return the generated question ID regardless of insert result (consistent with previous logic)
+    return '${timeStamp}_$userId'; // Return the generated question ID regardless of insert result (consistent with previous logic)
   } catch (e) {
     QuizzerLogger.logError('Error adding multiple choice question - $e');
     rethrow;
   } finally {
     getDatabaseMonitor().releaseDatabaseAccess();
+    
+    // Validate modules table after adding a question (after db access is released)
+    await ensureAllQuestionModuleNamesHaveCorrespondingModuleRecords();
   }
 }
 
+/// Adds a new select all that apply question to the database.
+/// 
+/// Args:
+///   moduleName: The name of the module this question belongs to.
+///   questionElements: A list of maps representing the question content.
+///   answerElements: A list of maps representing the explanation/answer rationale.
+///   options: A list of maps representing the options to choose from.
+///   indexOptionsThatApply: A list of indices (0-based) indicating which options are correct.
+///   debugDisableOutboundSyncCall: When true, prevents signaling the outbound sync system.
+///     This is useful for testing to avoid triggering sync operations during test execution.
+///     Defaults to false (sync is signaled normally).
+///
+/// Returns:
+///   The unique question_id generated for this question (format: timestamp_userId).
 Future<String> addQuestionSelectAllThatApply({
   required String moduleName,
   required List<Map<String, dynamic>> questionElements,
   required List<Map<String, dynamic>> answerElements,
   required List<Map<String, dynamic>> options,
   required List<int> indexOptionsThatApply, // Use List<int>
-  required String qstContrib,
-  String? citation,
-  String? concepts,
-  String? subjects,
+  bool debugDisableOutboundSyncCall = false,
 }) async {
   try {
     final db = await getDatabaseMonitor().requestDatabaseAccess();
@@ -1138,65 +1418,133 @@ Future<String> addQuestionSelectAllThatApply({
       throw Exception('Failed to acquire database access');
     }
     await verifyQuestionAnswerPairTable(db);
+    
+    // Get current user ID from session manager
+    final String? userId = getSessionManager().userId;
+    if (userId == null) {
+      throw Exception('User must be logged in to add a question');
+    }
+    
     final String timeStamp = DateTime.now().toUtc().toIso8601String();
-    final String questionId = '${timeStamp}_$qstContrib';
 
-    // Normalize the module name
-    final String normalizedModuleName = await normalizeString(moduleName);
+    // Check completion status before proceeding
+    final int completionStatus = checkCompletionStatus(
+        questionElements.isNotEmpty ? json.encode(questionElements) : '',
+        answerElements.isNotEmpty ? json.encode(answerElements) : ''
+    );
+    
+    if (completionStatus == 0) {
+      throw Exception('Question is incomplete. Both question and answer elements must be provided and valid.');
+    }
+    
+    // Normalize the module name and trim content fields in place
+    moduleName = await normalizeString(moduleName);
+    questionElements = trimContentFields(questionElements);
+    answerElements = trimContentFields(answerElements);
+    options = trimContentFields(options);
 
-    // Prepare the raw data map
-    final Map<String, dynamic> data = {
+    // Additional Validation here:
+    
+    // Validate general question entry requirements
+    _validateQuestionEntry(
+      moduleName: moduleName,
+      questionElements: questionElements,
+      answerElements: answerElements,
+    );
+
+    // Validate options using helper function
+    _validateQuestionOptions(options);
+
+    // Select all that apply specific validation
+    if (indexOptionsThatApply.isEmpty) {
+      throw Exception('At least one option must be selected for select all that apply questions.');
+    }
+    
+    for (int i = 0; i < indexOptionsThatApply.length; i++) {
+      final index = indexOptionsThatApply[i];
+      if (index < 0) {
+        throw Exception('Option index at position $i cannot be negative.');
+      }
+      if (index >= options.length) {
+        throw Exception('Option index $index at position $i is out of range. Options list has ${options.length} elements.');
+      }
+    }
+
+    // Use the universal insert helper
+    await insertRawData('question_answer_pairs', {
       'time_stamp': timeStamp,
-      'citation': citation,
-      'question_elements': questionElements,
-      'answer_elements': answerElements,
+      'question_elements': encodeValueForDB(questionElements),
+      'answer_elements': encodeValueForDB(answerElements),
       'ans_flagged': 0, // Changed from false to 0
       'ans_contrib': '', // Default empty
-      'concepts': concepts,
-      'subjects': subjects,
-      'qst_contrib': qstContrib,
+      'qst_contrib': userId,
       'qst_reviewer': '', // Default empty
       'has_been_reviewed': 0, // Changed from false to 0
       'flag_for_removal': 0, // Changed from false to 0
-      'completed': checkCompletionStatus(
-          questionElements.isNotEmpty ? json.encode(questionElements) : '',
-          answerElements.isNotEmpty ? json.encode(answerElements) : ''
-      ),
-      'module_name': normalizedModuleName,
+      'module_name': moduleName,
       'question_type': 'select_all_that_apply',
-      'options': options,
-      'index_options_that_apply': indexOptionsThatApply,
-      'question_id': questionId,
+      'options': encodeValueForDB(options),
+      'index_options_that_apply': encodeValueForDB(indexOptionsThatApply),
+      'question_id': '${timeStamp}_$userId',
       'has_been_synced': 0, // Initialize sync flags
       'edits_are_synced': 0,
       'last_modified_timestamp': timeStamp, // Use creation timestamp
-    };
+      'has_media': await hasMediaCheck({
+        'time_stamp': timeStamp,
+        'question_elements': encodeValueForDB(questionElements),
+        'answer_elements': encodeValueForDB(answerElements),
+        'ans_flagged': 0,
+        'ans_contrib': '',
+        'qst_contrib': userId,
+        'qst_reviewer': '',
+        'has_been_reviewed': 0,
+        'flag_for_removal': 0,
+        'module_name': moduleName,
+        'question_type': 'select_all_that_apply',
+        'options': encodeValueForDB(options),
+        'index_options_that_apply': encodeValueForDB(indexOptionsThatApply),
+        'question_id': '${timeStamp}_$userId',
+        'has_been_synced': 0,
+        'edits_are_synced': 0,
+        'last_modified_timestamp': timeStamp,
+      }),
+    }, db);
+    
+    if (!debugDisableOutboundSyncCall) {
+      signalOutboundSyncNeeded(); // Signal after successful insert
+    }
 
-
-    data['has_media'] = await hasMediaCheck(data);
-
-    // Use the universal insert helper
-    await insertRawData('question_answer_pairs', data, db);
-    signalOutboundSyncNeeded(); // Signal after successful insert
-
-    return questionId;
+    return '${timeStamp}_$userId';
   } catch (e) {
     QuizzerLogger.logError('Error adding select all that apply question - $e');
     rethrow;
   } finally {
     getDatabaseMonitor().releaseDatabaseAccess();
+    
+    // Validate modules table after adding a question (after db access is released)
+    await ensureAllQuestionModuleNamesHaveCorrespondingModuleRecords();
   }
 }
 
+/// Adds a new true/false question to the database.
+/// 
+/// Args:
+///   moduleName: The name of the module this question belongs to.
+///   questionElements: A list of maps representing the question content.
+///   answerElements: A list of maps representing the explanation/answer rationale.
+///   correctOptionIndex: The index of the correct option (0 for True, 1 for False).
+///   debugDisableOutboundSyncCall: When true, prevents signaling the outbound sync system.
+///     This is useful for testing to avoid triggering sync operations during test execution.
+///     Defaults to false (sync is signaled normally).
+///
+/// Returns:
+///   The unique question_id generated for this question (format: timestamp_userId).
 Future<String> addQuestionTrueFalse({
   required String moduleName,
   required List<Map<String, dynamic>> questionElements,
   required List<Map<String, dynamic>> answerElements,
   required int correctOptionIndex, // 0 for True, 1 for False
-  required String qstContrib,
-  String? citation,
-  String? concepts,
-  String? subjects,
+  bool debugDisableOutboundSyncCall = false,
 }) async {
   try {
     final db = await getDatabaseMonitor().requestDatabaseAccess();
@@ -1204,80 +1552,117 @@ Future<String> addQuestionTrueFalse({
       throw Exception('Failed to acquire database access');
     }
     await verifyQuestionAnswerPairTable(db);
+    
+    // Get current user ID from session manager
+    final String? userId = getSessionManager().userId;
+    if (userId == null) {
+      throw Exception('User must be logged in to add a question');
+    }
+    
     final String timeStamp = DateTime.now().toUtc().toIso8601String();
-    final String questionId = '${timeStamp}_$qstContrib';
 
-    // Normalize the module name
-    final String normalizedModuleName = await normalizeString(moduleName);
+    // Check completion status before proceeding
+    final int completionStatus = checkCompletionStatus(
+        questionElements.isNotEmpty ? json.encode(questionElements) : '',
+        answerElements.isNotEmpty ? json.encode(answerElements) : ''
+    );
+    
+    if (completionStatus == 0) {
+      throw Exception('Question is incomplete. Both question and answer elements must be provided and valid.');
+    }
+    
+    // Normalize the module name and trim content fields in place
+    moduleName = await normalizeString(moduleName);
+    questionElements = trimContentFields(questionElements);
+    answerElements = trimContentFields(answerElements);
 
-    // Prepare the raw data map
-    final Map<String, dynamic> data = {
+    // Additional Validation here:
+    
+    // Validate general question entry requirements
+    _validateQuestionEntry(
+      moduleName: moduleName,
+      questionElements: questionElements,
+      answerElements: answerElements,
+    );
+
+    // True/false specific validation
+    if (correctOptionIndex < 0 || correctOptionIndex > 1) {
+      throw Exception('Correct option index must be 0 (True) or 1 (False), got: $correctOptionIndex');
+    }
+
+    // Use the universal insert helper
+    await insertRawData('question_answer_pairs', {
       'time_stamp': timeStamp,
-      'citation': citation,
-      'question_elements': questionElements,
-      'answer_elements': answerElements,
+      'question_elements': encodeValueForDB(questionElements),
+      'answer_elements': encodeValueForDB(answerElements),
       'ans_flagged': 0, // Changed from false to 0
       'ans_contrib': '', // Default empty
-      'concepts': concepts,
-      'subjects': subjects,
-      'qst_contrib': qstContrib,
+      'qst_contrib': userId,
       'qst_reviewer': '', // Default empty
       'has_been_reviewed': 0, // Changed from false to 0
       'flag_for_removal': 0, // Changed from false to 0
-      'completed': checkCompletionStatus(
-          questionElements.isNotEmpty ? json.encode(questionElements) : '',
-          answerElements.isNotEmpty ? json.encode(answerElements) : ''
-      ),
-      'module_name': normalizedModuleName,
+      'module_name': moduleName,
       'question_type': 'true_false',
       'correct_option_index': correctOptionIndex,
-      'question_id': questionId,
+      'question_id': '${timeStamp}_$userId',
       'has_been_synced': 0, // Initialize sync flags
       'edits_are_synced': 0,
       'last_modified_timestamp': timeStamp, // Use creation timestamp
       // 'options' column is intentionally left NULL/unspecified for true_false type
-    };
+      'has_media': await hasMediaCheck({
+        'time_stamp': timeStamp,
+        'question_elements': encodeValueForDB(questionElements),
+        'answer_elements': encodeValueForDB(answerElements),
+        'ans_flagged': 0,
+        'ans_contrib': '',
+        'qst_contrib': userId,
+        'qst_reviewer': '',
+        'has_been_reviewed': 0,
+        'flag_for_removal': 0,
+        'module_name': moduleName,
+        'question_type': 'true_false',
+        'correct_option_index': correctOptionIndex,
+        'question_id': '${timeStamp}_$userId',
+        'has_been_synced': 0,
+        'edits_are_synced': 0,
+        'last_modified_timestamp': timeStamp,
+      }),
+    }, db);
+    if (!debugDisableOutboundSyncCall) {
+      signalOutboundSyncNeeded(); // Signal after successful insert
+    }
 
-
-    data['has_media'] = await hasMediaCheck(data);
-
-    // Use the universal insert helper
-    await insertRawData('question_answer_pairs', data, db);
-    signalOutboundSyncNeeded(); // Signal after successful insert
-
-    return questionId;
+    return '${timeStamp}_$userId';
   } catch (e) {
     QuizzerLogger.logError('Error adding true/false question - $e');
     rethrow;
   } finally {
     getDatabaseMonitor().releaseDatabaseAccess();
+    
+    // Validate modules table after adding a question (after db access is released)
+    await ensureAllQuestionModuleNamesHaveCorrespondingModuleRecords();
   }
 }
 
 /// Adds a new sort_order question to the database, following existing patterns.
 ///
 /// Args:
-///   moduleId: The ID of the module this question belongs to.
+///   moduleName: The name of the module this question belongs to.
 ///   questionElements: A list of maps representing the question content.
 ///   answerElements: A list of maps representing the explanation/answer rationale.
 ///   options: A list of strings representing the items to be sorted, **in the correct final order**.
-///   qstContrib: The contributor ID for this question.
-///   db: The database instance.
-///   citation: Optional citation string.
-///   concepts: Optional comma-separated concepts string.
-///   subjects: Optional comma-separated subjects string.
+///   debugDisableOutboundSyncCall: When true, prevents signaling the outbound sync system.
+///     This is useful for testing to avoid triggering sync operations during test execution.
+///     Defaults to false (sync is signaled normally).
 ///
 /// Returns:
-///   The unique question_id generated for this question (format: timestamp_qstContrib).
+///   The unique question_id generated for this question (format: timestamp_userId).
 Future<String> addSortOrderQuestion({
-  required String moduleId,
+  required String moduleName,
   required List<Map<String, dynamic>> questionElements,
   required List<Map<String, dynamic>> answerElements,
   required List<Map<String, dynamic>> options, // Items in the correct sorted order
-  required String qstContrib, // Added contributor ID to match pattern
-  String? citation,
-  String? concepts,
-  String? subjects,
+  bool debugDisableOutboundSyncCall = false,
 }) async {
   try {
     final db = await getDatabaseMonitor().requestDatabaseAccess();
@@ -1287,69 +1672,108 @@ Future<String> addSortOrderQuestion({
     // First verify that the table exists
     await verifyQuestionAnswerPairTable(db); // Ensure table and columns are ready
 
+    // Get current user ID from session manager
+    final String? userId = getSessionManager().userId;
+    if (userId == null) {
+      throw Exception('User must be logged in to add a question');
+    }
+    
     // Generate ID components using the established pattern
     final String timeStamp = DateTime.now().toUtc().toIso8601String();
-    final String questionId = '${timeStamp}_$qstContrib';
 
-    // Normalize the module name
-    final String normalizedModuleName = await normalizeString(moduleId);
+    // Check completion status before proceeding
+    final int completionStatus = checkCompletionStatus(
+        questionElements.isNotEmpty ? json.encode(questionElements) : '',
+        answerElements.isNotEmpty ? json.encode(answerElements) : ''
+    );
+    
+    if (completionStatus == 0) {
+      throw Exception('Question is incomplete. Both question and answer elements must be provided and valid.');
+    }
+    
+    // Normalize the module name and trim content fields in place
+    moduleName = await normalizeString(moduleName);
+    questionElements = trimContentFields(questionElements);
+    answerElements = trimContentFields(answerElements);
+    options = trimContentFields(options);
 
-    // Prepare the raw data map - matching fields and defaults from other add functions
-    final Map<String, dynamic> rawData = {
-      'time_stamp': timeStamp, // Part of legacy primary key and used for ID
-      'citation': citation,
-      'question_elements': questionElements, // Will be JSON encoded by helper
-      'answer_elements': answerElements,     // Will be JSON encoded by helper
-      'ans_flagged': 0, // Default
-      'ans_contrib': '', // Default
-      'concepts': concepts,
-      'subjects': subjects,
-      'qst_contrib': qstContrib, // Store contributor ID
-      'qst_reviewer': '', // Default
-      'has_been_reviewed': 0, // Default
-      'flag_for_removal': 0, // Default
-      // Use the helper to check completion status, mirroring other add functions
-      'completed': checkCompletionStatus(
-          questionElements.isNotEmpty ? json.encode(questionElements) : '',
-          answerElements.isNotEmpty ? json.encode(answerElements) : ''
-      ),
-      'module_name': normalizedModuleName,
-      'question_type': 'sort_order', // Use string literal
-      'options': options, // Store correctly ordered list, will be JSON encoded by helper
-      'question_id': questionId, // Store the generated ID
-      'has_been_synced': 0, // Initialize sync flags
-      'edits_are_synced': 0,
-      'last_modified_timestamp': timeStamp, // Use creation timestamp
-      // Fields specific to other types are omitted (correct_option_index, index_options_that_apply, correct_order)
-    };
+    // Additional Validation here:
+    
+    // Validate general question entry requirements
+    _validateQuestionEntry(
+      moduleName: moduleName,
+      questionElements: questionElements,
+      answerElements: answerElements,
+    );
 
+    // Validate options using helper function
+    _validateQuestionOptions(options);
 
-    rawData['has_media'] = await hasMediaCheck(rawData);
+    // Sort order specific validation
+    if (options.length < 2) {
+      throw Exception('Sort order questions must have at least 2 options to sort.');
+    }
 
-    QuizzerLogger.logMessage('Adding sort_order question with ID: $questionId for module $moduleId');
+    QuizzerLogger.logMessage('Adding sort_order question with ID: ${timeStamp}_$userId for module $moduleName');
 
     // Use the universal insert helper (encoding happens inside)
     await insertRawData(
       'question_answer_pairs',
-      rawData,
+      {
+        'time_stamp': timeStamp, // Part of legacy primary key and used for ID
+        'question_elements': encodeValueForDB(questionElements), // Will be JSON encoded by helper
+        'answer_elements': encodeValueForDB(answerElements),     // Will be JSON encoded by helper
+        'ans_flagged': 0, // Default
+        'ans_contrib': '', // Default
+        'qst_contrib': userId, // Store contributor ID from session manager
+        'qst_reviewer': '', // Default
+        'has_been_reviewed': 0, // Default
+        'flag_for_removal': 0, // Default
+        'module_name': moduleName,
+        'question_type': 'sort_order', // Use string literal
+        'options': encodeValueForDB(options), // Store correctly ordered list, will be JSON encoded by helper
+        'question_id': '${timeStamp}_$userId', // Store the generated ID
+        'has_been_synced': 0, // Initialize sync flags
+        'edits_are_synced': 0,
+        'last_modified_timestamp': timeStamp, // Use creation timestamp
+        // Fields specific to other types are omitted (correct_option_index, index_options_that_apply, correct_order)
+        'has_media': await hasMediaCheck({
+          'time_stamp': timeStamp,
+          'question_elements': encodeValueForDB(questionElements),
+          'answer_elements': encodeValueForDB(answerElements),
+          'ans_flagged': 0,
+          'ans_contrib': '',
+          'qst_contrib': userId,
+          'qst_reviewer': '',
+          'has_been_reviewed': 0,
+          'flag_for_removal': 0,
+          'module_name': moduleName,
+          'question_type': 'sort_order',
+          'options': encodeValueForDB(options),
+          'question_id': '${timeStamp}_$userId',
+          'has_been_synced': 0,
+          'edits_are_synced': 0,
+          'last_modified_timestamp': timeStamp,
+        }),
+      },
       db,
     );
-    signalOutboundSyncNeeded(); // Signal after successful insert
+    if (!debugDisableOutboundSyncCall) {
+      signalOutboundSyncNeeded(); // Signal after successful insert
+    }
 
-    return questionId; // Return the generated ID
+    return '${timeStamp}_$userId'; // Return the generated ID
   } catch (e) {
     QuizzerLogger.logError('Error adding sort order question - $e');
     rethrow;
   } finally {
     getDatabaseMonitor().releaseDatabaseAccess();
+    
+    // Validate modules table after adding a question (after db access is released)
+    await ensureAllQuestionModuleNamesHaveCorrespondingModuleRecords();
   }
 }
 
-
-
-// ===============================================================================
-// Fill in the Blank Question Functions
-// ===============================================================================
 
 /// Adds a new fill_in_the_blank question to the database.
 /// 
@@ -1358,22 +1782,18 @@ Future<String> addSortOrderQuestion({
 ///   questionElements: A list of maps representing the question content (can include 'blank' type elements).
 ///   answerElements: A list of maps representing the explanation/answer rationale.
 ///   answersToBlanks: A list of maps where each map contains the correct answer and synonyms for each blank.
-///   qstContrib: The contributor ID for this question.
-///   citation: Optional citation string.
-///   concepts: Optional comma-separated concepts string.
-///   subjects: Optional comma-separated subjects string.
+///   debugDisableOutboundSyncCall: When true, prevents signaling the outbound sync system.
+///     This is useful for testing to avoid triggering sync operations during test execution.
+///     Defaults to false (sync is signaled normally).
 ///
 /// Returns:
-///   The unique question_id generated for this question (format: timestamp_qstContrib).
+///   The unique question_id generated for this question (format: timestamp_userId).
 Future<String> addFillInTheBlankQuestion({
   required String moduleName,
   required List<Map<String, dynamic>> questionElements,
   required List<Map<String, dynamic>> answerElements,
   required List<Map<String, List<String>>> answersToBlanks,
-  required String qstContrib,
-  String? citation,
-  String? concepts,
-  String? subjects,
+  bool debugDisableOutboundSyncCall = false,
 }) async {
 // [x] design data structure and answer validation for question type
 
@@ -1409,57 +1829,109 @@ Future<String> addFillInTheBlankQuestion({
       throw Exception('Failed to acquire database access');
     }
     await verifyQuestionAnswerPairTable(db);
+    
+    // Get current user ID from session manager
+    final String? userId = getSessionManager().userId;
+    if (userId == null) {
+      throw Exception('User must be logged in to add a question');
+    }
+    
     final String timeStamp = DateTime.now().toUtc().toIso8601String();
-    final String questionId = '${timeStamp}_$qstContrib';
 
-    // Normalize the module name
-    final String normalizedModuleName = await normalizeString(moduleName);
+    // Normalize the module name and trim content fields in place
+    moduleName = await normalizeString(moduleName);
+    questionElements = trimContentFields(questionElements);
+    answerElements = trimContentFields(answerElements);
 
-    // Basic validation: Ensure question_elements has n blank elements where n is the length of answers_to_blanks
-    final int blankCount = questionElements.where((element) => element['type'] == 'blank').length;
-    if (blankCount != answersToBlanks.length) {
-      throw ArgumentError('Number of blank elements ($blankCount) does not match number of answer groups (${answersToBlanks.length})');
+    // Additional Validation here:
+    
+    // Validate general question entry requirements
+    _validateQuestionEntry(
+      moduleName: moduleName,
+      questionElements: questionElements,
+      answerElements: answerElements,
+    );
+
+    // Fill in the blank specific validation
+    if (answersToBlanks.isEmpty) {
+      throw Exception('Fill in the blank questions must have at least one answer group.');
     }
 
-    // Prepare the raw data map
-    final Map<String, dynamic> data = {
+    // Ensure question_elements has n blank elements where n is the length of answers_to_blanks
+    final int blankCount = questionElements.where((element) => element['type'] == 'blank').length;
+    if (blankCount != answersToBlanks.length) {
+      throw Exception('Number of blank elements ($blankCount) does not match number of answer groups (${answersToBlanks.length})');
+    }
+
+    // Validate each answer group has at least one answer
+    for (int i = 0; i < answersToBlanks.length; i++) {
+      final answerGroup = answersToBlanks[i];
+      if (answerGroup.isEmpty) {
+        throw Exception('Answer group at index $i cannot be empty.');
+      }
+    }
+
+    // Check completion status before proceeding
+    final int completionStatus = checkCompletionStatus(
+        questionElements.isNotEmpty ? json.encode(questionElements) : '',
+        answerElements.isNotEmpty ? json.encode(answerElements) : ''
+    );
+    
+    if (completionStatus == 0) {
+      throw Exception('Question is incomplete. Both question and answer elements must be provided and valid.');
+    }
+
+    // Use the universal insert helper
+    await insertRawData('question_answer_pairs', {
       'time_stamp': timeStamp,
-      'citation': citation,
-      'question_elements': questionElements,
-      'answer_elements': answerElements,
+      'question_elements': encodeValueForDB(questionElements),
+      'answer_elements': encodeValueForDB(answerElements),
       'ans_flagged': 0,
       'ans_contrib': '',
-      'concepts': concepts,
-      'subjects': subjects,
-      'qst_contrib': qstContrib,
+      'qst_contrib': userId,
       'qst_reviewer': '',
       'has_been_reviewed': 0,
       'flag_for_removal': 0,
-      'completed': checkCompletionStatus(
-          questionElements.isNotEmpty ? json.encode(questionElements) : '',
-          answerElements.isNotEmpty ? json.encode(answerElements) : ''
-      ),
-      'module_name': normalizedModuleName,
+      'module_name': moduleName,
       'question_type': 'fill_in_the_blank',
-      'answers_to_blanks': answersToBlanks,
-      'question_id': questionId,
+      'answers_to_blanks': encodeValueForDB(answersToBlanks),
+      'question_id': '${timeStamp}_$userId',
       'has_been_synced': 0,
       'edits_are_synced': 0,
       'last_modified_timestamp': timeStamp,
-    };
+      'has_media': await hasMediaCheck({
+        'time_stamp': timeStamp,
+        'question_elements': encodeValueForDB(questionElements),
+        'answer_elements': encodeValueForDB(answerElements),
+        'ans_flagged': 0,
+        'ans_contrib': '',
+        'qst_contrib': userId,
+        'qst_reviewer': '',
+        'has_been_reviewed': 0,
+        'flag_for_removal': 0,
+        'module_name': moduleName,
+        'question_type': 'fill_in_the_blank',
+        'answers_to_blanks': encodeValueForDB(answersToBlanks),
+        'question_id': '${timeStamp}_$userId',
+        'has_been_synced': 0,
+        'edits_are_synced': 0,
+        'last_modified_timestamp': timeStamp,
+      }),
+    }, db);
+    
+    if (!debugDisableOutboundSyncCall) {
+      signalOutboundSyncNeeded();
+    }
 
-    data['has_media'] = await hasMediaCheck(data);
-
-    // Use the universal insert helper
-    await insertRawData('question_answer_pairs', data, db);
-    signalOutboundSyncNeeded();
-
-    return questionId;
+    return '${timeStamp}_$userId';
   } catch (e) {
     QuizzerLogger.logError('Error adding fill in the blank question - $e');
     rethrow;
   } finally {
     getDatabaseMonitor().releaseDatabaseAccess();
+    
+    // Validate modules table after adding a question (after db access is released)
+    await ensureAllQuestionModuleNamesHaveCorrespondingModuleRecords();
   }
 }
 
@@ -1574,21 +2046,17 @@ Future<void> batchUpsertQuestionAnswerPairs({
     QuizzerLogger.logMessage('Starting TRUE batch upsert for question_answer_pairs: ${records.length} records');
     await verifyQuestionAnswerPairTable(db);
 
-    // List of all columns in the table
+    // List of all columns in the table (excluding legacy fields that don't exist in local table)
     final columns = [
       'time_stamp',
-      'citation',
       'question_elements',
       'answer_elements',
       'ans_flagged',
       'ans_contrib',
-      'concepts',
-      'subjects',
       'qst_contrib',
       'qst_reviewer',
       'has_been_reviewed',
       'flag_for_removal',
-      'completed',
       'module_name',
       'question_type',
       'options',
@@ -1600,13 +2068,84 @@ Future<void> batchUpsertQuestionAnswerPairs({
       'edits_are_synced',
       'last_modified_timestamp',
       'has_media',
+      'answers_to_blanks',
     ];
 
     // Helper to get value or null/default
     dynamic getVal(Map<String, dynamic> r, String k, dynamic def) => r[k] ?? def;
 
-    for (int i = 0; i < records.length; i += chunkSize) {
-      final batch = records.sublist(i, i + chunkSize > records.length ? records.length : i + chunkSize);
+    // Process and validate all records before batch processing
+    final List<Map<String, dynamic>> processedRecords = [];
+    
+    for (final record in records) {
+      try {
+        // Ensure all required fields are present
+        final String? questionId = record['question_id'] as String?;
+        final String? timeStamp = record['time_stamp'] as String?;
+        final String? qstContrib = record['qst_contrib'] as String?;
+        final String? lastModifiedTimestamp = record['last_modified_timestamp'] as String?;
+        final String? moduleName = record['module_name'] as String?;
+        final String? questionType = record['question_type'] as String?;
+        final String? questionElementsJson = record['question_elements'] as String?;
+        final String? answerElementsJson = record['answer_elements'] as String?;
+
+        if (questionId == null || timeStamp == null || qstContrib == null || lastModifiedTimestamp == null ||
+            moduleName == null || questionType == null || questionElementsJson == null || answerElementsJson == null) {
+          QuizzerLogger.logWarning('Skipping record with missing required fields: $questionId');
+          continue;
+        }
+
+        // Validate the data using the same validation as addQuestion functions
+        try {
+          _validateQuestionEntry(
+            moduleName: moduleName,
+            questionElements: List<Map<String, dynamic>>.from(decodeValueFromDB(questionElementsJson)),
+            answerElements: List<Map<String, dynamic>>.from(decodeValueFromDB(answerElementsJson)),
+          );
+
+          // Validate options if present (for question types that use them)
+          if (questionType == 'multiple_choice' || questionType == 'select_all_that_apply' || questionType == 'sort_order') {
+            final optionsJson = record['options'] as String?;
+            if (optionsJson != null) {
+              final options = List<Map<String, dynamic>>.from(decodeValueFromDB(optionsJson));
+              _validateQuestionOptions(options);
+            }
+          }
+        } catch (e) {
+          QuizzerLogger.logError('Validation failed for question $questionId: $e');
+          continue; // Skip this record and continue with others
+        }
+
+        // Create processed record with legacy fields removed and sync flags set
+        final Map<String, dynamic> processedRecord = Map<String, dynamic>.from(record);
+        
+        // Remove legacy fields that don't exist in local table schema
+        processedRecord.remove('citation');
+        processedRecord.remove('concepts');
+        processedRecord.remove('subjects');
+        processedRecord.remove('completed');
+        
+        // Normalize the module name
+        processedRecord['module_name'] = await normalizeString(moduleName);
+        
+        // Set sync flags to indicate synced status
+        processedRecord['has_been_synced'] = 1;
+        processedRecord['edits_are_synced'] = 1;
+        
+        processedRecords.add(processedRecord);
+      } catch (e) {
+        QuizzerLogger.logError('Error processing record: $e');
+        continue; // Skip this record and continue with others
+      }
+    }
+
+    if (processedRecords.isEmpty) {
+      QuizzerLogger.logMessage('No valid records to process after validation');
+      return;
+    }
+
+    for (int i = 0; i < processedRecords.length; i += chunkSize) {
+      final batch = processedRecords.sublist(i, i + chunkSize > processedRecords.length ? processedRecords.length : i + chunkSize);
       
       // Check for duplicate question_ids within this batch
       final Set<String> questionIds = {};
@@ -1664,39 +2203,6 @@ Future<void> batchUpsertQuestionAnswerPairs({
     QuizzerLogger.logSuccess('TRUE batch upsert for question_answer_pairs complete.');
   } catch (e) {
     QuizzerLogger.logError('Error batch upserting question answer pairs - $e');
-    rethrow;
-  } finally {
-    getDatabaseMonitor().releaseDatabaseAccess();
-  }
-}
-
-/// Gets the most recent last_modified_timestamp from the question_answer_pairs table
-Future<String?> getMostRecentQuestionAnswerPairTimestamp() async {
-  // FIXME sync mechanism relies on this, but if a user adds a question mid login, some new data may be missed.
-  // FIXME We better sync mechanism
-  try {
-    final db = await getDatabaseMonitor().requestDatabaseAccess();
-    if (db == null) {
-      throw Exception('Failed to acquire database access');
-    }
-    
-    await verifyQuestionAnswerPairTable(db);
-    
-    // Query to get the maximum last_modified_timestamp
-    final List<Map<String, dynamic>> results = await db.rawQuery(
-      'SELECT MAX(last_modified_timestamp) as max_timestamp FROM question_answer_pairs WHERE last_modified_timestamp IS NOT NULL'
-    );
-    
-    if (results.isNotEmpty && results.first['max_timestamp'] != null) {
-      final String? maxTimestamp = results.first['max_timestamp'] as String?;
-      QuizzerLogger.logMessage('Most recent question timestamp found: $maxTimestamp');
-      return maxTimestamp;
-    } else {
-      QuizzerLogger.logMessage('No question records found with last_modified_timestamp');
-      return null;
-    }
-  } catch (e) {
-    QuizzerLogger.logError('Error getting most recent question timestamp - $e');
     rethrow;
   } finally {
     getDatabaseMonitor().releaseDatabaseAccess();

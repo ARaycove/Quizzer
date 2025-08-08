@@ -1,6 +1,7 @@
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/modules_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pair_management/question_answer_pairs_table.dart';
+import 'package:quizzer/backend_systems/session_manager/answer_validation/text_validation_functionality.dart';
 
 /// Renames a module by updating both the module record and all associated question records.
 /// 
@@ -26,64 +27,96 @@ Future<bool> renameModule({
   QuizzerLogger.logMessage('Starting module rename operation: "$oldModuleName" -> "$newModuleName"');
   
   try {
+    // Normalize both module names
+    final String normalizedOldModuleName = await normalizeString(oldModuleName);
+    final String normalizedNewModuleName = await normalizeString(newModuleName);
+    
+    QuizzerLogger.logMessage('Normalized module names: "$normalizedOldModuleName" -> "$normalizedNewModuleName"');
+    
     // Step 1: Verify the old module exists
     QuizzerLogger.logMessage('Step 1: Verifying old module exists');
-    final Map<String, dynamic>? existingModule = await getModule(oldModuleName);
+    final Map<String, dynamic>? existingModule = await getModule(normalizedOldModuleName);
     if (existingModule == null) {
-      QuizzerLogger.logError('Cannot rename module: Module "$oldModuleName" does not exist');
+      QuizzerLogger.logError('Cannot rename module: Module "$normalizedOldModuleName" does not exist');
       return false;
     }
-    QuizzerLogger.logSuccess('Verified old module exists: $oldModuleName');
+    QuizzerLogger.logSuccess('Verified old module exists: $normalizedOldModuleName');
     
     // Step 2: Check if new module name already exists
     QuizzerLogger.logMessage('Step 2: Checking if new module name already exists');
-    final Map<String, dynamic>? conflictingModule = await getModule(newModuleName);
+    final Map<String, dynamic>? conflictingModule = await getModule(normalizedNewModuleName);
     if (conflictingModule != null) {
-      QuizzerLogger.logError('Cannot rename module: Module "$newModuleName" already exists');
-      return false;
-    }
-    QuizzerLogger.logSuccess('Verified new module name is available: $newModuleName');
-    
-    // Step 3: Get all questions for the old module BEFORE renaming
-    QuizzerLogger.logMessage('Step 3: Getting all questions for the old module');
-    final List<Map<String, dynamic>> questionsToUpdate = await getQuestionRecordsForModule(oldModuleName);
-    QuizzerLogger.logSuccess('Found ${questionsToUpdate.length} questions to update');
-    
-    // Step 4: Update the module record with new name
-    QuizzerLogger.logMessage('Step 4: Updating module record with new name');
-    await updateModule(
-      name: oldModuleName,
-      newName: newModuleName,
-      description: existingModule['description'] as String?,
-      primarySubject: existingModule['primary_subject'] as String?,
-      subjects: (existingModule['subjects'] as List<dynamic>?)?.cast<String>(),
-      relatedConcepts: (existingModule['related_concepts'] as List<dynamic>?)?.cast<String>(),
-    );
-    
-    // Step 5: Update all question records with the new module name
-    QuizzerLogger.logMessage('Step 5: Updating question records with new module name');
-    int updatedQuestionsCount = 0;
-    for (final question in questionsToUpdate) {
-      final String questionId = question['question_id'] as String;
-      try {
-        await editQuestionAnswerPair(
-          questionId: questionId,
-          moduleName: newModuleName,
-        );
-        updatedQuestionsCount++;
-      } catch (e) {
-        QuizzerLogger.logError('Failed to update question $questionId: $e');
-        throw Exception('Failed to update question $questionId: $e');
+      QuizzerLogger.logMessage('Module "$normalizedNewModuleName" already exists - will move questions to existing module');
+      
+      // Step 3a: Get all questions for the old module
+      QuizzerLogger.logMessage('Step 3a: Getting all questions for the old module');
+      final List<Map<String, dynamic>> questionsToUpdate = await getQuestionRecordsForModule(normalizedOldModuleName);
+      QuizzerLogger.logSuccess('Found ${questionsToUpdate.length} questions to move');
+      
+      // Step 4a: Move all question records to the existing module (no module record update needed)
+      QuizzerLogger.logMessage('Step 4a: Moving question records to existing module');
+      int updatedQuestionsCount = 0;
+      for (final question in questionsToUpdate) {
+        final String questionId = question['question_id'] as String;
+        try {
+          await editQuestionAnswerPair(
+            questionId: questionId,
+            moduleName: normalizedNewModuleName,
+          );
+          updatedQuestionsCount++;
+        } catch (e) {
+          QuizzerLogger.logError('Failed to update question $questionId: $e');
+          throw Exception('Failed to update question $questionId: $e');
+        }
       }
+      QuizzerLogger.logSuccess('Moved $updatedQuestionsCount question records to existing module');
+      
+      // Note: Old module record is kept - only questions are moved to the existing module
+      
+    } else {
+      QuizzerLogger.logSuccess('Verified new module name is available: $normalizedNewModuleName');
+      
+      // Step 3b: Get all questions for the old module BEFORE renaming
+      QuizzerLogger.logMessage('Step 3b: Getting all questions for the old module');
+      final List<Map<String, dynamic>> questionsToUpdate = await getQuestionRecordsForModule(normalizedOldModuleName);
+      QuizzerLogger.logSuccess('Found ${questionsToUpdate.length} questions to update');
+      
+      // Step 4b: Update the module record with new name
+      QuizzerLogger.logMessage('Step 4b: Updating module record with new name');
+      await updateModule(
+        name: normalizedOldModuleName,
+        newName: normalizedNewModuleName,
+        description: existingModule['description'] as String?,
+        primarySubject: existingModule['primary_subject'] as String?,
+        subjects: (existingModule['subjects'] as List<dynamic>?)?.cast<String>(),
+        relatedConcepts: (existingModule['related_concepts'] as List<dynamic>?)?.cast<String>(),
+      );
+      
+      // Step 5b: Update all question records with the new module name
+      QuizzerLogger.logMessage('Step 5b: Updating question records with new module name');
+      int updatedQuestionsCount = 0;
+      for (final question in questionsToUpdate) {
+        final String questionId = question['question_id'] as String;
+        try {
+          await editQuestionAnswerPair(
+            questionId: questionId,
+            moduleName: normalizedNewModuleName,
+          );
+          updatedQuestionsCount++;
+        } catch (e) {
+          QuizzerLogger.logError('Failed to update question $questionId: $e');
+          throw Exception('Failed to update question $questionId: $e');
+        }
+      }
+      QuizzerLogger.logSuccess('Updated $updatedQuestionsCount question records');
     }
-    QuizzerLogger.logSuccess('Updated $updatedQuestionsCount question records');
     
     QuizzerLogger.logMessage('Step 6: Module rename completed');
     
     QuizzerLogger.logSuccess('✅ Module rename operation completed successfully');
-    QuizzerLogger.logValue('  Old module name: $oldModuleName');
-    QuizzerLogger.logValue('  New module name: $newModuleName');
-    QuizzerLogger.logValue('  Question records updated: $updatedQuestionsCount');
+    QuizzerLogger.logValue('  Old module name: $normalizedOldModuleName');
+    QuizzerLogger.logValue('  New module name: $normalizedNewModuleName');
+    QuizzerLogger.logValue('  Question records moved/updated: ${conflictingModule != null ? 'moved to existing module' : 'updated with new module name'}');
     
     return true;
     

@@ -1,0 +1,9 @@
+I DONT GIVE A FUCK IF TEST 1 AND 2 OF INBOUND SYNC SHARE STATE, IM NOT TRYING TO SYNC MY ENTIRE DATABASE TWICE IN A ROW, I HAVE COMPUTE RESOURCES TO WORRY ABOUT AND PHYSICAL DOLLARS YOU WASTE ON THSI SHIT. 
+
+i DON'T EVEN KNOW WHAT YOU'RE FUCKING UP RIGHT NOW.
+
+There are 3092 questions in the main table right now, so I set test 1 to expect at least 3090. 
+
+So at the start of the next test, test 2 there should be 3092(currently but fluctuates over time because this is an active system) records
+
+We then insert our 5 manually

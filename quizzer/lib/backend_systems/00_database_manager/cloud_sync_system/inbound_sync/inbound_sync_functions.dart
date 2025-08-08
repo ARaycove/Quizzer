@@ -7,16 +7,16 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_question_answer_pairs_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_settings_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/modules_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_eligible_questions_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_non_circulating_questions_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_in_circulation_questions_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_revision_streak_sum_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_total_user_question_answer_pairs_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_average_questions_shown_per_day_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_total_questions_answered_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_daily_questions_answered_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_days_left_until_questions_exhaust_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_average_daily_questions_learned_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_eligible_questions_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_non_circulating_questions_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_in_circulation_questions_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_revision_streak_sum_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_total_user_question_answer_pairs_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_average_questions_shown_per_day_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_total_questions_answered_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_daily_questions_answered_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_days_left_until_questions_exhaust_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_average_daily_questions_learned_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_module_activation_status_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/academic_archive.dart/subject_details_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/inbound_sync/inbound_sync_helper.dart';
@@ -88,8 +88,9 @@ Future<T> executeSupabaseCallWithRetry<T>(
 /// Syncs question_answer_pairs from the cloud that are newer than the last login date
 Future<void> syncQuestionAnswerPairsInbound(
   String userId,
-  SupabaseClient supabaseClient,
-) async {
+  SupabaseClient supabaseClient, {
+  String? effectiveLastLogin,
+}) async {
   try {
     QuizzerLogger.logMessage('Syncing inbound question_answer_pairs for user $userId...');
     
@@ -98,7 +99,7 @@ Future<void> syncQuestionAnswerPairsInbound(
       supabase: supabaseClient,
       tableName: 'question_answer_pairs',
       userId: userId,
-      useLastLogin: true,
+      effectiveLastLogin: effectiveLastLogin,
     );
     
     if (cloudRecords.isEmpty) {
@@ -125,8 +126,9 @@ Future<void> syncQuestionAnswerPairsInbound(
 /// Syncs user_question_answer_pairs from the cloud that are newer than the last login date
 Future<void> syncUserQuestionAnswerPairsInbound(
   String userId,
-  SupabaseClient supabaseClient,
-) async {
+  SupabaseClient supabaseClient, {
+  String? effectiveLastLogin,
+}) async {
   try {
     QuizzerLogger.logMessage('Syncing inbound user_question_answer_pairs for user $userId...');
     
@@ -136,7 +138,7 @@ Future<void> syncUserQuestionAnswerPairsInbound(
       tableName: 'user_question_answer_pairs',
       userId: userId,
       additionalFilters: {'user_uuid': userId},
-      useLastLogin: true,
+      effectiveLastLogin: effectiveLastLogin,
     );
     
     if (cloudRecords.isEmpty) {
@@ -163,8 +165,9 @@ Future<void> syncUserQuestionAnswerPairsInbound(
 /// Syncs user profile from the cloud that is newer than the last login date
 Future<void> syncUserProfileInbound(
   String userId,
-  SupabaseClient supabaseClient,
-) async {
+  SupabaseClient supabaseClient, {
+  String? effectiveLastLogin,
+}) async {
   try {
     QuizzerLogger.logMessage('Syncing inbound user profile for user $userId...');
     
@@ -174,7 +177,7 @@ Future<void> syncUserProfileInbound(
       tableName: 'user_profile',
       userId: userId,
       additionalFilters: {'uuid': userId},
-      useLastLogin: true,
+      effectiveLastLogin: effectiveLastLogin,
     );
 
     if (cloudRecords.isEmpty) {
@@ -198,8 +201,9 @@ Future<void> syncUserProfileInbound(
 /// Syncs user settings from the cloud that are newer than the initial profile timestamp for the user.
 Future<void> syncUserSettingsInbound(
   String userId,
-  SupabaseClient supabaseClient,
-) async {
+  SupabaseClient supabaseClient, {
+  String? effectiveLastLogin,
+}) async {
   try {
     QuizzerLogger.logMessage('Syncing inbound user_settings for user $userId...');
 
@@ -209,7 +213,7 @@ Future<void> syncUserSettingsInbound(
       tableName: 'user_settings',
       userId: userId,
       additionalFilters: {'user_id': userId},
-      useLastLogin: true,
+      effectiveLastLogin: effectiveLastLogin,
     );
 
     if (cloudRecords.isEmpty) {
@@ -219,10 +223,8 @@ Future<void> syncUserSettingsInbound(
 
     QuizzerLogger.logMessage('Found ${cloudRecords.length} new/updated user_settings to sync for user $userId.');
 
-    for (final record in cloudRecords) {
-      // Use the refactored function that handles its own database access
-      await upsertUserSettingsFromSupabase(record);
-    }
+    // Use batch upsert to handle all settings in a single transaction
+    await batchUpsertUserSettingsFromSupabase(cloudRecords, userId);
 
     QuizzerLogger.logSuccess('Synced ${cloudRecords.length} user_settings from cloud for user $userId.');
   } catch (e) {
@@ -259,6 +261,7 @@ Future<void> syncModulesInbound(
       await upsertModuleFromInboundSync(
         moduleName: record['module_name'],
         description: record['description'],
+        categories: record['categories']
       );
     }
 
@@ -271,8 +274,9 @@ Future<void> syncModulesInbound(
 
 Future<void> syncUserStatsEligibleQuestionsInbound(
   String userId,
-  SupabaseClient supabaseClient,
-) async {
+  SupabaseClient supabaseClient, {
+  String? effectiveLastLogin,
+}) async {
   try {
     QuizzerLogger.logMessage('Syncing inbound user_stats_eligible_questions for user $userId...');
 
@@ -282,7 +286,7 @@ Future<void> syncUserStatsEligibleQuestionsInbound(
       tableName: 'user_stats_eligible_questions',
       userId: userId,
       additionalFilters: {'user_id': userId},
-      useLastLogin: true,
+      effectiveLastLogin: effectiveLastLogin,
     );
 
     if (cloudRecords.isEmpty) {
@@ -305,8 +309,9 @@ Future<void> syncUserStatsEligibleQuestionsInbound(
 
 Future<void> syncUserStatsNonCirculatingQuestionsInbound(
   String userId,
-  SupabaseClient supabaseClient,
-) async {
+  SupabaseClient supabaseClient, {
+  String? effectiveLastLogin,
+}) async {
   try {
     QuizzerLogger.logMessage('Syncing inbound user_stats_non_circulating_questions for user $userId...');
 
@@ -316,7 +321,7 @@ Future<void> syncUserStatsNonCirculatingQuestionsInbound(
       tableName: 'user_stats_non_circulating_questions',
       userId: userId,
       additionalFilters: {'user_id': userId},
-      useLastLogin: true,
+      effectiveLastLogin: effectiveLastLogin,
     );
 
     if (cloudRecords.isEmpty) {
@@ -339,8 +344,9 @@ Future<void> syncUserStatsNonCirculatingQuestionsInbound(
 
 Future<void> syncUserStatsInCirculationQuestionsInbound(
   String userId,
-  SupabaseClient supabaseClient,
-) async {
+  SupabaseClient supabaseClient, {
+  String? effectiveLastLogin,
+}) async {
   try {
     QuizzerLogger.logMessage('Syncing inbound user_stats_in_circulation_questions for user $userId...');
 
@@ -350,7 +356,7 @@ Future<void> syncUserStatsInCirculationQuestionsInbound(
       tableName: 'user_stats_in_circulation_questions',
       userId: userId,
       additionalFilters: {'user_id': userId},
-      useLastLogin: true,
+      effectiveLastLogin: effectiveLastLogin,
     );
 
     if (cloudRecords.isEmpty) {
@@ -373,8 +379,9 @@ Future<void> syncUserStatsInCirculationQuestionsInbound(
 
 Future<void> syncUserStatsRevisionStreakSumInbound(
   String userId,
-  SupabaseClient supabaseClient,
-) async {
+  SupabaseClient supabaseClient, {
+  String? effectiveLastLogin,
+}) async {
   try {
     QuizzerLogger.logMessage('Syncing inbound user_stats_revision_streak_sum for user $userId...');
 
@@ -384,7 +391,7 @@ Future<void> syncUserStatsRevisionStreakSumInbound(
       tableName: 'user_stats_revision_streak_sum',
       userId: userId,
       additionalFilters: {'user_id': userId},
-      useLastLogin: true,
+      effectiveLastLogin: effectiveLastLogin,
     );
 
     if (cloudRecords.isEmpty) {
@@ -407,8 +414,9 @@ Future<void> syncUserStatsRevisionStreakSumInbound(
 
 Future<void> syncUserStatsTotalUserQuestionAnswerPairsInbound(
   String userId,
-  SupabaseClient supabaseClient,
-) async {
+  SupabaseClient supabaseClient, {
+  String? effectiveLastLogin,
+}) async {
   try {
     QuizzerLogger.logMessage('Syncing inbound user_stats_total_user_question_answer_pairs for user $userId...');
 
@@ -418,7 +426,7 @@ Future<void> syncUserStatsTotalUserQuestionAnswerPairsInbound(
       tableName: 'user_stats_total_user_question_answer_pairs',
       userId: userId,
       additionalFilters: {'user_id': userId},
-      useLastLogin: true,
+      effectiveLastLogin: effectiveLastLogin,
     );
 
     if (cloudRecords.isEmpty) {
@@ -441,8 +449,9 @@ Future<void> syncUserStatsTotalUserQuestionAnswerPairsInbound(
 
 Future<void> syncUserStatsAverageQuestionsShownPerDayInbound(
   String userId,
-  SupabaseClient supabaseClient,
-) async {
+  SupabaseClient supabaseClient, {
+  String? effectiveLastLogin,
+}) async {
   try {
     QuizzerLogger.logMessage('Syncing inbound user_stats_average_questions_shown_per_day for user $userId...');
 
@@ -452,7 +461,7 @@ Future<void> syncUserStatsAverageQuestionsShownPerDayInbound(
       tableName: 'user_stats_average_questions_shown_per_day',
       userId: userId,
       additionalFilters: {'user_id': userId},
-      useLastLogin: true,
+      effectiveLastLogin: effectiveLastLogin,
     );
 
     if (cloudRecords.isEmpty) {
@@ -475,8 +484,9 @@ Future<void> syncUserStatsAverageQuestionsShownPerDayInbound(
 
 Future<void> syncUserStatsTotalQuestionsAnsweredInbound(
   String userId,
-  SupabaseClient supabaseClient,
-) async {
+  SupabaseClient supabaseClient, {
+  String? effectiveLastLogin,
+}) async {
   try {
     QuizzerLogger.logMessage('Syncing inbound user_stats_total_questions_answered for user $userId...');
 
@@ -486,7 +496,7 @@ Future<void> syncUserStatsTotalQuestionsAnsweredInbound(
       tableName: 'user_stats_total_questions_answered',
       userId: userId,
       additionalFilters: {'user_id': userId},
-      useLastLogin: true,
+      effectiveLastLogin: effectiveLastLogin,
     );
 
     if (cloudRecords.isEmpty) {
@@ -509,8 +519,9 @@ Future<void> syncUserStatsTotalQuestionsAnsweredInbound(
 
 Future<void> syncUserStatsDailyQuestionsAnsweredInbound(
   String userId,
-  SupabaseClient supabaseClient,
-) async {
+  SupabaseClient supabaseClient, {
+  String? effectiveLastLogin,
+}) async {
   try {
     QuizzerLogger.logMessage('Syncing inbound user_stats_daily_questions_answered for user $userId...');
 
@@ -520,7 +531,7 @@ Future<void> syncUserStatsDailyQuestionsAnsweredInbound(
       tableName: 'user_stats_daily_questions_answered',
       userId: userId,
       additionalFilters: {'user_id': userId},
-      useLastLogin: true,
+      effectiveLastLogin: effectiveLastLogin,
     );
 
     if (cloudRecords.isEmpty) {
@@ -543,8 +554,9 @@ Future<void> syncUserStatsDailyQuestionsAnsweredInbound(
 
 Future<void> syncUserStatsDaysLeftUntilQuestionsExhaustInbound(
   String userId,
-  SupabaseClient supabaseClient,
-) async {
+  SupabaseClient supabaseClient, {
+  String? effectiveLastLogin,
+}) async {
   try {
     QuizzerLogger.logMessage('Syncing inbound user_stats_days_left_until_questions_exhaust for user $userId...');
 
@@ -554,7 +566,7 @@ Future<void> syncUserStatsDaysLeftUntilQuestionsExhaustInbound(
       tableName: 'user_stats_days_left_until_questions_exhaust',
       userId: userId,
       additionalFilters: {'user_id': userId},
-      useLastLogin: true,
+      effectiveLastLogin: effectiveLastLogin,
     );
 
     if (cloudRecords.isEmpty) {
@@ -577,8 +589,9 @@ Future<void> syncUserStatsDaysLeftUntilQuestionsExhaustInbound(
 
 Future<void> syncUserStatsAverageDailyQuestionsLearnedInbound(
   String userId,
-  SupabaseClient supabaseClient,
-) async {
+  SupabaseClient supabaseClient, {
+  String? effectiveLastLogin,
+}) async {
   try {
     QuizzerLogger.logMessage('Syncing inbound user_stats_average_daily_questions_learned for user $userId...');
 
@@ -588,7 +601,7 @@ Future<void> syncUserStatsAverageDailyQuestionsLearnedInbound(
       tableName: 'user_stats_average_daily_questions_learned',
       userId: userId,
       additionalFilters: {'user_id': userId},
-      useLastLogin: true,
+      effectiveLastLogin: effectiveLastLogin,
     );
 
     if (cloudRecords.isEmpty) {
@@ -611,8 +624,9 @@ Future<void> syncUserStatsAverageDailyQuestionsLearnedInbound(
 
 Future<void> syncUserModuleActivationStatusInbound(
   String userId,
-  SupabaseClient supabaseClient,
-) async {
+  SupabaseClient supabaseClient, {
+  String? effectiveLastLogin,
+}) async {
   try {
     QuizzerLogger.logMessage('Syncing inbound user_module_activation_status for user $userId...');
 
@@ -622,7 +636,7 @@ Future<void> syncUserModuleActivationStatusInbound(
       tableName: 'user_module_activation_status',
       userId: userId,
       additionalFilters: {'user_id': userId},
-      useLastLogin: true,
+      effectiveLastLogin: effectiveLastLogin,
     );
 
     if (cloudRecords.isEmpty) {
@@ -681,48 +695,65 @@ Future<void> syncSubjectDetailsInbound(
   }
 }
 
-Future<void> runInboundSync(SessionManager sessionManager) async {
+Future<void> runInboundSync(SessionManager sessionManager, {bool isDatabaseFresh = false}) async {
   QuizzerLogger.logMessage('Starting inbound sync aggregator...');
   final String? userId = sessionManager.userId;
 
-  // Get last_login timestamp using the imported helper
-  final String? lastLogin = await getLastLoginForUser(userId!);
-  // If lastLogin is null, set it to 20 years ago to ensure we get all records
-  final String effectiveLastLogin = lastLogin ?? DateTime.now().subtract(const Duration(days: 365 * 20)).toUtc().toIso8601String();
-  QuizzerLogger.logMessage('Using effective last login timestamp: $effectiveLastLogin');
+  if (userId == null) {
+    QuizzerLogger.logError('Cannot run inbound sync: userId is null');
+    throw StateError('Cannot run inbound sync: userId is null');
+  }
+
+  String effectiveLastLogin;
+  if (isDatabaseFresh) {
+    // Fresh database - use 1970 timestamp to get ALL records
+    effectiveLastLogin = DateTime(1970, 1, 1).toUtc().toIso8601String();
+    QuizzerLogger.logMessage('Fresh database detected - using 1970 timestamp to sync ALL records: $effectiveLastLogin');
+  } else {
+    // Existing database - use last_login from profile
+    final String? lastLogin = await getLastLoginForUser(userId);
+    effectiveLastLogin = lastLogin ?? DateTime(1970, 1, 1).toUtc().toIso8601String();
+    QuizzerLogger.logMessage('Existing database - using last login timestamp: $effectiveLastLogin');
+  }
 
   try {
     QuizzerLogger.logMessage('Starting inbound sync for user $userId...');
 
-    // Execute all sync operations concurrently
-    await Future.wait([
-      // Sync question_answer_pairs
-      syncQuestionAnswerPairsInbound(userId, sessionManager.supabase),
-      // Sync user_question_answer_pairs using the initial profile last_modified_timestamp
-      syncUserQuestionAnswerPairsInbound(userId, sessionManager.supabase),
-      // Sync user profile using the initial profile last_modified_timestamp
-      syncUserProfileInbound(userId, sessionManager.supabase),
-      // Sync user settings using the initial profile last_modified_timestamp
-      syncUserSettingsInbound(userId, sessionManager.supabase),
-      // Sync modules using the initial profile last_modified_timestamp
-      syncModulesInbound(sessionManager.supabase),
-      // Sync subject_details using the local table's most recent timestamp
-      syncSubjectDetailsInbound(sessionManager.supabase),
-      // Sync user stats using the initial profile last_modified_timestamp
-      syncUserStatsEligibleQuestionsInbound(userId, sessionManager.supabase),
-      syncUserStatsNonCirculatingQuestionsInbound(userId, sessionManager.supabase),
-      syncUserStatsInCirculationQuestionsInbound(userId, sessionManager.supabase),
-      syncUserStatsRevisionStreakSumInbound(userId, sessionManager.supabase),
-      syncUserStatsTotalUserQuestionAnswerPairsInbound(userId, sessionManager.supabase),
-      syncUserStatsAverageQuestionsShownPerDayInbound(userId, sessionManager.supabase),
-      syncUserStatsTotalQuestionsAnsweredInbound(userId, sessionManager.supabase),
-      syncUserStatsDailyQuestionsAnsweredInbound(userId, sessionManager.supabase),
-      syncUserStatsDaysLeftUntilQuestionsExhaustInbound(userId, sessionManager.supabase),
-      syncUserStatsAverageDailyQuestionsLearnedInbound(userId, sessionManager.supabase),
-      syncUserModuleActivationStatusInbound(userId, sessionManager.supabase),
-  ]);
+    // Execute all sync operations sequentially to avoid data loss issues
+    // Sync question_answer_pairs
+    await syncQuestionAnswerPairsInbound(userId, sessionManager.supabase, effectiveLastLogin: effectiveLastLogin);
+    
+    // Sync user_question_answer_pairs using the initial profile last_modified_timestamp
+    await syncUserQuestionAnswerPairsInbound(userId, sessionManager.supabase, effectiveLastLogin: effectiveLastLogin);
+    
+    // Sync modules using the initial profile last_modified_timestamp
+    await syncModulesInbound(sessionManager.supabase);
+    
+    // Sync subject_details using the local table's most recent timestamp
+    await syncSubjectDetailsInbound(sessionManager.supabase);
+    
+    // Sync user stats using the initial profile last_modified_timestamp
+    await syncUserStatsEligibleQuestionsInbound(userId, sessionManager.supabase, effectiveLastLogin: effectiveLastLogin);
+    await syncUserStatsNonCirculatingQuestionsInbound(userId, sessionManager.supabase, effectiveLastLogin: effectiveLastLogin);
+    await syncUserStatsInCirculationQuestionsInbound(userId, sessionManager.supabase, effectiveLastLogin: effectiveLastLogin);
+    await syncUserStatsRevisionStreakSumInbound(userId, sessionManager.supabase, effectiveLastLogin: effectiveLastLogin);
+    await syncUserStatsTotalUserQuestionAnswerPairsInbound(userId, sessionManager.supabase, effectiveLastLogin: effectiveLastLogin);
+    await syncUserStatsAverageQuestionsShownPerDayInbound(userId, sessionManager.supabase, effectiveLastLogin: effectiveLastLogin);
+    await syncUserStatsTotalQuestionsAnsweredInbound(userId, sessionManager.supabase, effectiveLastLogin: effectiveLastLogin);
+    await syncUserStatsDailyQuestionsAnsweredInbound(userId, sessionManager.supabase, effectiveLastLogin: effectiveLastLogin);
+    await syncUserStatsDaysLeftUntilQuestionsExhaustInbound(userId, sessionManager.supabase, effectiveLastLogin: effectiveLastLogin);
+    await syncUserStatsAverageDailyQuestionsLearnedInbound(userId, sessionManager.supabase, effectiveLastLogin: effectiveLastLogin);
+    await syncUserModuleActivationStatusInbound(userId, sessionManager.supabase, effectiveLastLogin: effectiveLastLogin);
 
-  QuizzerLogger.logSuccess('Inbound sync completed successfully.');
+    // Sync user settings separately to avoid race conditions
+    QuizzerLogger.logMessage('Syncing user settings separately to avoid race conditions...');
+    await syncUserSettingsInbound(userId, sessionManager.supabase, effectiveLastLogin: effectiveLastLogin);
+
+    // Now sync the user profile LAST - this will update the last_login timestamp
+    QuizzerLogger.logMessage('Syncing user profile last to update last_login timestamp...');
+    await syncUserProfileInbound(userId, sessionManager.supabase, effectiveLastLogin: effectiveLastLogin);
+
+    QuizzerLogger.logSuccess('Inbound sync completed successfully.');
   } catch (e) {
     QuizzerLogger.logError('runInboundSync: Error - $e');
     rethrow;

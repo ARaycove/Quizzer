@@ -3,6 +3,7 @@ import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dar
 import 'package:quizzer/backend_systems/00_database_manager/tables/modules_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_module_activation_status_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pair_management/question_answer_pairs_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/table_helper.dart';
 import 'dart:convert';
 
 /// Optimized query to fetch all module data, questions, and activation status in a single operation.
@@ -32,6 +33,7 @@ Future<Map<String, Map<String, dynamic>>> getOptimizedModuleData(String userId) 
         modules.primary_subject,
         modules.subjects,
         modules.related_concepts,
+        modules.categories,
         modules.creation_date,
         modules.creator_id,
         user_module_activation_status.is_active,
@@ -62,8 +64,8 @@ Future<Map<String, Map<String, dynamic>>> getOptimizedModuleData(String userId) 
       LEFT JOIN question_answer_pairs 
         ON modules.module_name = question_answer_pairs.module_name
       GROUP BY modules.module_name, modules.description, modules.primary_subject, 
-               modules.subjects, modules.related_concepts, modules.creation_date, 
-               modules.creator_id, user_module_activation_status.is_active
+               modules.subjects, modules.related_concepts, modules.categories, 
+               modules.creation_date, modules.creator_id, user_module_activation_status.is_active
       ORDER BY modules.module_name
     ''';
     
@@ -124,6 +126,7 @@ Future<Map<String, Map<String, dynamic>>> getOptimizedModuleData(String userId) 
         'primary_subject': row['primary_subject'],
         'subjects': row['subjects'],
         'related_concepts': row['related_concepts'],
+        'categories': decodeValueFromDB(row['categories']),
         'creation_date': row['creation_date'],
         'creator_id': row['creator_id'],
         'is_active': (row['is_active'] as int? ?? 0) == 1,
@@ -171,6 +174,7 @@ Future<Map<String, dynamic>?> getIndividualModuleData(String userId, String modu
         modules.primary_subject,
         modules.subjects,
         modules.related_concepts,
+        modules.categories,
         modules.creation_date,
         modules.creator_id,
         user_module_activation_status.is_active,
@@ -202,8 +206,8 @@ Future<Map<String, dynamic>?> getIndividualModuleData(String userId, String modu
         ON modules.module_name = question_answer_pairs.module_name
       WHERE modules.module_name = ?
       GROUP BY modules.module_name, modules.description, modules.primary_subject, 
-               modules.subjects, modules.related_concepts, modules.creation_date, 
-               modules.creator_id, user_module_activation_status.is_active
+               modules.subjects, modules.related_concepts, modules.categories, 
+               modules.creation_date, modules.creator_id, user_module_activation_status.is_active
     ''';
     
     final List<Map<String, dynamic>> results = await db.rawQuery(sql, [userId, moduleName]);
@@ -263,6 +267,7 @@ Future<Map<String, dynamic>?> getIndividualModuleData(String userId, String modu
       'primary_subject': row['primary_subject'],
       'subjects': row['subjects'],
       'related_concepts': row['related_concepts'],
+      'categories': decodeValueFromDB(row['categories']),
       'creation_date': row['creation_date'],
       'creator_id': row['creator_id'],
       'is_active': (row['is_active'] as int? ?? 0) == 1,

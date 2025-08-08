@@ -111,7 +111,6 @@ class OutboundSyncWorker {
   // --- Core Sync Logic (Refactored) ---
   /// The core synchronization logic.
   Future<void> _performSync() async {
-    // TODO Performance Refactor
     // All sync functions should be grouped, get all records that need synced and group them into one long list, then using the unified push record function, group the pushes and send them all in batches ASYNC style.
     QuizzerLogger.logMessage('OutboundSyncWorker: Starting sync cycle.');
 

@@ -200,9 +200,11 @@ class _EditModuleDialogState extends State<EditModuleDialog> {
   Widget build(BuildContext context) {
     return Dialog(
       child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
                 // Header
                 Text('Edit Module: ${formatModuleNameForDisplay(_moduleName)}'),
                 const Divider(),
@@ -271,6 +273,7 @@ class _EditModuleDialogState extends State<EditModuleDialog> {
                   ],
                 ),
               ],
+            ),
             ),
           ),
         );

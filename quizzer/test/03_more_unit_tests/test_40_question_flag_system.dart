@@ -3,7 +3,6 @@ import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/backend_systems/02_login_authentication/login_initialization.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pair_management/question_answer_pair_flags_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pair_management/question_answer_pairs_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_question_answer_pairs_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
 import 'package:quizzer/backend_systems/00_database_manager/review_system/handle_question_flags.dart';
@@ -70,13 +69,21 @@ void main() {
       getDatabaseMonitor().releaseDatabaseAccess();
       
       // Get an existing question_id from question_answer_pair table for testing
-      final randomQuestion = await getRandomQuestionAnswerPair();
-      if (randomQuestion != null) {
-        existingQuestionId = randomQuestion['question_id'] as String;
-        QuizzerLogger.logMessage('Using existing question_id for testing: $existingQuestionId');
-      } else {
-        QuizzerLogger.logWarning('No existing questions found for testing');
+      final dbForQuestion = await getDatabaseMonitor().requestDatabaseAccess();
+      if (dbForQuestion != null) {
+        final List<Map<String, dynamic>> results = await dbForQuestion.query(
+          'question_answer_pairs',
+          columns: ['question_id'],
+          limit: 1,
+        );
+        if (results.isNotEmpty) {
+          existingQuestionId = results.first['question_id'] as String;
+          QuizzerLogger.logMessage('Using existing question_id for testing: $existingQuestionId');
+        } else {
+          QuizzerLogger.logWarning('No existing questions found for testing');
+        }
       }
+      getDatabaseMonitor().releaseDatabaseAccess();
     });
     
     test('Test 1: Should reject gracefully if question_id not in question_answer_pair table', () async {
@@ -84,15 +91,17 @@ void main() {
       
       final randomQuestionId = '${DateTime.now().millisecondsSinceEpoch}_random_user';
       
-      expect(
-        () => addQuestionAnswerPairFlag(
+      try {
+        await addQuestionAnswerPairFlag(
           questionId: randomQuestionId,
           flagType: 'factually_incorrect',
           flagDescription: 'Test flag',
-        ),
-        throwsA(isA<StateError>()),
-        reason: 'Should throw StateError for non-existent question_id'
-      );
+        );
+        fail('Should have thrown StateError for non-existent question_id');
+      } catch (e) {
+        expect(e, isA<StateError>(), reason: 'Should throw StateError for non-existent question_id');
+        expect(e.toString(), contains('Question ID does not exist'), reason: 'Error should mention question ID does not exist');
+      }
       
       QuizzerLogger.logSuccess('Test 1 passed: Random question_id correctly rejected');
     });
@@ -100,22 +109,23 @@ void main() {
     test('Test 2: Should reject gracefully if invalid flag type', () async {
       QuizzerLogger.logMessage('Test 2: Testing rejection of invalid flag type');
       
-      expect(
-        () => addQuestionAnswerPairFlag(
+      try {
+        await addQuestionAnswerPairFlag(
           questionId: existingQuestionId!,
           flagType: 'invalid_flag_type',
           flagDescription: 'Test flag',
-        ),
-        throwsA(isA<StateError>()),
-        reason: 'Should throw StateError for invalid flag type'
-      );
+        );
+        fail('Should have thrown StateError for invalid flag type');
+      } catch (e) {
+        expect(e, isA<StateError>(), reason: 'Should throw StateError for invalid flag type');
+        expect(e.toString(), contains('Invalid flag type'), reason: 'Error should mention invalid flag type');
+      }
       
       QuizzerLogger.logSuccess('Test 2 passed: Invalid flag type correctly rejected');
     });
     
     test('Test 3: Should succeed for all valid flag types', () async {
       QuizzerLogger.logMessage('Test 3: Testing all valid flag types');
-      
       
       // Test all valid flag types
       for (final flagType in validFlagTypes) {
@@ -135,18 +145,17 @@ void main() {
     test('Test 4: Should reject when flag description is empty', () async {
       QuizzerLogger.logMessage('Test 4: Testing rejection of empty flag description');
       
-
-      
-      // The function should reject empty flag descriptions
-      expect(
-        () => addQuestionAnswerPairFlag(
+      try {
+        await addQuestionAnswerPairFlag(
           questionId: existingQuestionId!,
           flagType: 'factually_incorrect',
           flagDescription: '',
-        ),
-        throwsA(isA<StateError>()),
-        reason: 'Should throw StateError for empty flag description'
-      );
+        );
+        fail('Should have thrown StateError for empty flag description');
+      } catch (e) {
+        expect(e, isA<StateError>(), reason: 'Should throw StateError for empty flag description');
+        expect(e.toString(), contains('Flag description cannot be empty'), reason: 'Error should mention flag description cannot be empty');
+      }
       
       QuizzerLogger.logSuccess('Test 4 passed: Empty flag description correctly rejected');
     });
@@ -191,12 +200,18 @@ void main() {
       
       // Get 5 question_ids from question_answer_pair table
       final List<String> questionIds = [];
-      for (int i = 0; i < 5; i++) {
-        final randomQuestion = await getRandomQuestionAnswerPair();
-        if (randomQuestion != null) {
-          questionIds.add(randomQuestion['question_id'] as String);
+      final dbForQuestions = await getDatabaseMonitor().requestDatabaseAccess();
+      if (dbForQuestions != null) {
+        final List<Map<String, dynamic>> results = await dbForQuestions.query(
+          'question_answer_pairs',
+          columns: ['question_id'],
+          limit: 5,
+        );
+        for (final result in results) {
+          questionIds.add(result['question_id'] as String);
         }
       }
+      getDatabaseMonitor().releaseDatabaseAccess();
       
 
       
@@ -252,12 +267,18 @@ void main() {
       
       // Get 5 random question_ids from question_answer_pair table for testing
       testQuestionIds = [];
-      for (int i = 0; i < 5; i++) {
-        final randomQuestion = await getRandomQuestionAnswerPair();
-        if (randomQuestion != null) {
-          testQuestionIds.add(randomQuestion['question_id'] as String);
+      final dbForTestQuestions = await getDatabaseMonitor().requestDatabaseAccess();
+      if (dbForTestQuestions != null) {
+        final List<Map<String, dynamic>> results = await dbForTestQuestions.query(
+          'question_answer_pairs',
+          columns: ['question_id'],
+          limit: 5,
+        );
+        for (final result in results) {
+          testQuestionIds.add(result['question_id'] as String);
         }
       }
+      getDatabaseMonitor().releaseDatabaseAccess();
       
       if (testQuestionIds.isNotEmpty) {
         // Add records for each question_id
@@ -643,7 +664,7 @@ void main() {
           .select('*')
           .or('is_reviewed.is.null,is_reviewed.eq.0');
       
-      QuizzerLogger.logMessage('Verify response: $verifyResponse');
+      QuizzerLogger.logMessage('Found ${verifyResponse.length} test records in supabase');
       
       expect(verifyResponse.length, greaterThanOrEqualTo(10), 
              reason: 'Should have at least 10 test records in supabase');
@@ -798,7 +819,6 @@ void main() {
         'has_been_reviewed': 0,
         'ans_flagged': 0,
         'flag_for_removal': 0,
-        'completed': 1,
       };
       
       // Create test flag record
@@ -901,7 +921,6 @@ void main() {
         'has_been_reviewed': 0,
         'ans_flagged': 0,
         'flag_for_removal': 0,
-        'completed': 1,
       };
       
       // Create test flag record
@@ -1005,26 +1024,28 @@ void main() {
         'has_been_reviewed': 0,
         'ans_flagged': 0,
         'flag_for_removal': 0,
-        'completed': 1,
       };
       
       // Add question to local database (required for validation)
       final db = await getDatabaseMonitor().requestDatabaseAccess();
       if (db != null) {
-        // Add question to local question_answer_pairs table
-        await db.insert('question_answer_pairs', testQuestionRecord);
-        
-        // Add user question record to local database
-        await db.insert('user_question_answer_pairs', {
-          'user_uuid': sessionManager.userId,
-          'question_id': testQuestionId,
-          'flagged': 0,
-          'revision_streak': 0,
-          'in_circulation': 1,
-          'total_attempts': 0,
-        });
+        try {
+          // Add question to local question_answer_pairs table
+          await db.insert('question_answer_pairs', testQuestionRecord);
+          
+          // Add user question record to local database
+          await db.insert('user_question_answer_pairs', {
+            'user_uuid': sessionManager.userId,
+            'question_id': testQuestionId,
+            'flagged': 0,
+            'revision_streak': 0,
+            'in_circulation': 1,
+            'total_attempts': 0,
+          });
+        } finally {
+          getDatabaseMonitor().releaseDatabaseAccess();
+        }
       }
-      getDatabaseMonitor().releaseDatabaseAccess();
       
       // Call the addQuestionFlag API
       final result = await sessionManager.addQuestionFlag(
@@ -1038,17 +1059,20 @@ void main() {
       // Verify flag was added to local database (it syncs outbound later)
       final db3 = await getDatabaseMonitor().requestDatabaseAccess();
       if (db3 != null) {
-        final flagResponse = await db3.query(
-          'question_answer_pair_flags',
-          where: 'question_id = ? AND flag_type = ?',
-          whereArgs: [testQuestionId, 'factually_incorrect'],
-        );
-        
-        expect(flagResponse, isNotEmpty, reason: 'Flag record should exist in local database');
-        expect(flagResponse.first['flag_description'], equals('Test flag via API'));
-        expect(flagResponse.first['has_been_synced'], equals(0), reason: 'Flag should be marked as unsynced');
+        try {
+          final flagResponse = await db3.query(
+            'question_answer_pair_flags',
+            where: 'question_id = ? AND flag_type = ?',
+            whereArgs: [testQuestionId, 'factually_incorrect'],
+          );
+          
+          expect(flagResponse, isNotEmpty, reason: 'Flag record should exist in local database');
+          expect(flagResponse.first['flag_description'], equals('Test flag via API'));
+          expect(flagResponse.first['has_been_synced'], equals(0), reason: 'Flag should be marked as unsynced');
+        } finally {
+          getDatabaseMonitor().releaseDatabaseAccess();
+        }
       }
-      getDatabaseMonitor().releaseDatabaseAccess();
       
       // Verify user question was marked as flagged
       final userQuestionResponse = await getUserQuestionAnswerPairById(sessionManager.userId!, testQuestionId);
@@ -1057,29 +1081,32 @@ void main() {
       // Clean up local database records
       final db2 = await getDatabaseMonitor().requestDatabaseAccess();
       if (db2 != null) {
-        // Clean up local question record
-        await db2.delete(
-          'question_answer_pairs',
-          where: 'question_id = ?',
-          whereArgs: [testQuestionId],
-        );
-        
-        // Clean up local flag record
-        await db2.delete(
-          'question_answer_pair_flags',
-          where: 'question_id = ? AND flag_type = ?',
-          whereArgs: [testQuestionId, 'factually_incorrect'],
-        );
-        
-        // Clean up user question record
-        await db2.delete(
-          'user_question_answer_pairs',
-          where: 'user_uuid = ? AND question_id = ?',
-          whereArgs: [sessionManager.userId, testQuestionId],
-        );
-        QuizzerLogger.logMessage('Cleaned up local database records');
+        try {
+          // Clean up local question record
+          await db2.delete(
+            'question_answer_pairs',
+            where: 'question_id = ?',
+            whereArgs: [testQuestionId],
+          );
+          
+          // Clean up local flag record
+          await db2.delete(
+            'question_answer_pair_flags',
+            where: 'question_id = ? AND flag_type = ?',
+            whereArgs: [testQuestionId, 'factually_incorrect'],
+          );
+          
+          // Clean up user question record
+          await db2.delete(
+            'user_question_answer_pairs',
+            where: 'user_uuid = ? AND question_id = ?',
+            whereArgs: [sessionManager.userId, testQuestionId],
+          );
+          QuizzerLogger.logMessage('Cleaned up local database records');
+        } finally {
+          getDatabaseMonitor().releaseDatabaseAccess();
+        }
       }
-      getDatabaseMonitor().releaseDatabaseAccess();
       
       QuizzerLogger.logSuccess('Test 1 passed: addQuestionFlag API successfully added flag to local DB and marked question as flagged');
     });

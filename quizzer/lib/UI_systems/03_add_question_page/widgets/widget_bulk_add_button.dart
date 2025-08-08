@@ -25,9 +25,31 @@ class BulkAddButton extends StatefulWidget {
 
 class _BulkAddButtonState extends State<BulkAddButton> {
   bool _isLoading = false;
-  final SessionManager _session = getSessionManager();
+  SessionManager? _session;
+  
+  @override
+  void initState() {
+    super.initState();
+    _initializeSession();
+  }
+  
+  Future<void> _initializeSession() async {
+    try {
+      _session = getSessionManager();
+      await _session!.initializationComplete;
+    } catch (e) {
+      // Handle session initialization error
+    }
+  }
 
   Future<void> _handleBulkAdd(BuildContext context) async {
+    if (_session == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error: Session not initialized. Please try again.')),
+      );
+      return;
+    }
+    
     setState(() => _isLoading = true);
     String? selectedFileName; // To store filename for logging
     int itemsProcessed = 0; // Renamed from itemsAttempted
@@ -173,7 +195,13 @@ class _BulkAddButtonState extends State<BulkAddButton> {
       QuizzerLogger.logMessage('Bulk Add: Validation passed for item $itemNumber. Calling API...');
 
       // 6. Call SessionManager to Add - Errors will propagate and stop the process (Fail Fast)
-      await _session.addNewQuestion(
+      if (_session == null) {
+        QuizzerLogger.logError('Bulk Add: SessionManager not initialized. Skipping item $itemNumber.');
+        itemsSkipped++;
+        continue;
+      }
+      
+      await _session!.addNewQuestion(
         questionType: questionType, // Already validated non-null/empty
         moduleName: moduleName,     // Already validated non-null/empty
         questionElements: questionElements, // Already validated non-null
@@ -181,10 +209,6 @@ class _BulkAddButtonState extends State<BulkAddButton> {
         options: options,                   // Validated per type
         correctOptionIndex: correctOptionIndex, // Validated per type
         indexOptionsThatApply: indexOptionsThatApply, // Validated per type
-        // Optional fields from map
-        citation: questionMap['citation'] as String?,
-        concepts: questionMap['concepts'] as String?,
-        subjects: questionMap['subjects'] as String?,
       );
 
       itemsAdded++; // Increment only if API call succeeds

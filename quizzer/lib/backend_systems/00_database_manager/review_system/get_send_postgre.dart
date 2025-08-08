@@ -1,8 +1,8 @@
-import 'dart:convert';
 import 'dart:math'; // For random selection
 import 'package:supabase/supabase.dart'; // Corrected Supabase import again
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/table_helper.dart' show encodeValueForDB, decodeValueFromDB;
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pair_management/question_answer_pairs_table.dart';
 import 'package:quizzer/backend_systems/session_manager/answer_validation/text_validation_functionality.dart'; 
 // ======================================================
@@ -17,51 +17,9 @@ import 'package:quizzer/backend_systems/session_manager/answer_validation/text_v
 // - Question performance badges
 // - Contribution badges
 
-/// Encodes a Dart value into a type suitable for SQLite storage (TEXT, INTEGER, REAL, NULL).
-/// Handles Strings, ints, doubles, booleans, Lists, and Maps.
-/// Lists and Maps are encoded as JSON TEXT. Booleans are stored as INTEGER (1/0).
-/// Throws StateError for unsupported types.
-encodeValueForDB(dynamic value) {
-  if (value == null) {
-    return null; // Store nulls directly
-  } else if (value is String || value is int || value is double) {
-    return value; // Store primitives directly
-  } else if (value is bool) {
-    return value ? 1 : 0; // Store booleans as integers
-  } else if (value is List || value is Map) {
-    // Encode Lists and Maps as JSON strings
-    // json.encode itself can throw if objects are not encodable, which aligns with Fail Fast.
-    return json.encode(value);
-  } else {
-    // Fail Fast for any other type
-    throw StateError('Unsupported type for database encoding: ${value.runtimeType}');
-  }
-}
 
-/// Decodes a value retrieved from SQLite back into its likely Dart type.
-/// Assumes that TEXT fields starting with '[' or '{' are JSON strings representing Lists/Maps.
-/// Other TEXT fields are returned as Strings. INTEGER, REAL, and NULL are returned directly.
-/// Does NOT automatically convert INTEGER back to boolean; callers must handle this based on context.
-decodeValueFromDB(dynamic dbValue) {
-  if (dbValue == null || dbValue is int || dbValue is double || dbValue is bool) {
-    return dbValue; // Return nulls, integers, doubles, and booleans directly
-  } else if (dbValue is String) {
-    // Trim whitespace before checking brackets/braces
-    final trimmedValue = dbValue.trim();
-    if (trimmedValue.startsWith('[') || trimmedValue.startsWith('{')) {
-      // Attempt to decode potential JSON strings
-      // json.decode will throw FormatException on invalid JSON, aligning with Fail Fast.
-      return json.decode(trimmedValue);
-    } else {
-      // Assume it's a plain string if it doesn't look like JSON
-      return dbValue;
-    }
-  } else {
-    // Should not happen with standard SQLite types (TEXT, INTEGER, REAL, NULL, BLOB)
-    // BLOBs are not currently handled.
-    throw StateError('Unsupported type retrieved from database: ${dbValue.runtimeType}');
-  }
-}
+
+
 
 
 // ==========================================

@@ -1,5 +1,4 @@
 import 'package:uuid/uuid.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pair_management/question_answer_pairs_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'dart:convert';
@@ -225,8 +224,9 @@ Future<bool> updateLastLogin(String userId) async {
     await _verifyUserProfileTable(db!);
     
     final String nowTimestamp = DateTime.now().toUtc().toIso8601String();
+    final String lastLoginTimestamp = DateTime.now().subtract(const Duration(minutes: 1)).toUtc().toIso8601String();
     final Map<String, dynamic> updates = {
-      'last_login': nowTimestamp,
+      'last_login': lastLoginTimestamp,
       'edits_are_synced': 0,
       'last_modified_timestamp': nowTimestamp,
     };
@@ -307,9 +307,8 @@ Future<Map<String, bool>> getModuleActivationStatus(String userId) async {
 Future<Map<String, int>> getUserSubjectInterests(String userId) async {
   try {
     // QuizzerLogger.logMessage('Getting subject interests for user: $userId');
-    // Get all unique subjects from question database
-    final List<String> allSubjectsList = await getUniqueSubjects();
-    final Set<String> allSubjects = allSubjectsList.toSet();
+    // Since subjects are now handled by separate relationship tables, we'll use a default set
+    final Set<String> allSubjects = {'misc'}; // Default subject for handling questions without subjects
     
     final db = await getDatabaseMonitor().requestDatabaseAccess();
     await _verifyUserProfileTable(db!);

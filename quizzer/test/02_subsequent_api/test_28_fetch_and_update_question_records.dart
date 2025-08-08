@@ -4,6 +4,7 @@ import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/backend_systems/02_login_authentication/login_initialization.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pair_management/question_answer_pairs_table.dart';
 import 'package:quizzer/backend_systems/09_data_caches/question_queue_cache.dart';
+import 'package:quizzer/backend_systems/session_manager/answer_validation/text_validation_functionality.dart';
 import '../test_helpers.dart';
 import 'dart:io';
 import 'dart:math';
@@ -197,9 +198,6 @@ void main() {
           // Perform the update
           final int rowsAffected = await sessionManager.updateExistingQuestion(
             questionId: questionId,
-            citation: updateData['citation'],
-            concepts: updateData['concepts'],
-            subjects: updateData['subjects'],
             ansContrib: updateData['ansContrib'],
             hasBeenReviewed: updateData['hasBeenReviewed'],
             flagForRemoval: updateData['flagForRemoval'],
@@ -212,12 +210,6 @@ void main() {
           final Map<String, dynamic> updatedDetails = await sessionManager.fetchQuestionDetailsById(questionId);
           
           // Verify the changes were applied
-          expect(updatedDetails['citation'], equals(updateData['citation']), 
-            reason: 'Citation should be updated');
-          expect(updatedDetails['concepts'], equals(updateData['concepts']), 
-            reason: 'Concepts should be updated');
-          expect(updatedDetails['subjects'], equals(updateData['subjects']), 
-            reason: 'Subjects should be updated');
           expect(updatedDetails['ans_contrib'], equals(updateData['ansContrib']), 
             reason: 'Answer contributor should be updated');
           expect(updatedDetails['has_been_reviewed'], equals(updateData['hasBeenReviewed'] ? 1 : 0), 
@@ -324,7 +316,7 @@ void main() {
       try {
         await sessionManager.updateExistingQuestion(
           questionId: 'non_existent_question_12345',
-          citation: 'Test citation',
+          moduleName: 'test_module',
         );
         QuizzerLogger.logWarning('Invalid question ID did not throw exception');
       } catch (e) {
@@ -337,7 +329,7 @@ void main() {
       try {
         await sessionManager.updateExistingQuestion(
           questionId: '', // Empty string
-          citation: 'Test citation',
+          moduleName: 'test_module',
         );
         QuizzerLogger.logWarning('Empty question ID did not throw exception');
       } catch (e) {
@@ -417,9 +409,10 @@ void main() {
           // Fetch the updated question and verify changes
           final Map<String, dynamic> updatedDetails = await sessionManager.fetchQuestionDetailsById(questionId);
           
-          // Verify the module name was updated
-          expect(updatedDetails['module_name'], equals(newModuleName), 
-            reason: 'Module name should be updated');
+          // Verify the module name was updated (should be normalized)
+          final String expectedNormalizedModuleName = await normalizeString(newModuleName);
+          expect(updatedDetails['module_name'], equals(expectedNormalizedModuleName), 
+            reason: 'Module name should be updated and normalized');
           
           QuizzerLogger.logSuccess('Successfully updated module name for question: $questionId');
           successfulModuleUpdates++;
@@ -532,12 +525,8 @@ void main() {
 
 /// Helper function to create update data for a question based on its type and index
 Map<String, dynamic> _createUpdateDataForQuestion(Map<String, dynamic> originalDetails, int index) {
-  final String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
   
   return {
-    'citation': 'Updated Citation $index - $timestamp',
-    'concepts': 'Updated Concepts $index - $timestamp',
-    'subjects': 'Updated Subjects $index - $timestamp',
     'ansContrib': 'test_user_$index',
     'hasBeenReviewed': index % 2 == 0, // Alternate between true and false
     'flagForRemoval': index % 3 == 0, // Every third question flagged

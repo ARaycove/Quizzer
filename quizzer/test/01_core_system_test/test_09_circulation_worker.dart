@@ -92,7 +92,7 @@ void main() {
         
         // Clear the user_question_answer_pairs table using helper function
         QuizzerLogger.logMessage('Clearing user_question_answer_pairs table using helper function...');
-        final resetSuccess = await resetUserQuestionAnswerPairsTable();
+        final resetSuccess = await deleteAllRecordsFromTable('user_question_answer_pairs', userId: sessionManager.userId!);
         expect(resetSuccess, isTrue, reason: 'Failed to reset user_question_answer_pairs table');
         QuizzerLogger.logSuccess('User question answer pairs table cleared successfully');
 

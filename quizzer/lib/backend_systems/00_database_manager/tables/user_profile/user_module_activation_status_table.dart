@@ -94,28 +94,75 @@ Future<void> _ensureAllModulesHaveActivationStatusForUser(dynamic db, String use
       if (normalizedModuleName != currentModuleName) {
         final int isActive = record['is_active'] as int;
         
-        QuizzerLogger.logMessage('Updating module name from "$currentModuleName" to "$normalizedModuleName" for user: $userId (is_active: $isActive)');
+        QuizzerLogger.logMessage('Checking normalization from "$currentModuleName" to "$normalizedModuleName" for user: $userId (is_active: $isActive)');
         
-        // Update the record with normalized name while preserving activation status
-        final Map<String, dynamic> updateData = {
-          'module_name': normalizedModuleName,
-          'has_been_synced': 0, // Mark for outbound sync
-          'edits_are_synced': 0,
-          'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
-        };
-        
-        final int updateResult = await updateRawData(
+        // First, check if a record with the normalized name already exists
+        final List<Map<String, dynamic>> existingNormalizedRecords = await queryAndDecodeDatabase(
           'user_module_activation_status',
-          updateData,
-          'user_id = ? AND module_name = ?',
-          [userId, currentModuleName],
           db,
+          where: 'user_id = ? AND module_name = ?',
+          whereArgs: [userId, normalizedModuleName],
         );
         
-        if (updateResult > 0) {
-          QuizzerLogger.logMessage('Successfully updated module name for user: $userId');
+        if (existingNormalizedRecords.isNotEmpty) {
+          // A record with the normalized name already exists
+          final Map<String, dynamic> existingRecord = existingNormalizedRecords.first;
+          final int existingIsActive = existingRecord['is_active'] as int;
+          
+          QuizzerLogger.logMessage('Record with normalized name "$normalizedModuleName" already exists for user: $userId (existing is_active: $existingIsActive, current is_active: $isActive)');
+          
+          // Merge activation status: if either record is active, the result should be active
+          final int mergedIsActive = (existingIsActive == 1 || isActive == 1) ? 1 : 0;
+          
+          if (mergedIsActive != existingIsActive) {
+            QuizzerLogger.logMessage('Merging activation status for normalized module: $normalizedModuleName (merged is_active: $mergedIsActive)');
+            final Map<String, dynamic> updateData = {
+              'is_active': mergedIsActive,
+              'has_been_synced': 0,
+              'edits_are_synced': 0,
+              'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
+            };
+            
+            await updateRawData(
+              'user_module_activation_status',
+              updateData,
+              'user_id = ? AND module_name = ?',
+              [userId, normalizedModuleName],
+              db,
+            );
+          }
+          
+          // Delete the old record with the non-normalized name (now that we've merged its data)
+          QuizzerLogger.logMessage('Deleting old record with non-normalized name: $currentModuleName (after merging)');
+          await db.delete(
+            'user_module_activation_status',
+            where: 'user_id = ? AND module_name = ?',
+            whereArgs: [userId, currentModuleName],
+          );
         } else {
-          QuizzerLogger.logWarning('Failed to update module name for user: $userId, module: $currentModuleName');
+          // No existing record with normalized name, safe to update
+          QuizzerLogger.logMessage('Updating module name from "$currentModuleName" to "$normalizedModuleName" for user: $userId (is_active: $isActive)');
+          
+          final Map<String, dynamic> updateData = {
+            'module_name': normalizedModuleName,
+            'has_been_synced': 0, // Mark for outbound sync
+            'edits_are_synced': 0,
+            'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
+          };
+          
+          final int updateResult = await updateRawData(
+            'user_module_activation_status',
+            updateData,
+            'user_id = ? AND module_name = ?',
+            [userId, currentModuleName],
+            db,
+          );
+          
+          if (updateResult > 0) {
+            QuizzerLogger.logMessage('Successfully updated module name for user: $userId');
+          } else {
+            QuizzerLogger.logWarning('Failed to update module name for user: $userId, module: $currentModuleName');
+          }
         }
       }
     }

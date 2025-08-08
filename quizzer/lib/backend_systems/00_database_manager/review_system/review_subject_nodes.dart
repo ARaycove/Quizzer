@@ -1,7 +1,7 @@
 import 'dart:math';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
-import 'get_send_postgre.dart' show encodeValueForDB, decodeValueFromDB;
+import 'package:quizzer/backend_systems/00_database_manager/tables/table_helper.dart' show encodeValueForDB, decodeValueFromDB;
 
 // ==========================================
 // Constants

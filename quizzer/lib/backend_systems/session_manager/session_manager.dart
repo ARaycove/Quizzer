@@ -29,21 +29,22 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/system_data/e
 import 'package:quizzer/backend_systems/00_database_manager/tables/system_data/user_feedback_table.dart'; // Removed alias
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_settings_table.dart' as user_settings_table;
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_question_answer_pairs_table.dart'; // Added for direct access
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/stat_update_aggregator.dart'; // do not use aliases in the import statements
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_eligible_questions_table.dart'; // Added import for user_stats_eligible_questions_table
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_non_circulating_questions_table.dart'; // Added import for user_stats_non_circulating_questions_table
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_in_circulation_questions_table.dart'; // Added import for user_stats_in_circulation_questions_table
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_revision_streak_sum_table.dart'; // Added import for user_stats_revision_streak_sum_table
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_total_user_question_answer_pairs_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_average_questions_shown_per_day_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_total_questions_answered_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_daily_questions_answered_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_average_daily_questions_learned_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_stats/user_stats_days_left_until_questions_exhaust_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/stat_update_aggregator.dart'; // do not use aliases in the import statements
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_eligible_questions_table.dart'; // Added import for user_stats_eligible_questions_table
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_non_circulating_questions_table.dart'; // Added import for user_stats_non_circulating_questions_table
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_in_circulation_questions_table.dart'; // Added import for user_stats_in_circulation_questions_table
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_revision_streak_sum_table.dart'; // Added import for user_stats_revision_streak_sum_table
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_total_user_question_answer_pairs_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_average_questions_shown_per_day_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_total_questions_answered_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_daily_questions_answered_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_average_daily_questions_learned_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_days_left_until_questions_exhaust_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_module_activation_status_table.dart'; // Added import for the new table
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pair_management/question_answer_pair_flags_table.dart'; // Added import for flags table
 import 'package:quizzer/backend_systems/00_helper_utils/file_locations.dart';
 import 'package:quizzer/backend_systems/00_database_manager/custom_queries.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/modules_table.dart' as modules_table;
 
 class SessionManager {
   // Singleton instance
@@ -722,6 +723,47 @@ class SessionManager {
   }
 
   //  --------------------------------------------------------------------------------
+  // API for getting available categories
+  List<String> getAvailableModuleCategories() {
+    try {
+      QuizzerLogger.logMessage('Entering getAvailableCategories()...');
+      
+      final categories = modules_table.getAvailableCategories();
+      
+      QuizzerLogger.logMessage('Successfully retrieved available categories: $categories');
+      return categories;
+    } catch (e) {
+      QuizzerLogger.logError('Error in getAvailableCategories - $e');
+      rethrow;
+    }
+  }
+
+  //  --------------------------------------------------------------------------------
+  // API for updating a module's categories
+  Future<bool> updateModuleCategories(String moduleName, List<String> categories) async {
+    try {
+      QuizzerLogger.logMessage('Entering updateModuleCategories()...');
+      
+      assert(userId != null);
+      
+      // Normalize the module name before processing
+      final String normalizedModuleName = await text_validation.normalizeString(moduleName);
+      
+      // Use the existing updateModule function from modules_table
+      await modules_table.updateModule(
+        name: normalizedModuleName,
+        categories: categories,
+      );
+      
+      QuizzerLogger.logMessage('Successfully updated module categories for module: $moduleName');
+      return true;
+    } catch (e) {
+      QuizzerLogger.logError('Error in updateModuleCategories - $e');
+      rethrow;
+    }
+  }
+
+  //  --------------------------------------------------------------------------------
   // API for updating a module's description
   Future<bool> updateModuleDescription(String moduleName, String newDescription) async {
     try {
@@ -1029,10 +1071,6 @@ class SessionManager {
     int?                              correctOptionIndex, // For MC & TrueFalse
     List<int>?                        indexOptionsThatApply, // For select_all_that_apply
     List<Map<String, List<String>>>?  answersToBlanks, // For fill_in_the_blank
-    // --- Common Optional/Metadata ---
-    String? citation,
-    String? concepts,
-    String? subjects,
   }) async {
     try {
       QuizzerLogger.logMessage('Entering addNewQuestion()...');
@@ -1041,8 +1079,6 @@ class SessionManager {
       // --- 1. Pre-checks --- 
       assert(userId != null, 'User must be logged in to add a question.'); 
 
-      final String qstContrib = userId!; // Use current user ID as the question contributor
-
       // --- 2. Validate/Create Module ---
       QuizzerLogger.logMessage('Validating module exists: $moduleName');
       final bool moduleValidated = await module_management.validateModuleExists(moduleName, creatorId: userId!);
@@ -1050,6 +1086,9 @@ class SessionManager {
         throw Exception('Failed to validate or create module: $moduleName');
       }
       QuizzerLogger.logMessage('Module validated/created successfully: $moduleName');
+      
+      // Normalize the module name for consistent use throughout the function
+      final String normalizedModuleName = await text_validation.normalizeString(moduleName);
 
       // --- 3. Database Operation (table functions handle their own DB access) --- 
       Map<String, dynamic> response;
@@ -1062,15 +1101,11 @@ class SessionManager {
           }
           // Call refactored function with correct args
           await q_pairs_table.addQuestionMultipleChoice(
-            moduleName: moduleName,
+            moduleName: normalizedModuleName,
             questionElements: questionElements,
             answerElements: answerElements,
             options: options,
             correctOptionIndex: correctOptionIndex,
-            qstContrib: qstContrib, 
-            citation: citation,
-            concepts: concepts,
-            subjects: subjects,
           );
           break;
 
@@ -1081,15 +1116,11 @@ class SessionManager {
           }
           // Call refactored function with correct args
           await q_pairs_table.addQuestionSelectAllThatApply(
-            moduleName: moduleName,
+            moduleName: normalizedModuleName,
             questionElements: questionElements,
             answerElements: answerElements,
             options: options,
             indexOptionsThatApply: indexOptionsThatApply,
-            qstContrib: qstContrib,
-            citation: citation,
-            concepts: concepts,
-            subjects: subjects,
           );
           break;
 
@@ -1102,14 +1133,10 @@ class SessionManager {
           
           // Call refactored function with correct args
           await q_pairs_table.addQuestionTrueFalse(
-              moduleName: moduleName,
+              moduleName: normalizedModuleName,
               questionElements: questionElements,
               answerElements: answerElements,
               correctOptionIndex: correctOptionIndex, // Already checked non-null
-              qstContrib: qstContrib,
-              citation: citation,
-              concepts: concepts,
-              subjects: subjects,
             );
           break;
         
@@ -1120,14 +1147,10 @@ class SessionManager {
           }
           // Call the specific function using the correct parameter
           await q_pairs_table.addSortOrderQuestion(
-            moduleId: moduleName,
+            moduleName: normalizedModuleName,
             questionElements: questionElements,
             answerElements: answerElements,
             options: options, // Pass the validated List<String>
-            qstContrib: qstContrib,
-            citation: citation,
-            concepts: concepts,
-            subjects: subjects,
           );
           break;
 
@@ -1138,14 +1161,10 @@ class SessionManager {
           }
           // Call the specific function for fill_in_the_blank
           await q_pairs_table.addFillInTheBlankQuestion(
-            moduleName: moduleName,
+            moduleName: normalizedModuleName,
             questionElements: questionElements,
             answerElements: answerElements,
             answersToBlanks: answersToBlanks,
-            qstContrib: qstContrib,
-            citation: citation,
-            concepts: concepts,
-            subjects: subjects,
           );
           break;
 
@@ -1154,9 +1173,9 @@ class SessionManager {
       }
 
       // --- 3. Post-question operations (table functions handle their own DB access) ---
-      final bool activationResult = await updateModuleActivationStatus(userId!, moduleName, true);
+      final bool activationResult = await updateModuleActivationStatus(userId!, normalizedModuleName, true);
       if (!activationResult) {
-        QuizzerLogger.logWarning('Failed to activate module $moduleName after adding question');
+        QuizzerLogger.logWarning('Failed to activate module $normalizedModuleName after adding question');
       }
       await validateAllModuleQuestions(userId!);
       
@@ -1195,14 +1214,11 @@ class SessionManager {
   /// Returns the number of rows affected (should be 1 if successful).
   Future<int> updateExistingQuestion({
     required String questionId,
-    String? citation,
     List<Map<String, dynamic>>? questionElements,
     List<Map<String, dynamic>>? answerElements,
     List<int>? indexOptionsThatApply,
     bool? ansFlagged,
     String? ansContrib,
-    String? concepts,
-    String? subjects,
     String? qstReviewer,
     bool? hasBeenReviewed,
     bool? flagForRemoval,
@@ -1220,21 +1236,25 @@ class SessionManager {
       // Fail fast if not logged in
       assert(userId != null, 'User must be logged in to update a question.');
       
+      // Normalize module name if provided
+      String? normalizedModuleName;
+      
+      if (moduleName != null) {
+        normalizedModuleName = await text_validation.normalizeString(moduleName);
+      }
+      
       // Table function handles its own database access
       final int result = await q_pairs_table.editQuestionAnswerPair(
         questionId: questionId,
-        citation: citation,
         questionElements: questionElements,
         answerElements: answerElements,
         indexOptionsThatApply: indexOptionsThatApply,
         ansFlagged: ansFlagged,
         ansContrib: ansContrib,
-        concepts: concepts,
-        subjects: subjects,
         qstReviewer: qstReviewer,
         hasBeenReviewed: hasBeenReviewed,
         flagForRemoval: flagForRemoval,
-        moduleName: moduleName,
+        moduleName: normalizedModuleName,
         questionType: questionType,
         options: options,
         correctOptionIndex: correctOptionIndex,

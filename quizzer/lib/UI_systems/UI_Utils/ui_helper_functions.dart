@@ -1,5 +1,13 @@
+/// List of exam/certification strings that should be displayed in full uppercase
+final List<String> _examCertificationStrings = [
+  'mcat',
+  'clep',
+  // Add more exam/certification strings here as needed
+];
+
 /// Converts a normalized module name to Title Case for display
 /// Handles special cases like roman numerals (i, ii, iii -> I, II, III)
+/// and exam/certification strings (mcat -> MCAT, clep -> CLEP)
 String formatModuleNameForDisplay(String normalizedModuleName) {
   if (normalizedModuleName.isEmpty) {
     return normalizedModuleName;
@@ -14,8 +22,12 @@ String formatModuleNameForDisplay(String normalizedModuleName) {
     
     if (word.isEmpty) continue;
 
+    // Special handling for exam/certification strings
+    if (_examCertificationStrings.contains(word.toLowerCase())) {
+      formattedWords.add(word.toUpperCase());
+    }
     // Special handling for roman numerals
-    if (_isRomanNumeral(word)) {
+    else if (_isRomanNumeral(word)) {
       formattedWords.add(word.toUpperCase());
     } else {
       // Regular title case conversion

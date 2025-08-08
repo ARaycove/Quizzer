@@ -17,7 +17,7 @@ class ModuleSelection extends StatefulWidget {
 }
 
 class _ModuleSelectionState extends State<ModuleSelection> {
-  SessionManager session = getSessionManager();
+  SessionManager? session;
   List<String>   _suggestions = [];
   bool           _isLoading = false;
   
@@ -25,25 +25,56 @@ class _ModuleSelectionState extends State<ModuleSelection> {
   @override
   void initState() {
     super.initState();
-    _loadModules();
+    _initializeSession();
+  }
+
+  Future<void> _initializeSession() async {
+    try {
+      session = getSessionManager();
+      await session!.initializationComplete;
+      _loadModules();
+    } catch (e) {
+      // Handle session initialization error
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 
   Future<void> _loadModules() async {
-    setState(() {
-      _isLoading = true;
-    });
+    if (session == null) {
+      return;
+    }
 
-    final result = await session.getModuleData();
-    
-    setState(() {
-      // result is Map<String, Map<String, dynamic>> where keys are module names
-      _suggestions = result.keys.toList();
-      _isLoading = false;
-    });
+    if (mounted) {
+      setState(() {
+        _isLoading = true;
+      });
+    }
+
+    try {
+      final result = await session!.getModuleData();
+      
+      if (mounted) {
+        setState(() {
+          // result is Map<String, Map<String, dynamic>> where keys are module names
+          _suggestions = result.keys.toList();
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 
   List<String> _getFilteredSuggestions(String query) {
-    if (query.isEmpty) return [];
+    if (query.isEmpty || _suggestions.isEmpty) return [];
     return _suggestions
         .where((module) => module.toLowerCase().contains(query.toLowerCase()))
         .toList();
@@ -72,7 +103,9 @@ class _ModuleSelectionState extends State<ModuleSelection> {
                   border: OutlineInputBorder(),
                 ),
                 onChanged: (value) {
-                  setState(() {});
+                  if (mounted) {
+                    setState(() {});
+                  }
                 },
               ),
               if (_isLoading)
@@ -80,7 +113,7 @@ class _ModuleSelectionState extends State<ModuleSelection> {
                   padding: EdgeInsets.symmetric(vertical: 8.0),
                   child: CircularProgressIndicator(),
                 )
-              else if (widget.controller.text.isNotEmpty)
+              else if (widget.controller.text.isNotEmpty && _suggestions.isNotEmpty)
                 Container(
                   constraints: BoxConstraints(
                     maxHeight: 200,
@@ -90,12 +123,16 @@ class _ModuleSelectionState extends State<ModuleSelection> {
                     shrinkWrap: true,
                     itemCount: _getFilteredSuggestions(widget.controller.text).length,
                     itemBuilder: (context, index) {
-                      final suggestion = _getFilteredSuggestions(widget.controller.text)[index];
+                      final suggestions = _getFilteredSuggestions(widget.controller.text);
+                      if (index >= suggestions.length) return const SizedBox.shrink();
+                      final suggestion = suggestions[index];
                       return ListTile(
                         title: Text(suggestion),
                         onTap: () {
                           widget.controller.text = suggestion;
-                          setState(() {});
+                          if (mounted) {
+                            setState(() {});
+                          }
                         },
                       );
                     },
