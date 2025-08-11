@@ -30,7 +30,7 @@ class InboundSyncWorker {
 
   // --- Control Methods ---
   /// Starts the worker loop.
-  Future<void> start({bool isDatabaseFresh = false}) async {
+  Future<void> start() async {
     QuizzerLogger.logMessage('Entering InboundSyncWorker start()...');
     
     if (_sessionManager.userId == null) {
@@ -39,7 +39,7 @@ class InboundSyncWorker {
     }
     
     _isRunning = true;
-    _runLoop(isDatabaseFresh: isDatabaseFresh);
+    _runLoop();
     QuizzerLogger.logMessage('InboundSyncWorker started.');
   }
 
@@ -58,7 +58,7 @@ class InboundSyncWorker {
   // ----------------------
 
   // --- Main Loop ---
-  Future<void> _runLoop({bool isDatabaseFresh = false}) async {
+  Future<void> _runLoop() async {
     QuizzerLogger.logMessage('Entering InboundSyncWorker _runLoop()...');
     
     while (_isRunning) {
@@ -72,9 +72,7 @@ class InboundSyncWorker {
       
       // Run inbound sync
       QuizzerLogger.logMessage('InboundSyncWorker: Running inbound sync...');
-      await runInboundSync(_sessionManager, isDatabaseFresh: isDatabaseFresh);
-      // Reset internal now (if inbound sync runs again, then we do not need to resync everything)
-      isDatabaseFresh = false;
+      await runInboundSync(_sessionManager);
       QuizzerLogger.logMessage('InboundSyncWorker: Inbound sync completed.');
       
       // Signal that the sync cycle is complete

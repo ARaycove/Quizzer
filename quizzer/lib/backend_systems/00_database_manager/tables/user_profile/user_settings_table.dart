@@ -21,65 +21,72 @@ const List<Map<String, dynamic>> _applicationSettings = [
   // Show eligible questions count on home page
   {
     'name': 'home_display_eligible_questions',
-    'default_value': false,
+    'default_value': "0",
     'is_admin_setting': false,
   },
   // Show in circulation questions count on home page
   {
     'name': 'home_display_in_circulation_questions',
-    'default_value': false,
+    'default_value': "0",
     'is_admin_setting': false,
   },
   // Show non-circulating questions count on home page
   {
     'name': 'home_display_non_circulating_questions',
-    'default_value': false,
+    'default_value': "0",
     'is_admin_setting': false,
   },
   // Show lifetime total questions answered on home page
   {
     'name': 'home_display_lifetime_total_questions_answered',
-    'default_value': false,
+    'default_value': "0",
     'is_admin_setting': false,
   },
   // Show daily questions answered on home page
   {
     'name': 'home_display_daily_questions_answered',
-    'default_value': false,
+    'default_value': "0",
     'is_admin_setting': false,
   },
   // Show average daily questions learned on home page
   {
     'name': 'home_display_average_daily_questions_learned',
-    'default_value': false,
+    'default_value': "0",
     'is_admin_setting': false,
   },
   // Show average questions shown per day on home page
   {
     'name': 'home_display_average_questions_shown_per_day',
-    'default_value': false,
+    'default_value': "0",
     'is_admin_setting': false,
   },
   // Show days left until questions exhaust on home page
   {
     'name': 'home_display_days_left_until_questions_exhaust',
-    'default_value': false,
+    'default_value': "0",
     'is_admin_setting': false,
   },
   // Show current revision streak score on home page
   {
     'name': 'home_display_revision_streak_score',
-    'default_value': false,
+    'default_value': "0",
     'is_admin_setting': false,
   },
   // Show last reviewed date on home page
   {
     'name': 'home_display_last_reviewed',
-    'default_value': false,
+    'default_value': "0",
     'is_admin_setting': false,
   },
 ];
 const String _tableName = 'user_settings';
+
+/// Exposes the application's hardcoded user settings specification.
+/// Returns the const list of setting definitions used to initialize and verify settings.
+/// Each entry contains: {'name': String, 'default_value': dynamic, 'is_admin_setting': bool}
+List<Map<String, dynamic>> getApplicationUserSettingsSpec() {
+  return _applicationSettings;
+}
 
 // --- Internal Helper: Ensure Setting Rows Exist ---
 
@@ -137,7 +144,7 @@ Future<void> _ensureUserSettingsRowsExist(String userId, Database db) async {
 /// Verifies that the user_settings table exists and creates it if not.
 /// Also ensures that all application-defined setting rows exist for the given user.
 /// [skipEnsureRows] - When true, skips calling _ensureUserSettingsRowsExist (used during inbound sync)
-Future<void> _verifyUserSettingsTable(String userId, Database db, {bool skipEnsureRows = false}) async {
+Future<void> verifyUserSettingsTable(String userId, Database db, {bool skipEnsureRows = false}) async {
   await db.execute('PRAGMA foreign_keys = ON;');
   final List<Map<String, dynamic>> tables = await db.rawQuery(
     "SELECT name FROM sqlite_master WHERE type='table' AND name=?",
@@ -187,7 +194,7 @@ Future<void> _verifyUserSettingsTable(String userId, Database db, {bool skipEnsu
 Future<Map<String, dynamic>?> getSettingValue(String userId, String settingName) async {
   try {
     final db = await getDatabaseMonitor().requestDatabaseAccess();
-    await _verifyUserSettingsTable(userId, db!); // Ensures table and all rows are initialized
+    await verifyUserSettingsTable(userId, db!); // Ensures table and all rows are initialized
     final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
       _tableName,
       db,
@@ -221,7 +228,7 @@ Future<Map<String, dynamic>?> getSettingValue(String userId, String settingName)
 Future<Map<String, Map<String, dynamic>>> getAllUserSettings(String userId) async {
   try {
     final db = await getDatabaseMonitor().requestDatabaseAccess();
-    await _verifyUserSettingsTable(userId, db!); // Ensures table and all rows are initialized
+    await verifyUserSettingsTable(userId, db!); // Ensures table and all rows are initialized
     final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
       _tableName,
       db,
@@ -234,7 +241,7 @@ Future<Map<String, Map<String, dynamic>>> getAllUserSettings(String userId) asyn
     for (final row in results) {
       final String settingName = row['setting_name'] as String;
       userSettings[settingName] = {
-        'value': row['setting_value'],
+        'setting_value': row['setting_value'],
         'is_admin_setting': row['is_admin_setting'] as int? ?? 0, // Default to 0 if null
       };
     }
@@ -256,7 +263,7 @@ Future<Map<String, Map<String, dynamic>>> getAllUserSettings(String userId) asyn
 Future<int> updateUserSetting(String userId, String settingName, dynamic newValue, {bool skipSyncFlags = false, String? cloudTimestamp}) async {
   try {
     final db = await getDatabaseMonitor().requestDatabaseAccess();
-    await _verifyUserSettingsTable(userId, db!); // Ensures table and row exist before update attempt
+    await verifyUserSettingsTable(userId, db!); // Ensures table and row exist before update attempt
 
     final Map<String, dynamic> dataToUpdate = {
       'setting_value': newValue,
@@ -331,7 +338,7 @@ Future<void> resetAllUserSettingsToInitialValues(String userId) async {
 Future<List<Map<String, dynamic>>> getUnsyncedUserSettings(String userId, {bool skipEnsureRows = false}) async {
   try {
     final db = await getDatabaseMonitor().requestDatabaseAccess();
-    await _verifyUserSettingsTable(userId, db!, skipEnsureRows: skipEnsureRows); // Ensures table and rows exist
+    await verifyUserSettingsTable(userId, db!, skipEnsureRows: skipEnsureRows); // Ensures table and rows exist
     final List<Map<String, dynamic>> results = await db.query(
       _tableName,
       where: 'user_id = ? AND (has_been_synced = 0 OR edits_are_synced = 0)',
@@ -358,7 +365,7 @@ Future<void> updateUserSettingSyncFlags({
 }) async {
   try {
     final db = await getDatabaseMonitor().requestDatabaseAccess();
-    await _verifyUserSettingsTable(userId, db!); // Ensure table/columns exist
+    await verifyUserSettingsTable(userId, db!); // Ensure table/columns exist
 
     final Map<String, dynamic> updates = {
       'has_been_synced': hasBeenSynced ? 1 : 0,
@@ -427,7 +434,7 @@ Future<void> upsertUserSettingsFromSupabase(Map<String, dynamic> settingData) as
     QuizzerLogger.logMessage('upsertUserSettingsFromSupabase: Assertions passed, getting database access...');
     final db = await getDatabaseMonitor().requestDatabaseAccess();
     QuizzerLogger.logMessage('upsertUserSettingsFromSupabase: Got database access, verifying table...');
-    await _verifyUserSettingsTable(userId!, db!, skipEnsureRows: true);
+    await verifyUserSettingsTable(userId!, db!, skipEnsureRows: true);
     QuizzerLogger.logMessage('upsertUserSettingsFromSupabase: Table verified');
 
     final Map<String, dynamic> dataToInsertOrUpdate = {
@@ -480,7 +487,7 @@ Future<void> batchUpsertUserSettingsFromSupabase(List<Map<String, dynamic>> sett
 
     final db = await getDatabaseMonitor().requestDatabaseAccess();
     QuizzerLogger.logMessage('batchUpsertUserSettingsFromSupabase: Got database access, verifying table...');
-    await _verifyUserSettingsTable(userId, db!, skipEnsureRows: false); // Don't skip ensure - create default settings first
+    await verifyUserSettingsTable(userId, db!, skipEnsureRows: false); // Don't skip ensure - create default settings first
     QuizzerLogger.logMessage('batchUpsertUserSettingsFromSupabase: Table verified and default settings ensured');
 
     // Loop through each setting and update it using direct database operations

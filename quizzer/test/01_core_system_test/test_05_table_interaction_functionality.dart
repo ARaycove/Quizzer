@@ -2784,6 +2784,8 @@ void main() {
 
   // NEXT GROUP HERE
   group('User Settings Table Tests', () {
+    final List<Map<String, dynamic>> expectedSettings = getApplicationUserSettingsSpec();
+
     group('verifyUserSettingsTable Tests', () {
       test('Test 1: Should create table and populate default settings when table does not exist', () async {
         QuizzerLogger.logMessage('Testing verifyUserSettingsTable - table creation and default settings');
@@ -2794,82 +2796,39 @@ void main() {
         
         // Setup: Ensure clean state by dropping table if it exists
         await dropTable('user_settings');
-        QuizzerLogger.logMessage('Cleaned up existing user_settings table');
+        // Make sure our table is now missing:
+        expectTableIsMissing("user_settings");
+
+
+        final DatabaseMonitor dbMonitor = getDatabaseMonitor();
+        final db = await dbMonitor.requestDatabaseAccess();
         
-        // Execute: Call getAllUserSettings which internally calls the verification function
+        try {
+          // Action: Verify the user settings table
+          await verifyUserSettingsTable(userId, db!);
+        } finally {
+          dbMonitor.releaseDatabaseAccess();
+        }
+
+
+
         final allSettings = await getAllUserSettings(userId);
+        expect(allSettings.length, equals(expectedSettings.length), reason: 'Should have the same number of settings as defined in the application spec');
         
-        // Verify: Check that table was created
-        final db2 = await getDatabaseMonitor().requestDatabaseAccess();
-        if (db2 != null) {
-          try {
-            final List<Map<String, dynamic>> tables = await db2.rawQuery(
-              "SELECT name FROM sqlite_master WHERE type='table' AND name='user_settings'"
-            );
-            expect(tables.length, equals(1), reason: 'user_settings table should exist');
-            
-            // Check table structure
-            final List<Map<String, dynamic>> columns = await db2.rawQuery(
-              "PRAGMA table_info(user_settings)"
-            );
-            
-            // Verify all required columns exist
-            final List<String> columnNames = columns.map((col) => col['name'] as String).toList();
-            
-            expect(columnNames, contains('user_id'), reason: 'user_id column should exist');
-            expect(columnNames, contains('setting_name'), reason: 'setting_name column should exist');
-            expect(columnNames, contains('setting_value'), reason: 'setting_value column should exist');
-            expect(columnNames, contains('has_been_synced'), reason: 'has_been_synced column should exist');
-            expect(columnNames, contains('edits_are_synced'), reason: 'edits_are_synced column should exist');
-            expect(columnNames, contains('last_modified_timestamp'), reason: 'last_modified_timestamp column should exist');
-            expect(columnNames, contains('is_admin_setting'), reason: 'is_admin_setting column should exist');
-            
-            // Verify that all default settings are populated (11 settings from _applicationSettings)
-            expect(allSettings.length, equals(11), reason: 'Should have 11 default settings populated');
-            
-            // Verify specific settings exist with correct default values
-            // Check admin setting
-            expect(allSettings.containsKey('geminiApiKey'), isTrue, reason: 'geminiApiKey setting should exist');
-            expect(allSettings['geminiApiKey']!['value'], isNull, reason: 'geminiApiKey should have null default value');
-            expect(allSettings['geminiApiKey']!['is_admin_setting'], equals(1), reason: 'geminiApiKey should be admin setting');
-            
-            // Check some user settings
-            expect(allSettings.containsKey('home_display_eligible_questions'), isTrue, reason: 'home_display_eligible_questions setting should exist');
-            expect(allSettings['home_display_eligible_questions']!['value'], equals('0'), reason: 'home_display_eligible_questions should have "0" default value');
-            expect(allSettings['home_display_eligible_questions']!['is_admin_setting'], equals(0), reason: 'home_display_eligible_questions should not be admin setting');
-            
-            expect(allSettings.containsKey('home_display_in_circulation_questions'), isTrue, reason: 'home_display_in_circulation_questions setting should exist');
-            expect(allSettings['home_display_in_circulation_questions']!['value'], equals('0'), reason: 'home_display_in_circulation_questions should have "0" default value');
-            
-            expect(allSettings.containsKey('home_display_non_circulating_questions'), isTrue, reason: 'home_display_non_circulating_questions setting should exist');
-            expect(allSettings['home_display_non_circulating_questions']!['value'], equals('0'), reason: 'home_display_non_circulating_questions should have "0" default value');
-            
-            expect(allSettings.containsKey('home_display_lifetime_total_questions_answered'), isTrue, reason: 'home_display_lifetime_total_questions_answered setting should exist');
-            expect(allSettings['home_display_lifetime_total_questions_answered']!['value'], equals('0'), reason: 'home_display_lifetime_total_questions_answered should have "0" default value');
-            
-            expect(allSettings.containsKey('home_display_daily_questions_answered'), isTrue, reason: 'home_display_daily_questions_answered setting should exist');
-            expect(allSettings['home_display_daily_questions_answered']!['value'], equals('0'), reason: 'home_display_daily_questions_answered should have "0" default value');
-            
-            expect(allSettings.containsKey('home_display_average_daily_questions_learned'), isTrue, reason: 'home_display_average_daily_questions_learned setting should exist');
-            expect(allSettings['home_display_average_daily_questions_learned']!['value'], equals('0'), reason: 'home_display_average_daily_questions_learned should have "0" default value');
-            
-            expect(allSettings.containsKey('home_display_average_questions_shown_per_day'), isTrue, reason: 'home_display_average_questions_shown_per_day setting should exist');
-            expect(allSettings['home_display_average_questions_shown_per_day']!['value'], equals('0'), reason: 'home_display_average_questions_shown_per_day should have "0" default value');
-            
-            expect(allSettings.containsKey('home_display_days_left_until_questions_exhaust'), isTrue, reason: 'home_display_days_left_until_questions_exhaust setting should exist');
-            expect(allSettings['home_display_days_left_until_questions_exhaust']!['value'], equals('0'), reason: 'home_display_days_left_until_questions_exhaust should have "0" default value');
-            
-            expect(allSettings.containsKey('home_display_revision_streak_score'), isTrue, reason: 'home_display_revision_streak_score setting should exist');
-            expect(allSettings['home_display_revision_streak_score']!['value'], equals('0'), reason: 'home_display_revision_streak_score should have "0" default value');
-            
-            expect(allSettings.containsKey('home_display_last_reviewed'), isTrue, reason: 'home_display_last_reviewed setting should exist');
-            expect(allSettings['home_display_last_reviewed']!['value'], equals('0'), reason: 'home_display_last_reviewed should have "0" default value');
-            
-            QuizzerLogger.logSuccess('✅ verifyUserSettingsTable table creation and default settings test passed');
-            
-          } finally {
-            getDatabaseMonitor().releaseDatabaseAccess();
-          }
+        // Verify all settings from the spec are present and have correct initial values
+        for (final settingSpec in expectedSettings) {
+          final String settingName = settingSpec['name'] as String;
+          final dynamic expectedDefaultValue = settingSpec['default_value'];
+          
+          expect(allSettings.containsKey(settingName), isTrue, reason: 'Setting "$settingName" should exist');
+          
+          final Map<String, dynamic> settingDetails = allSettings[settingName]!;
+          
+          // Since setting_value is stored as text, we need to compare it as a string
+          final String storedValue = settingDetails['setting_value'].toString();
+          final String expectedValueStr = (expectedDefaultValue ?? 'null').toString();
+          
+          expect(storedValue, equals(expectedValueStr), reason: 'Setting "$settingName" should have correct default value');
         }
       });
       
@@ -2884,85 +2843,38 @@ void main() {
         await deleteAllRecordsFromTable('user_settings');
         QuizzerLogger.logMessage('Deleted all records from user_settings table');
         
-        // Verify: Check that the table is actually empty by querying the database directly
-        final db1 = await getDatabaseMonitor().requestDatabaseAccess();
-        if (db1 != null) {
-          try {
-            final List<Map<String, dynamic>> emptyResults = await db1.rawQuery(
-              'SELECT COUNT(*) as count FROM user_settings WHERE user_id = ?',
-              [userId]
-            );
-            final int count = emptyResults.first['count'] as int;
-            expect(count, equals(0), reason: 'Table should be empty after deleting all records');
-            QuizzerLogger.logMessage('Verified table is empty: $count records found');
-          } finally {
-            getDatabaseMonitor().releaseDatabaseAccess();
-          }
-        }
+        // Verify: Check that the table is actually empty by USING THE HELPER FUNCTION FOR EXPECTATIONS
+        expectTableIsEmpty('user_settings');
         
-        // Execute: Call getSettingValue which internally calls the verification function
-        // This will trigger the verification and repopulation of default settings
-        await getSettingValue(userId, 'geminiApiKey');
-        
-        // Verify: Check that settings were repopulated by querying the database directly
-        final db2 = await getDatabaseMonitor().requestDatabaseAccess();
-        if (db2 != null) {
-          try {
-            final List<Map<String, dynamic>> populatedResults = await db2.rawQuery(
-              'SELECT COUNT(*) as count FROM user_settings WHERE user_id = ?',
-              [userId]
-            );
-            final int count = populatedResults.first['count'] as int;
-            expect(count, equals(11), reason: 'Table should have 11 default settings after verification');
-            QuizzerLogger.logMessage('Verified table was repopulated: $count records found');
-          } finally {
-            getDatabaseMonitor().releaseDatabaseAccess();
-          }
+        // Action: Verify the user settings table which should repopulate the defaults
+        final db = await getDatabaseMonitor().requestDatabaseAccess();
+        try {
+          await verifyUserSettingsTable(userId, db!);
+        } finally {
+          getDatabaseMonitor().releaseDatabaseAccess();
         }
         
         // Now get all settings to verify they were repopulated correctly
         final allSettings = await getAllUserSettings(userId);
         
         // Verify: Check that all default settings are repopulated
-        expect(allSettings.length, equals(11), reason: 'Should have 11 default settings repopulated');
+        expect(allSettings.length, equals(expectedSettings.length), reason: 'Should have the same number of settings as defined in the application spec');
         
-        // Verify specific settings exist with correct default values
-        // Check admin setting
-        expect(allSettings.containsKey('geminiApiKey'), isTrue, reason: 'geminiApiKey setting should exist');
-        expect(allSettings['geminiApiKey']!['value'], isNull, reason: 'geminiApiKey should have null default value');
-        expect(allSettings['geminiApiKey']!['is_admin_setting'], equals(1), reason: 'geminiApiKey should be admin setting');
-        
-        // Check some user settings
-        expect(allSettings.containsKey('home_display_eligible_questions'), isTrue, reason: 'home_display_eligible_questions setting should exist');
-        expect(allSettings['home_display_eligible_questions']!['value'], equals('0'), reason: 'home_display_eligible_questions should have "0" default value');
-        expect(allSettings['home_display_eligible_questions']!['is_admin_setting'], equals(0), reason: 'home_display_eligible_questions should not be admin setting');
-        
-        expect(allSettings.containsKey('home_display_in_circulation_questions'), isTrue, reason: 'home_display_in_circulation_questions setting should exist');
-        expect(allSettings['home_display_in_circulation_questions']!['value'], equals('0'), reason: 'home_display_in_circulation_questions should have "0" default value');
-        
-        expect(allSettings.containsKey('home_display_non_circulating_questions'), isTrue, reason: 'home_display_non_circulating_questions setting should exist');
-        expect(allSettings['home_display_non_circulating_questions']!['value'], equals('0'), reason: 'home_display_non_circulating_questions should have "0" default value');
-        
-        expect(allSettings.containsKey('home_display_lifetime_total_questions_answered'), isTrue, reason: 'home_display_lifetime_total_questions_answered setting should exist');
-        expect(allSettings['home_display_lifetime_total_questions_answered']!['value'], equals('0'), reason: 'home_display_lifetime_total_questions_answered should have "0" default value');
-        
-        expect(allSettings.containsKey('home_display_daily_questions_answered'), isTrue, reason: 'home_display_daily_questions_answered setting should exist');
-        expect(allSettings['home_display_daily_questions_answered']!['value'], equals('0'), reason: 'home_display_daily_questions_answered should have "0" default value');
-        
-        expect(allSettings.containsKey('home_display_average_daily_questions_learned'), isTrue, reason: 'home_display_average_daily_questions_learned setting should exist');
-        expect(allSettings['home_display_average_daily_questions_learned']!['value'], equals('0'), reason: 'home_display_average_daily_questions_learned should have "0" default value');
-        
-        expect(allSettings.containsKey('home_display_average_questions_shown_per_day'), isTrue, reason: 'home_display_average_questions_shown_per_day setting should exist');
-        expect(allSettings['home_display_average_questions_shown_per_day']!['value'], equals('0'), reason: 'home_display_average_questions_shown_per_day should have "0" default value');
-        
-        expect(allSettings.containsKey('home_display_days_left_until_questions_exhaust'), isTrue, reason: 'home_display_days_left_until_questions_exhaust setting should exist');
-        expect(allSettings['home_display_days_left_until_questions_exhaust']!['value'], equals('0'), reason: 'home_display_days_left_until_questions_exhaust should have "0" default value');
-        
-        expect(allSettings.containsKey('home_display_revision_streak_score'), isTrue, reason: 'home_display_revision_streak_score setting should exist');
-        expect(allSettings['home_display_revision_streak_score']!['value'], equals('0'), reason: 'home_display_revision_streak_score should have "0" default value');
-        
-        expect(allSettings.containsKey('home_display_last_reviewed'), isTrue, reason: 'home_display_last_reviewed setting should exist');
-        expect(allSettings['home_display_last_reviewed']!['value'], equals('0'), reason: 'home_display_last_reviewed should have "0" default value');
+        // Verify all settings from the spec are present and have correct initial values
+        for (final settingSpec in expectedSettings) {
+          final String settingName = settingSpec['name'] as String;
+          final dynamic expectedDefaultValue = settingSpec['default_value'];
+          
+          expect(allSettings.containsKey(settingName), isTrue, reason: 'Setting "$settingName" should exist');
+          
+          final Map<String, dynamic> settingDetails = allSettings[settingName]!;
+          
+          // Since setting_value is stored as text, we need to compare it as a string
+          final String storedValue = (settingDetails['setting_value'] ?? 'null').toString();
+          final String expectedValueStr = (expectedDefaultValue ?? 'null').toString();
+          
+          expect(storedValue, equals(expectedValueStr), reason: 'Setting "$settingName" should have correct default value');
+        }
         
         QuizzerLogger.logSuccess('✅ verifyUserSettingsTable repopulate default settings test passed');
       });
@@ -2981,87 +2893,8 @@ void main() {
         final userId = sessionManager.userId!;
         QuizzerLogger.logMessage('Using user ID: $userId for batch upsert tests');
         
-        // Setup: Create mock records for each setting
-        final List<Map<String, dynamic>> mockSettingsData = [
-          {
-            'user_id': userId,
-            'setting_name': 'geminiApiKey',
-            'setting_value': 'test-api-key-12345',
-            'last_modified_timestamp': '2025-01-15T10:30:00.000Z',
-            'is_admin_setting': true,
-          },
-          {
-            'user_id': userId,
-            'setting_name': 'home_display_eligible_questions',
-            'setting_value': '1',
-            'last_modified_timestamp': '2025-01-15T10:30:00.000Z',
-            'is_admin_setting': false,
-          },
-          {
-            'user_id': userId,
-            'setting_name': 'home_display_in_circulation_questions',
-            'setting_value': '1',
-            'last_modified_timestamp': '2025-01-15T10:30:00.000Z',
-            'is_admin_setting': false,
-          },
-          {
-            'user_id': userId,
-            'setting_name': 'home_display_non_circulating_questions',
-            'setting_value': '1',
-            'last_modified_timestamp': '2025-01-15T10:30:00.000Z',
-            'is_admin_setting': false,
-          },
-          {
-            'user_id': userId,
-            'setting_name': 'home_display_lifetime_total_questions_answered',
-            'setting_value': '1',
-            'last_modified_timestamp': '2025-01-15T10:30:00.000Z',
-            'is_admin_setting': false,
-          },
-          {
-            'user_id': userId,
-            'setting_name': 'home_display_daily_questions_answered',
-            'setting_value': '1',
-            'last_modified_timestamp': '2025-01-15T10:30:00.000Z',
-            'is_admin_setting': false,
-          },
-          {
-            'user_id': userId,
-            'setting_name': 'home_display_average_daily_questions_learned',
-            'setting_value': '1',
-            'last_modified_timestamp': '2025-01-15T10:30:00.000Z',
-            'is_admin_setting': false,
-          },
-          {
-            'user_id': userId,
-            'setting_name': 'home_display_average_questions_shown_per_day',
-            'setting_value': '1',
-            'last_modified_timestamp': '2025-01-15T10:30:00.000Z',
-            'is_admin_setting': false,
-          },
-          {
-            'user_id': userId,
-            'setting_name': 'home_display_days_left_until_questions_exhaust',
-            'setting_value': '1',
-            'last_modified_timestamp': '2025-01-15T10:30:00.000Z',
-            'is_admin_setting': false,
-          },
-          {
-            'user_id': userId,
-            'setting_name': 'home_display_revision_streak_score',
-            'setting_value': '1',
-            'last_modified_timestamp': '2025-01-15T10:30:00.000Z',
-            'is_admin_setting': false,
-          },
-          {
-            'user_id': userId,
-            'setting_name': 'home_display_last_reviewed',
-            'setting_value': '1',
-            'last_modified_timestamp': '2025-01-15T10:30:00.000Z',
-            'is_admin_setting': false,
-          },
-        ];
-        
+        // Setup: Create mock records for each setting using the helper function
+        final mockSettingsData = generateMockUserSettings(userId);
         QuizzerLogger.logMessage('Created ${mockSettingsData.length} mock settings records for testing');
         
         // Step 1: Delete all records
@@ -3072,47 +2905,8 @@ void main() {
         await batchUpsertUserSettingsFromSupabase(mockSettingsData, userId);
         QuizzerLogger.logMessage('Called batchUpsertUserSettingsFromSupabase');
         
-         // Step 3: Immediately call verify table again (through getAllUserSettings)
-         await getAllUserSettings(userId);
-         QuizzerLogger.logMessage('Called getAllUserSettings after batch upsert (triggers _verifyUserSettingsTable)');
-         
-         // Step 4: Call ensureAllRecords function by itself (first time) - through getSettingValue
-         final step4Result = await getSettingValue(userId, 'geminiApiKey');
-         expect(step4Result!['value'], equals('test-api-key-12345'), reason: 'Step 4: geminiApiKey should return the batch upsert value');
-         QuizzerLogger.logMessage('Called getSettingValue (first time) - triggers _ensureUserSettingsRowsExist');
-         
-         // Step 5: Call it again (second time) - through getSettingValue
-         final step5Result = await getSettingValue(userId, 'home_display_eligible_questions');
-         expect(step5Result!['value'], equals('1'), reason: 'Step 5: home_display_eligible_questions should return the batch upsert value');
-         QuizzerLogger.logMessage('Called getSettingValue (second time) - triggers _ensureUserSettingsRowsExist');
-         
-         // Step 6: Call it a third time - through getSettingValue
-         final step6Result = await getSettingValue(userId, 'home_display_in_circulation_questions');
-         expect(step6Result!['value'], equals('1'), reason: 'Step 6: home_display_in_circulation_questions should return the batch upsert value');
-         QuizzerLogger.logMessage('Called getSettingValue (third time) - triggers _ensureUserSettingsRowsExist');
-        
-        // Step 7: Test expectations - ensure the settings were updated correctly and match what we fed into the batch upsert
-        final allSettings = await getAllUserSettings(userId);
-        
-        // Verify we have all 11 settings
-        expect(allSettings.length, equals(11), reason: 'Should have 11 settings after batch upsert and repeated ensure calls');
-        
-        // Verify specific settings match our mock data
-        expect(allSettings['geminiApiKey']!['value'], equals('test-api-key-12345'), reason: 'geminiApiKey should match mock data');
-        expect(allSettings['geminiApiKey']!['is_admin_setting'], equals(1), reason: 'geminiApiKey should be admin setting');
-        
-        expect(allSettings['home_display_eligible_questions']!['value'], equals('1'), reason: 'home_display_eligible_questions should match mock data');
-        expect(allSettings['home_display_eligible_questions']!['is_admin_setting'], equals(0), reason: 'home_display_eligible_questions should not be admin setting');
-        
-        expect(allSettings['home_display_in_circulation_questions']!['value'], equals('1'), reason: 'home_display_in_circulation_questions should match mock data');
-        expect(allSettings['home_display_non_circulating_questions']!['value'], equals('1'), reason: 'home_display_non_circulating_questions should match mock data');
-        expect(allSettings['home_display_lifetime_total_questions_answered']!['value'], equals('1'), reason: 'home_display_lifetime_total_questions_answered should match mock data');
-        expect(allSettings['home_display_daily_questions_answered']!['value'], equals('1'), reason: 'home_display_daily_questions_answered should match mock data');
-        expect(allSettings['home_display_average_daily_questions_learned']!['value'], equals('1'), reason: 'home_display_average_daily_questions_learned should match mock data');
-        expect(allSettings['home_display_average_questions_shown_per_day']!['value'], equals('1'), reason: 'home_display_average_questions_shown_per_day should match mock data');
-        expect(allSettings['home_display_days_left_until_questions_exhaust']!['value'], equals('1'), reason: 'home_display_days_left_until_questions_exhaust should match mock data');
-        expect(allSettings['home_display_revision_streak_score']!['value'], equals('1'), reason: 'home_display_revision_streak_score should match mock data');
-        expect(allSettings['home_display_last_reviewed']!['value'], equals('1'), reason: 'home_display_last_reviewed should match mock data');
+        // Step 3: Verify the settings match the mock data using the expectation helper
+        await expectNonDefaultSettings(userId, mockSettingsData);
         
         QuizzerLogger.logSuccess('✅ batchUpsertUserSettingsFromSupabase with repeated ensure function calls test passed');
       });
@@ -3120,22 +2914,17 @@ void main() {
       test('Test 2: Should handle empty settings list gracefully', () async {
         final userId = sessionManager.userId!;
         
-        // Get initial state
-        final initialSettings = await getAllUserSettings(userId);
+        // Setup: Ensure settings are in a known, non-default state first
+        final mockSettings = generateMockUserSettings(userId);
+        await batchUpsertUserSettingsFromSupabase(mockSettings, userId);
+        await expectNonDefaultSettings(userId, mockSettings); // Verify they are set
         
-        // Store some initial values to verify they don't change
-        final initialGeminiValue = initialSettings['geminiApiKey']!['value'];
-        final initialEligibleValue = initialSettings['home_display_eligible_questions']!['value'];
-        
+        // Action: Call batch upsert with an empty list
         final List<Map<String, dynamic>> emptySettingsData = [];
-        
-        // Should not throw an error
         await batchUpsertUserSettingsFromSupabase(emptySettingsData, userId);
         
-        // Verify settings remain unchanged
-        final finalSettings = await getAllUserSettings(userId);
-        expect(finalSettings['geminiApiKey']!['value'], equals(initialGeminiValue), reason: 'geminiApiKey should remain unchanged');
-        expect(finalSettings['home_display_eligible_questions']!['value'], equals(initialEligibleValue), reason: 'home_display_eligible_questions should remain unchanged');
+        // Verify: Settings should now be reset to their default values
+        await expectNonDefaultSettings(userId, mockSettings);
         
         QuizzerLogger.logSuccess('✅ batchUpsertUserSettingsFromSupabase empty list test passed');
       });

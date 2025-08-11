@@ -1,4 +1,6 @@
-# Login Streamline update:
+Before we do anything we need a more streamlined approach to automated build and version updating
+
+# Login Streamline update 1.1.0:
 
 - update login page with
   [] login with google
@@ -14,6 +16,16 @@ Implementation TODO:
 [] Figure out how to validate user session within the app
 
 - Perhaps we can figure out how to send an email out that when clicked opens a specific page on the app itself, thus the only way to access the reset user password section of the app is through the email link?
+  Bug Fixes
+
+* [ ] user settings are resetting on login and on new device
+  * [x] removed isDatabaseFresh check and passing of parameter, fetchAll now handles timestamp for filtering as the only source of truth - did not fix the issue
+* [X] some module names are not getting normalized, make sure all functions that deal with module_name normalize the moduleName
+  * [X] multiple functions in modules_table.dart did not normalize, they do now
+  * [X] checked if the question answer pair table was normalizing
+  * [X] checked inbound sync to normalize inbound data
+  * [X] checked outbound sync to normalize outbound data
+* [x] Fix update_flags review system, does not validate that the question being flagged still exists in the database
 
 Miscellaneous Addition
 
@@ -26,6 +38,7 @@ Miscellaneous Addition
   * [ ] font-size for everything else
     * [ ] add setting value to settings page
     * [ ] add setting value to table
+* [ ] Fix Environment variables (Credentials should be stored securely)
 
 # Tutorial Update:
 

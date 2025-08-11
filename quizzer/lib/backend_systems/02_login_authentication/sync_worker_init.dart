@@ -3,14 +3,13 @@ import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/in
 import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/outbound_sync/outbound_sync_worker.dart';
 import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/media_sync_worker.dart';
 import 'package:quizzer/backend_systems/10_switch_board/switch_board.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/modules_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_profile_table.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 
 /// Initializes the sync workers for online login.
 /// Starts inbound sync worker, waits for first cycle completion,
 /// then starts outbound and media sync workers.
-Future<void> initializeSyncWorkers({bool isDatabaseFresh = false}) async {
+Future<void> initializeSyncWorkers() async {
   try {
     // check connection
     
@@ -19,18 +18,13 @@ Future<void> initializeSyncWorkers({bool isDatabaseFresh = false}) async {
     // Start inbound sync worker
     QuizzerLogger.logMessage('Starting inbound sync worker...');
     final inboundSyncWorker = InboundSyncWorker();
-    inboundSyncWorker.start(isDatabaseFresh: isDatabaseFresh);
+    inboundSyncWorker.start();
     
     // Wait for inbound sync cycle to complete before starting other workers
     QuizzerLogger.logMessage('Waiting for inbound sync cycle to complete...');
     final switchBoard = SwitchBoard();
     await switchBoard.onInboundSyncCycleComplete.first;
     QuizzerLogger.logSuccess('Inbound sync cycle completed');
-    
-    // Validate modules table after inbound sync cycle completes (all database access released)
-    QuizzerLogger.logMessage('Validating modules table after inbound sync cycle...');
-    await ensureAllQuestionModuleNamesHaveCorrespondingModuleRecords();
-    QuizzerLogger.logSuccess('Modules table validation completed');
     
     // Update lastLogin after inbound sync completes it's cycle
     QuizzerLogger.logMessage('Updating last login timestamp after successful inbound sync...');

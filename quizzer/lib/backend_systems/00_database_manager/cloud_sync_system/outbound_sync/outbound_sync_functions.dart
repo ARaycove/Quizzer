@@ -22,6 +22,7 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_days_left_until_questions_exhaust_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_average_daily_questions_learned_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_module_activation_status_table.dart';
+import 'package:quizzer/backend_systems/session_manager/answer_validation/text_validation_functionality.dart';
 import 'dart:io'; // For SocketException
 
 // ==========================================
@@ -348,6 +349,13 @@ Future<void> syncQuestionAnswerPairs() async {
         failureCount++;
         continue;
       }
+      
+      // Normalize the module name before sending to server
+      if (record['module_name'] != null && record['module_name'] is String) {
+        final String normalizedModuleName = await normalizeString(record['module_name'] as String);
+        record['module_name'] = normalizedModuleName;
+      }
+      
       QuizzerLogger.logMessage('About to push to $reviewTable. Payload: $record');
       final bool pushSuccess = await pushRecordToSupabase(reviewTable, record);
       QuizzerLogger.logMessage('pushRecordToSupabase returned: $pushSuccess for table: $reviewTable');
@@ -720,6 +728,13 @@ Future<void> syncModules() async {
     int failureCount = 0;
 
     for (final record in unsyncedRecords) {
+      // Normalize the module name before sending to server
+      if (record['module_name'] != null && record['module_name'] is String) {
+        final String normalizedModuleName = await normalizeString(record['module_name'] as String);
+        record['module_name'] = normalizedModuleName;
+        QuizzerLogger.logMessage('Normalized module name for outbound sync: ${record['module_name']} -> $normalizedModuleName');
+      }
+      
       final bool pushSuccess = await pushRecordToSupabase(tableName, record);
       if (pushSuccess) {
         successCount++;

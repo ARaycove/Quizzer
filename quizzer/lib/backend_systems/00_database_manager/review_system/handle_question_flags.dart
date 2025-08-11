@@ -40,7 +40,9 @@ Future<Map<String, dynamic>?> getFlaggedQuestionForReview({
           .eq('flag_id', '0')
           .or('is_reviewed.is.null,is_reviewed.eq.0');
     }
-    
+    // Run check if that question_id exists in the question-answer_pair table
+
+
     if (response.isEmpty) {
       QuizzerLogger.logMessage('No unreviewed flagged questions available for review.');
       return null;
@@ -50,11 +52,61 @@ Future<Map<String, dynamic>?> getFlaggedQuestionForReview({
     // Otherwise, select a random flag from the results
     final selectedFlag = primaryKey != null ? response.first : response[Random().nextInt(response.length)];
     
-    final String questionId = selectedFlag['question_id'] as String;
-    final String flagType = selectedFlag['flag_type'] as String;
-    final String? flagDescription = selectedFlag['flag_description'] as String?;
+    String questionId = selectedFlag['question_id'] as String;
+    String flagType = selectedFlag['flag_type'] as String;
+    String? flagDescription = selectedFlag['flag_description'] as String?;
     
     QuizzerLogger.logMessage('Found flag for question: $questionId, type: $flagType');
+    
+    // Run check if that question_id exists in the question-answer_pair table
+    // Validate that the flagged question still exists in the database
+    // If not, delete the flag and try to get another one
+    bool questionExists = false;
+    
+    while (!questionExists && response.isNotEmpty) {
+      // Check if the question exists
+      QuizzerLogger.logMessage('Validating question exists for question_id: $questionId');
+      final questionCheck = await supabase
+          .from('question_answer_pairs')
+          .select('*')
+          .eq('question_id', questionId);
+      
+      if (questionCheck.isNotEmpty) {
+        questionExists = true;
+        QuizzerLogger.logMessage('Successfully validated question exists for question_id: $questionId');
+      } else {
+        // Question doesn't exist, delete the flag and try another one
+        QuizzerLogger.logMessage('Question $questionId no longer exists, deleting flag and trying another...');
+        
+        // Delete the invalid flag
+        await supabase
+            .from('question_answer_pair_flags')
+            .delete()
+            .eq('question_id', questionId)
+            .eq('flag_type', flagType);
+        
+        // Remove this flag from our response list
+        response.removeWhere((flag) => 
+            flag['question_id'] == questionId && flag['flag_type'] == flagType);
+        
+        if (response.isEmpty) {
+          QuizzerLogger.logMessage('No more valid flagged questions available for review.');
+          return null;
+        }
+        
+        // Try the next flag
+        final nextFlag = response[Random().nextInt(response.length)];
+        final String nextQuestionId = nextFlag['question_id'] as String;
+        final String nextFlagType = nextFlag['flag_type'] as String;
+        final String? nextFlagDescription = nextFlag['flag_description'] as String?;
+        
+        QuizzerLogger.logMessage('Trying next flag for question: $nextQuestionId, type: $nextFlagType');
+        
+        questionId = nextQuestionId;
+        flagType = nextFlagType;
+        flagDescription = nextFlagDescription;
+      }
+    }
     
     // Now fetch the corresponding question data
     QuizzerLogger.logMessage('Fetching question data for question_id: $questionId');

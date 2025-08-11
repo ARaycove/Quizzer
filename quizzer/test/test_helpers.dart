@@ -1955,3 +1955,92 @@ Future<List<String>> addTestQuestionsToLocalDatabase({
   }
 }
 
+/// Generates a list of mock user settings with non-default values for testing.
+///
+/// Parameters:
+/// - userId: The user ID to associate with the mock settings.
+///
+/// Returns:
+/// - A list of maps, where each map represents a user setting record.
+List<Map<String, dynamic>> generateMockUserSettings(String userId) {
+  return [
+    {
+      'user_id': userId,
+      'setting_name': 'geminiApiKey',
+      'setting_value': 'test-api-key-12345',
+      'last_modified_timestamp': '2025-01-15T10:30:00.000Z',
+      'is_admin_setting': true,
+    },
+    {
+      'user_id': userId,
+      'setting_name': 'home_display_eligible_questions',
+      'setting_value': '1',
+      'last_modified_timestamp': '2025-01-15T10:30:00.000Z',
+      'is_admin_setting': false,
+    },
+    {
+      'user_id': userId,
+      'setting_name': 'home_display_in_circulation_questions',
+      'setting_value': '1',
+      'last_modified_timestamp': '2025-01-15T10:30:00.000Z',
+      'is_admin_setting': false,
+    },
+    {
+      'user_id': userId,
+      'setting_name': 'home_display_non_circulating_questions',
+      'setting_value': '1',
+      'last_modified_timestamp': '2025-01-15T10:30:00.000Z',
+      'is_admin_setting': false,
+    },
+    {
+      'user_id': userId,
+      'setting_name': 'home_display_lifetime_total_questions_answered',
+      'setting_value': '1',
+      'last_modified_timestamp': '2025-01-15T10:30:00.000Z',
+      'is_admin_setting': false,
+    },
+    {
+      'user_id': userId,
+      'setting_name': 'home_display_daily_questions_answered',
+      'setting_value': '1',
+      'last_modified_timestamp': '2025-01-15T10:30:00.000Z',
+      'is_admin_setting': false,
+    },
+    {
+      'user_id': userId,
+      'setting_name': 'home_display_average_daily_questions_learned',
+      'setting_value': '1',
+      'last_modified_timestamp': '2025-01-15T10:30:00.000Z',
+      'is_admin_setting': false,
+    },
+    {
+      'user_id': userId,
+      'setting_name': 'home_display_average_questions_shown_per_day',
+      'setting_value': '1',
+      'last_modified_timestamp': '2025-01-15T10:30:00.000Z',
+      'is_admin_setting': false,
+    },
+    {
+      'user_id': userId,
+      'setting_name': 'home_display_days_left_until_questions_exhaust',
+      'setting_value': '1',
+      'last_modified_timestamp': '2025-01-15T10:30:00.000Z',
+      'is_admin_setting': false,
+    },
+    {
+      'user_id': userId,
+      'setting_name': 'home_display_revision_streak_score',
+      'setting_value': '1',
+      'last_modified_timestamp': '2025-01-15T10:30:00.000Z',
+      'is_admin_setting': false,
+    },
+    {
+      'user_id': userId,
+      'setting_name': 'home_display_last_reviewed',
+      'setting_value': '1',
+      'last_modified_timestamp': '2025-01-15T10:30:00.000Z',
+      'is_admin_setting': false,
+    },
+  ];
+}
+

@@ -5,7 +5,6 @@ import 'package:quizzer/backend_systems/02_login_authentication/offline_login.da
 import 'package:quizzer/backend_systems/02_login_authentication/login_attempts_record.dart';
 import 'package:quizzer/backend_systems/02_login_authentication/sync_worker_init.dart';
 import 'package:quizzer/backend_systems/02_login_authentication/queue_server_init.dart';
-import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
 import 'dart:async';
 import 'package:quizzer/backend_systems/10_switch_board/sb_other_signals.dart';
 import 'package:supabase/supabase.dart';
@@ -272,22 +271,12 @@ Future<Map<String, dynamic>> loginInitialization({
       signalLoginProgress("Checking your data...");
       QuizzerLogger.logMessage('Checking database state for sync worker initialization...');
       
-      final dbMonitor = getDatabaseMonitor();
-      final bool isDatabaseFresh = await dbMonitor.isDatabaseFresh();
+      // Initialize sync workers
+      await initializeSyncWorkers();
       
-      if (isDatabaseFresh) {
-        // Fresh database - await sync workers to populate initial data
-        signalLoginProgress("Setting up your data for the first time...");
-        QuizzerLogger.logMessage('Database is fresh, awaiting sync workers to populate initial data...');
-        await initializeSyncWorkers(isDatabaseFresh: isDatabaseFresh);
-        QuizzerLogger.logSuccess('Sync workers completed for fresh database');
-      } else {
-        // Not fresh - start sync workers in background
-        signalLoginProgress("Starting background synchronization...");
-        QuizzerLogger.logMessage('Database has existing data, starting sync workers in background...');
-        initializeSyncWorkers(isDatabaseFresh: isDatabaseFresh); // Don't await - let them run in background
-        QuizzerLogger.logSuccess('Sync workers started in background for existing database');
-      }
+      // Start background sync workers
+      initializeSyncWorkers(); // Don't await - let them run in background
+      QuizzerLogger.logSuccess('Sync workers started in background for existing database');
     } else {
       if (testRun) {
         QuizzerLogger.logMessage('Skipping sync workers for test run');

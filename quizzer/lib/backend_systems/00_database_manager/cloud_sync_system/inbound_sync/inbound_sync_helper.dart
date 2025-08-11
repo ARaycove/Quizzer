@@ -66,7 +66,6 @@ Future<String> calculateEffectiveInitialTimestamp({
 /// - pageSize: Number of records per page (default: 500)
 /// - additionalFilters: Map of column names to filter values (e.g., {'user_uuid': '123'})
 /// - useLastLogin: Whether to use last login date for filtering (default: true, set to false for global tables)
-/// - effectiveLastLogin: Optional timestamp to use instead of fetching from profile (for fresh device scenarios)
 /// 
 /// Returns:
 /// - List<Map<String, dynamic>> containing ALL records newer than the last login date
@@ -78,26 +77,17 @@ Future<List<Map<String, dynamic>>> fetchAllRecordsOlderThanLastLogin({
   int pageSize = 500,
   Map<String, dynamic>? additionalFilters,
   bool useLastLogin = true,
-  String? effectiveLastLogin,
 }) async {
   QuizzerLogger.logMessage('Fetching ALL records from $tableName newer than last login for user: $userId');
   
   try {
-    String finalEffectiveLastLogin;
-    
-    if (effectiveLastLogin != null) {
-      // Use the provided timestamp (e.g., 1970 for fresh devices)
-      finalEffectiveLastLogin = effectiveLastLogin;
-      QuizzerLogger.logMessage('Using provided effective last login timestamp: $finalEffectiveLastLogin');
-    } else {
-      // Calculate the effective initial timestamp using the new function
-      finalEffectiveLastLogin = await calculateEffectiveInitialTimestamp(
-        supabase: supabase,
-        tableName: tableName,
-        userId: userId,
-        useLastLogin: useLastLogin,
-      );
-    }
+    // Calculate the effective initial timestamp using the internal function
+    final String finalEffectiveLastLogin = await calculateEffectiveInitialTimestamp(
+      supabase: supabase,
+      tableName: tableName,
+      userId: userId,
+      useLastLogin: useLastLogin,
+    );
     
     QuizzerLogger.logMessage('Using effective last login timestamp: $finalEffectiveLastLogin');
     

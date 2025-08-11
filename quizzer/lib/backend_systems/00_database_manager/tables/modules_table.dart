@@ -3,6 +3,7 @@ import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'table_helper.dart'; // Import the helper file
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
 import 'package:quizzer/backend_systems/10_switch_board/sb_sync_worker_signals.dart';
+import 'package:quizzer/backend_systems/session_manager/answer_validation/text_validation_functionality.dart';
 
 // Table name and field constants
 const String modulesTableName = 'modules';
@@ -132,7 +133,11 @@ Future<void> insertModule({
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    QuizzerLogger.logMessage('Inserting new module: $name');
+    
+    // Normalize the module name before storing
+    final String normalizedName = await normalizeString(name);
+    QuizzerLogger.logMessage('Inserting new module: $name (normalized to: $normalizedName)');
+    
     await verifyModulesTable(db);
     final now = DateTime.now().toUtc().toIso8601String();
     
@@ -141,7 +146,7 @@ Future<void> insertModule({
     
     // Prepare the raw data map - join lists into strings as needed by schema
     final Map<String, dynamic> data = {
-      moduleNameField: name,
+      moduleNameField: normalizedName, // Use normalized name
       descriptionField: description,
       primarySubjectField: primarySubject,
       subjectsField: subjects, // Pass raw list for JSON encoding
@@ -164,10 +169,10 @@ Future<void> insertModule({
     
     // Log based on result (insertRawData returns row ID or 0/-1 on failure/ignore)
     if (result > 0) { // replace returns rowID
-      QuizzerLogger.logSuccess('Module $name inserted/replaced successfully');
+      QuizzerLogger.logSuccess('Module $normalizedName inserted/replaced successfully');
     } else {
        // This case might indicate an issue if replace was expected to always work
-       QuizzerLogger.logWarning('Insert/replace operation for module $name returned $result.');
+       QuizzerLogger.logWarning('Insert/replace operation for module $normalizedName returned $result.');
     }
   } catch (e) {
     QuizzerLogger.logError('Error inserting module - $e');
@@ -188,19 +193,23 @@ Future<void> updateModule({
   List<String>? categories,
 }) async {
   try {
+    // Normalize the search name
+    final String normalizedName = await normalizeString(name);
+    
     final db = await getDatabaseMonitor().requestDatabaseAccess();
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    QuizzerLogger.logMessage('Updating module: $name');
+    QuizzerLogger.logMessage('Updating module: $name (normalized to: $normalizedName)');
     await verifyModulesTable(db);
     final updates = <String, dynamic>{};
     
-    // Handle module name change if provided
+    // Handle module name change if provided - normalize the new name
     if (newName != null && newName != name) {
-      updates[moduleNameField] = newName;
+      final String normalizedNewName = await normalizeString(newName);
+      updates[moduleNameField] = normalizedNewName;
       updates['edits_are_synced'] = 0; // Mark as needing sync when name changes
-      QuizzerLogger.logMessage('Module name will be changed from "$name" to "$newName"');
+      QuizzerLogger.logMessage('Module name will be changed from "$normalizedName" to "$normalizedNewName"');
     }
     
     // Prepare map with raw data - lists will be handled by encodeValueForDB in the helper
@@ -223,23 +232,24 @@ Future<void> updateModule({
     final int result = await updateRawData(
       modulesTableName,
       updates,
-      '$moduleNameField = ?', // where clause
-      [name],                 // whereArgs
+      '$moduleNameField = ?',   // where clause
+      [normalizedName],         // whereArgs
       db,
     );
     
     // Log based on result (updateRawData returns number of rows affected)
     if (result > 0) {
       if (newName != null && newName != name) {
-        QuizzerLogger.logSuccess('Module renamed from "$name" to "$newName" successfully ($result row affected).');
+        final String normalizedNewName = await normalizeString(newName);
+        QuizzerLogger.logSuccess('Module renamed from "$normalizedName" to "$normalizedNewName" successfully ($result row affected).');
       } else {
-        QuizzerLogger.logSuccess('Module $name updated successfully ($result row affected).');
+        QuizzerLogger.logSuccess('Module $normalizedName updated successfully ($result row affected).');
       }
       
       // Trigger outbound sync for module updates
       signalOutboundSyncNeeded();
     } else {
-      QuizzerLogger.logWarning('Update operation for module $name affected 0 rows. Module might not exist or data was unchanged.');
+      QuizzerLogger.logWarning('Update operation for module $normalizedName affected 0 rows. Module might not exist or data was unchanged.');
     }
   } catch (e) {
     QuizzerLogger.logError('Error updating module - $e');
@@ -252,11 +262,14 @@ Future<void> updateModule({
 // Get a module by name
 Future<Map<String, dynamic>?> getModule(String name) async {
   try {
+    // Normalize the input name before searching
+    final String normalizedName = await normalizeString(name);
+    
     final db = await getDatabaseMonitor().requestDatabaseAccess();
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    QuizzerLogger.logMessage('Fetching module: $name');
+    QuizzerLogger.logMessage('Fetching module: $name (normalized to: $normalizedName)');
     await verifyModulesTable(db);
     
     // Use the universal query helper
@@ -264,17 +277,17 @@ Future<Map<String, dynamic>?> getModule(String name) async {
       modulesTableName,
       db,
       where: '$moduleNameField = ?',
-      whereArgs: [name],
+      whereArgs: [normalizedName], // Search with normalized name
       limit: 2, // Limit to 2 to detect if PK constraint is violated
     );
 
     if (results.isEmpty) {
-      QuizzerLogger.logMessage('Module $name not found');
+      QuizzerLogger.logMessage('Module $normalizedName not found');
       return null;
     } else if (results.length > 1) {
       // This shouldn't happen if moduleNameField is a primary key
-      QuizzerLogger.logError('Found multiple modules with the same name: $name. PK constraint violation?');
-      throw StateError('Found multiple modules with the same primary key: $name');
+      QuizzerLogger.logError('Found multiple modules with the same name: $normalizedName. PK constraint violation?');
+      throw StateError('Found multiple modules with the same primary key: $normalizedName');
     }
 
     // Get the single, already decoded map
@@ -501,11 +514,14 @@ Future<void> updateModuleSyncFlags({
   required bool editsAreSynced,
 }) async {
   try {
+    // Normalize the module name before searching
+    final String normalizedModuleName = await normalizeString(moduleName);
+    
     final db = await getDatabaseMonitor().requestDatabaseAccess();
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    QuizzerLogger.logMessage('Updating sync flags for module: $moduleName');
+    QuizzerLogger.logMessage('Updating sync flags for module: $moduleName (normalized to: $normalizedModuleName)');
     await verifyModulesTable(db);
     
     final updates = {
@@ -517,14 +533,14 @@ Future<void> updateModuleSyncFlags({
       modulesTableName,
       updates,
       '$moduleNameField = ?',
-      [moduleName],
+      [normalizedModuleName], // Use normalized name
       db,
     );
     
     if (result > 0) {
-      QuizzerLogger.logSuccess('Sync flags updated for module $moduleName');
+      QuizzerLogger.logSuccess('Sync flags updated for module $normalizedModuleName');
     } else {
-      QuizzerLogger.logWarning('No rows affected when updating sync flags for module $moduleName');
+      QuizzerLogger.logWarning('No rows affected when updating sync flags for module $normalizedModuleName');
     }
   } catch (e) {
     QuizzerLogger.logError('Error updating module sync flags - $e');
@@ -542,17 +558,20 @@ Future<void> upsertModuleFromInboundSync({
   required String categories,
 }) async {
   try {
+    // Normalize the module name before storing
+    final String normalizedModuleName = await normalizeString(moduleName);
+    
     final db = await getDatabaseMonitor().requestDatabaseAccess();
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    QuizzerLogger.logMessage('Upserting module $moduleName from inbound sync...');
+    QuizzerLogger.logMessage('Upserting module $moduleName (normalized to: $normalizedModuleName) from inbound sync...');
 
     await verifyModulesTable(db);
 
     // Prepare the data map with only the fields we store in Supabase
     final Map<String, dynamic> data = {
-      'module_name': moduleName,
+      'module_name': normalizedModuleName, // Use normalized name
       'description': description,
       'categories': categories,
       'has_been_synced': 1,
@@ -567,7 +586,7 @@ Future<void> upsertModuleFromInboundSync({
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
 
-    QuizzerLogger.logSuccess('Successfully upserted module $moduleName from inbound sync.');
+    QuizzerLogger.logSuccess('Successfully upserted module $normalizedModuleName from inbound sync.');
   } catch (e) {
     QuizzerLogger.logError('Error upserting module from inbound sync - $e');
     rethrow;
