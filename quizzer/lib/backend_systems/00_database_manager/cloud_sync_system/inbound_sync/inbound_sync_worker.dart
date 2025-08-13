@@ -53,6 +53,12 @@ class InboundSyncWorker {
     }
 
     _isRunning = false;
+    
+    // Wait for current sync cycle to complete before returning
+    QuizzerLogger.logMessage('InboundSyncWorker: Waiting for current sync cycle to complete...');
+    await _switchBoard.onInboundSyncCycleComplete.first;
+    QuizzerLogger.logMessage('InboundSyncWorker: Current sync cycle completed.');
+    
     QuizzerLogger.logMessage('InboundSyncWorker stopped.');
   }
   // ----------------------

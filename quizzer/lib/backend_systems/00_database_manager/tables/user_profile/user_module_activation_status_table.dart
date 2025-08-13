@@ -73,7 +73,7 @@ Future<void> verifyUserModuleActivationStatusTable(dynamic db, String userId) as
 Future<void> _ensureAllModulesHaveActivationStatusForUser(dynamic db, String userId) async {
   try {
     // 1. Get all module names from module_table
-    final List<Map<String, dynamic>> allModules = await getAllModules();
+    final List<Map<String, dynamic>> allModules = await getAllModules(db);
     final List<String> allModuleNames = allModules.map((module) => module['module_name'] as String).toList();
     
     // 2. Get all current activation status records for the user
@@ -226,7 +226,6 @@ Future<Map<String, bool>> getModuleActivationStatus(String userId) async {
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    await verifyUserModuleActivationStatusTable(db, userId);
     
     final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
       'user_module_activation_status',
@@ -278,7 +277,6 @@ Future<bool> updateModuleActivationStatus(String userId, String moduleName, bool
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    await verifyUserModuleActivationStatusTable(db, userId);
     
     final Map<String, dynamic> data = {
       'user_id': userId,
@@ -320,12 +318,12 @@ Future<bool> updateModuleActivationStatus(String userId, String moduleName, bool
 Future<void> ensureAllModulesHaveActivationStatus(String userId) async {
   try {
     QuizzerLogger.logMessage('Ensuring all modules have activation status for user: $userId');
-    final List<Map<String, dynamic>> allModules = await getAllModules();
+    
     final db = await getDatabaseMonitor().requestDatabaseAccess();
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    await verifyUserModuleActivationStatusTable(db, userId);
+    final List<Map<String, dynamic>> allModules = await getAllModules(db);
     
     // Get all module names from the modules table
     
@@ -398,7 +396,6 @@ Future<List<String>> getActiveModuleNames(String userId) async {
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    await verifyUserModuleActivationStatusTable(db, userId);
     
     final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
       'user_module_activation_status',
@@ -428,7 +425,6 @@ Future<List<Map<String, dynamic>>> getModuleActivationStatusRecords(String userI
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    await verifyUserModuleActivationStatusTable(db, userId);
     
     return await queryAndDecodeDatabase(
       'user_module_activation_status',
@@ -453,7 +449,6 @@ Future<List<Map<String, dynamic>>> getUnsyncedModuleActivationStatusRecords(Stri
       throw Exception('Failed to acquire database access');
     }
     QuizzerLogger.logMessage('Fetching unsynced module activation status records for user: $userId...');
-    await verifyUserModuleActivationStatusTable(db, userId);
 
     final List<Map<String, dynamic>> results = await db.query(
       'user_module_activation_status',
@@ -488,7 +483,6 @@ Future<void> updateModuleActivationStatusSyncFlags({
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    await verifyUserModuleActivationStatusTable(db, userId);
     
     final Map<String, dynamic> updates = {
       'has_been_synced': hasBeenSynced ? 1 : 0,
@@ -518,49 +512,31 @@ Future<void> updateModuleActivationStatusSyncFlags({
 
 /// Inserts or updates module activation status records from inbound sync
 /// Sets sync flags to indicate the record is synced and edits are synced
-Future<void> upsertModuleActivationStatusFromInboundSync({
-  required String userId,
-  required String moduleName,
-  required bool isActive,
-  required String lastModifiedTimestamp,
+Future<void> batchUpsertUserModuleActivationStatusFromInboundSync({
+  required List<Map<String, dynamic>> userModuleActivationStatusRecords,
+  required dynamic db,
 }) async {
   try {
-    // Normalize the module name
-    final String normalizedModuleName = await normalizeString(moduleName);
-    
-    final db = await getDatabaseMonitor().requestDatabaseAccess();
-    if (db == null) {
-      throw Exception('Failed to acquire database access');
-    }
-    QuizzerLogger.logMessage('Upserting module activation status from inbound sync (User: $userId, Module: $moduleName -> $normalizedModuleName)');
-    
-    await verifyUserModuleActivationStatusTable(db, userId);
-
-    final Map<String, dynamic> data = {
-      'user_id': userId,
-      'module_name': normalizedModuleName,
-      'is_active': isActive ? 1 : 0,
-      'has_been_synced': 1, // Mark as synced from cloud
-      'edits_are_synced': 1, // Mark edits as synced (as it's from cloud)
-      'last_modified_timestamp': lastModifiedTimestamp,
-    };
-
-    final int result = await insertRawData(
-      'user_module_activation_status',
-      data,
-      db,
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
-
-    if (result > 0) {
-      QuizzerLogger.logSuccess('Successfully upserted module activation status from inbound sync (User: $userId, Module: $normalizedModuleName)');
-    } else {
-      QuizzerLogger.logWarning('upsertModuleActivationStatusFromInboundSync: insertRawData with replace returned 0 for (User: $userId, Module: $normalizedModuleName)');
+    for (Map<String, dynamic> actRecord in userModuleActivationStatusRecords) {
+      // Define the map for insert
+      final Map<String, dynamic> data = {
+        'user_id': actRecord['user_id'],
+        'module_name': normalizeString(actRecord['module_name']), // module name get's normalized
+        'is_active': actRecord['is_active'] ? 1 : 0,
+        'has_been_synced': 1, // Mark as synced from cloud
+        'edits_are_synced': 1, // Mark edits as synced (as it's from cloud)
+        'last_modified_timestamp': actRecord['last_modified_timestamp'],
+      };
+      // insert the map
+      await insertRawData(
+        'user_module_activation_status',
+        data,
+        db,
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
     }
   } catch (e) {
-    QuizzerLogger.logError('Error upserting module activation status from inbound sync (User: $userId, Module: $moduleName) - $e');
+    QuizzerLogger.logError('Error upserting module activation status from inbound sync - $e');
     rethrow;
-  } finally {
-    getDatabaseMonitor().releaseDatabaseAccess();
   }
 }

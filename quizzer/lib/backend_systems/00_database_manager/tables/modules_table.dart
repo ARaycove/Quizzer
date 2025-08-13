@@ -137,8 +137,6 @@ Future<void> insertModule({
     // Normalize the module name before storing
     final String normalizedName = await normalizeString(name);
     QuizzerLogger.logMessage('Inserting new module: $name (normalized to: $normalizedName)');
-    
-    await verifyModulesTable(db);
     final now = DateTime.now().toUtc().toIso8601String();
     
     // Validate and normalize categories
@@ -201,7 +199,6 @@ Future<void> updateModule({
       throw Exception('Failed to acquire database access');
     }
     QuizzerLogger.logMessage('Updating module: $name (normalized to: $normalizedName)');
-    await verifyModulesTable(db);
     final updates = <String, dynamic>{};
     
     // Handle module name change if provided - normalize the new name
@@ -270,7 +267,6 @@ Future<Map<String, dynamic>?> getModule(String name) async {
       throw Exception('Failed to acquire database access');
     }
     QuizzerLogger.logMessage('Fetching module: $name (normalized to: $normalizedName)');
-    await verifyModulesTable(db);
     
     // Use the universal query helper
     final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
@@ -321,15 +317,10 @@ Future<Map<String, dynamic>?> getModule(String name) async {
 /// Returns a full map of all data for each module including name, description, 
 /// primary subject, subjects list, related concepts list, creation date, and creator ID.
 /// This is not a snapshot but the complete current state of all modules in the database.
-Future<List<Map<String, dynamic>>> getAllModules() async {
+/// Function is used as part of the initial verification and thus can't be responsible for isolating db access
+Future<List<Map<String, dynamic>>> getAllModules(dynamic db) async {
   try {
-    final db = await getDatabaseMonitor().requestDatabaseAccess();
-    if (db == null) {
-      throw Exception('Failed to acquire database access');
-    }
     QuizzerLogger.logMessage('Fetching all modules');
-    await verifyModulesTable(db);
-    
     // Use the universal query helper
     final List<Map<String, dynamic>> decodedModules = await queryAndDecodeDatabase(
       modulesTableName,
@@ -378,8 +369,6 @@ Future<List<Map<String, dynamic>>> getAllModules() async {
   } catch (e) {
     QuizzerLogger.logError('Error getting all modules - $e');
     rethrow;
-  } finally {
-    getDatabaseMonitor().releaseDatabaseAccess();
   }
 }
 
@@ -430,8 +419,6 @@ Future<List<Map<String, dynamic>>> getModulesByCategory(String category) async {
       throw Exception('Failed to acquire database access');
     }
     QuizzerLogger.logMessage('Fetching modules by category: $category');
-    await verifyModulesTable(db);
-    
     // Validate and normalize category
     final normalizedCategory = category.toLowerCase();
     final validatedCategory = allowedCategories.contains(normalizedCategory) ? normalizedCategory : 'other';
@@ -487,8 +474,6 @@ Future<List<Map<String, dynamic>>> getUnsyncedModules() async {
       throw Exception('Failed to acquire database access');
     }
     QuizzerLogger.logMessage('Fetching unsynced modules');
-    await verifyModulesTable(db);
-    
     // Use the universal query helper to get modules that need syncing
     final List<Map<String, dynamic>> unsyncedModules = await queryAndDecodeDatabase(
       modulesTableName,
@@ -522,8 +507,6 @@ Future<void> updateModuleSyncFlags({
       throw Exception('Failed to acquire database access');
     }
     QuizzerLogger.logMessage('Updating sync flags for module: $moduleName (normalized to: $normalizedModuleName)');
-    await verifyModulesTable(db);
-    
     final updates = {
       'has_been_synced': hasBeenSynced ? 1 : 0,
       'edits_are_synced': editsAreSynced ? 1 : 0,
@@ -552,46 +535,28 @@ Future<void> updateModuleSyncFlags({
 
 /// Upserts a module from inbound sync and sets sync flags to 1.
 /// This function is specifically for handling inbound sync operations.
-Future<void> upsertModuleFromInboundSync({
-  required String moduleName,
-  required String description,
-  required String categories,
+Future<void> batchUpsertModuleFromInboundSync({
+  required List<Map<String, dynamic>> moduleRecords,
+  required dynamic db
 }) async {
   try {
     // Normalize the module name before storing
-    final String normalizedModuleName = await normalizeString(moduleName);
-    
-    final db = await getDatabaseMonitor().requestDatabaseAccess();
-    if (db == null) {
-      throw Exception('Failed to acquire database access');
+    for (Map<String, dynamic> moduleRecord in moduleRecords) {
+      // Define the data for insert
+      final Map<String, dynamic> data = {
+        'module_name': await normalizeString(moduleRecord["module_name"]), // module name should be normalized on sync
+        'description': moduleRecord["description"],
+        'categories': moduleRecord["categories"],
+        'has_been_synced': 1,
+        'edits_are_synced': 1,
+        'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
+      };
+
+      await insertRawData("modules", data, db, conflictAlgorithm: ConflictAlgorithm.replace);
     }
-    QuizzerLogger.logMessage('Upserting module $moduleName (normalized to: $normalizedModuleName) from inbound sync...');
-
-    await verifyModulesTable(db);
-
-    // Prepare the data map with only the fields we store in Supabase
-    final Map<String, dynamic> data = {
-      'module_name': normalizedModuleName, // Use normalized name
-      'description': description,
-      'categories': categories,
-      'has_been_synced': 1,
-      'edits_are_synced': 1,
-      'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
-    };
-
-    // Use upsert to handle both insert and update cases
-    await db.insert(
-      'modules',
-      data,
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
-
-    QuizzerLogger.logSuccess('Successfully upserted module $normalizedModuleName from inbound sync.');
   } catch (e) {
     QuizzerLogger.logError('Error upserting module from inbound sync - $e');
     rethrow;
-  } finally {
-    getDatabaseMonitor().releaseDatabaseAccess();
   }
 }
 
@@ -607,9 +572,6 @@ Future<void> ensureAllQuestionModuleNamesHaveCorrespondingModuleRecords() async 
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    
-    await verifyModulesTable(db);
-    
     // Get all unique module names from question_answer_pairs table
     final List<Map<String, dynamic>> moduleNamesResult = await db.rawQuery(
       'SELECT DISTINCT module_name FROM question_answer_pairs WHERE module_name IS NOT NULL AND module_name != ""'

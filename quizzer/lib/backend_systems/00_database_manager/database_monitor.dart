@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:quizzer/backend_systems/00_database_manager/quizzer_database.dart';
+import 'package:quizzer/backend_systems/10_switch_board/sb_database_signals.dart';
 
 // Global database monitor instance
 final DatabaseMonitor _globalDatabaseMonitor = DatabaseMonitor._internal();
@@ -127,7 +128,48 @@ class DatabaseMonitor {
     _isLocked = true;
     _currentLockHolder = caller;
     QuizzerLogger.logMessage('Database access granted to $caller with lock (${isSyncRequest ? 'sync' : 'priority'} request)');
-    return getDatabaseForMonitor();
+    
+    // Check if database is accessible and try to fix if it's not
+    try {
+      Database db = await getDatabaseForMonitor();
+      if (await _isDatabaseAccessible(db)) {
+        return db;
+      } else {
+        // Database exists but is not accessible, try to reset connection
+        QuizzerLogger.logWarning('Database not accessible, attempting to reset connection...');
+        await resetDatabaseConnection();
+        
+        // Try to get a fresh database reference
+        db = await getDatabaseForMonitor();
+        if (await _isDatabaseAccessible(db)) {
+          QuizzerLogger.logSuccess('Database connection reset successfully');
+          return db;
+        } else {
+          // If still not accessible after reset, the database file might be deleted
+          // Try to close and recreate the database connection
+          QuizzerLogger.logWarning('Database still not accessible after reset, attempting to recreate connection...');
+          await closeDatabase();
+          
+          // Wait a moment for file system to settle
+          await Future.delayed(const Duration(milliseconds: 100));
+          
+          // Try one more time
+          db = await getDatabaseForMonitor();
+          if (await _isDatabaseAccessible(db)) {
+            QuizzerLogger.logSuccess('Database connection recreated successfully');
+            return db;
+          } else {
+            throw Exception('Failed to establish accessible database connection after multiple attempts');
+          }
+        }
+      }
+    } catch (e) {
+      // Release lock and rethrow if we can't get a working database
+      _isLocked = false;
+      _currentLockHolder = null;
+      QuizzerLogger.logError('Failed to provide accessible database to $caller: $e');
+      rethrow;
+    }
   }
 
   /// Releases the database lock and gives access to the next highest priority request
@@ -158,69 +200,99 @@ class DatabaseMonitor {
       _isLocked = false;
       _currentLockHolder = null;
       QuizzerLogger.logMessage('Database lock released by $caller - no more requests in queue');
+      
+      // Signal that the queue is now empty
+      signalDatabaseMonitorQueueEmpty();
     }
   }
 
-  /// !!! CRITICAL OVERRIDE !!!
-  /// Provides direct, UNLOCKED access to the database instance.
-  /// This method BYPASSES the entire locking mechanism (_isLocked, _accessQueue).
-  /// 
-  /// **WARNING:** This should ONLY be used by the critical error logging system
-  /// (`SessionManager.reportError`) to ensure errors can be logged even if the
-  /// database is otherwise locked (potentially by the operation that CAUSED the error).
-  /// 
-  /// Using this for any other purpose can lead to race conditions, data corruption,
-  /// or deadlocks.
-  /// 
-  /// Since this method does NOT acquire a lock, `releaseDatabaseAccess()` 
-  /// MUST NOT be called by the user of this method for the obtained Database instance.
-  /// PERMANENTLY LOCKS THE DB MONITOR, locking all other functionality from working.
-  Future<Database?> getDirectDatabaseAccessForCriticalLogging() async {
-    final caller = _getCallerInfo(StackTrace.current);
-    QuizzerLogger.logWarning('DATABASE_MONITOR: CRITICAL OVERRIDE - Providing direct, unlocked DB access for error logging to $caller.');
-    _isLocked = true;
-    _currentLockHolder = caller;
-    return getDatabaseForMonitor();
+  /// Resets the database connection when the database file has been deleted
+  /// This ensures that subsequent database operations will create a fresh connection
+  Future<void> resetDatabaseConnection() async {
+    try {
+      QuizzerLogger.logMessage('Resetting database connection after database deletion...');
+      
+      // Close the current database connection if it exists
+      await closeDatabase();
+      
+      // Clear the lock state since the database is no longer valid
+      _isLocked = false;
+      _currentLockHolder = null;
+      
+      // Don't clear the queue - pending requests should still get access after reset
+      // _priorityQueue.clear();
+      // _syncQueue.clear();
+      
+      QuizzerLogger.logSuccess('Database connection reset successfully');
+    } catch (e) {
+      QuizzerLogger.logError('Error resetting database connection: $e');
+      // Even if there's an error, clear the lock state to prevent deadlocks
+      _isLocked = false;
+      _currentLockHolder = null;
+      // Don't clear the queue on error either
+      // _priorityQueue.clear();
+      // _syncQueue.clear();
+    }
   }
 
-  /// Checks if the database is in a fresh state (only user_profile and login_attempts tables exist).
-  /// This is used to determine whether to await sync workers during login initialization.
-  /// 
-  /// Returns:
-  /// - true if database is fresh (only basic tables exist)
-  /// - false if database has additional tables (indicating previous data exists)
-  Future<bool> isDatabaseFresh() async {
+  /// Checks if the database is accessible and can perform operations
+  /// Returns true if the database is accessible, false otherwise
+  Future<bool> isDatabaseAccessible() async {
     try {
-      QuizzerLogger.logMessage('Checking if database is in fresh state...');
+      final db = await getDatabaseForMonitor();
       
-      final db = await requestDatabaseAccess();
-      if (db == null) {
-        throw Exception('Failed to acquire database access');
-      }
-      
-      // Get all table names
-      final List<Map<String, dynamic>> tables = await db.rawQuery(
-        "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' AND name != 'android_metadata'"
-      );
-      
-      final List<String> tableNames = tables.map((row) => row['name'] as String).toList();
-      QuizzerLogger.logMessage('Found tables: ${tableNames.join(', ')}');
-      
-      // Check if question_answer_pairs table exists
-      final bool hasQuestionAnswerPairs = tableNames.contains('question_answer_pairs');
-      
-      // Fresh state means only user_profile and login_attempts tables exist
-      final bool isFresh = !hasQuestionAnswerPairs;
-      
-      QuizzerLogger.logMessage('Database fresh state check: $isFresh (question_answer_pairs exists: $hasQuestionAnswerPairs)');
-      
-      return isFresh;
-      
+      // Try a simple query to test if the database is accessible
+      await db.rawQuery('SELECT 1');
+      return true;
     } catch (e) {
-      QuizzerLogger.logError('Error checking database fresh state: $e');
-      rethrow;
-    } finally {
-      releaseDatabaseAccess();
+      QuizzerLogger.logWarning('Database accessibility check failed: $e');
+      return false;
+    }
+  }
+
+  /// Private method to check if a specific database instance is accessible
+  /// Returns true if the database is accessible, false otherwise
+  Future<bool> _isDatabaseAccessible(Database db) async {
+    try {
+      // Try a simple query to test if the database is accessible
+      await db.rawQuery('SELECT 1');
+      return true;
+    } catch (e) {
+      // Check for specific database file deletion errors
+      final errorString = e.toString().toLowerCase();
+      if (errorString.contains('disk i/o error') || 
+          errorString.contains('readonly database') ||
+          errorString.contains('no such table') ||
+          errorString.contains('database is locked')) {
+        QuizzerLogger.logWarning('Database accessibility check failed - database file likely deleted or corrupted: $e');
+        return false;
+      }
+      QuizzerLogger.logWarning('Database accessibility check failed: $e');
+      return false;
+    }
+  }
+
+  /// Clears all pending database requests from both priority and sync queues
+  /// This method is used during logout to ensure no pending requests remain
+  /// that could cause issues after the database is reset
+  Future<void> clearAllQueues() async {
+    try {
+      QuizzerLogger.logMessage('Clearing all pending database request queues...');
+      
+      // Clear both queues
+      _priorityQueue.clear();
+      _syncQueue.clear();
+      
+      // Clear the lock state to ensure clean shutdown
+      _isLocked = false;
+      _currentLockHolder = null;
+      
+      QuizzerLogger.logSuccess('All database request queues cleared successfully');
+    } catch (e) {
+      QuizzerLogger.logError('Error clearing database request queues: $e');
+      // Even if there's an error, clear the lock state to prevent deadlocks
+      _isLocked = false;
+      _currentLockHolder = null;
     }
   }
 }

@@ -37,7 +37,8 @@ class _RevisionStreakScoreDisplaySettingState extends State<RevisionStreakScoreD
   }
 
   Future<void> _handleSave(bool newValue) async {
-    await _sessionManager.updateUserSetting('home_display_revision_streak_score', newValue);
+    // Fire and forget - don't await the response
+    _sessionManager.updateUserSetting('home_display_revision_streak_score', newValue);
     setState(() {
       _isEnabled = newValue;
     });

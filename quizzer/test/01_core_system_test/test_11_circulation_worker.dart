@@ -82,7 +82,9 @@ void main() {
         // Set state:
         // First, deactivate all modules
         QuizzerLogger.logMessage('Deactivating all modules...');
-        final List<Map<String, dynamic>> allModules = await getAllModules();
+        final db = getDatabaseMonitor().requestDatabaseAccess();
+        final List<Map<String, dynamic>> allModules = await getAllModules(db);
+        getDatabaseMonitor().releaseDatabaseAccess();
         for (final module in allModules) {
           final String moduleName = module['module_name'] as String;
           final bool result = await updateModuleActivationStatus(sessionManager.userId!, moduleName, false);

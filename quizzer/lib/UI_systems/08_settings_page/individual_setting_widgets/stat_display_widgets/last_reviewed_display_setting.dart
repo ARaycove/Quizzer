@@ -37,7 +37,8 @@ class _LastReviewedDisplaySettingState extends State<LastReviewedDisplaySetting>
   }
 
   Future<void> _handleSave(bool newValue) async {
-    await _sessionManager.updateUserSetting('home_display_last_reviewed', newValue);
+    // Fire and forget - don't await the response
+    _sessionManager.updateUserSetting('home_display_last_reviewed', newValue);
     setState(() {
       _isEnabled = newValue;
     });

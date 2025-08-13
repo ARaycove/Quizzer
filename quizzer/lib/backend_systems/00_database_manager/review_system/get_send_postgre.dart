@@ -15,7 +15,7 @@ import 'package:quizzer/backend_systems/session_manager/answer_validation/text_v
 const String _newReviewTable = 'question_answer_pair_new_review';
 const String _editsReviewTable = 'question_answer_pair_edits_review';
 const String _mainPairsTable = 'question_answer_pairs';
-const double _newReviewWeight = 0.7; // 70% chance to pick from new review table
+// const double _newReviewWeight = 0.7; // 70% chance to pick from new review table
 
 // --- Helper for Decoding a Full Record ---
 Map<String, dynamic> _decodeReviewRecord(Map<String, dynamic> rawRecord) {
@@ -89,7 +89,7 @@ Future<Map<String, dynamic>> getRandomQuestionToBeReviewed() async {
   // Determine which table to pull from based on weight and availability
   String selectedTable;
   int countForSelectedTable;
-  if (newCount > 0 && (editsCount == 0 || random.nextDouble() < _newReviewWeight)) {
+  if (newCount > 0) {
     selectedTable = _newReviewTable;
     countForSelectedTable = newCount;
   } else if (editsCount > 0) {

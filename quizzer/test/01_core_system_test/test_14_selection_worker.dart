@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/backend_systems/10_switch_board/switch_board.dart';
@@ -151,7 +152,10 @@ void main() {
         
         // Step 3: Get all modules and find one with enough questions
         QuizzerLogger.logMessage('Step 3: Finding module with sufficient questions...');
-        final List<Map<String, dynamic>> allModules = await getAllModules();
+        final db = getDatabaseMonitor().requestDatabaseAccess();
+        final List<Map<String, dynamic>> allModules = await getAllModules(db);
+        getDatabaseMonitor().releaseDatabaseAccess();
+
         const int threshold = QuestionQueueCache.queueThreshold;
         QuizzerLogger.logMessage('Queue threshold: $threshold');
         
@@ -247,7 +251,9 @@ void main() {
         
         // Step 3: Deactivate all modules to ensure no eligible questions
         QuizzerLogger.logMessage('Step 3: Deactivating all modules...');
-        final List<Map<String, dynamic>> allModules = await getAllModules();
+        final db = getDatabaseMonitor().requestDatabaseAccess();
+        final List<Map<String, dynamic>> allModules = await getAllModules(db);
+        getDatabaseMonitor().releaseDatabaseAccess();
         for (final module in allModules) {
           final String moduleName = module['module_name'] as String;
           await updateModuleActivationStatus(sessionManager.userId!, moduleName, false);
@@ -303,7 +309,10 @@ void main() {
         await queueCache.clear();
         
         // Activate a module and make questions eligible
-        final List<Map<String, dynamic>> allModules = await getAllModules();
+        final db = getDatabaseMonitor().requestDatabaseAccess();
+        final List<Map<String, dynamic>> allModules = await getAllModules(db);
+        getDatabaseMonitor().releaseDatabaseAccess();
+
         const int threshold = QuestionQueueCache.queueThreshold;
         int totalQuestions = 0;
         
@@ -388,7 +397,9 @@ void main() {
         await queueCache.clear();
         
         // Activate a module and make questions eligible
-        final List<Map<String, dynamic>> allModules = await getAllModules();
+        final db = getDatabaseMonitor().requestDatabaseAccess();
+        final List<Map<String, dynamic>> allModules = await getAllModules(db);
+        getDatabaseMonitor().releaseDatabaseAccess();
         const int threshold = QuestionQueueCache.queueThreshold;
         int totalQuestions = 0;
         

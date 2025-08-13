@@ -12,8 +12,7 @@ import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dar
 import 'package:supabase/supabase.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'dart:math'; // Import for max function
-// import 'dart:convert'; // ADDED for jsonDecode
-// import 'dart:io'; // ADDED for File operations
+import 'package:quizzer/backend_systems/00_helper_utils/file_locations.dart';
 
 // ==========================================
 // Helper Function to Log Current Question Details
@@ -1649,7 +1648,9 @@ Future<List<Map<String, dynamic>>> selectRandomModulesForTesting({
   
   try {
     // Get all available modules
-    final List<Map<String, dynamic>> allModules = await getAllModules();
+    final db = getDatabaseMonitor().requestDatabaseAccess();
+    final List<Map<String, dynamic>> allModules = await getAllModules(db);
+    getDatabaseMonitor().releaseDatabaseAccess();
     final random = Random();
     final int modulesToTest = allModules.length < maxModules ? allModules.length : maxModules;
     final List<Map<String, dynamic>> modulesToSelect = [];
@@ -2042,5 +2043,92 @@ List<Map<String, dynamic>> generateMockUserSettings(String userId) {
       'is_admin_setting': false,
     },
   ];
+}
+
+/// Reset local state to replicate a "fresh device"
+/// 
+/// This function performs a complete reset of the local device state by:
+/// 1. Deleting the entire QuizzerApp/sqlite directory containing the SQLite database
+/// 2. Deleting the entire QuizzerAppMedia directory containing media files and staging
+/// 3. Deleting the entire QuizzerAppHive directory containing Hive persistent data
+/// 4. Deleting the entire QuizzerAppLogs directory containing log files
+/// 
+/// This simulates a device that has never had the app installed, ensuring no
+/// cached data, user preferences, or previous session information remains.
+/// 
+/// Use this function when testing scenarios that require a completely clean
+/// local state, such as first-time app launches or device migration testing.
+Future<void> resetToFreshDevice() async {
+  QuizzerLogger.logMessage('Resetting to fresh device state...');
+  
+  try {
+    // Get all the app data paths
+    final dbPath = await getQuizzerDatabasePath();
+    final dbDir = Directory(dbPath).parent;
+    final mediaPath = await getQuizzerMediaPath();
+    final mediaDir = Directory(mediaPath).parent;
+    final hivePath = await getQuizzerHivePath();
+    final hiveDir = Directory(hivePath);
+    final logsPath = await getQuizzerLogsPath();
+    final logsDir = Directory(logsPath);
+    
+    // Delete database directory and contents
+    if (await dbDir.exists()) {
+      await dbDir.delete(recursive: true);
+      QuizzerLogger.logMessage('Database directory and contents deleted');
+    }
+    
+    // Delete media directory and contents
+    if (await mediaDir.exists()) {
+      await mediaDir.delete(recursive: true);
+      QuizzerLogger.logMessage('Media directory and contents deleted');
+    }
+    
+    // Delete Hive directory and contents
+    if (await hiveDir.exists()) {
+      await hiveDir.delete(recursive: true);
+      QuizzerLogger.logMessage('Hive directory and contents deleted');
+    }
+    
+    // Delete logs directory and contents
+    if (await logsDir.exists()) {
+      await logsDir.delete(recursive: true);
+      QuizzerLogger.logMessage('Logs directory and contents deleted');
+    }
+    
+    QuizzerLogger.logSuccess('Fresh device reset complete - all app data removed');
+  } catch (e) {
+    QuizzerLogger.logError('Error during fresh device reset: $e');
+    rethrow;
+  }
+}
+
+/// Deletes all user settings records for a given user on Supabase
+/// 
+/// This function removes all settings records from the Supabase server
+/// for the specified user, typically used for test cleanup.
+/// 
+/// Parameters:
+/// - userId: The user ID whose settings should be deleted
+/// 
+/// Throws:
+/// - Exception if the deletion operation fails
+Future<void> deleteAllUserSettingsOnSupabase(String userId) async {
+  QuizzerLogger.logMessage('Deleting all user settings on Supabase for user $userId');
+  
+  try {
+    final sessionManager = getSessionManager();
+    
+    // Delete all settings records for this user from Supabase
+    await sessionManager.supabase
+        .from('user_settings')
+        .delete()
+        .eq('user_id', userId);
+    
+    QuizzerLogger.logSuccess('Successfully deleted all user settings on Supabase for user $userId');
+  } catch (e) {
+    QuizzerLogger.logError('Error deleting user settings on Supabase: $e');
+    rethrow;
+  }
 }
 

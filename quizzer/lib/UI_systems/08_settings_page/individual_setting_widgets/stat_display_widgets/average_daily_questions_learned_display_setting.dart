@@ -37,7 +37,8 @@ class _AverageDailyQuestionsLearnedDisplaySettingState extends State<AverageDail
   }
 
   Future<void> _handleSave(bool newValue) async {
-    await _sessionManager.updateUserSetting('home_display_average_daily_questions_learned', newValue);
+    // Fire and forget - don't await the response
+    _sessionManager.updateUserSetting('home_display_average_daily_questions_learned', newValue);
     setState(() {
       _isEnabled = newValue;
     });

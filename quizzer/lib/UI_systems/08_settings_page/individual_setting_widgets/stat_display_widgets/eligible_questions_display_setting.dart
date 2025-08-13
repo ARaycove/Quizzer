@@ -37,7 +37,8 @@ class _EligibleQuestionsDisplaySettingState extends State<EligibleQuestionsDispl
   }
 
   Future<void> _handleSave(bool newValue) async {
-    await _sessionManager.updateUserSetting('home_display_eligible_questions', newValue);
+    // Fire and forget - don't await the response
+    _sessionManager.updateUserSetting('home_display_eligible_questions', newValue);
     setState(() {
       _isEnabled = newValue;
     });

@@ -37,7 +37,8 @@ class _AverageQuestionsShownPerDayDisplaySettingState extends State<AverageQuest
   }
 
   Future<void> _handleSave(bool newValue) async {
-    await _sessionManager.updateUserSetting('home_display_average_questions_shown_per_day', newValue);
+    // Fire and forget - don't await the response
+    _sessionManager.updateUserSetting('home_display_average_questions_shown_per_day', newValue);
     setState(() {
       _isEnabled = newValue;
     });

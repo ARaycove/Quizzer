@@ -46,6 +46,7 @@ class QuizzerLogger {
     "database_monitor.dart",
     "sb_sync_worker_signals.dart",
     "sb_cache_signals.dart",
+    "sb_database_signals.dart",
     "user_module_activation_status_table.dart",
     "user_stats_days_left_until_questions_exhaust_table.dart",
     "user_stats_in_circulation_questions_table.dart",

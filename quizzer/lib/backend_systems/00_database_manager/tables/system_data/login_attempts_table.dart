@@ -1,25 +1,32 @@
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_profile_table.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 
 import '../table_helper.dart'; // Import the helper file
 import 'package:quizzer/backend_systems/10_switch_board/sb_sync_worker_signals.dart'; // Import sync signals
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
 
-Future<bool> _doesLoginAttemptsTableExist(Database db) async {
+/// Verifies that all necessary columns, including sync fields, exist in the login_attempts table.
+/// Adds missing columns if the table exists but is missing them.
+Future<void> verifyLoginAttemptsTable(dynamic db) async {
   final List<Map<String, dynamic>> tables = await db.rawQuery(
     "SELECT name FROM sqlite_master WHERE type='table' AND name='login_attempts'"
   );
-  return tables.isNotEmpty;
-}
-
-/// Verifies that all necessary columns, including sync fields, exist in the login_attempts table.
-/// Adds missing columns if the table exists but is missing them.
-Future<void> _verifyLoginAttemptsTableFields(Database db) async {
-  if (!await _doesLoginAttemptsTableExist(db)) {
-    // Table doesn't exist, so createLoginAttemptsTable will handle the full schema.
-    await _createLoginAttemptsTable(db);
-    return;
+  if (tables.isEmpty) {
+    await db.execute('''
+    CREATE TABLE login_attempts(
+      login_attempt_id TEXT PRIMARY KEY,
+      user_id TEXT,
+      email TEXT NOT NULL,
+      timestamp TEXT NOT NULL,
+      status_code TEXT NOT NULL,
+      ip_address TEXT,
+      device_info TEXT,
+      has_been_synced INTEGER DEFAULT 0,
+      edits_are_synced INTEGER DEFAULT 0,
+      last_modified_timestamp TEXT,
+      FOREIGN KEY (user_id) REFERENCES user_profile(uuid)
+    )
+    ''');
   }
 
   // Table exists, check for specific columns.
@@ -41,24 +48,6 @@ Future<void> _verifyLoginAttemptsTableFields(Database db) async {
     QuizzerLogger.logMessage('Adding last_modified_timestamp column to login_attempts table.');
     await db.execute('ALTER TABLE login_attempts ADD COLUMN last_modified_timestamp TEXT');
   }
-}
-
-Future<void> _createLoginAttemptsTable(Database db) async {
-  await db.execute('''
-  CREATE TABLE login_attempts(
-    login_attempt_id TEXT PRIMARY KEY,
-    user_id TEXT,
-    email TEXT NOT NULL,
-    timestamp TEXT NOT NULL,
-    status_code TEXT NOT NULL,
-    ip_address TEXT,
-    device_info TEXT,
-    has_been_synced INTEGER DEFAULT 0,
-    edits_are_synced INTEGER DEFAULT 0,
-    last_modified_timestamp TEXT,
-    FOREIGN KEY (user_id) REFERENCES user_profile(uuid)
-  )
-  ''');
 }
 
 Future<bool> addLoginAttemptRecord({
@@ -88,10 +77,6 @@ Future<bool> addLoginAttemptRecord({
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-
-
-    // If we reach here, userId was successfully retrieved.
-    await _verifyLoginAttemptsTableFields(db); 
     
     String ipAddress = await getUserIpAddress();
     String deviceInfo = await getDeviceInfo();
@@ -147,7 +132,6 @@ Future<List<Map<String, dynamic>>> getUnsyncedLoginAttempts() async {
       throw Exception('Failed to acquire database access');
     }
     QuizzerLogger.logMessage('Fetching unsynced login attempts...');
-    await _verifyLoginAttemptsTableFields(db); // Ensure table and sync columns exist
 
     final List<Map<String, dynamic>> results = await db.query(
       'login_attempts',
@@ -175,7 +159,6 @@ Future<List<Map<String, dynamic>>> getLoginAttemptsByEmail(String email) async {
       throw Exception('Failed to acquire database access');
     }
     QuizzerLogger.logMessage('Fetching login attempts for email: $email');
-    await _verifyLoginAttemptsTableFields(db);
 
     final List<Map<String, dynamic>> results = await db.query(
       'login_attempts',

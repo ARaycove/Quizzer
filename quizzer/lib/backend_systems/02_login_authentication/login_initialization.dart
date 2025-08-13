@@ -1,3 +1,4 @@
+import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_profile_table.dart';
 import 'package:quizzer/backend_systems/02_login_authentication/user_auth.dart';
@@ -10,9 +11,11 @@ import 'package:quizzer/backend_systems/10_switch_board/sb_other_signals.dart';
 import 'package:supabase/supabase.dart';
 import 'package:hive/hive.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/stat_update_aggregator.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/outbound_sync/outbound_sync_functions.dart';
 import 'package:quizzer/backend_systems/00_helper_utils/utils.dart';
+import 'package:quizzer/backend_systems/02_login_authentication/verify_all_tables.dart';
 
 // Spin up necessary processes and get userID from local profile, effectively intialize any session specific variables that should only be brought after successful login
 Future<String?> initializeSession(Map<String, dynamic> data) async {
@@ -174,6 +177,14 @@ Future<Map<String, dynamic>> performLoginProcess({
     }
 
     // Step 6: Ensure local profile exists
+    // Make sure the table exists (only during setup and right before its first needed)
+    final db = await getDatabaseMonitor().requestDatabaseAccess();
+    // Wrap in transaction to ensure it commits
+    db!.transaction((txn) async {
+    verifyUserProfileTable(db);
+    });
+    getDatabaseMonitor().releaseDatabaseAccess();
+
     bool hasLocalProfile = false; // Track if local profile exists
     
     if (loginResult['offline_mode']) {
@@ -266,6 +277,10 @@ Future<Map<String, dynamic>> loginInitialization({
       return loginResult;
     }
 
+    // After we validate the user we will ensure that all the tables needed for Quizzer are present and in correct form:
+    SessionManager session = getSessionManager();
+    verifyAllTablesExist(session.userId);
+
     // Step 2: Check if database is fresh and handle sync workers accordingly
     if (!loginResult['offline_mode'] && !testRun) {
       signalLoginProgress("Checking your data...");
@@ -274,8 +289,6 @@ Future<Map<String, dynamic>> loginInitialization({
       // Initialize sync workers
       await initializeSyncWorkers();
       
-      // Start background sync workers
-      initializeSyncWorkers(); // Don't await - let them run in background
       QuizzerLogger.logSuccess('Sync workers started in background for existing database');
     } else {
       if (testRun) {
@@ -294,7 +307,33 @@ Future<Map<String, dynamic>> loginInitialization({
       QuizzerLogger.logMessage('Skipping question queue server initialization for test run');
     }
 
-    // Step 4: Return results
+    // Step 4: Update settings cache and stats before returning
+    if (!loginResult['offline_mode'] && !testRun) {
+      signalLoginProgress("Updating your data...");
+      QuizzerLogger.logMessage('Updating settings cache and stats before returning...');
+      
+      final sessionManager = getSessionManager();
+      
+      // DEBUG: Check user_settings table contents before getUserSettings
+      QuizzerLogger.logMessage("Get Settings BEFORE first get user settings call");
+      logUserSettingsTableContent();
+      
+      final allSettings = await sessionManager.getUserSettings(getAll: true);
+      QuizzerLogger.logMessage("When updating the cache we get these list of settings $allSettings");
+      
+      // DEBUG: Check user_settings table contents after getUserSettings
+      QuizzerLogger.logMessage("Get Settings AFTER first get user settings call");
+      logUserSettingsTableContent();
+      
+      sessionManager.setCachedUserSettings(allSettings);
+      
+      // Update stats using the stat update aggregator - this creates daily records
+      await updateAllUserDailyStats(sessionManager.userId!);
+      
+      QuizzerLogger.logSuccess('Settings cache and stats updated successfully');
+    }
+
+    // Step 5: Return results
     signalLoginProgress("Welcome back! You're all set.");
     
     QuizzerLogger.logMessage('Login initialization completed for email: $email');

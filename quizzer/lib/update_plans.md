@@ -18,14 +18,31 @@ Implementation TODO:
 - Perhaps we can figure out how to send an email out that when clicked opens a specific page on the app itself, thus the only way to access the reset user password section of the app is through the email link?
   Bug Fixes
 
-* [ ] user settings are resetting on login and on new device
+* [x] user settings are resetting on login and on new device
   * [x] removed isDatabaseFresh check and passing of parameter, fetchAll now handles timestamp for filtering as the only source of truth - did not fix the issue
+  * [x] updated outbound sync to refuse pushing default setting records
+  * [x] rewrote the ensure default settings exist function
+  * [x] rewrote the batch upsert function
+  * [x] Moving the verify function seemed to solve local reset issue, but new device not syncing persists. . .
+  * [x] Optimize table interactions by creating a central function that verifies all tables during login initialization removing the calls from each individual table file
+    * All table verification is now done ONCE during the login initialization
+  * [x] All table helpers that read or write data are updated to take in txn or db
+  * [x] Potential issue in inbound sync mechanism where update does not persist outside of the inbound sync call, solution will be to restructre the inbound sync such that
+    * [x] All calls to fetch data is done at once asynchronously (saving time)
+    * [x] all batch upserts to the tables are done together as a single transaction, ensuring everything is committed together
 * [X] some module names are not getting normalized, make sure all functions that deal with module_name normalize the moduleName
   * [X] multiple functions in modules_table.dart did not normalize, they do now
   * [X] checked if the question answer pair table was normalizing
   * [X] checked inbound sync to normalize inbound data
   * [X] checked outbound sync to normalize outbound data
 * [x] Fix update_flags review system, does not validate that the question being flagged still exists in the database
+* [x] Circulation should remove access revision score 0 questions from circulation
+* [] Latex elements left aligned with $single dollar signs$ need to have more top padding to prevent overlap
+  * Top padding of 8 was to small try 12
+* [] Matrix latex elements with fractions inside, formatted fraction elements need padding on top to prevent overlap
+* [] Latex elements that are too long need to wrap instead of being cut off at edge of screen
+
+
 
 Miscellaneous Addition
 
@@ -38,6 +55,7 @@ Miscellaneous Addition
   * [ ] font-size for everything else
     * [ ] add setting value to settings page
     * [ ] add setting value to table
+* [ ] User Setting: Shrink or Wrap options with default Wrap for math related latex. If Shrink the font size of a latex element will shrink to fit the screen, if wrap the latex element will wrap over to a new line to avoid cutting off text
 * [ ] Fix Environment variables (Credentials should be stored securely)
 
 # Tutorial Update:

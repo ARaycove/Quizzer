@@ -10,7 +10,7 @@ import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dar
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 
 /// Verifies the user_stats_average_daily_questions_learned table exists, creates if not.
-Future<void> _verifyUserStatsAverageDailyQuestionsLearnedTable(Database db) async {
+Future<void> verifyUserStatsAverageDailyQuestionsLearnedTable(dynamic db) async {
   final List<Map<String, dynamic>> tables = await db.rawQuery(
     "SELECT name FROM sqlite_master WHERE type='table' AND name='user_stats_average_daily_questions_learned'"
   );
@@ -60,7 +60,6 @@ Future<void> updateAverageDailyQuestionsLearnedStat(String userId) async {
       // Not enough data to calculate increase
       final db = await getDatabaseMonitor().requestDatabaseAccess();
       final String today = DateTime.now().toUtc().toIso8601String().substring(0, 10);
-      await _verifyUserStatsAverageDailyQuestionsLearnedTable(db!);
       
       final Map<String, dynamic> data = {
         'user_id': userId,
@@ -101,7 +100,6 @@ Future<void> updateAverageDailyQuestionsLearnedStat(String userId) async {
     
     final db = await getDatabaseMonitor().requestDatabaseAccess();
     final String today = DateTime.now().toUtc().toIso8601String().substring(0, 10);
-    await _verifyUserStatsAverageDailyQuestionsLearnedTable(db!);
 
     // Overwrite (insert or update) the record for today
     final Map<String, dynamic> data = {
@@ -130,7 +128,6 @@ Future<void> updateAverageDailyQuestionsLearnedStat(String userId) async {
 Future<List<Map<String, dynamic>>> getUserStatsAverageDailyQuestionsLearnedRecordsByUser(String userId) async {
   try {
     final db = await getDatabaseMonitor().requestDatabaseAccess();
-    await _verifyUserStatsAverageDailyQuestionsLearnedTable(db!);
     return await queryAndDecodeDatabase(
       'user_stats_average_daily_questions_learned',
       db,
@@ -148,7 +145,6 @@ Future<List<Map<String, dynamic>>> getUserStatsAverageDailyQuestionsLearnedRecor
 Future<Map<String, dynamic>> getUserStatsAverageDailyQuestionsLearnedRecordByDate(String userId, String recordDate) async {
   try {
     final db = await getDatabaseMonitor().requestDatabaseAccess();
-    await _verifyUserStatsAverageDailyQuestionsLearnedTable(db!);
     final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
       'user_stats_average_daily_questions_learned',
       db,
@@ -187,8 +183,7 @@ Future<List<Map<String, dynamic>>> getUnsyncedUserStatsAverageDailyQuestionsLear
   try {
     final db = await getDatabaseMonitor().requestDatabaseAccess();
     QuizzerLogger.logMessage('Fetching unsynced average_daily_questions_learned records for user: $userId...');
-    await _verifyUserStatsAverageDailyQuestionsLearnedTable(db!);
-    final List<Map<String, dynamic>> results = await db.query(
+    final List<Map<String, dynamic>> results = await db!.query(
       'user_stats_average_daily_questions_learned',
       where: '(has_been_synced = 0 OR edits_are_synced = 0) AND user_id = ?',
       whereArgs: [userId],
@@ -212,7 +207,6 @@ Future<void> updateUserStatsAverageDailyQuestionsLearnedSyncFlags({
   try {
     final db = await getDatabaseMonitor().requestDatabaseAccess();
     QuizzerLogger.logMessage('Updating sync flags for average_daily_questions_learned record (User: $userId, Date: $recordDate) -> Synced: $hasBeenSynced, Edits Synced: $editsAreSynced');
-    await _verifyUserStatsAverageDailyQuestionsLearnedTable(db!);
     final Map<String, dynamic> updates = {
       'has_been_synced': hasBeenSynced ? 1 : 0,
       'edits_are_synced': editsAreSynced ? 1 : 0,
@@ -238,49 +232,32 @@ Future<void> updateUserStatsAverageDailyQuestionsLearnedSyncFlags({
   }
 }
 
-Future<void> upsertUserStatsAverageDailyQuestionsLearnedFromInboundSync(Map<String, dynamic> record) async {
+Future<void> batchUpsertUserStatsAverageDailyQuestionsLearnedFromInboundSync({
+  required List<Map<String,dynamic>> userStatsAverageDailyQuestionsLearnedRecords,
+  required dynamic db
+}) async {
   try {
-    final db = await getDatabaseMonitor().requestDatabaseAccess();
-    final String? userId = record['user_id'] as String?;
-    final String? recordDate = record['record_date'] as String?;
-    final double? avgLearned = record['average_daily_questions_learned'] is int
-        ? (record['average_daily_questions_learned'] as int).toDouble()
-        : record['average_daily_questions_learned'] as double?;
-    final String? lastModifiedTimestamp = record['last_modified_timestamp'] as String?;
-
-    assert(userId != null, 'upsertUserStatsAverageDailyQuestionsLearnedFromInboundSync: user_id cannot be null. Data: $record');
-    assert(recordDate != null, 'upsertUserStatsAverageDailyQuestionsLearnedFromInboundSync: record_date cannot be null. Data: $record');
-    assert(avgLearned != null, 'upsertUserStatsAverageDailyQuestionsLearnedFromInboundSync: average_daily_questions_learned cannot be null. Data: $record');
-    assert(lastModifiedTimestamp != null, 'upsertUserStatsAverageDailyQuestionsLearnedFromInboundSync: last_modified_timestamp cannot be null. Data: $record');
-
-    await _verifyUserStatsAverageDailyQuestionsLearnedTable(db!);
-
-    final Map<String, dynamic> dataToInsertOrUpdate = {
-      'user_id': userId,
-      'record_date': recordDate,
-      'average_daily_questions_learned': avgLearned,
-      'has_been_synced': 1,
-      'edits_are_synced': 1,
-      'last_modified_timestamp': lastModifiedTimestamp,
-    };
-
-    final int rowId = await insertRawData(
-      'user_stats_average_daily_questions_learned',
-      dataToInsertOrUpdate,
-      db,
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
-
-    if (rowId > 0) {
-      QuizzerLogger.logSuccess('Successfully upserted user_stats_average_daily_questions_learned for user $userId, date $recordDate from inbound sync.');
-    } else {
-      QuizzerLogger.logWarning('upsertUserStatsAverageDailyQuestionsLearnedFromInboundSync: insertRawData with replace returned 0 for user $userId, date $recordDate. Data: $dataToInsertOrUpdate');
+    for (Map<String,dynamic> statRecord in userStatsAverageDailyQuestionsLearnedRecords) {
+      // Define the data map for insert
+      final Map<String, dynamic> dataToInsertOrUpdate = {
+        'user_id': statRecord['user_id'],
+        'record_date': statRecord['record_date'],
+        'average_daily_questions_learned': statRecord['average_daily_questions_learned'],
+        'has_been_synced': 1,
+        'edits_are_synced': 1,
+        'last_modified_timestamp': statRecord['last_modified_timestamp'],
+      };
+      // Insert the data map
+      await insertRawData(
+        'user_stats_average_daily_questions_learned',
+        dataToInsertOrUpdate,
+        db,
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
     }
   } catch (e) {
     QuizzerLogger.logError('Error upserting average daily questions learned record from inbound sync - $e');
     rethrow;
-  } finally {
-    getDatabaseMonitor().releaseDatabaseAccess();
   }
 }
 

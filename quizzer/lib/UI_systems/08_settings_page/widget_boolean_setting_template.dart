@@ -20,7 +20,6 @@ class WidgetBooleanSettingTemplate extends StatefulWidget {
 
 class _WidgetBooleanSettingTemplateState extends State<WidgetBooleanSettingTemplate> {
   late bool _currentValue;
-  bool _isLoading = false;
 
   @override
   void initState() {
@@ -39,24 +38,23 @@ class _WidgetBooleanSettingTemplateState extends State<WidgetBooleanSettingTempl
   Future<void> _handleToggle(bool? newValue) async {
     if (newValue == null || newValue == _currentValue) return;
     
+    // Update UI immediately for instant feedback
     setState(() {
-      _isLoading = true;
+      _currentValue = newValue;
     });
     
+    // Handle the save operation in the background
     try {
       await widget.onSave(newValue);
-      setState(() {
-        _currentValue = newValue;
-        _isLoading = false;
-      });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('${widget.displayName} updated successfully.')),
         );
       }
     } catch (e) {
+      // Revert on failure
       setState(() {
-        _isLoading = false;
+        _currentValue = !newValue;
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -74,13 +72,10 @@ class _WidgetBooleanSettingTemplateState extends State<WidgetBooleanSettingTempl
           Expanded(
             child: Text(widget.displayName),
           ),
-          if (_isLoading)
-            const CircularProgressIndicator()
-          else
-            Checkbox(
-              value: _currentValue,
-              onChanged: _handleToggle,
-            ),
+          Checkbox(
+            value: _currentValue,
+            onChanged: _handleToggle,
+          ),
         ],
       ),
     );

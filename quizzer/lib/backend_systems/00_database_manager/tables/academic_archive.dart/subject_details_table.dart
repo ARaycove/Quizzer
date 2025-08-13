@@ -49,7 +49,6 @@ Future<void> insertSubjectDetail({
       throw Exception('Failed to acquire database access');
     }
     QuizzerLogger.logMessage('Inserting new subject detail: $subject');
-    await verifySubjectDetailsTable(db);
     
     // Prepare the raw data map
     final Map<String, dynamic> data = {
@@ -95,7 +94,6 @@ Future<void> updateSubjectDetail({
       throw Exception('Failed to acquire database access');
     }
     QuizzerLogger.logMessage('Updating subject detail: $subject');
-    await verifySubjectDetailsTable(db);
     final updates = <String, dynamic>{};
     
     // Handle subject name change if provided
@@ -151,7 +149,6 @@ Future<Map<String, dynamic>?> getSubjectDetail(String subject) async {
       throw Exception('Failed to acquire database access');
     }
     QuizzerLogger.logMessage('Fetching subject detail: $subject');
-    await verifySubjectDetailsTable(db);
     
     // Use the universal query helper
     final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
@@ -198,7 +195,6 @@ Future<List<Map<String, dynamic>>> getAllSubjectDetails() async {
       throw Exception('Failed to acquire database access');
     }
     QuizzerLogger.logMessage('Fetching all subject details');
-    await verifySubjectDetailsTable(db);
     
     // Use the universal query helper
     final List<Map<String, dynamic>> decodedSubjectDetails = await queryAndDecodeDatabase(
@@ -225,7 +221,6 @@ Future<List<Map<String, dynamic>>> getUnsyncedSubjectDetails() async {
       throw Exception('Failed to acquire database access');
     }
     QuizzerLogger.logMessage('Fetching unsynced subject details');
-    await verifySubjectDetailsTable(db);
     
     // Use the universal query helper to get subject details that need syncing
     final List<Map<String, dynamic>> unsyncedSubjectDetails = await queryAndDecodeDatabase(
@@ -257,8 +252,7 @@ Future<void> updateSubjectDetailSyncFlags({
       throw Exception('Failed to acquire database access');
     }
     QuizzerLogger.logMessage('Updating sync flags for subject detail: $subject');
-    await verifySubjectDetailsTable(db);
-    
+
     final updates = {
       'has_been_synced': hasBeenSynced ? 1 : 0,
       'edits_are_synced': editsAreSynced ? 1 : 0,
@@ -299,8 +293,6 @@ Future<void> upsertSubjectDetailFromInboundSync({
     }
     QuizzerLogger.logMessage('Upserting subject detail $subject from inbound sync...');
 
-    await verifySubjectDetailsTable(db);
-
     // Prepare the data map with only the fields we store in Supabase
     final Map<String, dynamic> data = {
       'subject': subject,
@@ -335,7 +327,6 @@ Future<void> deleteSubjectDetail(String subject) async {
       throw Exception('Failed to acquire database access');
     }
     QuizzerLogger.logMessage('Deleting subject detail: $subject');
-    await verifySubjectDetailsTable(db);
     
     final int result = await db.delete(
       subjectDetailsTableName,
@@ -364,7 +355,6 @@ Future<List<Map<String, dynamic>>> getSubjectDetailsByParent(String parentSubjec
       throw Exception('Failed to acquire database access');
     }
     QuizzerLogger.logMessage('Fetching subject details with parent: $parentSubject');
-    await verifySubjectDetailsTable(db);
     
     // Use the universal query helper
     final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
@@ -392,7 +382,6 @@ Future<List<Map<String, dynamic>>> getRootSubjects() async {
       throw Exception('Failed to acquire database access');
     }
     QuizzerLogger.logMessage('Fetching root subjects (no immediate parent)');
-    await verifySubjectDetailsTable(db);
     
     // Use the universal query helper
     final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
@@ -421,7 +410,6 @@ Future<String?> getMostRecentSubjectDetailTimestamp() async {
       throw Exception('Failed to acquire database access');
     }
     QuizzerLogger.logMessage('Fetching most recent subject_detail timestamp');
-    await verifySubjectDetailsTable(db);
     
     final List<Map<String, dynamic>> results = await db.rawQuery(
       'SELECT last_modified_timestamp FROM $subjectDetailsTableName WHERE last_modified_timestamp IS NOT NULL ORDER BY last_modified_timestamp DESC LIMIT 1'
@@ -443,19 +431,15 @@ Future<String?> getMostRecentSubjectDetailTimestamp() async {
   }
 }
 
-/// True batch upsert for subject_details using a single SQL statement
+/// batch upsert for subject_details using a single SQL statement
 Future<void> batchUpsertSubjectDetails({
-  required List<Map<String, dynamic>> records,
+  required List<Map<String, dynamic>> subjectDetailRecords,
+  required dynamic db,
   int chunkSize = 500,
 }) async {
   try {
-    final db = await getDatabaseMonitor().requestDatabaseAccess();
-    if (db == null) {
-      throw Exception('Failed to acquire database access');
-    }
-    if (records.isEmpty) return;
-    QuizzerLogger.logMessage('Starting TRUE batch upsert for subject_details: \\${records.length} records');
-    await verifySubjectDetailsTable(db);
+    if (subjectDetailRecords.isEmpty) return;
+    QuizzerLogger.logMessage('Starting batch upsert for subject_details: \\${subjectDetailRecords.length} records');
 
     // List of all columns in the table
     final columns = [
@@ -470,8 +454,8 @@ Future<void> batchUpsertSubjectDetails({
     // Helper to get value or null/default
     dynamic getVal(Map<String, dynamic> r, String k, dynamic def) => r[k] ?? def;
 
-    for (int i = 0; i < records.length; i += chunkSize) {
-      final batch = records.sublist(i, i + chunkSize > records.length ? records.length : i + chunkSize);
+    for (int i = 0; i < subjectDetailRecords.length; i += chunkSize) {
+      final batch = subjectDetailRecords.sublist(i, i + chunkSize > subjectDetailRecords.length ? subjectDetailRecords.length : i + chunkSize);
       final values = <dynamic>[];
       final valuePlaceholders = batch.map((r) {
         for (final col in columns) {
@@ -489,8 +473,6 @@ Future<void> batchUpsertSubjectDetails({
   } catch (e) {
     QuizzerLogger.logError('Error batch upserting subject details - $e');
     rethrow;
-  } finally {
-    getDatabaseMonitor().releaseDatabaseAccess();
   }
 }
 

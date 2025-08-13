@@ -6,7 +6,7 @@ import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dar
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_question_answer_pairs_table.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 
-Future<void> _verifyUserStatsRevisionStreakSumTable(Database db) async {
+Future<void> verifyUserStatsRevisionStreakSumTable(dynamic db) async {
   QuizzerLogger.logMessage('user_stats_revision_streak_sum_table: Starting table verification...');
   QuizzerLogger.logMessage('user_stats_revision_streak_sum_table: About to query sqlite_master for table existence...');
   final List<Map<String, dynamic>> tables = await db.rawQuery(
@@ -74,10 +74,9 @@ Future<void> updateRevisionStreakSumStat(String userId) async {
     
     final db = await getDatabaseMonitor().requestDatabaseAccess();
     final String today = DateTime.now().toUtc().toIso8601String().substring(0, 10);
-    await _verifyUserStatsRevisionStreakSumTable(db!);
     
     // Delete existing records for today
-    await db.delete(
+    await db!.delete(
       'user_stats_revision_streak_sum',
       where: 'user_id = ? AND record_date = ?',
       whereArgs: [userId, today],
@@ -123,7 +122,6 @@ Future<List<Map<String, dynamic>>> getUserStatsRevisionStreakSumRecordsByUser(St
     }
     QuizzerLogger.logMessage('user_stats_revision_streak_sum_table: Starting getUserStatsRevisionStreakSumRecordsByUser for user $userId');
     QuizzerLogger.logMessage('user_stats_revision_streak_sum_table: About to call verifyUserStatsRevisionStreakSumTable...');
-    await _verifyUserStatsRevisionStreakSumTable(db);
     QuizzerLogger.logMessage('user_stats_revision_streak_sum_table: Table verification completed, calling queryAndDecodeDatabase...');
     final result = await queryAndDecodeDatabase(
       'user_stats_revision_streak_sum',
@@ -149,7 +147,6 @@ Future<List<Map<String, dynamic>>> getUserStatsRevisionStreakSumRecordsByDate(St
     }
     QuizzerLogger.logMessage('user_stats_revision_streak_sum_table: Starting getUserStatsRevisionStreakSumRecordsByDate for user $userId, date $recordDate');
     QuizzerLogger.logMessage('user_stats_revision_streak_sum_table: About to call verifyUserStatsRevisionStreakSumTable...');
-    await _verifyUserStatsRevisionStreakSumTable(db);
     QuizzerLogger.logMessage('user_stats_revision_streak_sum_table: Table verification completed, calling queryAndDecodeDatabase...');
     final result = await queryAndDecodeDatabase(
       'user_stats_revision_streak_sum',
@@ -183,7 +180,6 @@ Future<List<Map<String, dynamic>>> getUnsyncedUserStatsRevisionStreakSumRecords(
       throw Exception('Failed to acquire database access');
     }
     QuizzerLogger.logMessage('Fetching unsynced revision streak sum records for user: $userId...');
-    await _verifyUserStatsRevisionStreakSumTable(db);
     final List<Map<String, dynamic>> results = await db.query(
       'user_stats_revision_streak_sum',
       where: '(has_been_synced = 0 OR edits_are_synced = 0) AND user_id = ?',
@@ -212,7 +208,6 @@ Future<void> updateUserStatsRevisionStreakSumSyncFlags({
       throw Exception('Failed to acquire database access');
     }
     QuizzerLogger.logMessage('Updating sync flags for revision streak sum record (User: $userId, Date: $recordDate, Streak: $revisionStreakScore) -> Synced: $hasBeenSynced, Edits Synced: $editsAreSynced');
-    await _verifyUserStatsRevisionStreakSumTable(db);
     final Map<String, dynamic> updates = {
       'has_been_synced': hasBeenSynced ? 1 : 0,
       'edits_are_synced': editsAreSynced ? 1 : 0,
@@ -238,53 +233,32 @@ Future<void> updateUserStatsRevisionStreakSumSyncFlags({
   }
 }
 
-Future<void> upsertUserStatsRevisionStreakSumFromInboundSync(Map<String, dynamic> record) async {
+Future<void> batchUpsertUserStatsRevisionStreakSumFromInboundSync({
+  required List<Map<String, dynamic>> userStatsRevisionStreakSumRecords,
+  required dynamic db
+}) async {
   try {
-    final db = await getDatabaseMonitor().requestDatabaseAccess();
-    if (db == null) {
-      throw Exception('Failed to acquire database access');
-    }
-    
-    final String? userId = record['user_id'] as String?;
-    final String? recordDate = record['record_date'] as String?;
-    final int? revisionStreakScore = record['revision_streak_score'] as int?;
-    final int? questionCount = record['question_count'] as int?;
-    final String? lastModifiedTimestamp = record['last_modified_timestamp'] as String?;
-
-    assert(userId != null, 'upsertUserStatsRevisionStreakSumFromInboundSync: user_id cannot be null. Data: $record');
-    assert(recordDate != null, 'upsertUserStatsRevisionStreakSumFromInboundSync: record_date cannot be null. Data: $record');
-    assert(revisionStreakScore != null, 'upsertUserStatsRevisionStreakSumFromInboundSync: revision_streak_score cannot be null. Data: $record');
-    assert(questionCount != null, 'upsertUserStatsRevisionStreakSumFromInboundSync: question_count cannot be null. Data: $record');
-    assert(lastModifiedTimestamp != null, 'upsertUserStatsRevisionStreakSumFromInboundSync: last_modified_timestamp cannot be null. Data: $record');
-
-    await _verifyUserStatsRevisionStreakSumTable(db);
-
-    final Map<String, dynamic> dataToInsertOrUpdate = {
-      'user_id': userId,
-      'record_date': recordDate,
-      'revision_streak_score': revisionStreakScore,
-      'question_count': questionCount,
-      'has_been_synced': 1,
-      'edits_are_synced': 1,
-      'last_modified_timestamp': lastModifiedTimestamp,
-    };
-
-    final int rowId = await insertRawData(
-      'user_stats_revision_streak_sum',
-      dataToInsertOrUpdate,
-      db,
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
-
-    if (rowId > 0) {
-      QuizzerLogger.logSuccess('Successfully upserted user_stats_revision_streak_sum for user $userId, date $recordDate, streak $revisionStreakScore from inbound sync.');
-    } else {
-      QuizzerLogger.logWarning('upsertUserStatsRevisionStreakSumFromInboundSync: insertRawData with replace returned 0 for user $userId, date $recordDate, streak $revisionStreakScore. Data: $dataToInsertOrUpdate');
+    for (Map<String, dynamic> statRecord in userStatsRevisionStreakSumRecords) {
+      //Define the data map for insert
+      final Map<String, dynamic> dataToInsertOrUpdate = {
+        'user_id': statRecord['user_id'],
+        'record_date': statRecord['record_date'],
+        'revision_streak_score': statRecord['revision_streak_score'],
+        'question_count': statRecord['question_count'],
+        'has_been_synced': 1,
+        'edits_are_synced': 1,
+        'last_modified_timestamp': statRecord['last_modified_timestamp'],
+      };
+      // then insert it
+      await insertRawData(
+        'user_stats_revision_streak_sum',
+        dataToInsertOrUpdate,
+        db,
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
     }
   } catch (e) {
     QuizzerLogger.logError('Error upserting user_stats_revision_streak_sum from inbound sync - $e');
     rethrow;
-  } finally {
-    getDatabaseMonitor().releaseDatabaseAccess();
   }
 }

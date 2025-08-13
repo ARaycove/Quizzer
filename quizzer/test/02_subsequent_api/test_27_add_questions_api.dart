@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/backend_systems/02_login_authentication/login_initialization.dart';
@@ -147,7 +148,10 @@ void main() {
       
       // Step 6: Verify module was created
       QuizzerLogger.logMessage('Step 6: Verifying module was created...');
-      final List<Map<String, dynamic>> modulesAfterAdd = await getAllModules();
+      final db = getDatabaseMonitor().requestDatabaseAccess();
+      final List<Map<String, dynamic>> modulesAfterAdd = await getAllModules(db);
+      getDatabaseMonitor().releaseDatabaseAccess();
+
       final int moduleCount = modulesAfterAdd.length;
       expect(moduleCount, equals(1), reason: 'Should have exactly 1 module after adding questions');
       
@@ -243,7 +247,10 @@ void main() {
       
       // Step 6: Verify module was created
       QuizzerLogger.logMessage('Step 6: Verifying module was created...');
-      final List<Map<String, dynamic>> modulesAfterAdd = await getAllModules();
+      final db = getDatabaseMonitor().requestDatabaseAccess();
+      final List<Map<String, dynamic>> modulesAfterAdd = await getAllModules(db);
+      getDatabaseMonitor().releaseDatabaseAccess();
+
       final int moduleCount = modulesAfterAdd.length;
       expect(moduleCount, equals(1), reason: 'Should have exactly 1 module after adding questions');
       
@@ -339,7 +346,10 @@ void main() {
       
       // Step 6: Verify module was created
       QuizzerLogger.logMessage('Step 6: Verifying module was created...');
-      final List<Map<String, dynamic>> modulesAfterAdd = await getAllModules();
+      final db = getDatabaseMonitor().requestDatabaseAccess();
+      final List<Map<String, dynamic>> modulesAfterAdd = await getAllModules(db);
+      getDatabaseMonitor().releaseDatabaseAccess();
+
       final int moduleCount = modulesAfterAdd.length;
       expect(moduleCount, equals(1), reason: 'Should have exactly 1 module after adding questions');
       
@@ -434,7 +444,10 @@ void main() {
       
       // Step 6: Verify module was created
       QuizzerLogger.logMessage('Step 6: Verifying module was created...');
-      final List<Map<String, dynamic>> modulesAfterAdd = await getAllModules();
+      final db = getDatabaseMonitor().requestDatabaseAccess();
+      final List<Map<String, dynamic>> modulesAfterAdd = await getAllModules(db);
+      getDatabaseMonitor().releaseDatabaseAccess();
+
       final int moduleCount = modulesAfterAdd.length;
       expect(moduleCount, equals(1), reason: 'Should have exactly 1 module after adding questions');
       
@@ -528,7 +541,10 @@ void main() {
       
       // Step 6: Verify module was created
       QuizzerLogger.logMessage('Step 6: Verifying module was created...');
-      final List<Map<String, dynamic>> modulesAfterAdd = await getAllModules();
+      final db = getDatabaseMonitor().requestDatabaseAccess();
+      final List<Map<String, dynamic>> modulesAfterAdd = await getAllModules(db);
+      getDatabaseMonitor().requestDatabaseAccess();
+
       final int moduleCount = modulesAfterAdd.length;
       expect(moduleCount, equals(1), reason: 'Should have exactly 1 module after adding questions');
       
@@ -549,7 +565,10 @@ void main() {
       
       // Get final counts
       final List<Map<String, dynamic>> finalQuestions = await getAllQuestionAnswerPairs();
-      final List<Map<String, dynamic>> finalModules = await getAllModules();
+      final db = getDatabaseMonitor().requestDatabaseAccess();
+      final List<Map<String, dynamic>> finalModules = await getAllModules(db);
+      getDatabaseMonitor().releaseDatabaseAccess();
+
       final int finalQuestionCount = finalQuestions.length;
       final int finalModuleCount = finalModules.length;
       
@@ -612,7 +631,9 @@ void main() {
       // Step 2: Get current counts after clearing (should be 0)
       QuizzerLogger.logMessage('Step 2: Getting current counts after clearing...');
       final List<Map<String, dynamic>> questionsBeforeBulk = await getAllQuestionAnswerPairs();
-      final List<Map<String, dynamic>> modulesBeforeBulk = await getAllModules();
+      final db = getDatabaseMonitor().requestDatabaseAccess();
+      final List<Map<String, dynamic>> modulesBeforeBulk = await getAllModules(db);
+      getDatabaseMonitor().releaseDatabaseAccess();
       final int questionsBeforeCount = questionsBeforeBulk.length;
       final int modulesBeforeCount = modulesBeforeBulk.length;
       QuizzerLogger.logMessage('Questions before bulk: $questionsBeforeCount');
@@ -733,7 +754,9 @@ void main() {
       // Step 6: Verify all questions were added
       QuizzerLogger.logMessage('Step 6: Verifying all questions were added...');
       final List<Map<String, dynamic>> questionsAfterBulk = await getAllQuestionAnswerPairs();
-      final List<Map<String, dynamic>> modulesAfterBulk = await getAllModules();
+      final db2 = getDatabaseMonitor().requestDatabaseAccess();
+      final List<Map<String, dynamic>> modulesAfterBulk = await getAllModules(db2);
+      getDatabaseMonitor().releaseDatabaseAccess();
       final int questionsAfterCount = questionsAfterBulk.length;
       final int modulesAfterCount = modulesAfterBulk.length;
       // Log all module names to see what they are
@@ -796,7 +819,9 @@ void main() {
       
       // Get final counts
       final List<Map<String, dynamic>> finalQuestions = await getAllQuestionAnswerPairs();
-      final List<Map<String, dynamic>> finalModules = await getAllModules();
+      final db = getDatabaseMonitor().requestDatabaseAccess();
+      final List<Map<String, dynamic>> finalModules = await getAllModules(db);
+      getDatabaseMonitor().releaseDatabaseAccess();
       final int finalQuestionCount = finalQuestions.length;
       final int finalModuleCount = finalModules.length;
       

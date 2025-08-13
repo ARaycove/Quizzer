@@ -13,11 +13,8 @@ Future<String> getUserIdByEmail(String emailAddress) async {
   try {
     QuizzerLogger.logMessage('Getting user ID for email: $emailAddress');
     final db = await getDatabaseMonitor().requestDatabaseAccess();
-    await _verifyUserProfileTable(db!);
-    // First verify the table exists
-    
     // Query might fail if table doesn't exist yet, let it crash (Fail Fast)
-    final List<Map<String, dynamic>> result = await db.query(
+    final List<Map<String, dynamic>> result = await db!.query(
         'user_profile',
         columns: ['uuid'],
         where: 'email = ?',
@@ -45,10 +42,6 @@ Future<bool> createNewUserProfile(String email, String username) async {
   try {
     QuizzerLogger.logMessage('Creating new user profile for email: $email, username: $username');
     final db = await getDatabaseMonitor().requestDatabaseAccess();
-    await _verifyUserProfileTable(db!);
-    
-    // First verify that the User Profile Table exists
-    
 
     // Send data to authentication service to store password field with auth service
     QuizzerLogger.logSuccess('User registered with Supabase');
@@ -71,7 +64,7 @@ Future<bool> createNewUserProfile(String email, String username) async {
     
     // Insert the new user profile with minimal required fields
     // If db.insert fails, it should throw an exception (Fail Fast)
-    await db.insert('user_profile', {
+    await db!.insert('user_profile', {
       'uuid': userUUID,
       'email': email,
       'username': username,
@@ -109,7 +102,7 @@ String generateUserUUID() {
 /// Verifies that the User Profile Table exists in the database
 /// Creates the table if it doesn't exist based on the schema in documentation
 /// Private function that requires a database parameter to avoid race conditions
-Future<void> _verifyUserProfileTable(Database db) async {
+Future<void> verifyUserProfileTable(dynamic db) async {
   try {
     QuizzerLogger.logMessage('Verifying user profile table existence');
     
@@ -221,7 +214,6 @@ Future<bool> updateLastLogin(String userId) async {
   try {
     QuizzerLogger.logMessage('Updating last login for userId: $userId');
     final db = await getDatabaseMonitor().requestDatabaseAccess();
-    await _verifyUserProfileTable(db!);
     
     final String nowTimestamp = DateTime.now().toUtc().toIso8601String();
     final String lastLoginTimestamp = DateTime.now().subtract(const Duration(minutes: 1)).toUtc().toIso8601String();
@@ -255,7 +247,6 @@ Future<Map<String, bool>> getModuleActivationStatus(String userId) async {
   try {
     
     final db = await getDatabaseMonitor().requestDatabaseAccess();
-    await _verifyUserProfileTable(db!);
     
     final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
       'user_profile',
@@ -311,9 +302,8 @@ Future<Map<String, int>> getUserSubjectInterests(String userId) async {
     final Set<String> allSubjects = {'misc'}; // Default subject for handling questions without subjects
     
     final db = await getDatabaseMonitor().requestDatabaseAccess();
-    await _verifyUserProfileTable(db!);
     // Query for the user's interest data column
-    final List<Map<String, dynamic>> result = await db.query(
+    final List<Map<String, dynamic>> result = await db!.query(
       'user_profile',
       columns: ['interest_data'],
       where: 'uuid = ?',
@@ -442,10 +432,9 @@ Future<List<String>> getAllUserEmails() async {
     QuizzerLogger.logMessage('Fetching all emails from user_profile table.');
     // Ensure table exists (Fail Fast if verifyUserProfileTable fails)
     final db = await getDatabaseMonitor().requestDatabaseAccess();
-    await _verifyUserProfileTable(db!);
     // Query the database for the email column
     // If query fails (e.g., table structure wrong), let it crash (Fail Fast)
-    final List<Map<String, dynamic>> results = await db.query(
+    final List<Map<String, dynamic>> results = await db!.query(
       'user_profile',
       columns: ['email'],
     );
@@ -478,8 +467,7 @@ Future<List<Map<String, dynamic>>> getUnsyncedUserProfiles(String userId) async 
   try {
     QuizzerLogger.logMessage('Fetching unsynced user profile for user ID: $userId...');
     final db = await getDatabaseMonitor().requestDatabaseAccess();
-    await _verifyUserProfileTable(db!);
-    final List<Map<String, dynamic>> results = await db.query(
+    final List<Map<String, dynamic>> results = await db!.query(
       'user_profile',
       where: '(has_been_synced = 0 OR edits_are_synced = 0) AND uuid = ?',
       whereArgs: [userId], // Use the passed userId parameter
@@ -507,7 +495,6 @@ Future<void> updateUserProfileSyncFlags({
   try {
     QuizzerLogger.logMessage('Updating sync flags for User Profile: $userId -> Synced: $hasBeenSynced, Edits Synced: $editsAreSynced');
     final db = await getDatabaseMonitor().requestDatabaseAccess();
-    await _verifyUserProfileTable(db!);
     final Map<String, dynamic> updates = {
       'has_been_synced': hasBeenSynced ? 1 : 0,
       'edits_are_synced': editsAreSynced ? 1 : 0,
@@ -576,86 +563,63 @@ Future<String?> getLastModifiedTimestampForUser(String userId) async {
 
 /// Inserts a new user profile or updates an existing one from data fetched from the cloud.
 /// Sets sync flags to indicate the record is synced and edits are synced.
-Future<void> upsertUserProfileFromInboundSync(Map<String, dynamic> profileData) async {
+Future<void> upsertUserProfileFromInboundSync({
+  required List<Map<String, dynamic>> profileDataList,
+  required dynamic db,
+}) async {
   try {
-    // Ensure all required fields are present in the incoming data
-    final String? userId = profileData['uuid'] as String?;
-    final String? email = profileData['email'] as String?;
-    final String? username = profileData['username'] as String?;
-    final String? lastModifiedTimestamp = profileData['last_modified_timestamp'] as String?;
-
-    assert(userId != null, 'upsertUserProfileFromInboundSync: uuid cannot be null. Data: $profileData');
-    assert(email != null, 'upsertUserProfileFromInboundSync: email cannot be null. Data: $profileData');
-    assert(username != null, 'upsertUserProfileFromInboundSync: username cannot be null. Data: $profileData');
-    assert(lastModifiedTimestamp != null, 'upsertUserProfileFromInboundSync: last_modified_timestamp cannot be null. Data: $profileData');
-
-    final db = await getDatabaseMonitor().requestDatabaseAccess();
-    if (db == null) {
-      throw Exception('Failed to acquire database access');
-    }
-    
-    // Ensure the table exists
-    await _verifyUserProfileTable(db);
+    if (profileDataList.isEmpty) return;
+    // should only be one profile per user, so grab the first one if the list isn't empty
+    Map<String, dynamic> profileData = profileDataList[0];
 
     final Map<String, dynamic> dataToInsertOrUpdate = {
-      'uuid': userId,
-      'email': email,
-      'username': username,
-      'role': profileData['role'],
-      'account_status': profileData['account_status'],
-      'account_creation_date': profileData['account_creation_date'],
-      'last_login': profileData['last_login'],
-      'profile_picture': profileData['profile_picture'],
-      'birth_date': profileData['birth_date'],
-      'address': profileData['address'],
-      'job_title': profileData['job_title'],
-      'education_level': profileData['education_level'],
-      'specialization': profileData['specialization'],
-      'teaching_experience': profileData['teaching_experience'],
-      'primary_language': profileData['primary_language'],
-      'secondary_languages': profileData['secondary_languages'],
-      'study_schedule': profileData['study_schedule'],
-      'social_links': profileData['social_links'],
-      'achievement_sharing': profileData['achievement_sharing'],
-      'interest_data': profileData['interest_data'],
-      'settings': profileData['settings'],
+      'uuid':                     profileData['uuid'],
+      'email':                    profileData['email'],
+      'username':                 profileData['username'],
+      'role':                     profileData['role'],
+      'account_status':           profileData['account_status'],
+      'account_creation_date':    profileData['account_creation_date'],
+      'last_login':               profileData['last_login'],
+      'profile_picture':          profileData['profile_picture'],
+      'birth_date':               profileData['birth_date'],
+      'address':                  profileData['address'],
+      'job_title':                profileData['job_title'],
+      'education_level':          profileData['education_level'],
+      'specialization':           profileData['specialization'],
+      'teaching_experience':      profileData['teaching_experience'],
+      'primary_language':         profileData['primary_language'],
+      'secondary_languages':      profileData['secondary_languages'],
+      'study_schedule':           profileData['study_schedule'],
+      'social_links':             profileData['social_links'],
+      'achievement_sharing':      profileData['achievement_sharing'],
+      'interest_data':            profileData['interest_data'],
+      'settings':                 profileData['settings'],
       'notification_preferences': profileData['notification_preferences'],
-      'learning_streak': profileData['learning_streak'],
-      'total_study_time': profileData['total_study_time'],
+      'learning_streak':          profileData['learning_streak'],
+      'total_study_time':         profileData['total_study_time'],
       'total_questions_answered': profileData['total_questions_answered'],
-      'average_session_length': profileData['average_session_length'],
-      'peak_cognitive_hours': profileData['peak_cognitive_hours'],
-      'health_data': profileData['health_data'],
-      'recall_accuracy_trends': profileData['recall_accuracy_trends'],
-      'content_portfolio': profileData['content_portfolio'],
-      'activation_status_of_modules': profileData['activation_status_of_modules'],
-      'completion_status_of_modules': profileData['completion_status_of_modules'],
-      'tutorial_progress': profileData['tutorial_progress'],
+      'average_session_length':   profileData['average_session_length'],
+      'peak_cognitive_hours':     profileData['peak_cognitive_hours'],
+      'health_data':              profileData['health_data'],
+      'recall_accuracy_trends':   profileData['recall_accuracy_trends'],
+      'content_portfolio':        profileData['content_portfolio'],
+      'tutorial_progress':        profileData['tutorial_progress'],
       'has_been_synced': 1, // Mark as synced from cloud
       'edits_are_synced': 1, // Mark edits as synced (as it's from cloud)
-      'last_modified_timestamp': lastModifiedTimestamp,
+      'last_modified_timestamp':  profileData['last_modified_timestamp'],
     };
 
     // Use ConflictAlgorithm.replace to handle both insert and update scenarios.
     // The primary key is uuid.
-    final int rowId = await insertRawData(
+    await insertRawData(
       'user_profile',
       dataToInsertOrUpdate,
       db,
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
-
-    if (rowId > 0) {
-      QuizzerLogger.logSuccess('Successfully inserted/updated user profile for user $userId from cloud.');
-    } else {
-      // This case should ideally not happen with ConflictAlgorithm.replace unless there's a deeper issue.
-      QuizzerLogger.logWarning('upsertUserProfileFromInboundSync: insertRawData with replace returned 0 for user $userId. Data: $dataToInsertOrUpdate');
-    }
   } catch (e) {
     QuizzerLogger.logError('Error upserting user profile from inbound sync - $e');
     rethrow;
-  } finally {
-    getDatabaseMonitor().releaseDatabaseAccess();
   }
 }
 
@@ -682,8 +646,16 @@ Future<void> fetchAndInsertUserProfileFromSupabase(String email) async {
     final Map<String, dynamic> profileData = Map<String, dynamic>.from(results.first);
     QuizzerLogger.logSuccess('Successfully fetched user profile from Supabase for email: $email');
     
+    // Ensure last_modified_timestamp is not null by setting it to current time if it's null
+    if (profileData['last_modified_timestamp'] == null) {
+      QuizzerLogger.logMessage('Supabase profile has null last_modified_timestamp, setting to current time');
+      profileData['last_modified_timestamp'] = DateTime.now().toIso8601String();
+    }
+    
     // Insert the profile into local database using the existing upsert function
-    await upsertUserProfileFromInboundSync(profileData);
+    final db = await getDatabaseMonitor().requestDatabaseAccess();
+    await upsertUserProfileFromInboundSync(profileDataList: [profileData], db: db);
+    getDatabaseMonitor().releaseDatabaseAccess();
     
     QuizzerLogger.logSuccess('Successfully inserted user profile from Supabase for email: $email');
   } catch (e) {
@@ -694,8 +666,7 @@ Future<void> fetchAndInsertUserProfileFromSupabase(String email) async {
 
 Future<Map<String, dynamic>?> getUserProfileByEmail(String email) async {
   final db = await getDatabaseMonitor().requestDatabaseAccess();
-  await _verifyUserProfileTable(db!);
-  final List<Map<String, dynamic>> result = await db.query(
+  final List<Map<String, dynamic>> result = await db!.query(
     'user_profile',
     where: 'email = ?',
     whereArgs: [email],

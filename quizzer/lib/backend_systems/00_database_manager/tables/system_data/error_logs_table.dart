@@ -61,7 +61,7 @@ Future<String> _readLogFileContent() async {
 }
 
 /// Verifies the existence and schema of the error_logs table.
-Future<void> _verifyErrorLogsTable(Database db) async {
+Future<void> verifyErrorLogsTable(dynamic db) async {
   QuizzerLogger.logMessage('Verifying $_errorLogsTableName table...');
   final List<Map<String, dynamic>> tables = await db.rawQuery(
     "SELECT name FROM sqlite_master WHERE type='table' AND name='$_errorLogsTableName'"
@@ -138,7 +138,6 @@ Future<String> addErrorLog({
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    await _verifyErrorLogsTable(db);
     const uuid = Uuid();
     final String newId = uuid.v4();
     final String now = DateTime.now().toUtc().toIso8601String();
@@ -204,7 +203,6 @@ Future<int> updateErrorLog({
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    await _verifyErrorLogsTable(db);
     final String now = DateTime.now().toUtc().toIso8601String();
 
     final Map<String, dynamic> updates = {};
@@ -270,8 +268,6 @@ Future<String> upsertErrorLog({
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    await _verifyErrorLogsTable(db);
-
     String currentId = id ?? const Uuid().v4();
     bool recordExists = false;
 
@@ -319,8 +315,6 @@ Future<List<Map<String, dynamic>>> getUnsyncedErrorLogs() async {
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    await _verifyErrorLogsTable(db);
-    
     QuizzerLogger.logMessage('Fetching unsynced error logs (older than 1 hour) from $_errorLogsTableName...');
     
     // Use table helper function for proper querying and decoding
@@ -446,7 +440,6 @@ Future<int> deleteLocalErrorLog(String id) async {
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    await _verifyErrorLogsTable(db);
     QuizzerLogger.logMessage('Deleting local error log with id: $id from $_errorLogsTableName');
     
     final int rowsDeleted = await db.delete(

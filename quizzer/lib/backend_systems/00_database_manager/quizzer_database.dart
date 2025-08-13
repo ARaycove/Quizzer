@@ -36,3 +36,18 @@ Future<void> closeDatabase() async {
     _database = null;
   }
 }
+
+/// Resets the database connection by closing and clearing the current reference
+/// This is useful when the database file has been deleted and needs to be recreated
+Future<void> resetDatabaseConnection() async {
+  if (_database != null) {
+    try {
+      if (_database!.isOpen) {
+        await _database!.close();
+      }
+    } catch (e) {
+      // Ignore errors when closing a deleted database
+    }
+    _database = null;
+  }
+}

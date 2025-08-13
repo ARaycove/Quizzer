@@ -22,6 +22,7 @@ import 'package:quizzer/backend_systems/session_manager/answer_validation/sessio
 import 'package:quizzer/backend_systems/session_manager/answer_validation/text_validation_functionality.dart' as text_validation;
 import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/outbound_sync/outbound_sync_worker.dart'; // Import the new worker
 import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/media_sync_worker.dart'; // Added import for MediaSyncWorker
+import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart'; // Import for getDatabaseMonitor
 import 'package:quizzer/backend_systems/00_database_manager/review_system/get_send_postgre.dart';
 import 'package:quizzer/backend_systems/00_database_manager/review_system/review_subject_nodes.dart' as subject_review;
 import 'package:quizzer/backend_systems/00_database_manager/review_system/handle_question_flags.dart' as flag_review;
@@ -579,14 +580,20 @@ class SessionManager {
       QuizzerLogger.logMessage("Starting user logout process for user: $currentUserEmailForLogoutOps, Current UserID for final ops: $currentUserIdForLogoutOps");
 
 
-      // 1. Stop Workers (Order might matter depending on dependencies, stop consumers first?)
+      // 1. Clear all pending database requests first
+      QuizzerLogger.logMessage("Clearing all pending database requests...");
+      final databaseMonitor = getDatabaseMonitor();
+      await databaseMonitor.clearAllQueues();
+      QuizzerLogger.logSuccess("Database request queues cleared.");
+      
+      // 2. Stop Workers (Order might matter depending on dependencies, stop consumers first?)
       QuizzerLogger.logMessage("Stopping background workers...");
       // Get worker instances (assuming they are singletons accessed via factory)
       final psw                   = PresentationSelectionWorker();
       final outboundSyncWorker    = OutboundSyncWorker(); // Get the outbound sync worker instance
       final mediaSyncWorker       = MediaSyncWorker(); // Get MediaSyncWorker instance
       
-      // Stop them (await completion)
+      // Stop them and wait for current operations to complete
       await psw.stop();
       await outboundSyncWorker.stop(); // Stop the outbound sync worker
       await mediaSyncWorker.stop(); // Stop the media sync worker
@@ -1381,13 +1388,26 @@ class SessionManager {
       switch (operationMode) {
         case "all":
           QuizzerLogger.logMessage('SessionManager: Getting all user settings for user $userId (Role: $currentUserRole).');
+          
+          // DEBUG: Check if data still exists in database before calling getAllUserSettings
+          try {
+            final db = await getDatabaseMonitor().requestDatabaseAccess();
+            if (db != null) {
+              final List<Map<String, dynamic>> debugResults = await db.query('user_settings', where: 'user_id = ?', whereArgs: [userId]);
+              QuizzerLogger.logMessage('SessionManager DEBUG: Database query before getAllUserSettings returned ${debugResults.length} records: $debugResults');
+              getDatabaseMonitor().releaseDatabaseAccess();
+            }
+          } catch (e) {
+            QuizzerLogger.logError('SessionManager DEBUG: Failed to query database before getAllUserSettings: $e');
+          }
+          
           // Table function handles its own database access
           final Map<String, Map<String, dynamic>> allSettingsWithFlags = await user_settings_table.getAllUserSettings(userId!);
           final Map<String, dynamic> filteredSettings = {};
           allSettingsWithFlags.forEach((key, settingDetails) {
             final bool isAdminSetting = (settingDetails['is_admin_setting'] as int? ?? 0) == 1;
             if (!isAdminSetting || currentUserRole == 'admin' || currentUserRole == 'contributor') {
-              filteredSettings[key] = settingDetails['value'];
+              filteredSettings[key] = settingDetails['setting_value'];
             }
           });
           // Cache the results
@@ -1401,7 +1421,7 @@ class SessionManager {
           if (settingDetails != null) {
             final bool isAdminSetting = (settingDetails['is_admin_setting'] as int? ?? 0) == 1;
             if (!isAdminSetting || currentUserRole == 'admin' || currentUserRole == 'contributor') {
-              resultToReturn = settingDetails['value'];
+              resultToReturn = settingDetails['setting_value'];
               // Always update cache for single setting
               _cachedUserSettings[settingName] = resultToReturn;
             } else {
@@ -1421,7 +1441,7 @@ class SessionManager {
             if (settingDetails != null) {
               final bool isAdminSetting = (settingDetails['is_admin_setting'] as int? ?? 0) == 1;
               if (!isAdminSetting || currentUserRole == 'admin' || currentUserRole == 'contributor') {
-                listedResults[name] = settingDetails['value'];
+                listedResults[name] = settingDetails['setting_value'];
               }
               // If it's an admin setting and user is not admin/contributor, we simply don't add it to the map for listedResults.
             }

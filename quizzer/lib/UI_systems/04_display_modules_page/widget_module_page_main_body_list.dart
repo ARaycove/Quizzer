@@ -35,7 +35,8 @@ class _ModulePageMainBodyListState extends State<ModulePageMainBodyList> {
         'trigonometry',
         'calculus 1',
         'calculus 2',
-        'calculus 3'
+        'calculus 3',
+        'linear algebra'
         ]
     },
     {

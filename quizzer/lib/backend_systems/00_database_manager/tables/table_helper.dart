@@ -86,11 +86,15 @@ Future<int> insertRawData(
   // QuizzerLogger.logValue('Performing insert into $tableName with encoded data: ${encodedData.keys.join(', ')}');
   
   // Perform the actual database insertion with the encoded data
-  final result = await db.insert(
+  dynamic result = 0;
+
+  // Perform the actual database insertion with the encoded data
+  result = await db.insert(
     tableName,
     encodedData,
     conflictAlgorithm: conflictAlgorithm, // Pass the algorithm
   );
+
   
   return result;
 }
@@ -197,6 +201,45 @@ Future<int> updateRawData(
     where: where,
     whereArgs: whereArgs,
     conflictAlgorithm: conflictAlgorithm,
+  );
+  
+  return result;
+}
+
+/// Upserts data into the specified table using SQLite's INSERT OR REPLACE.
+/// This is a true upsert operation that handles conflicts at the database level.
+///
+/// Args:
+///   tableName: The name of the table to upsert into.
+///   data: A map where keys are column names and values are the raw Dart objects to upsert.
+///   db: The database instance.
+///   conflictAlgorithm: Optional conflict resolution algorithm (defaults to REPLACE for true upsert).
+///
+/// Returns:
+///   The row ID of the inserted/updated row.
+///   Throws exceptions on database errors (Fail Fast).
+Future<int> upsertRawData(
+  String tableName,
+  Map<String, dynamic> data,
+  dynamic db, // Accept either Database or Transaction
+  {ConflictAlgorithm? conflictAlgorithm}
+) async {
+  // Encode the data for database storage
+  final Map<String, dynamic> encodedData = {};
+  for (final entry in data.entries) {
+    final key = entry.key;
+    final rawValue = entry.value;
+    encodedData[key] = encodeValueForDB(rawValue);
+  }
+
+  // Use REPLACE conflict algorithm for true upsert behavior
+  final ConflictAlgorithm algorithm = conflictAlgorithm ?? ConflictAlgorithm.replace;
+  
+  // Perform the upsert operation
+  final result = await db.insert(
+    tableName,
+    encodedData,
+    conflictAlgorithm: algorithm,
   );
   
   return result;

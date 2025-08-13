@@ -863,6 +863,18 @@ Future<void> syncUserSettings() async {
         mutableRecord['last_modified_timestamp'] = DateTime.now().toUtc().toIso8601String();
       }
 
+      // Skip push if timestamp is the default timestamp
+      if (mutableRecord['last_modified_timestamp'] == '1970-01-01T00:00:00.000Z') {
+        QuizzerLogger.logMessage('syncUserSettings: Skipping record (User: $userId, Setting: $settingName) - has default timestamp. Updating local flags to mark as synced.');
+        await updateUserSettingSyncFlags(
+          userId: userId,
+          settingName: settingName!,
+          hasBeenSynced: true, 
+          editsAreSynced: true, 
+        );
+        continue;
+      }
+
       bool operationSuccess = false;
 
       if (hasBeenSynced == 0) {

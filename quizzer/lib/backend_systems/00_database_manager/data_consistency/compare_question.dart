@@ -8,7 +8,8 @@ import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dar
 Future<Map<String, dynamic>> compareAndUpdateQuestionRecord(String questionId) async {
   try {
     // Get local record with raw query
-    final db = await getDatabaseMonitor().requestDatabaseAccess();
+    final DatabaseMonitor dbMonitor = getDatabaseMonitor();
+    final db = await dbMonitor.requestDatabaseAccess();
     if (db == null) {
       return {
         'updated': false,
@@ -54,7 +55,7 @@ Future<Map<String, dynamic>> compareAndUpdateQuestionRecord(String questionId) a
           'message': 'Question not found in cloud database but was created by current user - preserving local record'
         };
       } else {
-        final db = await getDatabaseMonitor().requestDatabaseAccess();
+        final db = await dbMonitor.requestDatabaseAccess();
         if (db != null) {
           await db.delete('question_answer_pairs', where: 'question_id = ?', whereArgs: [questionId]);
           getDatabaseMonitor().releaseDatabaseAccess();
@@ -79,7 +80,10 @@ Future<Map<String, dynamic>> compareAndUpdateQuestionRecord(String questionId) a
       };
     } else {
       // Use batchUpsertQuestionAnswerPairs like inbound sync does
-      await batchUpsertQuestionAnswerPairs(records: [cloudRecord]);
+      final db2 = await dbMonitor.requestDatabaseAccess();
+      await batchUpsertQuestionAnswerPairs(records: [cloudRecord], db: db2);
+      getDatabaseMonitor().releaseDatabaseAccess();
+
       return {
         'updated': true,
         'message': 'Local record updated with cloud data'
@@ -88,10 +92,7 @@ Future<Map<String, dynamic>> compareAndUpdateQuestionRecord(String questionId) a
     
   } catch (e) {
     QuizzerLogger.logError('Error comparing question $questionId: $e');
-    return {
-      'updated': false,
-      'message': 'Error: $e'
-    };
+    rethrow;
   }
 }
 

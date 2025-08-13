@@ -70,6 +70,7 @@ Future<Map<String, Map<String, dynamic>>> getOptimizedModuleData(String userId) 
     ''';
     
     final List<Map<String, dynamic>> results = await db.rawQuery(sql, [userId]);
+    getDatabaseMonitor().releaseDatabaseAccess();
 
     // Process results - no iteration over individual questions
     final Map<String, Map<String, dynamic>> result = {};
@@ -144,8 +145,6 @@ Future<Map<String, Map<String, dynamic>>> getOptimizedModuleData(String userId) 
   } catch (e) {
     QuizzerLogger.logError('Error in getOptimizedModuleData - $e');
     rethrow;
-  } finally {
-    getDatabaseMonitor().releaseDatabaseAccess();
   }
 }
 
@@ -211,6 +210,7 @@ Future<Map<String, dynamic>?> getIndividualModuleData(String userId, String modu
     ''';
     
     final List<Map<String, dynamic>> results = await db.rawQuery(sql, [userId, moduleName]);
+    getDatabaseMonitor().releaseDatabaseAccess();
 
     if (results.isEmpty) {
       QuizzerLogger.logWarning('No module found with name: $moduleName');
@@ -281,8 +281,6 @@ Future<Map<String, dynamic>?> getIndividualModuleData(String userId, String modu
   } catch (e) {
     QuizzerLogger.logError('Error in getIndividualModuleData - $e');
     rethrow;
-  } finally {
-    getDatabaseMonitor().releaseDatabaseAccess();
   }
 }
 

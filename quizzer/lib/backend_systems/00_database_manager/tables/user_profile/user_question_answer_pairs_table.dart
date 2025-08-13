@@ -1,12 +1,11 @@
 import 'dart:async';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
-import '../table_helper.dart'; // Import the helper file
-import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pair_management/question_answer_pairs_table.dart'; // Import for _verifyQuestionAnswerPairTable
+import 'package:quizzer/backend_systems/00_database_manager/tables/table_helper.dart';
 import 'package:quizzer/backend_systems/10_switch_board/sb_sync_worker_signals.dart'; // Import sync signals
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_module_activation_status_table.dart';
 
-Future<void> _verifyUserQuestionAnswerPairTable(dynamic db) async {
+Future<void> verifyUserQuestionAnswerPairTable(dynamic db) async {
   
   // Check if the table exists
   final List<Map<String, dynamic>> tables = await db.rawQuery(
@@ -94,8 +93,6 @@ Future<int> addUserQuestionAnswerPair({
       throw Exception('Failed to acquire database access');
     }
     QuizzerLogger.logMessage('Starting addUserQuestionAnswerPair for User: $userUuid, Q: $questionAnswerReference');
-    await _verifyUserQuestionAnswerPairTable(db);
-
     // Prepare raw data map
     final Map<String, dynamic> data = {
       'user_uuid': userUuid,
@@ -170,7 +167,6 @@ Future<int> editUserQuestionAnswerPair({
       throw Exception('Failed to acquire database access');
     }
     QuizzerLogger.logMessage('Starting editUserQuestionAnswerPair for User: $userUuid, Q: $questionId');
-    await _verifyUserQuestionAnswerPairTable(db);
 
     Map<String, dynamic> values = {};
     if (revisionStreak != null) values['revision_streak'] = revisionStreak;
@@ -217,8 +213,6 @@ Future<Map<String, dynamic>> getUserQuestionAnswerPairById(String userUuid, Stri
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    await _verifyUserQuestionAnswerPairTable(db);
-    
     // Use the universal query helper
     final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
       'user_question_answer_pairs',
@@ -254,7 +248,6 @@ Future<List<Map<String, dynamic>>> getUserQuestionAnswerPairsByUser(String userU
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    await _verifyUserQuestionAnswerPairTable(db);
     // Use universal query helper
     return await queryAndDecodeDatabase(
       'user_question_answer_pairs',
@@ -283,8 +276,6 @@ Future<List<Map<String, dynamic>>> getActiveQuestionsInCirculation(String userUu
       throw Exception('Failed to acquire database access');
     }
     QuizzerLogger.logMessage('Fetching active questions in circulation for user: $userUuid...');
-    await _verifyUserQuestionAnswerPairTable(db);
-
     // Build the query with proper joins and conditions
     String sql = '''
       SELECT user_question_answer_pairs.*
@@ -333,8 +324,6 @@ Future<List<Map<String, dynamic>>> getQuestionsInCirculation(String userUuid) as
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    await _verifyUserQuestionAnswerPairTable(db);
-    await verifyQuestionAnswerPairTable(db);
     
     // Use a JOIN to exclude orphaned records (user records that reference non-existent questions)
     String sql = '''
@@ -342,7 +331,7 @@ Future<List<Map<String, dynamic>>> getQuestionsInCirculation(String userUuid) as
       FROM user_question_answer_pairs
       INNER JOIN question_answer_pairs ON user_question_answer_pairs.question_id = question_answer_pairs.question_id
       WHERE user_question_answer_pairs.user_uuid = ?
-        AND user_question_answer_pairs.in_circulation = 1
+      AND user_question_answer_pairs.in_circulation = 1
     ''';
     
     List<dynamic> whereArgs = [userUuid];
@@ -366,7 +355,6 @@ Future<List<Map<String, dynamic>>> getAllUserQuestionAnswerPairs(String userUuid
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    await _verifyUserQuestionAnswerPairTable(db);
     // Use universal query helper
     return await queryAndDecodeDatabase(
         'user_question_answer_pairs',
@@ -388,8 +376,6 @@ Future<int> removeUserQuestionAnswerPair(String userUuid, String questionAnswerR
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    await _verifyUserQuestionAnswerPairTable(db);
-
     return await db.delete(
       'user_question_answer_pairs',
       where: 'user_uuid = ? AND question_id = ?',
@@ -413,8 +399,6 @@ Future<void> incrementTotalAttempts(String userUuid, String questionId) async {
     QuizzerLogger.logMessage('Incrementing total attempts for User: $userUuid, Question: $questionId');
     
     // Ensure the table and column exist before attempting update
-    await _verifyUserQuestionAnswerPairTable(db);
-
     final String currentTime = DateTime.now().toUtc().toIso8601String();
     final int rowsAffected = await db.rawUpdate(
       'UPDATE user_question_answer_pairs SET total_attempts = total_attempts + 1, edits_are_synced = 0, last_modified_timestamp = ? WHERE user_uuid = ? AND question_id = ?',
@@ -449,10 +433,6 @@ Future<void> setCirculationStatus(String userUuid, String questionId, bool isInC
     final String statusString = isInCirculation ? 'IN' : 'OUT OF';
     QuizzerLogger.logMessage(
         'DB Table: Setting question $questionId $statusString circulation for user $userUuid');
-
-    // Ensure table exists before update
-    await _verifyUserQuestionAnswerPairTable(db);
-
     // Perform the update using the universal update helper directly
     final Map<String, dynamic> updateData = {
       'in_circulation': isInCirculation, // Pass bool directly
@@ -504,8 +484,6 @@ Future<List<Map<String, dynamic>>> getUnsyncedUserQuestionAnswerPairs(String use
       throw Exception('Failed to acquire database access');
     }
     QuizzerLogger.logMessage('Fetching unsynced user-question-answer pairs for user: $userId...');
-    await _verifyUserQuestionAnswerPairTable(db);
-
     final List<Map<String, dynamic>> results = await db.query(
       'user_question_answer_pairs',
       where: '(has_been_synced = 0 OR edits_are_synced = 0) AND user_uuid = ?',
@@ -536,8 +514,6 @@ Future<void> updateUserQuestionAnswerPairSyncFlags({
       throw Exception('Failed to acquire database access');
     }
     QuizzerLogger.logMessage('Updating sync flags for UserQuestionAnswerPair (User: $userUuid, QID: $questionId) -> Synced: $hasBeenSynced, Edits Synced: $editsAreSynced');
-    await _verifyUserQuestionAnswerPairTable(db); // Ensure table/columns exist
-
     final Map<String, dynamic> updates = {
       'has_been_synced': hasBeenSynced ? 1 : 0,
       'edits_are_synced': editsAreSynced ? 1 : 0,
@@ -582,8 +558,6 @@ Future<int> insertOrUpdateUserQuestionAnswerPair({
       throw Exception('Failed to acquire database access');
     }
     QuizzerLogger.logMessage('Starting insertOrUpdateUserQuestionAnswerPair for User: $userUuid, Q: $questionId');
-    await _verifyUserQuestionAnswerPairTable(db);
-
     // First try to get existing record
     QuizzerLogger.logMessage('Checking for existing record...');
     final List<Map<String, dynamic>> existing = await queryAndDecodeDatabase(
@@ -632,17 +606,12 @@ Future<int> insertOrUpdateUserQuestionAnswerPair({
 /// True batch upsert for user_question_answer_pairs using a single SQL statement
 Future<void> batchUpsertUserQuestionAnswerPairs({
   required List<Map<String, dynamic>> records,
+  required dynamic db,
   int chunkSize = 500,
 }) async {
   try {
-    final db = await getDatabaseMonitor().requestDatabaseAccess();
-    if (db == null) {
-      throw Exception('Failed to acquire database access');
-    }
     if (records.isEmpty) return;
     QuizzerLogger.logMessage('Starting TRUE batch upsert for user_question_answer_pairs: ${records.length} records');
-    await _verifyUserQuestionAnswerPairTable(db);
-
     // Get all columns dynamically from the table
     final List<Map<String, dynamic>> columnInfo = await db.rawQuery("PRAGMA table_info(user_question_answer_pairs)");
     final List<String> columns = columnInfo.map((col) => col['name'] as String).toList();
@@ -672,8 +641,6 @@ Future<void> batchUpsertUserQuestionAnswerPairs({
   } catch (e) {
     QuizzerLogger.logError('Error batch upserting user question answer pairs - $e');
     rethrow;
-  } finally {
-    getDatabaseMonitor().releaseDatabaseAccess();
   }
 }
 
@@ -695,8 +662,6 @@ Future<List<Map<String, dynamic>>> getEligibleUserQuestionAnswerPairs(String use
       throw Exception('Failed to acquire database access');
     }
     QuizzerLogger.logMessage('Fetching eligible user question answer pairs for user: $userUuid...');
-    await _verifyUserQuestionAnswerPairTable(db);
-
     // Eligible question criteria:
     // 1. The question must be in circulation -> in_circulation = 1
     // 2. The question must be past due -> next_revision_due < now
@@ -780,8 +745,6 @@ Future<int> getLowRevisionStreakEligibleCount(String userUuid) async {
       throw Exception('Failed to acquire database access');
     }
     QuizzerLogger.logMessage('Counting revision_score == 0 eligible questions for user: $userUuid...');
-    await _verifyUserQuestionAnswerPairTable(db);
-
     final String now = DateTime.now().toUtc().toIso8601String();
     
     // Build the query with proper joins and conditions, limiting to 10 results
@@ -839,8 +802,6 @@ Future<int> getTotalEligibleCount(String userUuid) async {
       throw Exception('Failed to acquire database access');
     }
     QuizzerLogger.logMessage('Counting total eligible questions for user: $userUuid...');
-    await _verifyUserQuestionAnswerPairTable(db);
-
     final String now = DateTime.now().toUtc().toIso8601String();
     
     // Build the query with proper joins and conditions, limiting to 100 results
@@ -892,18 +853,21 @@ Future<List<Map<String, dynamic>>> getNonCirculatingQuestionsWithDetails(String 
       throw Exception('Failed to acquire database access');
     }
     QuizzerLogger.logMessage('Fetching non-circulating questions with details for user: $userUuid...');
-    // Ensure BOTH tables exist before running the query
-    await _verifyUserQuestionAnswerPairTable(db);
-    await verifyQuestionAnswerPairTable(db);
-
     // Build the query with proper joins to get both user question data and question details
+    // filter out flagged questions
+    // filter out questions with inactive modules
     String sql = '''
-      SELECT user_question_answer_pairs.*, question_answer_pairs.*
+      SELECT
+        user_question_answer_pairs.*,
+        question_answer_pairs.*
       FROM user_question_answer_pairs
       INNER JOIN question_answer_pairs ON user_question_answer_pairs.question_id = question_answer_pairs.question_id
-      WHERE user_question_answer_pairs.user_uuid = ?
+      INNER JOIN user_module_activation_status ON user_question_answer_pairs.user_uuid = user_module_activation_status.user_id AND question_answer_pairs.module_name = user_module_activation_status.module_name
+      WHERE
+        user_question_answer_pairs.user_uuid = ?
         AND user_question_answer_pairs.in_circulation = 0
         AND user_question_answer_pairs.flagged = 0
+        AND user_module_activation_status.is_active = 1
       ORDER BY user_question_answer_pairs.next_revision_due ASC
     ''';
     
@@ -944,8 +908,6 @@ Future<bool> toggleUserQuestionFlaggedStatus({
     }
     
     try {
-      await _verifyUserQuestionAnswerPairTable(db);
-
       // Update the flagged status and circulation status
       final Map<String, dynamic> values = {
         'flagged': newFlaggedStatus ? 1 : 0,

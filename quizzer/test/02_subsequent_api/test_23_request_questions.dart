@@ -1,10 +1,12 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
+import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/backend_systems/02_login_authentication/login_initialization.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/modules_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_module_activation_status_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pair_management/question_answer_pairs_table.dart';
+
 import '../test_helpers.dart';
 import 'dart:io';
 
@@ -71,7 +73,9 @@ void main() {
       QuizzerLogger.logMessage('Step 4: Finding and activating modules to get 101-150 questions total...');
       
       // Find all modules with questions and their counts
-      final List<Map<String, dynamic>> allModules = await getAllModules();
+      final db = getDatabaseMonitor().requestDatabaseAccess();
+      final List<Map<String, dynamic>> allModules = await getAllModules(db);
+      getDatabaseMonitor().releaseDatabaseAccess();
       final List<Map<String, dynamic>> modulesWithQuestionCounts = [];
       
       for (final module in allModules) {
@@ -190,7 +194,9 @@ void main() {
       QuizzerLogger.logMessage('=== Test 4: Activate modules and verify activation ===');
       
       // Find all modules with questions and their counts
-      final List<Map<String, dynamic>> allModules = await getAllModules();
+      final db = getDatabaseMonitor().requestDatabaseAccess();
+      final List<Map<String, dynamic>> allModules = await getAllModules(db);
+      getDatabaseMonitor().releaseDatabaseAccess();
       final List<Map<String, dynamic>> modulesWithQuestionCounts = [];
       
       for (final module in allModules) {

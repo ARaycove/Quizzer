@@ -11,7 +11,7 @@ import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dar
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_question_answer_pairs_table.dart';
 
-Future<void> _verifyUserStatsDaysLeftUntilQuestionsExhaustTable(Database db) async {
+Future<void> verifyUserStatsDaysLeftUntilQuestionsExhaustTable(dynamic db) async {
   final List<Map<String, dynamic>> tables = await db.rawQuery(
     "SELECT name FROM sqlite_master WHERE type='table' AND name='user_stats_days_left_until_questions_exhaust'"
   );
@@ -78,7 +78,6 @@ Future<void> updateDaysLeftUntilQuestionsExhaustStat(String userId) async {
     
     final db = await getDatabaseMonitor().requestDatabaseAccess();
     final String today = DateTime.now().toUtc().toIso8601String().substring(0, 10);
-    await _verifyUserStatsDaysLeftUntilQuestionsExhaustTable(db!);
 
     // Overwrite (insert or update) the record for today
     final List<Map<String, dynamic>> existing = await queryAndDecodeDatabase(
@@ -129,7 +128,6 @@ Future<void> updateDaysLeftUntilQuestionsExhaustStat(String userId) async {
 Future<List<Map<String, dynamic>>> getUserStatsDaysLeftUntilQuestionsExhaustRecordsByUser(String userId) async {
   try {
     final db = await getDatabaseMonitor().requestDatabaseAccess();
-    await _verifyUserStatsDaysLeftUntilQuestionsExhaustTable(db!);
     return await queryAndDecodeDatabase(
       'user_stats_days_left_until_questions_exhaust',
       db,
@@ -147,7 +145,6 @@ Future<List<Map<String, dynamic>>> getUserStatsDaysLeftUntilQuestionsExhaustReco
 Future<Map<String, dynamic>> getUserStatsDaysLeftUntilQuestionsExhaustRecordByDate(String userId, String recordDate) async {
   try {
     final db = await getDatabaseMonitor().requestDatabaseAccess();
-    await _verifyUserStatsDaysLeftUntilQuestionsExhaustTable(db!);
     final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
       'user_stats_days_left_until_questions_exhaust',
       db,
@@ -181,8 +178,7 @@ Future<List<Map<String, dynamic>>> getUnsyncedUserStatsDaysLeftUntilQuestionsExh
   try {
     final db = await getDatabaseMonitor().requestDatabaseAccess();
     QuizzerLogger.logMessage('Fetching unsynced days_left_until_questions_exhaust records for user: $userId...');
-    await _verifyUserStatsDaysLeftUntilQuestionsExhaustTable(db!);
-    final List<Map<String, dynamic>> results = await db.query(
+    final List<Map<String, dynamic>> results = await db!.query(
       'user_stats_days_left_until_questions_exhaust',
       where: '(has_been_synced = 0 OR edits_are_synced = 0) AND user_id = ?',
       whereArgs: [userId],
@@ -206,7 +202,6 @@ Future<void> updateUserStatsDaysLeftUntilQuestionsExhaustSyncFlags({
   try {
     final db = await getDatabaseMonitor().requestDatabaseAccess();
     QuizzerLogger.logMessage('Updating sync flags for days_left_until_questions_exhaust record (User: $userId, Date: $recordDate) -> Synced: $hasBeenSynced, Edits Synced: $editsAreSynced');
-    await _verifyUserStatsDaysLeftUntilQuestionsExhaustTable(db!);
     final Map<String, dynamic> updates = {
       'has_been_synced': hasBeenSynced ? 1 : 0,
       'edits_are_synced': editsAreSynced ? 1 : 0,
@@ -232,48 +227,31 @@ Future<void> updateUserStatsDaysLeftUntilQuestionsExhaustSyncFlags({
   }
 }
 
-Future<void> upsertUserStatsDaysLeftUntilQuestionsExhaustFromInboundSync(Map<String, dynamic> record) async {
+Future<void> batchUpsertUserStatsDaysLeftUntilQuestionsExhaustFromInboundSync({
+  required List<Map<String, dynamic>> userStatsDaysLeftUntilQuestionsExhaustRecords,
+  required dynamic db
+}) async {
   try {
-    final db = await getDatabaseMonitor().requestDatabaseAccess();
-    final String? userId = record['user_id'] as String?;
-    final String? recordDate = record['record_date'] as String?;
-    final double? daysLeft = record['days_left_until_questions_exhaust'] is int
-        ? (record['days_left_until_questions_exhaust'] as int).toDouble()
-        : record['days_left_until_questions_exhaust'] as double?;
-    final String? lastModifiedTimestamp = record['last_modified_timestamp'] as String?;
-
-    assert(userId != null, 'upsertUserStatsDaysLeftUntilQuestionsExhaustFromInboundSync: user_id cannot be null. Data: $record');
-    assert(recordDate != null, 'upsertUserStatsDaysLeftUntilQuestionsExhaustFromInboundSync: record_date cannot be null. Data: $record');
-    assert(daysLeft != null, 'upsertUserStatsDaysLeftUntilQuestionsExhaustFromInboundSync: days_left_until_questions_exhaust cannot be null. Data: $record');
-    assert(lastModifiedTimestamp != null, 'upsertUserStatsDaysLeftUntilQuestionsExhaustFromInboundSync: last_modified_timestamp cannot be null. Data: $record');
-
-    await _verifyUserStatsDaysLeftUntilQuestionsExhaustTable(db!);
-
-    final Map<String, dynamic> dataToInsertOrUpdate = {
-      'user_id': userId,
-      'record_date': recordDate,
-      'days_left_until_questions_exhaust': daysLeft,
-      'has_been_synced': 1,
-      'edits_are_synced': 1,
-      'last_modified_timestamp': lastModifiedTimestamp,
-    };
-
-    final int rowId = await insertRawData(
-      'user_stats_days_left_until_questions_exhaust',
-      dataToInsertOrUpdate,
-      db,
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
-
-    if (rowId > 0) {
-      QuizzerLogger.logSuccess('Successfully upserted user_stats_days_left_until_questions_exhaust for user $userId, date $recordDate from inbound sync.');
-    } else {
-      QuizzerLogger.logWarning('upsertUserStatsDaysLeftUntilQuestionsExhaustFromInboundSync: insertRawData with replace returned 0 for user $userId, date $recordDate. Data: $dataToInsertOrUpdate');
+    for (Map<String, dynamic> statRecord in userStatsDaysLeftUntilQuestionsExhaustRecords) {
+      // Define the data map
+      final Map<String, dynamic> dataToInsertOrUpdate = {
+        'user_id': statRecord['user_id'],
+        'record_date': statRecord['record_date'],
+        'days_left_until_questions_exhaust': statRecord['days_left_until_questions_exhaust'],
+        'has_been_synced': 1,
+        'edits_are_synced': 1,
+        'last_modified_timestamp': statRecord['last_modified_timestamp'],
+      };
+      // Insert the data map
+      await insertRawData(
+        'user_stats_days_left_until_questions_exhaust',
+        dataToInsertOrUpdate,
+        db,
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
     }
   } catch (e) {
     QuizzerLogger.logError('Error upserting days left until questions exhaust record from inbound sync - $e');
     rethrow;
-  } finally {
-    getDatabaseMonitor().releaseDatabaseAccess();
   }
 }

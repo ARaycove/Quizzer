@@ -191,12 +191,16 @@ class LaTexTState extends State<LaTexT> {
 
         Widget tex = SingleChildScrollView(
           scrollDirection: Axis.horizontal,
-          child: Math.tex(
-            subTexts[j].trim(),
-            textStyle: widget.equationStyle ?? widget.laTeXCode.style,
-            onErrorFallback: (exception) =>
-                widget.onErrorFallback?.call(subTexts[j].trim()) ??
-                Math.defaultOnErrorFallback(exception),
+          child: Padding(
+            padding: const EdgeInsets.only(top: 8.0), // Add top padding to LaTeX elements
+            child: Math.tex(
+              // Proactively replace \nabla with Unicode ∇ since flutter_math_fork doesn't render it properly
+              subTexts[j].replaceAll(r'\nabla', '∇').trim(),
+              textStyle: widget.equationStyle ?? widget.laTeXCode.style,
+              onErrorFallback: (exception) =>
+                  widget.onErrorFallback?.call(subTexts[j]) ??
+                  Math.defaultOnErrorFallback(exception),
+            ),
           ),
         );
 

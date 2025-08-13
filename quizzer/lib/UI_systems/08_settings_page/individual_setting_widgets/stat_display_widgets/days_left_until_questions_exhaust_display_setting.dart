@@ -37,7 +37,8 @@ class _DaysLeftUntilQuestionsExhaustDisplaySettingState extends State<DaysLeftUn
   }
 
   Future<void> _handleSave(bool newValue) async {
-    await _sessionManager.updateUserSetting('home_display_days_left_until_questions_exhaust', newValue);
+    // Fire and forget - don't await the response
+    _sessionManager.updateUserSetting('home_display_days_left_until_questions_exhaust', newValue);
     setState(() {
       _isEnabled = newValue;
     });

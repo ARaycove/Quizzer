@@ -37,7 +37,8 @@ class _LifetimeTotalQuestionsAnsweredDisplaySettingState extends State<LifetimeT
   }
 
   Future<void> _handleSave(bool newValue) async {
-    await _sessionManager.updateUserSetting('home_display_lifetime_total_questions_answered', newValue);
+    // Fire and forget - don't await the response
+    _sessionManager.updateUserSetting('home_display_lifetime_total_questions_answered', newValue);
     setState(() {
       _isEnabled = newValue;
     });

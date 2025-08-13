@@ -61,6 +61,12 @@ class OutboundSyncWorker {
     }
 
     _isRunning = false;
+    
+    // Wait for current sync cycle to complete before returning
+    QuizzerLogger.logMessage('OutboundSyncWorker: Waiting for current sync cycle to complete...');
+    await _switchBoard.onOutboundSyncCycleComplete.first;
+    QuizzerLogger.logMessage('OutboundSyncWorker: Current sync cycle completed.');
+    
     await _signalSubscription?.cancel();
     QuizzerLogger.logMessage('OutboundSyncWorker stopped.');
   }

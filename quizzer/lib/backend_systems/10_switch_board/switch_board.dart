@@ -200,6 +200,11 @@ class SwitchBoard {
   Stream<bool> get onCirculationWorkerFinished => circulationWorkerFinishedController.stream;
   // -------------------------------------
 
+  // --- Database Monitor Queue Empty Stream ---
+  final StreamController<void> databaseMonitorQueueEmptyController = StreamController<void>.broadcast();
+  Stream<void> get onDatabaseMonitorQueueEmpty => databaseMonitorQueueEmptyController.stream;
+  // -------------------------------------
+
   // --- Dispose Method ---
   /// Closes all stream controllers. Should be called on application shutdown.
   void dispose() {
@@ -247,6 +252,7 @@ class SwitchBoard {
     loginProgressController.close();
     questionAnsweredCorrectlyController.close();
     circulationWorkerFinishedController.close();
+    databaseMonitorQueueEmptyController.close();
     
     QuizzerLogger.logMessage('SwitchBoard disposed.');
   }

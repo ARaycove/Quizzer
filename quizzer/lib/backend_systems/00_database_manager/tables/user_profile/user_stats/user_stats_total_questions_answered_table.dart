@@ -8,7 +8,7 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/table_helper.
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 
-Future<void> _verifyUserStatsTotalQuestionsAnsweredTable(Database db) async {
+Future<void> verifyUserStatsTotalQuestionsAnsweredTable(dynamic db) async {
   final List<Map<String, dynamic>> tables = await db.rawQuery(
     "SELECT name FROM sqlite_master WHERE type='table' AND name='user_stats_total_questions_answered'"
   );
@@ -64,7 +64,6 @@ Future<void> incrementTotalQuestionsAnsweredStat(String userId, bool isCorrect) 
       throw Exception('Failed to acquire database access');
     }
     final String today = DateTime.now().toUtc().toIso8601String().substring(0, 10);
-    await _verifyUserStatsTotalQuestionsAnsweredTable(db);
 
     // Fetch the most recent record for the user (by date desc)
     final List<Map<String, dynamic>> recentRecords = await db.query(
@@ -197,7 +196,6 @@ Future<List<Map<String, dynamic>>> getUserStatsTotalQuestionsAnsweredRecordsByUs
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    await _verifyUserStatsTotalQuestionsAnsweredTable(db);
     return await queryAndDecodeDatabase(
       'user_stats_total_questions_answered',
       db,
@@ -218,7 +216,6 @@ Future<Map<String, dynamic>> getUserStatsTotalQuestionsAnsweredRecordByDate(Stri
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    await _verifyUserStatsTotalQuestionsAnsweredTable(db);
     final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
       'user_stats_total_questions_answered',
       db,
@@ -320,7 +317,6 @@ Future<List<Map<String, dynamic>>> getUnsyncedUserStatsTotalQuestionsAnsweredRec
       throw Exception('Failed to acquire database access');
     }
     QuizzerLogger.logMessage('Fetching unsynced total questions answered records for user: $userId...');
-    await _verifyUserStatsTotalQuestionsAnsweredTable(db);
     final List<Map<String, dynamic>> results = await db.query(
       'user_stats_total_questions_answered',
       where: '(has_been_synced = 0 OR edits_are_synced = 0) AND user_id = ?',
@@ -348,7 +344,6 @@ Future<void> updateUserStatsTotalQuestionsAnsweredSyncFlags({
       throw Exception('Failed to acquire database access');
     }
     QuizzerLogger.logMessage('Updating sync flags for total questions answered record (User: $userId, Date: $recordDate) -> Synced: $hasBeenSynced, Edits Synced: $editsAreSynced');
-    await _verifyUserStatsTotalQuestionsAnsweredTable(db);
     final Map<String, dynamic> updates = {
       'has_been_synced': hasBeenSynced ? 1 : 0,
       'edits_are_synced': editsAreSynced ? 1 : 0,
@@ -374,53 +369,33 @@ Future<void> updateUserStatsTotalQuestionsAnsweredSyncFlags({
   }
 }
 
-Future<void> upsertUserStatsTotalQuestionsAnsweredFromInboundSync(Map<String, dynamic> record) async {
+Future<void> batchUpsertUserStatsTotalQuestionsAnsweredFromInboundSync({
+  required List<Map<String, dynamic>> userStatsTotalQuestionsAnsweredRecords,
+  required dynamic db
+}) async {
   try {
-    final db = await getDatabaseMonitor().requestDatabaseAccess();
-    if (db == null) {
-      throw Exception('Failed to acquire database access');
-    }
-    final String? userId = record['user_id'] as String?;
-    final String? recordDate = record['record_date'] as String?;
-    final int? totalCount = record['total_questions_answered'] as int?;
-    final String? lastModifiedTimestamp = record['last_modified_timestamp'] as String?;
-    final int correctCount = record['correct_questions_answered'] as int? ?? 0;
-    final int incorrectCount = record['incorrect_questions_answered'] as int? ?? 0;
-
-    assert(userId != null, 'upsertUserStatsTotalQuestionsAnsweredFromInboundSync: user_id cannot be null. Data: $record');
-    assert(recordDate != null, 'upsertUserStatsTotalQuestionsAnsweredFromInboundSync: record_date cannot be null. Data: $record');
-    assert(totalCount != null, 'upsertUserStatsTotalQuestionsAnsweredFromInboundSync: total_questions_answered cannot be null. Data: $record');
-    assert(lastModifiedTimestamp != null, 'upsertUserStatsTotalQuestionsAnsweredFromInboundSync: last_modified_timestamp cannot be null. Data: $record');
-
-    await _verifyUserStatsTotalQuestionsAnsweredTable(db);
-
-    final Map<String, dynamic> dataToInsertOrUpdate = {
-      'user_id': userId,
-      'record_date': recordDate,
-      'total_questions_answered': totalCount,
-      'correct_questions_answered': correctCount,
-      'incorrect_questions_answered': incorrectCount,
-      'has_been_synced': 1,
-      'edits_are_synced': 1,
-      'last_modified_timestamp': lastModifiedTimestamp,
-    };
-
-    final int rowId = await insertRawData(
-      'user_stats_total_questions_answered',
-      dataToInsertOrUpdate,
-      db,
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
-
-    if (rowId > 0) {
-      QuizzerLogger.logSuccess('Successfully upserted user_stats_total_questions_answered for user $userId, date $recordDate from inbound sync.');
-    } else {
-      QuizzerLogger.logWarning('upsertUserStatsTotalQuestionsAnsweredFromInboundSync: insertRawData with replace returned 0 for user $userId, date $recordDate. Data: $dataToInsertOrUpdate');
+    for (Map<String, dynamic> statRecord in userStatsTotalQuestionsAnsweredRecords) {
+      // Define the data map
+      final Map<String, dynamic> dataToInsertOrUpdate = {
+        'user_id': statRecord['user_id'],
+        'record_date': statRecord['record_date'],
+        'total_questions_answered': statRecord['total_questions_answered'],
+        'correct_questions_answered': statRecord['correct_questions_answered'],
+        'incorrect_questions_answered': statRecord['incorrect_questions_answered'],
+        'has_been_synced': 1,
+        'edits_are_synced': 1,
+        'last_modified_timestamp': statRecord['last_modified_timestamp'],
+      };
+      // Insert the data map
+      await insertRawData(
+        'user_stats_total_questions_answered',
+        dataToInsertOrUpdate,
+        db,
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
     }
   } catch (e) {
     QuizzerLogger.logError('Error upserting user_stats_total_questions_answered from inbound sync - $e');
     rethrow;
-  } finally {
-    getDatabaseMonitor().releaseDatabaseAccess();
   }
 }

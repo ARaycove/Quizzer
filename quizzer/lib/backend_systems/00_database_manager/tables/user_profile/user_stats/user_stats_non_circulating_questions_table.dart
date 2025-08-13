@@ -9,7 +9,7 @@ import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dar
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_question_answer_pairs_table.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 
-Future<void> _verifyUserStatsNonCirculatingQuestionsTable(Database db) async {
+Future<void> verifyUserStatsNonCirculatingQuestionsTable(dynamic db) async {
   final List<Map<String, dynamic>> tables = await db.rawQuery(
     "SELECT name FROM sqlite_master WHERE type='table' AND name='user_stats_non_circulating_questions'"
   );
@@ -56,7 +56,6 @@ Future<void> updateNonCirculatingQuestionsStat(String userId) async {
     
     final db = await getDatabaseMonitor().requestDatabaseAccess();
     final String today = DateTime.now().toUtc().toIso8601String().substring(0, 10);
-    await _verifyUserStatsNonCirculatingQuestionsTable(db!);
     
     // Overwrite (insert or update) the record for today
     final List<Map<String, dynamic>> existing = await queryAndDecodeDatabase(
@@ -110,7 +109,6 @@ Future<List<Map<String, dynamic>>> getUserStatsNonCirculatingQuestionsRecordsByU
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    await _verifyUserStatsNonCirculatingQuestionsTable(db);
     return await queryAndDecodeDatabase(
       'user_stats_non_circulating_questions',
       db,
@@ -131,7 +129,6 @@ Future<Map<String, dynamic>> getUserStatsNonCirculatingQuestionsRecordByDate(Str
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    await _verifyUserStatsNonCirculatingQuestionsTable(db);
     final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
       'user_stats_non_circulating_questions',
       db,
@@ -168,7 +165,6 @@ Future<List<Map<String, dynamic>>> getUnsyncedUserStatsNonCirculatingQuestionsRe
       throw Exception('Failed to acquire database access');
     }
     QuizzerLogger.logMessage('Fetching unsynced non-circulating questions records for user: $userId...');
-    await _verifyUserStatsNonCirculatingQuestionsTable(db);
     final List<Map<String, dynamic>> results = await db.query(
       'user_stats_non_circulating_questions',
       where: '(has_been_synced = 0 OR edits_are_synced = 0) AND user_id = ?',
@@ -196,7 +192,6 @@ Future<void> updateUserStatsNonCirculatingQuestionsSyncFlags({
       throw Exception('Failed to acquire database access');
     }
     QuizzerLogger.logMessage('Updating sync flags for non-circulating questions record (User: $userId, Date: $recordDate) -> Synced: $hasBeenSynced, Edits Synced: $editsAreSynced');
-    await _verifyUserStatsNonCirculatingQuestionsTable(db);
     final Map<String, dynamic> updates = {
       'has_been_synced': hasBeenSynced ? 1 : 0,
       'edits_are_synced': editsAreSynced ? 1 : 0,
@@ -222,51 +217,33 @@ Future<void> updateUserStatsNonCirculatingQuestionsSyncFlags({
   }
 }
 
-Future<void> upsertUserStatsNonCirculatingQuestionsFromInboundSync(Map<String, dynamic> record) async {
+Future<void> batchUpsertUserStatsNonCirculatingQuestionsFromInboundSync({
+  required List<Map<String, dynamic>> userStatsNonCirculatingQuestionsRecords,
+  required dynamic db
+}) async {
   try {
-    final db = await getDatabaseMonitor().requestDatabaseAccess();
-    if (db == null) {
-      throw Exception('Failed to acquire database access');
-    }
-    
-    // Ensure required fields are present
-    final String? userId = record['user_id'] as String?;
-    final String? recordDate = record['record_date'] as String?;
-    final int? nonCirculatingQuestionsCount = record['non_circulating_questions_count'] as int?;
-    final String? lastModifiedTimestamp = record['last_modified_timestamp'] as String?;
 
-    assert(userId != null, 'upsertUserStatsNonCirculatingQuestionsFromInboundSync: user_id cannot be null. Data: $record');
-    assert(recordDate != null, 'upsertUserStatsNonCirculatingQuestionsFromInboundSync: record_date cannot be null. Data: $record');
-    assert(nonCirculatingQuestionsCount != null, 'upsertUserStatsNonCirculatingQuestionsFromInboundSync: non_circulating_questions_count cannot be null. Data: $record');
-    assert(lastModifiedTimestamp != null, 'upsertUserStatsNonCirculatingQuestionsFromInboundSync: last_modified_timestamp cannot be null. Data: $record');
+    for (Map<String, dynamic> statRecord in userStatsNonCirculatingQuestionsRecords) {
+      //Define the map for insert
+      final Map<String, dynamic> dataToInsertOrUpdate = {
+        'user_id': statRecord['user_id'],
+        'record_date': statRecord['record_date'],
+        'non_circulating_questions_count': statRecord['non_circulating_questions_count'],
+        'has_been_synced': 1,
+        'edits_are_synced': 1,
+        'last_modified_timestamp': statRecord['last_modified_timestamp'],
+      };
+      // Insert the data
+      await insertRawData(
+        'user_stats_non_circulating_questions',
+        dataToInsertOrUpdate,
+        db,
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
 
-    await _verifyUserStatsNonCirculatingQuestionsTable(db);
-
-    final Map<String, dynamic> dataToInsertOrUpdate = {
-      'user_id': userId,
-      'record_date': recordDate,
-      'non_circulating_questions_count': nonCirculatingQuestionsCount,
-      'has_been_synced': 1,
-      'edits_are_synced': 1,
-      'last_modified_timestamp': lastModifiedTimestamp,
-    };
-
-    final int rowId = await insertRawData(
-      'user_stats_non_circulating_questions',
-      dataToInsertOrUpdate,
-      db,
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
-
-    if (rowId > 0) {
-      QuizzerLogger.logSuccess('Successfully upserted user_stats_non_circulating_questions for user $userId, date $recordDate from inbound sync.');
-    } else {
-      QuizzerLogger.logWarning('upsertUserStatsNonCirculatingQuestionsFromInboundSync: insertRawData with replace returned 0 for user $userId, date $recordDate. Data: $dataToInsertOrUpdate');
     }
   } catch (e) {
     QuizzerLogger.logError('Error upserting user_stats_non_circulating_questions from inbound sync - $e');
     rethrow;
-  } finally {
-    getDatabaseMonitor().releaseDatabaseAccess();
   }
 } 

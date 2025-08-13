@@ -3,6 +3,7 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/modules_table
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pair_management/question_answer_pairs_table.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/session_manager/answer_validation/text_validation_functionality.dart';
+import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
 
 Future<Map<String, dynamic>> handleLoadModules(Map<String, dynamic> data) async {
   try {
@@ -12,8 +13,11 @@ Future<Map<String, dynamic>> handleLoadModules(Map<String, dynamic> data) async 
       'activationStatus': {},
     };
     
-    // Get all modules first - table function handles its own database access
-    final List<Map<String, dynamic>> modules = await getAllModules();
+    // Get all modules first
+    final db = getDatabaseMonitor().requestDatabaseAccess();
+    final List<Map<String, dynamic>> modules = await getAllModules(db);
+    getDatabaseMonitor().releaseDatabaseAccess();
+
     QuizzerLogger.logMessage('handleLoadModules: Found ${modules.length} modules');
     
     // Add questions data to each module dynamically
@@ -22,7 +26,7 @@ Future<Map<String, dynamic>> handleLoadModules(Map<String, dynamic> data) async 
       final String moduleName = module['module_name'] as String;
       QuizzerLogger.logMessage('handleLoadModules: Processing module: $moduleName');
       
-      // Get full question records for this module using indexed query - table function handles its own database access
+      // Get full question records for this module using indexed query
       final List<Map<String, dynamic>> questionRecords = await getQuestionRecordsForModule(moduleName);
       QuizzerLogger.logMessage('handleLoadModules: Found ${questionRecords.length} questions for module: $moduleName');
       

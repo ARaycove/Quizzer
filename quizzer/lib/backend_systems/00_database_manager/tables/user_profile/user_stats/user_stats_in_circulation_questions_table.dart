@@ -9,7 +9,7 @@ import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dar
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_question_answer_pairs_table.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 
-Future<void> _verifyUserStatsInCirculationQuestionsTable(Database db) async {
+Future<void> verifyUserStatsInCirculationQuestionsTable(dynamic db) async {
   final List<Map<String, dynamic>> tables = await db.rawQuery(
     "SELECT name FROM sqlite_master WHERE type='table' AND name='user_stats_in_circulation_questions'"
   );
@@ -56,7 +56,6 @@ Future<void> updateInCirculationQuestionsStat(String userId) async {
     
     final db = await getDatabaseMonitor().requestDatabaseAccess();
     final String today = DateTime.now().toUtc().toIso8601String().substring(0, 10);
-    await _verifyUserStatsInCirculationQuestionsTable(db!);
     
     // Overwrite (insert or update) the record for today
     final List<Map<String, dynamic>> existing = await queryAndDecodeDatabase(
@@ -110,7 +109,6 @@ Future<List<Map<String, dynamic>>> getUserStatsInCirculationQuestionsRecordsByUs
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    await _verifyUserStatsInCirculationQuestionsTable(db);
     return await queryAndDecodeDatabase(
       'user_stats_in_circulation_questions',
       db,
@@ -131,7 +129,6 @@ Future<Map<String, dynamic>> getUserStatsInCirculationQuestionsRecordByDate(Stri
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    await _verifyUserStatsInCirculationQuestionsTable(db);
     final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
       'user_stats_in_circulation_questions',
       db,
@@ -168,7 +165,6 @@ Future<List<Map<String, dynamic>>> getUnsyncedUserStatsInCirculationQuestionsRec
       throw Exception('Failed to acquire database access');
     }
     QuizzerLogger.logMessage('Fetching unsynced in-circulation questions records for user: $userId...');
-    await _verifyUserStatsInCirculationQuestionsTable(db);
     final List<Map<String, dynamic>> results = await db.query(
       'user_stats_in_circulation_questions',
       where: '(has_been_synced = 0 OR edits_are_synced = 0) AND user_id = ?',
@@ -196,7 +192,6 @@ Future<void> updateUserStatsInCirculationQuestionsSyncFlags({
       throw Exception('Failed to acquire database access');
     }
     QuizzerLogger.logMessage('Updating sync flags for in-circulation questions record (User: $userId, Date: $recordDate) -> Synced: $hasBeenSynced, Edits Synced: $editsAreSynced');
-    await _verifyUserStatsInCirculationQuestionsTable(db);
     final Map<String, dynamic> updates = {
       'has_been_synced': hasBeenSynced ? 1 : 0,
       'edits_are_synced': editsAreSynced ? 1 : 0,
@@ -222,51 +217,33 @@ Future<void> updateUserStatsInCirculationQuestionsSyncFlags({
   }
 }
 
-Future<void> upsertUserStatsInCirculationQuestionsFromInboundSync(Map<String, dynamic> record) async {
+Future<void> batchUpsertUserStatsInCirculationQuestionsFromInboundSync({
+  required List<Map<String, dynamic>> userStatsInCirculationQuestionsRecords,
+  required dynamic db,
+
+}) async {
   try {
-    final db = await getDatabaseMonitor().requestDatabaseAccess();
-    if (db == null) {
-      throw Exception('Failed to acquire database access');
-    }
-    
-    final String? userId = record['user_id'] as String?;
-    final String? recordDate = record['record_date'] as String?;
-    final int? inCirculationQuestionsCount = record['in_circulation_questions_count'] as int?;
-    final String? lastModifiedTimestamp = record['last_modified_timestamp'] as String?;
-
-    assert(userId != null, 'upsertUserStatsInCirculationQuestionsFromInboundSync: user_id cannot be null. Data: $record');
-    assert(recordDate != null, 'upsertUserStatsInCirculationQuestionsFromInboundSync: record_date cannot be null. Data: $record');
-    assert(inCirculationQuestionsCount != null, 'upsertUserStatsInCirculationQuestionsFromInboundSync: in_circulation_questions_count cannot be null. Data: $record');
-    assert(lastModifiedTimestamp != null, 'upsertUserStatsInCirculationQuestionsFromInboundSync: last_modified_timestamp cannot be null. Data: $record');
-
-    await _verifyUserStatsInCirculationQuestionsTable(db);
-
-    final Map<String, dynamic> dataToInsertOrUpdate = {
-      'user_id': userId,
-      'record_date': recordDate,
-      'in_circulation_questions_count': inCirculationQuestionsCount,
-      'has_been_synced': 1,
-      'edits_are_synced': 1,
-      'last_modified_timestamp': lastModifiedTimestamp,
-    };
-
-    final int rowId = await insertRawData(
-      'user_stats_in_circulation_questions',
-      dataToInsertOrUpdate,
-      db,
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
-
-    if (rowId > 0) {
-      QuizzerLogger.logSuccess('Successfully upserted user_stats_in_circulation_questions for user $userId, date $recordDate from inbound sync.');
-    } else {
-      QuizzerLogger.logWarning('upsertUserStatsInCirculationQuestionsFromInboundSync: insertRawData with replace returned 0 for user $userId, date $recordDate. Data: $dataToInsertOrUpdate');
+    for (Map<String, dynamic> statRecord in userStatsInCirculationQuestionsRecords) {
+      // Define the map for insert
+      final Map<String, dynamic> dataToInsertOrUpdate = {
+        'user_id': statRecord["user_id"],
+        'record_date': statRecord['record_date'],
+        'in_circulation_questions_count': statRecord['in_circulation_questions_count'],
+        'has_been_synced': 1,
+        'edits_are_synced': 1,
+        'last_modified_timestamp': statRecord['last_modified_timestamp'],
+      };
+      // Insert record
+      await insertRawData(
+        'user_stats_in_circulation_questions',
+        dataToInsertOrUpdate,
+        db,
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
     }
   } catch (e) {
     QuizzerLogger.logError('Error upserting user_stats_in_circulation_questions from inbound sync - $e');
     rethrow;
-  } finally {
-    getDatabaseMonitor().releaseDatabaseAccess();
   }
 }
 

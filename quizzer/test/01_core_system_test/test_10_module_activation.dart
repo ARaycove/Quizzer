@@ -72,11 +72,12 @@ void main() {
           throw Exception('Failed to acquire database access for verification');
         }
         final List<Map<String, dynamic>> activationRecords = await dbVerify.query('user_module_activation_status');
+        final List<Map<String, dynamic>> allModules = await getAllModules(dbVerify);
         getDatabaseMonitor().releaseDatabaseAccess();
         expect(activationRecords.isEmpty, isTrue, reason: 'user_module_activation_status table should be empty after truncation');
         QuizzerLogger.logSuccess('Verified user_module_activation_status table is empty');
         
-        final List<Map<String, dynamic>> allModules = await getAllModules();
+        
         for (final module in allModules) {
           final String moduleName = module['module_name'] as String;
           final bool result = await updateModuleActivationStatus(sessionManager.userId!, moduleName, false);
@@ -117,13 +118,14 @@ void main() {
           throw Exception('Failed to acquire database access for verification');
         }
         final List<Map<String, dynamic>> questionRecords = await dbVerify.query('user_question_answer_pairs');
+        final List<Map<String, dynamic>> allModules = await getAllModules(dbVerify);
         getDatabaseMonitor().releaseDatabaseAccess();
         expect(questionRecords.isEmpty, isTrue, reason: 'user_question_answer_pairs table should be empty after truncation');
         QuizzerLogger.logSuccess('Verified user_question_answer_pairs table is empty');
         
         // Step 3: Select a random module with questions
         QuizzerLogger.logMessage('Step 3: Selecting a random module with questions');
-        final List<Map<String, dynamic>> allModules = await getAllModules();
+        
         final random = Random();
         String selectedModuleName = '';
         int questionCount = 0;
@@ -202,7 +204,11 @@ void main() {
       try {
         // Step 1: Deactivate all modules
         QuizzerLogger.logMessage('Step 1: Deactivating all modules');
-        final List<Map<String, dynamic>> allModules = await getAllModules();
+        
+        final db = getDatabaseMonitor().requestDatabaseAccess();
+        final List<Map<String, dynamic>> allModules = await getAllModules(db);
+        getDatabaseMonitor().releaseDatabaseAccess();
+
         for (final module in allModules) {
           final String moduleName = module['module_name'] as String;
           final bool result = await updateModuleActivationStatus(sessionManager.userId!, moduleName, false);

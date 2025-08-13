@@ -13,7 +13,7 @@ import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dar
 const String _userFeedbackTableName = 'user_feedback';
 
 /// Verifies the existence and schema of the user_feedback table.
-Future<void> _verifyUserFeedbackTable(Database db) async {
+Future<void> verifyUserFeedbackTable(dynamic db) async {
   QuizzerLogger.logMessage('Verifying $_userFeedbackTableName table...');
   final List<Map<String, dynamic>> tables = await db.rawQuery(
     "SELECT name FROM sqlite_master WHERE type='table' AND name='$_userFeedbackTableName'"
@@ -89,7 +89,6 @@ Future<String> addUserFeedback({
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    await _verifyUserFeedbackTable(db); // Ensure table exists and is correct
     const uuid = Uuid();
     final String newId = uuid.v4();
     final String now = DateTime.now().toUtc().toIso8601String();
@@ -141,7 +140,6 @@ Future<List<Map<String, dynamic>>> getUnsyncedUserFeedback() async {
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    await _verifyUserFeedbackTable(db);
     QuizzerLogger.logMessage('Fetching unsynced user feedback from $_userFeedbackTableName...');
     
     // Fetch records where has_been_synced is 0 (false)
@@ -172,7 +170,6 @@ Future<void> markUserFeedbackAsSynced(List<String> ids) async {
       QuizzerLogger.logMessage('No feedback IDs provided to mark as synced.');
       return;
     }
-    await _verifyUserFeedbackTable(db);
     final String now = DateTime.now().toUtc().toIso8601String();
     
     // Create a String of placeholders for the IN clause
@@ -212,9 +209,7 @@ Future<int> deleteLocalUserFeedback(List<String> ids) async {
     if (ids.isEmpty) {
       QuizzerLogger.logMessage('No feedback IDs provided for deletion.');
       return 0;
-    }
-    await _verifyUserFeedbackTable(db);
-    
+    }    
     final String placeholders = List.filled(ids.length, '?').join(',');
     final int rowsDeleted = await db.delete(
       _userFeedbackTableName,

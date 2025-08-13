@@ -7,7 +7,7 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
 
 /// Verifies the existence and schema of the question_answer_attempts table.
-Future<void> _verifyQuestionAnswerAttemptTable(Database db) async {
+Future<void> verifyQuestionAnswerAttemptTable(dynamic db) async {
   QuizzerLogger.logMessage('Verifying question_answer_attempts table...');
   final List<Map<String, dynamic>> tables = await db.rawQuery(
     "SELECT name FROM sqlite_master WHERE type='table' AND name='question_answer_attempts'"
@@ -120,8 +120,6 @@ Future<int> addQuestionAnswerAttempt({
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    await _verifyQuestionAnswerAttemptTable(db);
-
     QuizzerLogger.logMessage('Adding question attempt for Q: $questionId, User: $participantId');
     
     // Prepare the raw data map
@@ -176,7 +174,6 @@ Future<int> deleteQuestionAnswerAttemptRecord(String participantId, String quest
       throw Exception('Failed to acquire database access');
     }
     QuizzerLogger.logMessage('Deleting question answer attempt (PID: $participantId, QID: $questionId, TS: $timeStamp)');
-    await _verifyQuestionAnswerAttemptTable(db);
     final int rowsDeleted = await db.delete(
       'question_answer_attempts',
       where: 'participant_id = ? AND question_id = ? AND time_stamp = ?',
@@ -205,7 +202,6 @@ Future<List<Map<String, dynamic>>> getAttemptsByQuestionAndUser(String questionI
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    await _verifyQuestionAnswerAttemptTable(db);
     QuizzerLogger.logMessage('Fetching attempts for Q: $questionId, User: $userId');
     // Use the universal query helper
     return await queryAndDecodeDatabase(
@@ -230,7 +226,6 @@ Future<List<Map<String, dynamic>>> getAttemptsByUser(String userId) async {
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    await _verifyQuestionAnswerAttemptTable(db);
     QuizzerLogger.logMessage('Fetching all attempts for User: $userId');
     // Use the universal query helper
     return await queryAndDecodeDatabase(
@@ -261,8 +256,6 @@ Future<List<Map<String, dynamic>>> getUnsyncedQuestionAnswerAttempts() async {
       throw Exception('Failed to acquire database access');
     }
     QuizzerLogger.logMessage('Fetching unsynced question answer attempts...');
-    await _verifyQuestionAnswerAttemptTable(db); // Ensure table and sync columns exist
-
     final List<Map<String, dynamic>> results = await db.query(
       'question_answer_attempts',
       where: 'has_been_synced = 0 OR edits_are_synced = 0',

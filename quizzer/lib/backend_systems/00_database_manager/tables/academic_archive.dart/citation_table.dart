@@ -244,6 +244,7 @@ Future<void> insertCitation({
       db,
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
+    getDatabaseMonitor().releaseDatabaseAccess();
     
     if (result > 0) {
       QuizzerLogger.logSuccess('Citation $title inserted/replaced successfully');
@@ -253,8 +254,6 @@ Future<void> insertCitation({
   } catch (e) {
     QuizzerLogger.logError('Error inserting citation - $e');
     rethrow;
-  } finally {
-    getDatabaseMonitor().releaseDatabaseAccess();
   }
 }
 
@@ -507,6 +506,7 @@ Future<void> updateCitation({
       [title, subtitle, publisher, publicationDate],
       db,
     );
+    getDatabaseMonitor().releaseDatabaseAccess();
     
     if (result > 0) {
       QuizzerLogger.logSuccess('Citation $title updated successfully ($result row affected).');
@@ -516,8 +516,6 @@ Future<void> updateCitation({
   } catch (e) {
     QuizzerLogger.logError('Error updating citation - $e');
     rethrow;
-  } finally {
-    getDatabaseMonitor().releaseDatabaseAccess();
   }
 }
 
@@ -544,6 +542,7 @@ Future<Map<String, dynamic>?> getCitation({
       whereArgs: [title, subtitle, publisher, publicationDate],
       limit: 2, // Limit to 2 to detect if PK constraint is violated
     );
+    getDatabaseMonitor().releaseDatabaseAccess();
 
     if (results.isEmpty) {
       QuizzerLogger.logMessage('Citation $title not found');
@@ -561,8 +560,6 @@ Future<Map<String, dynamic>?> getCitation({
   } catch (e) {
     QuizzerLogger.logError('Error getting citation - $e');
     rethrow;
-  } finally {
-    getDatabaseMonitor().releaseDatabaseAccess();
   }
 }
 
@@ -582,14 +579,13 @@ Future<List<Map<String, dynamic>>> getAllCitations() async {
       db,
       // No WHERE clause needed to get all
     );
+    getDatabaseMonitor().releaseDatabaseAccess();
 
     QuizzerLogger.logValue('Retrieved ${decodedCitations.length} citations');
     return decodedCitations;
   } catch (e) {
     QuizzerLogger.logError('Error getting all citations - $e');
     rethrow;
-  } finally {
-    getDatabaseMonitor().releaseDatabaseAccess();
   }
 }
 
@@ -610,14 +606,13 @@ Future<List<Map<String, dynamic>>> getUnsyncedCitations() async {
       where: 'edits_are_synced = ?',
       whereArgs: [0],
     );
+    getDatabaseMonitor().releaseDatabaseAccess();
 
     QuizzerLogger.logValue('Found ${unsyncedCitations.length} unsynced citations');
     return unsyncedCitations;
   } catch (e) {
     QuizzerLogger.logError('Error getting unsynced citations - $e');
     rethrow;
-  } finally {
-    getDatabaseMonitor().releaseDatabaseAccess();
   }
 }
 
@@ -650,6 +645,7 @@ Future<void> updateCitationSyncFlags({
       [title, subtitle, publisher, publicationDate],
       db,
     );
+    getDatabaseMonitor().releaseDatabaseAccess();
     
     if (result > 0) {
       QuizzerLogger.logSuccess('Sync flags updated for citation $title');
@@ -659,8 +655,6 @@ Future<void> updateCitationSyncFlags({
   } catch (e) {
     QuizzerLogger.logError('Error updating citation sync flags - $e');
     rethrow;
-  } finally {
-    getDatabaseMonitor().releaseDatabaseAccess();
   }
 }
 
@@ -770,13 +764,12 @@ Future<void> upsertCitationFromInboundSync({
       data,
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
+    getDatabaseMonitor().releaseDatabaseAccess();
 
     QuizzerLogger.logSuccess('Successfully upserted citation $title from inbound sync.');
   } catch (e) {
     QuizzerLogger.logError('Error upserting citation from inbound sync - $e');
     rethrow;
-  } finally {
-    getDatabaseMonitor().releaseDatabaseAccess();
   }
 }
 
@@ -800,6 +793,7 @@ Future<void> deleteCitation({
       where: '$titleField = ? AND $subtitleField = ? AND $publisherField = ? AND $publicationDateField = ?',
       whereArgs: [title, subtitle, publisher, publicationDate],
     );
+    getDatabaseMonitor().releaseDatabaseAccess();
     
     if (result > 0) {
       QuizzerLogger.logSuccess('Citation $title deleted successfully ($result row affected).');
@@ -809,8 +803,6 @@ Future<void> deleteCitation({
   } catch (e) {
     QuizzerLogger.logError('Error deleting citation - $e');
     rethrow;
-  } finally {
-    getDatabaseMonitor().releaseDatabaseAccess();
   }
 }
 

@@ -7,7 +7,7 @@ import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dar
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_question_answer_pairs_table.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 
-Future<void> _verifyUserStatsEligibleQuestionsTable(Database db) async {
+Future<void> verifyUserStatsEligibleQuestionsTable(dynamic db) async {
   final List<Map<String, dynamic>> tables = await db.rawQuery(
     "SELECT name FROM sqlite_master WHERE type='table' AND name='user_stats_eligible_questions'"
   );
@@ -58,11 +58,6 @@ Future<void> updateEligibleQuestionsStat(String userId) async {
     // Get today's date in YYYY-MM-DD format
     final String today = DateTime.now().toUtc().toIso8601String().substring(0, 10);
 
-
-
-    // Verify only the stats table before writing
-    await _verifyUserStatsEligibleQuestionsTable(db);
-
     // Overwrite (insert or update) the record for today
     final List<Map<String, dynamic>> existing = await queryAndDecodeDatabase(
       'user_stats_eligible_questions',
@@ -112,7 +107,6 @@ Future<void> updateEligibleQuestionsStat(String userId) async {
 Future<List<Map<String, dynamic>>> getUserStatsEligibleQuestionsRecordsByUser(String userId) async {
   try {
     final db = await getDatabaseMonitor().requestDatabaseAccess();
-    await _verifyUserStatsEligibleQuestionsTable(db!);
     return await queryAndDecodeDatabase(
       'user_stats_eligible_questions',
       db,
@@ -130,7 +124,6 @@ Future<List<Map<String, dynamic>>> getUserStatsEligibleQuestionsRecordsByUser(St
 Future<Map<String, dynamic>> getUserStatsEligibleQuestionsRecordByDate(String userId, String recordDate) async {
   try {
     final db = await getDatabaseMonitor().requestDatabaseAccess();
-    await _verifyUserStatsEligibleQuestionsTable(db!);
     final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
       'user_stats_eligible_questions',
       db,
@@ -164,8 +157,7 @@ Future<List<Map<String, dynamic>>> getUnsyncedUserStatsEligibleQuestionsRecords(
   try {
     final db = await getDatabaseMonitor().requestDatabaseAccess();
     QuizzerLogger.logMessage('Fetching unsynced eligible questions records for user: $userId...');
-    await _verifyUserStatsEligibleQuestionsTable(db!);
-    final List<Map<String, dynamic>> results = await db.query(
+    final List<Map<String, dynamic>> results = await db!.query(
       'user_stats_eligible_questions',
       where: '(has_been_synced = 0 OR edits_are_synced = 0) AND user_id = ?',
       whereArgs: [userId],
@@ -189,7 +181,6 @@ Future<void> updateUserStatsEligibleQuestionsSyncFlags({
   try {
     final db = await getDatabaseMonitor().requestDatabaseAccess();
     QuizzerLogger.logMessage('Updating sync flags for eligible questions record (User: $userId, Date: $recordDate) -> Synced: $hasBeenSynced, Edits Synced: $editsAreSynced');
-    await _verifyUserStatsEligibleQuestionsTable(db!);
     final Map<String, dynamic> updates = {
       'has_been_synced': hasBeenSynced ? 1 : 0,
       'edits_are_synced': editsAreSynced ? 1 : 0,
@@ -215,47 +206,33 @@ Future<void> updateUserStatsEligibleQuestionsSyncFlags({
   }
 }
 
-Future<void> upsertUserStatsEligibleQuestionsFromInboundSync(Map<String, dynamic> record) async {
+
+Future<void> batchUpsertUserStatsEligibleQuestionsFromInboundSync({
+  required List<Map<String, dynamic>> userStatsEligibleQuestionsRecords,
+  required dynamic db
+  }) async {
   try {
-    final db = await getDatabaseMonitor().requestDatabaseAccess();
     // Ensure required fields are present
-    final String? userId = record['user_id'] as String?;
-    final String? recordDate = record['record_date'] as String?;
-    final int? eligibleQuestionsCount = record['eligible_questions_count'] as int?;
-    final String? lastModifiedTimestamp = record['last_modified_timestamp'] as String?;
+    for (Map<String, dynamic> statRecord in userStatsEligibleQuestionsRecords) {
+      // Define the data mpa we are entering explicitly
+      final Map<String, dynamic> dataToInsertOrUpdate = {
+        'user_id': statRecord['user_id'],
+        'record_date': statRecord['record_date'],
+        'eligible_questions_count': statRecord['eligible_questions_count'],
+        'has_been_synced': 1,
+        'edits_are_synced': 1,
+        'last_modified_timestamp': statRecord['last_modified_timestamp'],
+      };
 
-    assert(userId != null, 'upsertUserStatsEligibleQuestionsFromInboundSync: user_id cannot be null. Data: $record');
-    assert(recordDate != null, 'upsertUserStatsEligibleQuestionsFromInboundSync: record_date cannot be null. Data: $record');
-    assert(eligibleQuestionsCount != null, 'upsertUserStatsEligibleQuestionsFromInboundSync: eligible_questions_count cannot be null. Data: $record');
-    assert(lastModifiedTimestamp != null, 'upsertUserStatsEligibleQuestionsFromInboundSync: last_modified_timestamp cannot be null. Data: $record');
-
-    await _verifyUserStatsEligibleQuestionsTable(db!);
-
-    final Map<String, dynamic> dataToInsertOrUpdate = {
-      'user_id': userId,
-      'record_date': recordDate,
-      'eligible_questions_count': eligibleQuestionsCount,
-      'has_been_synced': 1,
-      'edits_are_synced': 1,
-      'last_modified_timestamp': lastModifiedTimestamp,
-    };
-
-    final int rowId = await insertRawData(
-      'user_stats_eligible_questions',
-      dataToInsertOrUpdate,
-      db,
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
-
-    if (rowId > 0) {
-      QuizzerLogger.logSuccess('Successfully upserted user_stats_eligible_questions for user $userId, date $recordDate from inbound sync.');
-    } else {
-      QuizzerLogger.logWarning('upsertUserStatsEligibleQuestionsFromInboundSync: insertRawData with replace returned 0 for user $userId, date $recordDate. Data: $dataToInsertOrUpdate');
+      await insertRawData(
+        'user_stats_eligible_questions',
+        dataToInsertOrUpdate,
+        db,
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
     }
   } catch (e) {
     QuizzerLogger.logError('Error upserting eligible questions record from inbound sync - $e');
     rethrow;
-  } finally {
-    getDatabaseMonitor().releaseDatabaseAccess();
   }
 }

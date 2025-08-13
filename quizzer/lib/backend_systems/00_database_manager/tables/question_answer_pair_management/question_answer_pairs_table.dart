@@ -633,9 +633,6 @@ Future<int> editQuestionAnswerPair({
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    // First verify that the table exists
-    await verifyQuestionAnswerPairTable(db);
-
     // Prepare map for raw values to update 
     Map<String, dynamic> valuesToUpdate = {};
     
@@ -716,8 +713,6 @@ Future<Map<String, dynamic>> getQuestionAnswerPairById(String questionId) async 
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    // First verify that the table exists
-    await verifyQuestionAnswerPairTable(db);
     // Use the single helper function
     final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
       'question_answer_pairs',
@@ -791,8 +786,6 @@ Future<List<Map<String, dynamic>>>  getAllQuestionAnswerPairs() async {
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    // First verify that the table exists
-    await verifyQuestionAnswerPairTable(db);
     // Use the helper function to query and decode all rows
     return await queryAndDecodeDatabase('question_answer_pairs', db);
   } catch (e) {
@@ -831,9 +824,6 @@ Future<int> removeQuestionAnswerPair(String timeStamp, String qstContrib) async 
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    // First verify that the table exists
-    await verifyQuestionAnswerPairTable(db);
-
     return await db.delete(
       'question_answer_pairs',
       where: 'time_stamp = ? AND qst_contrib = ?',
@@ -855,8 +845,6 @@ Future<String> getModuleNameForQuestionId(String questionId) async {
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    await verifyQuestionAnswerPairTable(db);
-    
     final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
       'question_answer_pairs',
       db,
@@ -894,8 +882,6 @@ Future<List<Map<String, dynamic>>> getQuestionRecordsForModule(String moduleName
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    await verifyQuestionAnswerPairTable(db);
-    
     // Normalize the module name for consistent matching
     final String normalizedModuleName = await normalizeString(moduleName);
     
@@ -929,8 +915,6 @@ Future<Map<String, String>> getModuleNamesForQuestionIds(List<String> questionId
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    await verifyQuestionAnswerPairTable(db);
-    
     // Create placeholders for the IN clause
     final placeholders = List.filled(questionIds.length, '?').join(',');
     
@@ -973,8 +957,6 @@ Future<List<String>> getQuestionIdsForModule(String moduleName) async {
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    await verifyQuestionAnswerPairTable(db);
-    
     // Normalize the module name for consistent matching
     final String normalizedModuleName = await normalizeString(moduleName);
     
@@ -1035,8 +1017,6 @@ Future<void> updateQuestionSyncFlags({
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    await verifyQuestionAnswerPairTable(db);
-    
     // Ensure sync flags are only 1 or 0, never -1 or other values
     final Map<String, dynamic> updates = {
       'has_been_synced': hasBeenSynced ? 1 : 0,
@@ -1082,8 +1062,6 @@ Future<List<Map<String, dynamic>>> getUnsyncedQuestionAnswerPairs() async {
       throw Exception('Failed to acquire database access');
     }
     QuizzerLogger.logMessage('Fetching unsynced question-answer pairs...');
-    await verifyQuestionAnswerPairTable(db); // Ensure table and sync columns exist
-
     final List<Map<String, dynamic>> results = await db.query(
       'question_answer_pairs',
       where: 'has_been_synced = 0 OR edits_are_synced = 0',
@@ -1111,8 +1089,6 @@ Future<bool> insertOrUpdateQuestionAnswerPair(Map<String, dynamic> questionData)
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    await verifyQuestionAnswerPairTable(db);
-
     // Ensure all required fields are present in the incoming data
     final String? questionId = questionData['question_id'] as String?;
     final String? timeStamp = questionData['time_stamp'] as String?;
@@ -1288,8 +1264,6 @@ Future<String> addQuestionMultipleChoice({
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    await verifyQuestionAnswerPairTable(db);
-    
     // Get current user ID from session manager
     final String? userId = getSessionManager().userId;
     if (userId == null) {
@@ -1418,8 +1392,6 @@ Future<String> addQuestionSelectAllThatApply({
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    await verifyQuestionAnswerPairTable(db);
-    
     // Get current user ID from session manager
     final String? userId = getSessionManager().userId;
     if (userId == null) {
@@ -1552,8 +1524,6 @@ Future<String> addQuestionTrueFalse({
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    await verifyQuestionAnswerPairTable(db);
-    
     // Get current user ID from session manager
     final String? userId = getSessionManager().userId;
     if (userId == null) {
@@ -1670,9 +1640,6 @@ Future<String> addSortOrderQuestion({
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    // First verify that the table exists
-    await verifyQuestionAnswerPairTable(db); // Ensure table and columns are ready
-
     // Get current user ID from session manager
     final String? userId = getSessionManager().userId;
     if (userId == null) {
@@ -1829,8 +1796,6 @@ Future<String> addFillInTheBlankQuestion({
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    await verifyQuestionAnswerPairTable(db);
-    
     // Get current user ID from session manager
     final String? userId = getSessionManager().userId;
     if (userId == null) {
@@ -1959,8 +1924,6 @@ Future<List<Map<String, dynamic>>> getPairsWithNullMediaStatus() async {
       throw Exception('Failed to acquire database access');
     }
     QuizzerLogger.logMessage('Fetching question-answer pairs with NULL has_media status...');
-    await verifyQuestionAnswerPairTable(db); // Ensure table and columns exist
-
     final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
       'question_answer_pairs',
       db,
@@ -2038,17 +2001,15 @@ Future<void> processNullMediaStatusPairs() async {
 /// True batch upsert for question_answer_pairs using a single SQL statement
 Future<void> batchUpsertQuestionAnswerPairs({
   required List<Map<String, dynamic>> records,
+  required dynamic db,
   int chunkSize = 500,
 }) async {
   try {
-    final db = await getDatabaseMonitor().requestDatabaseAccess();
-    if (db == null) {
-      throw Exception('Failed to acquire database access');
+    if (records.isEmpty) {
+      QuizzerLogger.logMessage("No Records returned for question_answer_pairs");
+      return;
     }
-    if (records.isEmpty) return;
-    QuizzerLogger.logMessage('Starting TRUE batch upsert for question_answer_pairs: ${records.length} records');
-    await verifyQuestionAnswerPairTable(db);
-
+    QuizzerLogger.logMessage('Starting batch upsert for question_answer_pairs: ${records.length} records');
     // List of all columns in the table (excluding legacy fields that don't exist in local table)
     final columns = [
       'time_stamp',
@@ -2207,7 +2168,5 @@ Future<void> batchUpsertQuestionAnswerPairs({
   } catch (e) {
     QuizzerLogger.logError('Error batch upserting question answer pairs - $e');
     rethrow;
-  } finally {
-    getDatabaseMonitor().releaseDatabaseAccess();
   }
 }

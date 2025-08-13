@@ -44,7 +44,7 @@ Future<Map<String, dynamic>> attemptSupabaseLogin(String email, String password,
 
     
     // Get the local user ID from the user profile table, not the Supabase user ID
-    final localUserId = await user_profile.getUserIdByEmail(email);
+    final String localUserId = await user_profile.getUserIdByEmail(email);
     sessionManager.userId = localUserId;
     sessionManager.userEmail = email;
     sessionManager.userLoggedIn = true;
@@ -104,6 +104,53 @@ Future<void> ensureLocalProfileExists(String email) async {
     
     if (!isEmailInList) {
       throw StateError("Failed to ensure local profile exists for $email");
+    }
+
+    // FINAL VERIFICATION: Ensure local user ID matches Supabase user ID
+    QuizzerLogger.logMessage("Verifying local user ID matches Supabase user ID for $email");
+    try {
+      // Get the local user ID
+      final String localUserId = await user_profile.getUserIdByEmail(email);
+
+      // Get the Supabase user profile UUID (not the auth user ID)
+      final sessionManager = getSessionManager();
+      final List<dynamic> supabaseProfile = await sessionManager.supabase
+          .from('user_profile')
+          .select('uuid')
+          .eq('email', email)
+          .limit(1);
+      
+      if (supabaseProfile.isEmpty) {
+        QuizzerLogger.logWarning("No Supabase user profile found for $email, skipping user ID verification");
+        return;
+      }
+      
+      final String supabaseUserId = supabaseProfile.first['uuid'] as String;
+
+      QuizzerLogger.logMessage("Local user ID: $localUserId, Supabase user profile UUID: $supabaseUserId");
+
+      // If they don't match, update the local profile to use the Supabase user profile UUID
+      if (localUserId != supabaseUserId) {
+        QuizzerLogger.logWarning("User ID mismatch detected! Local: $localUserId, Supabase: $supabaseUserId");
+        QuizzerLogger.logMessage("Updating local profile to use Supabase user profile UUID for $email");
+        
+        // Fetch the profile from Supabase again to ensure we have the correct data
+        await user_profile.fetchAndInsertUserProfileFromSupabase(email);
+        
+        // Verify the update was successful
+        final String updatedLocalUserId = await user_profile.getUserIdByEmail(email);
+        if (updatedLocalUserId != supabaseUserId) {
+          throw StateError("Failed to update local profile to match Supabase user profile UUID for $email");
+        }
+        
+        QuizzerLogger.logSuccess("Successfully updated local profile to match Supabase user profile UUID: $supabaseUserId");
+      } else {
+        QuizzerLogger.logSuccess("User ID verification passed - local and Supabase user profile UUIDs match: $localUserId");
+      }
+    } catch (e) {
+      QuizzerLogger.logError("Error during user ID verification for $email: $e");
+      // Don't rethrow here - the profile exists, we just couldn't verify the ID match
+      // This is a warning, not a critical failure
     }
   } catch (e) {
     QuizzerLogger.logError('Error ensuring local profile exists for $email - $e');

@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
+import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/backend_systems/02_login_authentication/login_initialization.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/modules_table.dart';
@@ -92,7 +93,9 @@ void main() {
       
       // Step 2: Get all modules from database for comparison
       QuizzerLogger.logMessage('Step 2: Getting all modules from database for comparison...');
-      final List<Map<String, dynamic>> allModules = await getAllModules();
+      final db = getDatabaseMonitor().requestDatabaseAccess();
+      final List<Map<String, dynamic>> allModules = await getAllModules(db);
+      getDatabaseMonitor().releaseDatabaseAccess();
       expect(allModules, isNotEmpty, reason: 'Should have modules in database');
       QuizzerLogger.logSuccess('Found ${allModules.length} modules in database');
       
@@ -178,7 +181,9 @@ void main() {
       
       // Step 1: Get all modules from database
       QuizzerLogger.logMessage('Step 1: Getting all modules from database...');
-      final List<Map<String, dynamic>> allModules = await getAllModules();
+      final db = getDatabaseMonitor().requestDatabaseAccess();
+      final List<Map<String, dynamic>> allModules = await getAllModules(db);
+      getDatabaseMonitor().releaseDatabaseAccess();
       expect(allModules, isNotEmpty, reason: 'Should have modules in database');
       QuizzerLogger.logSuccess('Found ${allModules.length} modules to test');
       
@@ -201,7 +206,10 @@ void main() {
         expect(updateResult1, isTrue, reason: 'Failed to update description for module: $moduleName');
         
         // Verify the change
-        final List<Map<String, dynamic>> moduleAfterUpdate1 = await getAllModules();
+        final db = getDatabaseMonitor().requestDatabaseAccess();
+        final List<Map<String, dynamic>> moduleAfterUpdate1 = await getAllModules(db);
+        getDatabaseMonitor().releaseDatabaseAccess();
+
         final Map<String, dynamic> updatedModule1 = moduleAfterUpdate1.firstWhere(
           (m) => m['module_name'] == moduleName,
           orElse: () => <String, dynamic>{},
@@ -217,7 +225,9 @@ void main() {
         expect(updateResult2, isTrue, reason: 'Failed to revert description for module: $moduleName');
         
         // Verify the reversion
-        final List<Map<String, dynamic>> moduleAfterUpdate2 = await getAllModules();
+        final db2 = getDatabaseMonitor().requestDatabaseAccess();
+        final List<Map<String, dynamic>> moduleAfterUpdate2 = await getAllModules(db2);
+        getDatabaseMonitor().releaseDatabaseAccess();
         final Map<String, dynamic> updatedModule2 = moduleAfterUpdate2.firstWhere(
           (m) => m['module_name'] == moduleName,
           orElse: () => <String, dynamic>{},
@@ -243,7 +253,10 @@ void main() {
       
       // Step 1: Get all modules to find one to test with
       QuizzerLogger.logMessage('Step 1: Getting all modules to select one for testing...');
-      final List<Map<String, dynamic>> allModules = await getAllModules();
+      final db = getDatabaseMonitor().requestDatabaseAccess();
+      final List<Map<String, dynamic>> allModules = await getAllModules(db);
+      getDatabaseMonitor().releaseDatabaseAccess();
+      
       expect(allModules, isNotEmpty, reason: 'Should have modules in database');
       
       // Select the first module for testing

@@ -8,7 +8,7 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/table_helper.
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 
-Future<void> _verifyUserStatsDailyQuestionsAnsweredTable(Database db) async {
+Future<void> verifyUserStatsDailyQuestionsAnsweredTable(dynamic db) async {
   final List<Map<String, dynamic>> tables = await db.rawQuery(
     "SELECT name FROM sqlite_master WHERE type='table' AND name='user_stats_daily_questions_answered'"
   );
@@ -61,10 +61,9 @@ Future<void> incrementDailyQuestionsAnsweredStat(String userId, bool isCorrect) 
   try {
     final db = await getDatabaseMonitor().requestDatabaseAccess();
     final String today = DateTime.now().toUtc().toIso8601String().substring(0, 10);
-    await _verifyUserStatsDailyQuestionsAnsweredTable(db!);
 
     // Fetch the most recent record for the user (by date desc)
-    final List<Map<String, dynamic>> recentRecords = await db.query(
+    final List<Map<String, dynamic>> recentRecords = await db!.query(
       'user_stats_daily_questions_answered',
       where: 'user_id = ?',
       whereArgs: [userId],
@@ -191,7 +190,6 @@ Future<void> incrementDailyQuestionsAnsweredStat(String userId, bool isCorrect) 
 Future<List<Map<String, dynamic>>> getUserStatsDailyQuestionsAnsweredRecordsByUser(String userId) async {
   try {
     final db = await getDatabaseMonitor().requestDatabaseAccess();
-    await _verifyUserStatsDailyQuestionsAnsweredTable(db!);
     return await queryAndDecodeDatabase(
       'user_stats_daily_questions_answered',
       db,
@@ -209,7 +207,6 @@ Future<List<Map<String, dynamic>>> getUserStatsDailyQuestionsAnsweredRecordsByUs
 Future<Map<String, dynamic>> getUserStatsDailyQuestionsAnsweredRecordByDate(String userId, String recordDate) async {
   try {
     final db = await getDatabaseMonitor().requestDatabaseAccess();
-    await _verifyUserStatsDailyQuestionsAnsweredTable(db!);
     final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
       'user_stats_daily_questions_answered',
       db,
@@ -243,8 +240,7 @@ Future<List<Map<String, dynamic>>> getUnsyncedUserStatsDailyQuestionsAnsweredRec
   try {
     final db = await getDatabaseMonitor().requestDatabaseAccess();
     QuizzerLogger.logMessage('Fetching unsynced daily questions answered records for user: $userId...');
-    await _verifyUserStatsDailyQuestionsAnsweredTable(db!);
-    final List<Map<String, dynamic>> results = await db.query(
+    final List<Map<String, dynamic>> results = await db!.query(
       'user_stats_daily_questions_answered',
       where: '(has_been_synced = 0 OR edits_are_synced = 0) AND user_id = ?',
       whereArgs: [userId],
@@ -268,7 +264,6 @@ Future<void> updateUserStatsDailyQuestionsAnsweredSyncFlags({
   try {
     final db = await getDatabaseMonitor().requestDatabaseAccess();
     QuizzerLogger.logMessage('Updating sync flags for daily questions answered record (User: $userId, Date: $recordDate) -> Synced: $hasBeenSynced, Edits Synced: $editsAreSynced');
-    await _verifyUserStatsDailyQuestionsAnsweredTable(db!);
     final Map<String, dynamic> updates = {
       'has_been_synced': hasBeenSynced ? 1 : 0,
       'edits_are_synced': editsAreSynced ? 1 : 0,
@@ -294,50 +289,33 @@ Future<void> updateUserStatsDailyQuestionsAnsweredSyncFlags({
   }
 }
 
-Future<void> upsertUserStatsDailyQuestionsAnsweredFromInboundSync(Map<String, dynamic> record) async {
+Future<void> batchUpsertUserStatsDailyQuestionsAnsweredFromInboundSync({
+  required List<Map<String, dynamic>> userStatsDailyQuestionsAnsweredRecords,
+  required dynamic db
+}) async {
   try {
-    final db = await getDatabaseMonitor().requestDatabaseAccess();
-    final String? userId = record['user_id'] as String?;
-    final String? recordDate = record['record_date'] as String?;
-    final int? dailyCount = record['daily_questions_answered'] as int?;
-    final String? lastModifiedTimestamp = record['last_modified_timestamp'] as String?;
-    final int correctCount = record['correct_questions_answered'] as int? ?? 0;
-    final int incorrectCount = record['incorrect_questions_answered'] as int? ?? 0;
-
-    assert(userId != null, 'upsertUserStatsDailyQuestionsAnsweredFromInboundSync: user_id cannot be null. Data: $record');
-    assert(recordDate != null, 'upsertUserStatsDailyQuestionsAnsweredFromInboundSync: record_date cannot be null. Data: $record');
-    assert(dailyCount != null, 'upsertUserStatsDailyQuestionsAnsweredFromInboundSync: daily_questions_answered cannot be null. Data: $record');
-    assert(lastModifiedTimestamp != null, 'upsertUserStatsDailyQuestionsAnsweredFromInboundSync: last_modified_timestamp cannot be null. Data: $record');
-
-    await _verifyUserStatsDailyQuestionsAnsweredTable(db!);
-
-    final Map<String, dynamic> dataToInsertOrUpdate = {
-      'user_id': userId,
-      'record_date': recordDate,
-      'daily_questions_answered': dailyCount,
-      'correct_questions_answered': correctCount,
-      'incorrect_questions_answered': incorrectCount,
-      'has_been_synced': 1,
-      'edits_are_synced': 1,
-      'last_modified_timestamp': lastModifiedTimestamp,
-    };
-
-    final int rowId = await insertRawData(
-      'user_stats_daily_questions_answered',
-      dataToInsertOrUpdate,
-      db,
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
-
-    if (rowId > 0) {
-      QuizzerLogger.logSuccess('Successfully upserted user_stats_daily_questions_answered for user $userId, date $recordDate from inbound sync.');
-    } else {
-      QuizzerLogger.logWarning('upsertUserStatsDailyQuestionsAnsweredFromInboundSync: insertRawData with replace returned 0 for user $userId, date $recordDate. Data: $dataToInsertOrUpdate');
+    for (Map<String, dynamic> statRecord in userStatsDailyQuestionsAnsweredRecords) {
+      // Define the data map 
+      final Map<String, dynamic> dataToInsertOrUpdate = {
+        'user_id': statRecord['user_id'],
+        'record_date': statRecord['record_date'],
+        'daily_questions_answered': statRecord['daily_questions_answered'],
+        'correct_questions_answered': statRecord['correct_questions_answered'],
+        'incorrect_questions_answered': statRecord['incorrect_questions_answered'],
+        'has_been_synced': 1,
+        'edits_are_synced': 1,
+        'last_modified_timestamp': statRecord['last_modified_timestamp'],
+      };
+      // Insert the data map
+      await insertRawData(
+        'user_stats_daily_questions_answered',
+        dataToInsertOrUpdate,
+        db,
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
     }
   } catch (e) {
     QuizzerLogger.logError('Error upserting daily questions answered record from inbound sync - $e');
     rethrow;
-  } finally {
-    getDatabaseMonitor().releaseDatabaseAccess();
   }
 }

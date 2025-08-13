@@ -21,7 +21,7 @@ const String _colExistsLocally = 'exists_locally'; // INTEGER, NULLABLE
 const String _colExistsExternally = 'exists_externally'; // INTEGER, NULLABLE
 
 /// Verifies and creates the media_sync_status table if it doesn't exist.
-Future<void> _verifyMediaSyncStatusTable(Database db) async {
+Future<void> verifyMediaSyncStatusTable(dynamic db) async {
   final List<Map<String, dynamic>> tables = await db.rawQuery(
     "SELECT name FROM sqlite_master WHERE type='table' AND name='$_tableName'"
   );
@@ -95,7 +95,6 @@ Future<void> insertMediaSyncStatus({
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    await _verifyMediaSyncStatusTable(db);
     
     // Determine local existence
     final bool localFileExists = await _checkFileExistsLocally(fileName);
@@ -146,7 +145,6 @@ Future<int> updateMediaSyncStatus({
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    await _verifyMediaSyncStatusTable(db);
     QuizzerLogger.logMessage('Updating $_tableName for: $fileName');
     
     final Map<String, dynamic> row = {};
@@ -190,7 +188,6 @@ Future<Map<String, dynamic>?> getMediaSyncStatus(String fileName) async {
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    await _verifyMediaSyncStatusTable(db);
     QuizzerLogger.logMessage('Fetching record from $_tableName for $fileName.');
     
     final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
@@ -225,7 +222,6 @@ Future<List<Map<String, dynamic>>> getExistingLocallyNotExternally() async {
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    await _verifyMediaSyncStatusTable(db);
     QuizzerLogger.logMessage('Fetching records from $_tableName where $_colExistsLocally = 1 AND $_colExistsExternally = 0.');
     
     final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
@@ -254,7 +250,6 @@ Future<List<Map<String, dynamic>>> getExistingExternallyNotLocally() async {
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    await _verifyMediaSyncStatusTable(db);
     QuizzerLogger.logMessage('Fetching records from $_tableName where $_colExistsExternally = 1 AND ($_colExistsLocally = 0 OR $_colExistsLocally IS NULL).');
     
     final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(

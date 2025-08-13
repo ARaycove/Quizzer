@@ -82,11 +82,16 @@ class CirculationWorker {
         assert(_sessionManager.userId != null, 'Circulation check requires logged-in user.');
         final userId = _sessionManager.userId!;
 
+        // Check and remove excess revision_score 0 questions
+        // await _checkAndRemoveExcessRevisionScoreZeroQuestions(userId);
         // 1. Check if we should add a question
         final bool shouldAdd = await _shouldAddNewQuestion();
 
         if (shouldAdd) {
           QuizzerLogger.logMessage("$shouldAdd : selecting question");
+          
+
+          
           try {
             await _selectAndAddQuestionToCirculation(userId);
           } catch (e) {
@@ -195,7 +200,7 @@ class CirculationWorker {
       final userId = _sessionManager.userId!;
 
       // Get all questions currently in circulation for this user
-      final List<Map<String, dynamic>> circulatingQuestions = await getQuestionsInCirculation(userId);
+      final List<Map<String, dynamic>> circulatingQuestions = await getActiveQuestionsInCirculation(userId);
 
       if (circulatingQuestions.isEmpty) {
         QuizzerLogger.logMessage('CirculationWorker: No questions currently circulating.');
@@ -333,4 +338,33 @@ class CirculationWorker {
       rethrow;
     }
   }
+
+  // /// Checks if there are more than 10 revision_streak 0 questions in circulation
+  // /// and removes the excess to maintain the threshold.
+  // Future<void> _checkAndRemoveExcessRevisionScoreZeroQuestions(String userId) async {
+  //   try {
+  //     // Get all circulating questions
+  //     final List<Map<String, dynamic>> circulatingQuestions = await getQuestionsInCirculation(userId);
+      
+  //     // Filter for revision_streak 0 questions
+  //     final List<Map<String, dynamic>> revisionStreakZeroQuestions = circulatingQuestions
+  //         .where((q) => (q['revision_streak'] as int) == 0)
+  //         .toList();
+      
+  //     // If we have more than 10, remove the excess
+  //     if (revisionStreakZeroQuestions.length > 10) {
+  //       final int excessCount = revisionStreakZeroQuestions.length - 10;
+  //       QuizzerLogger.logMessage('Found ${revisionStreakZeroQuestions.length} revision_streak 0 questions, removing $excessCount excess');
+        
+  //       // Remove excess questions (could be random or based on some priority)
+  //       for (int i = 0; i < excessCount; i++) {
+  //         final questionToRemove = revisionStreakZeroQuestions[i];
+  //         await setCirculationStatus(userId, questionToRemove['question_id'], false);
+  //         QuizzerLogger.logMessage('Removed question ${questionToRemove['question_id']} from circulation');
+  //       }
+  //     }
+  //   } catch (e) {
+  //     QuizzerLogger.logError('Error in _checkAndRemoveExcessRevisionScoreZeroQuestions: $e');
+  //   }
+  // }
 }

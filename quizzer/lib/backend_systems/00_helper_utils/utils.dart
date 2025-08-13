@@ -3,6 +3,7 @@ import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/00_helper_utils/file_locations.dart';
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/table_helper.dart' show decodeValueFromDB;
+import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 
 /// Moves an image from the staging directory to the final assets directory
 /// Returns just the filename for storage in the database
@@ -101,4 +102,12 @@ List<Map<String, dynamic>> trimContentFields(dynamic elements) {
     }
     return newElement;
   }).toList();
+}
+
+Future<void> logUserSettingsTableContent() async{
+  // DEBUG: Check user_settings table contents before getUserSettings
+    final db = await getDatabaseMonitor().requestDatabaseAccess();
+    final List<Map<String, dynamic>> debugResults = await db!.query('user_settings', where: 'user_id = ?', whereArgs: [getSessionManager().userId]);
+    QuizzerLogger.logMessage('Current User Settings Records Are: ${debugResults.length} records: $debugResults');
+    getDatabaseMonitor().releaseDatabaseAccess();
 }

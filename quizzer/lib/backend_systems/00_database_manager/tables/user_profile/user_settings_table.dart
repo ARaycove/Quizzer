@@ -84,71 +84,20 @@ const String _tableName = 'user_settings';
 /// Exposes the application's hardcoded user settings specification.
 /// Returns the const list of setting definitions used to initialize and verify settings.
 /// Each entry contains: {'name': String, 'default_value': dynamic, 'is_admin_setting': bool}
-List<Map<String, dynamic>> getApplicationUserSettingsSpec() {
+List<Map<String, dynamic>> getApplicationUserSettings() {
   return _applicationSettings;
-}
-
-// --- Internal Helper: Ensure Setting Rows Exist ---
-
-/// Ensures that all application-defined settings rows exist for a given user.
-/// If a setting from `_applicationSettings` is not present for the user,
-/// it's inserted with its predefined initial value. This does NOT overwrite existing settings.
-Future<void> _ensureUserSettingsRowsExist(String userId, Database db) async {
-  for (final settingMap in _applicationSettings) {
-    final String settingName = settingMap['name'] as String;
-    final dynamic initialValue = settingMap['default_value'];
-    final bool isAdminSetting = settingMap['is_admin_setting'] as bool? ?? false;
-
-    // Get ALL records from the table and check if this setting exists
-    final List<Map<String, dynamic>> allRecords = await queryAndDecodeDatabase(
-      _tableName,
-      db,
-      where: 'user_id = ?',
-      whereArgs: [userId],
-    );
-
-    final bool settingExists = allRecords.any((record) => record['setting_name'] == settingName);
-
-    if (settingExists) {
-      continue;
-    }
-
-    // Convert boolean values to integers for database storage
-    dynamic dbValue = initialValue;
-    if (initialValue is bool) {
-      dbValue = initialValue ? 1 : 0;
-    }
-    
-    final int result = await insertRawData(
-      _tableName,
-      {
-        'user_id': userId,
-        'setting_name': settingName,
-        'setting_value': dbValue,
-        'has_been_synced': 0,
-        'edits_are_synced': 0,
-        'last_modified_timestamp': DateTime(1970, 1, 1).toUtc().toIso8601String(),
-        'is_admin_setting': isAdminSetting ? 1 : 0,
-      },
-      db
-    );
-    
-    if (result > 0) {
-      QuizzerLogger.logSuccess('_ensureUserSettingsRowsExist: Successfully inserted setting "$settingName" for user $userId');
-    }
-  }
 }
 
 // --- Table Verification & Initialization ---
 
 /// Verifies that the user_settings table exists and creates it if not.
 /// Also ensures that all application-defined setting rows exist for the given user.
+/// This function handles its own database access and transaction management.
 /// [skipEnsureRows] - When true, skips calling _ensureUserSettingsRowsExist (used during inbound sync)
-Future<void> verifyUserSettingsTable(String userId, Database db, {bool skipEnsureRows = false}) async {
+Future<void> verifyUserSettingsTable(dynamic db) async {
   await db.execute('PRAGMA foreign_keys = ON;');
   final List<Map<String, dynamic>> tables = await db.rawQuery(
-    "SELECT name FROM sqlite_master WHERE type='table' AND name=?",
-    [_tableName]
+    "SELECT name FROM sqlite_master WHERE type='table' AND name='user_settings'"
   );
 
   if (tables.isEmpty) {
@@ -167,7 +116,8 @@ Future<void> verifyUserSettingsTable(String userId, Database db, {bool skipEnsur
       )
     ''');
     QuizzerLogger.logSuccess('User settings table created successfully.');
-  } else {
+  }
+  else {
     // Check if is_admin_setting column exists, add if not (for existing databases)
     final List<Map<String, dynamic>> columns = await db.rawQuery(
       "PRAGMA table_info($_tableName)"
@@ -179,12 +129,6 @@ Future<void> verifyUserSettingsTable(String userId, Database db, {bool skipEnsur
       QuizzerLogger.logSuccess('Added is_admin_setting column to $_tableName table.');
     }
   }
-  
-  // Always ensure all setting rows exist for the user (handles new settings being added)
-  // Skip this during inbound sync to prevent overwriting cloud data
-  if (!skipEnsureRows) {
-    await _ensureUserSettingsRowsExist(userId, db);
-  }
 }
 
 // --- CRUD Operations & Reset Logic ---
@@ -194,7 +138,8 @@ Future<void> verifyUserSettingsTable(String userId, Database db, {bool skipEnsur
 Future<Map<String, dynamic>?> getSettingValue(String userId, String settingName) async {
   try {
     final db = await getDatabaseMonitor().requestDatabaseAccess();
-    await verifyUserSettingsTable(userId, db!); // Ensures table and all rows are initialized
+    
+    // Query for existing setting record
     final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
       _tableName,
       db,
@@ -205,15 +150,29 @@ Future<Map<String, dynamic>?> getSettingValue(String userId, String settingName)
     );
 
     if (results.isNotEmpty) {
-      // Return a map with the value and the admin flag
+      // Return existing setting from database
       return {
         'value': results.first['setting_value'],
-        'is_admin_setting': results.first['is_admin_setting'] as int? ?? 0, // Default to 0 if null
+        'is_admin_setting': results.first['is_admin_setting'] as int? ?? 0,
       };
+    } else {
+      // No database record exists, return default value from _applicationSettings
+      final defaultSetting = _applicationSettings.firstWhere(
+        (setting) => setting['name'] == settingName,
+        orElse: () => {},
+      );
+      
+      if (defaultSetting.isNotEmpty) {
+        return {
+          'value': defaultSetting['default_value'],
+          'is_admin_setting': defaultSetting['is_admin_setting'] ? 1 : 0,
+        };
+      }
+      
+      // Setting not found in either database or defaults
+      QuizzerLogger.logWarning('Setting "$settingName" not found for user $userId in database or defaults.');
+      return null;
     }
-    // This case should be rare if verifyUserSettingsTable works correctly with _ensureUserSettingsRowsExist
-    QuizzerLogger.logWarning('Setting "$settingName" not found for user $userId after verification.');
-    return null;
   } catch (e) {
     QuizzerLogger.logError('Error getting setting value for user ID: $userId, setting: $settingName - $e');
     rethrow;
@@ -227,30 +186,57 @@ Future<Map<String, dynamic>?> getSettingValue(String userId, String settingName)
 /// 'value' (the setting's value) and 'is_admin_setting' (int 0 or 1).
 Future<Map<String, Map<String, dynamic>>> getAllUserSettings(String userId) async {
   try {
+    QuizzerLogger.logMessage('getAllUserSettings: Starting for user $userId');
     final db = await getDatabaseMonitor().requestDatabaseAccess();
-    await verifyUserSettingsTable(userId, db!); // Ensures table and all rows are initialized
+    QuizzerLogger.logMessage('getAllUserSettings: Got database access for user $userId');
+    
+    // Query for existing settings from database
+    QuizzerLogger.logMessage('getAllUserSettings: About to query database for user $userId');
     final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
       _tableName,
       db,
-      columns: ['setting_name', 'setting_value', 'is_admin_setting'],
       where: 'user_id = ?',
       whereArgs: [userId],
     );
+    
+    QuizzerLogger.logMessage('getAllUserSettings: Raw database results for user $userId: $results');
+    QuizzerLogger.logMessage('getAllUserSettings: Number of results: ${results.length}');
 
     final Map<String, Map<String, dynamic>> userSettings = {};
+    
+    // Add existing database settings
     for (final row in results) {
       final String settingName = row['setting_name'] as String;
+      QuizzerLogger.logMessage('getAllUserSettings: Processing row for setting: $settingName, value: ${row['setting_value']}');
       userSettings[settingName] = {
         'setting_value': row['setting_value'],
-        'is_admin_setting': row['is_admin_setting'] as int? ?? 0, // Default to 0 if null
+        'is_admin_setting': row['is_admin_setting'] as int? ?? 0,
       };
     }
+    
+    QuizzerLogger.logMessage('getAllUserSettings: Processed userSettings map: $userSettings');
+    
+    // Add default values for any missing settings
+    for (final defaultSetting in _applicationSettings) {
+      final String settingName = defaultSetting['name'] as String;
+      if (!userSettings.containsKey(settingName)) {
+        QuizzerLogger.logMessage('getAllUserSettings: Adding default for missing setting: $settingName, value: ${defaultSetting['default_value']}');
+        userSettings[settingName] = {
+          'setting_value': defaultSetting['default_value'],
+          'is_admin_setting': defaultSetting['is_admin_setting'] ? 1 : 0,
+        };
+      }
+    }
+    
+    QuizzerLogger.logMessage('getAllUserSettings: FINAL RESULT for user $userId: $userSettings');
     return userSettings;
   } catch (e) {
     QuizzerLogger.logError('Error getting all user settings for user ID: $userId - $e');
+    QuizzerLogger.logError('Stack trace: ${StackTrace.current}');
     rethrow;
   } finally {
     getDatabaseMonitor().releaseDatabaseAccess();
+    QuizzerLogger.logMessage('getAllUserSettings: Released database access for user $userId');
   }
 }
 // ======================================================================================
@@ -263,10 +249,21 @@ Future<Map<String, Map<String, dynamic>>> getAllUserSettings(String userId) asyn
 Future<int> updateUserSetting(String userId, String settingName, dynamic newValue, {bool skipSyncFlags = false, String? cloudTimestamp}) async {
   try {
     final db = await getDatabaseMonitor().requestDatabaseAccess();
-    await verifyUserSettingsTable(userId, db!); // Ensures table and row exist before update attempt
+    if (db == null) {
+      throw Exception('Failed to acquire database access');
+    }
 
+    // Use upsertRawData to handle both insert and update cases
+    final settingDefinition = _applicationSettings.firstWhere(
+      (s) => s['name'] == settingName,
+      orElse: () => {'is_admin_setting': false},
+    );
+    
     final Map<String, dynamic> dataToUpdate = {
+      'user_id': userId,
+      'setting_name': settingName,
       'setting_value': newValue,
+      'is_admin_setting': settingDefinition['is_admin_setting'] as bool? ?? false,
     };
     
     // Only update sync flags and timestamp if not skipping
@@ -283,21 +280,19 @@ Future<int> updateUserSetting(String userId, String settingName, dynamic newValu
       }
     }
 
-    final int rowsAffected = await updateRawData(
+    final int rowsAffected = await upsertRawData(
       _tableName,
       dataToUpdate,
-      'user_id = ? AND setting_name = ?',
-      [userId, settingName],
       db,
     );
 
     if (rowsAffected > 0) {
-      QuizzerLogger.logSuccess('Setting "$settingName" updated for user $userId.');
+      QuizzerLogger.logSuccess('Setting "$settingName" upserted for user $userId.');
       if (!skipSyncFlags) {
         signalOutboundSyncNeeded();
       }
     } else {
-      QuizzerLogger.logWarning('Failed to update setting "$settingName" for user $userId. Setting or user may not exist, or value was the same.');
+      QuizzerLogger.logWarning('Failed to upsert setting "$settingName" for user $userId.');
     }
     return rowsAffected;
   } catch (e) {
@@ -336,9 +331,11 @@ Future<void> resetAllUserSettingsToInitialValues(String userId) async {
 
 // --- Sync-related Functions ---
 Future<List<Map<String, dynamic>>> getUnsyncedUserSettings(String userId, {bool skipEnsureRows = false}) async {
-  try {
+  try {    
     final db = await getDatabaseMonitor().requestDatabaseAccess();
-    await verifyUserSettingsTable(userId, db!, skipEnsureRows: skipEnsureRows); // Ensures table and rows exist
+    if (db == null) {
+      throw Exception('Failed to acquire database access');
+    }
     final List<Map<String, dynamic>> results = await db.query(
       _tableName,
       where: 'user_id = ? AND (has_been_synced = 0 OR edits_are_synced = 0)',
@@ -365,7 +362,9 @@ Future<void> updateUserSettingSyncFlags({
 }) async {
   try {
     final db = await getDatabaseMonitor().requestDatabaseAccess();
-    await verifyUserSettingsTable(userId, db!); // Ensure table/columns exist
+    if (db == null) {
+      throw Exception('Failed to acquire database access');
+    }
 
     final Map<String, dynamic> updates = {
       'has_been_synced': hasBeenSynced ? 1 : 0,
@@ -394,86 +393,14 @@ Future<void> updateUserSettingSyncFlags({
   }
 }
 
-// --- Function to Insert or Update from Cloud ---
-/// Takes cloud data and overwrites local data. No timestamp checking, no conditionals.
-/// Cloud is the source of truth during inbound sync.
-Future<void> upsertUserSettingsFromSupabase(Map<String, dynamic> settingData) async {
-  try {
-    QuizzerLogger.logMessage('upsertUserSettingsFromSupabase: Starting with data: $settingData');
-    
-    final String? userId = settingData['user_id'] as String?;
-    final String? settingName = settingData['setting_name'] as String?;
-    final dynamic settingValue = settingData['setting_value'];
-    final String? cloudLastModifiedTimestamp = settingData['last_modified_timestamp'] as String?;
-    
-    QuizzerLogger.logMessage('upsertUserSettingsFromSupabase: Parsed values - userId: $userId, settingName: $settingName, settingValue: $settingValue, timestamp: $cloudLastModifiedTimestamp');
-    
-    // Parse is_admin_setting
-    int isAdminSettingValue = 0;
-    if (settingData.containsKey('is_admin_setting')) {
-      final dynamic cloudAdminFlag = settingData['is_admin_setting'];
-      if (cloudAdminFlag is bool) {
-        isAdminSettingValue = cloudAdminFlag ? 1 : 0;
-      } else if (cloudAdminFlag is int) {
-        isAdminSettingValue = (cloudAdminFlag == 1) ? 1 : 0;
-      }
-    } else if (settingName != null) {
-      final appSettingDef = _applicationSettings.firstWhere(
-        (s) => s['name'] == settingName,
-        orElse: () => {},
-      );
-      if (appSettingDef.isNotEmpty && appSettingDef.containsKey('is_admin_setting')) {
-        isAdminSettingValue = (appSettingDef['is_admin_setting'] as bool? ?? false) ? 1 : 0;
-      }
-    }
-
-    assert(userId != null, 'upsertUserSettingsFromSupabase: userId cannot be null');
-    assert(settingName != null, 'upsertUserSettingsFromSupabase: settingName cannot be null');
-    assert(cloudLastModifiedTimestamp != null, 'upsertUserSettingsFromSupabase: lastModifiedTimestamp cannot be null');
-
-    QuizzerLogger.logMessage('upsertUserSettingsFromSupabase: Assertions passed, getting database access...');
-    final db = await getDatabaseMonitor().requestDatabaseAccess();
-    QuizzerLogger.logMessage('upsertUserSettingsFromSupabase: Got database access, verifying table...');
-    await verifyUserSettingsTable(userId!, db!, skipEnsureRows: true);
-    QuizzerLogger.logMessage('upsertUserSettingsFromSupabase: Table verified');
-
-    final Map<String, dynamic> dataToInsertOrUpdate = {
-      'user_id': userId,
-      'setting_name': settingName,
-      'setting_value': settingValue,
-      'has_been_synced': 1,
-      'edits_are_synced': 1,
-      'last_modified_timestamp': cloudLastModifiedTimestamp,
-      'is_admin_setting': isAdminSettingValue,
-    };
-
-    QuizzerLogger.logMessage('upsertUserSettingsFromSupabase: About to insert/update with data: $dataToInsertOrUpdate');
-    QuizzerLogger.logMessage('upsertUserSettingsFromSupabase: Using ConflictAlgorithm.replace');
-
-    final int result = await insertRawData(
-      _tableName,
-      dataToInsertOrUpdate,
-      db,
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
-
-    QuizzerLogger.logMessage('upsertUserSettingsFromSupabase: insertRawData returned: $result');
-    QuizzerLogger.logSuccess('Overwrote setting "$settingName" with $settingValue for user $userId with cloud data');
-  } catch (e) {
-    QuizzerLogger.logError('Error upserting from Supabase - $e');
-    QuizzerLogger.logError('upsertUserSettingsFromSupabase: Stack trace: ${StackTrace.current}');
-    rethrow;
-  } finally {
-    QuizzerLogger.logMessage('upsertUserSettingsFromSupabase: Releasing database access');
-    getDatabaseMonitor().releaseDatabaseAccess();
-    QuizzerLogger.logMessage('upsertUserSettingsFromSupabase: Completed');
-  }
-}
-
 // --- Batch Function to Insert or Update Multiple Settings from Cloud ---
 /// Takes a list of cloud data and overwrites local data in a single transaction.
 /// Cloud is the source of truth during inbound sync.
-Future<void> batchUpsertUserSettingsFromSupabase(List<Map<String, dynamic>> settingsData, String userId) async {
+Future<void> batchUpsertUserSettingsFromSupabase({
+  required List<Map<String, dynamic>> settingsData, 
+  required String userId,
+  required dynamic db
+  }) async {
   if (settingsData.isEmpty) {
     QuizzerLogger.logMessage('batchUpsertUserSettingsFromSupabase: No settings to upsert');
     return;
@@ -485,55 +412,65 @@ Future<void> batchUpsertUserSettingsFromSupabase(List<Map<String, dynamic>> sett
     
     assert(userId.isNotEmpty, 'batchUpsertUserSettingsFromSupabase: userId cannot be empty');
 
-    final db = await getDatabaseMonitor().requestDatabaseAccess();
-    QuizzerLogger.logMessage('batchUpsertUserSettingsFromSupabase: Got database access, verifying table...');
-    await verifyUserSettingsTable(userId, db!, skipEnsureRows: false); // Don't skip ensure - create default settings first
-    QuizzerLogger.logMessage('batchUpsertUserSettingsFromSupabase: Table verified and default settings ensured');
+    // Process and validate all records before batch processing
+    final List<Map<String, dynamic>> processedRecords = [];
+    
+    for (final record in settingsData) {
+      try {
+        if (record['setting_name'] == null || record['setting_value'] == null || record['last_modified_timestamp'] == null) {
+          QuizzerLogger.logWarning('Skipping record with missing required fields: ${record['setting_name']}');
+          continue;
+        }
 
-    // Loop through each setting and update it using direct database operations
-    for (final settingData in settingsData) {
-      final String? settingName = settingData['setting_name'] as String?;
-      final dynamic settingValue = settingData['setting_value'];
-      final String? cloudLastModifiedTimestamp = settingData['last_modified_timestamp'] as String?;
+        // Validate that the setting name exists in _applicationSettings
+        final bool isValidSetting = _applicationSettings.any((setting) => setting['name'] == record['setting_name']);
+        if (!isValidSetting) {
+          QuizzerLogger.logWarning('Skipping record with invalid setting name: ${record['setting_name']}');
+          continue;
+        }
 
-      if (!_applicationSettings.any((setting) => setting['name'] == settingName)) {
-        QuizzerLogger.logWarning('batchUpsertUserSettingsFromSupabase: Skipping invalid setting "$settingName" - not a valid application setting');
-        continue;
+        // Manually construct the record with only the fields we need
+        final Map<String, dynamic> processedRecord = {
+          'user_id': record['user_id'],
+          'setting_name': record['setting_name'],
+          'setting_value': record['setting_value'],
+          'last_modified_timestamp': record['last_modified_timestamp'],
+          'is_admin_setting': record['is_admin_setting'] ?? false,
+          'has_been_synced': 1,
+          'edits_are_synced': 1,
+        };
+        
+        processedRecords.add(processedRecord);
+      } catch (e) {
+        QuizzerLogger.logError('Error processing record: $e');
+        continue; // Skip this record and continue with others
       }
-      if (cloudLastModifiedTimestamp == null) {
-        QuizzerLogger.logWarning('batchUpsertUserSettingsFromSupabase: Skipping setting "$settingName" - missing lastModifiedTimestamp');
-        continue;
-      }
-
-      QuizzerLogger.logMessage('batchUpsertUserSettingsFromSupabase: Updating setting "$settingName" with value $settingValue');
-      
-      // Use direct database update - settings already exist from _ensureUserSettingsRowsExist
-      final Map<String, dynamic> dataToUpdate = {
-        'setting_value': settingValue,
-        'has_been_synced': 1,
-        'edits_are_synced': 1,
-        'last_modified_timestamp': cloudLastModifiedTimestamp,
-      };
-
-      final int result = await updateRawData(
-        _tableName,
-        dataToUpdate,
-        'user_id = ? AND setting_name = ?',
-        [userId, settingName],
-        db,
-      );
-      
-      QuizzerLogger.logMessage('batchUpsertUserSettingsFromSupabase: Setting "$settingName" update result: $result');
     }
 
-    QuizzerLogger.logSuccess('batchUpsertUserSettingsFromSupabase: Successfully batch upserted ${settingsData.length} settings for user $userId');
+    if (processedRecords.isEmpty) {
+      QuizzerLogger.logMessage('No valid records to process after validation');
+      return;
+    }
+
+    // Use a transaction to ensure all inserts are committed together
+    for (final processedRecord in processedRecords) {
+      // Use insertRawData with ConflictAlgorithm.replace to handle both insert and update cases
+      // This matches the working pattern from question_answer_pairs_table
+      final int result = await insertRawData(
+        _tableName,
+        processedRecord,
+        db,
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+      QuizzerLogger.logMessage('Upserted setting: $processedRecord, result: $result');
+    }
+
+
+    QuizzerLogger.logSuccess('batchUpsertUserSettingsFromSupabase: Successfully processed ${settingsData.length} settings');
+
   } catch (e) {
     QuizzerLogger.logError('batchUpsertUserSettingsFromSupabase: Error - $e');
     QuizzerLogger.logError('batchUpsertUserSettingsFromSupabase: Stack trace: ${StackTrace.current}');
     rethrow;
-  } finally {
-    QuizzerLogger.logMessage('batchUpsertUserSettingsFromSupabase: Releasing database access');
-    getDatabaseMonitor().releaseDatabaseAccess();
-    QuizzerLogger.logMessage('batchUpsertUserSettingsFromSupabase: Completed');
   }
 }

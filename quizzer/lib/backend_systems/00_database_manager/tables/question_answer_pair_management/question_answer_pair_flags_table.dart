@@ -160,8 +160,6 @@ Future<int> addQuestionAnswerPairFlag({
       throw Exception('Failed to acquire database access');
     }
     QuizzerLogger.logMessage('Adding flag for question: $questionId, type: $flagType');
-    await verifyQuestionAnswerPairFlagsTable(db);
-
     // Prepare raw data map
     final Map<String, dynamic> data = {
       'question_id': questionId,
@@ -213,9 +211,7 @@ Future<List<Map<String, dynamic>>> getUnsyncedQuestionAnswerPairFlags() async {
     final db = await getDatabaseMonitor().requestDatabaseAccess();
     if (db == null) {
       throw Exception('Failed to acquire database access');
-    }
-    await verifyQuestionAnswerPairFlagsTable(db);
-    
+    } 
     // Use universal query helper
     return await queryAndDecodeDatabase(
       questionAnswerPairFlagsTableName,
@@ -265,8 +261,6 @@ Future<int> deleteQuestionAnswerPairFlag(String questionId, String flagType) asy
       throw Exception('Failed to acquire database access');
     }
     QuizzerLogger.logMessage('Deleting flag for question: $questionId, type: $flagType');
-    await verifyQuestionAnswerPairFlagsTable(db);
-
     final int result = await db.delete(
       questionAnswerPairFlagsTableName,
       where: 'question_id = ? AND flag_type = ?',
