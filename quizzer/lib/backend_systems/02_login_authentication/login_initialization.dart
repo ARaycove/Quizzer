@@ -260,9 +260,9 @@ Future<Map<String, dynamic>> loginInitialization({
     // Make sure the table exists (only during setup and right before its first needed)
     final db = await getDatabaseMonitor().requestDatabaseAccess();
     // Wrap in transaction to ensure it commits
-    db!.transaction((txn) async {
-    verifyUserProfileTable(txn);
-    verifyLoginAttemptsTable(txn);
+    await db!.transaction((txn) async {
+    await verifyUserProfileTable(txn);
+    await verifyLoginAttemptsTable(txn);
     });
 
     getDatabaseMonitor().releaseDatabaseAccess();
