@@ -45,7 +45,7 @@ Implementation TODO:
 
 
 Miscellaneous Addition
-
+* [x] Changed review system to always review new question additions before reviews edits to existing questions
 * [ ] Add the Quizzer Logo to the background of the home page (grayscale)
 * [ ] Add font-size settings to settings page
   * [ ] font-size for math elements
