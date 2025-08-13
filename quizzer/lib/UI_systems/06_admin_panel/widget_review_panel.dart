@@ -213,7 +213,21 @@ class _ReviewPanelWidgetState extends State<ReviewPanelWidget> {
             isCorrectAnswerTrueTF: (displayData['question_type'] == 'true_false')
                 ? (displayData['correct_option_index'] == 0)
                 : null,
-            answersToBlanks: (displayData['answers_to_blanks'] as List<dynamic>? ?? []).map((e) => Map<String, List<String>>.from(e as Map)).toList(),
+            answersToBlanks: (displayData['answers_to_blanks'] as List<dynamic>? ?? []).map((e) {
+              final Map<String, dynamic> element = e as Map<String, dynamic>;
+              final Map<String, List<String>> convertedMap = {};
+              element.forEach((key, value) {
+                if (value is List) {
+                  // Cast the inner list from List<dynamic> to List<String>
+                  convertedMap[key] = List<String>.from(value);
+                } else {
+                  // Handle non-list values or throw an error if this is unexpected
+                  QuizzerLogger.logError('Unexpected value type for $key in answersToBlanks');
+                  convertedMap[key] = []; // Provide a safe fallback
+                }
+              });
+              return convertedMap;
+            }).toList(),
           ),
           // --- Module Name Verification Card ---
           AppTheme.sizedBoxSml,
