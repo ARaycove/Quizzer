@@ -16,6 +16,7 @@ import 'package:email_validator/email_validator.dart';
 import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/outbound_sync/outbound_sync_functions.dart';
 import 'package:quizzer/backend_systems/00_helper_utils/utils.dart';
 import 'package:quizzer/backend_systems/02_login_authentication/verify_all_tables.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/system_data/login_attempts_table.dart';
 
 // Spin up necessary processes and get userID from local profile, effectively intialize any session specific variables that should only be brought after successful login
 Future<String?> initializeSession(Map<String, dynamic> data) async {
@@ -260,9 +261,10 @@ Future<Map<String, dynamic>> loginInitialization({
     final db = await getDatabaseMonitor().requestDatabaseAccess();
     // Wrap in transaction to ensure it commits
     db!.transaction((txn) async {
-    verifyUserProfileTable(db);
+    verifyUserProfileTable(txn);
+    verifyLoginAttemptsTable(txn);
     });
-    
+
     getDatabaseMonitor().releaseDatabaseAccess();
     // Step 1: Perform core login process
     final loginResult = await performLoginProcess(
