@@ -521,7 +521,7 @@ Future<void> batchUpsertUserModuleActivationStatusFromInboundSync({
       // Define the map for insert
       final Map<String, dynamic> data = {
         'user_id': actRecord['user_id'],
-        'module_name': normalizeString(actRecord['module_name']), // module name get's normalized
+        'module_name': await normalizeString(actRecord['module_name']), // module name get's normalized
         'is_active': actRecord['is_active'],
         'has_been_synced': 1, // Mark as synced from cloud
         'edits_are_synced': 1, // Mark edits as synced (as it's from cloud)
