@@ -177,13 +177,6 @@ Future<Map<String, dynamic>> performLoginProcess({
     }
 
     // Step 6: Ensure local profile exists
-    // Make sure the table exists (only during setup and right before its first needed)
-    final db = await getDatabaseMonitor().requestDatabaseAccess();
-    // Wrap in transaction to ensure it commits
-    db!.transaction((txn) async {
-    verifyUserProfileTable(db);
-    });
-    getDatabaseMonitor().releaseDatabaseAccess();
 
     bool hasLocalProfile = false; // Track if local profile exists
     
@@ -263,7 +256,14 @@ Future<Map<String, dynamic>> loginInitialization({
 }) async {
   try {
     QuizzerLogger.logMessage('Entering loginInitialization()...');
+    // Make sure the table exists (only during setup and right before its first needed)
+    final db = await getDatabaseMonitor().requestDatabaseAccess();
+    // Wrap in transaction to ensure it commits
+    db!.transaction((txn) async {
+    verifyUserProfileTable(db);
+    });
     
+    getDatabaseMonitor().releaseDatabaseAccess();
     // Step 1: Perform core login process
     final loginResult = await performLoginProcess(
       email: email,
