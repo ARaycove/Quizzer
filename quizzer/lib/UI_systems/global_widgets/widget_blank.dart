@@ -44,8 +44,8 @@ class WidgetBlank extends StatelessWidget {
       // Answered state - use theme text color for better contrast with colored backgrounds
       textColor = Theme.of(context).colorScheme.onSurface;
     } else {
-      // Unanswered state - use onPrimary for contrast with default cyan background
-      textColor = Theme.of(context).colorScheme.onPrimary;
+      // Unanswered state - use onSurface for consistent text color
+      textColor = Theme.of(context).colorScheme.onSurface;
     }
     
     return ConstrainedBox(
@@ -60,6 +60,7 @@ class WidgetBlank extends StatelessWidget {
           onChanged: onChanged,
           enabled: enabled,
           style: TextStyle(color: textColor),
+          cursorColor: Theme.of(context).colorScheme.onSurface, // Set caret color to onSurface
           decoration: InputDecoration(
             border: const UnderlineInputBorder(),
             hintText: hasText ? null : '█', // Show placeholder if no text

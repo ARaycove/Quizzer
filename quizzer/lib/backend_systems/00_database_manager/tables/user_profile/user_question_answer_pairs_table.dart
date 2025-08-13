@@ -691,7 +691,8 @@ Future<List<Map<String, dynamic>>> getEligibleUserQuestionAnswerPairs(String use
         question_answer_pairs.options,
         question_answer_pairs.correct_option_index,
         question_answer_pairs.correct_order,
-        question_answer_pairs.index_options_that_apply
+        question_answer_pairs.index_options_that_apply,
+        question_answer_pairs.answers_to_blanks
       FROM user_question_answer_pairs
       INNER JOIN question_answer_pairs ON user_question_answer_pairs.question_id = question_answer_pairs.question_id
       WHERE user_question_answer_pairs.user_uuid = ?

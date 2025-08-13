@@ -370,6 +370,7 @@ class _AddQuestionAnswerPageState extends State<AddQuestionAnswerPage> {
        QuizzerLogger.logSuccess("Created blank from text '$selectedText'. Added ${newElements.length} new elements and 1 answer group.");
        QuizzerLogger.logMessage("Current question elements count: ${_currentQuestionElements.length}");
      });
+     _logQuestionData("Create Blank");
    }
    
    // --- Handle Answer Text Updates for Blanks ---
@@ -646,41 +647,43 @@ class _AddQuestionAnswerPageState extends State<AddQuestionAnswerPage> {
       questionElements: cleanedQuestionElements, // Use cleaned list without blankId
       answerElements: _currentAnswerElements,   // Use list potentially updated by finalizeStagedImages
       // Optional / Type-specific parameters (pass null if not applicable/empty)
+      answersToBlanks: _currentAnswersToBlanks,
       options: _currentOptions.isNotEmpty ? _currentOptions : null,
       correctOptionIndex: _currentCorrectOptionIndex,
       indexOptionsThatApply: _currentCorrectIndicesSATA.isNotEmpty ? _currentCorrectIndicesSATA : null,
-     );
+      );
+      QuizzerLogger.logMessage("$cleanedQuestionElements");
 
-     // --- 2. Assume Success Immediately (UI Update) ---
-     // No response check needed as we don't await
-     QuizzerLogger.logSuccess("Question submission initiated (fire and forget). Assuming success for UI.");
+      // --- 2. Assume Success Immediately (UI Update) ---
+      // No response check needed as we don't await
+      QuizzerLogger.logSuccess("Question submission initiated (fire and forget). Assuming success for UI.");
+      
+      // --- ADDED: 2.5 Cleanup Staging Directory ---
+      // Collect filenames from the submitted elements
+      final Set<String> submittedImageFilenames = { 
+        ..._currentQuestionElements.where((e) => e['type'] == 'image').map((e) => e['content'] as String), 
+        ..._currentAnswerElements.where((e) => e['type'] == 'image').map((e) => e['content'] as String), 
+      };
+      // Call cleanup asynchronously (don't block UI thread)
+      cleanupStagingDirectory(submittedImageFilenames).then((_) { 
+          QuizzerLogger.logMessage("Async staging cleanup call finished.");
+      }).catchError((error) { 
+          QuizzerLogger.logError("Async staging cleanup failed: $error");
+          // Log error but don't disrupt user flow
+      });
+      // --- END ADDED ---
      
-     // --- ADDED: 2.5 Cleanup Staging Directory ---
-     // Collect filenames from the submitted elements
-     final Set<String> submittedImageFilenames = { 
-       ..._currentQuestionElements.where((e) => e['type'] == 'image').map((e) => e['content'] as String), 
-       ..._currentAnswerElements.where((e) => e['type'] == 'image').map((e) => e['content'] as String), 
-     };
-     // Call cleanup asynchronously (don't block UI thread)
-     cleanupStagingDirectory(submittedImageFilenames).then((_) { 
-         QuizzerLogger.logMessage("Async staging cleanup call finished.");
-     }).catchError((error) { 
-        QuizzerLogger.logError("Async staging cleanup failed: $error");
-        // Log error but don't disrupt user flow
-     });
-     // --- END ADDED ---
-     
-     if (mounted) { // Still check mounted for Snack Bar
-    ScaffoldMessenger.of(context).showSnackBar(
-           const SnackBar(content: Text('Question Submitted!')),
-         );
-     }
-     // Clear the form immediately
-     _resetQuestionState();
-     // Optionally navigate back
-     // Navigator.pop(context);
+      if (mounted) { // Still check mounted for Snack Bar
+      ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Question Submitted!')),
+          );
+      }
+      // Clear the form immediately
+      _resetQuestionState();
+      // Optionally navigate back
+      // Navigator.pop(context);
 
-     // Removed try-catch block and await
+      // Removed try-catch block and await
   }
 
   @override

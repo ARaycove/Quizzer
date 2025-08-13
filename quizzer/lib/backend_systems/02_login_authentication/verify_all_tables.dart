@@ -21,7 +21,6 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/question_answ
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pair_management/question_answer_pairs_table.dart';
 
 import 'package:quizzer/backend_systems/00_database_manager/tables/system_data/error_logs_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/system_data/login_attempts_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/system_data/user_feedback_table.dart';
 
 import 'package:quizzer/backend_systems/00_database_manager/tables/modules_table.dart';
@@ -60,7 +59,6 @@ Future<void> verifyAllTablesExist(userId) async {
       await verifyQuestionAnswerPairFlagsTable(txn);
       await verifyQuestionAnswerPairTable(txn);
       await verifyErrorLogsTable(txn);
-      await verifyLoginAttemptsTable(txn);
       await verifyUserFeedbackTable(txn);
       await verifyModulesTable(txn);
       await verifyQuestionAnswerAttemptTable(txn);

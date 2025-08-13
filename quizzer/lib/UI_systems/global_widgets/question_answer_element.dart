@@ -103,12 +103,14 @@ class ElementRenderer extends StatefulWidget {
   final List<Map<String, dynamic>> elements;
   final Map<int, TextEditingController>? blankControllers; // Map of element index to controller
   final List<bool>? individualBlankResults; // Individual blank correctness results
+  final bool enabled; // Whether blank inputs should be enabled
 
   const ElementRenderer({
     super.key, 
     required this.elements,
     this.blankControllers,
     this.individualBlankResults,
+    this.enabled = true, // Default to enabled
   });
 
 
@@ -356,7 +358,7 @@ class _ElementRendererState extends State<ElementRenderer> {
          return WidgetBlank(
            width: width,
            controller: controller,
-           enabled: true, // Always enabled for now, we'll handle preview mode differently
+           enabled: widget.enabled, // Use the enabled parameter from ElementRenderer
            isCorrect: isCorrect,
          );
        // Add other synchronous types here

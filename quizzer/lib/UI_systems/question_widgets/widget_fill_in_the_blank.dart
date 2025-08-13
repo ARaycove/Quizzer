@@ -217,29 +217,23 @@ class _FillInTheBlankQuestionWidgetState
       return const Center(child: Text("No question data provided."));
     }
 
-    // Generate correct answer elements from blank elements for preview
+    // Generate correct answer elements from answers_to_blanks
     List<Map<String, dynamic>> correctAnswerElements = [];
-    if (widget.isDisabled && _isAnswerSubmitted) {
-      // For preview mode, create answer elements from answers_to_blanks
-      final answersToBlanks = widget.questionData['answers_to_blanks'] as List<Map<String, List<String>>>?;
-      if (answersToBlanks != null) {
-        for (final answerGroup in answersToBlanks) {
-          final correctAnswer = answerGroup.keys.first;
-          if (correctAnswer.isNotEmpty) {
-            correctAnswerElements.add({
-              'type': 'text',
-              'content': correctAnswer,
-            });
-          }
+    final answersToBlanks = widget.questionData['answers_to_blanks'] as List<Map<String, List<String>>>?;
+    if (answersToBlanks != null) {
+      for (final answerGroup in answersToBlanks) {
+        final correctAnswer = answerGroup.keys.first;
+        if (correctAnswer.isNotEmpty) {
+          correctAnswerElements.add({
+            'type': 'text',
+            'content': correctAnswer,
+          });
         }
       }
-    } else {
-      // Use provided answer elements for non-preview mode
-      correctAnswerElements = widget.answerElements;
     }
 
     // Determine if interactions should be enabled
-    final bool interactionsEnabled = !widget.isDisabled && !_isAnswerSubmitted;
+    final bool interactionsEnabled = !widget.isDisabled && !_session.isCurrentQuestionAnswered;
 
     // PRESERVE functional feedback colors for correctness states
     const Color correctColor = Colors.green;
@@ -256,6 +250,7 @@ class _FillInTheBlankQuestionWidgetState
             elements: widget.questionElements,
             blankControllers: _blankControllers,
             individualBlankResults: _individualBlankResults.isNotEmpty ? _individualBlankResults : null,
+            enabled: interactionsEnabled, // Disable blanks after submission
           ),
           AppTheme.sizedBoxLrg,
 

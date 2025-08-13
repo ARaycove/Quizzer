@@ -270,6 +270,9 @@ class SessionManager {
     _lastSubmittedIsCorrect = isCorrect;
   }
 
+  /// Returns whether the current question has been answered (for UI state management)
+  bool get isCurrentQuestionAnswered => _isAnswerSubmitted;
+
   /// Validates fill-in-the-blank answers and returns detailed correctness information
   /// Returns: {"isCorrect": bool, "ind_blanks": List<bool>}
   Future<Map<String, dynamic>> validateFillInTheBlankAnswer(List<String> userAnswers) async {
@@ -386,6 +389,11 @@ class SessionManager {
   // Safely cast List<dynamic> to List<Map<String, List<String>>>
   List<Map<String, List<String>>> get currentAnswersToBlanks {
     final dynamic answers = _currentQuestionDetails?['answers_to_blanks'];
+    QuizzerLogger.logMessage("SessionManager currentAnswersToBlanks: _currentQuestionDetails is null: ${_currentQuestionDetails == null}");
+    if (_currentQuestionDetails != null) {
+      QuizzerLogger.logMessage("SessionManager currentAnswersToBlanks: answers_to_blanks type: ${answers.runtimeType}");
+      QuizzerLogger.logMessage("SessionManager currentAnswersToBlanks: answers_to_blanks value: $answers");
+    }
     if (answers is List) {
       return List<Map<String, List<String>>>.from(answers.map((item) {
         final Map<String, dynamic> map = Map<String, dynamic>.from(item as Map);
