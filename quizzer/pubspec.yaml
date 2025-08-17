@@ -60,6 +60,8 @@ dependencies:
   text_analysis: ^1.0.0+2
   string_similarity: ^2.1.1
   flutter_math_fork: ^0.7.4
+  math_keyboard: any
+  math_expressions: ^2.7.0
   # llama_cpp_dart: ^0.1.0  # Temporarily disabled due to compilation issues
 dev_dependencies:
   flutter_test:

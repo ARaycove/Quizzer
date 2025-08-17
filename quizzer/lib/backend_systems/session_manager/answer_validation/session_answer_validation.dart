@@ -89,16 +89,39 @@ bool validateTrueFalseAnswer({
   required int correctIndex,
 }) {
   try {
-    QuizzerLogger.logMessage('Entering validateTrueFalseAnswer()...');
-    // Basic validation: correctIndex must be 0 or 1 for true/false
     assert(correctIndex == 0 || correctIndex == 1, 
            'Invalid correctIndex ($correctIndex) for true/false validation.');
 
-    // Check if user answer is the correct type (int) and value (0 or 1) and matches the correct index
-    final bool isCorrect = (userAnswer is int && userAnswer == correctIndex);
+    // Normalize string inputs to integers (0 or 1)
+    int normalizedAnswer;
+    if (userAnswer is String) {
+      final String lowerCaseAnswer = userAnswer.toLowerCase();
+      if (lowerCaseAnswer == 'true') {
+        normalizedAnswer = 1;
+      } else if (lowerCaseAnswer == 'false') {
+        normalizedAnswer = 0;
+      } else {
+        // If the string is neither "true" nor "false", treat it as an invalid answer
+        return false;
+      }
+    } else if (userAnswer is int) {
+      // Check if the integer input is valid (0 or 1)
+      if (userAnswer == 0 || userAnswer == 1) {
+        normalizedAnswer = userAnswer;
+      } else {
+        // Integer is not 0 or 1, treat as invalid
+        return false;
+      }
+    } else {
+      // Input is not a valid type (String or int)
+      return false;
+    }
+    
+    // Compare the normalized answer to the correct index
+    final bool isCorrect = (normalizedAnswer == correctIndex);
     return isCorrect;
   } catch (e) {
-    QuizzerLogger.logError('Error in validateTrueFalseAnswer - $e');
+    // Log error and rethrow
     rethrow;
   }
 }

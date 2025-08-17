@@ -321,7 +321,6 @@ class _FillInTheBlankQuestionWidgetState
                 ),
               ),
             ),
-
           // --- Answer Elements / Correct Answers (Show After Submission) ---
           if (_isAnswerSubmitted || widget.isDisabled)
             Column(
@@ -329,7 +328,20 @@ class _FillInTheBlankQuestionWidgetState
               children: [
                 const Text("Correct Answers:", style: TextStyle(fontWeight: FontWeight.bold)),
                 AppTheme.sizedBoxSml,
-                ElementRenderer(elements: correctAnswerElements),
+                // FIX: Render correct answers directly as a single RichText
+                RichText(
+                  text: TextSpan(
+                    style: Theme.of(context).textTheme.bodyLarge,
+                    children: [
+                      // Join all correct answers with a comma and space
+                      for (int i = 0; i < correctAnswerElements.length; i++) ...[
+                        TextSpan(text: correctAnswerElements[i]['content'].toString()),
+                        if (i < correctAnswerElements.length - 1)
+                          const TextSpan(text: ', '),
+                      ],
+                    ],
+                  ),
+                ),
                 AppTheme.sizedBoxLrg,
               ],
             ),

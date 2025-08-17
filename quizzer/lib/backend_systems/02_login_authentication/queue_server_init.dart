@@ -4,6 +4,7 @@ import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/09_data_caches/question_queue_cache.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_question_answer_pairs_table.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
+import 'package:quizzer/backend_systems/07_user_question_management/user_question_processes.dart';
 
 /// Starts all question queue server workers in the correct order
 /// This function should be called after data caches are initialized
@@ -11,7 +12,8 @@ import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 Future<void> startQuestionQueueServer() async {
   try {
     QuizzerLogger.logMessage('Starting question queue server workers...');
-    
+    SessionManager sessionManager = getSessionManager();
+    await validateAllModuleQuestions(sessionManager.userId!);
     // Start CirculationWorker first
     QuizzerLogger.logMessage('Starting CirculationWorker...');
     final circulationWorker = CirculationWorker();
@@ -25,7 +27,6 @@ Future<void> startQuestionQueueServer() async {
     QuizzerLogger.logMessage('Question queue server worker startup initiated');
     
     // Check if there are eligible questions for the user
-    final sessionManager = getSessionManager();
     if (sessionManager.userId != null) {
       final eligibleQuestions = await getEligibleUserQuestionAnswerPairs(sessionManager.userId!);
       

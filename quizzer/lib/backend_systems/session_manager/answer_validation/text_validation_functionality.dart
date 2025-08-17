@@ -94,20 +94,48 @@ Future<Map<String, dynamic>> validateFillInTheBlank(Map<String, dynamic> questio
       String                    primaryAnswer = correctAnswerGroup.keys.first;
       List<String>              synonyms = correctAnswerGroup.values.first;
       
-      // Check if user answer matches the primary correct answer
-      Map<String, dynamic>      similarityResult = await isSimilarTo(userAnswer, primaryAnswer);
-      bool                      blankIsCorrect = similarityResult["success"];
-      
-      // If not correct, check against synonyms
-      if (!blankIsCorrect && synonyms.isNotEmpty) {
-        for (String synonym in synonyms) {
-          Map<String, dynamic> synonymResult = await isSimilarTo(userAnswer, synonym);
-          if (synonymResult["success"]) {
-            blankIsCorrect = true;
-            break;
+      // In order to have fill in the blank do math validation, we need to add an additional step here.
+
+      // Is our primaryAnswer a pure integer
+      late bool blankIsCorrect;
+      bool isIntegerAnswer = int.tryParse(primaryAnswer.toString()) != null;
+      bool isAnswerInteger = int.tryParse(userAnswer) != null;
+
+      // TODO Future checks:
+      // Is the primary answer a math expression
+      // if it is we'll add a third branch to this chain
+
+      if (isIntegerAnswer) {
+        // Break off into this branch of evaluation
+        
+        // if the provided answer isn't also a pure integer, then the answer is wrong
+        if (!isAnswerInteger) {
+          blankIsCorrect = false;
+        } else if (isAnswerInteger && isIntegerAnswer) {
+          blankIsCorrect = int.parse(userAnswer) == int.parse(primaryAnswer);
+        }
+      } else {
+        // Do regular text validation:
+        // Check if user answer matches the primary correct answer
+        // Direct string match first
+        userAnswer = userAnswer.toLowerCase();
+        primaryAnswer = userAnswer.toLowerCase();
+        blankIsCorrect = (userAnswer == primaryAnswer);
+        if (blankIsCorrect) {continue;}
+        Map<String, dynamic>      similarityResult = await isSimilarTo(userAnswer, primaryAnswer);
+        blankIsCorrect = similarityResult["success"];
+        // If not correct, check against synonyms
+        if (!blankIsCorrect && synonyms.isNotEmpty) {
+          for (String synonym in synonyms) {
+            Map<String, dynamic> synonymResult = await isSimilarTo(userAnswer, synonym);
+            if (synonymResult["success"]) {
+              blankIsCorrect = true;
+              break;
+            }
           }
         }
       }
+
       // Track this blank's result
       individualBlanks.add(blankIsCorrect);
       // If any blank is incorrect, log the details

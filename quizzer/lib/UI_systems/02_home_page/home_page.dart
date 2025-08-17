@@ -11,6 +11,8 @@ import 'package:quizzer/UI_systems/question_widgets/widget_select_all_that_apply
 import 'package:quizzer/UI_systems/question_widgets/widget_true_false_question.dart'; 
 import 'package:quizzer/UI_systems/question_widgets/widget_sort_order_question.dart';
 import 'package:quizzer/UI_systems/question_widgets/widget_fill_in_the_blank.dart'; 
+import 'package:math_keyboard/math_keyboard.dart';
+import 'package:math_expressions/math_expressions.dart';
 /// HomePage acts as the main container, displaying the appropriate question widget.
 class HomePage extends StatefulWidget { // Change to StatefulWidget
   const HomePage({super.key});
@@ -23,6 +25,9 @@ class _HomePageState extends State<HomePage> { // State class
   final SessionManager session = SessionManager(); // Get session instance once
   Map<String, dynamic>? _editedQuestionData; // <-- ADDED State variable for callback data
   final GlobalKey _statSectionKey = GlobalKey();
+  late String expressionOne;
+  late String expressionTwo;
+  ExpressionParser p = GrammarParser();
 
   @override
   void initState() {
@@ -106,6 +111,65 @@ class _HomePageState extends State<HomePage> { // State class
               setState(() {});
             },
           ), // Add stat display section
+          // MathField(
+          //     variables: const ['x', 'y', 'θ'],
+          //     keyboardType: MathKeyboardType.expression,
+          //     onChanged: (value) {
+          //       // Begin internal function
+
+          //       // So we could dynamically replace our blank. .. 
+
+          //       // If the primary answer for a fill in the blank is parsable through TexParser, then it's an expression and should use MathField instead of TextField for the blanks input
+          //       try {
+          //         expressionOne = '${TeXParser(value).parse()}';
+          //       } catch (_) {
+          //         expressionOne = 'invalid input';
+          //       }
+          //       expressionOne.toString();
+
+          //       QuizzerLogger.logMessage("Exact output of expression is   : $expressionOne");
+          //       QuizzerLogger.logMessage("Exact output of parser is       : ${p.parse(expressionOne.toString())}");
+          //       QuizzerLogger.logMessage("Simplified using exp.simplify() : ${p.parse(expressionOne).simplify()}");
+          //       QuizzerLogger.logMessage("Exact output of second exp is: $expressionTwo");
+          //       QuizzerLogger.logMessage("Exact output of parser is    : ${p.parse(expressionTwo.toString())}");
+          //       QuizzerLogger.logMessage("Simplified using exp.simplify() : ${p.parse(expressionTwo).simplify()}");
+
+          //       // It would appear from this documentation that we could in theory, give a value to all variables in the expression entered
+
+          //       // Then evaluate both
+          //       // for identity functions, we would for example What is the identity dy/dx cos(x) = -sin(x)
+          //       // assign a value 10 to dy/dx cos(10) == -sin(10)
+          //       // if the values are equal the expressions are equal
+                
+
+                
+
+          //     },
+          //   ),
+          // MathField(
+          //     variables: const ['x', 'y', 'θ'],
+          //     keyboardType: MathKeyboardType.expression,
+          //     onChanged: (value) {
+          //       // Begin internal function
+
+          //       // So we could dynamically replace our blank. .. 
+
+          //       // If the primary answer for a fill in the blank is parsable through TexParser, then it's an expression and should use MathField instead of TextField for the blanks input
+          //       try {
+          //         expressionTwo = '${TeXParser(value).parse()}';
+          //       } catch (_) {
+          //         expressionTwo = 'invalid input';
+          //       }
+
+          //       QuizzerLogger.logMessage("Exact output of expression is   : $expressionOne");
+          //       QuizzerLogger.logMessage("Exact output of parser is       : ${p.parse(expressionOne.toString())}");
+          //       QuizzerLogger.logMessage("Simplified using exp.simplify() : ${p.parse(expressionOne).simplify()}");
+          //       QuizzerLogger.logMessage("Exact output of second exp is: $expressionTwo");
+          //       QuizzerLogger.logMessage("Exact output of parser is    : ${p.parse(expressionTwo.toString())}");
+          //       QuizzerLogger.logMessage("Simplified using exp.simplify() : ${p.parse(expressionTwo).simplify()}");
+
+          //     },
+          //   ),
           AppTheme.sizedBoxSml, // Spacer between stats and question
           Expanded(child: _buildQuestionBody()),
         ],

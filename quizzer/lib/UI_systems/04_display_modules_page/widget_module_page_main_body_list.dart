@@ -22,10 +22,12 @@ class _ModulePageMainBodyListState extends State<ModulePageMainBodyList> {
   final List<Map<String, List<String>>> _manualCategoryOrdering = [
     {
       'mathematics': [
+        'counting',
         'is even or odd',
         'basic addition',
         'basic subtraction',
         'basic multiplication',
+        'multiplication table',
         'basic division',
         'geometry',
         'algebra 1',

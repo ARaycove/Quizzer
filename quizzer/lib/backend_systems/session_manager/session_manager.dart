@@ -935,6 +935,7 @@ class SessionManager {
   Future<Map<String, dynamic>> submitAnswer({required dynamic userAnswer}) async {
     try {
       QuizzerLogger.logMessage('Entering submitAnswer()...');
+      QuizzerLogger.logMessage("Received a userAnswer of $userAnswer");
       
       // --- ADDED: Check for Dummy Record State --- 
       if (_currentQuestionRecord == null) {
@@ -986,9 +987,19 @@ class SessionManager {
             break;
           case 'true_false':
             // User answer should be 0 (True) or 1 (False)
+            QuizzerLogger.logMessage("Evaluating true/false correctness");
             assert(currentCorrectOptionIndex != null);
+            QuizzerLogger.logMessage("provided answer is: $userAnswer");
+            QuizzerLogger.logMessage("CorrectOptionIndex is: $currentCorrectOptionIndex");
+            int finalAnswer = 3; // 3 is not valid and will trigger an error. . .
+            if (userAnswer == "true" || userAnswer == true) {
+              finalAnswer = 0;
+            } else if (userAnswer == "false" || userAnswer == false) {
+              finalAnswer = 1;
+            }
+            QuizzerLogger.logMessage("$userAnswer transformed in $finalAnswer, passing the value of $finalAnswer into validation");
             isCorrect = validateTrueFalseAnswer(
-              userAnswer: userAnswer,
+              userAnswer: finalAnswer,
               correctIndex: currentCorrectOptionIndex!,
             );
             break;
@@ -1063,7 +1074,7 @@ class SessionManager {
 
       // Note: Question was already added to answer history cache when requested
       
-      QuizzerLogger.logMessage('Successfully submitted answer for QID: $questionId, isCorrect: $isCorrect');
+      QuizzerLogger.logMessage('Successfully submitted answer for QID: $questionId, isCorrect: $isCorrect, userAnswer: $userAnswer');
       return {'success': true, 'message': 'Answer submitted successfully.'};
     } catch (e) {
       QuizzerLogger.logError('Error in submitAnswer - $e');

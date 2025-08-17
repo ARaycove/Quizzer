@@ -142,6 +142,21 @@ class _EditableBlankElementState extends State<EditableBlankElement> {
   // --- Handle Synonym Focus Change ---
   void _handleSynonymFocusChange(int index) {
     if (!_synonymFocusNodes[index].hasFocus && _isEditingSynonyms[index] && mounted) {
+      final newSynonym = _synonymControllers[index].text.trim().toLowerCase();
+      
+      // Check for empty synonym and schedule the removal
+      if (newSynonym.isEmpty) {
+        // Schedule the removal to happen after the current frame/focus change cycle is complete
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            _removeSynonym(index);
+          }
+        });
+        // Do not proceed with submitting the synonym in the current frame
+        return;
+      }
+      
+      // If not empty, submit the synonym normally
       _submitSynonym(index);
       setState(() {
         _isEditingSynonyms[index] = false;
@@ -219,12 +234,28 @@ class _EditableBlankElementState extends State<EditableBlankElement> {
 
   // --- Add synonym ---
   void _addSynonym() {
+    // Create new controllers and nodes
+    final newController = TextEditingController();
+    final newFocusNode = FocusNode();
+    final newIndex = _synonymControllers.length;
+
+    // Add listener to the new focus node
+    newFocusNode.addListener(() => _handleSynonymFocusChange(newIndex));
+
+    // Update state to include the new synonym
     setState(() {
-      _synonymControllers.add(TextEditingController());
-      _synonymFocusNodes.add(FocusNode());
-      _isEditingSynonyms.add(false);
-      final newIndex = _synonymControllers.length - 1;
-      _synonymFocusNodes[newIndex].addListener(() => _handleSynonymFocusChange(newIndex));
+      _synonymControllers.add(newController);
+      _synonymFocusNodes.add(newFocusNode);
+      // CRITICAL: Immediately set the new synonym to be in edit mode
+      _isEditingSynonyms.add(true);
+    });
+    
+    // CRITICAL: Request focus on the new synonym field in the next frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Check if the widget is still mounted and the focus node exists
+      if (mounted && newIndex < _synonymFocusNodes.length && _synonymFocusNodes[newIndex].canRequestFocus) {
+        _synonymFocusNodes[newIndex].requestFocus();
+      }
     });
   }
 

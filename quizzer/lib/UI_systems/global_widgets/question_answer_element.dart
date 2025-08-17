@@ -170,111 +170,104 @@ class _ElementRendererState extends State<ElementRenderer> {
     // Since all widgets are now static (including images), no need for post-frame callback
   }
 
-  // Groups elements according to the specified rules
-  List<Widget> _groupElements() {
-    List<Widget> groupedWidgets = [];
-    int i = 0;
-    
-    while (i < _renderedWidgets.length) {
+// Groups elements according to the specified rules
+List<Widget> _groupElements() {
+  List<Widget> groupedWidgets = [];
+  int i = 0;
+
+  while (i < widget.elements.length) {
+    final currentElement = widget.elements[i];
+    // Corrected: Use 'var' to allow reassignment inside the loop
+    var currentType = currentElement['type'] as String?;
+
+    // Start a new group if the current element is text or a blank
+    if (currentType == 'text' || currentType == 'blank') {
+      List<InlineSpan> inlineSpans = [];
+
+      // Add the current element to the spans list first
       final currentWidget = _renderedWidgets[i];
-      
-      // Since images are now static, there should never be null widgets
-      if (currentWidget == null) {
-        QuizzerLogger.logWarning("ElementRenderer: Unexpected null widget at index $i");
-        groupedWidgets.add(const Text('[Error: Null widget]'));
-        i++;
-        continue;
-      }
-      
-      // Check if current element is a blank
-      final currentElement = widget.elements[i];
-      final currentType = currentElement['type'] as String?;
-      
-      if (currentType == 'blank') {
-        // Check if next element should be grouped with this blank
-        if (i + 1 < _renderedWidgets.length) {
-          final nextElement = widget.elements[i + 1];
-          final nextType = nextElement['type'] as String?;
-          
-          // Group blank with text or another blank
-          if (nextType == 'text' || nextType == 'blank') {
-            List<Widget> rowChildren = [currentWidget];
-            i++; // Move to next element
-            
-            // Continue adding elements to the row until we hit an image or end
-            while (i < _renderedWidgets.length) {
-              final nextWidget = _renderedWidgets[i];
-              final nextElementType = widget.elements[i]['type'] as String?;
-              
-              if (nextWidget == null) {
-                // If async widget is still loading, break the row
-                break;
-              }
-              
-              if (nextElementType == 'text' || nextElementType == 'blank') {
-                rowChildren.add(nextWidget);
-                i++;
-              } else {
-                // Stop at image or other types
-                break;
-              }
-            }
-            
-            groupedWidgets.add(Row(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: rowChildren,
+      if (currentWidget != null) {
+        if (currentType == 'text') {
+          final textContent = currentElement['content'].toString();
+          if (_hasLatexDelimiters(textContent)) {
+            inlineSpans.add(WidgetSpan(
+              child: LaTexT(laTeXCode: Text(textContent), equationStyle: const TextStyle(fontSize: 24.0)),
+              alignment: PlaceholderAlignment.middle,
             ));
-            continue;
+          } else {
+            inlineSpans.add(TextSpan(text: textContent));
           }
-        }
-      } else if (currentType == 'text') {
-        // Check if next element is a blank and should be grouped with this text
-        if (i + 1 < _renderedWidgets.length) {
-          final nextElement = widget.elements[i + 1];
-          final nextType = nextElement['type'] as String?;
-          
-          // Group text with blank
-          if (nextType == 'blank') {
-            List<Widget> rowChildren = [currentWidget];
-            i++; // Move to next element
-            
-            // Continue adding elements to the row until we hit an image or end
-            while (i < _renderedWidgets.length) {
-              final nextWidget = _renderedWidgets[i];
-              final nextElementType = widget.elements[i]['type'] as String?;
-              
-              if (nextWidget == null) {
-                // If async widget is still loading, break the row
-                break;
-              }
-              
-              if (nextElementType == 'text' || nextElementType == 'blank') {
-                rowChildren.add(nextWidget);
-                i++;
-              } else {
-                // Stop at image or other types
-                break;
-              }
-            }
-            
-            groupedWidgets.add(Row(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: rowChildren,
-            ));
-            continue;
-          }
+        } else if (currentType == 'blank') {
+          inlineSpans.add(WidgetSpan(
+            child: currentWidget,
+            alignment: PlaceholderAlignment.middle,
+          ));
         }
       }
-      
-      // Single element (not grouped)
-      groupedWidgets.add(currentWidget);
+      i++;
+
+      // Check if the next element is a text or blank and should be grouped
+      while (i < widget.elements.length) {
+        final nextElement = widget.elements[i];
+        final nextType = nextElement['type'] as String?;
+        final nextWidget = _renderedWidgets[i];
+
+        // This is the critical change: Only group text with a blank or a blank with a text.
+        // Do NOT group consecutive text elements.
+        if (nextWidget != null && ((currentType == 'text' && nextType == 'blank') || (currentType == 'blank' && nextType == 'text'))) {
+          if (nextType == 'text') {
+            inlineSpans.add(const TextSpan(text: ' ')); // Add space before text
+            final textContent = nextElement['content'].toString();
+            if (_hasLatexDelimiters(textContent)) {
+              inlineSpans.add(WidgetSpan(
+                child: LaTexT(laTeXCode: Text(textContent), equationStyle: const TextStyle(fontSize: 24.0)),
+                alignment: PlaceholderAlignment.middle,
+              ));
+            } else {
+              inlineSpans.add(TextSpan(text: textContent));
+            }
+          } else if (nextType == 'blank') {
+            inlineSpans.add(const TextSpan(text: ' ')); // Add space before blank
+            inlineSpans.add(WidgetSpan(
+              child: nextWidget,
+              alignment: PlaceholderAlignment.middle,
+            ));
+            inlineSpans.add(const TextSpan(text: ' ')); // Add space after blank
+          }
+          i++; // Move to the next element
+          currentType = nextType; // Update type for the next check
+        } else {
+          // Break the inner loop if the next element is not groupable with the current one.
+          break;
+        }
+      }
+
+      // Add the final grouped line as a single RichText widget
+      if (inlineSpans.isNotEmpty) {
+        groupedWidgets.add(Padding(
+          padding: const EdgeInsets.only(bottom: 4.0),
+          child: RichText(
+            text: TextSpan(
+              style: Theme.of(context).textTheme.bodyLarge,
+              children: inlineSpans,
+            ),
+          ),
+        ));
+      }
+    } else {
+      // If it's a non-groupable element (like an image), add it directly.
+      final widgetToAdd = _renderedWidgets[i];
+      if (widgetToAdd != null) {
+        groupedWidgets.add(widgetToAdd);
+      } else {
+        groupedWidgets.add(const Text('[Loading...]'));
+      }
       i++;
     }
-    
-    return groupedWidgets;
   }
+
+  return groupedWidgets;
+}
 
   @override
   Widget build(BuildContext context) {

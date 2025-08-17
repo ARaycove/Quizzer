@@ -14,38 +14,28 @@ Implementation TODO:
 [] Add a reset user password page
 
 [] Figure out how to validate user session within the app
-
 - Perhaps we can figure out how to send an email out that when clicked opens a specific page on the app itself, thus the only way to access the reset user password section of the app is through the email link?
-  Bug Fixes
 
-* [x] user settings are resetting on login and on new device
-  * [x] removed isDatabaseFresh check and passing of parameter, fetchAll now handles timestamp for filtering as the only source of truth - did not fix the issue
-  * [x] updated outbound sync to refuse pushing default setting records
-  * [x] rewrote the ensure default settings exist function
-  * [x] rewrote the batch upsert function
-  * [x] Moving the verify function seemed to solve local reset issue, but new device not syncing persists. . .
-  * [x] Optimize table interactions by creating a central function that verifies all tables during login initialization removing the calls from each individual table file
-    * All table verification is now done ONCE during the login initialization
-  * [x] All table helpers that read or write data are updated to take in txn or db
-  * [x] Potential issue in inbound sync mechanism where update does not persist outside of the inbound sync call, solution will be to restructre the inbound sync such that
-    * [x] All calls to fetch data is done at once asynchronously (saving time)
-    * [x] all batch upserts to the tables are done together as a single transaction, ensuring everything is committed together
-* [X] some module names are not getting normalized, make sure all functions that deal with module_name normalize the moduleName
-  * [X] multiple functions in modules_table.dart did not normalize, they do now
-  * [X] checked if the question answer pair table was normalizing
-  * [X] checked inbound sync to normalize inbound data
-  * [X] checked outbound sync to normalize outbound data
-* [x] Fix update_flags review system, does not validate that the question being flagged still exists in the database
-* [x] Circulation should remove access revision score 0 questions from circulation
-* [] Latex elements left aligned with $single dollar signs$ need to have more top padding to prevent overlap
-  * Top padding of 8 was to small try 12
+[] Will need to rigoursly test logout/login/logout/login cycle works and doesn't break the system. Currently there is some kind of issue regarding if we logout, existing processes are not closed properly. This is a login issue, and goes under the minor update
+## Bug Fixes
+* [] synonym adding in the add question page causes crash, if you tab out or lose focus of the synonym edit whilst it is blank, we get a crash "Concurrent modification during iteration: _Set len:1
+* [] Some question answer attempt records ARE NOT syncing and triggering an RLS violation. . .
+  * Appears to be intermittent, as many attempt records do get synced
+  * [] added conditional logging that logs the record trying to be pushed if a PostgrestException that contains -> <row-level security policy for table ""> is found with code: 42501
+
 * [] Matrix latex elements with fractions inside, formatted fraction elements need padding on top to prevent overlap
+
 * [] Latex elements that are too long need to wrap instead of being cut off at edge of screen
 
+* [] If a user edits a question, it does not persist across logins, this means if I make an edit to something, the edit is pushed to the admin for review, but on next login, is reverted back to the unedited state. (Feature or Bug)?
+  * I am contemplating removing the edit button from the main home page entirely, regular users would still have the ability to flag a question still sending it to the admin. flagging a question removes it from that users account until the question is reviewed upon which the question is restored to the user
+* [] User States: "Android version needs some bottom margin on pages, preventing widgets from getting partially hidden."
+  * snackbar pop-ups and margin cutoff on android are blocking the use of the next question button and submit answer buttons. Adding a bottom margin the height of the snackbar would remove this issue
+* [] Circulation worker does not properly remove excess new questions, allowing too many new questions to overload the user. Should have some kind of mechanism that will remove only revision score 0 questions from circulation
+* [] User States: Occasionally we get an app crash if I close my phone, then when I reopen the app I return to an error screen
 
 
-Miscellaneous Addition
-* [x] Changed review system to always review new question additions before reviews edits to existing questions
+## Miscellaneous Addition might get pushed to later updates
 * [ ] Add the Quizzer Logo to the background of the home page (grayscale)
 * [ ] Add font-size settings to settings page
   * [ ] font-size for math elements
@@ -57,7 +47,11 @@ Miscellaneous Addition
     * [ ] add setting value to table
 * [ ] User Setting: Shrink or Wrap options with default Wrap for math related latex. If Shrink the font size of a latex element will shrink to fit the screen, if wrap the latex element will wrap over to a new line to avoid cutting off text
 * [ ] Fix Environment variables (Credentials should be stored securely)
-
+* [ ] User Settings: auto-submit multiple choice questions (default behavior is to auto-matically submit the selected option)
+  * this settings would disable the auto-submit behavior and make it so the user needs to hit the submit answer button on multiple choice questions
+* [ ] overhaul adding images, allow an option to choose from existing images in the system or to upload a new image (this will help prevent duplicating the same image file many times over)
+* [ ] copy paste image support for add question interface
+* [ ] Add setting and option to display next revision day project after answering a question
 # Tutorial Update:
 
 This update will focus on adding info icons and tutorial to Quizzer to introduce new  user's to the platform, there are a lot of moving parts and a tutorial goes a long way to help a new user figure out what the hell is going on.

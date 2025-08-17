@@ -310,6 +310,11 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.0"
+  flutter_localizations:
+    dependency: transitive
+    description: flutter
+    source: sdk
+    version: "0.0.0"
   flutter_markdown:
     dependency: transitive
     description:
@@ -392,6 +397,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.2.3"
+  holding_gesture:
+    dependency: transitive
+    description:
+      name: holding_gesture
+      sha256: beb26bb731d7d67595c4895b42fa7962c209cecee8def42b665c495648d4620f
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.2.0"
   http:
     dependency: "direct main"
     description:
@@ -480,6 +493,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.2.1+1"
+  intl:
+    dependency: transitive
+    description:
+      name: intl
+      sha256: "3df61194eb431efc39c4ceba583b95633a403f46c9fd341e550ce0bfa50e9aa5"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.20.2"
   js:
     dependency: transitive
     description:
@@ -576,6 +597,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.11.1"
+  math_expressions:
+    dependency: "direct main"
+    description:
+      name: math_expressions
+      sha256: "218dc65bed4726562bb31c53d8daa3cc824664b26fb72d77bc592757edf74ba0"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.7.0"
+  math_keyboard:
+    dependency: "direct main"
+    description:
+      name: math_keyboard
+      sha256: "162a095235e04ed2c5e5cba8a55c054c6305a1d26c9c4e36b5e6bac107ed4a9d"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.3.3"
   meta:
     dependency: transitive
     description:

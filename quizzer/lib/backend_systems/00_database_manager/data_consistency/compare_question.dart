@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pair_management/question_answer_pairs_table.dart';
@@ -90,7 +92,15 @@ Future<Map<String, dynamic>> compareAndUpdateQuestionRecord(String questionId) a
       };
     }
     
+  } on SocketException catch (e) {
+    QuizzerLogger.logError('Network Error: Failed to connect. Please check your internet connection. $e');
+    return {
+      'updated': false,
+      'message': 'Network Error occurred'
+    };
   } catch (e) {
+    // This is a catch-all block for any other type of exception.
+    // We log it and rethrow it to preserve the original stack trace.
     QuizzerLogger.logError('Error comparing question $questionId: $e');
     rethrow;
   }
