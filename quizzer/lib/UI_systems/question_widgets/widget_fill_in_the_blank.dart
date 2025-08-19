@@ -46,8 +46,10 @@ class _FillInTheBlankQuestionWidgetState
   // State for managing blank inputs
   final Map<int, TextEditingController> _blankControllers = {};
   List<bool> _individualBlankResults = []; // Track individual blank correctness
+  final List<bool> _blankIsMathExpression = []; // NEW: Track if each blank is a math expression
   bool _isAnswerSubmitted = false;
   bool? _isOverallCorrect; // Null until submitted
+  List<String> formattedCorrectAnswers = [];
 
   @override
   void initState() {
@@ -72,11 +74,12 @@ class _FillInTheBlankQuestionWidgetState
   }
 
   void _initializeControllers() {
-    // Clear existing controllers
+    // Clear existing controllers and math expression states
     for (var controller in _blankControllers.values) {
       controller.dispose();
     }
     _blankControllers.clear();
+    _blankIsMathExpression.clear(); // Clear the list here
 
     // Count blank elements and create controllers
     int blankIndex = 0;
@@ -94,8 +97,27 @@ class _FillInTheBlankQuestionWidgetState
         String correctAnswer = '';
         if (answersToBlanks != null && blankIndex < answersToBlanks.length) {
           correctAnswer = answersToBlanks[blankIndex].keys.first;
+          
+          // NEW LOGIC: Use the ExpressionParser to determine if it's a math expression.
+          bool isMath = false;
+          SessionManager sessionManager = getSessionManager();
+          String valType = sessionManager.getFillInTheBlankValidationType(correctAnswer);
+          if (valType == "math_expression") {
+            isMath = true;
+            // modify correctAnswer since it's a math expression to have latex delimiters for the preview:
+            QuizzerLogger.logMessage("Translating $correctAnswer");
+            formattedCorrectAnswers.add("\$$correctAnswer\$");
+            QuizzerLogger.logMessage("Formatted answers are now $formattedCorrectAnswers");
+          } else {
+            formattedCorrectAnswers.add(correctAnswer);
+          }
+          _blankIsMathExpression.add(isMath);
+          QuizzerLogger.logMessage("Blank $blankIndex correct answer '$correctAnswer' is math: ${_blankIsMathExpression.last}");
+
+        } else {
+          // If no answer is found, default to non-math
+          _blankIsMathExpression.add(false);
         }
-        
         correctAnswers.add(correctAnswer);
         
         // Set custom user answers if provided, otherwise use correct answer for preview
@@ -246,11 +268,15 @@ class _FillInTheBlankQuestionWidgetState
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // --- Question Elements with Blank Controllers ---
+          // NOTE: ElementRenderer will need to be updated to accept the
+          // 'blankIsMathExpression' list and pass the corresponding
+          // boolean to each WidgetBlank.
           ElementRenderer(
             elements: widget.questionElements,
             blankControllers: _blankControllers,
             individualBlankResults: _individualBlankResults.isNotEmpty ? _individualBlankResults : null,
             enabled: interactionsEnabled, // Disable blanks after submission
+            blankIsMathExpression: _blankIsMathExpression, // NEW: Pass down the list
           ),
           AppTheme.sizedBoxLrg,
 
@@ -328,19 +354,14 @@ class _FillInTheBlankQuestionWidgetState
               children: [
                 const Text("Correct Answers:", style: TextStyle(fontWeight: FontWeight.bold)),
                 AppTheme.sizedBoxSml,
-                // FIX: Render correct answers directly as a single RichText
-                RichText(
-                  text: TextSpan(
-                    style: Theme.of(context).textTheme.bodyLarge,
-                    children: [
-                      // Join all correct answers with a comma and space
-                      for (int i = 0; i < correctAnswerElements.length; i++) ...[
-                        TextSpan(text: correctAnswerElements[i]['content'].toString()),
-                        if (i < correctAnswerElements.length - 1)
-                          const TextSpan(text: ', '),
-                      ],
-                    ],
-                  ),
+                ElementRenderer(
+                  // Map the list of strings into the required List<Map<String, dynamic>>
+                  // format for the ElementRenderer. Each element will have a 'type' of 'text'
+                  // and its 'content' will be the string itself.
+                  elements: formattedCorrectAnswers.map((answer) => {
+                    'type': 'text',
+                    'content': answer,
+                  }).toList(),
                 ),
                 AppTheme.sizedBoxLrg,
               ],

@@ -10,7 +10,7 @@ import 'dart:typed_data';
 import 'dart:io';
 import 'package:quizzer/backend_systems/00_helper_utils/file_locations.dart';
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
-import 'package:quizzer/backend_systems/session_manager/answer_validation/text_validation_functionality.dart';
+import 'package:quizzer/backend_systems/session_manager/answer_validation/text_analysis_tools.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/modules_table.dart';
 import 'package:quizzer/backend_systems/00_helper_utils/utils.dart';
 
@@ -304,53 +304,55 @@ int checkCompletionStatus(String questionElements, String answerElements) {
     QuizzerLogger.logMessage("Received questionElements: '$questionElements'");
     QuizzerLogger.logMessage("Received answerElements: '$answerElements'");
     
-    // Check if strings are empty or whitespace-only
     if (questionElements.trim().isEmpty || answerElements.trim().isEmpty) {
       QuizzerLogger.logMessage("Strings are empty or whitespace-only");
       return 0;
     }
     
-    // Parse and validate question elements
-    QuizzerLogger.logMessage("Attempting to parse questionElements...");
     final List<dynamic> questionList = decodeValueFromDB(questionElements);
-    QuizzerLogger.logMessage("Parsed questionList: $questionList");
     if (questionList.isEmpty) {
       QuizzerLogger.logMessage("questionList is empty");
       return 0;
     }
-    
-    // Check that each question element has non-empty content
+
+    int meaningfulQuestionElements = 0;
     for (final element in questionList) {
       if (element is Map<String, dynamic>) {
         final content = element['content'];
         QuizzerLogger.logMessage("Question element content: '$content' (type: ${content.runtimeType})");
         
-        // For blank elements, content can be numeric (width) or string
-        // For other elements, content must be non-empty string
         if (element['type'] == 'blank') {
-          if (content == null || (content is String && content.trim().isEmpty)) {
-            QuizzerLogger.logMessage("Blank element has empty content");
+          // CORRECTED LOGIC for blank elements
+          // Content must be a non-null number greater than 0
+          if (content == null || content is! num || content <= 0) {
+            QuizzerLogger.logMessage("Blank element has invalid or empty content");
             return 0;
           }
-        } else {
-          if (content == null || content is! String || content.trim().isEmpty) {
-            QuizzerLogger.logMessage("Non-blank element has invalid content");
+          meaningfulQuestionElements++;
+        } else { // 'text' elements
+          if (content == null || content is! String) {
+            QuizzerLogger.logMessage("Non-blank element has invalid content type");
             return 0;
+          }
+          if (content.trim().isNotEmpty) {
+            meaningfulQuestionElements++;
           }
         }
       }
     }
     
-    // Parse and validate answer elements
-    QuizzerLogger.logMessage("Attempting to parse answerElements...");
+    if (meaningfulQuestionElements == 0) {
+      QuizzerLogger.logMessage("Question has no meaningful elements");
+      return 0;
+    }
+
     final List<dynamic> answerList = decodeValueFromDB(answerElements);
-    QuizzerLogger.logMessage("Parsed answerList: $answerList");
     if (answerList.isEmpty) {
       QuizzerLogger.logMessage("answerList is empty");
       return 0;
     }
     
-    // Check that each answer element has non-empty content
+    int meaningfulAnswerElements = 0;
     for (final element in answerList) {
       if (element is Map<String, dynamic>) {
         final content = element['content'] as String?;
@@ -359,13 +361,18 @@ int checkCompletionStatus(String questionElements, String answerElements) {
           QuizzerLogger.logMessage("Answer element has empty content");
           return 0;
         }
+        meaningfulAnswerElements++;
       }
     }
     
+    if (meaningfulAnswerElements == 0) {
+      QuizzerLogger.logMessage("Answer has no meaningful elements");
+      return 0;
+    }
+
     QuizzerLogger.logMessage("All validation passed, returning 1");
     return 1;
   } catch (e) {
-    // If JSON parsing fails, return 0 (incomplete)
     QuizzerLogger.logError("JSON parsing failed: $e");
     return 0;
   }
@@ -1781,6 +1788,7 @@ Future<String> addSortOrderQuestion({
 ///   questionElements: A list of maps representing the question content (can include 'blank' type elements).
 ///   answerElements: A list of maps representing the explanation/answer rationale.
 ///   answersToBlanks: A list of maps where each map contains the correct answer and synonyms for each blank.
+///   >> [{"cos x":["cos(x)","cos","cosine x","cosine(x)","cosine"]}]
 ///   debugDisableOutboundSyncCall: When true, prevents signaling the outbound sync system.
 ///     This is useful for testing to avoid triggering sync operations during test execution.
 ///     Defaults to false (sync is signaled normally).

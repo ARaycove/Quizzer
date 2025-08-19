@@ -19,7 +19,7 @@ import 'package:quizzer/backend_systems/10_switch_board/switch_board.dart'; // I
 import 'package:quizzer/backend_systems/10_switch_board/sb_question_worker_signals.dart';
 import 'package:quizzer/backend_systems/session_manager/session_helper.dart';
 import 'package:quizzer/backend_systems/session_manager/answer_validation/session_answer_validation.dart';
-import 'package:quizzer/backend_systems/session_manager/answer_validation/text_validation_functionality.dart' as text_validation;
+import 'package:quizzer/backend_systems/session_manager/answer_validation/text_validation_functionality.dart';
 import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/outbound_sync/outbound_sync_worker.dart'; // Import the new worker
 import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/media_sync_worker.dart'; // Added import for MediaSyncWorker
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart'; // Import for getDatabaseMonitor
@@ -46,6 +46,7 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/question_answ
 import 'package:quizzer/backend_systems/00_helper_utils/file_locations.dart';
 import 'package:quizzer/backend_systems/00_database_manager/custom_queries.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/modules_table.dart' as modules_table;
+import 'package:quizzer/backend_systems/session_manager/answer_validation/text_analysis_tools.dart' as text_validation;
 
 class SessionManager {
   // Singleton instance
@@ -223,6 +224,11 @@ class SessionManager {
   Map<String, dynamic>? get currentQuestionUserRecord => _currentQuestionRecord;
   Map<String, dynamic>? get currentQuestionStaticData => _currentQuestionDetails;
   String?               get initialProfileLastModified => _initialProfileLastModified;
+  // How will a fill in the blank be evaluated?
+  String getFillInTheBlankValidationType(primaryAnswer) {
+    return getValidationType(primaryAnswer);
+  }
+
   // ADDED: Getter that uses cached user role to avoid repeated JWT decoding
   String get userRole {
     _cachedUserRole ??= determineUserRoleFromSupabaseSession(supabase.auth.currentSession);
@@ -286,7 +292,7 @@ class SessionManager {
     
     final List<Map<String, List<String>>> answersToBlanks = currentAnswersToBlanks;
     
-    return await text_validation.validateFillInTheBlank(
+    return await validateFillInTheBlank(
       {
         'question_type': 'fill_in_the_blank',
         'answers_to_blanks': answersToBlanks,

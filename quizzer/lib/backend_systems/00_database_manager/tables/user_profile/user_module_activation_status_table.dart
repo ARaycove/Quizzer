@@ -5,7 +5,7 @@ import 'package:quizzer/backend_systems/10_switch_board/sb_sync_worker_signals.d
 import 'package:sqflite/sqflite.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/modules_table.dart';
 import 'package:quizzer/backend_systems/07_user_question_management/user_question_processes.dart';
-import 'package:quizzer/backend_systems/session_manager/answer_validation/text_validation_functionality.dart';
+import 'package:quizzer/backend_systems/session_manager/answer_validation/text_analysis_tools.dart';
 
 /// Verifies that the user_module_activation_status table exists in the database
 /// Creates the table if it doesn't exist

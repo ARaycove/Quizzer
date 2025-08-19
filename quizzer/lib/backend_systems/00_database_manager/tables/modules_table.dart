@@ -3,7 +3,7 @@ import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'table_helper.dart'; // Import the helper file
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
 import 'package:quizzer/backend_systems/10_switch_board/sb_sync_worker_signals.dart';
-import 'package:quizzer/backend_systems/session_manager/answer_validation/text_validation_functionality.dart';
+import 'package:quizzer/backend_systems/session_manager/answer_validation/text_analysis_tools.dart';
 
 // Table name and field constants
 const String modulesTableName = 'modules';

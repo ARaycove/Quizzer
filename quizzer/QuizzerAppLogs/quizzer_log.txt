@@ -1,66 +1,20 @@
-Quizzer: [20:20:01] [34m[INFO][0m [<asynchronous suspension>] QuizzerLogger successfully set up file logging to: ./QuizzerAppLogs/quizzer_log.txt
-Quizzer: [20:20:01] [34m[INFO][0m [<asynchronous suspension>] QuizzerLogger: Attempting a SECOND test log message to file.
-Quizzer: [20:20:01] [34m[INFO][0m [how_many_lines.dart] Calculating total lines of code...
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart] 
---- Line Count Summary ---
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart] Total_Backend_Systems: 24906
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart] Total_UI_Systems:      14731
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart] Total_Test_Lines:      13132
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart] --------------------------
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart] Total_Lines:           52769
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart] --------------------------
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart] 
---- Backend Systems Breakdown (recursive, alphabetical) ---
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart] 00_database_manager/                      17296
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart] ├── cloud_sync_system/                         3160
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart] │   ├── inbound_sync/                              1054
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart] │   └── outbound_sync/                             1804
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart] ├── data_consistency/                           142
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart] ├── platform/                                    65
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart] ├── review_system/                              662
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart] └── tables/                                   12629
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart]     ├── academic_archive.dart/                     2032
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart]     │   └── relationship_data/                          214
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart]     ├── question_answer_pair_management/           2730
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart]     ├── system_data/                                902
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart]     └── user_profile/                              5672
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart]         └── user_stats/                                2978
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart] 00_helper_utils/                            262
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart] 02_login_authentication/                    893
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart] 03_account_creation/                        134
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart] 04_module_management/                       490
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart] 06_question_queue_server/                   832
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart] 07_user_question_management/                110
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart] 08_memory_retention_algo/                    90
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart] 09_data_caches/                             402
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart] 10_switch_board/                            746
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart] 11_ai_management/                           247
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart] 12_subject_concept_classifier/                0
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart] logger/                                     389
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart] session_manager/                           3015
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart] └── answer_validation/                          446
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart] 
---- UI Systems Breakdown (recursive, alphabetical) ---
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart] 00_login_page/                              261
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart] 01_new_user_page/                           271
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart] 02_home_page/                               893
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart] └── stat_display_section/                       331
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart] 03_add_question_page/                      4209
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart] ├── helpers/                                    173
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart] └── widgets/                                   3255
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart]     └── add_question_widget/                       2493
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart]         └── edit_elements/                             1629
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart] 04_display_modules_page/                   1590
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart] └── module_card/                               1101
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart] 05_menu_page/                               163
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart] 06_admin_panel/                             831
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart] 07_critical_error_page/                     303
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart] 08_settings_page/                          1153
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart] └── individual_setting_widgets/                 811
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart]     └── stat_display_widgets/                       690
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart] 09_feedback_page/                           176
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart] 10_stats_page/                             1523
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart] └── stat_widgets/                               990
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart] UI_Utils/                                    73
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart] global_widgets/                            1470
-Quizzer: [20:20:02] [34m[INFO][0m [how_many_lines.dart] question_widgets/                          1815
+Quizzer: [17:36:42] [34m[INFO][0m [<asynchronous suspension>] QuizzerLogger successfully set up file logging to: ./QuizzerAppLogs/quizzer_log.txt
+Quizzer: [17:36:42] [34m[INFO][0m [<asynchronous suspension>] QuizzerLogger: Attempting a SECOND test log message to file.
+Quizzer: [17:36:42] [34m[INFO][0m [math_validation.dart] Simplified comparison does:
+(2.0 * x)==(x + x)?
+Quizzer: [17:36:42] [34m[INFO][0m [math_validation.dart] Simplified comparison does:
+(3.0 + (2.0 * y))==((2.0 * y) + 3.0)?
+Quizzer: [17:36:42] [34m[INFO][0m [math_validation.dart] Simplified comparison does:
+x==((x + x) / 2.0)?
+Quizzer: [17:36:42] [34m[INFO][0m [math_validation.dart] Simplified comparison does:
+(x + 2.0)==(x + 1.0)?
+Quizzer: [17:36:42] [33m[WARNING][0m [math_validation.dart] ⚠️ FormatException caught: One or both expressions are malformed.
+Quizzer: [17:36:42] [34m[INFO][0m [math_validation.dart] Simplified comparison does:
+((2.0 * x) + 2.0)==((x + 1.0) * 2.0)?
+Quizzer: [17:36:42] [34m[INFO][0m [math_validation.dart] Simplified comparison does:
+tan(x)==(sin(x) / cos(x))?
+Quizzer: [17:36:42] [34m[INFO][0m [math_validation.dart] Simplified comparison does:
+y==((x + y) - x)?
+Quizzer: [17:36:42] [33m[WARNING][0m [math_validation.dart] ⚠️ FormatException caught: One or both expressions are malformed.
+Quizzer: [17:36:42] [34m[INFO][0m [math_validation.dart] Simplified comparison does:
+sin({sqrt(x)})==sin({sqrt(x)})?

@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:math_expressions/math_expressions.dart';
+import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 
 /// Must provide two expressions on which they will be evaluated for equivalency
 /// Optional values can be passed for the variables, otherwise they will be defaulted
@@ -18,9 +19,20 @@ Future<bool> evaluateMathExpressionsEquivalent({
   // variables are x, y, and θ
   // more to come, will update as we move on
   ExpressionParser p = GrammarParser();
-  Expression correctAnswer = p.parse(correctExpression).simplify();
-  Expression providedAnswer = p.parse(userExpression).simplify();
-
+  late Expression correctAnswer;
+  late Expression providedAnswer;
+  try {
+    // Attempt to parse both the correct and user expressions.
+    // This is the step that can throw a FormatException.
+    correctAnswer = p.parse(correctExpression).simplify();
+    providedAnswer = p.parse(userExpression).simplify();
+    QuizzerLogger.logMessage("Simplified comparison does:\n$correctAnswer==$providedAnswer?");
+  } on FormatException {
+    // If a FormatException is caught, it means one of the expressions is malformed.
+    // In this case, they cannot be equivalent, so we return false.
+    QuizzerLogger.logWarning("FormatException caught: One or both expressions are malformed.");
+    return false;
+  }
   List<String> variables = ["x", "y", "θ"];
 
   var context = ContextModel()
@@ -63,6 +75,6 @@ Future<bool> evaluateMathExpressionsEquivalent({
     return result;
   }
 
-  result = (evaluatedCorrectAnswer.simplify() == evaluatedUserAnswer.simplify());
+  result = (evaluatedCorrectAnswer == evaluatedUserAnswer);
   return result;
 }

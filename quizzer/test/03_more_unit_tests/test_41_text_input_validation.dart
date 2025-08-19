@@ -1,45 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:quizzer/backend_systems/session_manager/answer_validation/text_validation_functionality.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
-
+import 'package:quizzer/backend_systems/session_manager/answer_validation/text_analysis_tools.dart';
 void main() async {
   await QuizzerLogger.setupLogging();
-  
-  // // Phrases defined at top for reuse across tests
-  // List<String> phrases = [
-
-    
-    
-    
-    
-  // ];
-  
-  // // 5 new reconstructed/reworded phrases
-  // List<String> reconstructedPhrases = [
-  // ];
-  
-  // List<String> questions = [
-  //   'the lazy dog had a quick brown fox jump over him.',
-  //   'The quick brown fox jumps over the lazy dog.',
-  //   'The powerhouse of the cell is mitochondria.',
-  //   'Mitochondria are the powerhouse of the cell.',
-  //   'The process of photosynthesis requires sunlight to make glucose.',
-  //   'Photosynthesis converts sunlight into glucose.',
-  //   'Genetic information is stored in DNA',
-  //   'DNA contains genetic information.',
-  //   'In order to catalyze biochemical reactions, enzymes are required.',
-  //   'Enzymes catalyze biochemical reactions.',
-  //   'What is the capital of France?',
-  //   'How does photosynthesis work?',
-  //   'When did World War II end?',
-  //   'Who wrote Romeo and Juliet?',
-  //   'Where is the Great Wall of China located?',
-  //   'Why do leaves change color in autumn?',
-  //   'Which planet is closest to the sun?',
-  //   'How many bones are in the human body?',
-  //   'What causes earthquakes?',
-  //   'Who discovered penicillin?'
-  // ];
   
   group('Test 1: Similarity scoring', () {
     List<List<String>> testData = [
@@ -95,10 +59,10 @@ void main() async {
         table += '$term | $typo | $simScore | $levenScore | $boolResult |\n';
       }
       // Header
-      print('${'Term'.padRight(termWidth)} | ${'Typo'.padRight(typoWidth)} | ${'Sim Score'.padRight(simScoreWidth)} | ${'Leven Score'.padRight(levenScoreWidth)} | ${'Bool'.padRight(boolWidth)} |');
+      QuizzerLogger.logMessage('${'Term'.padRight(termWidth)} | ${'Typo'.padRight(typoWidth)} | ${'Sim Score'.padRight(simScoreWidth)} | ${'Leven Score'.padRight(levenScoreWidth)} | ${'Bool'.padRight(boolWidth)} |');
       // Divider
-      print('${''.padRight(termWidth, '-')} | ${''.padRight(typoWidth, '-')} | ${''.padRight(simScoreWidth, '-')} | ${''.padRight(levenScoreWidth, '-')} | ${''.padRight(boolWidth, '-')} |');
-      print(table);
+      QuizzerLogger.logMessage('${''.padRight(termWidth, '-')} | ${''.padRight(typoWidth, '-')} | ${''.padRight(simScoreWidth, '-')} | ${''.padRight(levenScoreWidth, '-')} | ${''.padRight(boolWidth, '-')} |');
+      QuizzerLogger.logMessage(table);
     });
   });
   group('Test 2: validation unit testing', () {

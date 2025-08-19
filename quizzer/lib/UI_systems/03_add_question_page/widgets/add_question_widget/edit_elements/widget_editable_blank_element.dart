@@ -1,29 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/app_theme.dart';
-import 'package:quizzer/backend_systems/session_manager/session_manager.dart'; // Added import for SessionManager
+import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
+import 'package:math_keyboard/math_keyboard.dart';
 
 // ==========================================
 //    Editable Blank Element Widget
 // ==========================================
-// Handles individual blank elements with inline synonym editing
-//
-// CRITICAL: DO NOT REVERT DOUBLE-CLICK EDITING FOR ANSWER TEXT
-// ================================================================
-// 
-// DESIGN REQUIREMENTS:
-// - Primary answer width MUST fit its content, NOT be a fixed width
-// - Synonyms use Wrap to prevent overflow
-// - Horizontal layout with container
-// - Primary answer on left (double-click editable)
-// - Synonyms in middle (double-click editable)
-// - Add/remove buttons on right
-// - NO SEPARATE EDIT MODE - everything inline
-// - Double-click edits ANSWER TEXT, not width metadata
-//
-// DO NOT REVERT THIS TO WIDTH EDITING - ANSWER TEXT EDITING IS REQUIRED
-// ================================================================
-
+// This widget is a single, self-contained element.
+// The unfocus logic will be handled by a top-level
+// GestureDetector in the parent widget.
+// ==========================================
 class EditableBlankElement extends StatefulWidget {
   final Map<String, dynamic> element;
   final int index;
@@ -56,12 +43,18 @@ class EditableBlankElement extends StatefulWidget {
 
 class _EditableBlankElementState extends State<EditableBlankElement> {
   late TextEditingController _primaryAnswerController;
+  late MathFieldEditingController _mathAnswerController;
   late FocusNode _primaryAnswerFocusNode;
+  late FocusNode _mathAnswerFocusNode;
   final List<TextEditingController> _synonymControllers = [];
   final List<FocusNode> _synonymFocusNodes = [];
   final List<bool> _isEditingSynonyms = [];
   bool _isEditingPrimary = false;
+  bool _isMathAnswer = false;
   
+  // New state variable to hold the last valid TeX string
+  late String _lastValidTex;
+
   // Cache for synonym suggestions to avoid duplicate API calls
   static final Map<String, List<String>> _synonymCache = {};
 
@@ -70,7 +63,28 @@ class _EditableBlankElementState extends State<EditableBlankElement> {
     super.initState();
     _primaryAnswerController = TextEditingController(text: widget.answerText ?? '');
     _primaryAnswerFocusNode = FocusNode();
+    
+    _mathAnswerController = MathFieldEditingController();
+    _mathAnswerFocusNode = FocusNode();
+    
+    // Validate initial answerText and set _lastValidTex
+    try {
+      if (widget.answerText != null && widget.answerText!.startsWith('\\')) {
+        TeXParser(widget.answerText!).parse();
+        _lastValidTex = widget.answerText!;
+        _isMathAnswer = true;
+      } else {
+        _lastValidTex = '';
+        _isMathAnswer = false;
+      }
+    } catch (e) {
+      QuizzerLogger.logError('initState: Invalid initial answer text. Setting to empty.');
+      _lastValidTex = '';
+      _isMathAnswer = false;
+    }
+
     _primaryAnswerFocusNode.addListener(_handlePrimaryFocusChange);
+    _mathAnswerFocusNode.addListener(_handlePrimaryFocusChange);
     
     // Initialize synonyms from widget
     if (widget.synonyms != null) {
@@ -91,6 +105,17 @@ class _EditableBlankElementState extends State<EditableBlankElement> {
     // Update primary answer if it changed
     if (oldWidget.answerText != widget.answerText) {
       _primaryAnswerController.text = widget.answerText ?? '';
+      
+      try {
+        final expression = TeXParser(widget.answerText ?? '').parse();
+        _mathAnswerController.updateValue(expression);
+        _lastValidTex = widget.answerText ?? '';
+        _isMathAnswer = true;
+      } catch (e) {
+        _mathAnswerController.updateValue(TeXParser('').parse());
+        _lastValidTex = '';
+        _isMathAnswer = false;
+      }
     }
     
     // Update synonyms if they changed
@@ -122,8 +147,11 @@ class _EditableBlankElementState extends State<EditableBlankElement> {
   @override
   void dispose() {
     _primaryAnswerFocusNode.removeListener(_handlePrimaryFocusChange);
+    _mathAnswerFocusNode.removeListener(_handlePrimaryFocusChange);
     _primaryAnswerController.dispose();
     _primaryAnswerFocusNode.dispose();
+    _mathAnswerController.dispose();
+    _mathAnswerFocusNode.dispose();
     
     for (int i = 0; i < _synonymControllers.length; i++) {
       _synonymControllers[i].dispose();
@@ -134,29 +162,27 @@ class _EditableBlankElementState extends State<EditableBlankElement> {
 
   // --- Handle Primary Answer Focus Change ---
   void _handlePrimaryFocusChange() {
-    if (!_primaryAnswerFocusNode.hasFocus && _isEditingPrimary && mounted) {
+    if (!mounted) return;
+    if ((!_primaryAnswerFocusNode.hasFocus && !_isMathAnswer && _isEditingPrimary) ||
+        (!_mathAnswerFocusNode.hasFocus && _isMathAnswer && _isEditingPrimary)) {
       _submitPrimaryAnswer();
     }
   }
 
   // --- Handle Synonym Focus Change ---
   void _handleSynonymFocusChange(int index) {
-    if (!_synonymFocusNodes[index].hasFocus && _isEditingSynonyms[index] && mounted) {
+    if (!mounted) return;
+    if (!_synonymFocusNodes[index].hasFocus && _isEditingSynonyms[index]) {
       final newSynonym = _synonymControllers[index].text.trim().toLowerCase();
       
-      // Check for empty synonym and schedule the removal
       if (newSynonym.isEmpty) {
-        // Schedule the removal to happen after the current frame/focus change cycle is complete
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) {
             _removeSynonym(index);
           }
         });
-        // Do not proceed with submitting the synonym in the current frame
         return;
       }
-      
-      // If not empty, submit the synonym normally
       _submitSynonym(index);
       setState(() {
         _isEditingSynonyms[index] = false;
@@ -164,13 +190,24 @@ class _EditableBlankElementState extends State<EditableBlankElement> {
     }
   }
 
+  void _toggleIsMathAnswer() {
+    setState(() {
+      _isMathAnswer = !_isMathAnswer;
+    });
+    _startEditingPrimary();
+  }
+
   // --- Start editing primary answer ---
   void _startEditingPrimary() {
     setState(() {
       _isEditingPrimary = true;
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted && _primaryAnswerFocusNode.canRequestFocus) {
-          _primaryAnswerFocusNode.requestFocus();
+        if (mounted) {
+          if (_isMathAnswer) {
+            _mathAnswerFocusNode.requestFocus();
+          } else {
+            _primaryAnswerFocusNode.requestFocus();
+          }
         }
       });
     });
@@ -180,23 +217,47 @@ class _EditableBlankElementState extends State<EditableBlankElement> {
   void _submitPrimaryAnswer() {
     if (!mounted) return;
     
-    final newAnswer = _primaryAnswerController.text;
-    if (newAnswer.isEmpty) {
-      QuizzerLogger.logWarning("Primary answer cannot be empty.");
-      return;
+    String newAnswer;
+    if (_isMathAnswer) {
+      try {
+        newAnswer = _mathAnswerController.currentEditingValue();
+        _lastValidTex = newAnswer;
+        
+        int blankIndex = -1;
+        if (widget.questionElements != null) {
+          blankIndex = widget.questionElements!.take(widget.index).where((e) => e['type'] == 'blank').length;
+        }
+        if (widget.onUpdateAnswerText != null && blankIndex >= 0) {
+          widget.onUpdateAnswerText!(blankIndex, newAnswer);
+        }
+      } catch (e) {
+        QuizzerLogger.logError('EditableBlankElement: Invalid math expression entered. Reverting to last valid state.');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Invalid math expression. Please correct it.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        _mathAnswerController.updateValue(TeXParser(_lastValidTex).parse());
+      }
+    } else {
+      newAnswer = _primaryAnswerController.text;
+      if (newAnswer.isEmpty) {
+        QuizzerLogger.logWarning("Primary answer cannot be empty.");
+        setState(() { _isEditingPrimary = false; });
+        return;
+      }
+      int blankIndex = -1;
+      if (widget.questionElements != null) {
+        blankIndex = widget.questionElements!.take(widget.index).where((e) => e['type'] == 'blank').length;
+      }
+      if (widget.onUpdateAnswerText != null && blankIndex >= 0) {
+        widget.onUpdateAnswerText!(blankIndex, newAnswer);
+      }
     }
-
-    // Calculate the correct blank index by counting blanks before this one
-    int blankIndex = -1;
-    if (widget.questionElements != null) {
-      blankIndex = widget.questionElements!.take(widget.index).where((e) => e['type'] == 'blank').length;
-    }
-
-    // Update primary answer
-    if (widget.onUpdateAnswerText != null && blankIndex >= 0) {
-      widget.onUpdateAnswerText!(blankIndex, newAnswer);
-    }
-
+    
+    _primaryAnswerFocusNode.unfocus();
+    _mathAnswerFocusNode.unfocus();
     setState(() {
       _isEditingPrimary = false;
     });
@@ -217,42 +278,27 @@ class _EditableBlankElementState extends State<EditableBlankElement> {
   // --- Submit synonym edit ---
   void _submitSynonym(int index) {
     if (!mounted) return;
-    
     final newSynonym = _synonymControllers[index].text.trim().toLowerCase();
     if (newSynonym.isEmpty) {
-      // Remove empty synonym
       _removeSynonym(index);
       return;
     }
-
-    // Update the controller with normalized text
     _synonymControllers[index].text = newSynonym;
-
-    // Update synonyms
     _updateSynonyms();
   }
 
   // --- Add synonym ---
   void _addSynonym() {
-    // Create new controllers and nodes
     final newController = TextEditingController();
     final newFocusNode = FocusNode();
     final newIndex = _synonymControllers.length;
-
-    // Add listener to the new focus node
     newFocusNode.addListener(() => _handleSynonymFocusChange(newIndex));
-
-    // Update state to include the new synonym
     setState(() {
       _synonymControllers.add(newController);
       _synonymFocusNodes.add(newFocusNode);
-      // CRITICAL: Immediately set the new synonym to be in edit mode
       _isEditingSynonyms.add(true);
     });
-    
-    // CRITICAL: Request focus on the new synonym field in the next frame
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Check if the widget is still mounted and the focus node exists
       if (mounted && newIndex < _synonymFocusNodes.length && _synonymFocusNodes[newIndex].canRequestFocus) {
         _synonymFocusNodes[newIndex].requestFocus();
       }
@@ -270,32 +316,22 @@ class _EditableBlankElementState extends State<EditableBlankElement> {
       }
       return;
     }
-
-    // Check cache first
     if (_synonymCache.containsKey(primaryAnswer)) {
       if (mounted) {
         _showSynonymSuggestionsDialog(_synonymCache[primaryAnswer]!);
       }
       return;
     }
-
     try {
-      // Show loading indicator
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Getting synonym suggestions...')),
         );
       }
-
-      // Call the SessionManager API
       final SessionManager session = SessionManager();
       final List<String> suggestions = await session.getSynonymSuggestions(primaryAnswer);
-
-      // Cache the results
       _synonymCache[primaryAnswer] = suggestions;
-
       if (mounted) {
-        // Show suggestions in a popup
         _showSynonymSuggestionsDialog(suggestions);
       }
     } catch (e) {
@@ -309,15 +345,11 @@ class _EditableBlankElementState extends State<EditableBlankElement> {
 
   // --- Show synonym suggestions dialog ---
   void _showSynonymSuggestionsDialog(List<String> suggestions) {
-    // Get current synonyms to pre-fill selections (normalized to lowercase)
     Set<String> currentSynonyms = _synonymControllers
         .map((controller) => controller.text.trim().toLowerCase())
         .where((text) => text.isNotEmpty)
         .toSet();
-    
-    // Track selected suggestions (pre-fill with existing synonyms)
     Set<String> selectedSuggestions = Set<String>.from(currentSynonyms);
-    
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -334,7 +366,6 @@ class _EditableBlankElementState extends State<EditableBlankElement> {
                     final suggestion = suggestions[index];
                     final isSelected = selectedSuggestions.contains(suggestion);
                     final isAlreadyInList = currentSynonyms.contains(suggestion);
-                    
                     return ListTile(
                       title: Text(suggestion),
                       subtitle: isAlreadyInList ? const Text('Already in list', style: TextStyle(fontStyle: FontStyle.italic, color: Colors.grey)) : null,
@@ -361,7 +392,6 @@ class _EditableBlankElementState extends State<EditableBlankElement> {
                 ),
                 TextButton(
                   onPressed: () {
-                    // Add only new suggestions (not already in list)
                     for (String suggestion in selectedSuggestions) {
                       if (!currentSynonyms.contains(suggestion)) {
                         _addSynonym();
@@ -398,22 +428,169 @@ class _EditableBlankElementState extends State<EditableBlankElement> {
   void _updateSynonyms() {
     final primaryAnswer = _primaryAnswerController.text;
     if (primaryAnswer.isEmpty) return;
-
     final synonyms = _synonymControllers
         .map((controller) => controller.text)
         .where((text) => text.isNotEmpty)
         .toList();
-
-    // Calculate the correct blank index by counting blanks before this one
     int blankIndex = -1;
     if (widget.questionElements != null) {
       blankIndex = widget.questionElements!.take(widget.index).where((e) => e['type'] == 'blank').length;
     }
-
-    // Update synonyms
     if (widget.onUpdateSynonyms != null && blankIndex >= 0) {
       widget.onUpdateSynonyms!(blankIndex, primaryAnswer, synonyms);
     }
+  }
+
+  // --- Build the primary answer field widget ---
+  Widget _buildPrimaryAnswerField() {
+    if (_isMathAnswer) {
+      return IntrinsicWidth(
+        child: MathField(
+          variables: const ["x", "y", "θ"],
+          controller: _mathAnswerController,
+          focusNode: _mathAnswerFocusNode,
+          autofocus: _isEditingPrimary,
+          decoration: const InputDecoration(
+            isDense: true,
+            border: InputBorder.none,
+            hintText: 'Enter a math expression',
+          ),
+        ),
+      );
+    } else {
+      if (_isEditingPrimary) {
+        return IntrinsicWidth(
+          child: TextField(
+            controller: _primaryAnswerController,
+            focusNode: _primaryAnswerFocusNode,
+            autofocus: true,
+            style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+            decoration: const InputDecoration(
+              isDense: true,
+              border: InputBorder.none,
+              hintText: 'Primary Answer',
+            ),
+            onSubmitted: (_) => _submitPrimaryAnswer(),
+          ),
+        );
+      } else {
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            border: Border.all(color: Theme.of(context).colorScheme.outline),
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: Text(
+            widget.answerText ?? '_____',
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurface,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        );
+      }
+    }
+  }
+
+  // --- Build the synonym box widget ---
+  Widget _buildSynonymBox() {
+    return Expanded(
+      child: Wrap(
+        spacing: 8,
+        runSpacing: 4,
+        children: [
+          ...(_synonymControllers.asMap().entries.map((entry) {
+            final index = entry.key;
+            final controller = entry.value;
+            return Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                GestureDetector(
+                  onTap: () => _startEditingSynonym(index),
+                  child: _isEditingSynonyms[index]
+                      ? SizedBox(
+                          width: 100,
+                          child: TextField(
+                            controller: controller,
+                            focusNode: _synonymFocusNodes[index],
+                            autofocus: true,
+                            style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+                            decoration: const InputDecoration(
+                              isDense: true,
+                              border: InputBorder.none,
+                              hintText: 'Synonym',
+                            ),
+                            onSubmitted: (_) => _submitSynonym(index),
+                          ),
+                        )
+                      : Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Theme.of(context).colorScheme.outline),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            controller.text.isEmpty ? 'Synonym' : controller.text,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.remove_circle_outline, size: 16),
+                  onPressed: () => _removeSynonym(index),
+                  visualDensity: VisualDensity.compact,
+                  padding: EdgeInsets.zero,
+                ),
+              ],
+            );
+          })),
+        ],
+      ),
+    );
+  }
+
+  // --- Build the action buttons widget ---
+  Widget _buildActionButtons() {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        IconButton(
+          icon: const Icon(Icons.numbers),
+          onPressed: _toggleIsMathAnswer,
+          tooltip: "Toggle Math Answer",
+          visualDensity: VisualDensity.compact,
+          padding: EdgeInsets.zero,
+        ),
+        IconButton(
+          icon: const Icon(Icons.add_circle_outline),
+          onPressed: _addSynonym,
+          tooltip: 'Add Synonym',
+          visualDensity: VisualDensity.compact,
+          padding: EdgeInsets.zero,
+        ),
+        IconButton(
+          icon: const Icon(Icons.lightbulb_outline),
+          onPressed: _getSynonymSuggestions,
+          tooltip: 'Get Synonym Suggestions',
+          visualDensity: VisualDensity.compact,
+          padding: EdgeInsets.zero,
+        ),
+        IconButton(
+          icon: const Icon(Icons.remove_circle_outline),
+          onPressed: () => widget.onRemoveElement(widget.index, widget.category),
+          tooltip: 'Remove Blank',
+          visualDensity: VisualDensity.compact,
+          padding: EdgeInsets.zero,
+        ),
+        ReorderableDragStartListener(
+          index: widget.index,
+          child: const Icon(Icons.drag_handle),
+        ),
+      ],
+    );
   }
 
   @override
@@ -423,131 +600,15 @@ class _EditableBlankElementState extends State<EditableBlankElement> {
         padding: const EdgeInsets.all(12),
         child: Row(
           children: [
-            // Primary Answer (left side) - fit content, not fixed size
             GestureDetector(
               onTap: () => _startEditingPrimary(),
-              child: _isEditingPrimary
-                  ? IntrinsicWidth(
-                      child: TextField(
-                        controller: _primaryAnswerController,
-                        focusNode: _primaryAnswerFocusNode,
-                        autofocus: true,
-                        style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
-                        decoration: const InputDecoration(
-                          isDense: true,
-                          border: InputBorder.none,
-                          hintText: 'Primary Answer',
-                        ),
-                        onSubmitted: (_) => _submitPrimaryAnswer(),
-                      ),
-                    )
-                  : Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Theme.of(context).colorScheme.outline),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        widget.answerText ?? '_____',
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
+              child: _buildPrimaryAnswerField(),
             ),
             AppTheme.sizedBoxMed,
             
-            // Synonyms (middle) - use Wrap to prevent overflow
-            Expanded(
-              child: Wrap(
-                spacing: 8,
-                runSpacing: 4,
-                children: [
-                  ...(_synonymControllers.asMap().entries.map((entry) {
-                    final index = entry.key;
-                    final controller = entry.value;
-                    return Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        GestureDetector(
-                          onTap: () => _startEditingSynonym(index),
-                          child: _isEditingSynonyms[index]
-                              ? SizedBox(
-                                  width: 100,
-                                  child: TextField(
-                                    controller: controller,
-                                    focusNode: _synonymFocusNodes[index],
-                                    autofocus: true,
-                                    style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
-                                    decoration: const InputDecoration(
-                                      isDense: true,
-                                      border: InputBorder.none,
-                                      hintText: 'Synonym',
-                                    ),
-                                    onSubmitted: (_) => _submitSynonym(index),
-                                  ),
-                                )
-                              : Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                  decoration: BoxDecoration(
-                                    border: Border.all(color: Theme.of(context).colorScheme.outline),
-                                    borderRadius: BorderRadius.circular(4),
-                                  ),
-                                  child: Text(
-                                    controller.text.isEmpty ? 'Synonym' : controller.text,
-                                    style: TextStyle(
-                                      color: Theme.of(context).colorScheme.onSurface,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                ),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.remove_circle_outline, size: 16),
-                          onPressed: () => _removeSynonym(index),
-                          visualDensity: VisualDensity.compact,
-                          padding: EdgeInsets.zero,
-                        ),
-                      ],
-                    );
-                  })),
-                ],
-              ),
-            ),
+            _buildSynonymBox(),
             
-            // Action buttons (right side)
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.add_circle_outline),
-                  onPressed: _addSynonym,
-                  tooltip: 'Add Synonym',
-                  visualDensity: VisualDensity.compact,
-                  padding: EdgeInsets.zero,
-                ),
-                IconButton(
-                  icon: const Icon(Icons.lightbulb_outline), // Changed icon for synonym suggestion
-                  onPressed: _getSynonymSuggestions,
-                  tooltip: 'Get Synonym Suggestions',
-                  visualDensity: VisualDensity.compact,
-                  padding: EdgeInsets.zero,
-                ),
-                IconButton(
-                  icon: const Icon(Icons.remove_circle_outline),
-                  onPressed: () => widget.onRemoveElement(widget.index, widget.category),
-                  tooltip: 'Remove Blank',
-                  visualDensity: VisualDensity.compact,
-                  padding: EdgeInsets.zero,
-                ),
-                // Drag handle for reordering
-                ReorderableDragStartListener(
-                  index: widget.index,
-                  child: const Icon(Icons.drag_handle),
-                ),
-              ],
-            ),
+            _buildActionButtons(),
           ],
         ),
       ),

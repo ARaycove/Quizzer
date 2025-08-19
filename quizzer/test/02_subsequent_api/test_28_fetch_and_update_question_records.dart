@@ -4,7 +4,7 @@ import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/backend_systems/02_login_authentication/login_initialization.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pair_management/question_answer_pairs_table.dart';
 import 'package:quizzer/backend_systems/09_data_caches/question_queue_cache.dart';
-import 'package:quizzer/backend_systems/session_manager/answer_validation/text_validation_functionality.dart';
+import 'package:quizzer/backend_systems/session_manager/answer_validation/text_analysis_tools.dart';
 import '../test_helpers.dart';
 import 'dart:io';
 import 'dart:math';

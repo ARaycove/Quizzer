@@ -104,6 +104,7 @@ class ElementRenderer extends StatefulWidget {
   final Map<int, TextEditingController>? blankControllers; // Map of element index to controller
   final List<bool>? individualBlankResults; // Individual blank correctness results
   final bool enabled; // Whether blank inputs should be enabled
+  final List<bool> blankIsMathExpression;
 
   const ElementRenderer({
     super.key, 
@@ -111,6 +112,7 @@ class ElementRenderer extends StatefulWidget {
     this.blankControllers,
     this.individualBlankResults,
     this.enabled = true, // Default to enabled
+    this.blankIsMathExpression = const [],
   });
 
 
@@ -269,6 +271,7 @@ List<Widget> _groupElements() {
   return groupedWidgets;
 }
 
+
   @override
   Widget build(BuildContext context) {
     if (_renderedWidgets.isEmpty) {
@@ -330,30 +333,35 @@ List<Widget> _groupElements() {
            QuizzerLogger.logError('ElementRenderer: Invalid blank width content: $content');
            width = 10; // Default width
          }
-         // Create a controller for the blank widget
-         final controller = widget.blankControllers?[index] ?? TextEditingController();
-         
-         // Get correctness for this blank
-         bool? isCorrect;
-         if (widget.individualBlankResults != null) {
-           // Count how many blanks come before this one to get the correct index
-           int blankIndex = 0;
-           for (int i = 0; i < index; i++) {
-             if (widget.elements[i]['type'] == 'blank') {
-               blankIndex++;
-             }
-           }
-           if (blankIndex < widget.individualBlankResults!.length) {
-             isCorrect = widget.individualBlankResults![blankIndex];
+
+         // Find the correct blank index to get the isMathExpression value
+         int blankIndex = 0;
+         for (int i = 0; i < index; i++) {
+           if (widget.elements[i]['type'] == 'blank') {
+             blankIndex++;
            }
          }
          
+         // Get correctness for this blank
+         bool? isCorrect;
+         if (widget.individualBlankResults != null && blankIndex < widget.individualBlankResults!.length) {
+           isCorrect = widget.individualBlankResults![blankIndex];
+         }
+         
+         // Get the math expression flag for this blank
+         bool isMathExpression = false;
+         if (blankIndex < widget.blankIsMathExpression.length) {
+           isMathExpression = widget.blankIsMathExpression[blankIndex];
+         }
+
+         // Wrap the WidgetBlank in a Container with a red background as requested
          return WidgetBlank(
-           width: width,
-           controller: controller,
-           enabled: widget.enabled, // Use the enabled parameter from ElementRenderer
-           isCorrect: isCorrect,
-         );
+             width: width,
+             controller: widget.blankControllers?[index] ?? TextEditingController(),
+             enabled: widget.enabled, // Use the enabled parameter from ElementRenderer
+             isCorrect: isCorrect,
+             isMathExpression: isMathExpression, // NEW: Pass the boolean down
+          );
        // Add other synchronous types here
        default:
          QuizzerLogger.logWarning('ElementRenderer static build encountered unsupported type: $type');

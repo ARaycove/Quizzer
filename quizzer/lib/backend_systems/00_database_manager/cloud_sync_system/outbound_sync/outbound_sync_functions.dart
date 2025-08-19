@@ -22,7 +22,7 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_days_left_until_questions_exhaust_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_average_daily_questions_learned_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_module_activation_status_table.dart';
-import 'package:quizzer/backend_systems/session_manager/answer_validation/text_validation_functionality.dart';
+import 'package:quizzer/backend_systems/session_manager/answer_validation/text_analysis_tools.dart';
 import 'dart:io'; // For SocketException
 
 // ==========================================

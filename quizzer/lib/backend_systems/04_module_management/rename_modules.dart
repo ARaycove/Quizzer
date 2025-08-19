@@ -1,7 +1,7 @@
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/modules_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pair_management/question_answer_pairs_table.dart';
-import 'package:quizzer/backend_systems/session_manager/answer_validation/text_validation_functionality.dart';
+import 'package:quizzer/backend_systems/session_manager/answer_validation/text_analysis_tools.dart';
 
 /// Renames a module by updating both the module record and all associated question records.
 /// 

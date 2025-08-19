@@ -1,7 +1,7 @@
 Before we do anything we need a more streamlined approach to automated build and version updating
 
-# Login Streamline update 1.1.0:
-
+# Login Streamline update 2.1.0:
+Pushed 2.1.0
 - update login page with
   [] login with google
   [] login with facebook
@@ -9,8 +9,7 @@ Before we do anything we need a more streamlined approach to automated build and
   [] login with . . .
 - reset password page with authentication setup (webpage?)
 
-Implementation TODO:
-
+## Implementation TODO:
 [] Add a reset user password page
 
 [] Figure out how to validate user session within the app
@@ -18,14 +17,11 @@ Implementation TODO:
 
 [] Will need to rigoursly test logout/login/logout/login cycle works and doesn't break the system. Currently there is some kind of issue regarding if we logout, existing processes are not closed properly. This is a login issue, and goes under the minor update
 ## Bug Fixes
-* [] synonym adding in the add question page causes crash, if you tab out or lose focus of the synonym edit whilst it is blank, we get a crash "Concurrent modification during iteration: _Set len:1
 * [] Some question answer attempt records ARE NOT syncing and triggering an RLS violation. . .
   * Appears to be intermittent, as many attempt records do get synced
   * [] added conditional logging that logs the record trying to be pushed if a PostgrestException that contains -> <row-level security policy for table ""> is found with code: 42501
 
 * [] Matrix latex elements with fractions inside, formatted fraction elements need padding on top to prevent overlap
-
-* [] Latex elements that are too long need to wrap instead of being cut off at edge of screen
 
 * [] If a user edits a question, it does not persist across logins, this means if I make an edit to something, the edit is pushed to the admin for review, but on next login, is reverted back to the unedited state. (Feature or Bug)?
   * I am contemplating removing the edit button from the main home page entirely, regular users would still have the ability to flag a question still sending it to the admin. flagging a question removes it from that users account until the question is reviewed upon which the question is restored to the user
@@ -52,8 +48,8 @@ Implementation TODO:
 * [ ] overhaul adding images, allow an option to choose from existing images in the system or to upload a new image (this will help prevent duplicating the same image file many times over)
 * [ ] copy paste image support for add question interface
 * [ ] Add setting and option to display next revision day project after answering a question
-# Tutorial Update:
 
+# Tutorial Update:
 This update will focus on adding info icons and tutorial to Quizzer to introduce new  user's to the platform, there are a lot of moving parts and a tutorial goes a long way to help a new user figure out what the hell is going on.
 
 # Automation Update:

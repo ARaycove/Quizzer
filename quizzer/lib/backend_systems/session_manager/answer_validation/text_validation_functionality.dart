@@ -11,13 +11,11 @@
 
 // Based on docks from string_similarity healed and sealed are higher sim than france and FrancE
 // We could maybe use this by normalizing, but It doesn't appear to be what we're looking for. . .
-
-import 'package:text_analysis/text_analysis.dart';
-import 'package:string_similarity/string_similarity.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:quizzer/backend_systems/session_manager/answer_validation/text_analysis_tools.dart';
+import 'package:quizzer/backend_systems/session_manager/answer_validation/math_validation.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
-import 'package:fuzzywuzzy/fuzzywuzzy.dart' as fuzzy;
+import 'package:math_keyboard/math_keyboard.dart';
+
 
 // For validation of short_answer and fill_in_the_blank questions
 // additional fields for validation
@@ -49,15 +47,41 @@ import 'package:fuzzywuzzy/fuzzywuzzy.dart' as fuzzy;
 //    3. if tokenized synonym matched,
 //        - replace with tokenized keyword.
 
-
-
-
-
-
-Future<bool> validateShortAnswer() async{
-  return false;
+/// Determines the validation type based on the content of the answer.
+String getValidationType(String answer) {
+  // 1. Try to parse the answer as a number first.
+  final Set<String> exactEvalCases = {"==", "!="};
+  String selectedType;
+  try {
+    TeXParser(answer).parse();
+    // If the parse is successful, it's a valid math expression.
+    selectedType = 'math_expression';
+  } catch (e) {
+    // if TexParser fails to parse we'll evaluate whether to do exact string match or similiarity string match
+    if (exactEvalCases.contains(answer)) {
+      selectedType = "exact_string_match";
+    } else {selectedType = 'string';}
+  }
+  QuizzerLogger.logMessage("Evaluation type for this option is: $selectedType");
+  return selectedType;
 }
 
+// typedef to ensure our validator functions have the correct signature.
+typedef BlankValidator = Future<bool> Function(String userAnswer, String correctAnswer);
+
+/// Validates a single number-based answer.
+/// If the correctAnswer is an integer we will evaluate correctness strictly, provided must be an exact match
+Future<bool> validateMathExpressionAnswer(String userAnswer, String correctAnswer) async {
+  bool returnValue = await evaluateMathExpressionsEquivalent(userExpression: userAnswer, correctExpression: correctAnswer);
+  return returnValue;
+}
+
+
+
+Future<bool> validateExactMatch(String userAnswer, String correctAnswer) async{
+  return (userAnswer == correctAnswer);
+}
+// --- The main validation function with your completed logic ---
 /// Return Data:
 /// {isCorrect: bool, ind_blanks: [bool, bool, bool]}
 Future<Map<String, dynamic>> validateFillInTheBlank(Map<String, dynamic> questionData, List<String> userAnswers) async{
@@ -82,72 +106,55 @@ Future<Map<String, dynamic>> validateFillInTheBlank(Map<String, dynamic> questio
       returnData["ind_blanks"] = List<bool>.filled(correctAnswers.length, false);
       return returnData;
     }
+    
+    final Map<String, BlankValidator> validators = {
+      'math_expression': validateMathExpressionAnswer,
+      'string': validateStringAnswer,
+      'exact_string_match': validateExactMatch,
+      // 'code': validateCodeAnswer,
+    };
+    
+    List<bool> individualBlanks = [];
 
-    List<bool> individualBlanks = []; // Track individual blank correctness
-
-    // Iterate over each blank and validate the user's answer
     for (int i = 0; i < userAnswers.length; i++) {
-      String                    userAnswer = userAnswers[i];
+      String userAnswer = userAnswers[i];
       Map<String, List<String>> correctAnswerGroup = correctAnswers[i];
       
-      // Extract the primary answer (key) and synonyms (value)
-      String                    primaryAnswer = correctAnswerGroup.keys.first;
-      List<String>              synonyms = correctAnswerGroup.values.first;
+      List<String> possibleAnswers = [correctAnswerGroup.keys.first] + correctAnswerGroup.values.first;
       
-      // In order to have fill in the blank do math validation, we need to add an additional step here.
+      bool blankIsCorrect = false;
+      
+      // Validation Loop
+      for (String validOption in possibleAnswers) {
+        // How should we validate this option
+        String validationType = getValidationType(validOption);
+        // Feed the type into our map to get the validation function we will use
+        BlankValidator? validator = validators[validationType];
 
-      // Is our primaryAnswer a pure integer
-      late bool blankIsCorrect;
-      bool isIntegerAnswer = int.tryParse(primaryAnswer.toString()) != null;
-      bool isAnswerInteger = int.tryParse(userAnswer) != null;
-
-      // TODO Future checks:
-      // Is the primary answer a math expression
-      // if it is we'll add a third branch to this chain
-
-      if (isIntegerAnswer) {
-        // Break off into this branch of evaluation
-        
-        // if the provided answer isn't also a pure integer, then the answer is wrong
-        if (!isAnswerInteger) {
-          blankIsCorrect = false;
-        } else if (isAnswerInteger && isIntegerAnswer) {
-          blankIsCorrect = int.parse(userAnswer) == int.parse(primaryAnswer);
+        // If it returns null, something seriously wrong went down, crash Quizzer immediately
+        if (validator == null) {
+          QuizzerLogger.logError("No Validation Function found for type: $validationType");
+          throw Exception("No Validation Function found for type: $validationType");
         }
-      } else {
-        // Do regular text validation:
-        // Check if user answer matches the primary correct answer
-        // Direct string match first
-        userAnswer = userAnswer.toLowerCase();
-        primaryAnswer = userAnswer.toLowerCase();
-        blankIsCorrect = (userAnswer == primaryAnswer);
-        if (blankIsCorrect) {continue;}
-        Map<String, dynamic>      similarityResult = await isSimilarTo(userAnswer, primaryAnswer);
-        blankIsCorrect = similarityResult["success"];
-        // If not correct, check against synonyms
-        if (!blankIsCorrect && synonyms.isNotEmpty) {
-          for (String synonym in synonyms) {
-            Map<String, dynamic> synonymResult = await isSimilarTo(userAnswer, synonym);
-            if (synonymResult["success"]) {
-              blankIsCorrect = true;
-              break;
-            }
-          }
+        
+        // Now run the validation, if true set blankIsCorrect to true and break out of this nested for loop to proceed to the nest blank
+        if (await validator(userAnswer, validOption)) {
+          blankIsCorrect = true;
+          break; // Stop checking other possible answers once one is a match.
         }
       }
-
+      
       // Track this blank's result
       individualBlanks.add(blankIsCorrect);
-      // If any blank is incorrect, log the details
+
+      // Log incorrect blanks
       if (!blankIsCorrect) {
-        List<String> allExpectedAnswers = [primaryAnswer, ...synonyms];
-        QuizzerLogger.logMessage('validateFillInTheBlank: Blank $i incorrect. User: "$userAnswer", Expected: ${allExpectedAnswers.join(", ")}');
+        QuizzerLogger.logMessage('validateFillInTheBlank: Blank $i incorrect. User: "$userAnswer", Expected: ${possibleAnswers.join(", ")}');
       }
     }
     
     // Determine overall correctness
     bool overallCorrect = individualBlanks.every((blank) => blank);
-    
     if (overallCorrect) {
       QuizzerLogger.logSuccess('validateFillInTheBlank: All blanks correct');
     }
@@ -163,157 +170,8 @@ Future<Map<String, dynamic>> validateFillInTheBlank(Map<String, dynamic> questio
     return returnData;
   }
 }
+
 // ======================================================================
 
-TextAnalyzer analyzer = English.analyzer;
-
-// Normalize the input 
-Future<String> normalizeString(String input) async{
-  String output = input.trim().toLowerCase().replaceAll('_', ' ');
-  return output;
-}
-
-Future<List<String>> callSynonymAPI(String input) async {
-  try {
-    // Parse input into list of words
-    List<String> words = input.trim().toLowerCase().split(' ');
-    
-    // Build API call - join words with + for URL encoding
-    String query = words.join('+');
-    String url = 'https://api.datamuse.com/words?ml=$query';
-    
-    QuizzerLogger.logMessage('Calling Datamuse API: $url');
-    
-    // Make HTTP request
-    final response = await http.get(Uri.parse(url));
-    
-    if (response.statusCode == 200) {
-      // Parse JSON response
-      List<dynamic> jsonResponse = json.decode(response.body);
-      
-      // Extract all words and sort by score (most to least relevant)
-      List<Map<String, dynamic>> wordObjects = [];
-      
-      for (Map<String, dynamic> wordObj in jsonResponse) {
-        String word = wordObj['word'] as String;
-        double score = (wordObj['score'] as num).toDouble();
-        wordObjects.add({'word': word, 'score': score});
-      }
-      
-      // Sort by score in descending order (highest score first)
-      wordObjects.sort((a, b) => (b['score'] as double).compareTo(a['score'] as double));
-      
-      // Extract just the words in sorted order
-      List<String> synonyms = wordObjects.map((obj) => obj['word'] as String).toList();
-      
-      QuizzerLogger.logMessage('Found ${synonyms.length} synonyms for "$input"');
-      return synonyms;
-    } else {
-      QuizzerLogger.logError('Datamuse API returned status code: ${response.statusCode}');
-      return [];
-    }
-  } catch (e) {
-    QuizzerLogger.logError('Error calling Datamuse API: $e');
-    return [];
-  }
-}
 
 
-/// Compares two strings for similarity using multiple validation methods.
-/// 
-/// This function performs a two-stage similarity check:
-/// 1. First uses string_similarity package to calculate similarity score
-/// 2. If similarity score is below threshold (0.5), falls back to fuzzy string matching
-/// 
-/// The function normalizes the input string before comparison by:
-/// - Trimming whitespace
-/// - Converting to lowercase
-/// 
-/// Returns a Map containing:
-/// - "sim_score": double - Similarity score from string_similarity (0.0 to 1.0)
-/// - "leven_score": double? - Levenshtein ratio from fuzzywuzzy (0.0 to 100.0), null if similarity check passes
-/// - "success": bool - Whether the strings are considered similar
-/// 
-/// Thresholds:
-/// - Similarity threshold: 0.5 (50% similarity)
-/// - Typo threshold: 80.0 (80% Levenshtein ratio)
-/// 
-/// Example:
-/// ```dart
-/// Map<String, dynamic> result = await isSimilarTo("enzyme", "enyzme");
-/// // Returns: {"sim_score": 0.8, "leven_score": 85.0, "success": true}
-/// ```
-Future<Map<String, dynamic>> isSimilarTo(String input, String comparison) async{
-  input = await normalizeString(input);
-  Map<String, dynamic> result = {
-    "sim_score": null,
-    "leven_score": null,
-    "success": false
-  };
-  double output = input.similarityTo(comparison);
-  QuizzerLogger.logMessage("$input Sim Score: $output");
-  result["sim_score"] = output;
-  double threshold = 0.5;
-  double typoThreshold = 80;
-  
-  // if the strings are similar after the first check return the result:
-  if (output >= threshold) {
-    result["success"] = true;
-    return result;
-  } else {
-    QuizzerLogger.logMessage("Sim score below threshold, additional checks required");
-    result["success"] = false;}
-  // if the strings are not similar move to next steps:
-
-  // Do we have a typo?
-  double fuzzyScore = fuzzy.ratio(input,comparison).toDouble();
-  result["leven_score"] = fuzzyScore;
-  QuizzerLogger.logMessage("$input => $comparison; Levenshteing_ratio: $fuzzyScore");
-  if (fuzzyScore >= typoThreshold) {
-    result["success"] = true;
-    return result;
-  } else {result["success"] = false;}
-
-
-  return result;
-}
-
-Future<List<String>> returnKeywords(String input) async{
-  List<String> splitTerms = await analyzer.phraseSplitter(input);
-  return splitTerms;
-}
-
-Future<List<String>> returnTerms(String input) async{
-  List<String> termList = analyzer.termSplitter(input);
-  return termList;
-}
-
-
-
-Future<List<Token>> _tokenizeString(String input) async{
-  List<Token> output = await analyzer.tokenizer(
-    input,
-    nGramRange: const NGramRange(1, 1)
-    );
-  return output;
-}
-String _tokensToString(List<Token> tokens) {
-  // Extract terms from tokens and join with spaces
-  List<String> terms = tokens.map((token) => token.term).toList();
-  return terms.join(' ');
-}
-
-Future<String> tokenizeAndReconstruct(String input) async {
-  // Tokenize the input string
-  List<Token> tokens = await _tokenizeString(input);
-  
-  // Convert tokens back to string
-  return _tokensToString(tokens);
-}
-
-// Tool did not output anything
-dynamic expandText(String input) async{
-  var output = analyzer.termExpander!(input);
-
-  return output;
-}
