@@ -11,6 +11,7 @@ import 'package:quizzer/UI_systems/question_widgets/widget_select_all_that_apply
 import 'package:quizzer/UI_systems/question_widgets/widget_true_false_question.dart'; 
 import 'package:quizzer/UI_systems/question_widgets/widget_sort_order_question.dart';
 import 'package:quizzer/UI_systems/question_widgets/widget_fill_in_the_blank.dart'; 
+import 'package:quizzer/UI_systems/global_widgets/widget_quizzer_background.dart';
 import 'package:math_expressions/math_expressions.dart';
 /// HomePage acts as the main container, displaying the appropriate question widget.
 class HomePage extends StatefulWidget { // Change to StatefulWidget
@@ -89,29 +90,41 @@ class _HomePageState extends State<HomePage> { // State class
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: HomePageTopBar( 
-        onMenuPressed: () {
-          Navigator.pushNamed(context, '/menu');
-        },
-        onQuestionEdited: _handleQuestionEdited,
-        onQuestionFlagged: _handleQuestionFlagged,
+    return GestureDetector(
+      // Taps on the area covered by the GestureDetector will trigger this.
+      onTap: () {
+        FocusScopeNode currentFocus = FocusScope.of(context);
+        if (!currentFocus.hasPrimaryFocus) {
+          currentFocus.unfocus();
+        }
+      },
+      child: Scaffold(
+        appBar: HomePageTopBar( 
+          onMenuPressed: () {
+            Navigator.pushNamed(context, '/menu');
+          },
+          onQuestionEdited: _handleQuestionEdited,
+          onQuestionFlagged: _handleQuestionFlagged,
+        ),
+        body: Stack(
+          children: [
+            const QuizzerBackground(), // The custom background widget
+            Column(
+              children: [
+                AppTheme.sizedBoxMed,
+                StatSectionWidget(
+                  key: _statSectionKey,
+                  onRefresh: () {
+                    setState(() {});
+                  },
+                ),
+                AppTheme.sizedBoxSml,
+                Expanded(child: _buildQuestionBody()),
+              ],
+            ),
+          ],
+        ), 
       ),
-      // Directly build the body, assuming SessionManager handles its initialization
-      body: Column(
-        children: [
-          AppTheme.sizedBoxMed, // Spacer from app bar
-          StatSectionWidget(
-            key: _statSectionKey,
-            onRefresh: () {
-              // Trigger rebuild of StatSectionWidget to re-read cached values
-              setState(() {});
-            },
-          ), // Add stat display section
-          AppTheme.sizedBoxSml, // Spacer between stats and question
-          Expanded(child: _buildQuestionBody()),
-        ],
-      ), 
     );
   }
 

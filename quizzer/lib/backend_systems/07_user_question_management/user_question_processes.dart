@@ -1,6 +1,6 @@
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_question_answer_pairs_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_profile_table.dart' as user_profile;
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pair_management/question_answer_pairs_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_module_activation_status_table.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 
 /// Checks if a module is active for a specific user
@@ -11,7 +11,7 @@ Future<bool> isModuleActiveForUser(String userId, String moduleName) async {
     QuizzerLogger.logMessage('Checking if module $moduleName is active for user $userId');
     
     // Table functions handle their own database access
-    final moduleActivationStatus = await user_profile.getModuleActivationStatus(userId);
+    final moduleActivationStatus = await getModuleActivationStatus(userId);
     
     // Check if the module exists in the activation status map
     final isActive = moduleActivationStatus[moduleName] ?? false;
@@ -95,11 +95,13 @@ Future<void> validateAllModuleQuestions(String userId) async {
     QuizzerLogger.logMessage('Starting validation of all module questions');
     
     // Get the module activation status map from the user's profile - table function handles its own database access
-    final moduleActivationStatus = await user_profile.getModuleActivationStatus(userId);
+    final Map<String, bool> moduleActivationStatus = await getModuleActivationStatus(userId);
     
     // Validate questions for each module in the user's profile
     for (final moduleName in moduleActivationStatus.keys) {
-      await validateModuleQuestionsInUserProfile(moduleName, userId);
+      if (moduleActivationStatus[moduleName] == true) {
+        await validateModuleQuestionsInUserProfile(moduleName, userId);
+      }
     }
     
     QuizzerLogger.logSuccess('Completed validation of all module questions');

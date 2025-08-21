@@ -316,21 +316,23 @@ Future<Map<String, dynamic>> loginInitialization({
       
       final sessionManager = getSessionManager();
       
-      // DEBUG: Check user_settings table contents before getUserSettings
-      QuizzerLogger.logMessage("Get Settings BEFORE first get user settings call");
-      logUserSettingsTableContent();
+      // // DEBUG: Check user_settings table contents before getUserSettings
+      // QuizzerLogger.logMessage("Get Settings BEFORE first get user settings call");
+      // logUserSettingsTableContent();
       
       final allSettings = await sessionManager.getUserSettings(getAll: true);
       QuizzerLogger.logMessage("When updating the cache we get these list of settings $allSettings");
       
-      // DEBUG: Check user_settings table contents after getUserSettings
-      QuizzerLogger.logMessage("Get Settings AFTER first get user settings call");
-      logUserSettingsTableContent();
+      // // DEBUG: Check user_settings table contents after getUserSettings
+      // QuizzerLogger.logMessage("Get Settings AFTER first get user settings call");
+      // logUserSettingsTableContent();
       
       sessionManager.setCachedUserSettings(allSettings);
       
       // Update stats using the stat update aggregator - this creates daily records
       await updateAllUserDailyStats(sessionManager.userId!);
+      // TODO Add call to confirm update of all modules (Are all questions that the user subscribed to in their profile?)
+      
       
       QuizzerLogger.logSuccess('Settings cache and stats updated successfully');
     }

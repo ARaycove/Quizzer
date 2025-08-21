@@ -21,7 +21,7 @@ class AddQuestionElements extends StatefulWidget {
   final Function(List<Map<String, dynamic>> reorderedElements, String category) onReorderElements;
   // Fill-in-the-blank specific callbacks
   final Function(int index, TextSelection selection)? onTextSelectionChanged;
-  final Function(int index, String selectedText) onCreateBlank;
+  final Function(int index, String selectedText)? onCreateBlank;
   final Function(int blankIndex, String newAnswerText)? onUpdateAnswerText; // For editing blank answers
   final Function(int blankIndex, String primaryAnswer, List<String> synonyms)? onUpdateSynonyms; // For editing synonyms
 
@@ -35,7 +35,7 @@ class AddQuestionElements extends StatefulWidget {
     required this.onEditElement,
     required this.onReorderElements,
     this.onTextSelectionChanged,
-    required this.onCreateBlank,
+    this.onCreateBlank,
     this.onUpdateAnswerText,
     this.onUpdateSynonyms,
   });
@@ -125,7 +125,7 @@ class _AddQuestionElementsState extends State<AddQuestionElements> {
             onRemoveElement: widget.onRemoveElement,
             onEditElement: widget.onEditElement,
             onTextSelectionChanged: widget.onTextSelectionChanged ?? (index, selection) {},
-            onCreateBlank: widget.onCreateBlank,
+            onCreateBlank: widget.onCreateBlank ?? (index, selectedText) {},
           );
         } else {
           return EditableTextElement(

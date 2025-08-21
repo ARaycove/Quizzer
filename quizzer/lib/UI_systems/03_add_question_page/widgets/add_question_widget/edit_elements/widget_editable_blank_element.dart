@@ -42,13 +42,17 @@ class EditableBlankElement extends StatefulWidget {
 }
 
 class _EditableBlankElementState extends State<EditableBlankElement> {
+  // Use a single, central FocusNode for both the TextField and MathField.
+  // This is a crucial change to properly manage focus and keyboard dismissal.
+  late FocusNode _combinedFocusNode;
+  
   late TextEditingController _primaryAnswerController;
   late MathFieldEditingController _mathAnswerController;
-  late FocusNode _primaryAnswerFocusNode;
-  late FocusNode _mathAnswerFocusNode;
+  
   final List<TextEditingController> _synonymControllers = [];
   final List<FocusNode> _synonymFocusNodes = [];
   final List<bool> _isEditingSynonyms = [];
+  
   bool _isEditingPrimary = false;
   bool _isMathAnswer = false;
   
@@ -61,15 +65,18 @@ class _EditableBlankElementState extends State<EditableBlankElement> {
   @override
   void initState() {
     super.initState();
+    
+    // Initialize the single combined FocusNode.
+    _combinedFocusNode = FocusNode();
+    _combinedFocusNode.addListener(_handlePrimaryFocusChange);
+    
     _primaryAnswerController = TextEditingController(text: widget.answerText ?? '');
-    _primaryAnswerFocusNode = FocusNode();
     
     _mathAnswerController = MathFieldEditingController();
-    _mathAnswerFocusNode = FocusNode();
     
     // Validate initial answerText and set _lastValidTex
     try {
-      if (widget.answerText != null && widget.answerText!.startsWith('\\')) {
+      if (widget.answerText != null && widget.answerText!.startsWith(r'\')) {
         TeXParser(widget.answerText!).parse();
         _lastValidTex = widget.answerText!;
         _isMathAnswer = true;
@@ -83,9 +90,6 @@ class _EditableBlankElementState extends State<EditableBlankElement> {
       _isMathAnswer = false;
     }
 
-    _primaryAnswerFocusNode.addListener(_handlePrimaryFocusChange);
-    _mathAnswerFocusNode.addListener(_handlePrimaryFocusChange);
-    
     // Initialize synonyms from widget
     if (widget.synonyms != null) {
       for (String synonym in widget.synonyms!) {
@@ -104,18 +108,8 @@ class _EditableBlankElementState extends State<EditableBlankElement> {
     
     // Update primary answer if it changed
     if (oldWidget.answerText != widget.answerText) {
+      // Always update the primary answer controller, regardless of type
       _primaryAnswerController.text = widget.answerText ?? '';
-      
-      try {
-        final expression = TeXParser(widget.answerText ?? '').parse();
-        _mathAnswerController.updateValue(expression);
-        _lastValidTex = widget.answerText ?? '';
-        _isMathAnswer = true;
-      } catch (e) {
-        _mathAnswerController.updateValue(TeXParser('').parse());
-        _lastValidTex = '';
-        _isMathAnswer = false;
-      }
     }
     
     // Update synonyms if they changed
@@ -146,12 +140,11 @@ class _EditableBlankElementState extends State<EditableBlankElement> {
 
   @override
   void dispose() {
-    _primaryAnswerFocusNode.removeListener(_handlePrimaryFocusChange);
-    _mathAnswerFocusNode.removeListener(_handlePrimaryFocusChange);
+    _combinedFocusNode.removeListener(_handlePrimaryFocusChange);
+    _combinedFocusNode.dispose();
+    
     _primaryAnswerController.dispose();
-    _primaryAnswerFocusNode.dispose();
     _mathAnswerController.dispose();
-    _mathAnswerFocusNode.dispose();
     
     for (int i = 0; i < _synonymControllers.length; i++) {
       _synonymControllers[i].dispose();
@@ -161,10 +154,10 @@ class _EditableBlankElementState extends State<EditableBlankElement> {
   }
 
   // --- Handle Primary Answer Focus Change ---
+  // The logic is now centralized to a single focus node.
   void _handlePrimaryFocusChange() {
     if (!mounted) return;
-    if ((!_primaryAnswerFocusNode.hasFocus && !_isMathAnswer && _isEditingPrimary) ||
-        (!_mathAnswerFocusNode.hasFocus && _isMathAnswer && _isEditingPrimary)) {
+    if (!_combinedFocusNode.hasFocus && _isEditingPrimary) {
       _submitPrimaryAnswer();
     }
   }
@@ -190,11 +183,27 @@ class _EditableBlankElementState extends State<EditableBlankElement> {
     }
   }
 
-  void _toggleIsMathAnswer() {
+ void _toggleIsMathAnswer() {
     setState(() {
       _isMathAnswer = !_isMathAnswer;
     });
+    _updatePrimaryAnswerText(null);
     _startEditingPrimary();
+  }
+
+  // --- Update primary answer and notify parent ---
+  void _updatePrimaryAnswerText(String? newAnswer) {
+    int blankIndex = -1;
+    if (widget.questionElements != null) {
+      blankIndex = widget.questionElements!.take(widget.index).where((e) => e['type'] == 'blank').length;
+    }
+    if (widget.onUpdateAnswerText != null && blankIndex >= 0) {
+      if (_isMathAnswer) {
+        widget.onUpdateAnswerText!(blankIndex, _mathAnswerController.currentEditingValue());
+      } else {
+        widget.onUpdateAnswerText!(blankIndex, _primaryAnswerController.text);
+      }
+    }
   }
 
   // --- Start editing primary answer ---
@@ -203,11 +212,8 @@ class _EditableBlankElementState extends State<EditableBlankElement> {
       _isEditingPrimary = true;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
-          if (_isMathAnswer) {
-            _mathAnswerFocusNode.requestFocus();
-          } else {
-            _primaryAnswerFocusNode.requestFocus();
-          }
+          // Request focus on the single, shared focus node.
+          _combinedFocusNode.requestFocus();
         }
       });
     });
@@ -239,6 +245,9 @@ class _EditableBlankElementState extends State<EditableBlankElement> {
           ),
         );
         _mathAnswerController.updateValue(TeXParser(_lastValidTex).parse());
+        // Since we reverted, we should try to regain focus to allow the user to correct it.
+        _combinedFocusNode.requestFocus();
+        return;
       }
     } else {
       newAnswer = _primaryAnswerController.text;
@@ -256,8 +265,8 @@ class _EditableBlankElementState extends State<EditableBlankElement> {
       }
     }
     
-    _primaryAnswerFocusNode.unfocus();
-    _mathAnswerFocusNode.unfocus();
+    // Unfocus the single combined focus node.
+    _combinedFocusNode.unfocus();
     setState(() {
       _isEditingPrimary = false;
     });
@@ -446,14 +455,17 @@ class _EditableBlankElementState extends State<EditableBlankElement> {
     if (_isMathAnswer) {
       return IntrinsicWidth(
         child: MathField(
-          variables: const ["x", "y", "θ"],
+          variables: const ["x", "y", "z", "a", "b", "c"],
           controller: _mathAnswerController,
-          focusNode: _mathAnswerFocusNode,
+          onChanged: (texString) {
+            _updatePrimaryAnswerText(texString);
+          },
+          focusNode: _combinedFocusNode,
           autofocus: _isEditingPrimary,
           decoration: const InputDecoration(
             isDense: true,
             border: InputBorder.none,
-            hintText: 'Enter a math expression',
+            hintText: 'Enter a math expression'
           ),
         ),
       );
@@ -462,7 +474,8 @@ class _EditableBlankElementState extends State<EditableBlankElement> {
         return IntrinsicWidth(
           child: TextField(
             controller: _primaryAnswerController,
-            focusNode: _primaryAnswerFocusNode,
+            // Pass the single, combined focus node to the TextField.
+            focusNode: _combinedFocusNode,
             autofocus: true,
             style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
             decoration: const InputDecoration(
@@ -471,6 +484,9 @@ class _EditableBlankElementState extends State<EditableBlankElement> {
               hintText: 'Primary Answer',
             ),
             onSubmitted: (_) => _submitPrimaryAnswer(),
+            onChanged: (text) {
+              _updatePrimaryAnswerText(text);
+            },
           ),
         );
       } else {
@@ -602,6 +618,9 @@ class _EditableBlankElementState extends State<EditableBlankElement> {
           children: [
             GestureDetector(
               onTap: () => _startEditingPrimary(),
+              // The single focus node is managed by the GestureDetector.
+              // The focus is requested here, which in turn gives focus to the
+              // correct child widget (TextField or MathField).
               child: _buildPrimaryAnswerField(),
             ),
             AppTheme.sizedBoxMed,

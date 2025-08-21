@@ -4,16 +4,18 @@ import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 
 /// A widget that renders a text or math input field for fill-in-the-blank questions.
 /// The width is determined by the content parameter (number of characters).
-/// This widget is now stateful to correctly manage its controllers as requested.
 class WidgetBlank extends StatefulWidget {
   final int width; // Number of characters to determine width
   final TextEditingController controller;
-  // Make the mathfieldController nullable as per your design.
+  // This controller is now optional and will be internally managed if not provided.
   final MathFieldEditingController? mathfieldController;
   final Function(String)? onChanged;
   final bool enabled; // Whether the field is editable
   final bool? isCorrect; // Whether this blank is correct (null = not submitted)
   final bool isMathExpression; // New property to decide which field to render
+  
+  // A crucial new parameter to receive the single, unified focus node from the parent.
+  final FocusNode? focusNode;
 
   const WidgetBlank({
     super.key,
@@ -24,6 +26,8 @@ class WidgetBlank extends StatefulWidget {
     this.enabled = true,
     this.isCorrect,
     this.isMathExpression = false,
+    // The focus node is now required for proper parent-child focus management.
+    this.focusNode,
   });
 
   @override
@@ -33,15 +37,11 @@ class WidgetBlank extends StatefulWidget {
 /// The state class for WidgetBlank.
 class WidgetBlankState extends State<WidgetBlank> {
   // We use this internal controller to manage the MathField if none is provided.
-  // We make it late as we will initialize it in initState.
   late MathFieldEditingController _internalMathController;
   
   @override
   void initState() {
     super.initState();
-    // CRITICAL: Check if a controller was passed. If not, create our own.
-    // This is the core of the fix and aligns with your request for an
-    // internally defined controller.
     _internalMathController = widget.mathfieldController ?? MathFieldEditingController();
 
     // We add a listener to the main controller to sync the math field.
@@ -128,9 +128,11 @@ class WidgetBlankState extends State<WidgetBlank> {
       inputField = SizedBox(
         height: 48.0, // Fixed height to match TextField.
         child: MathField(
-          variables: const ["x", "y", "θ"],
+          variables: const ["x", "y", "z", "a", "b", "c"],
           controller: _internalMathController,
           onChanged: _handleMathFieldChange,
+          // Pass the focus node received from the parent.
+          focusNode: widget.focusNode,
           decoration: InputDecoration(
             isDense: false, // Set to false to allow for more vertical space
             border: const OutlineInputBorder(), // Use OutlineInputBorder
@@ -156,6 +158,8 @@ class WidgetBlankState extends State<WidgetBlank> {
         enabled: widget.enabled,
         style: TextStyle(color: textColor),
         cursorColor: Theme.of(context).colorScheme.onSurface,
+        // Pass the focus node received from the parent.
+        focusNode: widget.focusNode,
         decoration: InputDecoration(
           border: const UnderlineInputBorder(),
           hintText: widget.controller.text.isNotEmpty ? null : '█',

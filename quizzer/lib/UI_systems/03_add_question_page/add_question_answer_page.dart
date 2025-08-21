@@ -9,6 +9,7 @@ import 'package:quizzer/UI_systems/03_add_question_page/widgets/add_question_wid
 import 'package:quizzer/UI_systems/03_add_question_page/widgets/widget_submit_clear_buttons.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/UI_systems/03_add_question_page/helpers/image_picker_helper.dart';
+import 'package:quizzer/UI_systems/global_widgets/widget_quizzer_background.dart';
 import 'package:quizzer/app_theme.dart';
 
 // ==========================================
@@ -688,97 +689,113 @@ class _AddQuestionAnswerPageState extends State<AddQuestionAnswerPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      // 1. Global App Bar
-      appBar: const GlobalAppBar(
-        title: 'Add/Edit Question',
-      ),
-      body: ListView(
-        children: [
-          // 2. Module Selection Widget
-          ModuleSelection(controller: _moduleController),
-          AppTheme.sizedBoxMed,
-          // 3. Question Type Selection Widget
-          QuestionTypeSelection(controller: _questionTypeController),
-          AppTheme.sizedBoxLrg,
+    return GestureDetector(
+      // Taps on the area covered by the GestureDetector will trigger this.
+      onTap: () {
+        FocusScopeNode currentFocus = FocusScope.of(context);
+        if (!currentFocus.hasPrimaryFocus) {
+          currentFocus.unfocus();
+        }
+      },
+      child: Scaffold(
+        // Set the background color to transparent to allow the QuizzerBackground to show through
+        // 1. Global App Bar
+        appBar: const GlobalAppBar(
+          title: 'Add/Edit Question',
+        ),
+        body: Stack(
+          children: [
+            // The background widget as the first child
+            const QuizzerBackground(),
+            // The ListView as the second child, containing all the original page content
+            ListView(
+              children: [
+                // 2. Module Selection Widget
+                ModuleSelection(controller: _moduleController),
+                AppTheme.sizedBoxMed,
+                // 3. Question Type Selection Widget
+                QuestionTypeSelection(controller: _questionTypeController),
+                AppTheme.sizedBoxLrg,
 
-          // --- Editing Controls Area --- (Moved Here)
-          AddQuestionWidget(
-             questionType: _questionTypeController.text,
-             questionElements: _currentQuestionElements,
-             answerElements: _currentAnswerElements,
-             options: _currentOptions,
-             correctOptionIndex: _currentCorrectOptionIndex,
-             correctIndicesSATA: _currentCorrectIndicesSATA,
-             answersToBlanks: _currentAnswersToBlanks,
-             onAddElement: _handleAddElement,
-             onRemoveElement: _handleRemoveElement,
-             onEditElement: _handleEditElement,
-             onAddOption: _handleAddOption,
-             onRemoveOption: _handleRemoveOption,
-             onEditOption: _handleEditOption,
-             onSetCorrectOptionIndex: _handleSetCorrectOptionIndex,
-             onToggleCorrectOptionSATA: _handleToggleCorrectOptionSATA,
-             onReorderElements: _handleReorderElements,
-             onReorderOptions: _handleReorderOptions,
-             onAnswersToBlanksChanged: _handleAnswersToBlanksChanged,
-             onCreateBlank: _handleCreateBlank,
-             onUpdateAnswerText: _handleUpdateAnswerText,
-             onUpdateSynonyms: _handleUpdateSynonyms,
-          ),
-          AppTheme.sizedBoxLrg,
+                // --- Editing Controls Area --- (Moved Here)
+                AddQuestionWidget(
+                  questionType: _questionTypeController.text,
+                  questionElements: _currentQuestionElements,
+                  answerElements: _currentAnswerElements,
+                  options: _currentOptions,
+                  correctOptionIndex: _currentCorrectOptionIndex,
+                  correctIndicesSATA: _currentCorrectIndicesSATA,
+                  answersToBlanks: _currentAnswersToBlanks,
+                  onAddElement: _handleAddElement,
+                  onRemoveElement: _handleRemoveElement,
+                  onEditElement: _handleEditElement,
+                  onAddOption: _handleAddOption,
+                  onRemoveOption: _handleRemoveOption,
+                  onEditOption: _handleEditOption,
+                  onSetCorrectOptionIndex: _handleSetCorrectOptionIndex,
+                  onToggleCorrectOptionSATA: _handleToggleCorrectOptionSATA,
+                  onReorderElements: _handleReorderElements,
+                  onReorderOptions: _handleReorderOptions,
+                  onAnswersToBlanksChanged: _handleAnswersToBlanksChanged,
+                  onCreateBlank: _handleCreateBlank,
+                  onUpdateAnswerText: _handleUpdateAnswerText,
+                  onUpdateSynonyms: _handleUpdateSynonyms,
+                ),
+                AppTheme.sizedBoxLrg,
 
-          // 4. Live Preview
-          const Text("Live Preview:"),
-          AppTheme.sizedBoxMed,
-          LivePreviewWidget(
-            key: ValueKey('live-preview-$_previewRebuildCounter'),
-            questionType: _questionTypeController.text,
-            questionElements: _currentQuestionElements.map((element) {
-              if (element['type'] == 'blank') {
-                final cleanedElement = Map<String, dynamic>.from(element);
-                cleanedElement.remove('blankId'); // Remove blankId for preview
-                return cleanedElement;
-              }
-              return element;
-            }).toList(),
-            answerElements: _currentAnswerElements,
-            options: _currentOptions,
-            correctOptionIndexMC: _currentCorrectOptionIndex,
-            correctIndicesSATA: _currentCorrectIndicesSATA,
-            isCorrectAnswerTrueTF: (_questionTypeController.text == 'true_false')
-                                    ? (_currentCorrectOptionIndex == 0)
-                                    : null,
-            answersToBlanks: _currentAnswersToBlanks,
-          ),
-          AppTheme.sizedBoxLrg,
+                // 4. Live Preview
+                const Text("Live Preview:"),
+                AppTheme.sizedBoxMed,
+                LivePreviewWidget(
+                  key: ValueKey('live-preview-$_previewRebuildCounter'),
+                  questionType: _questionTypeController.text,
+                  questionElements: _currentQuestionElements.map((element) {
+                    if (element['type'] == 'blank') {
+                      final cleanedElement = Map<String, dynamic>.from(element);
+                      cleanedElement.remove('blankId'); // Remove blankId for preview
+                      return cleanedElement;
+                    }
+                    return element;
+                  }).toList(),
+                  answerElements: _currentAnswerElements,
+                  options: _currentOptions,
+                  correctOptionIndexMC: _currentCorrectOptionIndex,
+                  correctIndicesSATA: _currentCorrectIndicesSATA,
+                  isCorrectAnswerTrueTF: (_questionTypeController.text == 'true_false')
+                                          ? (_currentCorrectOptionIndex == 0)
+                                          : null,
+                  answersToBlanks: _currentAnswersToBlanks,
+                ),
+                AppTheme.sizedBoxLrg,
 
-          // --- Submit/Clear Buttons ---
-          SubmitClearButtons(
-             onSubmit: _handleSubmitQuestion,
-             onClear: _resetQuestionState, // Use existing reset logic for Clear
-          ),
+                // --- Submit/Clear Buttons ---
+                SubmitClearButtons(
+                  onSubmit: _handleSubmitQuestion,
+                  onClear: _resetQuestionState, // Use existing reset logic for Clear
+                ),
 
-          AppTheme.sizedBoxLrg, // Spacing at the bottom
+                AppTheme.sizedBoxLrg, // Spacing at the bottom
 
-          // 5. Divider
-          const Divider(),
-          AppTheme.sizedBoxMed,
+                // 5. Divider
+                const Divider(),
+                AppTheme.sizedBoxMed,
 
-          // 6. Bulk Add Widget
-          const Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              BulkAddButton(),
-            ],
-          ),
-          AppTheme.sizedBoxMed,
-
-          // --- Editing Controls Area (Removed from here) ---
-          
-          // --- Live Preview Area (Removed from here) ---
-        ],
+                // 6. Bulk Add Widget
+                const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    BulkAddButton(),
+                  ],
+                ),
+                AppTheme.sizedBoxMed,
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
+
+
+
 } 

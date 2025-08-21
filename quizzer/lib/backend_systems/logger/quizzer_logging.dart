@@ -63,7 +63,6 @@ class QuizzerLogger {
     "login_attempts_table.dart",
     "question_answer_pair_flags_table.dart",
     "widget_multiple_choice_question.dart",
-    "outbound_sync_functions.dart",
     "stat_update_aggregator.dart"
   ]; // List of source filenames to exclude
 

@@ -2052,10 +2052,8 @@ Future<void> batchUpsertQuestionAnswerPairs({
 }) async {
   try {
     if (records.isEmpty) {
-      QuizzerLogger.logMessage("No Records returned for question_answer_pairs");
       return;
     }
-    QuizzerLogger.logMessage('Starting batch upsert for question_answer_pairs: ${records.length} records');
     // List of all columns in the table (excluding legacy fields that don't exist in local table)
     final columns = [
       'time_stamp',
@@ -2150,7 +2148,6 @@ Future<void> batchUpsertQuestionAnswerPairs({
     }
 
     if (processedRecords.isEmpty) {
-      QuizzerLogger.logMessage('No valid records to process after validation');
       return;
     }
 
@@ -2174,7 +2171,6 @@ Future<void> batchUpsertQuestionAnswerPairs({
       }
       
       if (deduplicatedBatch.isEmpty) {
-        QuizzerLogger.logMessage('Skipping empty batch after deduplication');
         continue;
       }
       
@@ -2192,7 +2188,6 @@ Future<void> batchUpsertQuestionAnswerPairs({
       
       try {
         await db.rawInsert(sql, values);
-        QuizzerLogger.logMessage('Successfully processed batch of ${deduplicatedBatch.length} records');
       } catch (e) {
         if (e.toString().contains('UNIQUE constraint failed') || e.toString().contains('2067')) {
           QuizzerLogger.logWarning('Unique constraint violation in batch upsert. Falling back to individual inserts.');
@@ -2210,7 +2205,6 @@ Future<void> batchUpsertQuestionAnswerPairs({
         }
       }
     }
-    QuizzerLogger.logSuccess('TRUE batch upsert for question_answer_pairs complete.');
   } catch (e) {
     QuizzerLogger.logError('Error batch upserting question answer pairs - $e');
     rethrow;

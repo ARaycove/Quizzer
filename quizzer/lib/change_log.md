@@ -1,3 +1,45 @@
+# Variable and Focus Update 2.1.0
+
+## Content Changes
+* [x] Need to add variables to the math keyboard z, a, b, c
+  * [x] added to blank widget MathField
+  * [x] added to add quesiton page editable blank MathField
+  * [x] updated bindings in validation function to assign values to each
+
+## Misc. Changes
+* [x] Removed excess logging from question answer pair table file
+* [x] Add the Quizzer Logo to the background of the home page (grayscale)
+
+## Bug Fixes
+* [x] Removed θ, unicode \theta does not parse correctly
+* [x] Crash and jank fixed in add question page, editable blank is no longer trying to actively use the TeXParser and this validation is now handled by the parent widget as it should have been in the first place
+* [x] Math Keyboard does not lose focus if we click off of it:
+  * one is located in the widget blank, the other in the add question page
+  * [x] Wrapped build method in a gesture detector so we can "focus" on the background
+* [x] Refactored editable blank widget
+    * set state error
+    * single focus node on MathField Widgets
+* [x] added conditional logging that logs the record trying to be pushed if a PostgrestException that contains -> <row-level security policy for table ""> is found with code: 42501
+* [x] Cleaned up old logging statements from outbound_sync_functions.dart, only warnings and errors remain as logging statements
+* [x] New questions added to modules that user's already have activated do not get added to the user profile UNLESS they reactivate the module
+  * Likely there is an issue with the loop functional in the ensure all modules functionality, grabbing the wrong information probably
+  * Deleted relic getModuleActivationStatus function from userProfile table file
+  * Check function in module activation status table (already there)
+  * updated imports
+  * updated validateAllModule* function to properly use the function and actually check if the module is active
+  * add validateAllModule* call to the login initialization process, user questions are ensured to exist on login and on new module activation
+* [x] Math Validation fails to properly parse \frac{98}{1}
+  * RESOLVE: expressions being passed in are valid through TexParser
+    * Pre-parse them using the TexParser
+    * value is Expression type -> convert to String
+    * pass into ExpressionParser for Evaluation
+    * Debug testing shows similarity score works ok: '\frac{78}{1} =? 78' -> Sim Score 0.166666...
+      * conjunction of equivalency + sim score could provide the proper validation
+      * more complicated math will require updates to the math keyboard and expressions validation and possibly the TeXParser as well
+  * need to fix the parsing
+  * math_keyboard provides a valid latex string
+  * math_expressions expects it to be written out (98 / 1)
+  
 # Update 2.0.0 - Math Questions and Validation
 Since this update is not backwards compatible we are updating as 2.0.0
 ## Core Changes:

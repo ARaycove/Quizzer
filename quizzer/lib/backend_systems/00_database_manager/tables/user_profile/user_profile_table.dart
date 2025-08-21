@@ -241,57 +241,6 @@ Future<bool> updateLastLogin(String userId) async {
   }
 }
 
-/// Gets the activation status of modules for a user
-/// Returns a Map<String, bool> where keys are module names and values are activation status
-Future<Map<String, bool>> getModuleActivationStatus(String userId) async {
-  try {
-    
-    final db = await getDatabaseMonitor().requestDatabaseAccess();
-    
-    final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
-      'user_profile',
-      db,
-      columns: ['activation_status_of_modules'],
-      where: 'uuid = ?',
-      whereArgs: [userId],
-    );
-    
-    if (results.isEmpty) {
-      QuizzerLogger.logError('No activation status found for user ID: $userId');
-      return {};
-    }
-    
-    final dynamic activationStatus = results.first['activation_status_of_modules'];
-    if (activationStatus == null) {
-      return {};
-    }
-    
-    // If it's already a Map, convert it to the correct type
-    if (activationStatus is Map) {
-      return activationStatus.map((key, value) => MapEntry(key.toString(), value as bool));
-    }
-    
-    // If it's a String, try to decode it
-    if (activationStatus is String) {
-      try {
-        final Map<String, dynamic> decoded = json.decode(activationStatus);
-        return decoded.map((key, value) => MapEntry(key, value as bool));
-      } catch (e) {
-        QuizzerLogger.logError('Failed to decode activation status for user ID: $userId');
-        return {};
-      }
-    }
-    
-    QuizzerLogger.logError('Unexpected type for activation_status_of_modules: ${activationStatus.runtimeType}');
-    return {};
-  } catch (e) {
-    QuizzerLogger.logError('Error getting module activation status for user ID: $userId - $e');
-    rethrow;
-  } finally {
-    getDatabaseMonitor().releaseDatabaseAccess();
-  }
-}
-
 /// Gets the subject interest data for a user
 /// If new subjects are found in the question database that aren't in the user profile,
 /// they will be added with a default interest value of 10

@@ -16,10 +16,25 @@ Pushed 2.1.0
 - Perhaps we can figure out how to send an email out that when clicked opens a specific page on the app itself, thus the only way to access the reset user password section of the app is through the email link?
 
 [] Will need to rigoursly test logout/login/logout/login cycle works and doesn't break the system. Currently there is some kind of issue regarding if we logout, existing processes are not closed properly. This is a login issue, and goes under the minor update
+
+* [] Refactor Outbound sync to:
+  * First gather all records from all tables that are unsynced ALL AT ONCE
+  * Future.wait / gather all records to be pushed and push them in a batch asynchronously
+  * Once the overall payload is back, check all values, and clean up accordingly
 ## Bug Fixes
+* [] Math validation should not allow the question to be entered as the answer
+  * if userAnswer matches exactly the question, then it should not allow it to work
+    * but if the correctAnswer is basic, then this doesn't fly
+    * Perhaps some way to determine how many steps away the userAnswer is from the correctAnswer
+    * has to at least be similar
+    * apply evaluation + similarity? Yes I think this is the way,
+      * similarity score must be greater than threshold AND evaluate correctly
+  * This would be for factor(xyz)
+  * evaluation function would evaluate both the same factored and non-factored version
+  * so data structure needs to be updated. . .?
+    * But this needs to be a more automatic determination
 * [] Some question answer attempt records ARE NOT syncing and triggering an RLS violation. . .
   * Appears to be intermittent, as many attempt records do get synced
-  * [] added conditional logging that logs the record trying to be pushed if a PostgrestException that contains -> <row-level security policy for table ""> is found with code: 42501
 
 * [] Matrix latex elements with fractions inside, formatted fraction elements need padding on top to prevent overlap
 
@@ -27,27 +42,40 @@ Pushed 2.1.0
   * I am contemplating removing the edit button from the main home page entirely, regular users would still have the ability to flag a question still sending it to the admin. flagging a question removes it from that users account until the question is reviewed upon which the question is restored to the user
 * [] User States: "Android version needs some bottom margin on pages, preventing widgets from getting partially hidden."
   * snackbar pop-ups and margin cutoff on android are blocking the use of the next question button and submit answer buttons. Adding a bottom margin the height of the snackbar would remove this issue
+
 * [] Circulation worker does not properly remove excess new questions, allowing too many new questions to overload the user. Should have some kind of mechanism that will remove only revision score 0 questions from circulation
+
 * [] User States: Occasionally we get an app crash if I close my phone, then when I reopen the app I return to an error screen
 
-
 ## Miscellaneous Addition might get pushed to later updates
-* [ ] Add the Quizzer Logo to the background of the home page (grayscale)
-* [ ] Add font-size settings to settings page
-  * [ ] font-size for math elements
-    * [ ] additional info icon to explain that math font size is larger due to exponents and readability
-    * [ ] add setting value to settings page
-    * [ ] add setting value to table
-  * [ ] font-size for everything else
-    * [ ] add setting value to settings page
-    * [ ] add setting value to table
-* [ ] User Setting: Shrink or Wrap options with default Wrap for math related latex. If Shrink the font size of a latex element will shrink to fit the screen, if wrap the latex element will wrap over to a new line to avoid cutting off text
-* [ ] Fix Environment variables (Credentials should be stored securely)
-* [ ] User Settings: auto-submit multiple choice questions (default behavior is to auto-matically submit the selected option)
+* [] Synonym fields in the add question interface should also allow for math expressions
+* [] Add font-size settings to settings page
+  * [] font-size for math elements
+    * [] additional info icon to explain that math font size is larger due to exponents and readability
+    * [] add setting value to settings page
+    * [] add setting value to table
+  * [] font-size for everything else
+    * [] add setting value to settings page
+    * [] add setting value to table
+* [] User Setting: Shrink or Wrap options with default Wrap for math related latex. If Shrink the font size of a latex element will shrink to fit the screen, if wrap the latex element will wrap over to a new line to avoid cutting off text
+* [] Fix Environment variables (Credentials should be stored securely)
+* [] User Settings: auto-submit multiple choice questions (default behavior is to auto-matically submit the selected option)
   * this settings would disable the auto-submit behavior and make it so the user needs to hit the submit answer button on multiple choice questions
-* [ ] overhaul adding images, allow an option to choose from existing images in the system or to upload a new image (this will help prevent duplicating the same image file many times over)
-* [ ] copy paste image support for add question interface
-* [ ] Add setting and option to display next revision day project after answering a question
+* [] overhaul adding images, allow an option to choose from existing images in the system or to upload a new image (this will help prevent duplicating the same image file many times over)
+* [] copy paste image support for add question interface
+* [] Add setting and option to display next revision day project after answering a question
+* [] Need to update QuizzerLogger such that I can trigger a level specific logging on a file by file basis
+
+# Update: Expansion of math_keyboard and math_expressions
+Not sure what's going on with the team that built the math_keyboard, permissions say modification and distributions is fine. I am considering taking the field and completely changing it. Names and all, and package it internally inside quizzer as a "global widget"
+- Goal is to be able to type math expressions using a keyboard, and provide a built in field that actively renders that latex
+- Current iteration write a TeX string, which means anything goes, and should be able to update easily based on the full library of TeX, but the iteration is hyper-limited to only some
+
+Second to address would be the update to the math_expressions library to allow evaluation of the 
+* [] Update TeXParser
+  * converts TeX string $\frac{x}{y}$ to computer readable expression
+* [] Update ExpressionParser
+  * takes a parsed TeX string and evaluates the result, by directly injecting variables with real values
 
 # Tutorial Update:
 This update will focus on adding info icons and tutorial to Quizzer to introduce new  user's to the platform, there are a lot of moving parts and a tutorial goes a long way to help a new user figure out what the hell is going on.
