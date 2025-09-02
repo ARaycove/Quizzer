@@ -129,7 +129,7 @@ class _MenuPageState extends State<MenuPage> {
               isLogoutButton: true,
               onPressed: () async {
                 final navigator = Navigator.of(context);
-                session.logoutUser();
+                await session.logoutUser();
                 QuizzerLogger.logMessage('Session state reset for logout');
                 if (mounted) { // Ensure the widget is still in the tree
                   // Clear navigation stack and go to login page

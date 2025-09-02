@@ -689,12 +689,12 @@ class _AddQuestionAnswerPageState extends State<AddQuestionAnswerPage> {
 
   @override
   Widget build(BuildContext context) {
+    final FocusNode backgroundFocusNode = FocusNode();
     return GestureDetector(
-      // Taps on the area covered by the GestureDetector will trigger this.
       onTap: () {
         FocusScopeNode currentFocus = FocusScope.of(context);
-        if (!currentFocus.hasPrimaryFocus) {
-          currentFocus.unfocus();
+        if (!backgroundFocusNode.hasFocus) {
+          currentFocus.requestFocus(backgroundFocusNode);
         }
       },
       child: Scaffold(
@@ -705,9 +705,10 @@ class _AddQuestionAnswerPageState extends State<AddQuestionAnswerPage> {
         ),
         body: Stack(
           children: [
-            // The background widget as the first child
-            const QuizzerBackground(),
-            // The ListView as the second child, containing all the original page content
+            Focus(
+              focusNode: backgroundFocusNode,
+              child: const QuizzerBackground(),
+            ),
             ListView(
               children: [
                 // 2. Module Selection Widget

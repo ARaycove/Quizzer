@@ -80,9 +80,9 @@ class PresentationSelectionWorker {
       
       // Clear both caches when stopping to ensure clean state
       QuizzerLogger.logMessage('Clearing QuestionQueueCache and AnswerHistoryCache on stop...');
-      _queueCache.clear();
+      await _queueCache.clear();
       final AnswerHistoryCache historyCache = AnswerHistoryCache();
-      historyCache.clear();
+      await historyCache.clear();
       QuizzerLogger.logSuccess('Both caches cleared');
       
       // Wait for the loop to finish if there's a completer

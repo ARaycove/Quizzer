@@ -6,8 +6,6 @@ import 'package:quizzer/backend_systems/00_helper_utils/file_locations.dart';
 import 'package:quizzer/app_theme.dart';
 import 'package:quizzer/UI_systems/global_widgets/widget_blank.dart';
 import 'package:quizzer/UI_systems/global_widgets/widget_latext_renderer.dart';
-
-
 // ==========================================
 //        Element Renderer Widget
 // ==========================================
@@ -101,7 +99,9 @@ import 'package:quizzer/UI_systems/global_widgets/widget_latext_renderer.dart';
 
 class ElementRenderer extends StatefulWidget {
   final List<Map<String, dynamic>> elements;
-  final Map<int, TextEditingController>? blankControllers; // Map of element index to controller
+  // The blankControllers map now holds a dynamic type to accommodate both
+  // TextEditingController and MathFieldEditingController.
+  final Map<int, dynamic>? blankControllers; // Map of element index to controller
   final List<bool>? individualBlankResults; // Individual blank correctness results
   final bool enabled; // Whether blank inputs should be enabled
   final List<bool> blankIsMathExpression;
@@ -155,7 +155,7 @@ class _ElementRendererState extends State<ElementRenderer> {
       final type = element['type'] as String?;
       final content = element['content'];
 
-      if (type == 'text' || type == null) { // Handle text and unknown types synchronously
+      if (type == 'text' || type == null) {// Handle text and unknown types synchronously
          // Directly build and store the widget
          _renderedWidgets[i] = _buildStaticWidget(type, content, i);
       } else if (type == 'blank') {
@@ -172,54 +172,33 @@ class _ElementRendererState extends State<ElementRenderer> {
     // Since all widgets are now static (including images), no need for post-frame callback
   }
 
-// Groups elements according to the specified rules
-List<Widget> _groupElements() {
-  List<Widget> groupedWidgets = [];
-  int i = 0;
+  // Groups elements according to the specified rules
+  List<Widget> _groupElements() {
+    List<Widget> groupedWidgets = [];
+    // String previousType;
 
-  while (i < widget.elements.length) {
-    final currentElement = widget.elements[i];
-    // Corrected: Use 'var' to allow reassignment inside the loop
-    var currentType = currentElement['type'] as String?;
+    int i = 0;
 
-    // Start a new group if the current element is text or a blank
-    if (currentType == 'text' || currentType == 'blank') {
-      List<InlineSpan> inlineSpans = [];
+    // for (Map<String, dynamic> element in widget.elements) {
+    //   String currentType = element['type'];
+    //   // Based on the current type we'll need to construct and get the static widget for this type
+    //   // Refactor will need to effect the entire page.
 
-      // Add the current element to the spans list first
-      final currentWidget = _renderedWidgets[i];
-      if (currentWidget != null) {
-        if (currentType == 'text') {
-          final textContent = currentElement['content'].toString();
-          if (_hasLatexDelimiters(textContent)) {
-            inlineSpans.add(WidgetSpan(
-              child: LaTexT(laTeXCode: Text(textContent), equationStyle: const TextStyle(fontSize: 24.0)),
-              alignment: PlaceholderAlignment.middle,
-            ));
-          } else {
-            inlineSpans.add(TextSpan(text: textContent));
-          }
-        } else if (currentType == 'blank') {
-          inlineSpans.add(WidgetSpan(
-            child: currentWidget,
-            alignment: PlaceholderAlignment.middle,
-          ));
-        }
-      }
-      i++;
+    // }
+    
+    while (i < widget.elements.length) {
+      final currentElement = widget.elements[i];
+      var currentType = currentElement['type'] as String?;
 
-      // Check if the next element is a text or blank and should be grouped
-      while (i < widget.elements.length) {
-        final nextElement = widget.elements[i];
-        final nextType = nextElement['type'] as String?;
-        final nextWidget = _renderedWidgets[i];
+      // Start a new group if the current element is text or a blank
+      if (currentType == 'text' || currentType == 'blank') {
+        List<InlineSpan> inlineSpans = [];
 
-        // This is the critical change: Only group text with a blank or a blank with a text.
-        // Do NOT group consecutive text elements.
-        if (nextWidget != null && ((currentType == 'text' && nextType == 'blank') || (currentType == 'blank' && nextType == 'text'))) {
-          if (nextType == 'text') {
-            inlineSpans.add(const TextSpan(text: ' ')); // Add space before text
-            final textContent = nextElement['content'].toString();
+        // Add the current element to the spans list first
+        final currentWidget = _renderedWidgets[i];
+        if (currentWidget != null) {
+          if (currentType == 'text') {
+            final textContent = currentElement['content'].toString();
             if (_hasLatexDelimiters(textContent)) {
               inlineSpans.add(WidgetSpan(
                 child: LaTexT(laTeXCode: Text(textContent), equationStyle: const TextStyle(fontSize: 24.0)),
@@ -228,48 +207,80 @@ List<Widget> _groupElements() {
             } else {
               inlineSpans.add(TextSpan(text: textContent));
             }
-          } else if (nextType == 'blank') {
-            inlineSpans.add(const TextSpan(text: ' ')); // Add space before blank
+          } else if (currentType == 'blank') {
             inlineSpans.add(WidgetSpan(
-              child: nextWidget,
+              child: currentWidget,
               alignment: PlaceholderAlignment.middle,
             ));
-            inlineSpans.add(const TextSpan(text: ' ')); // Add space after blank
           }
-          i++; // Move to the next element
-          currentType = nextType; // Update type for the next check
-        } else {
-          // Break the inner loop if the next element is not groupable with the current one.
-          break;
         }
-      }
+        i++;
 
-      // Add the final grouped line as a single RichText widget
-      if (inlineSpans.isNotEmpty) {
-        groupedWidgets.add(Padding(
-          padding: const EdgeInsets.only(bottom: 4.0),
-          child: RichText(
-            text: TextSpan(
-              style: Theme.of(context).textTheme.bodyLarge,
-              children: inlineSpans,
+        // Check if the next element is a text or blank and should be grouped
+        while (i < widget.elements.length) {
+          final nextElement = widget.elements[i];
+          final nextType = nextElement['type'] as String?;
+          final nextWidget = _renderedWidgets[i];
+
+          // Do NOT group consecutive text elements.
+          if (nextWidget != null && ((currentType == 'text' && nextType == 'blank') || (currentType == 'blank' && nextType == 'text'))) {
+            if (nextType == 'text') {
+              inlineSpans.add(const TextSpan(text: ' ')); // Add space before text
+              final textContent = nextElement['content'].toString();
+                // inlineSpans.add(WidgetSpan(
+                //   child: LaTexT(laTeXCode: Text(textContent), equationStyle: const TextStyle(fontSize: 24.0)),
+                //   alignment: PlaceholderAlignment.middle,
+                // ));
+              if (_hasLatexDelimiters(textContent)) {
+                inlineSpans.add(WidgetSpan(
+                  child: LaTexT(laTeXCode: Text(textContent), equationStyle: const TextStyle(fontSize: 24.0)),
+                  alignment: PlaceholderAlignment.middle,
+                ));
+              } else {
+                inlineSpans.add(TextSpan(text: textContent));
+              }
+            } else if (nextType == 'blank') {
+              inlineSpans.add(const TextSpan(text: ' ')); // Add space before blank
+              inlineSpans.add(WidgetSpan(
+                child: nextWidget,
+                alignment: PlaceholderAlignment.middle,
+              ));
+              inlineSpans.add(const TextSpan(text: ' ')); // Add space after blank
+            }
+            i++; // Move to the next element
+            currentType = nextType; // Update type for the next check
+          } else {
+            // Break the inner loop if the next element is not groupable with the current one.
+            break;
+          }
+        }
+
+        // Add the final grouped line as a single RichText widget
+        if (inlineSpans.isNotEmpty) {
+          groupedWidgets.add(Padding(
+            padding: const EdgeInsets.only(bottom: 4.0),
+            child: RichText(
+              text: TextSpan(
+                style: Theme.of(context).textTheme.bodyLarge,
+                children: inlineSpans,
+              ),
             ),
-          ),
-        ));
-      }
-    } else {
-      // If it's a non-groupable element (like an image), add it directly.
-      final widgetToAdd = _renderedWidgets[i];
-      if (widgetToAdd != null) {
-        groupedWidgets.add(widgetToAdd);
+          ));
+        }
       } else {
-        groupedWidgets.add(const Text('[Loading...]'));
+        // If it's a non-groupable element (like an image), add it directly.
+        final widgetToAdd = _renderedWidgets[i];
+        if (widgetToAdd != null) {
+          groupedWidgets.add(widgetToAdd);
+        } else {
+          groupedWidgets.add(const Text('[Loading...]'));
+        }
+        i++;
       }
-      i++;
     }
-  }
 
-  return groupedWidgets;
-}
+    return groupedWidgets;
+  }
 
 
   @override
@@ -324,17 +335,14 @@ List<Widget> _groupElements() {
            return Text(textContent);
          }
        case 'blank':
-         // Parse content as width for the blank widget
          int width;
          try {
-                    // Handle integer content directly as per database format
-         width = content is int ? content : int.parse(content.toString());
+           width = content is int ? content : int.parse(content.toString());
          } catch (e) {
            QuizzerLogger.logError('ElementRenderer: Invalid blank width content: $content');
-           width = 10; // Default width
+           width = 10;
          }
 
-         // Find the correct blank index to get the isMathExpression value
          int blankIndex = 0;
          for (int i = 0; i < index; i++) {
            if (widget.elements[i]['type'] == 'blank') {
@@ -342,26 +350,35 @@ List<Widget> _groupElements() {
            }
          }
          
-         // Get correctness for this blank
          bool? isCorrect;
          if (widget.individualBlankResults != null && blankIndex < widget.individualBlankResults!.length) {
            isCorrect = widget.individualBlankResults![blankIndex];
          }
          
-         // Get the math expression flag for this blank
          bool isMathExpression = false;
          if (blankIndex < widget.blankIsMathExpression.length) {
            isMathExpression = widget.blankIsMathExpression[blankIndex];
          }
+         
+         // Get the TextEditingController for the blank from the map.
+         // This now correctly expects a dynamic type.
+         final dynamic blankController = widget.blankControllers?[index];
 
-         // Wrap the WidgetBlank in a Container with a red background as requested
-         return WidgetBlank(
-             width: width,
-             controller: widget.blankControllers?[index] ?? TextEditingController(),
-             enabled: widget.enabled, // Use the enabled parameter from ElementRenderer
-             isCorrect: isCorrect,
-             isMathExpression: isMathExpression, // NEW: Pass the boolean down
-          );
+         // CRITICAL CHANGE: Ensure a controller is always provided. If not, this is an error.
+         if (blankController == null) {
+           QuizzerLogger.logError('ElementRenderer: Missing controller for blank at element index $index. This must be provided by the parent widget.');
+           return const Text('Error: Controller missing');
+         }
+
+         return Container(
+            child: WidgetBlank(
+                width: width,
+                controller: blankController,
+                enabled: widget.enabled,
+                isCorrect: isCorrect,
+                isMathExpression: isMathExpression,
+              ),
+         );
        // Add other synchronous types here
        default:
          QuizzerLogger.logWarning('ElementRenderer static build encountered unsupported type: $type');
@@ -500,5 +517,3 @@ Widget _buildErrorIconRow(String message, {required bool isWarning}) {
      ]
    ); 
 }
-
-

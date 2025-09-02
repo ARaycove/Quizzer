@@ -453,8 +453,7 @@ class _EditableBlankElementState extends State<EditableBlankElement> {
   // --- Build the primary answer field widget ---
   Widget _buildPrimaryAnswerField() {
     if (_isMathAnswer) {
-      return IntrinsicWidth(
-        child: MathField(
+      return MathField(
           variables: const ["x", "y", "z", "a", "b", "c"],
           controller: _mathAnswerController,
           onChanged: (texString) {
@@ -467,11 +466,10 @@ class _EditableBlankElementState extends State<EditableBlankElement> {
             border: InputBorder.none,
             hintText: 'Enter a math expression'
           ),
-        ),
-      );
+        );
     } else {
       if (_isEditingPrimary) {
-        return IntrinsicWidth(
+        return Expanded(
           child: TextField(
             controller: _primaryAnswerController,
             // Pass the single, combined focus node to the TextField.
@@ -616,12 +614,14 @@ class _EditableBlankElementState extends State<EditableBlankElement> {
         padding: const EdgeInsets.all(12),
         child: Row(
           children: [
-            GestureDetector(
-              onTap: () => _startEditingPrimary(),
-              // The single focus node is managed by the GestureDetector.
-              // The focus is requested here, which in turn gives focus to the
-              // correct child widget (TextField or MathField).
-              child: _buildPrimaryAnswerField(),
+            Expanded(
+              child: GestureDetector(
+                onTap: () => _startEditingPrimary(),
+                // The single focus node is managed by the GestureDetector.
+                // The focus is requested here, which in turn gives focus to the
+                // correct child widget (TextField or MathField).
+                child: _buildPrimaryAnswerField(),
+              ),
             ),
             AppTheme.sizedBoxMed,
             

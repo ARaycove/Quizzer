@@ -6,9 +6,9 @@ import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 /// The width is determined by the content parameter (number of characters).
 class WidgetBlank extends StatefulWidget {
   final int width; // Number of characters to determine width
-  final TextEditingController controller;
-  // This controller is now optional and will be internally managed if not provided.
-  final MathFieldEditingController? mathfieldController;
+  // The controller is now a generic `dynamic` type to accommodate both
+  // TextEditingController and MathFieldEditingController.
+  final dynamic controller;
   final Function(String)? onChanged;
   final bool enabled; // Whether the field is editable
   final bool? isCorrect; // Whether this blank is correct (null = not submitted)
@@ -21,7 +21,6 @@ class WidgetBlank extends StatefulWidget {
     super.key,
     required this.width,
     required this.controller,
-    this.mathfieldController,
     this.onChanged,
     this.enabled = true,
     this.isCorrect,
@@ -36,69 +35,63 @@ class WidgetBlank extends StatefulWidget {
 
 /// The state class for WidgetBlank.
 class WidgetBlankState extends State<WidgetBlank> {
-  // We use this internal controller to manage the MathField if none is provided.
-  late MathFieldEditingController _internalMathController;
-  
+  // We need to have a local focus node as well to manage the listeners.
+  late FocusNode _localFocusNode;
+  late Widget inputField;
+
   @override
   void initState() {
     super.initState();
-    _internalMathController = widget.mathfieldController ?? MathFieldEditingController();
+    _localFocusNode = widget.focusNode ?? FocusNode();
 
-    // We add a listener to the main controller to sync the math field.
-    widget.controller.addListener(_syncWithMainController);
+    // The listener on the focus node is now a named function for proper lifecycle management.
+    _localFocusNode.addListener(_focusListener);
   }
 
-  /// This listener keeps the math field in sync with the main controller's text.
-  void _syncWithMainController() {
-    // Only update if the text is different to prevent an infinite loop.
-    if (_internalMathController.currentEditingValue() != widget.controller.text) {
-      try {
-        _internalMathController.updateValue(TeXParser(widget.controller.text).parse());
-      } catch (e) {
-        // Clear the math field if the text cannot be parsed as TeX.
-        _internalMathController.clear();
-      }
+  /// The listener function for the focus node.
+  void _focusListener() {
+    if (!_localFocusNode.hasFocus) {
+      QuizzerLogger.logMessage("Focus lost. Controller text is now: ${_getControllerValue()}");
     }
   }
 
   @override
   void didUpdateWidget(covariant WidgetBlank oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // If the main controller instance changes, we must update our listener.
-    if (widget.controller != oldWidget.controller) {
-      oldWidget.controller.removeListener(_syncWithMainController);
-      widget.controller.addListener(_syncWithMainController);
+    // If the focus node instance changes, update our listener.
+    if (widget.focusNode != oldWidget.focusNode) {
+      oldWidget.focusNode?.removeListener(_focusListener);
+      _localFocusNode = widget.focusNode ?? FocusNode();
+      _localFocusNode.addListener(_focusListener);
     }
-
-    // If a new math controller is passed, update our internal reference.
-    if (widget.mathfieldController != oldWidget.mathfieldController) {
-      // If we were using an internally created controller, we must dispose it.
-      if (oldWidget.mathfieldController == null) {
-        oldWidget.mathfieldController?.dispose();
-      }
-      _internalMathController = widget.mathfieldController ?? MathFieldEditingController();
+  }
+  
+  String _getControllerValue() {
+    if (widget.isMathExpression) {
+      return widget.controller.currentEditingValue();
+    } else {
+      return widget.controller.text;
     }
   }
 
   @override
   void dispose() {
-    widget.controller.removeListener(_syncWithMainController);
-    // Only dispose of our internal controller if we created it ourselves.
-    if (widget.mathfieldController == null) {
-      _internalMathController.dispose();
+    _localFocusNode.removeListener(_focusListener);
+    if (widget.focusNode == null) {
+      _localFocusNode.dispose();
     }
     super.dispose();
   }
 
-  // This function is now part of the state class.
-  void _handleMathFieldChange(String mathfieldControlValue) {
-    QuizzerLogger.logMessage("math field sent: $mathfieldControlValue");
-    widget.controller.text = mathfieldControlValue;
+  /// This private method unifies how we handle value changes for both fields.
+  void _updateControllerValue(String value) {
+    // Now we simply call the parent's onChanged callback.
+    // The TextField's controller is updated automatically.
     if (widget.onChanged != null) {
-      widget.onChanged!(mathfieldControlValue);
+      widget.onChanged!(value);
     }
-
-    QuizzerLogger.logMessage("The controller reports a text value of ${widget.controller.text}");
+    inputField ;
+    QuizzerLogger.logMessage("The controller reports a text value of $value");
   }
 
   @override
@@ -123,46 +116,45 @@ class WidgetBlankState extends State<WidgetBlank> {
       textColor = Theme.of(context).colorScheme.onSurface;
     }
     
-    Widget inputField;
     if (widget.isMathExpression) {
-      inputField = SizedBox(
-        height: 48.0, // Fixed height to match TextField.
-        child: MathField(
-          variables: const ["x", "y", "z", "a", "b", "c"],
-          controller: _internalMathController,
-          onChanged: _handleMathFieldChange,
-          // Pass the focus node received from the parent.
-          focusNode: widget.focusNode,
-          decoration: InputDecoration(
-            isDense: false, // Set to false to allow for more vertical space
-            border: const OutlineInputBorder(), // Use OutlineInputBorder
-            hintText: 'Click/Tap to enter',
-            hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface),
-            filled: backgroundColor != null,
-            fillColor: backgroundColor,
-            focusedBorder: borderColor != null
-                ? OutlineInputBorder(borderSide: BorderSide(color: borderColor, width: 2.0))
-                : null,
-            enabledBorder: borderColor != null
-                ? OutlineInputBorder(borderSide: BorderSide(color: borderColor, width: 1.5))
-                : null,
-            contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
-          ),
+      inputField = MathField(
+        variables: const ["x", "y", "z", "a", "b", "c"],
+        controller: widget.controller,
+        // The onChanged callback still updates the controller on every keystroke
+        onChanged: _updateControllerValue,
+        // The onSubmitted callback also updates the controller on submission
+        // or focus loss, providing a more robust solution.
+        onSubmitted: _updateControllerValue,
+        // Use our local focus node which has the listener.
+        focusNode: _localFocusNode,
+        decoration: InputDecoration(
+          isDense: false, // Set to false to allow for more vertical space
+          border: const OutlineInputBorder(), // Use OutlineInputBorder
+          hintText: 'Click/Tap to enter',
+          hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+          filled: backgroundColor != null,
+          fillColor: backgroundColor,
+          focusedBorder: borderColor != null
+              ? OutlineInputBorder(borderSide: BorderSide(color: borderColor, width: 2.0))
+              : null,
+          enabledBorder: borderColor != null
+              ? OutlineInputBorder(borderSide: BorderSide(color: borderColor, width: 1.5))
+              : null,
+          contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
         ),
       );
     } else {
       inputField = TextField(
-        key: ValueKey('blank_${widget.controller.text}'),
         controller: widget.controller,
-        onChanged: widget.onChanged,
+        onChanged: _updateControllerValue,
+        onSubmitted: _updateControllerValue,
         enabled: widget.enabled,
         style: TextStyle(color: textColor),
         cursorColor: Theme.of(context).colorScheme.onSurface,
-        // Pass the focus node received from the parent.
-        focusNode: widget.focusNode,
+        focusNode: _localFocusNode,
         decoration: InputDecoration(
           border: const UnderlineInputBorder(),
-          hintText: widget.controller.text.isNotEmpty ? null : '█',
+          hintText: '█', 
           filled: backgroundColor != null,
           fillColor: backgroundColor,
           focusedBorder: borderColor != null
@@ -175,14 +167,31 @@ class WidgetBlankState extends State<WidgetBlank> {
       );
     }
 
-    return ConstrainedBox(
-      constraints: const BoxConstraints(
-        minWidth: 20.0,
-        maxWidth: double.infinity,
-      ),
-      child: IntrinsicWidth(
-        child: inputField,
-      ),
-    );
+    // return ConstrainedBox(
+    //   constraints: const BoxConstraints(
+    //     minWidth: 20.0,
+    //     maxWidth: double.infinity,
+    //   ),
+    //   child: IntrinsicWidth(
+    //     child: inputField,
+    //   ),
+    // );
+
+    if (!widget.isMathExpression) {
+      return ConstrainedBox(
+        constraints: const BoxConstraints(
+          minWidth: 20.0,
+          maxWidth: double.infinity,
+        ),
+        child: IntrinsicWidth(
+          child: inputField,
+        ),
+      );
+    } else {
+      return Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: IntrinsicWidth(child: inputField),
+      );
+    }
   }
 }

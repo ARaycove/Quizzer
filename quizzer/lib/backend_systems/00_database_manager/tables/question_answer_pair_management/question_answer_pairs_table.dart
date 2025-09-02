@@ -35,11 +35,6 @@ import 'package:quizzer/backend_systems/00_helper_utils/utils.dart';
 /// This function is called by all other functions in this file to ensure
 /// the table structure is up-to-date before performing operations.
 Future<void> verifyQuestionAnswerPairTable(dynamic db) async {
-  
-  // Check if the table exists
-  final List<Map<String, dynamic>> tables = await db.rawQuery(
-    "SELECT name FROM sqlite_master WHERE type='table' AND name='question_answer_pairs'"
-  );
   // ALL question_type:
   // - multiple_choice:       ✅ IMPLEMENTED
   // - select_all_that_apply: ✅ IMPLEMENTED
@@ -95,187 +90,115 @@ Future<void> verifyQuestionAnswerPairTable(dynamic db) async {
   //   {'type': 'image', 'content': 'paris_landmark.jpg'}
   // ]
   //
-  if (tables.isEmpty) {
+  // A single, comprehensive map of required columns and their SQLite data types
+  final requiredColumns = {
+    'question_id': 'TEXT UNIQUE', 
+    'time_stamp': 'TEXT',
+    'question_elements': 'TEXT',
+    'answer_elements': 'TEXT',
+    'ans_flagged': 'INTEGER',
+    'ans_contrib': 'TEXT',
+    'qst_contrib': 'TEXT',
+    'qst_reviewer': 'TEXT',
+    'has_been_reviewed': 'INTEGER',
+    'flag_for_removal': 'INTEGER',
+    'module_name': 'TEXT',
+    'question_type': 'TEXT',
+    'options': 'TEXT',
+    'correct_option_index': 'INTEGER',
+    'correct_order': 'TEXT',
+    'index_options_that_apply': 'TEXT',
+    'answers_to_blanks': 'TEXT',
+    'has_been_synced': 'INTEGER DEFAULT 0',
+    'edits_are_synced': 'INTEGER DEFAULT 0',
+    'last_modified_timestamp': 'TEXT',
+    'has_media': 'INTEGER DEFAULT NULL',
+  };
+  
+  final List<Map<String, dynamic>> tables = await db.rawQuery(
+    "SELECT name FROM sqlite_master WHERE type='table' AND name='question_answer_pairs'"
+  );
+
+  bool tableExists = tables.isNotEmpty;
+  List<Map<String, dynamic>>? recordsToMigrate;
+
+  if (tableExists) {
+    // Check if the primary key is question_id
+    final List<Map<String, dynamic>> tableInfo = await db.rawQuery(
+      "PRAGMA table_info(question_answer_pairs)"
+    );
+    final hasCorrectPrimaryKey = tableInfo.any((col) => col['name'] == 'question_id' && col['pk'] == 1);
+
+    if (!hasCorrectPrimaryKey) {
+      QuizzerLogger.logWarning('question_answer_pairs table has incorrect primary key. Migrating data and recreating table.');
+      
+      // Backup all data before dropping the table
+      try {
+        recordsToMigrate = await db.query('question_answer_pairs');
+        QuizzerLogger.logMessage('Successfully backed up ${recordsToMigrate!.length} records.');
+      } catch (e) {
+        QuizzerLogger.logError('Failed to backup data before migration: $e');
+        recordsToMigrate = null;
+      }
+      
+      await db.execute('DROP TABLE IF EXISTS question_answer_pairs');
+      tableExists = false;
+    }
+  }
+
+  if (!tableExists) {
+    QuizzerLogger.logMessage('question_answer_pairs table not found. Creating it.');
+    final columnsSql = requiredColumns.entries.map((e) => '${e.key} ${e.value}').join(',\n');
+    
     await db.execute('''
       CREATE TABLE question_answer_pairs (
-        time_stamp TEXT,                    -- UTC time question was entered
-        question_elements TEXT,             -- JSON question elements in format: type:content
-        answer_elements TEXT,               -- JSON of answer elements in format: type:content
-        ans_flagged INTEGER,                -- Changed from BOOLEAN to INTEGER
-        ans_contrib TEXT,                   -- user who entered the answer for this question
-        qst_contrib TEXT,                   -- uuid of user who entered question
-        qst_reviewer TEXT,                  -- uuid of admin/contributor
-        has_been_reviewed INTEGER,          -- Changed from BOOLEAN to INTEGER
-        flag_for_removal INTEGER,           -- REDACTED, system in place
-        module_name TEXT,                   -- Name of the module to which question belongs (1 module only)
-        question_type TEXT,                 -- The type of the question (multiple choice, true_false, etc.)
-        options TEXT,                       -- Added for multiple choice options
-        correct_option_index INTEGER,       -- Added for multiple choice correct answer
-        question_id TEXT UNIQUE,            -- Added for unique question identification with UNIQUE constraint
-        correct_order TEXT,                 -- Added for sort_order
-        index_options_that_apply TEXT,      -- Added for select_all_that_apply answer
-        answers_to_blanks TEXT,             -- Added for fill_in_the_blank answers
-        has_been_synced INTEGER DEFAULT 0,  -- Added for outbound sync tracking
-        edits_are_synced INTEGER DEFAULT 0, -- Added for outbound edit sync tracking
-        last_modified_timestamp TEXT,       -- Store as ISO8601 UTC string
-        has_media INTEGER DEFAULT NULL,     
-        PRIMARY KEY (time_stamp, qst_contrib)
+        $columnsSql,
+        PRIMARY KEY (question_id)
       )
     ''');
     
-    // Create index on module_name for better query performance
     await db.execute('CREATE INDEX idx_question_answer_pairs_module_name ON question_answer_pairs(module_name)');
-    
+    QuizzerLogger.logSuccess('question_answer_pairs table created successfully.');
   } else {
-    // Check if question_id column exists
-    final List<Map<String, dynamic>> columns = await db.rawQuery(
-      "PRAGMA table_info(question_answer_pairs)"
-    );
-    
-    final bool hasQuestionId = columns.any((column) => column['name'] == 'question_id');
-    
-    if (!hasQuestionId) {
-      // Add question_id column to existing table
-      await db.execute('ALTER TABLE question_answer_pairs ADD COLUMN question_id TEXT');
-      
-      // Update existing records with question_id
-      final List<Map<String, dynamic>> existingPairs = await db.query('question_answer_pairs');
-      for (var pair in existingPairs) {
-        final timeStamp = pair['time_stamp'] as String;
-        final qstContrib = pair['qst_contrib'] as String;
-        final questionId = '${timeStamp}_$qstContrib';
-        
-        await db.update(
-          'question_answer_pairs',
-          {'question_id': questionId},
-          where: 'time_stamp = ? AND qst_contrib = ?',
-          whereArgs: [timeStamp, qstContrib],
-        );
+    final List<Map<String, dynamic>> existingColumnsInfo = await db.rawQuery("PRAGMA table_info(question_answer_pairs)");
+    final existingColumns = existingColumnsInfo.map((e) => e['name'] as String).toSet();
+
+    final missingColumns = requiredColumns.keys.toSet().difference(existingColumns);
+
+    if (missingColumns.isNotEmpty) {
+      QuizzerLogger.logMessage('Found missing columns. Adding them to question_answer_pairs table.');
+      for (final column in missingColumns) {
+        await db.execute('ALTER TABLE question_answer_pairs ADD COLUMN $column ${requiredColumns[column]}');
+        QuizzerLogger.logMessage('Added column: $column');
       }
     }
-
-    // Check for correct_order (for sort_order type)
-    final bool hasCorrectOrder = columns.any((column) => column['name'] == 'correct_order');
-    if (!hasCorrectOrder) {
-      QuizzerLogger.logMessage('Adding correct_order column to question_answer_pairs table.');
-      // Add correct_order column as TEXT to store JSON list
-      await db.execute('ALTER TABLE question_answer_pairs ADD COLUMN correct_order TEXT'); 
-    }
-
-    // Check for index_options_that_apply (for select_all_that_apply type)
-    final bool hasIndexOptions = columns.any((column) => column['name'] == 'index_options_that_apply');
-    if (!hasIndexOptions) {
-      QuizzerLogger.logMessage('Adding index_options_that_apply column to question_answer_pairs table.');
-      // Add index_options_that_apply column as TEXT to store CSV list of integers
-      await db.execute('ALTER TABLE question_answer_pairs ADD COLUMN index_options_that_apply TEXT');
-    }
-
-    // Check for has_been_synced
-    final bool hasBeenSyncedCol = columns.any((column) => column['name'] == 'has_been_synced');
-    if (!hasBeenSyncedCol) {
-      QuizzerLogger.logMessage('Adding has_been_synced column to question_answer_pairs table.');
-      await db.execute('ALTER TABLE question_answer_pairs ADD COLUMN has_been_synced INTEGER DEFAULT 0');
-    }
-
-    // Check for edits_are_synced
-    final bool hasEditsAreSyncedCol = columns.any((column) => column['name'] == 'edits_are_synced');
-    if (!hasEditsAreSyncedCol) {
-      QuizzerLogger.logMessage('Adding edits_are_synced column to question_answer_pairs table.');
-      await db.execute('ALTER TABLE question_answer_pairs ADD COLUMN edits_are_synced INTEGER DEFAULT 0');
-    }
-
-    // Check for last_modified_timestamp
-    final bool hasLastModifiedCol = columns.any((column) => column['name'] == 'last_modified_timestamp');
-    if (!hasLastModifiedCol) {
-      QuizzerLogger.logMessage('Adding last_modified_timestamp column to question_answer_pairs table.');
-      await db.execute('ALTER TABLE question_answer_pairs ADD COLUMN last_modified_timestamp TEXT');
-    }
-
-    // Check for has_media column and add with DEFAULT NULL if missing
-    final bool hasMediaCol = columns.any((column) => column['name'] == 'has_media');
-    if (!hasMediaCol) {
-      QuizzerLogger.logMessage('Adding has_media column with DEFAULT NULL to question_answer_pairs table.');
-      await db.execute('ALTER TABLE question_answer_pairs ADD COLUMN has_media INTEGER DEFAULT NULL');
-    }
-
-    // Check for answers_to_blanks column and add if missing
-    final bool hasAnswersToBlanksCol = columns.any((column) => column['name'] == 'answers_to_blanks');
-    if (!hasAnswersToBlanksCol) {
-      QuizzerLogger.logMessage('Adding answers_to_blanks column to question_answer_pairs table.');
-      await db.execute('ALTER TABLE question_answer_pairs ADD COLUMN answers_to_blanks TEXT');
-    }
     
-    // Check if question_id has UNIQUE constraint and add it if missing
-    final List<Map<String, dynamic>> uniqueIndexes = await db.rawQuery(
-      "SELECT name FROM sqlite_master WHERE type='index' AND tbl_name='question_answer_pairs'"
-    );
-    
-    final List<String> existingUniqueIndexes = uniqueIndexes.map((index) => index['name'] as String).toList();
-    
-    // Check if unique constraint on question_id exists
-    if (!existingUniqueIndexes.contains('idx_question_answer_pairs_question_id_unique')) {
-      QuizzerLogger.logMessage('Checking for existing duplicates before adding UNIQUE constraint on question_id...');
-      
-      // First, find and clean up any existing duplicates
-      final List<Map<String, dynamic>> duplicateGroups = await db.rawQuery('''
-        SELECT question_id, COUNT(*) as count
-        FROM question_answer_pairs 
-        WHERE question_id IS NOT NULL 
-        GROUP BY question_id 
-        HAVING COUNT(*) > 1
-      ''');
-      
-      if (duplicateGroups.isNotEmpty) {
-        QuizzerLogger.logMessage('Found ${duplicateGroups.length} question_id groups with duplicates. Cleaning up...');
-        
-        for (final group in duplicateGroups) {
-          final String questionId = group['question_id'] as String;
-          final int count = group['count'] as int;
-          
-          QuizzerLogger.logMessage('Cleaning up $count duplicates for question_id: $questionId');
-          
-          // Get all records for this question_id
-          final List<Map<String, dynamic>> duplicates = await db.query(
-            'question_answer_pairs',
-            where: 'question_id = ?',
-            whereArgs: [questionId],
-            orderBy: 'time_stamp ASC', // Keep the oldest record
-          );
-          
-          // Keep the first record, delete the rest
-          for (int i = 1; i < duplicates.length; i++) {
-            final Map<String, dynamic> duplicate = duplicates[i];
-            final String timeStamp = duplicate['time_stamp'] as String;
-            final String qstContrib = duplicate['qst_contrib'] as String;
-            
-            QuizzerLogger.logMessage('Deleting duplicate: time_stamp=$timeStamp, qst_contrib=$qstContrib');
-            await db.delete(
-              'question_answer_pairs',
-              where: 'time_stamp = ? AND qst_contrib = ?',
-              whereArgs: [timeStamp, qstContrib],
-            );
-          }
-        }
-        
-        QuizzerLogger.logSuccess('Finished cleaning up duplicates');
-      }
-      
-      // Now create the unique index
-      QuizzerLogger.logMessage('Adding UNIQUE constraint on question_id column to prevent duplicates.');
-      await db.execute('CREATE UNIQUE INDEX idx_question_answer_pairs_question_id_unique ON question_answer_pairs(question_id)');
-    }
-    
-    // Check if module_name index exists and create it if it doesn't
-    final List<Map<String, dynamic>> indexes = await db.rawQuery(
-      "SELECT name FROM sqlite_master WHERE type='index' AND tbl_name='question_answer_pairs'"
-    );
-    
-    final List<String> existingIndexes = indexes.map((index) => index['name'] as String).toList();
+    // Check and create indexes if they don't exist
+    final List<Map<String, dynamic>> indexes = await db.rawQuery("SELECT name FROM sqlite_master WHERE type='index' AND tbl_name='question_answer_pairs'");
+    final existingIndexes = indexes.map((index) => index['name'] as String).toSet();
     
     if (!existingIndexes.contains('idx_question_answer_pairs_module_name')) {
-      QuizzerLogger.logMessage('Creating index on module_name column for better query performance.');
       await db.execute('CREATE INDEX idx_question_answer_pairs_module_name ON question_answer_pairs(module_name)');
+      QuizzerLogger.logMessage('Created index on module_name.');
     }
+  }
+
+  // Re-insert backed-up data if migration occurred
+  if (recordsToMigrate != null && recordsToMigrate.isNotEmpty) {
+    QuizzerLogger.logMessage('Migrating ${recordsToMigrate.length} records back into the table.');
+    await db.transaction((txn) async {
+      for (final record in recordsToMigrate!) {
+        final Map<String, dynamic> newRecord = Map<String, dynamic>.from(record);
+        if (newRecord['question_id'] == null) {
+          // Recreate the question_id if it was null
+          final String timeStamp = newRecord['time_stamp'] as String? ?? '';
+          final String qstContrib = newRecord['qst_contrib'] as String? ?? '';
+          newRecord['question_id'] = '${timeStamp}_$qstContrib';
+        }
+        await txn.insert('question_answer_pairs', newRecord);
+      }
+    });
+    QuizzerLogger.logSuccess('Data migration completed successfully.');
   }
 }
 
@@ -975,8 +898,6 @@ Future<Map<String, String>> getModuleNamesForQuestionIds(List<String> questionId
         questionIdToModuleName[questionId] = 'Unknown Module';
       }
     }
-    
-    QuizzerLogger.logMessage('Fetched module names for ${questionIdToModuleName.length} question IDs');
     return questionIdToModuleName;
   } catch (e) {
     QuizzerLogger.logError('Error getting module names for question IDs - $e');
@@ -1104,8 +1025,6 @@ Future<List<Map<String, dynamic>>> getUnsyncedQuestionAnswerPairs() async {
       'question_answer_pairs',
       where: 'has_been_synced = 0 OR edits_are_synced = 0',
     );
-
-    QuizzerLogger.logSuccess('Fetched ${results.length} unsynced question-answer pairs.');
     return results;
   } catch (e) {
     QuizzerLogger.logError('Error getting unsynced question answer pairs - $e');
@@ -1975,8 +1894,6 @@ Future<List<Map<String, dynamic>>> getPairsWithNullMediaStatus() async {
       db,
       where: 'has_media IS NULL',
     );
-
-    QuizzerLogger.logSuccess('Fetched ${results.length} question-answer pairs with NULL has_media status.');
     return results;
   } catch (e) {
     QuizzerLogger.logError('Error getting pairs with null media status - $e');
@@ -2054,97 +1971,36 @@ Future<void> batchUpsertQuestionAnswerPairs({
     if (records.isEmpty) {
       return;
     }
-    // List of all columns in the table (excluding legacy fields that don't exist in local table)
-    final columns = [
-      'time_stamp',
-      'question_elements',
-      'answer_elements',
-      'ans_flagged',
-      'ans_contrib',
-      'qst_contrib',
-      'qst_reviewer',
-      'has_been_reviewed',
-      'flag_for_removal',
-      'module_name',
-      'question_type',
-      'options',
-      'correct_option_index',
-      'question_id',
-      'correct_order',
-      'index_options_that_apply',
-      'has_been_synced',
-      'edits_are_synced',
-      'last_modified_timestamp',
-      'has_media',
-      'answers_to_blanks',
-    ];
-
-    // Helper to get value or null/default
-    dynamic getVal(Map<String, dynamic> r, String k, dynamic def) => r[k] ?? def;
-
-    // Process and validate all records before batch processing
-    final List<Map<String, dynamic>> processedRecords = [];
     
+    // Process all records before batch processing
+    final List<Map<String, dynamic>> processedRecords = [];
+
     for (final record in records) {
-      try {
-        // Ensure all required fields are present
-        final String? questionId = record['question_id'] as String?;
-        final String? timeStamp = record['time_stamp'] as String?;
-        final String? qstContrib = record['qst_contrib'] as String?;
-        final String? lastModifiedTimestamp = record['last_modified_timestamp'] as String?;
-        final String? moduleName = record['module_name'] as String?;
-        final String? questionType = record['question_type'] as String?;
-        final String? questionElementsJson = record['question_elements'] as String?;
-        final String? answerElementsJson = record['answer_elements'] as String?;
-
-        if (questionId == null || timeStamp == null || qstContrib == null || lastModifiedTimestamp == null ||
-            moduleName == null || questionType == null || questionElementsJson == null || answerElementsJson == null) {
-          QuizzerLogger.logWarning('Skipping record with missing required fields: $questionId');
-          continue;
-        }
-
-        // Validate the data using the same validation as addQuestion functions
-        try {
-          _validateQuestionEntry(
-            moduleName: moduleName,
-            questionElements: List<Map<String, dynamic>>.from(decodeValueFromDB(questionElementsJson)),
-            answerElements: List<Map<String, dynamic>>.from(decodeValueFromDB(answerElementsJson)),
-          );
-
-          // Validate options if present (for question types that use them)
-          if (questionType == 'multiple_choice' || questionType == 'select_all_that_apply' || questionType == 'sort_order') {
-            final optionsJson = record['options'] as String?;
-            if (optionsJson != null) {
-              final options = List<Map<String, dynamic>>.from(decodeValueFromDB(optionsJson));
-              _validateQuestionOptions(options);
-            }
-          }
-        } catch (e) {
-          QuizzerLogger.logError('Validation failed for question $questionId: $e');
-          continue; // Skip this record and continue with others
-        }
-
-        // Create processed record with legacy fields removed and sync flags set
-        final Map<String, dynamic> processedRecord = Map<String, dynamic>.from(record);
-        
-        // Remove legacy fields that don't exist in local table schema
-        processedRecord.remove('citation');
-        processedRecord.remove('concepts');
-        processedRecord.remove('subjects');
-        processedRecord.remove('completed');
-        
-        // Normalize the module name
-        processedRecord['module_name'] = await normalizeString(moduleName);
-        
-        // Set sync flags to indicate synced status
-        processedRecord['has_been_synced'] = 1;
-        processedRecord['edits_are_synced'] = 1;
-        
-        processedRecords.add(processedRecord);
-      } catch (e) {
-        QuizzerLogger.logError('Error processing record: $e');
-        continue; // Skip this record and continue with others
+      final String? questionId = record['question_id'] as String?;
+      if (questionId == null) {
+        QuizzerLogger.logWarning('Skipping record with missing question_id. This record cannot be upserted.');
+        continue;
       }
+      
+      // Create processed record with legacy fields removed and sync flags set
+      final Map<String, dynamic> processedRecord = Map<String, dynamic>.from(record);
+      
+      // Remove fields not present in local schema
+      processedRecord.remove('citation');
+      processedRecord.remove('concepts');
+      processedRecord.remove('subjects');
+      processedRecord.remove('completed');
+      
+      // Normalize the module name if it exists
+      if (processedRecord['module_name'] != null) {
+        processedRecord['module_name'] = await normalizeString(processedRecord['module_name']);
+      }
+      
+      // Set sync flags to indicate synced status
+      processedRecord['has_been_synced'] = 1;
+      processedRecord['edits_are_synced'] = 1;
+      
+      processedRecords.add(processedRecord);
     }
 
     if (processedRecords.isEmpty) {
@@ -2154,30 +2010,14 @@ Future<void> batchUpsertQuestionAnswerPairs({
     for (int i = 0; i < processedRecords.length; i += chunkSize) {
       final batch = processedRecords.sublist(i, i + chunkSize > processedRecords.length ? processedRecords.length : i + chunkSize);
       
-      // Check for duplicate question_ids within this batch
-      final Set<String> questionIds = {};
-      final List<Map<String, dynamic>> deduplicatedBatch = [];
-      
-      for (final record in batch) {
-        final String? questionId = record['question_id'] as String?;
-        if (questionId != null && questionId.isNotEmpty) {
-          if (questionIds.contains(questionId)) {
-            QuizzerLogger.logWarning('Skipping duplicate question_id in batch: $questionId');
-            continue;
-          }
-          questionIds.add(questionId);
-        }
-        deduplicatedBatch.add(record);
-      }
-      
-      if (deduplicatedBatch.isEmpty) {
-        continue;
-      }
+      // Dynamically get columns from the first record in the batch
+      if (batch.isEmpty) continue;
+      final columns = batch.first.keys.toList();
       
       final values = <dynamic>[];
-      final valuePlaceholders = deduplicatedBatch.map((r) {
+      final valuePlaceholders = batch.map((r) {
         for (final col in columns) {
-          values.add(getVal(r, col, null));
+          values.add(r[col]);
         }
         return '(${List.filled(columns.length, '?').join(',')})';
       }).join(', ');
@@ -2192,7 +2032,7 @@ Future<void> batchUpsertQuestionAnswerPairs({
         if (e.toString().contains('UNIQUE constraint failed') || e.toString().contains('2067')) {
           QuizzerLogger.logWarning('Unique constraint violation in batch upsert. Falling back to individual inserts.');
           // Fall back to individual inserts for this batch
-          for (final record in deduplicatedBatch) {
+          for (final record in batch) {
             try {
               await insertRawData('question_answer_pairs', record, db, conflictAlgorithm: ConflictAlgorithm.replace);
             } catch (individualError) {

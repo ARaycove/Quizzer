@@ -58,11 +58,7 @@ class _TrueFalseQuestionWidgetState extends State<TrueFalseQuestionWidget> {
   @override
   void didUpdateWidget(covariant TrueFalseQuestionWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.questionElements != oldWidget.questionElements ||
-        widget.isCorrectAnswerTrue != oldWidget.isCorrectAnswerTrue ||
-        widget.customOrderIndices != oldWidget.customOrderIndices ||
-        widget.autoSubmitAnswer != oldWidget.autoSubmitAnswer ||
-        widget.selectedAnswer != oldWidget.selectedAnswer) {
+    if (widget.autoSubmitAnswer != oldWidget.autoSubmitAnswer || widget.selectedAnswer != oldWidget.selectedAnswer) {
        QuizzerLogger.logMessage("TrueFalseQuestionWidget didUpdateWidget: Data changed, resetting.");
       _shuffleOrderAndResetState();
     } else {
@@ -202,10 +198,14 @@ class _TrueFalseQuestionWidgetState extends State<TrueFalseQuestionWidget> {
 
           // --- Next Question Button ---
           if (_isAnswerSubmitted)
-            ElevatedButton(
-              onPressed: widget.isDisabled ? null : _handleNextQuestion, 
-              child: const Text('Next Question'),
-            ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              widthFactor: 1,
+              child: ElevatedButton(
+                onPressed: widget.isDisabled ? null : _handleNextQuestion,
+                child: const Text('Next Question'),
+              ),           
+            )
         ],
       ),
     );

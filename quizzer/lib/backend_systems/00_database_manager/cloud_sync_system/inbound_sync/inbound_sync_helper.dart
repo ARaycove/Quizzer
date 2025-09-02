@@ -2,6 +2,7 @@ import 'package:supabase/supabase.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_profile_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
+import 'package:sqflite/sqflite.dart';
 
 /// Calculates the effective initial timestamp for inbound sync filtering.
 /// This is a complex decision that balances data completeness vs performance.
@@ -55,20 +56,24 @@ Future<String> calculateEffectiveInitialTimestamp({
   }
 }
 
-/// Fetches ALL records from a Supabase table that are newer than the last login date
-/// using proper pagination to ensure we get everything.
-/// 
+/// Fetches ALL new and updated records from a Supabase table.
+///
+/// This function now includes a fallback mechanism: if the local record count
+/// for a specific table is below a hardcoded threshold, it will perform a full
+/// server sync to retrieve all records. Otherwise, it uses a timestamp-based
+/// sync to minimize server traffic by only pulling necessary records.
+///
 /// Parameters:
 /// - supabase: The Supabase client instance
 /// - tableName: The name of the table to fetch records from
-/// - userId: The user ID to get the last login date for (or null for global tables)
-/// - timestampColumn: The column name that contains the timestamp to compare against (default: 'last_modified_timestamp')
+/// - userId: The user ID (not used by this function's logic)
+/// - timestampColumn: The column name with the timestamp
 /// - pageSize: Number of records per page (default: 500)
 /// - additionalFilters: Map of column names to filter values (e.g., {'user_uuid': '123'})
-/// - useLastLogin: Whether to use last login date for filtering (default: true, set to false for global tables)
-/// 
+/// - useLastLogin: Whether to use last login date for filtering (not used by this function's logic)
+///
 /// Returns:
-/// - List<Map<String, dynamic>> containing ALL records newer than the last login date
+/// - List<Map<String, dynamic>> containing ALL new and updated records from the table.
 Future<List<Map<String, dynamic>>> fetchAllRecordsOlderThanLastLogin({
   required SupabaseClient supabase,
   required String tableName,
@@ -78,62 +83,98 @@ Future<List<Map<String, dynamic>>> fetchAllRecordsOlderThanLastLogin({
   Map<String, dynamic>? additionalFilters,
   bool useLastLogin = true,
 }) async {
-  QuizzerLogger.logMessage('Fetching ALL records from $tableName newer than last login for user: $userId');
-  
+  QuizzerLogger.logMessage('Fetching new records from $tableName using robust sync logic');
+
   try {
-    // Calculate the effective initial timestamp using the internal function
-    final String finalEffectiveLastLogin = await calculateEffectiveInitialTimestamp(
-      supabase: supabase,
-      tableName: tableName,
-      userId: userId,
-      useLastLogin: useLastLogin,
-    );
-    
-    QuizzerLogger.logMessage('Using effective last login timestamp: $finalEffectiveLastLogin');
-    
+    // Hardcoded map to force a full sync for specific tables if local count is low.
+    final Map<String, int> forceSyncCounts = {
+      'question_answer_pairs': 2200,
+    };
+
+    bool performFullSync = false;
+    if (forceSyncCounts.containsKey(tableName)) {
+      Database? db = await getDatabaseMonitor().requestDatabaseAccess();
+      String localCountQuery = 'SELECT COUNT(*) AS count FROM "$tableName"';
+      if (tableName == 'question_answer_pairs') {
+        localCountQuery += ' WHERE qst_reviewer IS NOT NULL';
+      }
+      final localCountResult = await db!.rawQuery(localCountQuery);
+      getDatabaseMonitor().releaseDatabaseAccess();
+      final int localCount = localCountResult.first['count'] as int;
+
+      if (localCount < forceSyncCounts[tableName]!) {
+        performFullSync = true;
+        QuizzerLogger.logMessage('Forcing full sync for $tableName based on hardcoded map. Local count: $localCount, Required: ${forceSyncCounts[tableName]}');
+      }
+    }
+
+    String lastLocalTimestamp = '';
+    if (!performFullSync) {
+      Database? db = await getDatabaseMonitor().requestDatabaseAccess();
+      String lastTimestampQuery = 'SELECT MAX($timestampColumn) AS last_ts FROM "$tableName"';
+      if (tableName == 'question_answer_pairs') {
+        lastTimestampQuery += ' WHERE qst_reviewer IS NOT NULL';
+      }
+      final localTimestampResult = await db!.rawQuery(lastTimestampQuery);
+      getDatabaseMonitor().releaseDatabaseAccess();
+      lastLocalTimestamp = localTimestampResult.first['last_ts'] as String? ?? '1970-01-01T00:00:00Z';
+      
+      QuizzerLogger.logMessage('Using last local timestamp: $lastLocalTimestamp');
+    }
+
     final List<Map<String, dynamic>> allRecords = [];
     int offset = 0;
     bool hasMoreRecords = true;
-    
+
     while (hasMoreRecords) {
       QuizzerLogger.logMessage('Fetching page starting at offset: $offset from $tableName');
-      
-      // Build the query with timestamp filter
-      var query = supabase
-          .from(tableName)
-          .select('*')
-          .gt(timestampColumn, finalEffectiveLastLogin);
-      
-      // Apply additional filters if provided
+
+      var query = supabase.from(tableName).select('*');
+
+      if (!performFullSync) {
+        query = query.gte(timestampColumn, lastLocalTimestamp);
+      }
+
+      // Apply additional filters
       if (additionalFilters != null) {
         for (final entry in additionalFilters.entries) {
           query = query.eq(entry.key, entry.value);
         }
       }
-      
-      // Execute the query with range
+
+      // Add the ordering and range after all filters have been applied
       final List<Map<String, dynamic>> pageData = await query
+          .order(timestampColumn, ascending: true)
           .range(offset, offset + pageSize - 1);
-      
+
       QuizzerLogger.logMessage('Fetched ${pageData.length} records from $tableName');
-      
-      // Add the page data to our accumulated results
+
       allRecords.addAll(pageData);
-      
-      // Move to next page
+
       offset += pageSize;
-      
-      // If we got less than pageSize records, we've reached the end
+
       if (pageData.length < pageSize) {
         hasMoreRecords = false;
       }
     }
-    
-    QuizzerLogger.logSuccess('Successfully fetched ALL ${allRecords.length} records from $tableName newer than last login');
-    return allRecords;
-    
+
+    // Post-fetch filtering to remove duplicates caused by `gte`
+    final List<Map<String, dynamic>> uniqueRecords = [];
+    final Set<String> seenIds = {};
+
+    for (final record in allRecords) {
+      final String questionId = record['question_id'].toString();
+      if (!seenIds.contains(questionId)) {
+        uniqueRecords.add(record);
+        seenIds.add(questionId);
+      }
+    }
+
+    QuizzerLogger.logSuccess('Successfully fetched ALL ${uniqueRecords.length} new records from $tableName');
+    return uniqueRecords;
+
   } catch (e) {
-    QuizzerLogger.logError('Error fetching records from $tableName newer than last login: $e');
+    QuizzerLogger.logError('Error fetching records from $tableName: $e');
     rethrow;
   }
 }

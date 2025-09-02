@@ -3,6 +3,7 @@ import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/UI_systems/global_widgets/question_answer_element.dart';
 import 'package:quizzer/app_theme.dart';
+import 'package:math_keyboard/math_keyboard.dart';
 
 // ==========================================
 //    Fill in the Blank Question Widget
@@ -44,12 +45,12 @@ class _FillInTheBlankQuestionWidgetState
   final SessionManager _session = SessionManager();
   
   // State for managing blank inputs
-  final Map<int, TextEditingController> _blankControllers = {};
-  List<bool> _individualBlankResults = []; // Track individual blank correctness
-  final List<bool> _blankIsMathExpression = []; // NEW: Track if each blank is a math expression
+  final Map<int, dynamic> _blankControllers = {};
+  List<bool> _individualBlankResults = [];
+  final List<bool> _blankIsMathExpression = [];
   bool _isAnswerSubmitted = false;
-  bool? _isOverallCorrect; // Null until submitted
-  List<String> formattedCorrectAnswers = [];
+  bool? _isOverallCorrect;
+  Set<String> formattedCorrectAnswers = {};
 
   @override
   void initState() {
@@ -62,11 +63,11 @@ class _FillInTheBlankQuestionWidgetState
   void didUpdateWidget(covariant FillInTheBlankQuestionWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
     // Check if core data has changed
-    if (widget.questionElements != oldWidget.questionElements ||
-        widget.questionData != oldWidget.questionData ||
-        widget.autoSubmitAnswer != oldWidget.autoSubmitAnswer ||
-        widget.customUserAnswers != oldWidget.customUserAnswers) {
+    if (widget.autoSubmitAnswer != oldWidget.autoSubmitAnswer || widget.customUserAnswers != oldWidget.customUserAnswers) {
       QuizzerLogger.logMessage("FillInTheBlankQuestionWidget didUpdateWidget: Data changed, reinitializing.");
+      QuizzerLogger.logMessage("Comparing what triggered change state widget =? oldWidget:");
+      QuizzerLogger.logMessage("autoSubmitAnswer : ${widget.autoSubmitAnswer} =? ${oldWidget.autoSubmitAnswer}");
+      QuizzerLogger.logMessage("customUserAnswers: ${widget.customUserAnswers} =? ${oldWidget.customUserAnswers}");
       _initializeControllers();
     } else {
       QuizzerLogger.logMessage("FillInTheBlankQuestionWidget didUpdateWidget: Data same, no reinit.");
@@ -74,9 +75,13 @@ class _FillInTheBlankQuestionWidgetState
   }
 
   void _initializeControllers() {
-    // Clear existing controllers and math expression states
+    // Dispose of existing controllers and clear the map
     for (var controller in _blankControllers.values) {
-      controller.dispose();
+      if (controller is TextEditingController) {
+        controller.dispose();
+      } else if (controller is MathFieldEditingController) {
+        controller.dispose();
+      }
     }
     _blankControllers.clear();
     _blankIsMathExpression.clear(); // Clear the list here
@@ -91,47 +96,43 @@ class _FillInTheBlankQuestionWidgetState
     for (int i = 0; i < widget.questionElements.length; i++) {
       final element = widget.questionElements[i];
       if (element['type'] == 'blank') {
-        final controller = TextEditingController();
+        dynamic controller;
         
-        // Get correct answer from answers_to_blanks
+        // Determine if it's a math expression
+        bool isMath = false;
         String correctAnswer = '';
         if (answersToBlanks != null && blankIndex < answersToBlanks.length) {
           correctAnswer = answersToBlanks[blankIndex].keys.first;
           
-          // NEW LOGIC: Use the ExpressionParser to determine if it's a math expression.
-          bool isMath = false;
           SessionManager sessionManager = getSessionManager();
           String valType = sessionManager.getFillInTheBlankValidationType(correctAnswer);
           if (valType == "math_expression") {
             isMath = true;
-            // modify correctAnswer since it's a math expression to have latex delimiters for the preview:
-            QuizzerLogger.logMessage("Translating $correctAnswer");
             formattedCorrectAnswers.add("\$$correctAnswer\$");
-            QuizzerLogger.logMessage("Formatted answers are now $formattedCorrectAnswers");
           } else {
             formattedCorrectAnswers.add(correctAnswer);
           }
-          _blankIsMathExpression.add(isMath);
-          QuizzerLogger.logMessage("Blank $blankIndex correct answer '$correctAnswer' is math: ${_blankIsMathExpression.last}");
-
+        }
+        _blankIsMathExpression.add(isMath);
+        
+        // CRITICAL CHANGE: Create the correct controller type
+        if (isMath) {
+          controller = MathFieldEditingController();
+          if (widget.customUserAnswers != null && blankIndex < widget.customUserAnswers!.length) {
+            controller.updateValue(TeXParser(widget.customUserAnswers![blankIndex]).parse());
+          } else if (widget.isDisabled && correctAnswer.isNotEmpty) {
+            controller.updateValue(TeXParser(correctAnswer).parse());
+          }
         } else {
-          // If no answer is found, default to non-math
-          _blankIsMathExpression.add(false);
+          controller = TextEditingController();
+          if (widget.customUserAnswers != null && blankIndex < widget.customUserAnswers!.length) {
+            controller.text = widget.customUserAnswers![blankIndex];
+          } else if (widget.isDisabled && correctAnswer.isNotEmpty) {
+            controller.text = correctAnswer;
+          }
         }
+        
         correctAnswers.add(correctAnswer);
-        
-        // Set custom user answers if provided, otherwise use correct answer for preview
-        if (widget.customUserAnswers != null && 
-            blankIndex < widget.customUserAnswers!.length) {
-          controller.text = widget.customUserAnswers![blankIndex];
-        } else if (widget.isDisabled && correctAnswer.isNotEmpty) {
-          // For preview mode, show the correct answer
-          controller.text = correctAnswer;
-          QuizzerLogger.logMessage("FillInTheBlankWidget: Set preview answer '$correctAnswer' for blank $blankIndex");
-          // Debug: Check if text was actually set
-          QuizzerLogger.logMessage("FillInTheBlankWidget: Controller text is now '${controller.text}'");
-        }
-        
         _blankControllers[i] = controller;
         blankIndex++;
       }
@@ -143,7 +144,6 @@ class _FillInTheBlankQuestionWidgetState
       _isAnswerSubmitted = true;
       _isOverallCorrect = widget.isDisabled ? true : null; // Assume correct for disabled preview
       
-      // For preview mode, validate the correct answers to set individual results
       if (widget.isDisabled && correctAnswers.isNotEmpty) {
         _individualBlankResults = List<bool>.filled(correctAnswers.length, true); // All correct in preview
         QuizzerLogger.logMessage("FillInTheBlankWidget: Auto-submit state, auto-setting submitted=true for preview with ${correctAnswers.length} correct answers.");
@@ -154,7 +154,6 @@ class _FillInTheBlankQuestionWidgetState
       _individualBlankResults = [];
     }
     
-    // Force rebuild if in preview mode to ensure text is displayed
     if (widget.isDisabled && mounted) {
       setState(() {});
     }
@@ -173,7 +172,11 @@ class _FillInTheBlankQuestionWidgetState
       if (element['type'] == 'blank') {
         final controller = _blankControllers[i];
         if (controller != null) {
-          userAnswers.add(controller.text.trim());
+          if (controller is MathFieldEditingController) {
+            userAnswers.add(controller.currentEditingValue());
+          } else if (controller is TextEditingController) {
+            userAnswers.add(controller.text);
+          }
         }
       }
     }
@@ -183,7 +186,6 @@ class _FillInTheBlankQuestionWidgetState
     });
 
     try {
-      // Use the SessionManager API directly
       final validationResult = await _session.validateFillInTheBlankAnswer(userAnswers);
       
       setState(() {
@@ -191,11 +193,8 @@ class _FillInTheBlankQuestionWidgetState
         _individualBlankResults = List<bool>.from(validationResult['ind_blanks']);
       });
 
-      // Set all submission data in SessionManager BEFORE calling submitAnswer
       _session.setCurrentQuestionUserAnswer(userAnswers);
       _session.setCurrentQuestionIsCorrect(validationResult['isCorrect']);
-      
-      // Now call submitAnswer
       _session.submitAnswer(userAnswer: userAnswers);
       QuizzerLogger.logSuccess('Answer submission initiated (Fill in the Blank).');
     } catch (e) {
@@ -213,8 +212,6 @@ class _FillInTheBlankQuestionWidgetState
     }
   }
 
-
-
   void _handleNextQuestion() {
     // Disable if needed
     if (widget.isDisabled) return;
@@ -224,9 +221,13 @@ class _FillInTheBlankQuestionWidgetState
 
   @override
   void dispose() {
-    // Dispose all controllers
+    // Dispose all controllers, checking their type first
     for (var controller in _blankControllers.values) {
-      controller.dispose();
+      if (controller is TextEditingController) {
+        controller.dispose();
+      } else if (controller is MathFieldEditingController) {
+        controller.dispose();
+      }
     }
     super.dispose();
   }
@@ -264,6 +265,7 @@ class _FillInTheBlankQuestionWidgetState
     const Color lighterIncorrectColor = Color.fromRGBO(255, 0, 0, 0.1); // Lighter red background
 
     return SingleChildScrollView(
+      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -387,10 +389,14 @@ class _FillInTheBlankQuestionWidgetState
             ),
               
           if (_isAnswerSubmitted) // Show Next only after submission
-            ElevatedButton(
-              onPressed: widget.isDisabled ? null : _handleNextQuestion,
-              child: const Text('Next Question'),
-            ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              widthFactor: 1,
+              child: ElevatedButton(
+                onPressed: widget.isDisabled ? null : _handleNextQuestion,
+                child: const Text('Next Question'),
+              ),           
+            )
         ],
       ),
     );

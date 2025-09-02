@@ -1,3 +1,4 @@
+import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/inbound_sync/inbound_sync_worker.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_profile_table.dart';
 import 'package:quizzer/backend_systems/07_user_question_management/user_question_processes.dart' show validateAllModuleQuestions;
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pair_management/question_answer_pairs_table.dart' as q_pairs_table;
@@ -47,6 +48,7 @@ import 'package:quizzer/backend_systems/00_helper_utils/file_locations.dart';
 import 'package:quizzer/backend_systems/00_database_manager/custom_queries.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/modules_table.dart' as modules_table;
 import 'package:quizzer/backend_systems/session_manager/answer_validation/text_analysis_tools.dart' as text_validation;
+import 'package:quizzer/backend_systems/06_question_queue_server/circulation_worker.dart';
 
 class SessionManager {
   // Singleton instance
@@ -397,8 +399,8 @@ class SessionManager {
     final dynamic answers = _currentQuestionDetails?['answers_to_blanks'];
     QuizzerLogger.logMessage("SessionManager currentAnswersToBlanks: _currentQuestionDetails is null: ${_currentQuestionDetails == null}");
     if (_currentQuestionDetails != null) {
-      QuizzerLogger.logMessage("SessionManager currentAnswersToBlanks: answers_to_blanks type: ${answers.runtimeType}");
-      QuizzerLogger.logMessage("SessionManager currentAnswersToBlanks: answers_to_blanks value: $answers");
+      // QuizzerLogger.logMessage("SessionManager currentAnswersToBlanks: answers_to_blanks type: ${answers.runtimeType}");
+      // QuizzerLogger.logMessage("SessionManager currentAnswersToBlanks: answers_to_blanks value: $answers");
     }
     if (answers is List) {
       return List<Map<String, List<String>>>.from(answers.map((item) {
@@ -589,35 +591,36 @@ class SessionManager {
       // then immediately mark the user as logged out for the rest of the system.
       final String? currentUserIdForLogoutOps = userId; 
       final String? currentUserEmailForLogoutOps = userEmail;
-      userLoggedIn = false; // Set userLoggedIn to false IMMEDIATELY.
       QuizzerLogger.logMessage("SessionManager: userLoggedIn flag set to false at the beginning of logoutUser.");
       QuizzerLogger.logMessage("Starting user logout process for user: $currentUserEmailForLogoutOps, Current UserID for final ops: $currentUserIdForLogoutOps");
-
-
-      // 1. Clear all pending database requests first
-      QuizzerLogger.logMessage("Clearing all pending database requests...");
-      final databaseMonitor = getDatabaseMonitor();
-      await databaseMonitor.clearAllQueues();
-      QuizzerLogger.logSuccess("Database request queues cleared.");
       
-      // 2. Stop Workers (Order might matter depending on dependencies, stop consumers first?)
+      // Stop Background Workers
       QuizzerLogger.logMessage("Stopping background workers...");
       // Get worker instances (assuming they are singletons accessed via factory)
       final psw                   = PresentationSelectionWorker();
+      final circWorker            = CirculationWorker();
+      final inboundSyncWorker     = InboundSyncWorker();
       final outboundSyncWorker    = OutboundSyncWorker(); // Get the outbound sync worker instance
       final mediaSyncWorker       = MediaSyncWorker(); // Get MediaSyncWorker instance
       
-      // Stop them and wait for current operations to complete
+      // Every stop method flips an _isRunning boolean to false, triggers one final cycle of the worker to run, waits for the completion then returns.
       await psw.stop();
-      await outboundSyncWorker.stop(); // Stop the outbound sync worker
-      await mediaSyncWorker.stop(); // Stop the media sync worker
+      await circWorker.stop();
+      await outboundSyncWorker.stop();
+      await inboundSyncWorker.stop();
+      await mediaSyncWorker.stop();
       QuizzerLogger.logSuccess("Background workers stopped.");
-      
 
-      // 2. Clear Caches (TODO: Implement clear methods in caches)
+      // Clear all pending database requests
+      QuizzerLogger.logMessage("Clearing all pending database requests...");
+      final databaseMonitor = getDatabaseMonitor();
+      await databaseMonitor.clearAllQueues();
+      QuizzerLogger.logSuccess("Database request queues cleared.");  
+
+      // Clear Caches
       QuizzerLogger.logMessage("Clearing data caches...");
-      _queueCache.          clear();
-      _historyCache.        clear();
+      await _queueCache.clear();
+      await _historyCache.clear();
       QuizzerLogger.logSuccess("Data caches cleared (Placeholder - Clear methods TBD).");
 
       QuizzerLogger.logMessage("Disposing SwitchBoard");
@@ -626,7 +629,6 @@ class SessionManager {
       if (sessionStartTime != null && currentUserIdForLogoutOps != null) { // MODIFIED: Use stored userId
         final Duration elapsedDuration = DateTime.now().difference(sessionStartTime!); // Use non-null assertion
         final double hoursToAdd = elapsedDuration.inMilliseconds / (1000.0 * 60 * 60);
-
 
         QuizzerLogger.logMessage("Updating total study time for user $currentUserIdForLogoutOps..."); // MODIFIED: Use stored userId for logging
         await updateTotalStudyTime(currentUserIdForLogoutOps, hoursToAdd); // MODIFIED: Use stored userId
@@ -643,16 +645,12 @@ class SessionManager {
          QuizzerLogger.logError("Error during Supabase sign out: $e"); 
       }
 
-      // 4. Clear local session token (ensure key matches auth logic)
-      QuizzerLogger.logMessage("Clearing local session token...");
-      await _storage.delete('supabase.auth.token'); // Assume returns Future<void>
-      QuizzerLogger.logSuccess("Local session token cleared.");
-
       // 5. Reset SessionManager state
-      _clearSessionState(); // Already logs internally
+      _clearSessionState();
 
       QuizzerLogger.printHeader("User Logout Process Completed.");
       QuizzerLogger.logMessage('Successfully completed logoutUser');
+      userLoggedIn = false;
     } catch (e) {
       QuizzerLogger.logError('Error in logoutUser - $e');
       rethrow;

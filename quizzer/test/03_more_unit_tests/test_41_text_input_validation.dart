@@ -99,7 +99,13 @@ void main() async {
         {"nucleus": ["control center", "brain of cell", "genetic headquarters"]},
         {"cytoplasm": ["cell fluid", "cellular matrix", "intracellular space"]}
       ],
-      "user_answers": ["catalyze", "powerhouse", "light reaction", "control center", "cell fluid"]
+      "user_answers": [
+        "catalyze", 
+        "powerhouse",
+        "light reaction", 
+        "control center", 
+        "cell fluid",
+        ]
     };
 
     // Answers are not correct
@@ -109,9 +115,22 @@ void main() async {
         {"mitochondria": ["powerhouse", "energy factory", "cellular power plant"]},
         {"photosynthesis": ["light reaction", "solar energy conversion", "plant food making"]},
         {"nucleus": ["control center", "brain of cell", "genetic headquarters"]},
-        {"cytoplasm": ["cell fluid", "cellular matrix", "intracellular space"]}
+        {"cytoplasm": ["cell fluid", "cellular matrix", "intracellular space"]},
+        {"generalized linear model": []},
+        {"stromatolites": []},
+        {"endosymbiosis": []},
       ],
-      "user_answers": ["protein", "ribosome", "respiration", "membrane", "vacuole"]
+      "user_answers": [
+        "protein", 
+        "ribosome", 
+        "respiration", 
+        "membrane", 
+        "vacuole",
+        // Real Case (should not have scored this correct since "additive" and "linear" model are not equivalent answers
+        "generalized additive model", // generalized linear model 
+        "stalactomites", //stromatolites
+        "endocytosis",
+        ]
     };
 
     // Answers are partially correct (some are right some are wrong)

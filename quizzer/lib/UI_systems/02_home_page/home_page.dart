@@ -90,12 +90,13 @@ class _HomePageState extends State<HomePage> { // State class
 
   @override
   Widget build(BuildContext context) {
+    final FocusNode backgroundFocusNode = FocusNode();
+
     return GestureDetector(
-      // Taps on the area covered by the GestureDetector will trigger this.
       onTap: () {
         FocusScopeNode currentFocus = FocusScope.of(context);
-        if (!currentFocus.hasPrimaryFocus) {
-          currentFocus.unfocus();
+        if (!backgroundFocusNode.hasFocus) {
+          currentFocus.requestFocus(backgroundFocusNode);
         }
       },
       child: Scaffold(
@@ -108,7 +109,10 @@ class _HomePageState extends State<HomePage> { // State class
         ),
         body: Stack(
           children: [
-            const QuizzerBackground(), // The custom background widget
+            Focus(
+              focusNode: backgroundFocusNode,
+              child: const QuizzerBackground(),
+            ),
             Column(
               children: [
                 AppTheme.sizedBoxMed,

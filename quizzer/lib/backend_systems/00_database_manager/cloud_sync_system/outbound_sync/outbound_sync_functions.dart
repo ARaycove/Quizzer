@@ -70,7 +70,6 @@ Future<bool> pushBatchToSupabase(String tableName, List<Map<String, dynamic>> re
 
     final supabase = getSessionManager().supabase;
     await supabase.rpc('execute_sql', params: {'sql': sql});
-    QuizzerLogger.logSuccess('Raw SQL batch insert successful for $tableName.');
     return true;
   } catch (e) {
     QuizzerLogger.logError('Raw SQL batch insert FAILED for $tableName: $e');
@@ -82,10 +81,6 @@ Future<bool> pushBatchToSupabase(String tableName, List<Map<String, dynamic>> re
 /// Returns true if the upsert operation completes without error, false otherwise.
 Future<bool> pushRecordToSupabase(String tableName, Map<String, dynamic> recordData) async {
   try {
-    // USE SESSION MANAGER FOR ACCESS TO SUPABASE
-    // Try to get a meaningful ID for logging, without making it a hard requirement for the function's logic.
-    String recordIdForLog = "unknown_id";
-
     final supabase = getSessionManager().supabase;
     Map<String, dynamic> payload = Map.from(recordData);
     payload.remove('has_been_synced');
@@ -95,9 +90,7 @@ Future<bool> pushRecordToSupabase(String tableName, Map<String, dynamic> recordD
         payload[key] = 1.0;
       }
     });
-    QuizzerLogger.logValue('Pushing to $tableName. Payload: $payload');
     await supabase.from(tableName).upsert(payload);
-    QuizzerLogger.logSuccess('Supabase upsert successful for record $recordIdForLog to $tableName.');
     return true;
   } on PostgrestException catch (e) {
     // Handle Supabase-specific errors (network, policy violations, etc.)
@@ -112,9 +105,7 @@ Future<bool> pushRecordToSupabase(String tableName, Map<String, dynamic> recordD
           payload[key] = 1.0;
         }
       });
-      QuizzerLogger.logValue('Pushing to $tableName (insert fallback). Payload: $payload');
       await supabase.from(tableName).insert(payload);
-      QuizzerLogger.logSuccess('Supabase insert successful for record to $tableName.');
       return true;
     } on PostgrestException catch (e2) {
       QuizzerLogger.logError('Supabase insert FAILED for record to $tableName: ${e2.message} (Code: ${e2.code})');
@@ -220,7 +211,6 @@ Future<bool> updateRecordWithCompositeKeyInSupabase(
     }
     await query; // Executes the update query
 
-    // QuizzerLogger.logSuccess('Supabase update with composite key successful for ($filterLog) in $tableName.');
     return true;
   } on PostgrestException catch (e) {
     // Handle Supabase-specific errors (network, policy violations, etc.)

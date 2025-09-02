@@ -1,4 +1,5 @@
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
+import 'package:quizzer/backend_systems/07_user_question_management/user_question_processes.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_profile_table.dart';
 import 'package:quizzer/backend_systems/02_login_authentication/user_auth.dart';
@@ -17,6 +18,8 @@ import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/ou
 import 'package:quizzer/backend_systems/00_helper_utils/utils.dart';
 import 'package:quizzer/backend_systems/02_login_authentication/verify_all_tables.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/system_data/login_attempts_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/modules_table.dart';
+
 
 // Spin up necessary processes and get userID from local profile, effectively intialize any session specific variables that should only be brought after successful login
 Future<String?> initializeSession(Map<String, dynamic> data) async {
@@ -331,8 +334,12 @@ Future<Map<String, dynamic>> loginInitialization({
       
       // Update stats using the stat update aggregator - this creates daily records
       await updateAllUserDailyStats(sessionManager.userId!);
-      // TODO Add call to confirm update of all modules (Are all questions that the user subscribed to in their profile?)
-      
+
+      // Ensure no missing modules
+      await ensureAllQuestionModuleNamesHaveCorrespondingModuleRecords();
+
+      // Ensure no missing user question records
+      await validateAllModuleQuestions(session.userId!);
       
       QuizzerLogger.logSuccess('Settings cache and stats updated successfully');
     }

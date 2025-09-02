@@ -22,6 +22,7 @@ class OutboundSyncWorker {
   // --- Worker State ---
   bool _isRunning = false;
   bool _syncNeeded = false;
+  bool _inWaitingCycle = false;
   StreamSubscription? _signalSubscription;
   // --------------------
 
@@ -64,6 +65,9 @@ class OutboundSyncWorker {
     
     // Wait for current sync cycle to complete before returning
     QuizzerLogger.logMessage('OutboundSyncWorker: Waiting for current sync cycle to complete...');
+    // Trigger it to cycle at least one more time, just in case it's waiting for a signal
+    _inWaitingCycle = false; // Force the worker to leave the waiting loop
+    signalOutboundSyncNeeded();
     await _switchBoard.onOutboundSyncCycleComplete.first;
     QuizzerLogger.logMessage('OutboundSyncWorker: Current sync cycle completed.');
     
@@ -71,6 +75,12 @@ class OutboundSyncWorker {
     QuizzerLogger.logMessage('OutboundSyncWorker stopped.');
   }
   // ----------------------
+  Future<void> _doWaitingcycle() async {
+    _inWaitingCycle = true;
+    await Future.delayed(const Duration(seconds: 30));
+    _inWaitingCycle = false;
+  }
+
 
   // --- Main Loop ---
   Future<void> _runLoop() async {
@@ -81,7 +91,11 @@ class OutboundSyncWorker {
       final bool isConnected = await _checkConnectivity();
       if (!isConnected) {
         QuizzerLogger.logMessage('OutboundSyncWorker: No network connectivity, waiting 5 minutes before next attempt...');
-        await Future.delayed(const Duration(minutes: 5));
+        _inWaitingCycle = true;
+        while (_inWaitingCycle) {
+          await Future.delayed(const Duration(minutes: 5));
+          _inWaitingCycle = false;
+        }
         continue;
       }
       
@@ -96,7 +110,15 @@ class OutboundSyncWorker {
       
       // Add cooldown period to prevent infinite loops from self-signaling
       QuizzerLogger.logMessage('OutboundSyncWorker: Sync completed, entering 30-second cooldown...');
-      await Future.delayed(const Duration(seconds: 30));
+      // FIXME wait logic interferes with prompt shutting down of the worker on logout
+      _doWaitingcycle(); // Don't care if this returns, just trigger the boolean to true, and flip back to false after 30 seconds
+      // redundancy because explicit
+      _inWaitingCycle = true;
+      while (_inWaitingCycle) {
+        // If we're in a waiting cycle do nothing at all, loop should break when _inWaitingCycle is flipped
+        await Future.delayed(const Duration(minutes: 60));
+      }
+      
       
       // Check if sync is needed after cooldown
       if (_syncNeeded) {
@@ -109,8 +131,8 @@ class OutboundSyncWorker {
         QuizzerLogger.logMessage('OutboundSyncWorker: Woke up by sync signal.');
       }
     }
-    
     QuizzerLogger.logMessage('OutboundSyncWorker loop finished.');
+    signalOutboundSyncCycleComplete();
   }
   // -----------------
 

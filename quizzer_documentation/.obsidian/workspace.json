@@ -198,6 +198,7 @@
   },
   "left-ribbon": {
     "hiddenItems": {
+      "bases:Create new base": false,
       "switcher:Open quick switcher": false,
       "graph:Open graph view": false,
       "canvas:Create new canvas": false,
@@ -207,7 +208,7 @@
       "obsidian-excalidraw-plugin:New drawing": false
     }
   },
-  "active": "d47008925d227bd1",
+  "active": "d249bbc500d5d831",
   "lastOpenFiles": [
     "temp_notes.md",
     "Diagrams/Quizzer_Flow_Chart.md",

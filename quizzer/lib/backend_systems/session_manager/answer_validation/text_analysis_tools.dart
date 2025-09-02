@@ -174,3 +174,6 @@ Future<bool> validateStringAnswer(String userAnswer, String correctAnswer) async
   return similarityResult["success"];
 }
 
+Future<double> getFuzzyScoreForTypo(String userAnswer, String correctAnswer) async {
+  return fuzzy.ratio(userAnswer,correctAnswer).toDouble();
+}

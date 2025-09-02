@@ -73,10 +73,7 @@ class _MultipleChoiceQuestionWidgetState
     // Check if the core data has actually changed before resetting state
     // Basic check: if options list instance changes, reload.
     // More robust checks might compare question content if needed.
-    if (widget.options != oldWidget.options || 
-        widget.correctOptionIndex != oldWidget.correctOptionIndex ||
-        widget.customOrderIndices != oldWidget.customOrderIndices ||
-        widget.autoSubmitAnswer != oldWidget.autoSubmitAnswer ||
+    if (widget.autoSubmitAnswer != oldWidget.autoSubmitAnswer ||
         widget.selectedIndex != oldWidget.selectedIndex) {
         QuizzerLogger.logMessage("MultipleChoiceQuestionWidget didUpdateWidget: Data changed, shuffling.");
         _loadAndShuffleOptions();
@@ -344,11 +341,14 @@ class _MultipleChoiceQuestionWidgetState
 
           // --- Next Question Button --- 
           if (_isAnswerSubmitted)
-            ElevatedButton(
-              // Disable onPressed if isDisabled
-              onPressed: widget.isDisabled ? null : _handleNextQuestion,
-              child: const Text('Next Question'),
-            ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              widthFactor: 1,
+              child: ElevatedButton(
+                onPressed: widget.isDisabled ? null : _handleNextQuestion,
+                child: const Text('Next Question'),
+              ),           
+            )
         ],
       ),
     );

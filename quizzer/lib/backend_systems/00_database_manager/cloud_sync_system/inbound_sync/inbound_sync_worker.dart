@@ -53,12 +53,7 @@ class InboundSyncWorker {
     }
 
     _isRunning = false;
-    
-    // Wait for current sync cycle to complete before returning
-    QuizzerLogger.logMessage('InboundSyncWorker: Waiting for current sync cycle to complete...');
-    await _switchBoard.onInboundSyncCycleComplete.first;
-    QuizzerLogger.logMessage('InboundSyncWorker: Current sync cycle completed.');
-    
+    // Inbound sync worker only triggers on login, thus this will always be waiting infinitely if we wait on a signal    
     QuizzerLogger.logMessage('InboundSyncWorker stopped.');
   }
   // ----------------------

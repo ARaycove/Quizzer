@@ -62,7 +62,6 @@ Future<String> _readLogFileContent() async {
 
 /// Verifies the existence and schema of the error_logs table.
 Future<void> verifyErrorLogsTable(dynamic db) async {
-  QuizzerLogger.logMessage('Verifying $_errorLogsTableName table...');
   final List<Map<String, dynamic>> tables = await db.rawQuery(
     "SELECT name FROM sqlite_master WHERE type='table' AND name='$_errorLogsTableName'"
   );
@@ -376,8 +375,6 @@ Future<List<Map<String, dynamic>>> getUnsyncedErrorLogs() async {
         filteredRecords.add(truncatedRecord);
       }
     }
-
-    QuizzerLogger.logSuccess('Fetched ${allUnsyncedRecords.length} total unsynced records. ${filteredRecords.length} are older than 1 hour.');
     return filteredRecords;
   } catch (e) {
     // Check if this is the specific cursor window error

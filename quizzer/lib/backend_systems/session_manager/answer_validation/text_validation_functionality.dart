@@ -39,19 +39,23 @@ import 'package:math_keyboard/math_keyboard.dart';
 // -----------------------------------------
 
 
-// examine keywords fields,
-// for each keyword get list of synonyms,
-//    for synonym in keyword:
-//    1. tokenize synonym, 
-//    2. see if token is in the input
-//    3. if tokenized synonym matched,
-//        - replace with tokenized keyword.
 
+final Set<String> exactEvalCases = {
+"==", "!=", "isdigit()", "++",'System.out.println("Hello, World");'
+};
+final Set<String> typoCheckOnlyCases = {
+"endosymbiosis", "stromatolites", "generalized linear model", "adenosine triphosphate"
+};
 /// Determines the validation type based on the content of the answer.
 String getValidationType(String answer) {
-  // 1. Try to parse the answer as a number first.
-  final Set<String> exactEvalCases = {"==", "!="};
+  
+
+
+  // 2. Typo check only
+  
+
   String selectedType;
+  // 1. Try to parse the answer as a number first. (we're using try because it throws an error if the statement isn't parsable, so try then catch the error if we get it)
   try {
     TeXParser(answer).parse();
     // If the parse is successful, it's a valid math expression.
@@ -60,7 +64,12 @@ String getValidationType(String answer) {
     // if TexParser fails to parse we'll evaluate whether to do exact string match or similiarity string match
     if (exactEvalCases.contains(answer)) {
       selectedType = "exact_string_match";
-    } else {selectedType = 'string';}
+    } 
+    else if (typoCheckOnlyCases.contains(answer)) {
+      selectedType = "typo_check_only";
+    }
+    
+    else {selectedType = 'string';}
   }
   QuizzerLogger.logMessage("Evaluation type for this option is: $selectedType");
   return selectedType;
@@ -76,6 +85,10 @@ Future<bool> validateMathExpressionAnswer(String userAnswer, String correctAnswe
   return returnValue;
 }
 
+Future<bool> validateStringWithTypoCheck(String userAnswer, String correctAnswer) async{
+  double fuzzyScore = await getFuzzyScoreForTypo(userAnswer, correctAnswer);
+  return fuzzyScore >= 0.80;
+}
 
 
 Future<bool> validateExactMatch(String userAnswer, String correctAnswer) async{
@@ -111,6 +124,7 @@ Future<Map<String, dynamic>> validateFillInTheBlank(Map<String, dynamic> questio
       'math_expression': validateMathExpressionAnswer,
       'string': validateStringAnswer,
       'exact_string_match': validateExactMatch,
+      'typo_check_only': validateStringWithTypoCheck,
       // 'code': validateCodeAnswer,
     };
     

@@ -10,18 +10,26 @@ Pushed 2.1.0
 - reset password page with authentication setup (webpage?)
 
 ## Implementation TODO:
-[] Add a reset user password page
+* [] Add a reset user password page
 
-[] Figure out how to validate user session within the app
+* [] Figure out how to validate user session within the app
 - Perhaps we can figure out how to send an email out that when clicked opens a specific page on the app itself, thus the only way to access the reset user password section of the app is through the email link?
 
-[] Will need to rigoursly test logout/login/logout/login cycle works and doesn't break the system. Currently there is some kind of issue regarding if we logout, existing processes are not closed properly. This is a login issue, and goes under the minor update
+* [] Will need to rigoursly test logout/login/logout/login cycle works and doesn't break the system. Currently there is some kind of issue regarding if we logout, existing processes are not closed properly. This is a login issue, and goes under the minor update
 
 * [] Refactor Outbound sync to:
   * First gather all records from all tables that are unsynced ALL AT ONCE
   * Future.wait / gather all records to be pushed and push them in a batch asynchronously
   * Once the overall payload is back, check all values, and clean up accordingly
+
 ## Bug Fixes
+* [] Math field does not expand to fit the what's entered into it
+* [] Logout function does not properly return
+  * Perhaps the issue is that the menu page, immediately sends us back to the home page allowing us to login again before the logout cycle is done.
+  * [x] added await to the menu_page.dart await session.logoutUser() Further testing required at this point.
+  * [x] Outbound sync worker did not return stoppage, stuck waiting, thus added extra outboundSyncComplete signal for the stop function.
+    * Potential delay, if sync worker is in its 30 second wait cycle when logout is clicked.
+    * could solve with a new waiting while loop, and an additional method. The method will wait 30 seconds then flip the sentinel value breaking the loop, this would leave us open to flipping the sentinel value ourselves:
 * [] Math validation should not allow the question to be entered as the answer
   * if userAnswer matches exactly the question, then it should not allow it to work
     * but if the correctAnswer is basic, then this doesn't fly
@@ -33,13 +41,12 @@ Pushed 2.1.0
   * evaluation function would evaluate both the same factored and non-factored version
   * so data structure needs to be updated. . .?
     * But this needs to be a more automatic determination
+
 * [] Some question answer attempt records ARE NOT syncing and triggering an RLS violation. . .
   * Appears to be intermittent, as many attempt records do get synced
 
 * [] Matrix latex elements with fractions inside, formatted fraction elements need padding on top to prevent overlap
 
-* [] If a user edits a question, it does not persist across logins, this means if I make an edit to something, the edit is pushed to the admin for review, but on next login, is reverted back to the unedited state. (Feature or Bug)?
-  * I am contemplating removing the edit button from the main home page entirely, regular users would still have the ability to flag a question still sending it to the admin. flagging a question removes it from that users account until the question is reviewed upon which the question is restored to the user
 * [] User States: "Android version needs some bottom margin on pages, preventing widgets from getting partially hidden."
   * snackbar pop-ups and margin cutoff on android are blocking the use of the next question button and submit answer buttons. Adding a bottom margin the height of the snackbar would remove this issue
 
@@ -48,6 +55,40 @@ Pushed 2.1.0
 * [] User States: Occasionally we get an app crash if I close my phone, then when I reopen the app I return to an error screen
 
 ## Miscellaneous Addition might get pushed to later updates
+* [] Add ability to navigate using just the keyboard
+  * [] number keys select options, if press 1 selects first option (or de-selects)
+* [] Add category Computer Science:
+* [] Add sub-categories under Computer Science Category:
+  * [] Learn Python
+  * [] Learn Java
+  * [] Learn Dart
+
+* [] True False Button options need to be bigger and more tactile, right now they are tiny
+
+* [] Add \pm option to the math keyboard
+  * [] do testing on evaluation function to ensure validation works with \pm
+
+* [] Next Question and Submit Answer should always float at the bottom of the screen, rather than be part of the main DOM
+  * [] fill in the blank widget updated
+  * [] multiple choice question widget updated
+  * [] select all that apply widget updated
+  * [] sort order widget updated
+  * [] true false widget updated
+* [] Should autofocus to the Next Question button when it appears
+  * [] fill in the blank widget updated
+  * [] multiple choice question widget updated
+  * [] select all that apply widget updated
+  * [] sort order widget updated
+  * [] true false widget updated
+* [] Add keyboard dismiss behavior on drag to all question widgets
+  * [x] fill in the blank widget updated
+  * [] multiple choice question widget updated
+  * [] select all that apply widget updated
+  * [] sort order widget updated
+  * [] true false widget updated
+
+
+* [] Need to add variable n and r to the mathfield
 * [] Synonym fields in the add question interface should also allow for math expressions
 * [] Add font-size settings to settings page
   * [] font-size for math elements
@@ -79,6 +120,28 @@ Second to address would be the update to the math_expressions library to allow e
 
 # Tutorial Update:
 This update will focus on adding info icons and tutorial to Quizzer to introduce new  user's to the platform, there are a lot of moving parts and a tutorial goes a long way to help a new user figure out what the hell is going on.
+## Tutorial Points to Touch on:
+### Home Page Display
+#### Flag Question Button
+* [] Initial user will have no questions so tutorial will have to bring up a mock flag for the user to interact with
+#### Question Display
+* [] Math.tex is a horizontally scrolling, user will need to shift-scroll to see full expression or on mobile will have to swipe on it to see the whole equation.
+#### Menu
+
+
+
+# Admin tools expansion
+Some extra tools to make it easier to comb through and review the state of questions in Quizzer
+## Review Module Questions Tool
+### Features
+* [] Review Questions button in admin tool section of the modules page
+* [] Counter at top to show progress of the list of questions in the module
+* [] Arrow selection to skip to n# question in the module (for if admin doesn't get through all n questions)
+* [] Pull in review panel tool interface
+  * [] delete option
+  * [] edit option
+  * [] approve edit option (No direct push, require additional layer of validation from main panel)
+  * [] Should pull the question_id locally and pull the question record from the server directly
 
 # Automation Update:
 
@@ -154,7 +217,6 @@ Optional questionairre that will set all interest levels based on a series of qu
 * [ ] Add a back button for the review panels, requested by admin
 
 # Academic Archive Update:
-
 ## Keyword definitions table
 
 * [ ] Need to define the sql table for this

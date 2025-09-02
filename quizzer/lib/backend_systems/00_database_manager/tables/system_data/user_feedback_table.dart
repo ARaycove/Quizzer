@@ -148,8 +148,6 @@ Future<List<Map<String, dynamic>>> getUnsyncedUserFeedback() async {
       db,
       where: 'has_been_synced = 0', 
     );
-
-    QuizzerLogger.logSuccess('Fetched ${unsyncedFeedback.length} unsynced user feedback records.');
     return unsyncedFeedback;
   } catch (e) {
     QuizzerLogger.logError('Error getting unsynced user feedback - $e');

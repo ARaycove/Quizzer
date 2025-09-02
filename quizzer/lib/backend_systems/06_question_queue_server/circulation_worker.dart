@@ -65,6 +65,7 @@ class CirculationWorker {
       _isRunning = false;
       await _questionAnsweredSubscription?.cancel();
       QuizzerLogger.logMessage('CirculationWorker: Unsubscribed from all streams.');
+      QuizzerLogger.logMessage('Circulation Worker Stopped');
     } catch (e) {
       QuizzerLogger.logError('Error stopping CirculationWorker - $e');
       rethrow;

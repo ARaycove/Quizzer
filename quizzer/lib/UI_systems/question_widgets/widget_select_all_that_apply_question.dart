@@ -65,10 +65,7 @@ class _SelectAllThatApplyQuestionWidgetState
   @override
   void didUpdateWidget(covariant SelectAllThatApplyQuestionWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.options != oldWidget.options || 
-        widget.correctIndices != oldWidget.correctIndices ||
-        widget.customOrderIndices != oldWidget.customOrderIndices ||
-        widget.autoSubmitAnswer != oldWidget.autoSubmitAnswer ||
+    if (widget.autoSubmitAnswer != oldWidget.autoSubmitAnswer ||
         widget.selectedIndices != oldWidget.selectedIndices) {
         QuizzerLogger.logMessage("SelectAllThatApplyQuestionWidget didUpdateWidget: Data changed, shuffling.");
         _loadAndShuffleOptions();
@@ -372,14 +369,14 @@ class _SelectAllThatApplyQuestionWidgetState
               
           // Only show Next if submitted (isDisabled doesn't affect Next button display, only onPressed)
           if (_isAnswerSubmitted) 
-             Padding(
-               padding: const EdgeInsets.only(top: 8.0),
-               child: ElevatedButton(
-                 // Disable onPressed if isDisabled
-                 onPressed: widget.isDisabled ? null : _handleNextQuestion,
-                 child: const Text('Next Question'),
-               ),
-             ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              widthFactor: 1,
+              child: ElevatedButton(
+                onPressed: widget.isDisabled ? null : _handleNextQuestion,
+                child: const Text('Next Question'),
+              ),           
+            )
         ],
       ),
     );

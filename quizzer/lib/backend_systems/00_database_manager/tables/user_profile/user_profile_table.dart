@@ -422,7 +422,6 @@ Future<List<Map<String, dynamic>>> getUnsyncedUserProfiles(String userId) async 
       whereArgs: [userId], // Use the passed userId parameter
     );
 
-    QuizzerLogger.logSuccess('Fetched ${results.length} unsynced user profiles for user $userId.');
     return results;
   } catch (e) {
     QuizzerLogger.logError('Error fetching unsynced user profiles for user ID: $userId - $e');

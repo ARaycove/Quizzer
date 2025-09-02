@@ -1,5 +1,48 @@
-# Variable and Focus Update 2.1.0
+# Update 2.?.?
 
+## Misc. Changes:
+* [x] Added inboundSyncWorker.stop() call to the logout function
+* [x] logout function was deleting persistent storage information, removed this removal code
+* [x] cleaned up vibe coded comments (No longer using AI as an agent to write code)
+    * removed logging statements related to fetching unsynced records. . . No longer needed at the moment, cluttered the logs. No I'm going to list everything i removed
+* [x] Added typo check only string validation path, for specific cases (mostly for scientific terminology)
+* [x] inbound Sync now based on pagination, and how many records exists locally, if 2000 question answer pairs exist locally, and 2500 exist on the server, then pagination request for all records will start at 1999-N,
+
+## Data Pipeline
+* Added a data pipeline script that fetches the question answer pair data, vectorizes that data, then performs k-means clusters and PCA analysis on that data.
+  * Initial results are very interesting, effective, but a little noisy given the lack of data, it has effectively grouped all math, and most of history related topics togethers.
+
+## Bug Fixes:
+* [x] added call to login init:
+  * [x] login init now ensures all modules referenced by questions have a corresponding module record
+  * [x] login init now ensures that all questions that should be in the user profile are in the user profile
+* [x] didUpdateWidget needs to be updated to not refresh the page on click, like we did for multi choice and fillInTheBlank
+  * [x] select all that apply widget updated
+  * [x] sort order widget updated
+  * [x] true false widget updated
+* [x] If a user edits a question, it does not persist across logins, this means if I make an edit to something, the edit is pushed to the admin for review, but on next login, is reverted back to the unedited state. (Feature or Bug)?
+  * I am contemplating removing the edit button from the main home page entirely, regular users would still have the ability to flag a question still sending it to the admin. flagging a question removes it from that users account until the question is reviewed upon which the question is restored to the user
+  * [x] Removed the edit question button from the home page, user's can still flag questions to mark them as needing rework
+* [x] While values are being fixed the bug persists. Resolved, updates to didUpdateWidget and change to its conditions
+    * Whenever focus is granted to the background widget (click off to a non-widget portion of the screen) it triggers the home page to rebuild it's question widget. This rebuilding of the question widget appears to what is causing the primary issue.
+    * In order to resolve we need to figure out how to prevent the home page from rebuilding itself whenever a user clicks off into the background.
+* [x] Values not being passed correctly for fill in the blank
+  * [x] Refactored WidgetBlank, ElementRenderer and FillInTheBlank to pass a single controller, for fill in the blank questions the main question widget is now the single source of truth for which controller is passed to the WidgetBlank
+  * [x] home page build method GestureDetector Jank was the source of the issue. It was setup to tell everything to drop focus. This how now been changed to pass focus to the background if we click off, this has removed the issue with all focus is lost and the TextFields clear themselves as a result. Maybe something deep is going on. But this was the cause of the JANK
+  * If we lose focus then hit submit, a value of null is passed to the validation function
+  * MATHFIELD:
+    * [x] tab to submit answer works
+    * [x] clicking directly on submit answer works (while the math keyboard is still up)
+    * [x] clicking on background then on submit answer fails
+  * TEXTFIELD:
+    * [x] typing in blank works normally
+    * [x] clicking off the blank causes the blank widgets textfield to clear
+    * [x] clicking directly onto submit answer causes the blank widgets textfield to clear resulting in incorrect answer
+* [x] User States they filled a blank, the app deleted the information they types then marked it wrong
+* [x] User States that the correct answers are being duplicated in the Correct Answers portion of the fill in the blank question widget
+  * [x] changed formattedCorrectAnswers to a set, to avoid duplication
+
+# Update 2.1.0 - Variable and Focus 
 ## Content Changes
 * [x] Need to add variables to the math keyboard z, a, b, c
   * [x] added to blank widget MathField

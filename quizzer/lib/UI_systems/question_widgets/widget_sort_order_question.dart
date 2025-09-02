@@ -62,10 +62,7 @@ class _SortOrderQuestionWidgetState extends State<SortOrderQuestionWidget> {
   void didUpdateWidget(covariant SortOrderQuestionWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
     // Check if core data has changed
-    if (!const ListEquality().equals(widget.options, oldWidget.options) ||
-        !const ListEquality().equals(widget.questionElements, oldWidget.questionElements) ||
-        widget.customOrderIndices != oldWidget.customOrderIndices ||
-        widget.autoSubmitAnswer != oldWidget.autoSubmitAnswer ||
+    if (widget.autoSubmitAnswer != oldWidget.autoSubmitAnswer ||
         widget.customUserOrder != oldWidget.customUserOrder) {
       QuizzerLogger.logMessage(
           "SortOrderQuestionWidget didUpdateWidget: Data changed, resetting.");
@@ -417,10 +414,14 @@ class _SortOrderQuestionWidgetState extends State<SortOrderQuestionWidget> {
             ),
               
           if (_isAnswerSubmitted) // Show Next only after submission
-             ElevatedButton(
-               onPressed: widget.isDisabled ? null : _handleNextQuestion, // Respect isDisabled
-               child: const Text('Next Question'),
-             ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              widthFactor: 1,
+              child: ElevatedButton(
+                onPressed: widget.isDisabled ? null : _handleNextQuestion,
+                child: const Text('Next Question'),
+              ),           
+            )
         ],
       ),
     );
