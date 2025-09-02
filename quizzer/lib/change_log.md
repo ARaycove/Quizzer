@@ -1,4 +1,4 @@
-# Update 2.?.?
+# Update 2.2.0
 
 ## Misc. Changes:
 * [x] Added inboundSyncWorker.stop() call to the logout function
