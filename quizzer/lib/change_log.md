@@ -1,6 +1,10 @@
+# Update 2.2.1
+* [x] added variables, p, n, r, k to the math keyboard
+
 # Update 2.2.0
 
 ## Misc. Changes:
+
 * [x] Added inboundSyncWorker.stop() call to the logout function
 * [x] logout function was deleting persistent storage information, removed this removal code
 * [x] cleaned up vibe coded comments (No longer using AI as an agent to write code)

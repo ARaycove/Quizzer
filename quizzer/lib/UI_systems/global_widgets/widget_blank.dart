@@ -118,7 +118,7 @@ class WidgetBlankState extends State<WidgetBlank> {
     
     if (widget.isMathExpression) {
       inputField = MathField(
-        variables: const ["x", "y", "z", "a", "b", "c"],
+        variables: const ["x", "y", "z", "a", "b", "c", "n", "k", "r", "p"],
         controller: widget.controller,
         // The onChanged callback still updates the controller on every keystroke
         onChanged: _updateControllerValue,

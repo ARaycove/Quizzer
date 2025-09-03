@@ -41,7 +41,7 @@ import 'package:math_keyboard/math_keyboard.dart';
 
 
 final Set<String> exactEvalCases = {
-"==", "!=", "isdigit()", "++",'System.out.println("Hello, World");'
+"==", "!=", "isdigit()", "++",'System.out.println("Hello, World");', "a'b", "sudo dpkg -i filename.deb",
 };
 final Set<String> typoCheckOnlyCases = {
 "endosymbiosis", "stromatolites", "generalized linear model", "adenosine triphosphate"

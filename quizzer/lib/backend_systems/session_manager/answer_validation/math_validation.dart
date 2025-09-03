@@ -52,7 +52,7 @@ Future<bool> evaluateMathExpressionsEquivalent({
     QuizzerLogger.logWarning("FormatException caught: One or both expressions are malformed.");
     return false;
   }
-  List<String> variables = ["x", "y", "z", "a", "b", "c", "θ"];
+  List<String> variables = ["x", "y", "z", "a", "b", "c", "n", "k", "r", "p"];
 
   var context = ContextModel()
     ..bindVariable(Variable(variables[0]), Number(2.0))
@@ -61,7 +61,11 @@ Future<bool> evaluateMathExpressionsEquivalent({
     ..bindVariable(Variable(variables[3]), Number(4))
     ..bindVariable(Variable(variables[4]), Number(5))
     ..bindVariable(Variable(variables[5]), Number(6))
-    ..bindVariable(Variable(variables[6]), Number(180));
+    ..bindVariable(Variable(variables[6]), Number(7))
+    ..bindVariable(Variable(variables[7]), Number(8))
+    ..bindVariable(Variable(variables[8]), Number(9))
+    ..bindVariable(Variable(variables[9]), Number(10));
+
 
   // Docs:
   //

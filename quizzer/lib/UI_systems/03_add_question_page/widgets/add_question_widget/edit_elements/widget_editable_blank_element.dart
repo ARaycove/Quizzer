@@ -454,7 +454,7 @@ class _EditableBlankElementState extends State<EditableBlankElement> {
   Widget _buildPrimaryAnswerField() {
     if (_isMathAnswer) {
       return MathField(
-          variables: const ["x", "y", "z", "a", "b", "c"],
+          variables: const ["x", "y", "z", "a", "b", "c", "n", "k", "r", "p"],
           controller: _mathAnswerController,
           onChanged: (texString) {
             _updatePrimaryAnswerText(texString);
