@@ -1,3 +1,7 @@
+# What is this?
+This is the change_log, whenever the team (myself currently) goes to build the next update, we will pull all changes made from the update_plans.md. Anything that was actually done, and checked off will be moved to here, where those details will remain permanently. This is a working document, and update_plans.md is also a working document.
+New updates will be posted to the top of the file. At time of writing the current version is 1.0.3 and is being updated with patch 1.0.4
+
 # Update 2.2.1
 * [x] added variables, p, n, r, k to the math keyboard
 
@@ -104,7 +108,7 @@ This is not backwards compatible since prior to 2.0.0 there is no logic to parse
 * [x] math keyboard stayed in focus even though we left the page
 * [x] math keyboard crashed the program if we lose focus and the expression is invalid. -> add question page resolved
 
-# Update 1.0.4 PUSHED
+# Update 1.0.4 Patch Fix
 Some of these were in patch updates 1.0.3 and below, so there.
 * [x] Admin states that new questions added to already activated modules are NOT being added to the his profile
   * Likely the check was removed by the old coding agent, and the removal was not caught by the admin who did that refactor
@@ -147,8 +151,3 @@ in offline and does not have the sync mechanism enabled this check does not need
     * when adding a synonym to a fill in the blank question, focus is immediately given to the synonym field to be added 
 - Logs show that the network issue for compare_question.dart triggered, and handled the network error without crashing the program. Good!
 
-# What is this?
-
-This is the change_log, whenever the team (myself currently) goes to build the next update, we will pull all changes made from the update_plans.md. Anything that was actually done, and checked off will be moved to here, where those details will remain permanently. This is a working document, and update_plans.md is also a working document.
-
-New updates will be posted to the top of the file. At time of writing the current version is 1.0.3 and is being updated with patch 1.0.4
