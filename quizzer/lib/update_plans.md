@@ -1,36 +1,51 @@
-Before we do anything we need a more streamlined approach to automated build and version updating
+Bug Fixes are important, they are however a part of the backlog, and there will always be plenty of bugs to fix, for now. Anything listed under "## bug fixes" can be pushed to the next update, or included as a patch update at any point.
 
-# Login Streamline update 2.1.0:
-Pushed 2.1.0
-- update login page with
-  [] login with google
-  [] login with facebook
-  [] login with github
-  [] login with . . .
-- reset password page with authentication setup (webpage?)
+We are using the semantic versioning system n.n.n ==> Major.Minor.Patch
+
+Where major updates break compatability with previous versions
+Minor updates add features and other visible changes
+Patch updates are for bug fixes that don't add features, or for optimizations that the user does not see
+
+
+# Login Streamline update 2.?.?:
+The goal of this update is to:
+1. Ensure the login and logout flow works properly, that any asynchronous workers are closed, that the state of the app is completely reset for a new login attempt
+2. Ensure no keys are exposed, and security is up to standard
+3. Fix build issues
+4. Have a pipeline that makes it easy to push updates and package the app for distribution
+
 
 ## Implementation TODO:
+* [] update login page with
+  * [] login with google
+  * [] login with facebook
+  * [] login with github
+  * [] login with . . . (other social accounts as possible)
 * [] Add a reset user password page
+  - Currently there is no way for a user to properly reset their password, if they forget their password they get locked out of their account for good.
+  * [] Figure out how to validate user session within the app? Since there is no website domain for quizzer to utilize, so if there's a way to do this without a web app, that would be better
+  - Perhaps we can figure out how to send an email out that when clicked opens a specific page on the app itself, thus the only way to access the reset user password section of the app is through the email link?
+  * [] reset password page with authentication setup (webpage?) 
 
-* [] Figure out how to validate user session within the app
-- Perhaps we can figure out how to send an email out that when clicked opens a specific page on the app itself, thus the only way to access the reset user password section of the app is through the email link?
+* [] Will need to rigoursly test logout/login/logout/login cycle works and doesn't break the system. Currently there is some kind of issue regarding if we logout, existing processes are not closed properly. This is related to the login/logout process
+  * [] Logout function does not properly return
+    * Perhaps the issue is that the menu page, immediately sends us back to the home page allowing us to login again before the logout cycle is done.
+    * [x] added await to the menu_page.dart await session.logoutUser() Further testing required at this point.
+    * [x] Outbound sync worker did not return stoppage, stuck waiting, thus added extra outboundSyncComplete signal for the stop function.
+      * Potential delay, if sync worker is in its 30 second wait cycle when logout is clicked.
+      * could solve with a new waiting while loop, and an additional method. The method will wait 30 seconds then flip the sentinel value breaking the loop, this would leave us open to flipping the sentinel value ourselves:
 
-* [] Will need to rigoursly test logout/login/logout/login cycle works and doesn't break the system. Currently there is some kind of issue regarding if we logout, existing processes are not closed properly. This is a login issue, and goes under the minor update
+* [] Security sweep
+  * Ensure all environment variables and access is secure and nothing is exposed that shouldn't be exposed.
+  * Currently supabase.client has hardcoded access URL and such
 
-* [] Refactor Outbound sync to:
-  * First gather all records from all tables that are unsynced ALL AT ONCE
-  * Future.wait / gather all records to be pushed and push them in a batch asynchronously
-  * Once the overall payload is back, check all values, and clean up accordingly
+## Resolve bugs relating to login flow:
+
 
 ## Bug Fixes
 * [] Math field does not expand to fit the what's entered into it
-* [] Logout function does not properly return
-  * Perhaps the issue is that the menu page, immediately sends us back to the home page allowing us to login again before the logout cycle is done.
-  * [x] added await to the menu_page.dart await session.logoutUser() Further testing required at this point.
-  * [x] Outbound sync worker did not return stoppage, stuck waiting, thus added extra outboundSyncComplete signal for the stop function.
-    * Potential delay, if sync worker is in its 30 second wait cycle when logout is clicked.
-    * could solve with a new waiting while loop, and an additional method. The method will wait 30 seconds then flip the sentinel value breaking the loop, this would leave us open to flipping the sentinel value ourselves:
-* [] Math validation should not allow the question to be entered as the answer
+
+* [] Math validation should not allow the question to be entered as the answer (assuming the question is to transform the equation into some other form)
   * if userAnswer matches exactly the question, then it should not allow it to work
     * but if the correctAnswer is basic, then this doesn't fly
     * Perhaps some way to determine how many steps away the userAnswer is from the correctAnswer
@@ -42,32 +57,51 @@ Pushed 2.1.0
   * so data structure needs to be updated. . .?
     * But this needs to be a more automatic determination
 
-* [] Some question answer attempt records ARE NOT syncing and triggering an RLS violation. . .
-  * Appears to be intermittent, as many attempt records do get synced
-
 * [] Matrix latex elements with fractions inside, formatted fraction elements need padding on top to prevent overlap
 
 * [] User States: "Android version needs some bottom margin on pages, preventing widgets from getting partially hidden."
   * snackbar pop-ups and margin cutoff on android are blocking the use of the next question button and submit answer buttons. Adding a bottom margin the height of the snackbar would remove this issue
 
-* [] Circulation worker does not properly remove excess new questions, allowing too many new questions to overload the user. Should have some kind of mechanism that will remove only revision score 0 questions from circulation
-
 * [] User States: Occasionally we get an app crash if I close my phone, then when I reopen the app I return to an error screen
 
 ## Miscellaneous Addition might get pushed to later updates
-* [] Add ability to navigate using just the keyboard
-  * [] number keys select options, if press 1 selects first option (or de-selects)
-* [] Add category Computer Science:
-* [] Add sub-categories under Computer Science Category:
-  * [] Learn Python
-  * [] Learn Java
-  * [] Learn Dart
 
+* [] User Setting: Shrink or Wrap options with default Wrap for math related latex. If Shrink the font size of a latex element will shrink to fit the screen, if wrap the latex element will wrap over to a new line to avoid cutting off text
+* [] Fix Environment variables (Credentials should be stored securely)
+
+* [] overhaul adding images, allow an option to choose from existing images in the system or to upload a new image (this will help prevent duplicating the same image file many times over)
+* [] copy paste image support for add question interface
+* [] Add setting and option to display next revision day project after answering a question
+* [] Need to update QuizzerLogger such that I can trigger a level specific logging on a file by file basis
+
+# Update 2.?.?: Expansion of math_keyboard and math_expressions, initial changes to UI
+Not sure what's going on with the team that built the math_keyboard, permissions say modification and distributions is fine. I am considering taking the field and completely rebuilding it. Names and all, and package it internally inside quizzer as a "global widget":
+
+- Goal is to be able to type math expressions using a keyboard, and provide a built in field that actively renders that latex
+- Current iteration write a TeX string, which means anything goes, and should be able to update easily based on the full library of TeX, but the iteration is hyper-limited to only some
+
+- Then for question validation that tex string should then be evaluated down to value. So we neeed:
+  * [] ability to type any mathematical notation through a custom keyboard
+  * [] ability to evaluate any mathematical notation down to a number
+
+Second to address would be the update to the math_expressions library to allow evaluation of the 
+* [] Update TeXParser
+  * converts TeX string $\frac{x}{y}$ to computer readable expression
+* [] Update ExpressionParser
+  * takes a parsed TeX string and evaluates the result, by directly injecting variables with real values
+
+## Other minor changes
+* [] Synonym fields in the add question interface should also allow for math expressions
 * [] True False Button options need to be bigger and more tactile, right now they are tiny
-
 * [] Add \pm option to the math keyboard
   * [] do testing on evaluation function to ensure validation works with \pm
-
+* [] Refactor Outbound sync to:
+  * First gather all records from all tables that are unsynced ALL AT ONCE
+  * Future.wait / gather all records to be pushed and push them in a batch asynchronously
+  * Once the overall payload is back, check all values, and clean up accordingly
+* [] Add ability to navigate using just the keyboard
+  * [] number keys select options, if press 1 selects first option (or de-selects)
+  * Navigation of the app should be possible without needing the mouse (assuming we are on a desktop)
 * [] Next Question and Submit Answer should always float at the bottom of the screen, rather than be part of the main DOM
   * [] fill in the blank widget updated
   * [] multiple choice question widget updated
@@ -80,16 +114,6 @@ Pushed 2.1.0
   * [] select all that apply widget updated
   * [] sort order widget updated
   * [] true false widget updated
-* [] Add keyboard dismiss behavior on drag to all question widgets
-  * [x] fill in the blank widget updated
-  * [] multiple choice question widget updated
-  * [] select all that apply widget updated
-  * [] sort order widget updated
-  * [] true false widget updated
-
-
-* [] Need to add variable n and r to the mathfield
-* [] Synonym fields in the add question interface should also allow for math expressions
 * [] Add font-size settings to settings page
   * [] font-size for math elements
     * [] additional info icon to explain that math font size is larger due to exponents and readability
@@ -98,25 +122,15 @@ Pushed 2.1.0
   * [] font-size for everything else
     * [] add setting value to settings page
     * [] add setting value to table
-* [] User Setting: Shrink or Wrap options with default Wrap for math related latex. If Shrink the font size of a latex element will shrink to fit the screen, if wrap the latex element will wrap over to a new line to avoid cutting off text
-* [] Fix Environment variables (Credentials should be stored securely)
+
+## Additional User Settings:
 * [] User Settings: auto-submit multiple choice questions (default behavior is to auto-matically submit the selected option)
   * this settings would disable the auto-submit behavior and make it so the user needs to hit the submit answer button on multiple choice questions
-* [] overhaul adding images, allow an option to choose from existing images in the system or to upload a new image (this will help prevent duplicating the same image file many times over)
-* [] copy paste image support for add question interface
-* [] Add setting and option to display next revision day project after answering a question
-* [] Need to update QuizzerLogger such that I can trigger a level specific logging on a file by file basis
 
-# Update: Expansion of math_keyboard and math_expressions
-Not sure what's going on with the team that built the math_keyboard, permissions say modification and distributions is fine. I am considering taking the field and completely changing it. Names and all, and package it internally inside quizzer as a "global widget"
-- Goal is to be able to type math expressions using a keyboard, and provide a built in field that actively renders that latex
-- Current iteration write a TeX string, which means anything goes, and should be able to update easily based on the full library of TeX, but the iteration is hyper-limited to only some
-
-Second to address would be the update to the math_expressions library to allow evaluation of the 
-* [] Update TeXParser
-  * converts TeX string $\frac{x}{y}$ to computer readable expression
-* [] Update ExpressionParser
-  * takes a parsed TeX string and evaluates the result, by directly injecting variables with real values
+## Bug Fixes:
+* [] Some question answer attempt records ARE NOT syncing and triggering an RLS violation. . .
+  * Appears to be intermittent, as many attempt records do get synced
+* [] Circulation worker does not properly remove excess new questions, allowing too many new questions to overload the user. Should have some kind of mechanism that will remove only revision score 0 questions from circulation
 
 # Tutorial Update:
 This update will focus on adding info icons and tutorial to Quizzer to introduce new  user's to the platform, there are a lot of moving parts and a tutorial goes a long way to help a new user figure out what the hell is going on.
