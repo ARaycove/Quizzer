@@ -14,7 +14,6 @@ The goal of this update is to:
 3. Fix build issues
 4. Have a pipeline that makes it easy to push updates and package the app for distribution
 
-
 ## Implementation TODO:
 * [] update login page with
   * [] login with google
@@ -65,10 +64,8 @@ The goal of this update is to:
 * [] User States: Occasionally we get an app crash if I close my phone, then when I reopen the app I return to an error screen
 
 ## Miscellaneous Addition might get pushed to later updates
-
 * [] User Setting: Shrink or Wrap options with default Wrap for math related latex. If Shrink the font size of a latex element will shrink to fit the screen, if wrap the latex element will wrap over to a new line to avoid cutting off text
 * [] Fix Environment variables (Credentials should be stored securely)
-
 * [] overhaul adding images, allow an option to choose from existing images in the system or to upload a new image (this will help prevent duplicating the same image file many times over)
 * [] copy paste image support for add question interface
 * [] Add setting and option to display next revision day project after answering a question
@@ -131,6 +128,14 @@ Second to address would be the update to the math_expressions library to allow e
 * [] Some question answer attempt records ARE NOT syncing and triggering an RLS violation. . .
   * Appears to be intermittent, as many attempt records do get synced
 * [] Circulation worker does not properly remove excess new questions, allowing too many new questions to overload the user. Should have some kind of mechanism that will remove only revision score 0 questions from circulation
+
+
+# Update ?.?.? Coding blocks
+The goal of this update is to add to the fill_in_the_blank capabilities, specifically the ability to use ``` ``` delimiters to mark an answer as a code block, which will then be displayed correctly.
+Ideally we will replicate the entry format that you see in popular markdown editors such as obsidian. To where we can write up whatever we please in markdown to flexibally achieve any possible format.
+
+The challenge lies in the interaction and validation of these questions, not necessarily the ability to format them.
+
 
 # Tutorial Update:
 This update will focus on adding info icons and tutorial to Quizzer to introduce new  user's to the platform, there are a lot of moving parts and a tutorial goes a long way to help a new user figure out what the hell is going on.

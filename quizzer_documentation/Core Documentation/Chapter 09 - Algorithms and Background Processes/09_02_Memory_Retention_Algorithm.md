@@ -56,3 +56,38 @@ def calculate_next_revision_date(status: str, question_object:dict): #Private Fu
         question_object["next_revision_due"] = datetime.now()    
     return question_object
 ```
+
+## Model Selection
+
+### Output:
+What is the probablity that if you were to be asked this question time now, that you would get it correct:
+
+
+### Input Vectors
+
+user_question_answer_pair record -> $UQ_1$
+-  The user_question_answer_ pair record is the aggregate history of all attempts the user has made with this specific question
+-  Specifically {revision_steak, in_circulation, total_attempts, last_revised, current_time, first_attempt, days_since_last_revision}
+	-  **revision_streak** is calculated by adding one if user answered it correctly, and subtracting one if the user answers incorrectly. The higher this score is the more accurate they've been
+	-  **total_attempts**: The total number of times answered
+	-  **first_attempt**: Was this the first attempt at this question by the user
+	-  **last_revised**: The date the user last answered this question, can be null
+	-  **days_since_last_revision**: floating point value showing in days, how long since last revision
+	-  **current_time**: Not stored in the permanent record but to be used for the probability calculation
+	-  **question_vector**: The vector representing the question itself numerically, calculated using a transformer
+immediately_related user_question_answer_pair records denoted R-> $R_1 \dots R_k$ 
+
+cluster_location -> C
+- The cluster_location id that the k-means clustering algorithm determined the question belongs to
+-  Vector C 
+- ```dart
+  {
+  total_questions_in_cluster: //int
+  total_attempts_in_cluster: //int
+  overall_accuracy_in_cluster: //percentile
+  total_in_circulation:
+  total_out_circulation:
+  percent_in_circulation:
+  dimension_reduced_vector_rep_of_cluster: // Extracted vector of where the centroid of the cluster is (may or may not be meaningful)
+  }
+  ```

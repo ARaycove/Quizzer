@@ -1,4 +1,8 @@
-
+# Feature Extraction
+Given the question data set, we need to extract multiple features:
+-  The vectorized question data itself
+-  The K-nearest neighbors for each question record (which questions are immediately similar)
+-  K-means clustering, applying the cluster_id to the question record
 # Question Selection Algorithm
 After a user answers a question and submits a response, which question in the database should be presented next?
 
