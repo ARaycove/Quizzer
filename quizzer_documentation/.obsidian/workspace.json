@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Core Documentation/Chapter 09 - Algorithms and Background Processes/09_02_Memory_Retention_Algorithm.md",
+                "file": "Core Documentation/Chapter 09 - Algorithms and Background Processes/09_00_Feature_Outline.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "09_02_Memory_Retention_Algorithm"
+              "title": "09_00_Feature_Outline"
             }
           },
           {
@@ -118,8 +118,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 281.5,
-    "collapsed": true
+    "width": 281.5
   },
   "right": {
     "id": "1361b1d659fdf502",
@@ -213,7 +212,16 @@
   },
   "active": "d47008925d227bd1",
   "lastOpenFiles": [
+    "Core Documentation/Chapter 09 - Algorithms and Background Processes/Neural-Net Layer.md",
+    "Core Documentation/Chapter 09 - Algorithms and Background Processes/09_00_Feature_Outline.md",
+    "Pasted image 20250906115039.png",
+    "Core Documentation/Chapter 09 - Algorithms and Background Processes/09_02_Memory_Retention_Algorithm.md",
     "Core Documentation/Chapter 09 - Algorithms and Background Processes/09_01_Central_Algorithms_Overview.md",
+    "Core Documentation/Chapter 09 - Algorithms and Background Processes/09_03_Question_Circulation_Selection_Algorithm.md",
+    "Core Documentation/Chapter 09 - Algorithms and Background Processes/09_04_Question_Selection_Algorithm.md",
+    "Core Documentation/Chapter 09 - Algorithms and Background Processes/09_10_Data_Synchronization_Background_Process.md",
+    "Core Documentation/Chapter 09 - Algorithms and Background Processes/Untitled.base",
+    "z_dev_curiosity.md",
     "Diagrams/Question_Answer_Pair_Generation.md",
     "Diagrams/Quizzer_Flow_Chart.md",
     "temp_notes.md",
@@ -233,14 +241,6 @@
     "Core Documentation/Chapter 04 - Technical Architecture Philosophy, Design Principles, and Ethical Considerations/04_07_Research_Implementation_Gap.md",
     "Core Documentation/Chapter 04 - Technical Architecture Philosophy, Design Principles, and Ethical Considerations/04_05_Content_Moderation.md",
     "Core Documentation/Chapter 04 - Technical Architecture Philosophy, Design Principles, and Ethical Considerations/04_04_Technical_Design_Principles.md",
-    "Core Documentation/Chapter 04 - Technical Architecture Philosophy, Design Principles, and Ethical Considerations/04_03_UI_UX_Philosophy.md",
-    "Core Documentation/Chapter 04 - Technical Architecture Philosophy, Design Principles, and Ethical Considerations/04_03_Software_Design_Philosophy.md",
-    "Core Documentation/Chapter 04 - Technical Architecture Philosophy, Design Principles, and Ethical Considerations/04_03_Core_Technical_Philosophy.md",
-    "Core Documentation/Chapter 04 - Technical Architecture Philosophy, Design Principles, and Ethical Considerations/04_02_Ethical_Framework.md",
-    "Core Documentation/Chapter 04 - Technical Architecture Philosophy, Design Principles, and Ethical Considerations/04_01_Epistemology_The Foundation of Education.md",
-    "Core Documentation/Chapter 03 - Research Methodology/03_06_Task_03_Answer_Questions.md",
-    "Core Documentation/Chapter 03 - Research Methodology/03_05_Task_02_Question_Answer_Pair_Generation.md",
-    "Core Documentation/Chapter 03 - Research Methodology/03_04_Task_01_Source_Material_Generation_and_Classification.md",
     "Untitled.canvas",
     "Core Documentation/Chapter 00 - Project Overview and Guidelines/general-guidelines.mdc",
     "Core Documentation/Chapter 00 - Project Overview and Guidelines",
@@ -252,7 +252,6 @@
     "Excalidraw",
     "Quizzer_Logo.png",
     "Core Documentation/Chapter 07 - Functions",
-    "Core Documentation/Chapter 09 - Algorithms and Background Processes",
-    "Core Documentation/Chapter 08 - Database"
+    "Core Documentation/Chapter 09 - Algorithms and Background Processes"
   ]
 }

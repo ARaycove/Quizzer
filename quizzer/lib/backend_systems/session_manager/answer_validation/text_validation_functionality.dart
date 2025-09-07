@@ -42,9 +42,11 @@ import 'package:math_keyboard/math_keyboard.dart';
 
 final Set<String> exactEvalCases = {
 "==", "!=", "isdigit()", "++",'System.out.println("Hello, World");', "a'b", "sudo dpkg -i filename.deb",
+"java example one two three", "boolean myValue = true;"
 };
 final Set<String> typoCheckOnlyCases = {
-"endosymbiosis", "stromatolites", "generalized linear model", "adenosine triphosphate"
+"endosymbiosis", "stromatolites", "generalized linear model", "adenosine triphosphate",
+"cumulative distribution function", "probability density", "prior probability"
 };
 /// Determines the validation type based on the content of the answer.
 String getValidationType(String answer) {

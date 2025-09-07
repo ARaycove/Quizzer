@@ -130,6 +130,9 @@ Second to address would be the update to the math_expressions library to allow e
 * [] Circulation worker does not properly remove excess new questions, allowing too many new questions to overload the user. Should have some kind of mechanism that will remove only revision score 0 questions from circulation
 
 
+# Update ?.?.?: Module system rework
+For the planned circulation algorithm, the module system will work as the method by which user's "seed" their initial profile. Thus this update will focus on optimizes the display modules page and fix any bugs relating to this system.
+
 # Update ?.?.? Coding blocks
 The goal of this update is to add to the fill_in_the_blank capabilities, specifically the ability to use ``` ``` delimiters to mark an answer as a code block, which will then be displayed correctly.
 Ideally we will replicate the entry format that you see in popular markdown editors such as obsidian. To where we can write up whatever we please in markdown to flexibally achieve any possible format.
@@ -163,32 +166,14 @@ Some extra tools to make it easier to comb through and review the state of quest
   * [] Should pull the question_id locally and pull the question record from the server directly
 
 # Automation Update:
-
 This update will introduce the internal machine learning model that will allow Quizzer to improve dynamically as more data comes
-
 Deadline: New Years (after I take the Machine Learning Class)
+
+See quizzer_documentation for details on the model design
 
 ## Define our model [ ]
 
 ### Model Definitions
-
-Define the specifics of the model and the vector embedding themselves
-
-* [ ] Define input layer definitions
-  * [ ] Task Prompt
-    * [ ] Short statement that tells the model what needs to be done should always be a binary request as not to confuse the model
-  * [ ] User Information
-  * [ ] Context Window
-* [ ] Define Number of layers
-* [ ] Define Size of each layer
-* [ ] Define Output Layer and Activation function
-  * [ ] Output Layer
-    * [ ] Will be float 0 to 1
-    * [ ] Single output
-    * [ ] Activation function will vary based on Task Prompt?
-      * [ ] use the sigmoid activation for classification tasks
-      * [ ] use raw value for relationship tasks (To what extent is x related to y)
-      * [ ] for date outputs define custom activation function to convert float value to a date
 
 ### Storage:
 
