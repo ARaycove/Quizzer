@@ -42,19 +42,15 @@ import 'package:math_keyboard/math_keyboard.dart';
 
 final Set<String> exactEvalCases = {
 "==", "!=", "isdigit()", "++",'System.out.println("Hello, World");', "a'b", "sudo dpkg -i filename.deb",
-"java example one two three", "boolean myValue = true;"
+"java example one two three", "boolean myValue = true;", "int[][] twoD_arr = new int[10][20];"
 };
 final Set<String> typoCheckOnlyCases = {
 "endosymbiosis", "stromatolites", "generalized linear model", "adenosine triphosphate",
-"cumulative distribution function", "probability density", "prior probability"
+"cumulative distribution function", "probability density", "prior probability", "charged", "uncharged"
 };
 /// Determines the validation type based on the content of the answer.
 String getValidationType(String answer) {
-  
-
-
   // 2. Typo check only
-  
 
   String selectedType;
   // 1. Try to parse the answer as a number first. (we're using try because it throws an error if the statement isn't parsable, so try then catch the error if we get it)
