@@ -20,6 +20,7 @@ The goal of this update is to:
   * [] login with facebook
   * [] login with github
   * [] login with . . . (other social accounts as possible)
+  
 * [] Add a reset user password page
   - Currently there is no way for a user to properly reset their password, if they forget their password they get locked out of their account for good.
   * [] Figure out how to validate user session within the app? Since there is no website domain for quizzer to utilize, so if there's a way to do this without a web app, that would be better
