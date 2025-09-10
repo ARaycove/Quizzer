@@ -12,28 +12,29 @@ The goal of this update is to:
 1. Ensure the login and logout flow works properly, that any asynchronous workers are closed, that the state of the app is completely reset for a new login attempt
 2. Ensure no keys are exposed, and security is up to standard
 3. Fix build issues
-4. Have a pipeline that makes it easy to push updates and package the app for distribution
+
 
 ## Implementation TODO:
+* [] logout, closes processes and kills the app (include splash screen)
+  * [] Will need to rigoursly test logout/login/logout/login cycle works and doesn't break the system. Currently there is some kind of issue regarding if we logout, existing processes are not closed properly. This is related to the login/logout process
+    * [] Logout function does not properly return
+      * Perhaps the issue is that the menu page, immediately sends us back to the home page allowing us to login again before the logout cycle is done.
+      * [x] added await to the menu_page.dart await session.logoutUser() Further testing required at this point.
+      * [x] Outbound sync worker did not return stoppage, stuck waiting, thus added extra outboundSyncComplete signal for the stop function.
+        * Potential delay, if sync worker is in its 30 second wait cycle when logout is clicked.
+        * could solve with a new waiting while loop, and an additional method. The method will wait 30 seconds then flip the sentinel value breaking the loop, this would leave us open to flipping the sentinel value ourselves:
+        
 * [] update login page with
   * [] login with google
   * [] login with facebook
   * [] login with github
   * [] login with . . . (other social accounts as possible)
-  
+
 * [] Add a reset user password page
   - Currently there is no way for a user to properly reset their password, if they forget their password they get locked out of their account for good.
   * [] Figure out how to validate user session within the app? Since there is no website domain for quizzer to utilize, so if there's a way to do this without a web app, that would be better
   - Perhaps we can figure out how to send an email out that when clicked opens a specific page on the app itself, thus the only way to access the reset user password section of the app is through the email link?
   * [] reset password page with authentication setup (webpage?) 
-
-* [] Will need to rigoursly test logout/login/logout/login cycle works and doesn't break the system. Currently there is some kind of issue regarding if we logout, existing processes are not closed properly. This is related to the login/logout process
-  * [] Logout function does not properly return
-    * Perhaps the issue is that the menu page, immediately sends us back to the home page allowing us to login again before the logout cycle is done.
-    * [x] added await to the menu_page.dart await session.logoutUser() Further testing required at this point.
-    * [x] Outbound sync worker did not return stoppage, stuck waiting, thus added extra outboundSyncComplete signal for the stop function.
-      * Potential delay, if sync worker is in its 30 second wait cycle when logout is clicked.
-      * could solve with a new waiting while loop, and an additional method. The method will wait 30 seconds then flip the sentinel value breaking the loop, this would leave us open to flipping the sentinel value ourselves:
 
 * [] Security sweep
   * Ensure all environment variables and access is secure and nothing is exposed that shouldn't be exposed.
@@ -139,7 +140,7 @@ The goal of this update is to add to the fill_in_the_blank capabilities, specifi
 Ideally we will replicate the entry format that you see in popular markdown editors such as obsidian. To where we can write up whatever we please in markdown to flexibally achieve any possible format.
 
 The challenge lies in the interaction and validation of these questions, not necessarily the ability to format them.
-
+4. Have a pipeline that makes it easy to push updates and package the app for distribution
 
 # Tutorial Update:
 This update will focus on adding info icons and tutorial to Quizzer to introduce new  user's to the platform, there are a lot of moving parts and a tutorial goes a long way to help a new user figure out what the hell is going on.

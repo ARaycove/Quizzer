@@ -1,6 +1,12 @@
 # What is this?
 This is the change_log, whenever the team (myself currently) goes to build the next update, we will pull all changes made from the update_plans.md. Anything that was actually done, and checked off will be moved to here, where those details will remain permanently. This is a working document, and update_plans.md is also a working document.
 New updates will be posted to the top of the file. At time of writing the current version is 1.0.3 and is being updated with patch 1.0.4
+# Update 
+
+..
+..
+..
+
 
 # Update 2.2.1
 * [x] added variables, p, n, r, k to the math keyboard
