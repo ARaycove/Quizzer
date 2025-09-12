@@ -46,7 +46,8 @@ final Set<String> exactEvalCases = {
 };
 final Set<String> typoCheckOnlyCases = {
 "endosymbiosis", "stromatolites", "generalized linear model", "adenosine triphosphate",
-"cumulative distribution function", "probability density", "prior probability", "charged", "uncharged"
+"cumulative distribution function", "probability density", "prior probability", "charged", "uncharged",
+"positively", "negatively"
 };
 /// Determines the validation type based on the content of the answer.
 String getValidationType(String answer) {
@@ -85,7 +86,14 @@ Future<bool> validateMathExpressionAnswer(String userAnswer, String correctAnswe
 
 Future<bool> validateStringWithTypoCheck(String userAnswer, String correctAnswer) async{
   double fuzzyScore = await getFuzzyScoreForTypo(userAnswer, correctAnswer);
-  return fuzzyScore >= 0.80;
+  // Identity (These cases the algorithm is not properly detecting)
+
+  if (correctAnswer == "positively" && userAnswer == "negatively") {return false;}
+  else if (correctAnswer == "negativley" && userAnswer == "positively") {return false;}
+  else if (correctAnswer.contains("sexual") && userAnswer.contains("asexual")) {return false;} // A typo check sees an added "A" as a typo, instead of a negation modifier to the word
+  else if (correctAnswer.contains("asexual") && !userAnswer.contains("asexual")) {return false;} // if the correct answer is asexual the user answer must contain asexual, if the (a) is not included it is wrong
+
+  return fuzzyScore >= 0.90;
 }
 
 

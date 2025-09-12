@@ -226,6 +226,7 @@ class SessionManager {
   Map<String, dynamic>? get currentQuestionUserRecord => _currentQuestionRecord;
   Map<String, dynamic>? get currentQuestionStaticData => _currentQuestionDetails;
   String?               get initialProfileLastModified => _initialProfileLastModified;
+  
   // How will a fill in the blank be evaluated?
   String getFillInTheBlankValidationType(primaryAnswer) {
     return getValidationType(primaryAnswer);
