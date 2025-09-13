@@ -49,6 +49,21 @@ final Set<String> typoCheckOnlyCases = {
 "cumulative distribution function", "probability density", "prior probability", "charged", "uncharged",
 "positively", "negatively"
 };
+
+// Bad Cases:
+// The following table, provides cases that should be marked valid or invalid, but currently the text validation does not handle this properly
+/*
+| Correct Answer              | Provided Answer               | Valid | Why? |
+| "evaporative cooling"       | "evaporation"                 | No    | These are not equivalent in meaning, one is a general term and one is more specific
+| "positively"                | "negatively"                  | No    | Not equivalent in meaning 
+| "charged"                   | "uncharged"                   | No    | charged != uncharged
+| "generalized linear model"  | "generalized additive model"  | No    | linear models and additive models are not the same thing, just because they are both generalized models does not mean this is correct
+| "asexual reproduction"      | "sexual reproduction"         | No    | One is WITH and one is WITHOUT, algorithm needs to handle semantic meaning not similarity
+
+
+*/
+
+
 /// Determines the validation type based on the content of the answer.
 String getValidationType(String answer) {
   // 2. Typo check only
@@ -90,7 +105,6 @@ Future<bool> validateStringWithTypoCheck(String userAnswer, String correctAnswer
 
   if (correctAnswer == "positively" && userAnswer == "negatively") {return false;}
   else if (correctAnswer == "negativley" && userAnswer == "positively") {return false;}
-  else if (correctAnswer.contains("sexual") && userAnswer.contains("asexual")) {return false;} // A typo check sees an added "A" as a typo, instead of a negation modifier to the word
   else if (correctAnswer.contains("asexual") && !userAnswer.contains("asexual")) {return false;} // if the correct answer is asexual the user answer must contain asexual, if the (a) is not included it is wrong
 
   return fuzzyScore >= 0.90;
