@@ -1,66 +1,211 @@
-Quizzer: [10:37:12] [34m[INFO][0m [<asynchronous suspension>] QuizzerLogger successfully set up file logging to: ./QuizzerAppLogs/quizzer_log.txt
-Quizzer: [10:37:12] [34m[INFO][0m [<asynchronous suspension>] QuizzerLogger: Attempting a SECOND test log message to file.
-Quizzer: [10:37:12] [34m[INFO][0m [how_many_lines.dart] Calculating total lines of code...
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart] 
---- Line Count Summary ---
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart] Total_Backend_Systems: 24338
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart] Total_UI_Systems:      14980
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart] Total_Test_Lines:      13177
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart] --------------------------
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart] Total_Lines:           52495
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart] --------------------------
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart] 
---- Backend Systems Breakdown (recursive, alphabetical) ---
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart] 00_database_manager/                      16528
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart] ├── cloud_sync_system/                         2616
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart] │   ├── inbound_sync/                               510
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart] │   └── outbound_sync/                             1804
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart] ├── data_consistency/                           153
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart] ├── platform/                                    65
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart] ├── review_system/                              662
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart] └── tables/                                   12394
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart]     ├── academic_archive.dart/                     2014
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart]     │   └── relationship_data/                          214
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart]     ├── question_answer_pair_management/           2774
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart]     ├── system_data/                                902
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart]     └── user_profile/                              5426
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart]         └── user_stats/                                2822
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart] 00_helper_utils/                            262
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart] 02_login_authentication/                    899
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart] 03_account_creation/                        134
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart] 04_module_management/                       490
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart] 06_question_queue_server/                   832
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart] 07_user_question_management/                112
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart] 08_memory_retention_algo/                    90
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart] 09_data_caches/                             402
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart] 10_switch_board/                            746
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart] 11_ai_management/                           247
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart] 12_subject_concept_classifier/                0
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart] logger/                                     391
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart] session_manager/                           3205
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart] └── answer_validation/                          611
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart] 
---- UI Systems Breakdown (recursive, alphabetical) ---
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart] 00_login_page/                              261
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart] 01_new_user_page/                           271
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart] 02_home_page/                               895
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart] └── stat_display_section/                       331
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart] 03_add_question_page/                      4304
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart] ├── helpers/                                    173
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart] └── widgets/                                   3347
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart]     └── add_question_widget/                       2585
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart]         └── edit_elements/                             1721
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart] 04_display_modules_page/                   1592
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart] └── module_card/                               1101
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart] 05_menu_page/                               163
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart] 06_admin_panel/                             845
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart] 07_critical_error_page/                     303
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart] 08_settings_page/                          1153
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart] └── individual_setting_widgets/                 811
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart]     └── stat_display_widgets/                       690
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart] 09_feedback_page/                           176
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart] 10_stats_page/                             1523
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart] └── stat_widgets/                               990
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart] UI_Utils/                                    73
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart] global_widgets/                            1578
-Quizzer: [10:37:13] [34m[INFO][0m [how_many_lines.dart] question_widgets/                          1843
+Quizzer: [14:59:04] [34m[INFO][0m [<asynchronous suspension>] QuizzerLogger successfully set up file logging to: ./QuizzerAppLogs/quizzer_log.txt
+Quizzer: [14:59:04] [34m[INFO][0m [<asynchronous suspension>] QuizzerLogger: Attempting a SECOND test log message to file.
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] enzyme Sim Score: 0.4
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] Sim score below threshold, additional checks required
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] enzyme => enyzme; Levenshteing_ratio: 83.0
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] mitochondria Sim Score: 0.7272727272727273
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] photosynthesis Sim Score: 0.88
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] chlorophyll Sim Score: 0.9473684210526315
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] nucleus Sim Score: 0.6666666666666666
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] cytoplasm Sim Score: 0.8235294117647058
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] ribosome Sim Score: 0.7692307692307693
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] endoplasmic Sim Score: 0.8421052631578947
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] reticulum Sim Score: 0.8
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] lysosome Sim Score: 0.7692307692307693
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] vacuole Sim Score: 0.9090909090909091
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] chromosome Sim Score: 0.8235294117647058
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] deoxyribonucleic Sim Score: 0.896551724137931
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] adenosine Sim Score: 0.8
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] triphosphate Sim Score: 0.8571428571428571
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] glycolysis Sim Score: 0.8235294117647058
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] fermentation Sim Score: 0.7
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] respiration Sim Score: 0.8
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] metabolism Sim Score: 0.9411764705882353
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] catalysis Sim Score: 0.8
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] substrate Sim Score: 0.8
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] activation Sim Score: 0.8235294117647058
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] inhibition Sim Score: 0.625
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] diffusion Sim Score: 0.9333333333333333
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] osmosis Sim Score: 0.9090909090909091
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] Term                 | Typo                 | Sim Score  | Leven Score  | Bool  |
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] -------------------- | -------------------- | ---------- | ------------ | ----- |
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] enzyme               | enyzme               | 0.400      | 83.0         | true  |
+mitochondria         | mitochondira         | 0.727      | null         | true  |
+photosynthesis       | photosyntheis        | 0.880      | null         | true  |
+chlorophyll          | chlorophyl           | 0.947      | null         | true  |
+nucleus              | nucleas              | 0.667      | null         | true  |
+cytoplasm            | cytoplasam           | 0.824      | null         | true  |
+ribosome             | ribosme              | 0.769      | null         | true  |
+endoplasmic          | endoplasic           | 0.842      | null         | true  |
+reticulum            | reticulm             | 0.800      | null         | true  |
+lysosome             | lysosme              | 0.769      | null         | true  |
+vacuole              | vacuol               | 0.909      | null         | true  |
+chromosome           | chromosme            | 0.824      | null         | true  |
+deoxyribonucleic     | deoxyribonuclic      | 0.897      | null         | true  |
+adenosine            | adenosne             | 0.800      | null         | true  |
+triphosphate         | triphospate          | 0.857      | null         | true  |
+glycolysis           | glycolyis            | 0.824      | null         | true  |
+fermentation         | fementaion           | 0.700      | null         | true  |
+respiration          | resperation          | 0.800      | null         | true  |
+metabolism           | metabolis            | 0.941      | null         | true  |
+catalysis            | catalyis             | 0.800      | null         | true  |
+substrate            | substrte             | 0.800      | null         | true  |
+activation           | activaton            | 0.824      | null         | true  |
+inhibition           | inhibton             | 0.625      | null         | true  |
+diffusion            | difusion             | 0.933      | null         | true  |
+osmosis              | osmosi               | 0.909      | null         | true  |
+
+Quizzer: [14:59:04] [34m[INFO][0m [text_validation_functionality.dart] Evaluation type for this option is: string
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] Testing case 0 => [{enzyme: [catalyze, catalyzes, catalyzing]}] with provided Answer: [enzyme]
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] Result: {isCorrect: true, ind_blanks: [true]} vs Expected: true
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] __________________________________________________
+Quizzer: [14:59:04] [34m[INFO][0m [text_validation_functionality.dart] Evaluation type for this option is: string
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] Testing case 1 => [{mitochondria: [powerhouse, energy factory, cellular power plant]}] with provided Answer: [mitochondria]
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] Result: {isCorrect: true, ind_blanks: [true]} vs Expected: true
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] __________________________________________________
+Quizzer: [14:59:04] [34m[INFO][0m [text_validation_functionality.dart] Evaluation type for this option is: string
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] Testing case 2 => [{photosynthesis: [light reaction, solar energy conversion, plant food making]}] with provided Answer: [photosynthesis]
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] Result: {isCorrect: true, ind_blanks: [true]} vs Expected: true
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] __________________________________________________
+Quizzer: [14:59:04] [34m[INFO][0m [text_validation_functionality.dart] Evaluation type for this option is: string
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] Testing case 3 => [{nucleus: [control center, brain of cell, genetic headquarters]}] with provided Answer: [nucleus]
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] Result: {isCorrect: true, ind_blanks: [true]} vs Expected: true
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] __________________________________________________
+Quizzer: [14:59:04] [34m[INFO][0m [text_validation_functionality.dart] Evaluation type for this option is: string
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] Testing case 4 => [{cytoplasm: [cell fluid, cellular matrix, intracellular space]}] with provided Answer: [cytoplasm]
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] Result: {isCorrect: true, ind_blanks: [true]} vs Expected: true
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] __________________________________________________
+Quizzer: [14:59:04] [34m[INFO][0m [text_validation_functionality.dart] Evaluation type for this option is: string
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] enyzme Sim Score: 0.4
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] Sim score below threshold, additional checks required
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] enyzme => enzyme; Levenshteing_ratio: 83.0
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] Testing case 5 => [{enzyme: [catalyze, catalyzes, catalyzing]}] with provided Answer: [enyzme]
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] Result: {isCorrect: true, ind_blanks: [true]} vs Expected: true
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] __________________________________________________
+Quizzer: [14:59:04] [34m[INFO][0m [text_validation_functionality.dart] Evaluation type for this option is: string
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] mitochondira Sim Score: 0.7272727272727273
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] Testing case 6 => [{mitochondria: [powerhouse, energy factory, cellular power plant]}] with provided Answer: [mitochondira]
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] Result: {isCorrect: true, ind_blanks: [true]} vs Expected: true
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] __________________________________________________
+Quizzer: [14:59:04] [34m[INFO][0m [text_validation_functionality.dart] Evaluation type for this option is: string
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] photosyntheis Sim Score: 0.88
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] Testing case 7 => [{photosynthesis: [light reaction, solar energy conversion, plant food making]}] with provided Answer: [photosyntheis]
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] Result: {isCorrect: true, ind_blanks: [true]} vs Expected: true
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] __________________________________________________
+Quizzer: [14:59:04] [34m[INFO][0m [text_validation_functionality.dart] Evaluation type for this option is: string
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] nucleas Sim Score: 0.6666666666666666
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] Testing case 8 => [{nucleus: [control center, brain of cell, genetic headquarters]}] with provided Answer: [nucleas]
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] Result: {isCorrect: true, ind_blanks: [true]} vs Expected: true
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] __________________________________________________
+Quizzer: [14:59:04] [34m[INFO][0m [text_validation_functionality.dart] Evaluation type for this option is: string
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] ctyoplasam Sim Score: 0.47058823529411764
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] Sim score below threshold, additional checks required
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] ctyoplasam => cytoplasm; Levenshteing_ratio: 84.0
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] Testing case 9 => [{cytoplasm: [cell fluid, cellular matrix, intracellular space]}] with provided Answer: [ctyoplasam]
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] Result: {isCorrect: true, ind_blanks: [true]} vs Expected: true
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] __________________________________________________
+Quizzer: [14:59:04] [34m[INFO][0m [text_validation_functionality.dart] Evaluation type for this option is: string
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] collissions Sim Score: 0.9473684210526315
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] Testing case 10 => [{collisions: []}] with provided Answer: [collissions]
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] Result: {isCorrect: true, ind_blanks: [true]} vs Expected: true
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] __________________________________________________
+Quizzer: [14:59:04] [34m[INFO][0m [text_validation_functionality.dart] Evaluation type for this option is: string
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] catalyze Sim Score: 0.0
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] Sim score below threshold, additional checks required
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] catalyze => enzyme; Levenshteing_ratio: 29.0
+Quizzer: [14:59:04] [34m[INFO][0m [text_validation_functionality.dart] Evaluation type for this option is: string
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] Testing case 11 => [{enzyme: [catalyze, catalyzes, catalyzing]}] with provided Answer: [catalyze]
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] Result: {isCorrect: true, ind_blanks: [true]} vs Expected: true
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] __________________________________________________
+Quizzer: [14:59:04] [34m[INFO][0m [text_validation_functionality.dart] Evaluation type for this option is: string
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] powerhouse Sim Score: 0.1
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] Sim score below threshold, additional checks required
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] powerhouse => mitochondria; Levenshteing_ratio: 27.0
+Quizzer: [14:59:04] [34m[INFO][0m [text_validation_functionality.dart] Evaluation type for this option is: string
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] Testing case 12 => [{mitochondria: [powerhouse, energy factory, cellular power plant]}] with provided Answer: [powerhouse]
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] Result: {isCorrect: true, ind_blanks: [true]} vs Expected: true
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] __________________________________________________
+Quizzer: [14:59:04] [34m[INFO][0m [text_validation_functionality.dart] Evaluation type for this option is: string
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] light reaction Sim Score: 0.0
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] Sim score below threshold, additional checks required
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] light reaction => photosynthesis; Levenshteing_ratio: 29.0
+Quizzer: [14:59:04] [34m[INFO][0m [text_validation_functionality.dart] Evaluation type for this option is: string
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] Testing case 13 => [{photosynthesis: [light reaction, solar energy conversion, plant food making]}] with provided Answer: [light reaction]
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] Result: {isCorrect: true, ind_blanks: [true]} vs Expected: true
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] __________________________________________________
+Quizzer: [14:59:04] [34m[INFO][0m [text_validation_functionality.dart] Evaluation type for this option is: string
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] control center Sim Score: 0.0
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] Sim score below threshold, additional checks required
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] control center => nucleus; Levenshteing_ratio: 29.0
+Quizzer: [14:59:04] [34m[INFO][0m [text_validation_functionality.dart] Evaluation type for this option is: string
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] Testing case 14 => [{nucleus: [control center, brain of cell, genetic headquarters]}] with provided Answer: [control center]
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] Result: {isCorrect: true, ind_blanks: [true]} vs Expected: true
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] __________________________________________________
+Quizzer: [14:59:04] [34m[INFO][0m [text_validation_functionality.dart] Evaluation type for this option is: string
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] cell fluid Sim Score: 0.0
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] Sim score below threshold, additional checks required
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] cell fluid => cytoplasm; Levenshteing_ratio: 21.0
+Quizzer: [14:59:04] [34m[INFO][0m [text_validation_functionality.dart] Evaluation type for this option is: string
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] Testing case 15 => [{cytoplasm: [cell fluid, cellular matrix, intracellular space]}] with provided Answer: [cell fluid]
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] Result: {isCorrect: true, ind_blanks: [true]} vs Expected: true
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] __________________________________________________
+Quizzer: [14:59:04] [34m[INFO][0m [text_validation_functionality.dart] Evaluation type for this option is: string
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] protein Sim Score: 0.0
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] Sim score below threshold, additional checks required
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] protein => enzyme; Levenshteing_ratio: 31.0
+Quizzer: [14:59:04] [34m[INFO][0m [text_validation_functionality.dart] Evaluation type for this option is: string
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] protein Sim Score: 0.0
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] Sim score below threshold, additional checks required
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] protein => catalyze; Levenshteing_ratio: 27.0
+Quizzer: [14:59:04] [34m[INFO][0m [text_validation_functionality.dart] Evaluation type for this option is: string
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] protein Sim Score: 0.0
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] Sim score below threshold, additional checks required
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] protein => catalyzes; Levenshteing_ratio: 25.0
+Quizzer: [14:59:04] [34m[INFO][0m [text_validation_functionality.dart] Evaluation type for this option is: string
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] protein Sim Score: 0.13333333333333333
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] Sim score below threshold, additional checks required
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] protein => catalyzing; Levenshteing_ratio: 35.0
+Quizzer: [14:59:04] [34m[INFO][0m [text_validation_functionality.dart] validateFillInTheBlank: Blank 0 incorrect. User: "protein", Expected: enzyme, catalyze, catalyzes, catalyzing
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] Testing case 16 => [{enzyme: [catalyze, catalyzes, catalyzing]}] with provided Answer: [protein]
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] Result: {isCorrect: false, ind_blanks: [false]} vs Expected: false
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] __________________________________________________
+Quizzer: [14:59:04] [34m[INFO][0m [text_validation_functionality.dart] Evaluation type for this option is: string
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] ribosome Sim Score: 0.1111111111111111
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] Sim score below threshold, additional checks required
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] ribosome => mitochondria; Levenshteing_ratio: 30.0
+Quizzer: [14:59:04] [34m[INFO][0m [text_validation_functionality.dart] Evaluation type for this option is: string
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] ribosome Sim Score: 0.0
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] Sim score below threshold, additional checks required
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] ribosome => powerhouse; Levenshteing_ratio: 44.0
+Quizzer: [14:59:04] [34m[INFO][0m [text_validation_functionality.dart] Evaluation type for this option is: string
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] ribosome Sim Score: 0.0
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] Sim score below threshold, additional checks required
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] ribosome => energy factory; Levenshteing_ratio: 18.0
+Quizzer: [14:59:04] [34m[INFO][0m [text_validation_functionality.dart] Evaluation type for this option is: string
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] ribosome Sim Score: 0.0
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] Sim score below threshold, additional checks required
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] ribosome => cellular power plant; Levenshteing_ratio: 21.0
+Quizzer: [14:59:04] [34m[INFO][0m [text_validation_functionality.dart] validateFillInTheBlank: Blank 0 incorrect. User: "ribosome", Expected: mitochondria, powerhouse, energy factory, cellular power plant
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] Testing case 17 => [{mitochondria: [powerhouse, energy factory, cellular power plant]}] with provided Answer: [ribosome]
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] Result: {isCorrect: false, ind_blanks: [false]} vs Expected: false
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] __________________________________________________
+Quizzer: [14:59:04] [34m[INFO][0m [text_validation_functionality.dart] Evaluation type for this option is: string
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] respiration Sim Score: 0.08695652173913043
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] Sim score below threshold, additional checks required
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] respiration => photosynthesis; Levenshteing_ratio: 32.0
+Quizzer: [14:59:04] [34m[INFO][0m [text_validation_functionality.dart] Evaluation type for this option is: string
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] respiration Sim Score: 0.36363636363636365
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] Sim score below threshold, additional checks required
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] respiration => light reaction; Levenshteing_ratio: 56.0
+Quizzer: [14:59:04] [34m[INFO][0m [text_validation_functionality.dart] Evaluation type for this option is: string
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] respiration Sim Score: 0.2
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] Sim score below threshold, additional checks required
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] respiration => solar energy conversion; Levenshteing_ratio: 35.0
+Quizzer: [14:59:04] [34m[INFO][0m [text_validation_functionality.dart] Evaluation type for this option is: string
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] respiration Sim Score: 0.0
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] Sim score below threshold, additional checks required
+Quizzer: [14:59:04] [34m[INFO][0m [text_analysis_tools.dart] respiration => plant food making; Levenshteing_ratio: 36.0
+Quizzer: [14:59:04] [34m[INFO][0m [text_validation_functionality.dart] validateFillInTheBlank: Blank 0 incorrect. User: "respiration", Expected: photosynthesis, light reaction, solar energy conversion, plant food making
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] Testing case 18 => [{photosynthesis: [light reaction, solar energy conversion, plant food making]}] with provided Answer: [respiration]
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] Result: {isCorrect: false, ind_blanks: [false]} vs Expected: false
+Quizzer: [14:59:04] [34m[INFO][0m [test_41_text_input_validation.dart] __________________________________________________

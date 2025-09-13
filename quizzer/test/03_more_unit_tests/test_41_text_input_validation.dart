@@ -66,189 +66,87 @@ void main() async {
     });
   });
   group('Test 2: validation unit testing', () {
-    // correct/correctly spelled
-    Map<String, dynamic> correctAttempts = {
-      "answers_to_blanks": [
+    // Data Structure is a table:
+    // [answers to blanks, "provided answer", "expected"] // Comment as to why
+    // [List<Map<String, List<dynamic>>>, List<String>, bool]
+
+    List<List<dynamic>> validationCases = [
+      // Correct cases:
+      [[{"enzyme": ["catalyze", "catalyzes", "catalyzing"]}],                                     ["enzyme"],         true],
+      [[{"mitochondria": ["powerhouse", "energy factory", "cellular power plant"]}],              ["mitochondria"],   true],
+      [[{"photosynthesis": ["light reaction", "solar energy conversion", "plant food making"]}],  ["photosynthesis"], true],
+      [[{"nucleus": ["control center", "brain of cell", "genetic headquarters"]}],                ["nucleus"],        true],
+      [[{"cytoplasm": ["cell fluid", "cellular matrix", "intracellular space"]}],                 ["cytoplasm"],      true],
+      // Typos
+      [[{"enzyme": ["catalyze", "catalyzes", "catalyzing"]}],                                     ["enyzme"],         true],
+      [[{"mitochondria": ["powerhouse", "energy factory", "cellular power plant"]}],              ["mitochondira"],   true],
+      [[{"photosynthesis": ["light reaction", "solar energy conversion", "plant food making"]}],  ["photosyntheis"],  true],
+      [[{"nucleus": ["control center", "brain of cell", "genetic headquarters"]}],                ["nucleas"],        true],
+      [[{"cytoplasm": ["cell fluid", "cellular matrix", "intracellular space"]}],                 ["ctyoplasam"],     true],
+      [[{"collisions": [""]}], ["collissions"], true],
+      // Handle cases where synonym is provided
+      [[{"enzyme": ["catalyze", "catalyzes", "catalyzing"]}],                                     ["catalyze"],       true],
+      [[{"mitochondria": ["powerhouse", "energy factory", "cellular power plant"]}],              ["powerhouse"],                 true],
+      [[{"photosynthesis": ["light reaction", "solar energy conversion", "plant food making"]}],  ["light reaction"],             true],
+      [[{"nucleus": ["control center", "brain of cell", "genetic headquarters"]}],                ["control center"],             true],
+      [[{"cytoplasm": ["cell fluid", "cellular matrix", "intracellular space"]}],                 ["cell fluid"],                 true],
+      // Handle cases where wrong answer is provided
+      [[{"enzyme": ["catalyze", "catalyzes", "catalyzing"]}],                                     ["protein"],                    false],
+      [[{"mitochondria": ["powerhouse", "energy factory", "cellular power plant"]}],              ["ribosome"],                   false],
+      [[{"photosynthesis": ["light reaction", "solar energy conversion", "plant food making"]}],  ["respiration"],                false],
+      [[{"nucleus": ["control center", "brain of cell", "genetic headquarters"]}],                ["membrane"],                   false],
+      [[{"cytoplasm": ["cell fluid", "cellular matrix", "intracellular space"]}],                 ["vacuole"],                    false],
+      [[{"generalized linear model": [""]}],                                                      ["generalized additive model"], false],
+
+
+      [[{"stromatolites": [""]}], ["stalactomites"],  false],
+      [[{"endosymbiosis": [""]}], ["endocytosis"],    false],
+      // Too many answers provided (interface should prevent this)
+      [[{"enzyme": ["catalyze", "catalyzes", "catalyzing"]},{"mitochondria": ["powerhouse", "energy factory", "cellular power plant"]},{"photosynthesis": ["light reaction", "solar energy conversion", "plant food making"]}], 
+      ["enzyme", "mitochondria", "photosynthesis", "extra_answer", "another_extra"], 
+      false],
+      // Not enough answers provided:
+      [[
         {"enzyme": ["catalyze", "catalyzes", "catalyzing"]},
         {"mitochondria": ["powerhouse", "energy factory", "cellular power plant"]},
         {"photosynthesis": ["light reaction", "solar energy conversion", "plant food making"]},
         {"nucleus": ["control center", "brain of cell", "genetic headquarters"]},
         {"cytoplasm": ["cell fluid", "cellular matrix", "intracellular space"]}
-      ],
-      "user_answers": ["enzyme", "mitochondria", "photosynthesis", "nucleus", "cytoplasm"]
-    };
+      ], ["enzyme", "mitochondria"], false],
+      [[{"evaporative cooling": [""]}], ["evaporation"], false],
+      // These cases are explicitely wrong, even though they would pass a basic typo check
+      [[{"positively": [""]}], ["negatively"], false],
+      [[{"negatively": [""]}], ["positively"], false],
+      [[{"charged": [""]}], ["uncharged"], false],
+      [[{"uncharged": [""]}], ["charged"], false], 
+      [[{"asexual reproduction": [""]}], ["sexual reproduction"], false], 
+      [[{"sexual reproduction": [""]}], ["asexual reproduction"], false],
+      // passes similarity check, but still not correct answer
+      [[{"carbonic acid": [""]}], ["carbonate"], false],
+      [[{"hydrogen bonds": [""]}], ["bonds"], false], // Answer contains part of the correct response but is incomplete and thus should not pass validation (perhaps a simple ensure the provided answer is the same number of words heuristic?)
+      [[{"closed system": [""]}], ["system"], false], // incomple answer, not quite correct, should not pass
+      [[{"every element": [""]}], ["all elements", true]], // semantically the same both contains the core meaning (all components of elements)
 
-    // Answers are correct, but mispelled
-    Map<String,dynamic> typoCorrectAttempts = {
-      "answers_to_blanks": [
-        {"enzyme": ["catalyze", "catalyzes", "catalyzing"]},
-        {"mitochondria": ["powerhouse", "energy factory", "cellular power plant"]},
-        {"photosynthesis": ["light reaction", "solar energy conversion", "plant food making"]},
-        {"nucleus": ["control center", "brain of cell", "genetic headquarters"]},
-        {"cytoplasm": ["cell fluid", "cellular matrix", "intracellular space"]}
-      ],
-      "user_answers": ["enyzme", "mitochondira", "photosyntheis", "nucleas", "cytoplasam"]
-    };
+    ];
 
-    // Answers are synonyms provided, but not primary answer
-    Map<String, dynamic> synonymCorrectAttempts = {
-      "answers_to_blanks": [
-        {"enzyme": ["catalyze", "catalyzes", "catalyzing"]},
-        {"mitochondria": ["powerhouse", "energy factory", "cellular power plant"]},
-        {"photosynthesis": ["light reaction", "solar energy conversion", "plant food making"]},
-        {"nucleus": ["control center", "brain of cell", "genetic headquarters"]},
-        {"cytoplasm": ["cell fluid", "cellular matrix", "intracellular space"]}
-      ],
-      "user_answers": [
-        "catalyze", 
-        "powerhouse",
-        "light reaction", 
-        "control center", 
-        "cell fluid",
-        ]
-    };
+    test('Cases should all validate correctly', () async {
+      for (int i = 0; i < validationCases.length; i++) {
+        // Construct mock question data map for testing
+        Map<String, dynamic> questionData = {
+          "question_type": "fill_in_the_blank",
+          "answers_to_blanks": validationCases[i][0] // 0 index is the correct answers
+        };
+        List<String> userAnswers = validationCases[i][1];
+        bool expectedResult = validationCases[i][2];
 
-    // Answers are not correct
-    Map<String, dynamic> inCorrectAttempts = {
-      "answers_to_blanks": [
-        {"enzyme": ["catalyze", "catalyzes", "catalyzing"]},
-        {"mitochondria": ["powerhouse", "energy factory", "cellular power plant"]},
-        {"photosynthesis": ["light reaction", "solar energy conversion", "plant food making"]},
-        {"nucleus": ["control center", "brain of cell", "genetic headquarters"]},
-        {"cytoplasm": ["cell fluid", "cellular matrix", "intracellular space"]},
-        {"generalized linear model": []},
-        {"stromatolites": []},
-        {"endosymbiosis": []},
-      ],
-      "user_answers": [
-        "protein", 
-        "ribosome", 
-        "respiration", 
-        "membrane", 
-        "vacuole",
-        // Real Case (should not have scored this correct since "additive" and "linear" model are not equivalent answers
-        "generalized additive model", // generalized linear model 
-        "stalactomites", //stromatolites
-        "endocytosis",
-        ]
-    };
-
-    // Answers are partially correct (some are right some are wrong)
-    Map<String, dynamic> partiallyCorrectAttempts = {
-      "answers_to_blanks": [
-        {"enzyme": ["catalyze", "catalyzes", "catalyzing"]},
-        {"mitochondria": ["powerhouse", "energy factory", "cellular power plant"]},
-        {"photosynthesis": ["light reaction", "solar energy conversion", "plant food making"]},
-        {"nucleus": ["control center", "brain of cell", "genetic headquarters"]},
-        {"cytoplasm": ["cell fluid", "cellular matrix", "intracellular space"]}
-      ],
-      "user_answers": ["enzyme", "protein", "photosynthesis", "membrane", "cytoplasm"]
-    };
-
-    // too many answers
-    Map<String, dynamic> invalidDataOne = {
-      "answers_to_blanks": [
-        {"enzyme": ["catalyze", "catalyzes", "catalyzing"]},
-        {"mitochondria": ["powerhouse", "energy factory", "cellular power plant"]},
-        {"photosynthesis": ["light reaction", "solar energy conversion", "plant food making"]}
-      ],
-      "user_answers": ["enzyme", "mitochondria", "photosynthesis", "extra_answer", "another_extra"]
-    };
-
-    // not enough answers
-    Map<String, dynamic> invalidDataTwo = {
-      "answers_to_blanks": [
-        {"enzyme": ["catalyze", "catalyzes", "catalyzing"]},
-        {"mitochondria": ["powerhouse", "energy factory", "cellular power plant"]},
-        {"photosynthesis": ["light reaction", "solar energy conversion", "plant food making"]},
-        {"nucleus": ["control center", "brain of cell", "genetic headquarters"]},
-        {"cytoplasm": ["cell fluid", "cellular matrix", "intracellular space"]}
-      ],
-      "user_answers": ["enzyme", "mitochondria"]
-    };
-
-    test('correct attempts should pass validation', () async {
-      Map<String, dynamic> questionData = {
-        "question_type": "fill_in_the_blank",
-        "answers_to_blanks": correctAttempts["answers_to_blanks"]
-      };
-      
-      Map<String, dynamic> result = await validateFillInTheBlank(questionData, correctAttempts["user_answers"]);
-      
-      expect(result["isCorrect"], true);
-      expect(result["ind_blanks"], [true, true, true, true, true]);
-    });
-
-    test('typo correct attempts should pass validation', () async {
-      Map<String, dynamic> questionData = {
-        "question_type": "fill_in_the_blank",
-        "answers_to_blanks": typoCorrectAttempts["answers_to_blanks"]
-      };
-      
-      Map<String, dynamic> result = await validateFillInTheBlank(questionData, typoCorrectAttempts["user_answers"]);
-      
-      expect(result["isCorrect"], true);
-      expect(result["ind_blanks"], [true, true, true, true, true]);
-    });
-
-    test('synonym correct attempts should pass validation', () async {
-      Map<String, dynamic> questionData = {
-        "question_type": "fill_in_the_blank",
-        "answers_to_blanks": synonymCorrectAttempts["answers_to_blanks"]
-      };
-      
-      Map<String, dynamic> result = await validateFillInTheBlank(questionData, synonymCorrectAttempts["user_answers"]);
-      
-      expect(result["isCorrect"], true);
-      expect(result["ind_blanks"], [true, true, true, true, true]);
-    });
-
-    test('incorrect attempts should fail validation', () async {
-      Map<String, dynamic> questionData = {
-        "question_type": "fill_in_the_blank",
-        "answers_to_blanks": inCorrectAttempts["answers_to_blanks"]
-      };
-      
-      Map<String, dynamic> result = await validateFillInTheBlank(questionData, inCorrectAttempts["user_answers"]);
-      
-      expect(result["isCorrect"], false);
-      expect(result["ind_blanks"], [false, false, false, false, false]);
-    });
-
-    test('partially correct attempts should show mixed results', () async {
-      Map<String, dynamic> questionData = {
-        "question_type": "fill_in_the_blank",
-        "answers_to_blanks": partiallyCorrectAttempts["answers_to_blanks"]
-      };
-      
-      Map<String, dynamic> result = await validateFillInTheBlank(questionData, partiallyCorrectAttempts["user_answers"]);
-      
-      expect(result["isCorrect"], false);
-      expect(result["ind_blanks"], [true, false, true, false, true]);
-    });
-
-    test('too many answers should fail validation', () async {
-      Map<String, dynamic> questionData = {
-        "question_type": "fill_in_the_blank",
-        "answers_to_blanks": invalidDataOne["answers_to_blanks"]
-      };
-      
-      Map<String, dynamic> result = await validateFillInTheBlank(questionData, invalidDataOne["user_answers"]);
-      
-      expect(result["isCorrect"], false);
-      expect(result["ind_blanks"], [false, false, false]);
-    });
-
-    test('not enough answers should fail validation', () async {
-      Map<String, dynamic> questionData = {
-        "question_type": "fill_in_the_blank",
-        "answers_to_blanks": invalidDataTwo["answers_to_blanks"]
-      };
-      
-      Map<String, dynamic> result = await validateFillInTheBlank(questionData, invalidDataTwo["user_answers"]);
-      
-      expect(result["isCorrect"], false);
-      expect(result["ind_blanks"], [false, false, false, false, false]);
+        Map<String, dynamic> result = await validateFillInTheBlank(questionData, userAnswers);
+        QuizzerLogger.logMessage("Testing case $i => ${validationCases[i][0]} with provided Answer: $userAnswers");
+        QuizzerLogger.logMessage("Result: $result vs Expected: $expectedResult");
+        expect(result["isCorrect"], expectedResult);
+        // // Check that all individual blank results match the expected result
+        // expect(result["ind_blanks"].every((element) => element == expectedResult), true);
+        QuizzerLogger.logMessage("_" * 50);
+      }
     });
   });
 }

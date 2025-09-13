@@ -50,24 +50,8 @@ final Set<String> typoCheckOnlyCases = {
 "positively", "negatively"
 };
 
-// Bad Cases:
-// The following table, provides cases that should be marked valid or invalid, but currently the text validation does not handle this properly
-/*
-| Correct Answer              | Provided Answer               | Valid | Why? |
-| "evaporative cooling"       | "evaporation"                 | No    | These are not equivalent in meaning, one is a general term and one is more specific
-| "positively"                | "negatively"                  | No    | Not equivalent in meaning 
-| "charged"                   | "uncharged"                   | No    | charged != uncharged
-| "generalized linear model"  | "generalized additive model"  | No    | linear models and additive models are not the same thing, just because they are both generalized models does not mean this is correct
-| "asexual reproduction"      | "sexual reproduction"         | No    | One is WITH and one is WITHOUT, algorithm needs to handle semantic meaning not similarity
-
-
-*/
-
-
 /// Determines the validation type based on the content of the answer.
 String getValidationType(String answer) {
-  // 2. Typo check only
-
   String selectedType;
   // 1. Try to parse the answer as a number first. (we're using try because it throws an error if the statement isn't parsable, so try then catch the error if we get it)
   try {
