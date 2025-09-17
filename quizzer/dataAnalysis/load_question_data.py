@@ -8,14 +8,12 @@ def load_question_data() -> pd.DataFrame:
     """
     Retrieves data from the local SQLite database and loads it into a Pandas DataFrame,
     with pre-processing to ensure correct data types.
-
     This function performs the following steps:
     1.  Calls `initialize_and_fetch_db` to get the database connection.
     2.  Reads all records from the 'question_answer_pairs' table into a DataFrame.
     3.  Applies a pre-processing function to each record to clean data types.
     4.  Closes the database connection.
     5.  Returns the resulting DataFrame.
-
     Returns:
         A pandas.DataFrame containing the data from the 'question_answer_pairs' table
         with cleaned data types.
@@ -28,9 +26,10 @@ def load_question_data() -> pd.DataFrame:
     
     db.close()
     
-    # Apply the pre-processing function to each row of the DataFrame
-    df = df.apply(lambda row: pre_process_record(row.to_dict()), axis=1)
-
+    # Convert the DataFrame to a list of dictionaries, process each, then back to DataFrame
+    processed_records = [pre_process_record(row.to_dict()) for _, row in df.iterrows()]
+    df = pd.DataFrame(processed_records)
+    
     return df
 
 def pre_process_record(record):
@@ -52,8 +51,10 @@ def pre_process_record(record):
         "question_elements",
         "answer_elements",
         "options",
-        "index_options_that_apply"
-        "answers_to_blanks"
+        "index_options_that_apply",
+        "answers_to_blanks",
+        "question_vector",
+        "keywords"
     ]
 
     for field in json_fields:
@@ -125,6 +126,8 @@ def validate_first_record(df: pd.DataFrame) -> None:
                 print("  Dictionary is empty.")
         
         print("-" * 20)
+
+
 
 def main():
     validate_first_record(load_question_data())

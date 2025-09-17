@@ -4,6 +4,7 @@ import supabase
 import sqlite3
 from sqlite3 import Connection
 import datetime
+import numpy as np
 import typing
 
 SUPABASE_URL = "https://yruvxuvzztnahuuiqxit.supabase.co"
@@ -12,6 +13,153 @@ SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
 DB_FILE = "data.db"
 LAST_SYNC_FILE = "last_sync.json"
 SUPABASE_TABLE = "question_answer_pairs"
+
+def upsert_question_record(db: Connection, question_record) -> bool:
+    """
+    Upserts a question record to the database.
+    Updates if question_id exists, inserts if it doesn't.
+    Ensures required columns exist before attempting upsert.
+    
+    Args:
+        db: SQLite database connection
+        question_record: Dictionary containing question data with question_id
+        
+    Returns:
+        True if successful, False otherwise
+    """
+    cursor = db.cursor()
+    
+    try:
+        # Get question_id for the upsert
+        question_id = question_record.get('question_id')
+        if not question_id:
+            print("Error: question_record must contain 'question_id'")
+            return False
+        
+        # Convert numpy arrays to JSON strings for storage
+        processed_record = {}
+        for key, value in question_record.items():
+            if isinstance(value, np.ndarray):
+                processed_record[key] = json.dumps(value.tolist())
+            elif isinstance(value, list):
+                processed_record[key] = json.dumps(value)
+            else:
+                processed_record[key] = value
+        
+        # Get all columns from the table
+        cursor.execute("PRAGMA table_info(question_answer_pairs)")
+        table_columns = [column[1] for column in cursor.fetchall()]
+        
+        # Ensure required columns exist - add them if missing
+        required_columns = {
+            'question_vector': 'TEXT',
+            'is_math': 'INTEGER',  # SQLite stores booleans as integers
+            'keywords': 'TEXT'
+        }
+        
+        for column_name, column_type in required_columns.items():
+            if column_name not in table_columns:
+                print(f"Adding missing column: {column_name}")
+                cursor.execute(f"ALTER TABLE question_answer_pairs ADD COLUMN {column_name} {column_type}")
+                table_columns.append(column_name)
+        
+        db.commit()
+        
+        # Check if record exists
+        cursor.execute("SELECT question_id FROM question_answer_pairs WHERE question_id = ?", (question_id,))
+        exists = cursor.fetchone() is not None
+        
+        if exists:
+            # UPDATE existing record - only update the fields we want to change
+            update_fields = ['question_vector', 'is_math', 'keywords']
+            update_values = []
+            set_clauses = []
+            
+            for field in update_fields:
+                if field in processed_record:
+                    set_clauses.append(f"{field} = ?")
+                    update_values.append(processed_record[field])
+            
+            if set_clauses:
+                update_values.append(question_id)  # For WHERE clause
+                query = f"UPDATE question_answer_pairs SET {', '.join(set_clauses)} WHERE question_id = ?"
+                cursor.execute(query, update_values)
+            
+        else:
+            # INSERT new record - filter to only existing columns
+            filtered_record = {k: v for k, v in processed_record.items() if k in table_columns}
+            
+            if not filtered_record:
+                print("Error: No valid columns found in question_record")
+                return False
+            
+            columns = list(filtered_record.keys())
+            placeholders = ['?' for _ in columns]
+            values = list(filtered_record.values())
+            
+            query = f"INSERT INTO question_answer_pairs ({', '.join(columns)}) VALUES ({', '.join(placeholders)})"
+            cursor.execute(query, values)
+        
+        db.commit()
+        
+        print(f"Successfully upserted record with question_id: {question_id}")
+        return True
+        
+    except Exception as e:
+        print(f"Error upserting question record: {e}")
+        db.rollback()
+        return False
+
+def get_empty_vector_record(db: Connection):
+    """
+    Fetches one record from question_answer_pairs where question_vector is empty/null.
+    Creates the question_vector column if it doesn't exist.
+    
+    Args:
+        db: SQLite database connection
+        
+    Returns:
+        Dictionary containing the record data, or None if no empty records found
+    """
+    cursor = db.cursor()
+    
+    # Check if question_vector column exists, create if not
+    try:
+        cursor.execute(f"PRAGMA table_info({SUPABASE_TABLE})")
+        columns = [column[1] for column in cursor.fetchall()]
+        
+        if 'question_vector' not in columns:
+            print("Creating question_vector column...")
+            cursor.execute("ALTER TABLE question_answer_pairs ADD COLUMN question_vector TEXT")
+            db.commit()
+            print("question_vector column created successfully.")
+    
+    except Exception as e:
+        print(f"Error checking/creating question_vector column: {e}")
+        return None
+    
+    # Fetch one record where question_vector is null or empty
+    try:
+        cursor.execute("""
+            SELECT * FROM question_answer_pairs 
+            WHERE question_vector IS NULL OR question_vector = '' 
+            LIMIT 1
+        """)
+        
+        row = cursor.fetchone()
+        if row is None:
+            return None
+            
+        # Get column names
+        column_names = [description[0] for description in cursor.description]
+        
+        # Convert row to dictionary
+        record = dict(zip(column_names, row))
+        return record
+        
+    except Exception as e:
+        print(f"Error fetching empty vector record: {e}")
+        return None
 
 def upsert_records_to_db(records: typing.List[typing.Dict], db: sqlite3.Connection) -> None:
     """
@@ -67,7 +215,6 @@ def upsert_records_to_db(records: typing.List[typing.Dict], db: sqlite3.Connecti
         print(f"SQLite error during upsert: {e}")
     finally:
         print("--- upsert_records_to_db finished ---")
-
 
 def find_newest_timestamp(records: typing.List[typing.Dict]) -> typing.Union[str, None]:
     """

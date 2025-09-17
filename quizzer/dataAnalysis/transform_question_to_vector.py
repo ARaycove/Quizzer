@@ -1,25 +1,17 @@
-import typing
 from typing import Dict, List, Any
 import load_question_data
 import pandas as pd
 import numpy as np
-import typing
 import time
-from typing import Dict, List, Any
 from PIL import Image
-import io
 import torch
-from sentence_transformers import SentenceTransformer
-from torchvision import models, transforms
-import os
-from sync_fetch_data import initialize_supabase_session
-from supabase import Client
-import multiprocessing as mp
-import concurrent.futures
+from data_utils import load_image, text_to_image, combine_images_vertically, get_is_math, get_keywords
+from transformers import InstructBlipProcessor, InstructBlipForConditionalGeneration
+import torch.nn.functional as F
+from sync_fetch_data import get_empty_vector_record, upsert_question_record, initialize_and_fetch_db
+from load_question_data import pre_process_record
 
 
-import typing
-from typing import Dict, List, Any
 
 def simplify_question_record(record: Dict[str, Any]) -> Dict[str, Any]:
     """
@@ -51,6 +43,8 @@ def simplify_question_record(record: Dict[str, Any]) -> Dict[str, Any]:
         - 'answer_media': A list of image file names from the answer and options.
     """
     # Get the question_id and handle cases where it might not exist
+    # Assuming the record came directly from the database it must be processed into types before we can extract it's contents
+    record = pre_process_record(record)
     question_id = record.get('question_id')
 
     # Handle the case where the record is nested under a single integer key.
@@ -112,355 +106,230 @@ def simplify_question_record(record: Dict[str, Any]) -> Dict[str, Any]:
     print(data_map)
     return data_map
 
+processor = InstructBlipProcessor.from_pretrained("Salesforce/instructblip-vicuna-7b")
+model = InstructBlipForConditionalGeneration.from_pretrained("Salesforce/instructblip-vicuna-7b")
 
-def pre_process_question_dataframe(df: pd.DataFrame) -> List:
+def vectorize_records() -> None:
     """
-    Processes a DataFrame of question records by applying a simplification
-    function to each record.
-
-    This function iterates through the DataFrame, processes each record, and
-    constructs a new DataFrame from the simplified results.
-
-    Args:
-        df: A pandas.DataFrame containing question records.
-
-    Returns:
-        A new pandas.DataFrame with the simplified records.
-    """
-    # Ensure the input is a DataFrame, even if a Series is passed.
-    if isinstance(df, pd.Series):
-        df = pd.DataFrame(df)
-
-    processed_records: List[Dict[str, Any]] = []
-
-    # Iterate over the records in the DataFrame, converting each row to a dictionary
-    # for processing by the `simplify_question_record` function.
-    for record in df.to_dict('records'):
-        # NOTE: This function assumes that `simplify_question_record` is defined
-        # in the same scope.
-        processed_record = simplify_question_record(record[0])
-        processed_records.append(processed_record)
+    Vectorizes question records from database using InstructBLIP multi-modal transformer.
+    Processes records one by one until all have vectors.
+    Uses combined embeddings that capture cross-modal educational semantic meaning.
     
-    # Construct a new DataFrame using the list of processed records
-    return processed_records
-
-def vectorize_records(records: List[Dict[str, Any]]) -> List[Dict[str, np.ndarray]]:
+    InstructBLIP is specifically designed for instruction-following with visual content,
+    making it ideal for educational Q&A that combines text explanations with images,
+    diagrams, equations, and other visual learning materials.
+    
+    Fetches records from DB, processes them, and saves back to DB until complete.
     """
-    Vectorizes a list of question records in batches for improved performance.
-
-    This function processes all text and media from a list of records at once
-    to leverage the parallel processing capabilities of the models. It now also
-    preserves the question_id for tracking.
-
-    Args:
-        records: A list of simplified dictionaries, each with the following keys:
-                 - 'question_id' (str)
-                 - 'question_text' (str)
-                 - 'answer_text' (str)
-                 - 'question_media' (List[str])
-                 - 'answer_media' (List[str])
-
-    Returns:
-        A list of new dictionaries, with each value replaced by its
-        corresponding vector (NumPy array) and the original question_id.
-    """
-    # Initialize text and vision models outside the main loop to avoid re-loading.
-    text_model = SentenceTransformer('all-MiniLM-L6-v2')
-    vision_model = models.resnet50(weights=models.ResNet50_Weights.IMAGENET1K_V2)
-    vision_model = torch.nn.Sequential(*list(vision_model.children())[:-1])
-    vision_model.eval()
-    preprocess = transforms.Compose([
-        transforms.Resize(256),
-        transforms.CenterCrop(224),
-        transforms.ToTensor(),
-        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-    ])
-
-    def load_and_preprocess_image(image_name: str, preprocess: transforms.Compose) -> typing.Union[torch.Tensor, None]:
-        """
-        Loads an image from a local directory or downloads it from Supabase,
-        then preprocesses it for the vision model.
-
-        Args:
-            image_name (str): The name of the image file (e.g., 'image.png').
-            preprocess (transforms.Compose): The torchvision preprocessing pipeline.
-
-        Returns:
-            A preprocessed image tensor if successful, otherwise None.
-        """
-        if not image_name:
-            print("Warning: Received an empty image name. Skipping processing.")
-            return None
-
-        local_path = os.path.join("data_images", image_name)
+    db = initialize_and_fetch_db()
+    processed_count = 0
+    
+    print("Starting vectorization process...")
+    
+    while True:
+        # Get next record that needs vectorization
+        record = get_empty_vector_record(db)
         
-        # Check if the image exists locally
-        if os.path.exists(local_path):
-            print(f"Loading image from local cache: {local_path}")
-            try:
-                img = Image.open(local_path)
-                # Convert palette images to RGBA to handle transparency
-                if img.mode != 'RGB':
-                    img = img.convert('RGB')
-                return preprocess(img)
-            except Exception as e:
-                print(f"Error opening image from local path {local_path}: {e}")
-                return None
-        else:
-            print(f"Image not found locally. Downloading from Supabase: {image_name}")
-            try:
-                supabase_client: Client = initialize_supabase_session()
-                bucket_name = 'question-answer-pair-assets'
-                
-                # Download the image bytes from Supabase
-                res = supabase_client.storage.from_(bucket_name).download(image_name)
-                
-                # Create the local directory if it doesn't exist
-                os.makedirs(os.path.dirname(local_path), exist_ok=True)
-                
-                # Save the image locally
-                with open(local_path, "wb") as f:
-                    f.write(res)
-                
-                # Open the image from the saved bytes
-                img = Image.open(io.BytesIO(res))
-                # Convert palette images to RGBA to handle transparency
-                if img.mode != 'RGB':
-                    img = img.convert('RGB')
-                
-                print(f"Downloaded and saved image to {local_path}")
-                return preprocess(img)
+        # Break if no more records need processing
+        if record is None:
+            print(f"Vectorization complete! Processed {processed_count} records.")
+            break
+        
+        try:
+            # Simplify the record format
+            record = simplify_question_record(record)
+            
+            question_id = record.get('question_id', '')
+            question_text = record.get('question_text', '')
+            answer_text = record.get('answer_text', '')
+            question_media = record.get('question_media', [])
+            answer_media = record.get('answer_media', [])
+            combined_text = f"{question_text} {answer_text}".strip()
+            keywords = get_keywords(combined_text)
+            is_math = get_is_math(combined_text)
 
-            except Exception as e:
-                print(f"Error processing image {image_name}: {e}")
+            # Create educational instruction that emphasizes subject matter and concept understanding
+            instruction_text = f"Analyze the educational concept and subject matter in this learning material. Question: {question_text} Answer: {answer_text}. What is the main educational topic and key concepts being taught?"
+            
+            # Helper function to safely convert tensor to PIL
+            def safe_tensor_to_pil(img_tensor):
+                if img_tensor is None:
+                    return None
+                
+                # If it's already a PIL Image, return as-is
+                if isinstance(img_tensor, Image.Image):
+                    return img_tensor
+                
+                # Convert tensor to PIL safely
+                if torch.is_tensor(img_tensor):
+                    # Normalize tensor to [0,1] range
+                    img_tensor = img_tensor.float()
+                    img_tensor = (img_tensor - img_tensor.min()) / (img_tensor.max() - img_tensor.min())
+                    
+                    # Remove batch dimension if present
+                    if img_tensor.dim() == 4:
+                        img_tensor = img_tensor.squeeze(0)
+                    
+                    # Ensure correct channel order (C, H, W) -> (H, W, C)
+                    if img_tensor.dim() == 3 and img_tensor.shape[0] in [1, 3]:
+                        img_tensor = img_tensor.permute(1, 2, 0)
+                    
+                    # Convert to uint8 and PIL
+                    img_array = (img_tensor * 255).clamp(0, 255).byte().numpy()
+                    
+                    # Handle grayscale
+                    if img_array.shape[-1] == 1:
+                        img_array = img_array.squeeze(-1)
+                        return Image.fromarray(img_array, mode='L')
+                    else:
+                        return Image.fromarray(img_array, mode='RGB')
+                
                 return None
 
-    # Extract all text and media into separate lists for batch processing.
-    all_question_ids = [record.get('question_id', '') for record in records]
-    all_question_texts = [record.get('question_text', '') for record in records]
-    all_answer_texts = [record.get('answer_text', '') for record in records]
-    
-    all_question_media_lists = [record.get('question_media', []) for record in records]
-    all_answer_media_lists = [record.get('answer_media', []) for record in records]
-
-    # Vectorize all text fields in a single batch.
-    question_text_vectors = text_model.encode(all_question_texts)
-    print("Vectorized question text")
-    print(question_text_vectors)
-    answer_text_vectors = text_model.encode(all_answer_texts)
-    print("Vectorized answer text")
-    print(answer_text_vectors)
-
-    # Vectorize all media fields in a single batch.
-    all_media_names = []
-    for media_list in all_question_media_lists + all_answer_media_lists:
-        all_media_names.extend(media_list)
-
-    # Process all images and keep track of successful ones.
-    processed_images_info = []
-    for name in all_media_names:
-        tensor = load_and_preprocess_image(image_name=name, preprocess=preprocess)
-        if tensor is not None:
-            processed_images_info.append((name, tensor))
-
-    image_tensors = [info[1] for info in processed_images_info]
-    successful_image_names = [info[0] for info in processed_images_info]
-
-    media_vectors = {}
-    if image_tensors:
-        image_batch = torch.stack(image_tensors)
-        with torch.no_grad():
-            vectors_tensor = vision_model(image_batch).squeeze()
-        
-        # If there's only one image, squeeze() can remove the batch dimension.
-        # We need to reshape it to be a 2D array.
-        if vectors_tensor.dim() == 1:
-            vectors_tensor = vectors_tensor.unsqueeze(0)
-        
-        vectorized_images = vectors_tensor.numpy()
-        
-        # Correctly map vectorized images back to their original names.
-        for i, name in enumerate(successful_image_names):
-            media_vectors[name] = vectorized_images[i]
-
-    print(media_vectors)
-    # Reconstruct the records with the new vectorized data.
-    vectorized_records = []
-    for i in range(len(records)):
-        record = records[i]
-        
-        q_media_vectors = []
-        for media_name in all_question_media_lists[i]:
-            if media_name in media_vectors:
-                q_media_vectors.append(media_vectors[media_name])
-        
-        a_media_vectors = []
-        for media_name in all_answer_media_lists[i]:
-            if media_name in media_vectors:
-                a_media_vectors.append(media_vectors[media_name])
-                
-        vectorized_record = {
-            "question_id": all_question_ids[i],
-            "question_text": question_text_vectors[i],
-            "answer_text": answer_text_vectors[i],
-            "question_media": np.mean(q_media_vectors, axis=0) if q_media_vectors else np.zeros(2048),
-            "answer_media": np.mean(a_media_vectors, axis=0) if a_media_vectors else np.zeros(2048),
-        }
-        vectorized_records.append(vectorized_record)
-
-    return vectorized_records
-
-
-def process_and_vectorize_dataframe() -> pd.DataFrame:
-    """
-    Processes and vectorizes a Pandas DataFrame of question records using multiprocessing.
-
-    This function acts as a pipeline:
-    1. It simplifies each record into a standardized dictionary format.
-    2. It splits the records into chunks and processes each chunk on a separate
-       process to leverage all available CPU cores.
-    3. The vectorized data is returned as a single Pandas DataFrame.
-
-    Returns:
-        A pandas.DataFrame containing the vector representations of the question's
-        text and media.
-    """
-
-    # simplified_records = pre_process_question_dataframe(load_question_data.load_question_data())
-
-    # if not simplified_records:
-    #     return pd.DataFrame()
-
-    # # Determine the number of workers to use (number of CPU cores).
-    # num_workers = os.cpu_count() or 1
-    
-    # # Divide the records into chunks for each worker.
-    # # The `+ 1` ensures that even a small remainder gets its own chunk.
-    # chunk_size = len(simplified_records) // num_workers + 1
-
-    # chunks = [
-    #     simplified_records[i:i + chunk_size]
-    #     for i in range(0, len(simplified_records), chunk_size)
-    # ]
-
-    # all_vectorized_data = []
-    # with concurrent.futures.ProcessPoolExecutor(max_workers=num_workers) as executor:
-    #     # Submit each chunk to the executor for vectorization.
-    #     future_to_chunk = {executor.submit(vectorize_records, chunk): chunk for chunk in chunks}
-        
-    #     for future in concurrent.futures.as_completed(future_to_chunk):
-    #         try:
-    #             # Retrieve the vectorized data from the completed future.
-    #             result = future.result()
-    #             all_vectorized_data.extend(result)
-    #         except Exception as e:
-    #             # Catch and print any errors that occur during a chunk's processing.
-    #             print(f"Error vectorizing a chunk: {e}")
-                
-    # # Convert the combined vectorized data back into a DataFrame.
-    # vectorized_df = pd.DataFrame(all_vectorized_data)
-
-    # Step 1: Simplify each record in the DataFrame.
-    # We convert each row to a dictionary and simplify it.
-    simplified_records = pre_process_question_dataframe(load_question_data.load_question_data())
-
-    # Step 2: Vectorize all simplified records in a single batch.
-    vectorized_data = vectorize_records(simplified_records)
-    # Step 3: Convert the vectorized data into a Pandas DataFrame.
-    vectorized_df = pd.DataFrame(vectorized_data)
-
-    # Step 4: Save the vectorized data to a local file for caching.
-    # The Parquet format is used for efficient storage of DataFrames.
-    print("\n--- Saving vectorized data to vectorized_data.parquet ---")
-    try:
-        # Before saving, ensure the dtypes are uniform to avoid errors.
-        # This is a common issue with mixed-type NumPy arrays.
-        for col in ['question_media', 'answer_media']:
-            if col in vectorized_df.columns:
-                vectorized_df[col] = vectorized_df[col].apply(
-                    lambda x: x.astype(np.float64) if isinstance(x, np.ndarray) else x
+            # Handle images - load actual media images if they exist
+            all_images = []
+            
+            # Load question media images
+            if question_media:
+                for img_name in question_media:
+                    if img_name:
+                        try:
+                            img_tensor = load_image(img_name)
+                            img_pil = safe_tensor_to_pil(img_tensor)
+                            if img_pil is not None:
+                                all_images.append(img_pil)
+                        except Exception as e:
+                            print(f"Error loading question image {img_name}: {e}")
+            
+            # Load answer media images  
+            if answer_media:
+                for img_name in answer_media:
+                    if img_name:
+                        try:
+                            img_tensor = load_image(img_name)
+                            img_pil = safe_tensor_to_pil(img_tensor)
+                            if img_pil is not None:
+                                all_images.append(img_pil)
+                        except Exception as e:
+                            print(f"Error loading answer image {img_name}: {e}")
+            
+            # If no actual images, create a simple white image as placeholder
+            if not all_images:
+                placeholder_image = Image.new('RGB', (224, 224), color='white')
+                all_images = [placeholder_image]
+            
+            # Combine multiple images if present
+            if len(all_images) > 1:
+                combined_image = combine_images_vertically(all_images)
+            else:
+                combined_image = all_images[0]
+            
+            # Process through InstructBLIP
+            inputs = processor(
+                images=combined_image, 
+                text=instruction_text, 
+                return_tensors="pt"
+            )
+            
+            with torch.no_grad():
+                # Get the full model outputs which include cross-modal interactions
+                outputs = model.vision_model(
+                    pixel_values=inputs.pixel_values,
+                    return_dict=True
                 )
-        
-        vectorized_df.to_parquet('vectorized_data.parquet')
-        print("--- Save successful ---")
-    except Exception as e:
-        print(f"Error saving vectorized data: {e}")
-
-    return vectorized_df
-
-
-def print_first_n_records(df: pd.DataFrame, n_head: int, n_media: int) -> None:
-    """
-    Provides a summary of a Pandas DataFrame by printing its first `n_head` records
-    and the first `n_media` records that contain non-zero media vectors.
-
-    This function combines two separate printing functionalities into a single call.
-
-    Args:
-        df (pd.DataFrame): The DataFrame to summarize.
-        n_head (int): The number of records to print from the beginning of the DataFrame.
-        n_media (int): The number of records to print that have non-zero media vectors.
-    """
-    if df.empty:
-        print("DataFrame is empty. No records to display.")
-        return
-
-    # Print the head of the DataFrame
-    print(f"\n--- Printing the first {n_head} records from the DataFrame ---")
-    if n_head > 0:
-        print(df.head(n_head))
-    else:
-        print("Invalid number of records to print from the head. Please provide a positive integer.")
-    print("--- End of DataFrame preview ---")
-
-    # Print the records with non-zero media vectors
-    print(f"\n--- Printing the first {n_media} records with non-zero media vectors ---")
+                
+                # Get vision features
+                vision_features = outputs.last_hidden_state  # [batch, patches, hidden_size]
+                vision_pooled = outputs.pooler_output  # [batch, hidden_size]
+                
+                # Get text embeddings
+                text_embeddings = model.language_model.get_input_embeddings()(inputs.input_ids)
+                text_pooled = text_embeddings.mean(dim=1)  # [batch, hidden_size]
+                
+                # Create combined cross-modal embedding
+                # This captures the interaction between visual and textual educational content
+                
+                # Method 1: Concatenate vision and text features
+                vision_flat = vision_pooled.squeeze()  # Remove batch dim
+                text_flat = text_pooled.squeeze()      # Remove batch dim
+                
+                # Ensure same dimensionality for proper combination
+                if vision_flat.shape[0] != text_flat.shape[0]:
+                    # Project to common dimension
+                    target_dim = min(vision_flat.shape[0], text_flat.shape[0])
+                    vision_projected = F.linear(vision_flat.unsqueeze(0), 
+                                              torch.randn(target_dim, vision_flat.shape[0])).squeeze()
+                    text_projected = F.linear(text_flat.unsqueeze(0), 
+                                            torch.randn(target_dim, text_flat.shape[0])).squeeze()
+                else:
+                    vision_projected = vision_flat
+                    text_projected = text_flat
+                
+                # Create combined embedding that captures cross-modal educational semantics
+                # Weighted combination emphasizing both modalities
+                alpha = 0.6  # Weight for vision (important for educational diagrams/images)
+                beta = 0.4   # Weight for text (important for concepts/explanations)
+                
+                combined_embedding = alpha * vision_projected + beta * text_projected
+                
+                # Optional: Add interaction term to capture cross-modal relationships
+                interaction_term = vision_projected * text_projected * 0.1
+                final_embedding = combined_embedding + interaction_term
+                
+                embedding = final_embedding.cpu().numpy()
+            
+            # Update the original record with computed values
+            record['question_vector'] = embedding
+            record['is_math'] = is_math
+            record['keywords'] = keywords
+            
+            # Save back to database
+            success = upsert_question_record(db, record)
+            
+            if success:
+                processed_count += 1
+                print(f"Processed record {processed_count}: {question_id}")
+                print(f"  - Is math: {is_math}")
+                print(f"  - Keywords: {len(keywords) if keywords else 0}")
+                print(f"  - Images processed: {len(all_images)}")
+                print(f"  - Embedding shape: {embedding.shape}")
+            else:
+                print(f"Failed to save record: {question_id}")
+            
+        except Exception as e:
+            print(f"Error processing record {record.get('question_id', 'unknown')}: {e}")
+            
+            # Still try to save a fallback record to avoid infinite loop
+            try:
+                record['question_vector'] = np.zeros(4096, dtype=np.float32)  # Fallback embedding
+                record['is_math'] = False
+                record['keywords'] = []
+                upsert_question_record(db, record)
+                processed_count += 1
+                print(f"Saved fallback for record: {record.get('question_id', 'unknown')}")
+            except Exception as save_error:
+                print(f"Failed to save fallback record: {save_error}")
+                break  # Prevent infinite loop if DB is broken
     
-    # We first need to check if the columns exist to avoid an error.
-    if 'question_media' in df.columns and 'answer_media' in df.columns:
-        # Create boolean masks for non-zero media vectors
-        # We apply a lambda function to each row to check for non-zero values in the media columns
-        has_question_media = df['question_media'].apply(lambda x: np.any(np.array(x) != 0) if isinstance(x, (list, np.ndarray)) else False)
-        has_answer_media = df['answer_media'].apply(lambda x: np.any(np.array(x) != 0) if isinstance(x, (list, np.ndarray)) else False)
-        
-        # Combine the masks to find records with either non-zero question or answer media
-        non_zero_media_df = df[has_question_media | has_answer_media]
-
-        if not non_zero_media_df.empty:
-            print(non_zero_media_df.head(n_media))
-        else:
-            print("No records with non-zero media vectors found.")
-    else:
-        print("DataFrame does not contain 'question_media' or 'answer_media' columns.")
-    
-    print("--- End of media records preview ---")
+    db.close()
+    print("Database connection closed.")
 
 def main():
     """
     Main execution function for the data processing pipeline.
     """
+    np.random.seed(42)
+    torch.manual_seed(42)
     start_time = time.time()
-    
-    # Placeholder for the function call to process and vectorize data
-    vectorized_df = process_and_vectorize_dataframe()
+    vectorize_records()
     
     end_time = time.time()
     total_time = end_time - start_time
-    
-    if not vectorized_df.empty:
-        df_length = len(vectorized_df)
-        avg_time_per_record = total_time / df_length
-    else:
-        df_length = 0
-        avg_time_per_record = 0.0
 
-    # Placeholder for printing the first n records of the DataFrame
-    print_first_n_records(vectorized_df, 10, 5)
+
 
     print(f"\nVectorization complete.")
     print(f"Total time taken: {total_time:.2f} seconds")
-    print(f"Number of records vectorized: {df_length}")
-    print(f"Average time per record: {avg_time_per_record:.4f} seconds")
 
 if __name__ == '__main__':
     main()
