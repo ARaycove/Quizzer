@@ -13,6 +13,7 @@ from k_means_cluster_question_data import (
     plot_cluster_relations_heatmap, plot_clusters_pca, plot_elbow_method,
     update_db_with_cluster_ids)
 from data_utils import filter_df_for_k_means, calculate_optimal_pca_components, run_pca
+from plotting_functions import umap_plot
 
 
 
@@ -64,8 +65,8 @@ k = 4 #Set by the elbow method
 print(df.head(5))
 
 
-k_means_df = filter_df_for_k_means(df)
-k_means_df, shape = create_onehot_features(df = k_means_df, pca_components=1886) # Use one principle component per subject field identified in the taxonomy
+encoded_df = filter_df_for_k_means(df)
+encoded_df, shape = create_onehot_features(df = encoded_df) # Use one principle component per subject field identified in the taxonomy
 
 # We'll reduce this using PCA
 # let's say we want 100 samples per core component 
@@ -74,24 +75,29 @@ print(f"Samples: {samples}")
 d = shape[1] + 1408 # 1408 is the size of our transformer vector (subtract one add one is_math - the single feature in here that represents the vector)
 print(f"Dimensionality: {d}")
 
-# Since we are working in extremely high dimensional space, with a relatively limited sample size, we will run a calculation on the spot to determine the optimal reduction
-p = calculate_optimal_pca_components(num_samples=samples, num_features=d)
-print(f"Ideal p value is: {p}")
+umap_plot(df = encoded_df, min_k=43, max_k = 100, filename="cluster_plots/umap_plot")
 
-k_means_df = run_pca(k_means_df, p)
 
-# elbow method when new data, uncomment and rerun
-skip_initial_elbow_plot = False
-if not skip_initial_elbow_plot:
-    plot_elbow_method(df=k_means_df, file_name="elbow_plots/question_data_elbow_plot.png", k_end = 10)
-    # Subject (2nd layer) taxonomy is around 30 subject matters of distinction. Given we had data for all 30, we should expect around 30 clusters, with subclusters within.
 
-# Elbow method does nothing on this set now, there is no elbow
-k = 5 # 5 reflects UNESCO academic classification 5 broad domains
-cluster_data = cluster_data_with_kmeans(k_means_df, k)
-cluster_relations = calculate_cluster_relations(cluster_data[1])
-plot_cluster_relations_heatmap(cluster_relations, "cluster_plots/cluster_relational_strength")
-plot_clusters_pca(cluster_data[0], k, "cluster_plots/question_data_kmeans_cluster")
+# OLD CODE, not using this right now:
+# # Since we are working in extremely high dimensional space, with a relatively limited sample size, we will run a calculation on the spot to determine the optimal reduction
+# p = calculate_optimal_pca_components(num_samples=samples, num_features=d)
+# print(f"Ideal p value is: {p}")
+
+# k_means_df = run_pca(k_means_df, p)
+
+# # elbow method when new data, uncomment and rerun
+# skip_initial_elbow_plot = False
+# if not skip_initial_elbow_plot:
+#     plot_elbow_method(df=k_means_df, file_name="elbow_plots/question_data_elbow_plot.png", k_end = 10)
+#     # Subject (2nd layer) taxonomy is around 30 subject matters of distinction. Given we had data for all 30, we should expect around 30 clusters, with subclusters within.
+
+# # Elbow method does nothing on this set now, there is no elbow
+# k = 5 # 5 reflects UNESCO academic classification 5 broad domains
+# cluster_data = cluster_data_with_kmeans(k_means_df, k)
+# cluster_relations = calculate_cluster_relations(cluster_data[1])
+# plot_cluster_relations_heatmap(cluster_relations, "cluster_plots/cluster_relational_strength")
+# plot_clusters_pca(cluster_data[0], k, "cluster_plots/question_data_kmeans_cluster")
 
 # For hierarchical clustering, we will repeat the same cluster_data_with_kmeans k times,
 
@@ -112,4 +118,4 @@ plot_clusters_pca(cluster_data[0], k, "cluster_plots/question_data_kmeans_cluste
 
 # plot_clusters_pca(combined_df, sum(sub_k), "question_data_sub_clusters", 3) #replot with subclusters
 
-update_db_with_cluster_ids(cluster_data[0], initialize_and_fetch_db())
+# update_db_with_cluster_ids(cluster_data[0], initialize_and_fetch_db())

@@ -53,12 +53,14 @@
             "id": "d477a20869bd563d",
             "type": "leaf",
             "state": {
-              "type": "excalidraw",
+              "type": "markdown",
               "state": {
-                "file": "Excalidraw/Drawing 2025-04-17 10.16.39.excalidraw.md"
+                "file": "Core Documentation/Chapter 09 - Algorithms and Background Processes/09_00_Feature_Outline.md",
+                "mode": "source",
+                "source": false
               },
-              "icon": "excalidraw-icon",
-              "title": "Drawing 2025-04-17 10.16.39.excalidraw"
+              "icon": "lucide-file",
+              "title": "09_00_Feature_Outline"
             }
           }
         ],
@@ -119,7 +121,8 @@
       }
     ],
     "direction": "horizontal",
-    "width": 281.5
+    "width": 281.5,
+    "collapsed": true
   },
   "right": {
     "id": "1361b1d659fdf502",
@@ -213,6 +216,7 @@
   },
   "active": "d477a20869bd563d",
   "lastOpenFiles": [
+    "Excalidraw/Drawing 2025-04-17 10.16.39.excalidraw.md",
     "CSCI_447 Assignment 0.md",
     "Core Documentation/Chapter 09 - Algorithms and Background Processes/09_00_Feature_Outline.md",
     "Core Documentation/Chapter 09 - Algorithms and Background Processes/Neural-Net Layer.md",
@@ -229,7 +233,6 @@
     "temp_notes.md",
     "Diagrams/NewUserSignUp-LoginPage.png",
     "Diagrams/LoginPage.png",
-    "Excalidraw/Drawing 2025-04-17 10.16.39.excalidraw.md",
     "Core Documentation/Chapter 05 - User Experience and User Interface Design/05_08_Enter_Source_Material_Page.md",
     "Core Documentation/Chapter 05 - User Experience and User Interface Design/05_07_Help_With_Research_Page.md",
     "Core Documentation/Chapter 05 - User Experience and User Interface Design/05_06_Menu_Page.md",

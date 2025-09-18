@@ -30,6 +30,7 @@ migrate_working_dir/
 .pub-cache/
 .pub/
 /build/
+
 quizzer/google-chrome-stable_current_amd64.deb
 
 
@@ -46,3 +47,4 @@ app.*.map.json
 
 # Scripts with hardcoded credentials
 test/fix_module_names.dart
+quizzer/dataAnalysis/data.db

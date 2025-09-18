@@ -169,4 +169,4 @@ quizzer/linux/
 quizzer/macos/
 quizzer/google-chrome-stable_current_amd64.deb
 quizzer/lib/main.dart
-
+quizzer/dataAnalysis/data.db
