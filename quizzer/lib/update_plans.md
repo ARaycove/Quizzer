@@ -15,9 +15,9 @@ The goal of this update is to:
 
 
 ## Implementation TODO:
-* [] logout, closes processes and kills the app (include splash screen)
-  * [] Will need to rigoursly test logout/login/logout/login cycle works and doesn't break the system. Currently there is some kind of issue regarding if we logout, existing processes are not closed properly. This is related to the login/logout process
-    * [] Logout function does not properly return
+* [x] logout, closes processes and kills the app (include splash screen)
+  * [x] Will need to rigoursly test logout/login/logout/login cycle works and doesn't break the system. Currently there is some kind of issue regarding if we logout, existing processes are not closed properly. This is related to the login/logout process
+    * [x] Logout function does not properly return
       * Perhaps the issue is that the menu page, immediately sends us back to the home page allowing us to login again before the logout cycle is done.
       * [x] added await to the menu_page.dart await session.logoutUser() Further testing required at this point.
       * [x] Outbound sync worker did not return stoppage, stuck waiting, thus added extra outboundSyncComplete signal for the stop function.
@@ -41,41 +41,6 @@ The goal of this update is to:
   * Currently supabase.client has hardcoded access URL and such
 
 ## Resolve bugs relating to login flow:
-
-
-## Bug Fixes
-* [] Math field does not expand to fit the what's entered into it
-
-* [] Math validation should not allow the question to be entered as the answer (assuming the question is to transform the equation into some other form)
-  * if userAnswer matches exactly the question, then it should not allow it to work
-    * but if the correctAnswer is basic, then this doesn't fly
-    * Perhaps some way to determine how many steps away the userAnswer is from the correctAnswer
-    * has to at least be similar
-    * apply evaluation + similarity? Yes I think this is the way,
-      * similarity score must be greater than threshold AND evaluate correctly
-  * This would be for factor(xyz)
-  * evaluation function would evaluate both the same factored and non-factored version
-  * so data structure needs to be updated. . .?
-    * But this needs to be a more automatic determination
-
-* [] Matrix latex elements with fractions inside, formatted fraction elements need padding on top to prevent overlap
-
-* [] User States: "Android version needs some bottom margin on pages, preventing widgets from getting partially hidden."
-  * snackbar pop-ups and margin cutoff on android are blocking the use of the next question button and submit answer buttons. Adding a bottom margin the height of the snackbar would remove this issue
-
-* [] User States: Occasionally we get an app crash if I close my phone, then when I reopen the app I return to an error screen
-
-## Miscellaneous Addition might get pushed to later updates
-* [] User Setting: Shrink or Wrap options with default Wrap for math related latex. If Shrink the font size of a latex element will shrink to fit the screen, if wrap the latex element will wrap over to a new line to avoid cutting off text
-* [] Fix Environment variables (Credentials should be stored securely)
-* [] overhaul adding images, allow an option to choose from existing images in the system or to upload a new image (this will help prevent duplicating the same image file many times over)
-* [] copy paste image support for add question interface
-* [] Add setting and option to display next revision day project after answering a question
-* [] Need to update QuizzerLogger such that I can trigger a level specific logging on a file by file basis
-
-
-
-
 
 # Update ?.?.?: User Profile Page
 The user profile page serves as the first set of features to be fed into the question accuracy prediction model. The following series of updates will setup the data flow such that we can easily get this data and feed it into the model
@@ -183,11 +148,30 @@ Some extra tools to make it easier to comb through and review the state of quest
   * [] approve edit option (No direct push, require additional layer of validation from main panel)
   * [] Should pull the question_id locally and pull the question record from the server directly
 
-
 ## Bug Fixes:
 * [] Some question answer attempt records ARE NOT syncing and triggering an RLS violation. . .
   * Appears to be intermittent, as many attempt records do get synced
 * [] Circulation worker does not properly remove excess new questions, allowing too many new questions to overload the user. Should have some kind of mechanism that will remove only revision score 0 questions from circulation
+* [] Math field does not expand to fit the what's entered into it
+
+* [] Math validation should not allow the question to be entered as the answer (assuming the question is to transform the equation into some other form)
+  * if userAnswer matches exactly the question, then it should not allow it to work
+    * but if the correctAnswer is basic, then this doesn't fly
+    * Perhaps some way to determine how many steps away the userAnswer is from the correctAnswer
+    * has to at least be similar
+    * apply evaluation + similarity? Yes I think this is the way,
+      * similarity score must be greater than threshold AND evaluate correctly
+  * This would be for factor(xyz)
+  * evaluation function would evaluate both the same factored and non-factored version
+  * so data structure needs to be updated. . .?
+    * But this needs to be a more automatic determination
+
+* [] Matrix latex elements with fractions inside, formatted fraction elements need padding on top to prevent overlap
+
+* [] User States: "Android version needs some bottom margin on pages, preventing widgets from getting partially hidden."
+  * snackbar pop-ups and margin cutoff on android are blocking the use of the next question button and submit answer buttons. Adding a bottom margin the height of the snackbar would remove this issue
+
+* [] User States: Occasionally we get an app crash if I close my phone, then when I reopen the app I return to an error screen
 
 ## Other minor changes
 * [] Synonym fields in the add question interface should also allow for math expressions
@@ -221,6 +205,12 @@ Some extra tools to make it easier to comb through and review the state of quest
   * [] font-size for everything else
     * [] add setting value to settings page
     * [] add setting value to table
+* [] User Setting: Shrink or Wrap options with default Wrap for math related latex. If Shrink the font size of a latex element will shrink to fit the screen, if wrap the latex element will wrap over to a new line to avoid cutting off text
+* [] Fix Environment variables (Credentials should be stored securely)
+* [] overhaul adding images, allow an option to choose from existing images in the system or to upload a new image (this will help prevent duplicating the same image file many times over)
+* [] copy paste image support for add question interface
+* [] Add setting and option to display next revision day project after answering a question
+* [] Need to update QuizzerLogger such that I can trigger a level specific logging on a file by file basis
 
 # Update ?.?.? Rebuild Selection and Circulation algorithms:
 This update will introduce the internal machine learning model that will allow Quizzer to improve dynamically as more data comes
