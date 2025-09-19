@@ -75,8 +75,8 @@ print(f"Samples: {samples}")
 d = shape[1] + 1408 # 1408 is the size of our transformer vector (subtract one add one is_math - the single feature in here that represents the vector)
 print(f"Dimensionality: {d}")
 
-umap_plot(df = encoded_df, min_k=43, max_k = 100, filename="cluster_plots/umap_plot")
-
+cluster_data = umap_plot(df = encoded_df, min_k=65, max_k = 65, filename="cluster_plots/umap_plot")
+update_db_with_cluster_ids(cluster_data, initialize_and_fetch_db())
 
 
 # OLD CODE, not using this right now:
@@ -118,4 +118,3 @@ umap_plot(df = encoded_df, min_k=43, max_k = 100, filename="cluster_plots/umap_p
 
 # plot_clusters_pca(combined_df, sum(sub_k), "question_data_sub_clusters", 3) #replot with subclusters
 
-# update_db_with_cluster_ids(cluster_data[0], initialize_and_fetch_db())

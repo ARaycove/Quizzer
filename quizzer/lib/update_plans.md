@@ -267,22 +267,61 @@ Optional questionairre that will set all interest levels based on a series of qu
 
 * [ ] Add a back button for the review panels, requested by admin
 
-# Academic Archive Update:
-## Keyword definitions table
+# Update ?.?.? Academic Archive:
+This update will be critical for further model optimizations and for adding an extra layer of validity to Quizzer
 
-* [ ] Need to define the sql table for this
-* [ ] Need to add a section to the admin panel allowing our admins to
-  * [ ] submit keyword records
-  * [ ] update keyword records with wiki articles
+We are focused on three core categories in Academic Taxonomy,
+**Keywords/Concepts**, **Subject/Fields/Major**, **Source Citations**
 
-## Citation Entry Table
+In order to allow for training of better models, we need to classify questions by their concept(s) and subject(s). A question may have multiple concepts and multiple subjects that it covers or even just one of each. For each of these we need to add functionality to the Admin Panel so we have the tooling to provide to our non-technical team to be able to add to and contribute to this archive.
 
+## Keywords and Concepts definitions table
+### Define the SQL table where this information gets stored
+  Here a "keyword" and a "concept_label" are identical in meaning
+
+  This table will be relatively simple storing {keyword: "<name>" and article: "<article>"}. The article will be a markdown document that can be loaded and rendered as such. Having this information provides us the capability to add features like a wiki section of the app that allows users to step outside the quizzer loop and just read the information they are looking for.
+
+  * [ ] Need to define the sql table for this
+  * [ ] Need to add a section to the admin panel allowing our admins to
+    * [ ] submit keyword records
+    * [ ] update keyword records with wiki articles
+### Define the Relational Table
+  Here we will define a table that links a question_id to an array of keywords
+  * [] question_id | keyword | 
+    - Very simple table, for every keyword associated with the question_id we will have a single record
+    * [] Create an index for the SQL table that allows for O(1) look up times for faster queries, index by question_id
+
+### Provide a tool in the admin panel
+  Here we need a tool that will look for question records that have not been classified whatsoever and present them for classification. I expect extensive work on this, as the total number of concepts will grow into the tens of thousands in length. So we need some optimal way to allow our team who uses this tool to easily look up relevant concepts, assume the user is not able to recall off the top of their heads what the concept is.
+
+This then lays the groundwork for setting up both the archive of wiki articles detailing extensively the base of human knowledge, and gives us the tooling needed to first generate the labels by hand, then use that information to train a ML classifier to automatically classify questions with ease. Once such a model for that is developed we can use it in conjunction with the admin tool for classification.
+
+## Subjects
+### Define the SQL Table for subject definitions:
+* [x] The SQL table is already defined
+
+### Admin tool
+* [x] The admin tool already exists to provide subject definitions
+  * [] Optimize the tool and do any redesign work necessary
+
+### Define the relational table:
+* [] question_id | subject
+  - Much like the keywords relational table, the purpose of this table is to store what question has what subject labels
+  * [] Ensure we have an index by question_id for quick O(1) Lookup times
+
+## Citations
+The purpose of citations is to have an archive of all material, citations table should include:
+- Complete valid citation
+- The actual content being cited should be stored in the table
+
+If the actual content being cited is not stored in the archive, it defeats the purpose of storing this information, as citations might exist, but the source material is missing, making the citation effectively pointless. The hope is that by having this information, a future generative model can be created that can produce educational content on the fly based off real accurate, verified primary and secondary sources.
+### Define the SQL table:
 * [ ] Need to define an sql table
 * [ ] Need to add a section to the admin panel allowing admins to:
   * [ ] Submit full citations, including the actual content of the cited material
 
-## New Model Task - Binary Keyword Classification
 
+## New Model Task - Binary Keyword Classification
 * [ ] Generate inference data from existing llm models
 * [ ] Train our existing model on new data-set
 * [ ] Then have our model classify the existing questions
@@ -290,8 +329,8 @@ Optional questionairre that will set all interest levels based on a series of qu
   * [ ] Update active training loop system with new task
 * [ ] All questions should now be classified by keyword and subject labels
 
-## Home Page Info Icon
 
+## Home Page Info Icon
 * [ ] To be displayed in the Answer Explanation AFTER a quesiton is answered
 * [ ] Based on the classification results, display a list of keywords that the question covers
   * [ ] for each keyword, it should allow an info icon that when clicked gives a dialogue popup for the wiki of that keyword for further reading by the user. This means that if the user is curious the information is at their fingertips. If they are not, they are not bogged down in a wall of text.

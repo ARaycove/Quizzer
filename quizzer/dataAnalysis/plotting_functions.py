@@ -171,7 +171,7 @@ def umap_plot(df, max_k, filename, min_k=2, k_clusters=None):
         if i == len(k_values) - 1:
             final_kmeans = KMeans(n_clusters=unique_clusters, random_state=42, n_init=10)
             final_cluster_ids = final_kmeans.fit_predict(X_umap)
-            df_result['cluster_id'] = final_cluster_ids
+            df_result['cluster_label'] = final_cluster_ids
     
     print(f"UMAP analysis complete! Generated {batch_num-1} batch images.")
     
