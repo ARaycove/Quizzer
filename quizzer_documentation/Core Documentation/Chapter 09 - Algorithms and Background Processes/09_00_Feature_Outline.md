@@ -12,8 +12,45 @@ See [[Neural-Net Layer]] Diagram for outline of the input layer to our probabili
 ---
 **Health Metrics**: The list of health metrics, given a user syncs their health data with us for analysis
 n features
-**User Specific Metrics**
-6 features
+**User Profile Metrics**
+Metrics that demographic, and can help provide information on unique identifies
+
+| Feature                       | description                                                                                                                                  | purpose                                                                                                                                              |
+| ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Age                           | How old is this person?                                                                                                                      | Age is usually a good heuristic of general knowledge (though not really, there is a correlation)                                                     |
+| highest_level_of_education    | What is the highest grade completed:<br>(i.e secondary school, high school, undergrad, masters, phd) -> get's one hot encoded as categorical | education_level                                                                                                                                      |
+| undergrad_major               | array of degrees, What did this person major                                                                                                 | education_level                                                                                                                                      |
+| minor                         | array of minor, What did this person minor in                                                                                                | education_level                                                                                                                                      |
+| grad_major                    | array of degrees, What did this person major in, for grad school if completed                                                                | education_level                                                                                                                                      |
+| country_of_origin             | Where was this person born and raised                                                                                                        | provides insight as a indicator of what cultural background this person has. (socio-cultural factors are a major determinant in many facets of life) |
+| current_country_of_residence  |                                                                                                                                              | indicator of socio-cultural status                                                                                                                   |
+| current_state                 |                                                                                                                                              | indicator of socio-cultural status                                                                                                                   |
+| current_city                  |                                                                                                                                              | indicator of socio-cultural status                                                                                                                   |
+| religion                      | To which religion if any, does this person self-identify with                                                                                | indicator of self-identity                                                                                                                           |
+| political_affiliation         | To which political ideology if any, does this person self-identify with                                                                      | indicator of self-identity                                                                                                                           |
+| native_language               |                                                                                                                                              |                                                                                                                                                      |
+| other_language_proficiences   | array_of_language indicators                                                                                                                 |                                                                                                                                                      |
+| current_occupation_industry   |                                                                                                                                              |                                                                                                                                                      |
+| household_income              |                                                                                                                                              |                                                                                                                                                      |
+| hours_worked_per_week         |                                                                                                                                              |                                                                                                                                                      |
+| years_work_experience         |                                                                                                                                              |                                                                                                                                                      |
+| total_job_changes             | how many different jobs has this person had                                                                                                  |                                                                                                                                                      |
+| marital_status                |                                                                                                                                              |                                                                                                                                                      |
+| number_of_children            |                                                                                                                                              |                                                                                                                                                      |
+| urban_vs_rural                | one hot encode                                                                                                                               |                                                                                                                                                      |
+| military service              | 0/1                                                                                                                                          |                                                                                                                                                      |
+| learning_disabilities         |                                                                                                                                              |                                                                                                                                                      |
+| num_languages_spoken          |                                                                                                                                              |                                                                                                                                                      |
+| years_since_graduation        | how many years from the most recent graduation/degree                                                                                        |                                                                                                                                                      |
+| commute_time_minutes          |                                                                                                                                              |                                                                                                                                                      |
+| family_educational_background | first_gen_college, etc.                                                                                                                      |                                                                                                                                                      |
+| disability_status             | physical disabilities                                                                                                                        |                                                                                                                                                      |
+| housing_situation             | own, rent, live_with_family, etc.                                                                                                            |                                                                                                                                                      |
+| birth_order                   | oldest, middle, youngest, only_child                                                                                                         |                                                                                                                                                      |
+|                               |                                                                                                                                              |                                                                                                                                                      |
+
+**User Stats Metrics**
+11 features
 
 | Feature                    | description                                                                                                        | purpose                                                                                            |
 | -------------------------- | ------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------- |
@@ -23,6 +60,11 @@ n features
 | total_questions_in_profile | the total number of questions that have been introduced to the user                                                | cumulative performance metric                                                                      |
 | average_daily_learned      | currently learning rate, measured by how many new questions are introduced to the user on a daily basis            | cumulative performance metric                                                                      |
 | average_daily_answered     | the amount of questions the user answers per day on average                                                        | cumulative performance metric                                                                      |
+| mcq_avg_accuracy           |                                                                                                                    |                                                                                                    |
+| fitb_avg_accuracy          |                                                                                                                    |                                                                                                    |
+| sata_avg_accuracy          |                                                                                                                    |                                                                                                    |
+| tf_avg_accuracy            |                                                                                                                    |                                                                                                    |
+| so_avg_accuracy            |                                                                                                                    |                                                                                                    |
 
 
 **Question Performance Data**
@@ -53,7 +95,7 @@ n features
 | attempt_day_ratio           | total_attempts / days_since_first_introduced                                                                                                                                |                                                                                                                                                                                                     |
 | average_hesitation          | In days (normalized) how long did it take them from time of presentation, to click on the answer field?                                                                     | Initial reaction time, hopefully this is a measure of engagement, disengaged users would take longer.                                                                                               |
 | average_reaction_time       | At time of attempt reaction time is recorded, give the average amount of time the user takes to answer the specific question                                                | From time of presentation to hitting submit, time in days. Measure of speed with this question                                                                                                      |
-**Module Performance Data**
+**Module Performance Data** (16 features)
 To be meaningful to the model, all module vectors will be ordered alphabetically by name, to ensure that all module vectors combined result in uniform ordering.
 
 We will label every such feature set as ```{module_name}_feature_name```
@@ -62,20 +104,24 @@ Does the number of questions by type effect accuracy?
 Do individual question types effect accuracy?
 Does partial versus full exposure to a module introduce transfer learning benefits?
 
-| feature          | description                                                                                                                                  | purpose |
-| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
-| num_mcq          | the number of mcq's in this module                                                                                                           |         |
-| num_fitb         | the number of fill in the blank questions                                                                                                    |         |
-| num_sata         | the number of select all that apply questions                                                                                                |         |
-| num_tf           | the number of true_false questions                                                                                                           |         |
-| num_so           | the number of sort order questions                                                                                                           |         |
-| num_total        | total number of questions in this module                                                                                                     |         |
-| total_seen       | the total number of questions in this module that are in the user's profile, that have been answered at least once revision_streak is $>= 1$ |         |
-| percentile_seen  | In this module, what is the total_seen / num_total ratio                                                                                     |         |
-| total_attempts   | How many questions have been attempted in this specific module                                                                               |         |
-| total_correct    | total correct attempts                                                                                                                       |         |
-| total_incorrect  | total incorrect attempts                                                                                                                     |         |
-| overall_accuracy | the number of correct attempt versus incorrect attempts inside this module                                                                   |         |
+| feature                   | description                                                                                                                                  | purpose |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| num_mcq                   | the number of mcq's in this module                                                                                                           |         |
+| num_fitb                  | the number of fill in the blank questions                                                                                                    |         |
+| num_sata                  | the number of select all that apply questions                                                                                                |         |
+| num_tf                    | the number of true_false questions                                                                                                           |         |
+| num_so                    | the number of sort order questions                                                                                                           |         |
+| num_total                 | total number of questions in this module                                                                                                     |         |
+| total_seen                | the total number of questions in this module that are in the user's profile, that have been answered at least once revision_streak is $>= 1$ |         |
+| percentile_seen           | In this module, what is the total_seen / num_total ratio                                                                                     |         |
+| avg_attempts_per_question | total_attempts / num_total                                                                                                                   |         |
+| total_attempts            | How many questions have been attempted in this specific module                                                                               |         |
+| total_correct             | total correct attempts                                                                                                                       |         |
+| total_incorrect           | total incorrect attempts                                                                                                                     |         |
+| overall_accuracy          | the number of correct attempt versus incorrect attempts inside this module                                                                   |         |
+| avg_reaction_time         | overall module reaction time $\frac{1}{n} \Sigma R_t$<br>Where $R_t$ is reaction_time and $n$ is total-attempts                              |         |
+| days_taken_to_master      | from the first question introduction in said module, how many days did it take to introduce all questions in the module?                     |         |
+| days_since_last_seen      | how many days has it been since any question in this module has been reviewed?                                                               |         |
 ## Some other Questions
 Does the amount of time a user is awake for, effect their accuracy?
 

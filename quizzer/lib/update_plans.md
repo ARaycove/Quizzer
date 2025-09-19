@@ -73,10 +73,68 @@ The goal of this update is to:
 * [] Add setting and option to display next revision day project after answering a question
 * [] Need to update QuizzerLogger such that I can trigger a level specific logging on a file by file basis
 
-# Update 2.?.?: Expansion of math_keyboard and math_expressions, initial changes to UI
+
+
+
+
+# Update ?.?.?: User Profile Page
+The user profile page serves as the first set of features to be fed into the question accuracy prediction model. The following series of updates will setup the data flow such that we can easily get this data and feed it into the model
+
+If you have other suggestions for easily quantifiable metrics that could be included in the user profile page, please do say something.
+
+* [] Need to create the User Profile page, On this page the user will be prompted to fill out there profile with all the fields listed in the user_profile table.
+* [] Profile picture should be at the top of the User profile page. 
+  * [] It should be a round portrait frame, 
+    * [] make sure you write this in such way that it's easy to add on decorations and frames around the profile that will be able to be unlocked through a future planned badge and achievement system.
+  * [] around the profile picture, we will have a progress indicator that wraps around the profile picture
+    * [] when they 100% fill out the profile there should be some form of easter egg, like the bar turning golden or some shit like that. Don't really care, just want the psychological effect of an award being given to the user in some capacity.
+* [] Good UI/UX for filling this out,
+  * [] Perhaps a button that when clicked gives a slide-show style presentation that pops up just what the user hasn't filled out yet, so they don't have to be bothered with filling this information out.
+* [] Info button -> "Why are you asking me for all this personal data? And Why should I give it to you?"
+  * [] I would like some kind of optional info button / FAQ whatever, that can alleviate the data privacy concerns a user might have.If we want user's to provide their data to improve model accuracy we must give them good reasons and be persuasive.
+
+# Update ?.?.?: Training Data Collection:
+For this update we need to rebuild the stat collections metrics.
+* [] Update supabase with the question_vector column
+  * [] Update the ml_pipeline to push the question vector back to supabase
+
+* [] Every module will need to be updated such that we track overall performance on a module by module basis. These stat block will become vectors which will feed into the accuracy prediction model.
+  * [] we will need a user_module_performance_table.dart sql table made to house this data
+
+* [] SubmitAnswer will need to be updated to capture the correct features
+  * [] Repurpose question_answer_attempts table with each field being a "feature" we collect
+  - The goal is that whenever a question is answered, Quizzer generates a complete training data point (approximately)
+  - See quizzer_v04/quizzer_documentation/Core Documentation/Chapter 09 - Algorithms and Background Processes/09_00_Feature_Outline.md for details on the full vector output expected
+
+* [] Update ML pipeline to pull all training data from supabase
+  * [] Export model and write a function that takes the input vector as input, and outputs the result of the model
+  * [] Write a specific function that generates the input vector for running the model locally, taking in just the question_id, and db_txn as input parameters
+  * [] Write unit tests to ensure sub-system works
+  
+Once this is all set up and Quizzer is generating the training data needed for the model we can begin work on rebuilding the UI/UX to be more "pretty" and usable
+
+# Update ?.?.?: UI Overhaul
+For this update we will focus on building new widgets and rebuilding old pages so they are less janky and overall have a proper UI/UX design.
+
+## Module system rework
+For the planned circulation algorithm, the module system will work as the method by which user's "seed" their initial profile. Thus this update will focus on optimizes the display modules page and fix any bugs relating to this system.
+
+The design of the display_modules page should be such that
+- User's can easily and intuitively find any topic they might be interested in (module names are written as topic matters)
+- Easy to navigate the modules, this is a challenge because the number of modules will only ever get larger, so we need a scalable display that can adapt on the fly
+  * [] Rewrite the admin utility that allows the groupings to be changed by the admin, after the display_module redesign. Admin should be able to reorganize the structure of the module cards, so if a module is misplaced an admin should be able to put it in the correct location
+- Keep module card design if possible, we want the user to have immediate access to the module description and meta-data about that module
+
+* [] Search and filter modules functionality
+* [] Update the module card to display percentage of questions in module in rotation (completion status)
+* [] Add option to incorporate Graphical backgrounds to individual modules for added visual flair (Admin access only)
+
+## Expansion of math_keyboard and math_expressions, initial changes to UI
 Not sure what's going on with the team that built the math_keyboard, permissions say modification and distributions is fine. I am considering taking the field and completely rebuilding it. Names and all, and package it internally inside quizzer as a "global widget":
 
 - Goal is to be able to type math expressions using a keyboard, and provide a built in field that actively renders that latex
+  - desmos.com has a proper keyboard that can enter any kind of notation ever. Essentially we want the blank widget to have a keyboard that allows the user to easily enter math notation and thus allow for more complicated mathematics questions
+
 - Current iteration write a TeX string, which means anything goes, and should be able to update easily based on the full library of TeX, but the iteration is hyper-limited to only some
 
 - Then for question validation that tex string should then be evaluated down to value. So we neeed:
@@ -88,6 +146,48 @@ Second to address would be the update to the math_expressions library to allow e
   * converts TeX string $\frac{x}{y}$ to computer readable expression
 * [] Update ExpressionParser
   * takes a parsed TeX string and evaluates the result, by directly injecting variables with real values
+
+## Rebuild Add Question Page
+The current add question page is janky and hard to use. Though it is working.
+
+We want to scrap it, and rebuild it as a WYSIWYG (What you see is what you get) style interface
+- [] Question type selection
+- [] Based on question type selected the interface will adapt (perhaps just by graying out incompatible components, MCQ won't get an option to add fill in the blank elements)
+  - That is unless you want to spend the extra time to make this dynamically detect what kind of question_type it is on the fly.
+
+
+## Additional User Settings:
+* [] User Settings: auto-submit multiple choice questions (default behavior is to auto-matically submit the selected option)
+  * this settings would disable the auto-submit behavior and make it so the user needs to hit the submit answer button on multiple choice questions
+
+## Tutorial Update:
+This update will focus on adding info icons and tutorial to Quizzer to introduce new  user's to the platform, there are a lot of moving parts and a tutorial goes a long way to help a new user figure out what the hell is going on.
+## Tutorial Points to Touch on:
+### Home Page Display
+#### Flag Question Button
+* [] Initial user will have no questions so tutorial will have to bring up a mock flag for the user to interact with
+#### Question Display
+* [] Math.tex is a horizontally scrolling, user will need to shift-scroll to see full expression or on mobile will have to swipe on it to see the whole equation.
+#### Menu
+
+## Admin tools expansion
+Some extra tools to make it easier to comb through and review the state of questions in Quizzer
+## Review Module Questions Tool
+### Features
+* [] Review Questions button in admin tool section of the modules page
+* [] Counter at top to show progress of the list of questions in the module
+* [] Arrow selection to skip to n# question in the module (for if admin doesn't get through all n questions)
+* [] Pull in review panel tool interface
+  * [] delete option
+  * [] edit option
+  * [] approve edit option (No direct push, require additional layer of validation from main panel)
+  * [] Should pull the question_id locally and pull the question record from the server directly
+
+
+## Bug Fixes:
+* [] Some question answer attempt records ARE NOT syncing and triggering an RLS violation. . .
+  * Appears to be intermittent, as many attempt records do get synced
+* [] Circulation worker does not properly remove excess new questions, allowing too many new questions to overload the user. Should have some kind of mechanism that will remove only revision score 0 questions from circulation
 
 ## Other minor changes
 * [] Synonym fields in the add question interface should also allow for math expressions
@@ -122,54 +222,9 @@ Second to address would be the update to the math_expressions library to allow e
     * [] add setting value to settings page
     * [] add setting value to table
 
-## Additional User Settings:
-* [] User Settings: auto-submit multiple choice questions (default behavior is to auto-matically submit the selected option)
-  * this settings would disable the auto-submit behavior and make it so the user needs to hit the submit answer button on multiple choice questions
-
-## Bug Fixes:
-* [] Some question answer attempt records ARE NOT syncing and triggering an RLS violation. . .
-  * Appears to be intermittent, as many attempt records do get synced
-* [] Circulation worker does not properly remove excess new questions, allowing too many new questions to overload the user. Should have some kind of mechanism that will remove only revision score 0 questions from circulation
-
-
-# Update ?.?.?: Module system rework
-For the planned circulation algorithm, the module system will work as the method by which user's "seed" their initial profile. Thus this update will focus on optimizes the display modules page and fix any bugs relating to this system.
-
-# Update ?.?.? Coding blocks
-The goal of this update is to add to the fill_in_the_blank capabilities, specifically the ability to use ``` ``` delimiters to mark an answer as a code block, which will then be displayed correctly.
-Ideally we will replicate the entry format that you see in popular markdown editors such as obsidian. To where we can write up whatever we please in markdown to flexibally achieve any possible format.
-
-The challenge lies in the interaction and validation of these questions, not necessarily the ability to format them.
-4. Have a pipeline that makes it easy to push updates and package the app for distribution
-
-# Tutorial Update:
-This update will focus on adding info icons and tutorial to Quizzer to introduce new  user's to the platform, there are a lot of moving parts and a tutorial goes a long way to help a new user figure out what the hell is going on.
-## Tutorial Points to Touch on:
-### Home Page Display
-#### Flag Question Button
-* [] Initial user will have no questions so tutorial will have to bring up a mock flag for the user to interact with
-#### Question Display
-* [] Math.tex is a horizontally scrolling, user will need to shift-scroll to see full expression or on mobile will have to swipe on it to see the whole equation.
-#### Menu
-
-
-
-# Admin tools expansion
-Some extra tools to make it easier to comb through and review the state of questions in Quizzer
-## Review Module Questions Tool
-### Features
-* [] Review Questions button in admin tool section of the modules page
-* [] Counter at top to show progress of the list of questions in the module
-* [] Arrow selection to skip to n# question in the module (for if admin doesn't get through all n questions)
-* [] Pull in review panel tool interface
-  * [] delete option
-  * [] edit option
-  * [] approve edit option (No direct push, require additional layer of validation from main panel)
-  * [] Should pull the question_id locally and pull the question record from the server directly
-
-# Automation Update:
+# Update ?.?.? Rebuild Selection and Circulation algorithms:
 This update will introduce the internal machine learning model that will allow Quizzer to improve dynamically as more data comes
-Deadline: New Years (after I take the Machine Learning Class)
+Deadline: New Years (after/during taking the Machine Learning Class)
 
 See quizzer_documentation for details on the model design
 
@@ -251,16 +306,18 @@ Optional questionairre that will set all interest levels based on a series of qu
 * [ ] Based on the classification results, display a list of keywords that the question covers
   * [ ] for each keyword, it should allow an info icon that when clicked gives a dialogue popup for the wiki of that keyword for further reading by the user. This means that if the user is curious the information is at their fingertips. If they are not, they are not bogged down in a wall of text.
 
-# Additional Question Types Update:
+# Update ?.?.? Additional Question Types:
+In this update we will be adding new question types to increase the variability of the platform. More types of questions should result in a more interactive platform and expand the range of things Quizzer can teach to people including the effectiveness of such
 
-## Math questions
+## Coding blocks
+question_type == "coding"
+Add a new question type coding
 
-- these will be manual input for answer, user is given a math equation to solve and must use the interface to enter their answer. There are no options, no hints. Validation is much needed for this.
-
-- [ ] Custom Validation will need to handle multiple inputs that all could be correct, 2+ 3 = 3 + 2 for example, but this gets far more complicated so there has to be a way to validate equivalency of equations systematically. . .
+This question type will prompt the user to write some code snippet (small or large) in a given programming language.
+The app should then be able to evaluate that the could snippet is correct for the given language. Since this requires special validation, it will be it's own question type
 
 ## Speech Questions
-
+new question_type == "language"
 - speech to text, say the word on the screen
 - due to unpredictability, there will be an attempt count, say 3 tries to get it right before we flag it wrong
 - This question type will allow for modules that quiz and help teach the user how to read and speak a language. My target module is for my daughter called sight words where the questions will be a sight word and she will have to say the word in order to answer it correctly
@@ -268,22 +325,52 @@ Optional questionairre that will set all interest levels based on a series of qu
 - Development of this question type provides the speech-to-text functionality needed for the general accessibility update
 
 ## Short Answer Questions
+question_type == "short_answer"
+An extension of the fill in the blank evaluation. but more complex
+Question is asked, and the user needs to type one or two sentences to answer the question. Then the platform will evaluate the answer on the fly. This is as challenging as it sounds
 
 ## Matching Questions
+question_type == "matching"
+Simple categorization question
+Given category 1 - N, and options 1 - K, sort the options into the appropriate category bucket
+
+Interactive drag and drop, make it fun
 
 ## Hot Spot Image Questions
+An image will be provided to the user, and the correct pixel location(s) of the image must be clicked on by the user,
+
+Such questions that fall into this question would include 
+- "Given this map: Where is "Nepal" or "United States" or "Pakistan" or "Europe"
+- Given an image of the engine bay, which part is the alternator
+- Given an image of a cell diagram, where is the Smooth ER
+
+This will be meant to be highly flexible and accomodate multiple fields of study
 
 ## Diagram Label Question
+question_type = "diagram_label"
 
-# Module Page Refinement Update:
+User is presented with an image of a diagram with empty labels and will be required to fill in the labels
 
-* [ ] Allow the module page filter button to sort based on presets
-* [ ] Add a search icon button that allows the user to fuzzy search existing modules
-* [ ] Update the module card to display percentage of questions in module in rotation (completion status)
-* [ ] Add option to incorporate Graphical backgrounds to individual modules for added visual flair
-* [ ]
+## Electrical Wiring Question
+question_type = "electrical_wiring"
 
-# Accessibility Update:
+User will be presented a diagram with devices on it, and will have to "wire it up" to the panel box.
+
+For submission a custom effect could be a lot of fun, have them flip the panel box on, and if its wired correctly the lights go on. If not then the panel box blows/pops up just as it would in real life.
+
+# Update ?.?.? Badges and Achievements:
+badge and acheivement system needs to be built out, track question contributors and contribution by subject matter
+
+The purpose of this update is to boost the level of engagement we can get off the platform. Engaged users will learn more and benefit more from the app.
+- Question performance badges
+- Contribution badges
+- Unlocks in the User Profile Page
+- Unlockable easter eggs
+
+We will discuss again if we ever get here
+
+# Update ?.?.? Accessibility:
+Options and infrastructure for the disabled benefit everyone involved including those who are not physically or cognitively disabled.
 
 ## Speech to Text for the blind?
 
@@ -291,51 +378,18 @@ Optional questionairre that will set all interest levels based on a series of qu
   - To test in isolation we will generate a few sentences and then pass to service, save the audio recording to a file, then use a different software to play it.
 - Read Aloud button on home page that reads the question to the user. . .
 
-## Spell and Grammar check for those with learning disabilities?
-
+## Spell and Grammar check
 * [ ] Spell and grammer check should be added wherever relevant
   * [ ] Markdown editors
   * [ ] Add Question Page
   * [ ] Edit Question Dialogue
 
-# User Profile Page Implementation Update:
 
-This update will enable the user profile, mainly for collection of information on the user that can be fed into Quizzer's internal AI model that has not been implemented yet.
 
-The hope is that additional profile information can help make the model make more reliable and predictable assumptions thus providing a better learning experience
 
-[] Radial display of user interests
 
-[] decide whether settings of user subject interests is in the User Profile or the User Settings Page
 
-# User Stats Page Refinement Update:
-
-Experiement with different flutter chart libraries for better more engaging visuals in the stats portion
-
-* [ ] Stat that tracks and displays the accuracy percentage by time of day
-  * [ ] Will be 0hours to 24hours
-  * [ ] by hour how accurate is the user (percentage correct)
-  * [ ] Will need to track when questions are answered along with whether right or wrong
-* [ ] Stat that tracks questions answered by time of day
-  * [ ] Will be 0hours to 24hours
-  * [ ] Likely update the existing questions answered to have 24 fields for hour of the day, incrementing the specific hour instead of the overall, then the overal can just be a sum of the 24 hour fields
-* [ ]
-
-## Suggestions:
-
-fl_charts is garbage performance for large datasets
-
----
-
-These updates are in the backlog no immediate plans
-
-# Badges update:
-
-badge and acheivement system needs to be built out, track question contributors and contribution by subject matter
-
-- Question performance badges
-- Contribution badges
 
 # Other ideas thrown at me:
 
-subscribe to user question functionality, allow users to subscribe to specific creators, any questions they make get added to that user's profile
+subscribe to user question functionality, allow users to subscribe to specific creators, any questions they make get added to that user's profile automatically
