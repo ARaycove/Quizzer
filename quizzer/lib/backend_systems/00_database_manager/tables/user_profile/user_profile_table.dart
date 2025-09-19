@@ -7,6 +7,64 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/table_helper.
 import 'package:sqflite/sqflite.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 
+final List<Map<String, String>> expectedColumns = [
+  {'name': 'uuid',                  'type': 'TEXT PRIMARY KEY'},
+  {'name': 'email',                 'type': 'TEXT NOT NULL'},
+  {'name': 'username',              'type': 'TEXT NOT NULL'},
+  // Specific Account information
+  {'name': 'role',                  'type': 'TEXT DEFAULT \'base_user\''},
+  {'name': 'account_status',        'type': 'TEXT DEFAULT \'active\''},
+  {'name': 'account_creation_date', 'type': 'TEXT NOT NULL'},
+  {'name': 'last_login',            'type': 'TEXT'},
+  // Education level indicators
+  {'name': 'highest_level_edu',     'type': 'TEXT'},
+  {'name': 'undergrad_major',       'type': 'TEXT'},
+  {'name': 'undergrad_minor',       'type': 'TEXT'},
+  {'name': 'grad_major',            'type': 'TEXT'},
+  {'name': 'years_since_graduation','type': 'INTEGER'},
+  {'name': 'education_background',  'type': 'TEXT'},
+  {'name': 'teaching_experience',   'type': 'INTEGER'}, // How many years of teaching experience does the user have.
+
+  // socio-cultural indicators
+  {'name': 'profile_picture',       'type': 'TEXT'},
+  {'name': 'country_of_origin',     'type': 'TEXT'},
+  {'name': 'current_country',       'type': 'TEXT'},
+  {'name': 'current_state',         'type': 'TEXT'},
+  {'name': 'current_city',          'type': 'TEXT'},
+  {'name': 'urban_rural',           'type': 'TEXT'}, // Is the address in a rural, suburban, or urban setting?
+  {'name': 'religion',              'type': 'TEXT'},
+  {'name': 'political_affilition',  'type': 'TEXT'},
+  {'name': 'marital_status',        'type': 'TEXT'},
+  {'name': 'num_children',          'type': 'INTEGER'},
+  {'name': 'veteran_status',        'type': 'INTEGER'},
+  {'name': 'native_language',       'type': 'TEXT'},
+  {'name': 'secondary_languages',   'type': 'TEXT'},
+  {'name': 'num_languages_spoken',  'type': 'INTEGER'},
+  {'name': 'birth_date',            'type': 'TEXT'},
+  {'name': 'age',                   'type': 'INTEGER'},
+  {'name': 'household_income',      'type': 'REAL'},
+  {'name': 'learning_disabilities', 'type': 'TEXT'}, // Array of learning disabilities (ADHD, Autism, Aspergers, etc)
+  {'name': 'physical_disabilities', 'type': 'TEXT'}, // Array of physical disabilities (amputee, wheel-chair, crippled)
+  {'name': 'housing_situation',     'type': 'TEXT'},
+  {'name': 'birth_order',           'type': 'TEXT'},
+
+
+  // Work experience
+  {'name': 'current_occupation',    'type': 'TEXT'},
+  {'name': 'years_work_experience', 'type': 'INTEGER'},
+  {'name': 'hours_worked_per_week', 'type': 'REAL'},
+  {'name': 'total_job_changes',     'type': 'INTEGER'},
+
+  {'name': 'interest_data', 'type': 'TEXT'},                //TODO move to settings, the interest data will be a map of ratings, depicting how interested in any given subject or topic a user is, this is used for circulation and selection criteria
+  {'name': 'notification_preferences', 'type': 'TEXT'},     //TODO should be a setting, leave here for now
+  {'name': 'total_study_time', 'type': 'REAL DEFAULT 0.0'}, //TODO move to stat table
+  {'name': 'average_session_length', 'type': 'REAL'},       //TODO move to stat table
+  {'name': 'has_been_synced', 'type': 'INTEGER DEFAULT 0'},
+  {'name': 'edits_are_synced', 'type': 'INTEGER DEFAULT 0'},
+  {'name': 'last_modified_timestamp', 'type': 'TEXT'},
+];
+
+
 /// Gets the user ID for a given email address.
 /// Throws a StateError if no user is found.
 Future<String> getUserIdByEmail(String emailAddress) async {
@@ -108,62 +166,7 @@ Future<void> verifyUserProfileTable(dynamic db) async {
     QuizzerLogger.logMessage('Verifying user profile table existence');
     
     // Define expected columns with their types and constraints
-    final List<Map<String, String>> expectedColumns = [
-      {'name': 'uuid',                  'type': 'TEXT PRIMARY KEY'},
-      {'name': 'email',                 'type': 'TEXT NOT NULL'},
-      {'name': 'username',              'type': 'TEXT NOT NULL'},
-      // Specific Account information
-      {'name': 'role',                  'type': 'TEXT DEFAULT \'base_user\''},
-      {'name': 'account_status',        'type': 'TEXT DEFAULT \'active\''},
-      {'name': 'account_creation_date', 'type': 'TEXT NOT NULL'},
-      {'name': 'last_login',            'type': 'TEXT'},
-      // Education level indicators
-      {'name': 'highest_level_edu',     'type': 'TEXT'},
-      {'name': 'undergrad_major',       'type': 'TEXT'},
-      {'name': 'undergrad_minor',       'type': 'TEXT'},
-      {'name': 'grad_major',            'type': 'TEXT'},
-      {'name': 'years_since_graduation','type': 'INTEGER'},
-      {'name': 'education_background',  'type': 'TEXT'},
-      {'name': 'teaching_experience',   'type': 'INTEGER'}, // How many years of teaching experience does the user have.
 
-      // socio-cultural indicators
-      {'name': 'profile_picture',       'type': 'TEXT'},
-      {'name': 'country_of_origin',     'type': 'TEXT'},
-      {'name': 'current_country',       'type': 'TEXT'},
-      {'name': 'current_state',         'type': 'TEXT'},
-      {'name': 'current_city',          'type': 'TEXT'},
-      {'name': 'urban_rural',           'type': 'TEXT'}, // Is the address in a rural, suburban, or urban setting?
-      {'name': 'religion',              'type': 'TEXT'},
-      {'name': 'political_affilition',  'type': 'TEXT'},
-      {'name': 'marital_status',        'type': 'TEXT'},
-      {'name': 'num_children',          'type': 'INTEGER'},
-      {'name': 'veteran_status',        'type': 'INTEGER'},
-      {'name': 'native_language',       'type': 'TEXT'},
-      {'name': 'secondary_languages',   'type': 'TEXT'},
-      {'name': 'num_languages_spoken',  'type': 'INTEGER'},
-      {'name': 'birth_date',            'type': 'TEXT'},
-      {'name': 'age',                   'type': 'INTEGER'},
-      {'name': 'household_income',      'type': 'REAL'},
-      {'name': 'learning_disabilities', 'type': 'TEXT'}, // Array of learning disabilities (ADHD, Autism, Aspergers, etc)
-      {'name': 'physical_disabilities', 'type': 'TEXT'}, // Array of physical disabilities (amputee, wheel-chair, crippled)
-      {'name': 'housing_situation',     'type': 'TEXT'},
-      {'name': 'birth_order',           'type': 'TEXT'},
-
-
-      // Work experience
-      {'name': 'current_occupation',    'type': 'TEXT'},
-      {'name': 'years_work_experience', 'type': 'INTEGER'},
-      {'name': 'hours_worked_per_week', 'type': 'REAL'},
-      {'name': 'total_job_changes',     'type': 'INTEGER'},
-
-      {'name': 'interest_data', 'type': 'TEXT'},                //TODO move to settings, the interest data will be a map of ratings, depicting how interested in any given subject or topic a user is, this is used for circulation and selection criteria
-      {'name': 'notification_preferences', 'type': 'TEXT'},     //TODO should be a setting, leave here for now
-      {'name': 'total_study_time', 'type': 'REAL DEFAULT 0.0'}, //TODO move to stat table
-      {'name': 'average_session_length', 'type': 'REAL'},       //TODO move to stat table
-      {'name': 'has_been_synced', 'type': 'INTEGER DEFAULT 0'},
-      {'name': 'edits_are_synced', 'type': 'INTEGER DEFAULT 0'},
-      {'name': 'last_modified_timestamp', 'type': 'TEXT'},
-    ];
 
     // Check if the table exists
     final List<Map<String, dynamic>> tables = await db.rawQuery(
@@ -577,54 +580,21 @@ Future<void> upsertUserProfileFromInboundSync({
 }) async {
   try {
     if (profileDataList.isEmpty) return;
-    // should only be one profile per user, so grab the first one if the list isn't empty
-    Map<String, dynamic> profileData = profileDataList[0];
-
-    final Map<String, dynamic> dataToInsertOrUpdate = {
-      'uuid':                     profileData['uuid'],
-      'email':                    profileData['email'],
-      'username':                 profileData['username'],
-      'role':                     profileData['role'],
-      'account_status':           profileData['account_status'],
-      'account_creation_date':    profileData['account_creation_date'],
-      'last_login':               profileData['last_login'],
-      'profile_picture':          profileData['profile_picture'],
-      'birth_date':               profileData['birth_date'],
-      'address':                  profileData['address'],
-      'job_title':                profileData['job_title'],
-      'education_level':          profileData['education_level'],
-      'specialization':           profileData['specialization'],
-      'teaching_experience':      profileData['teaching_experience'],
-      'primary_language':         profileData['primary_language'],
-      'secondary_languages':      profileData['secondary_languages'],
-      'study_schedule':           profileData['study_schedule'],
-      'social_links':             profileData['social_links'],
-      'achievement_sharing':      profileData['achievement_sharing'],
-      'interest_data':            profileData['interest_data'],
-      'settings':                 profileData['settings'],
-      'notification_preferences': profileData['notification_preferences'],
-      'learning_streak':          profileData['learning_streak'],
-      'total_study_time':         profileData['total_study_time'],
-      'total_questions_answered': profileData['total_questions_answered'],
-      'average_session_length':   profileData['average_session_length'],
-      'peak_cognitive_hours':     profileData['peak_cognitive_hours'],
-      'health_data':              profileData['health_data'],
-      'recall_accuracy_trends':   profileData['recall_accuracy_trends'],
-      'content_portfolio':        profileData['content_portfolio'],
-      'tutorial_progress':        profileData['tutorial_progress'],
-      'has_been_synced': 1, // Mark as synced from cloud
-      'edits_are_synced': 1, // Mark edits as synced (as it's from cloud)
-      'last_modified_timestamp':  profileData['last_modified_timestamp'],
-    };
-
-    // Use ConflictAlgorithm.replace to handle both insert and update scenarios.
-    // The primary key is uuid.
-    await insertRawData(
-      'user_profile',
-      dataToInsertOrUpdate,
-      db,
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+    
+    final profileData = profileDataList[0];
+    final dataToInsert = <String, dynamic>{};
+    
+    for (final col in expectedColumns) {
+      final name = col['name'] as String;
+      if (profileData.containsKey(name)) {
+        dataToInsert[name] = profileData[name];
+      }
+    }
+    
+    dataToInsert['has_been_synced'] = 1;
+    dataToInsert['edits_are_synced'] = 1;
+    
+    await insertRawData('user_profile', dataToInsert, db, conflictAlgorithm: ConflictAlgorithm.replace);
   } catch (e) {
     QuizzerLogger.logError('Error upserting user profile from inbound sync - $e');
     rethrow;
