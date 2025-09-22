@@ -12,7 +12,7 @@ import 'package:quizzer/backend_systems/10_switch_board/sb_other_signals.dart';
 import 'package:supabase/supabase.dart';
 import 'package:hive/hive.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/stat_update_aggregator.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_daily_stats_table.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/outbound_sync/outbound_sync_functions.dart';
 import 'package:quizzer/backend_systems/00_helper_utils/utils.dart';

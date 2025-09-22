@@ -10,15 +10,6 @@ Key features:
 
 import 'package:flutter/material.dart';
 import 'package:quizzer/UI_systems/global_widgets/widget_global_app_bar.dart';
-import 'stat_widgets/eligible_questions_stat_widget.dart';
-import 'stat_widgets/circulation_status_stat_widget.dart';
-import 'stat_widgets/revision_score_stat_widget.dart';
-import 'stat_widgets/total_question_pairs_stat_widget.dart';
-import 'stat_widgets/average_questions_shown_stat_widget.dart';
-import 'stat_widgets/total_questions_answered_stat_widget.dart';
-import 'stat_widgets/daily_questions_answered_stat_widget.dart';
-import 'stat_widgets/average_daily_questions_learned_stat_widget.dart';
-import 'stat_widgets/days_left_until_exhaust_stat_widget.dart';
 
 class StatsPage extends StatefulWidget {
   const StatsPage({super.key});
@@ -45,15 +36,7 @@ class _StatsPageState extends State<StatsPage> {
         // padding 16 is more than enough do not increase. . . 
         padding: const EdgeInsets.only(right: 16.0), // Add right padding to prevent scroll bar overlap
         children: const [
-          AverageDailyQuestionsLearnedStatWidget(),
-          DailyQuestionsAnsweredStatWidget(),
-          TotalQuestionsAnsweredStatWidget(),
-          RevisionScoreStatWidget(),
-          CirculationStatusStatWidget(),
-          TotalQuestionPairsStatWidget(),
-          EligibleQuestionsStatWidget(),
-          AverageQuestionsShownStatWidget(),
-          DaysLeftUntilExhaustStatWidget(),
+          Text("Stat page under construction, no stat display currently")
         ],
       ),
     );

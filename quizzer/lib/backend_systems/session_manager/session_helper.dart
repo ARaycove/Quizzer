@@ -5,14 +5,10 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/question_answ
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart'; // Logger needed for debugging
 import 'package:supabase/supabase.dart'; // For supabase.Session type
 import 'package:jwt_decode/jwt_decode.dart'; // For decoding JWT
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_total_questions_answered_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_daily_questions_answered_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_average_daily_questions_learned_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_average_questions_shown_per_day_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_days_left_until_questions_exhaust_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_revision_streak_sum_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_question_answer_pairs_table.dart';
-import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
+import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart'; // Import for getDatabaseMonitor
+import 'package:quizzer/backend_systems/00_database_manager/tables/table_helper.dart'; // Import the helper file
+
 
 // ==========================================
 // Helper Function for Recording Answer Attempt
@@ -21,60 +17,350 @@ import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 // These functions help to reduce the lines of code in the SessionManager class itself. This should simplify the SessionManager class and make it easier to maintain.
 
 Future<void> recordQuestionAnswerAttempt({
-  required Map<String, dynamic> recordBeforeUpdate, // User record *before* updates
-  required bool isCorrect,
-  required DateTime timeAnswerGiven,
-  required DateTime timeDisplayed,
   required String userId,
   required String questionId,
-  required String? currentSubjects, // From static details
-  required String? currentConcepts, // From static details
+  required bool isCorrect,
 }) async {
   try {
     QuizzerLogger.logMessage('Entering recordQuestionAnswerAttempt()...');
     
-    // Calculate response time
-    final double responseTimeSeconds = 
-        timeAnswerGiven.difference(timeDisplayed).inMicroseconds / Duration.microsecondsPerSecond;
- 
-    // Calculate days since last revision
-    final String? lastRevisedBeforeStr = 
-        recordBeforeUpdate['last_revised'] as String?;
- 
-    final DateTime? lastRevisedBefore = 
-        lastRevisedBeforeStr == null ? null : DateTime.tryParse(lastRevisedBeforeStr);
- 
-    double? daysSinceLastRevision;
- 
-    if (lastRevisedBefore != null) {
-      daysSinceLastRevision = timeAnswerGiven.difference(lastRevisedBefore).inMicroseconds / Duration.microsecondsPerDay;
+    final db = await getDatabaseMonitor().requestDatabaseAccess();
+    if (db == null) {
+      throw Exception('Failed to acquire database access');
     }
     
-    // Format context as JSON
-    final List<String> subjectsList = (currentSubjects ?? '').split(',').map((s) => s.trim()).where((s) => s.isNotEmpty).toList();
-    final List<String> conceptsList = (currentConcepts ?? '').split(',').map((c) => c.trim()).where((c) => c.isNotEmpty).toList();
-    final String contextJson = jsonEncode({
-      'subjects': subjectsList,
-      'concepts': conceptsList,
-    });
-
-    // Table function handles its own database access
+    final String timeStamp = DateTime.now().toUtc().toIso8601String();
+    
+    // ===================================
+    // Query 1: Question Metadata
+    // ===================================
+    const questionMetadataQuery = '''
+      SELECT 
+        question_vector,
+        module_name,
+        question_type,
+        options,
+        question_elements
+      FROM question_answer_pairs
+      WHERE question_id = ?
+      LIMIT 1
+    ''';
+    
+    final List<Map<String, dynamic>> questionResults = await db.rawQuery(questionMetadataQuery, [questionId]);
+    
+    if (questionResults.isEmpty) {
+      throw Exception('Question not found: $questionId');
+    }
+    
+    final Map<String, dynamic> questionData = questionResults.first;
+    
+    // Extract question vector (if exists)
+    final String? questionVector = questionData['question_vector'] as String?;
+    
+    // Extract basic question info
+    final String moduleName = questionData['module_name'] as String;
+    final String questionType = questionData['question_type'] as String;
+    
+    // Calculate option counts based on question type and data
+    int numMcqOptions = 0;
+    int numSoOptions = 0;
+    int numSataOptions = 0;
+    int numBlanks = 0;
+    
+    if (questionType == 'multiple_choice' || questionType == 'select_all_that_apply' || questionType == 'sort_order') {
+      final String? optionsJson = questionData['options'] as String?;
+      if (optionsJson != null) {
+        final List<dynamic> options = decodeValueFromDB(optionsJson);
+        final int optionCount = options.length;
+        
+        switch (questionType) {
+          case 'multiple_choice':
+            numMcqOptions = optionCount;
+            break;
+          case 'select_all_that_apply':
+            numSataOptions = optionCount;
+            break;
+          case 'sort_order':
+            numSoOptions = optionCount;
+            break;
+        }
+      }
+    } else if (questionType == 'fill_in_the_blank') {
+      // Count blank elements in question_elements
+      final String? questionElementsJson = questionData['question_elements'] as String?;
+      if (questionElementsJson != null) {
+        final List<dynamic> questionElements = decodeValueFromDB(questionElementsJson);
+        numBlanks = questionElements.where((element) => 
+          element is Map && element['type'] == 'blank'
+        ).length;
+      }
+    }
+    
+    // ===================================
+    // Query 2: Individual Question Performance
+    // ===================================
+    const userQuestionQuery = '''
+      SELECT 
+        avg_reaction_time,
+        total_correct_attempts,
+        total_incorect_attempts,
+        total_attempts,
+        question_accuracy_rate,
+        revision_streak,
+        last_revised,
+        day_time_introduced
+      FROM user_question_answer_pairs
+      WHERE user_uuid = ? AND question_id = ?
+      LIMIT 1
+    ''';
+    
+    final List<Map<String, dynamic>> userQuestionResults = await db.rawQuery(userQuestionQuery, [userId, questionId]);
+    
+    if (userQuestionResults.isEmpty) {
+      throw Exception('User question pair not found: userId=$userId, questionId=$questionId');
+    }
+    
+    final Map<String, dynamic> userQuestionData = userQuestionResults.first;
+    
+    // Extract performance metrics
+    final double avgReactTime = userQuestionData['avg_reaction_time'] as double? ?? 0.0;
+    final int totalCorrectAttempts = userQuestionData['total_correct_attempts'] as int? ?? 0;
+    final int totalIncorrectAttempts = userQuestionData['total_incorect_attempts'] as int? ?? 0;
+    final int totalAttempts = userQuestionData['total_attempts'] as int? ?? 0;
+    final double accuracyRate = userQuestionData['question_accuracy_rate'] as double? ?? 0.0;
+    final int revisionStreak = userQuestionData['revision_streak'] as int? ?? 0;
+    final String? lastRevisedDate = userQuestionData['last_revised'] as String?;
+    final String? dayTimeIntroduced = userQuestionData['day_time_introduced'] as String?;
+    
+    // Calculate temporal metrics at time of recording
+    final String timeOfPresentation = timeStamp;
+    final bool wasFirstAttempt = totalAttempts == 0;
+    
+    // Calculate days since last revision
+    double daysSinceLastRevision = 0.0;
+    if (lastRevisedDate != null) {
+      final DateTime lastRevised = DateTime.parse(lastRevisedDate);
+      final DateTime now = DateTime.parse(timeStamp);
+      daysSinceLastRevision = now.difference(lastRevised).inMicroseconds / Duration.microsecondsPerDay;
+    }
+    
+    // Calculate days since first introduced
+    double daysSinceFirstIntroduced = 0.0;
+    double attemptDayRatio = 0.0;
+    if (dayTimeIntroduced != null) {
+      final DateTime firstIntroduced = DateTime.parse(dayTimeIntroduced);
+      final DateTime now = DateTime.parse(timeStamp);
+      daysSinceFirstIntroduced = now.difference(firstIntroduced).inMicroseconds / Duration.microsecondsPerDay;
+      
+      // Calculate attempt day ratio (avoid division by zero)
+      if (daysSinceFirstIntroduced > 0) {
+        attemptDayRatio = totalAttempts / daysSinceFirstIntroduced;
+      }
+    }
+    
+    // ===================================
+    // Query 3: User Stats Vector
+    // ===================================
+    final String today = DateTime.now().toUtc().toIso8601String().substring(0, 10);
+    
+    const userStatsQuery = '''
+      SELECT *
+      FROM user_daily_stats
+      WHERE user_id = ? AND record_date = ?
+      LIMIT 1
+    ''';
+    
+    final List<Map<String, dynamic>> userStatsResults = await db.rawQuery(userStatsQuery, [userId, today]);
+    
+    String? userStatsVector;
+    if (userStatsResults.isNotEmpty) {
+      userStatsVector = jsonEncode(userStatsResults.first);
+    }
+    
+    // ===================================
+    // Query 4: Module Performance Vector
+    // ===================================
+    const modulePerformanceQuery = '''
+      SELECT 
+        module_name,
+        num_mcq,
+        num_fitb,
+        num_sata,
+        num_tf,
+        num_so,
+        num_total,
+        total_seen,
+        percentage_seen,
+        total_correct_attempts,
+        total_incorrect_attempts,
+        total_attempts,
+        overall_accuracy,
+        avg_attempts_per_question,
+        avg_reaction_time
+      FROM user_module_activation_status
+      WHERE user_id = ?
+      ORDER BY module_name
+    ''';
+    
+    final List<Map<String, dynamic>> modulePerformanceResults = await db.rawQuery(modulePerformanceQuery, [userId]);
+    
+    String? modulePerformanceVector;
+    if (modulePerformanceResults.isNotEmpty) {
+      // Calculate days_since_last_seen for each module and add to records
+      final DateTime now = DateTime.parse(timeStamp);
+      
+      // Get last seen dates for all user modules in a single query
+      const lastSeenQuery = '''
+        SELECT 
+          qap.module_name,
+          MAX(uqap.last_revised) as last_seen_date
+        FROM user_question_answer_pairs uqap
+        INNER JOIN question_answer_pairs qap ON uqap.question_id = qap.question_id
+        WHERE uqap.user_uuid = ?
+        GROUP BY qap.module_name
+      ''';
+      
+      final List<Map<String, dynamic>> lastSeenResults = await db.rawQuery(lastSeenQuery, [userId]);
+      
+      // Create map of module_name -> last_seen_date for quick lookup
+      final Map<String, String?> moduleLastSeen = {};
+      for (final result in lastSeenResults) {
+        moduleLastSeen[result['module_name'] as String] = result['last_seen_date'] as String?;
+      }
+      
+      // Process each module performance record
+      final List<Map<String, dynamic>> processedModuleRecords = [];
+      for (final moduleRecord in modulePerformanceResults) {
+        final Map<String, dynamic> processedRecord = Map<String, dynamic>.from(moduleRecord);
+        final String moduleNameKey = moduleRecord['module_name'] as String;
+        
+        // Calculate days_since_last_seen
+        double daysSinceLastSeen = 0.0;
+        final String? lastSeenDateStr = moduleLastSeen[moduleNameKey];
+        if (lastSeenDateStr != null) {
+          final DateTime lastSeenDate = DateTime.parse(lastSeenDateStr);
+          daysSinceLastSeen = now.difference(lastSeenDate).inMicroseconds / Duration.microsecondsPerDay;
+        }
+        
+        processedRecord['days_since_last_seen'] = daysSinceLastSeen;
+        processedModuleRecords.add(processedRecord);
+      }
+      
+      modulePerformanceVector = jsonEncode(processedModuleRecords);
+    }
+    
+    // ===================================
+    // Query 5: User Profile Record
+    // ===================================
+    const userProfileQuery = '''
+      SELECT 
+        highest_level_edu,
+        undergrad_major,
+        undergrad_minor,
+        grad_major,
+        years_since_graduation,
+        education_background,
+        teaching_experience,
+        profile_picture,
+        country_of_origin,
+        current_country,
+        current_state,
+        current_city,
+        urban_rural,
+        religion,
+        political_affilition,
+        marital_status,
+        num_children,
+        veteran_status,
+        native_language,
+        secondary_languages,
+        num_languages_spoken,
+        birth_date,
+        age,
+        household_income,
+        learning_disabilities,
+        physical_disabilities,
+        housing_situation,
+        birth_order,
+        current_occupation,
+        years_work_experience,
+        hours_worked_per_week,
+        total_job_changes
+      FROM user_profile
+      WHERE uuid = ?
+      LIMIT 1
+    ''';
+    
+    final List<Map<String, dynamic>> userProfileResults = await db.rawQuery(userProfileQuery, [userId]);
+    
+    String? userProfileRecord;
+    if (userProfileResults.isNotEmpty) {
+      userProfileRecord = jsonEncode(userProfileResults.first);
+    }
+    
+    // ===================================
+    // Prepare Data for Insert
+    // ===================================
+    final Map<String, dynamic> additionalFields = {
+      'response_result': isCorrect ? 1 : 0,
+      'module_name': moduleName,
+      'question_type': questionType,
+      'num_mcq_options': numMcqOptions,
+      'num_so_options': numSoOptions,
+      'num_sata_options': numSataOptions,
+      'num_blanks': numBlanks,
+      // Individual question performance
+      'avg_react_time': avgReactTime,
+      'was_first_attempt': wasFirstAttempt ? 1 : 0,
+      'total_correct_attempts': totalCorrectAttempts,
+      'total_incorrect_attempts': totalIncorrectAttempts,
+      'total_attempts': totalAttempts,
+      'accuracy_rate': accuracyRate,
+      'revision_streak': revisionStreak,
+      // Temporal metrics
+      'time_of_presentation': timeOfPresentation,
+      'last_revised_date': lastRevisedDate,
+      'days_since_last_revision': daysSinceLastRevision,
+      'days_since_first_introduced': daysSinceFirstIntroduced,
+      'attempt_day_ratio': attemptDayRatio,
+    };
+    
+    // Add question_vector if it exists
+    if (questionVector != null) {
+      additionalFields['question_vector'] = questionVector;
+    }
+    
+    // Add user_stats_vector if it exists
+    if (userStatsVector != null) {
+      additionalFields['user_stats_vector'] = userStatsVector;
+    }
+    
+    // Add module_performance_vector if it exists
+    if (modulePerformanceVector != null) {
+      additionalFields['module_performance_vector'] = modulePerformanceVector;
+    }
+    
+    // Add user_profile_record if it exists
+    if (userProfileRecord != null) {
+      additionalFields['user_profile_record'] = userProfileRecord;
+    }
+    
+    // Release database access before calling table function
+    getDatabaseMonitor().releaseDatabaseAccess();
+ 
+    // Insert the training sample (this function gets its own db access)
     await attempt_table.addQuestionAnswerAttempt(
-      timeStamp: timeAnswerGiven.toUtc().toIso8601String(),
       questionId: questionId,
       participantId: userId,
-      responseTime: responseTimeSeconds,
-      responseResult: isCorrect ? 1 : 0,
-      questionContextCsv: contextJson, // Pass the JSON string 
-      totalAttempts: recordBeforeUpdate['total_attempts'] as int,        // Value *before* update
-      revisionStreak: recordBeforeUpdate['revision_streak'] as int,     // Value *before* update
-      lastRevisedDate: recordBeforeUpdate['last_revised'] as String?,   // Value *before* update
-      daysSinceLastRevision: daysSinceLastRevision,                       // Calculated based on *before* update
+      timeStamp: timeStamp,
+      additionalFields: additionalFields,
     );
     
     QuizzerLogger.logMessage('Successfully recorded question answer attempt for QID: $questionId');
   } catch (e) {
     QuizzerLogger.logError('Error in recordQuestionAnswerAttempt - $e');
+    // Make sure we release the connection even if there's an error
+    getDatabaseMonitor().releaseDatabaseAccess();
     rethrow;
   }
 }
@@ -166,6 +452,7 @@ Map<String, dynamic> _calculateNextRevisionDate({
   required int updatedStreak,
   required double updatedTimeBetweenRevisions,
 }) {
+  // TODO This will need to be updated once the probability model is in place
   try {
     QuizzerLogger.logMessage('Entering _calculateNextRevisionDate()...');
     
@@ -191,182 +478,133 @@ Map<String, dynamic> _calculateNextRevisionDate({
 // Public Helper Function
 // ==========================================
 
-/// Manually queries for stat data and fills the SessionManager caches.
-/// This function bypasses the normal stat update flow to directly populate caches.
-Future<void> fillSessionManagerStatCaches(String userId) async {
-  try {
-    QuizzerLogger.logMessage('Entering fillSessionManagerStatCaches()...');
-    
-    final SessionManager sessionManager = SessionManager();
-    
-    // Query and cache each stat
-    final List<Map<String, dynamic>> eligibleQuestions = await getEligibleUserQuestionAnswerPairs(userId);
-    final int eligibleCount = eligibleQuestions.length;
-    sessionManager.setCachedEligibleQuestionsCount(eligibleCount);
-    
-    final List<Map<String, dynamic>> inCirculationQuestions = await getQuestionsInCirculation(userId);
-    final int inCirculationCount = inCirculationQuestions.length;
-    sessionManager.setCachedInCirculationQuestionsCount(inCirculationCount);
-    
-    final List<Map<String, dynamic>> nonCirculatingQuestions = await getNonCirculatingQuestionsWithDetails(userId);
-    final int nonCirculatingCount = nonCirculatingQuestions.length;
-    sessionManager.setCachedNonCirculatingQuestionsCount(nonCirculatingCount);
-    
-    final Map<String, dynamic> totalAnsweredRecord = await getTodayUserStatsTotalQuestionsAnsweredRecord(userId);
-    final int lifetimeTotal = totalAnsweredRecord['total_questions_answered'] as int? ?? 0;
-    sessionManager.setCachedLifetimeTotalQuestionsAnswered(lifetimeTotal);
-    
-    final Map<String, dynamic> dailyAnsweredRecord = await getTodayUserStatsDailyQuestionsAnsweredRecord(userId);
-    final int dailyTotal = dailyAnsweredRecord['daily_questions_answered'] as int? ?? 0;
-    sessionManager.setCachedDailyQuestionsAnswered(dailyTotal);
-    
-    final Map<String, dynamic> avgLearnedRecord = await getTodayUserStatsAverageDailyQuestionsLearnedRecord(userId);
-    final double avgLearned = avgLearnedRecord['average_daily_questions_learned'] as double? ?? 0.0;
-    sessionManager.setCachedAverageDailyQuestionsLearned(avgLearned);
-    
-    final Map<String, dynamic> avgShownRecord = await getTodayUserStatsAverageQuestionsShownPerDayRecord(userId);
-    final double avgShown = avgShownRecord['average_questions_shown_per_day'] as double? ?? 0.0;
-    sessionManager.setCachedAverageQuestionsShownPerDay(avgShown);
-    
-    final Map<String, dynamic> daysLeftRecord = await getTodayUserStatsDaysLeftUntilQuestionsExhaustRecord(userId);
-    final double daysLeft = daysLeftRecord['days_left_until_questions_exhaust'] as double? ?? 0.0;
-    sessionManager.setCachedDaysLeftUntilQuestionsExhaust(daysLeft);
-    
-    final List<Map<String, dynamic>> revisionStreakRecords = await getTodayUserStatsRevisionStreakSumRecords(userId);
-    final int revisionStreak = revisionStreakRecords.isNotEmpty ? (revisionStreakRecords.first['revision_streak_sum'] as int? ?? 0) : 0;
-    sessionManager.setCachedRevisionStreakScore(revisionStreak);
-    
-    // Get last reviewed from user question answer pairs
-    final List<Map<String, dynamic>> userPairs = await getUserQuestionAnswerPairsByUser(userId);
-    DateTime? lastReviewed;
-    if (userPairs.isNotEmpty) {
-      // Find the most recent last_revised date
-      for (final pair in userPairs) {
-        final String? lastRevisedStr = pair['last_revised'] as String?;
-        if (lastRevisedStr != null) {
-          final DateTime lastRevised = DateTime.parse(lastRevisedStr);
-          if (lastReviewed == null || lastRevised.isAfter(lastReviewed)) {
-            lastReviewed = lastRevised;
-          }
-        }
-      }
-    }
-    sessionManager.setCachedLastReviewed(lastReviewed);
-    
-    QuizzerLogger.logSuccess('Successfully filled SessionManager stat caches for user: $userId');
-  } catch (e) {
-    QuizzerLogger.logError('Error in fillSessionManagerStatCaches - $e');
-    rethrow;
-  }
-}
-
 /// Updates the user-specific question record based on the answer correctness.
-/// Calculates new SRS values and returns the updated record.
-Map<String, dynamic> updateUserQuestionRecordOnAnswer({
+/// Calculates new SRS values and directly updates the database.
+/// All updates happen in a single atomic operation.
+Future<void> updateUserQuestionRecordOnAnswer({
   required Map<String, dynamic> currentUserRecord,
   required bool isCorrect,
-}) {
+  required String userId,
+  required String questionId,
+  required double reactionTime,
+}) async {
   try {
     QuizzerLogger.logMessage('Entering updateUserQuestionRecordOnAnswer()...');
     
-    // Create a mutable copy to avoid modifying the original map directly
-    final Map<String, dynamic> updatedRecord = Map<String, dynamic>.from(currentUserRecord);
-
     // --- 1. Extract necessary current values ---
-    final int currentRevisionStreak = updatedRecord['revision_streak'] as int;
-    final double currentTimeBetweenRevisions = updatedRecord['time_between_revisions'] as double;
-    final int currentTotalAttempts = updatedRecord['total_attempts'] as int;
-    final String currentNextRevisionDueStr = updatedRecord['next_revision_due'] as String;
-
+    final int currentRevisionStreak = currentUserRecord['revision_streak'] as int;
+    final double currentTimeBetweenRevisions = currentUserRecord['time_between_revisions'] as double;
+    final int currentTotalAttempts = currentUserRecord['total_attempts'] as int;
+    final String currentNextRevisionDueStr = currentUserRecord['next_revision_due'] as String;
+    final double currentAvgReactionTime = (currentUserRecord['avg_reaction_time'] as double?) ?? 0.0;
     final DateTime now = DateTime.now();
     final DateTime currentNextRevisionDue = DateTime.parse(currentNextRevisionDueStr); 
-
+    
     QuizzerLogger.logMessage('Current values - streak: $currentRevisionStreak, timeBetweenRevisions: $currentTimeBetweenRevisions, totalAttempts: $currentTotalAttempts, isCorrect: $isCorrect');
-
-    // --- 2. Calculate and Assign Updates Directly to the Copy ---
-    // --------------------------------------------------
-    // Update total attempts
-    updatedRecord['total_attempts'] = currentTotalAttempts + 1;
-
-    // --------------------------------------------------
+    
+    // --- 2. Calculate Updates ---
+    
+    // Calculate correct/incorrect attempt counters
+    final int currentTotalCorrectAttempts = (currentUserRecord['total_correct_attempts'] as int?) ?? 0;
+    final int currentTotalIncorrectAttempts = (currentUserRecord['total_incorect_attempts'] as int?) ?? 0;
+    
+    final int newTotalCorrectAttempts = isCorrect ? currentTotalCorrectAttempts + 1 : currentTotalCorrectAttempts;
+    final int newTotalIncorrectAttempts = !isCorrect ? currentTotalIncorrectAttempts + 1 : currentTotalIncorrectAttempts;
+    
+    // Calculate new total attempts as sum of correct and incorrect attempts
+    final int newTotalAttempts = newTotalCorrectAttempts + newTotalIncorrectAttempts;
+    
+    // Calculate new avg_reaction_time using the derived total attempts:
+    final double newAvgReactionTime = ((currentAvgReactionTime * currentTotalAttempts) + reactionTime) / newTotalAttempts;
+    
+    // Calculate accuracy rates
+    final double newQuestionAccuracyRate = newTotalCorrectAttempts / newTotalAttempts;
+    final double newQuestionInaccuracyRate = newTotalIncorrectAttempts / newTotalAttempts;
+    
     // Update Revision Streak and Time Between Revisions
     final double adjustment = _calculateTimeBetweenRevisionsAdjustment(
       isCorrect: isCorrect,
       now: now,
       currentNextRevisionDue: currentNextRevisionDue,
     );
-
+    
     final int streakAdjustment = _calculateStreakAdjustment(
       isCorrect: isCorrect,
     );
-
-    // Update streak (ensure >= 0)
-    updatedRecord['revision_streak'] = max(0, currentRevisionStreak + streakAdjustment);
-
-    // Update time_between_revisions
-    updatedRecord['time_between_revisions'] = _calculateUpdatedTimeBetweenRevisions(
+    
+    // Calculate new streak (ensure >= 0)
+    final int newRevisionStreak = max(0, currentRevisionStreak + streakAdjustment);
+    
+    // Calculate new time_between_revisions // FIXME Deprecated, there will be no k (time between revision metric once probability model is in place)
+    final double newTimeBetweenRevisions = _calculateUpdatedTimeBetweenRevisions(
       currentTimeBetweenRevisions: currentTimeBetweenRevisions,
       adjustment: adjustment,
     );
-
-    QuizzerLogger.logMessage('Updated values - streak: ${updatedRecord['revision_streak']}, timeBetweenRevisions: ${updatedRecord['time_between_revisions']}, totalAttempts: ${updatedRecord['total_attempts']}');
-
-    // --------------------------------------------------
-    // update next_revision_due and average_times_shown_per_day
+    
+    // Calculate next_revision_due and average_times_shown_per_day
     final String status = isCorrect ? 'correct' : 'incorrect';
+    
     final Map<String, dynamic> nextRevisionData = _calculateNextRevisionDate(
       status: status,
-      updatedStreak: updatedRecord['revision_streak'] as int, // Use the newly updated streak
-      updatedTimeBetweenRevisions: updatedRecord['time_between_revisions'] as double, // Use the newly updated time
+      updatedStreak: newRevisionStreak,
+      updatedTimeBetweenRevisions: newTimeBetweenRevisions,
     );
-    updatedRecord['next_revision_due'] = nextRevisionData['next_revision_due'] as String;
-    updatedRecord['average_times_shown_per_day'] = nextRevisionData['average_times_shown_per_day'] as double;
-
-    // --------------------------------------------------
-    // update last_revised and last_updated
-    updatedRecord['last_revised'] = now.toIso8601String();
-    updatedRecord['last_updated'] = updatedRecord['last_revised']; // Use same 'now' timestamp
-
-    // --------------------------------------------------
-    // CONDITIONAL REMOVAL FROM CIRCULATION
-    // --------------------------------------------------
-    // Purpose: Remove questions from circulation that users consistently struggle with
-    // 
-    // Rationale: If a user has attempted a question n+ times and still has a 
-    // revision_streak of 0, they are likely struggling with the concept and need
-    // a break from seeing this question repeatedly. This prevents frustration and
-    // allows the user to focus on other questions they can learn from.
-    //
-    // Criteria: revision_streak still 0 AND total_attempts >= n
-    // This handles patterns like:
-    // - Incorrect → Incorrect → ... (triggers on nth attempt)
-    // - Correct → Incorrect → Incorrect → ... (triggers on nth attempt)  
-    // - Any back-and-forth where they can't consistently get it right
-    //
-    // Secondary criteria: revision_streak = 1 AND total_attempts >= m
-    // This catches inconsistent back-and-forth patterns like:
-    // - Correct → Incorrect → Correct → Incorrect → ... (many attempts, low streak)
-    // Where someone occasionally gets it right but struggles overall
-    //
-    // Action: Reset attempts to 0 and remove from circulation
-    // This gives the question a "fresh start" when it eventually returns
-    final int finalAttempts = updatedRecord['total_attempts'] as int;
-    final int finalRevisionStreak = updatedRecord['revision_streak'] as int;
+    final String newNextRevisionDue = nextRevisionData['next_revision_due'] as String;
+    final double newAverageTimesShownPerDay = nextRevisionData['average_times_shown_per_day'] as double;
     
-    if ((finalAttempts >= 2 && finalRevisionStreak == 0) || 
-        (finalAttempts >= 4 && finalRevisionStreak == 1)) {
-      QuizzerLogger.logMessage('Removing question from circulation: n+ attempts with revision_streak still 0, or m+ attempts with revision_streak = 1');
+    // Calculate last_revised
+    final String newLastRevised = now.toIso8601String();
+    
+    // Calculate day_time_introduced if it doesn't exist
+    final String? dayTimeIntroduced = currentUserRecord['day_time_introduced'] as String?;
+    final String finalDayTimeIntroduced = dayTimeIntroduced ?? DateTime.now().toUtc().toIso8601String();
+    
+    // --- 3. CONDITIONAL REMOVAL FROM CIRCULATION ---
+    // Determine final values based on circulation removal logic
+    int finalTotalAttempts = newTotalAttempts;
+    bool finalInCirculation = (currentUserRecord['in_circulation'] as int? ?? 1) == 1;
+    
+    if ((newTotalAttempts >= 2 && newRevisionStreak == 0) || 
+        (newTotalAttempts >= 4 && newRevisionStreak == 1)) {
+      QuizzerLogger.logMessage('Removing question from circulation: attempts >= threshold with low streak');
       
-      // Reset attempts to 0 and remove from circulation
-      updatedRecord['total_attempts'] = 0;
-      updatedRecord['in_circulation'] = 0; // SQL boolean as integer
+      finalTotalAttempts = 0;
+      finalInCirculation = false;
       
       QuizzerLogger.logSuccess('Question removed from circulation and attempts reset to 0');
     }
-
-    QuizzerLogger.logMessage('Successfully updated user question record with new SRS values');
     
-    return updatedRecord;
+    QuizzerLogger.logMessage('Final values - streak: $newRevisionStreak, timeBetweenRevisions: $newTimeBetweenRevisions, totalAttempts: $finalTotalAttempts, inCirculation: $finalInCirculation, avgReactionTime: $newAvgReactionTime, correctAttempts: $newTotalCorrectAttempts, incorrectAttempts: $newTotalIncorrectAttempts, accuracyRate: $newQuestionAccuracyRate');
+    
+    Map<String, dynamic> updateData = {
+        'revision_streak': newRevisionStreak,
+        'last_revised': newLastRevised,
+        'next_revision_due': newNextRevisionDue,
+        'time_between_revisions': newTimeBetweenRevisions,
+        'average_times_shown_per_day': newAverageTimesShownPerDay,
+        'in_circulation': finalInCirculation,
+        'total_attempts': finalTotalAttempts,
+        'avg_reaction_time': newAvgReactionTime,
+        'day_time_introduced': finalDayTimeIntroduced,
+        'total_correct_attempts': newTotalCorrectAttempts,
+        'total_incorect_attempts': newTotalIncorrectAttempts,
+        'question_accuracy_rate': newQuestionAccuracyRate,
+        'question_inaccuracy_rate': newQuestionInaccuracyRate,
+      };
+
+    // QuizzerLogger.logMessage("Individual Question Record Updated, feed is:");
+    // updateData.forEach((key, value) {
+    //   QuizzerLogger.logMessage("${key.padRight(20)}, $value");
+    // });
+
+    // --- 4. Update Database in Single Atomic Operation ---
+    await editUserQuestionAnswerPair(
+      userUuid: userId,
+      questionId: questionId,
+      updates: updateData,
+    );
+    
+    QuizzerLogger.logMessage('Successfully updated user question record in database');
   } catch (e) {
     QuizzerLogger.logError('Error in updateUserQuestionRecordOnAnswer - $e');
     rethrow;

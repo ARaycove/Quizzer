@@ -31,17 +31,7 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/system_data/e
 import 'package:quizzer/backend_systems/00_database_manager/tables/system_data/user_feedback_table.dart'; // Removed alias
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_settings_table.dart' as user_settings_table;
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_question_answer_pairs_table.dart'; // Added for direct access
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/stat_update_aggregator.dart'; // do not use aliases in the import statements
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_eligible_questions_table.dart'; // Added import for user_stats_eligible_questions_table
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_non_circulating_questions_table.dart'; // Added import for user_stats_non_circulating_questions_table
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_in_circulation_questions_table.dart'; // Added import for user_stats_in_circulation_questions_table
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_revision_streak_sum_table.dart'; // Added import for user_stats_revision_streak_sum_table
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_total_user_question_answer_pairs_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_average_questions_shown_per_day_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_total_questions_answered_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_daily_questions_answered_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_average_daily_questions_learned_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_days_left_until_questions_exhaust_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_daily_stats_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_module_activation_status_table.dart'; // Added import for the new table
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pair_management/question_answer_pair_flags_table.dart'; // Added import for flags table
 import 'package:quizzer/backend_systems/00_helper_utils/file_locations.dart';
@@ -1033,50 +1023,48 @@ class SessionManager {
       // Note: Submission data (_lastSubmittedUserAnswer, _lastSubmittedIsCorrect, _lastSubmittedCustomOrderIndices) 
       // should be set by widgets BEFORE calling submitAnswer
 
-      // --- 4. Calculate Updated User Record ---
+      // --- 4. Record Answer Attempt (at time of presentation) ---
       // Keep a copy of the record *before* updates for the attempt log
-      final Map<String, dynamic> recordBeforeUpdate = Map<String, dynamic>.from(_currentQuestionRecord!); 
-      final Map<String, dynamic> updatedUserRecord = updateUserQuestionRecordOnAnswer(
-         currentUserRecord:  _currentQuestionRecord!,
-         isCorrect:          isCorrect,
-      );
-      // Call the top-level helper function from session_helper.dart
+      
+      // Call the top-level helper function from session_helper.dart //FIXME Need to resolve and ensure our new features are being recorded as intended before we start generating samples.
       await recordQuestionAnswerAttempt(
-        recordBeforeUpdate: recordBeforeUpdate,
         isCorrect: isCorrect,
-        timeAnswerGiven: _timeAnswerGiven!, 
-        timeDisplayed: _timeDisplayed!, 
         userId: userId!,
         questionId: questionId,
-        currentSubjects: currentSubjects, // Use getter
-        currentConcepts: currentConcepts, // Use getter
+      );
+      
+      double reactionTime = _timeAnswerGiven!.difference(_timeDisplayed!).inMicroseconds / Duration.microsecondsPerSecond;
+      // --- 5. Update Module Performance Stats ---
+      await updateModulePerformanceStats(
+        userId: userId!,
+        moduleName: currentModuleName, // Use getter
+        isCorrect: isCorrect,
+        reactionTime: reactionTime,
       );
 
-      // --- 6. Update User-Question Pair in DB (table functions handle their own DB access) ---
-      await updateAllUserDailyStats(userId!, isCorrect: isCorrect);
-      
-      // Table functions handle their own database access
-      await incrementTotalAttempts(userId!, questionId);
-      
-      await editUserQuestionAnswerPair(
-        userUuid: userId!,
+      // --- 6. Update User-Question Pair Record ---
+      // Update user-question pair record (this now handles all DB operations internally)
+      await updateUserQuestionRecordOnAnswer(
+        currentUserRecord: _currentQuestionRecord!,
+        isCorrect: isCorrect,
+        userId: userId!,
         questionId: questionId,
-        revisionStreak: updatedUserRecord['revision_streak'] as int,
-        lastRevised: updatedUserRecord['last_revised'] as String,
-        nextRevisionDue: updatedUserRecord['next_revision_due'] as String,
-        timeBetweenRevisions: updatedUserRecord['time_between_revisions'] as double,
-        averageTimesShownPerDay: updatedUserRecord['average_times_shown_per_day'] as double,
-        isEligible: (updatedUserRecord['is_eligible'] as int? ?? 0) == 1,
-        inCirculation: (updatedUserRecord['in_circulation'] as int? ?? 0) == 1,
+        reactionTime: reactionTime,
       );
 
-      // Don't send signal until the current question is updated in the DB. . .
+      // --- 7. Update Daily User Stats ---
+      await updateAllUserDailyStats(userId!, isCorrect: isCorrect, reactionTime: reactionTime, questionId: questionId);
+
+      // --- 8. Signal completion and update in-memory state ---
+      // Don't send signal until the current question is updated in the DB
       if (isCorrect) {
         signalQuestionAnsweredCorrectly(questionId);
       }
-      // --- 7. Update In-Memory State ---
-      _currentQuestionRecord = updatedUserRecord;
-
+      
+      
+      // Note: We no longer update _currentQuestionRecord since the function doesn't return the updated record
+      // The in-memory state will be refreshed when the next question is requested
+      
       // Note: Question was already added to answer history cache when requested
       
       QuizzerLogger.logMessage('Successfully submitted answer for QID: $questionId, isCorrect: $isCorrect, userAnswer: $userAnswer');
@@ -1718,445 +1706,9 @@ class SessionManager {
   // =====================================================================
   // --- User Stats API (Eligible Questions) ---
   // =====================================================================
+  // TODO Since individual stat tables are removed, we have removed all individual api calls, to be replaced with one master api call
 
-  /// Fetches eligible questions stats for the current user.
-  /// - If [date] is provided, returns the stat for that date (or null if not found).
-  /// - If [getAll] is true, returns the full history as a List.
-  /// - If neither is provided, returns today's stat.
-  /// Only one mode can be used at a time.
-  Future<dynamic> getEligibleQuestionsStats({DateTime? date, bool getAll = false}) async {
-    try {
-      QuizzerLogger.logMessage('Entering getEligibleQuestionsStats()...');
-      
-      assert(userId != null, 'User must be logged in to get stats.');
 
-      if (getAll) {
-        // Table function handles its own database access
-        final records = await getUserStatsEligibleQuestionsRecordsByUser(userId!);
-        QuizzerLogger.logMessage('Successfully retrieved all eligible questions stats for user: $userId');
-        return records;
-      }
-
-      final String dateString = (date ?? DateTime.now().toUtc()).toIso8601String().substring(0, 10);
-      try {
-        // Table function handles its own database access
-        final record = await getUserStatsEligibleQuestionsRecordByDate(userId!, dateString);
-        QuizzerLogger.logMessage('Successfully retrieved eligible questions stats for date: $dateString, user: $userId');
-        return record;
-      } catch (e) {
-        // If record doesn't exist, return a default record
-        QuizzerLogger.logMessage('No eligible questions record found for date: $dateString, user: $userId. Returning default.');
-        return {
-          'user_id': userId,
-          'record_date': dateString,
-          'eligible_questions_count': 0,
-          'has_been_synced': 0,
-          'edits_are_synced': 0,
-          'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
-        };
-      }
-    } catch (e) {
-      QuizzerLogger.logError('Error in getEligibleQuestionsStats - $e');
-      rethrow;
-    }
-  }
-
-  /// Fetches non-circulating questions stats for the current user.
-  /// - If [date] is provided, returns the stat for that date (or null if not found).
-  /// - If [getAll] is true, returns the full history as a List.
-  /// - If neither is provided, returns today's stat.
-  /// Only one mode can be used at a time.
-  Future<dynamic> getNonCirculatingQuestionsStats({DateTime? date, bool getAll = false}) async {
-    try {
-      QuizzerLogger.logMessage('Entering getNonCirculatingQuestionsStats()...');
-      
-      assert(userId != null, 'User must be logged in to get stats.');
-
-      if (getAll) {
-        // Table function handles its own database access
-        final records = await getUserStatsNonCirculatingQuestionsRecordsByUser(userId!);
-        QuizzerLogger.logMessage('Successfully retrieved all non-circulating questions stats for user: $userId');
-        return records;
-      }
-
-      final String dateString = (date ?? DateTime.now().toUtc()).toIso8601String().substring(0, 10);
-      try {
-        // Table function handles its own database access
-        final record = await getUserStatsNonCirculatingQuestionsRecordByDate(userId!, dateString);
-        QuizzerLogger.logMessage('Successfully retrieved non-circulating questions stats for date: $dateString, user: $userId');
-        return record;
-      } catch (e) {
-        // If record doesn't exist, return a default record
-        QuizzerLogger.logMessage('No non-circulating questions record found for date: $dateString, user: $userId. Returning default.');
-        return {
-          'user_id': userId,
-          'record_date': dateString,
-          'non_circulating_questions_count': 0,
-          'has_been_synced': 0,
-          'edits_are_synced': 0,
-          'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
-        };
-      }
-    } catch (e) {
-      QuizzerLogger.logError('Error in getNonCirculatingQuestionsStats - $e');
-      rethrow;
-    }
-  }
-
-  /// Fetches in-circulating questions stats for the current user.
-  /// - If [date] is provided, returns the stat for that date (or null if not found).
-  /// - If [getAll] is true, returns the full history as a List.
-  /// - If neither is provided, returns today's stat.
-  /// Only one mode can be used at a time.
-  Future<dynamic> getInCirculationQuestionsStats({DateTime? date, bool getAll = false}) async {
-    try {
-      QuizzerLogger.logMessage('Entering getInCirculationQuestionsStats()...');
-      
-      assert(userId != null, 'User must be logged in to get stats.');
-
-      if (getAll) {
-        // Table function handles its own database access
-        final records = await getUserStatsInCirculationQuestionsRecordsByUser(userId!);
-        QuizzerLogger.logMessage('Successfully retrieved all in-circulating questions stats for user: $userId');
-        return records;
-      }
-
-      final String dateString = (date ?? DateTime.now().toUtc()).toIso8601String().substring(0, 10);
-      try {
-        // Table function handles its own database access
-        final record = await getUserStatsInCirculationQuestionsRecordByDate(userId!, dateString);
-        QuizzerLogger.logMessage('Successfully retrieved in-circulating questions stats for date: $dateString, user: $userId');
-        return record;
-      } catch (e) {
-        // If record doesn't exist, return a default record
-        QuizzerLogger.logMessage('No in-circulating questions record found for date: $dateString, user: $userId. Returning default.');
-        return {
-          'user_id': userId,
-          'record_date': dateString,
-          'in_circulation_questions_count': 0,
-          'has_been_synced': 0,
-          'edits_are_synced': 0,
-          'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
-        };
-      }
-    } catch (e) {
-      QuizzerLogger.logError('Error in getInCirculationQuestionsStats - $e');
-      rethrow;
-    }
-  }
-
-  /// Fetches the current day's revision streak sum records for the logged-in user.
-  Future<List<Map<String, dynamic>>> getCurrentRevisionStreakSumStats() async {
-    try {
-      QuizzerLogger.logMessage('Entering getCurrentRevisionStreakSumStats()...');
-      
-      if (userId == null) {
-        QuizzerLogger.logWarning('SessionManager.getCurrentRevisionStreakSumStats: User ID is null.');
-        return [];
-      }
-
-      try {
-        // Table function handles its own database access
-        final List<Map<String, dynamic>> result = await getTodayUserStatsRevisionStreakSumRecords(userId!);
-        
-        QuizzerLogger.logMessage('Successfully retrieved current revision streak sum stats for user: $userId');
-        return result;
-      } catch (e) {
-        // If record doesn't exist, return empty list
-        QuizzerLogger.logMessage('No revision streak sum records found for user: $userId. Returning empty list.');
-        return [];
-      }
-    } catch (e) {
-      QuizzerLogger.logError('Error in getCurrentRevisionStreakSumStats - $e');
-      rethrow;
-    }
-  }
-
-  /// Fetches all historical revision streak sum records for the logged-in user.
-  Future<List<Map<String, dynamic>>> getHistoricalRevisionStreakSumStats() async {
-    try {
-      QuizzerLogger.logMessage('Entering getHistoricalRevisionStreakSumStats()...');
-      
-      if (userId == null) {
-        QuizzerLogger.logWarning('SessionManager.getHistoricalRevisionStreakSumStats: User ID is null.');
-        return [];
-      }
-
-      // Table function handles its own database access
-      final List<Map<String, dynamic>> result = await getUserStatsRevisionStreakSumRecordsByUser(userId!);
-      
-      QuizzerLogger.logMessage('Successfully retrieved historical revision streak sum stats for user: $userId');
-      return result;
-    } catch (e) {
-      QuizzerLogger.logError('Error in getHistoricalRevisionStreakSumStats - $e');
-      rethrow;
-    }
-  }
-
-  /// Fetches the current day's total user question answer pairs count for the logged-in user.
-  Future<int> getCurrentTotalUserQuestionAnswerPairsCount() async {
-    try {
-      QuizzerLogger.logMessage('Entering getCurrentTotalUserQuestionAnswerPairsCount()...');
-      
-      if (userId == null) {
-        QuizzerLogger.logWarning('SessionManager.getCurrentTotalUserQuestionAnswerPairsCount: User ID is null.');
-        return 0;
-      }
-
-      try {
-        // Table function handles its own database access
-        final Map<String, dynamic> record = await getTodayUserStatsTotalUserQuestionAnswerPairsRecord(userId!);
-        
-        final int count = record['total_question_answer_pairs'] as int? ?? 0;
-        QuizzerLogger.logMessage('Successfully retrieved current total user question answer pairs count: $count for user: $userId');
-        return count;
-      } catch (e) {
-        // If record doesn't exist, return 0
-        QuizzerLogger.logMessage('No total user question answer pairs record found for user: $userId. Returning 0.');
-        return 0;
-      }
-    } catch (e) {
-      QuizzerLogger.logError('Error in getCurrentTotalUserQuestionAnswerPairsCount - $e');
-      rethrow;
-    }
-  }
-
-  /// Fetches all historical total user question answer pairs records for the logged-in user.
-  Future<List<Map<String, dynamic>>> getHistoricalTotalUserQuestionAnswerPairsStats() async {
-    try {
-      QuizzerLogger.logMessage('Entering getHistoricalTotalUserQuestionAnswerPairsStats()...');
-      
-      if (userId == null) {
-        QuizzerLogger.logWarning('SessionManager.getHistoricalTotalUserQuestionAnswerPairsStats: User ID is null.');
-        return [];
-      }
-
-      // Table function handles its own database access
-      final List<Map<String, dynamic>> result = await getUserStatsTotalUserQuestionAnswerPairsRecordsByUser(userId!);
-      
-      QuizzerLogger.logMessage('Successfully retrieved historical total user question answer pairs stats for user: $userId');
-      return result;
-    } catch (e) {
-      QuizzerLogger.logError('Error in getHistoricalTotalUserQuestionAnswerPairsStats - $e');
-      rethrow;
-    }
-  }
-
-  /// Fetches the current day's average questions shown per day stat for the logged-in user.
-  Future<Map<String, dynamic>?> getCurrentAverageQuestionsShownPerDayStat() async {
-    try {
-      QuizzerLogger.logMessage('Entering getCurrentAverageQuestionsShownPerDayStat()...');
-      
-      if (userId == null) {
-        QuizzerLogger.logWarning('SessionManager.getCurrentAverageQuestionsShownPerDayStat: User ID is null.');
-        return null;
-      }
-
-      // Table function handles its own database access
-      final Map<String, dynamic> record = await getTodayUserStatsAverageQuestionsShownPerDayRecord(userId!);
-      
-      QuizzerLogger.logMessage('Successfully retrieved current average questions shown per day stat for user: $userId');
-      return record;
-    } catch (e) {
-      QuizzerLogger.logWarning('SessionManager.getCurrentAverageQuestionsShownPerDayStat: $e');
-      return null;
-    }
-  }
-
-  /// Fetches all historical average questions shown per day records for the logged-in user.
-  Future<List<Map<String, dynamic>>> getHistoricalAverageQuestionsShownPerDayStats() async {
-    try {
-      QuizzerLogger.logMessage('Entering getHistoricalAverageQuestionsShownPerDayStats()...');
-      
-      if (userId == null) {
-        QuizzerLogger.logWarning('SessionManager.getHistoricalAverageQuestionsShownPerDayStats: User ID is null.');
-        return [];
-      }
-
-      // Table function handles its own database access
-      final List<Map<String, dynamic>> result = await getUserStatsAverageQuestionsShownPerDayRecordsByUser(userId!);
-      
-      QuizzerLogger.logMessage('Successfully retrieved historical average questions shown per day stats for user: $userId');
-      return result;
-    } catch (e) {
-      QuizzerLogger.logWarning('SessionManager.getHistoricalAverageQuestionsShownPerDayStats: $e');
-      return [];
-    }
-  }
-
-  /// Fetches the current day's total questions answered count for the logged-in user.
-  Future<int> getCurrentTotalQuestionsAnsweredCount() async {
-    try {
-      QuizzerLogger.logMessage('Entering getCurrentTotalQuestionsAnsweredCount()...');
-      
-      if (userId == null) {
-        QuizzerLogger.logWarning('SessionManager.getCurrentTotalQuestionsAnsweredCount: User ID is null.');
-        return 0;
-      }
-
-      try {
-        // Table function handles its own database access
-        final Map<String, dynamic> record = await getTodayUserStatsTotalQuestionsAnsweredRecord(userId!);
-        
-        final int count = record['total_questions_answered'] as int? ?? 0;
-        QuizzerLogger.logMessage('Successfully retrieved current total questions answered count: $count for user: $userId');
-        return count;
-      } catch (e) {
-        // If record doesn't exist, return 0
-        QuizzerLogger.logMessage('No total questions answered record found for user: $userId. Returning 0.');
-        return 0;
-      }
-    } catch (e) {
-      QuizzerLogger.logError('Error in getCurrentTotalQuestionsAnsweredCount - $e');
-      rethrow;
-    }
-  }
-
-  /// Fetches all historical total questions answered records for the logged-in user.
-  Future<List<Map<String, dynamic>>> getHistoricalTotalQuestionsAnsweredStats() async {
-    try {
-      QuizzerLogger.logMessage('Entering getHistoricalTotalQuestionsAnsweredStats()...');
-      
-      if (userId == null) {
-        QuizzerLogger.logWarning('SessionManager.getHistoricalTotalQuestionsAnsweredStats: User ID is null.');
-        return [];
-      }
-
-      // Table function handles its own database access
-      final List<Map<String, dynamic>> result = await getUserStatsTotalQuestionsAnsweredRecordsByUser(userId!);
-      
-      QuizzerLogger.logMessage('Successfully retrieved historical total questions answered stats for user: $userId');
-      return result;
-    } catch (e) {
-      QuizzerLogger.logError('Error in getHistoricalTotalQuestionsAnsweredStats - $e');
-      rethrow;
-    }
-  }
-
-  /// Fetches all historical daily questions answered records for the logged-in user.
-  Future<List<Map<String, dynamic>>> getHistoricalDailyQuestionsAnsweredStats() async {
-    try {
-      QuizzerLogger.logMessage('Entering getHistoricalDailyQuestionsAnsweredStats()...');
-      
-      if (userId == null) {
-        QuizzerLogger.logWarning('SessionManager.getHistoricalDailyQuestionsAnsweredStats: User ID is null.');
-        return [];
-      }
-
-      // Table function handles its own database access
-      final List<Map<String, dynamic>> result = await getUserStatsDailyQuestionsAnsweredRecordsByUser(userId!);
-      
-      QuizzerLogger.logMessage('Successfully retrieved historical daily questions answered stats for user: $userId');
-      return result;
-    } catch (e) {
-      QuizzerLogger.logError('Error in getHistoricalDailyQuestionsAnsweredStats - $e');
-      rethrow;
-    }
-  }
-
-  /// Fetches the current day's average daily questions learned stat for the logged-in user.
-  Future<Map<String, dynamic>?> getCurrentAverageDailyQuestionsLearnedStat() async {
-    try {
-      QuizzerLogger.logMessage('Entering getCurrentAverageDailyQuestionsLearnedStat()...');
-      
-      if (userId == null) {
-        QuizzerLogger.logWarning('SessionManager.getCurrentAverageDailyQuestionsLearnedStat: User ID is null.');
-        return null;
-      }
-
-      // Table function handles its own database access
-      final Map<String, dynamic> record = await getTodayUserStatsAverageDailyQuestionsLearnedRecord(userId!);
-      
-      QuizzerLogger.logMessage('Successfully retrieved current average daily questions learned stat for user: $userId');
-      return record;
-    } catch (e) {
-      QuizzerLogger.logWarning('SessionManager.getCurrentAverageDailyQuestionsLearnedStat: $e');
-      return null;
-    }
-  }
-
-  /// Fetches all historical average daily questions learned records for the logged-in user.
-  Future<List<Map<String, dynamic>>> getHistoricalAverageDailyQuestionsLearnedStats() async {
-    try {
-      QuizzerLogger.logMessage('Entering getHistoricalAverageDailyQuestionsLearnedStats()...');
-      
-      if (userId == null) {
-        QuizzerLogger.logWarning('SessionManager.getHistoricalAverageDailyQuestionsLearnedStats: User ID is null.');
-        return [];
-      }
-
-      // Table function handles its own database access
-      final List<Map<String, dynamic>> result = await getUserStatsAverageDailyQuestionsLearnedRecordsByUser(userId!);
-      
-      QuizzerLogger.logMessage('Successfully retrieved historical average daily questions learned stats for user: $userId');
-      return result;
-    } catch (e) {
-      QuizzerLogger.logWarning('SessionManager.getHistoricalAverageDailyQuestionsLearnedStats: $e');
-      return [];
-    }
-  }
-
-  /// Fetches the current day's days left until questions exhaust stat for the logged-in user.
-  Future<Map<String, dynamic>?> getCurrentDaysLeftUntilQuestionsExhaustStat() async {
-    try {
-      QuizzerLogger.logMessage('Entering getCurrentDaysLeftUntilQuestionsExhaustStat()...');
-      
-      if (userId == null) {
-        QuizzerLogger.logWarning('SessionManager.getCurrentDaysLeftUntilQuestionsExhaustStat: User ID is null.');
-        return null;
-      }
-
-      // Table function handles its own database access
-      final Map<String, dynamic> record = await getTodayUserStatsDaysLeftUntilQuestionsExhaustRecord(userId!);
-      
-      QuizzerLogger.logMessage('Successfully retrieved current days left until questions exhaust stat for user: $userId');
-      return record;
-    } catch (e) {
-      QuizzerLogger.logWarning('SessionManager.getCurrentDaysLeftUntilQuestionsExhaustStat: $e');
-      return null;
-    }
-  }
-
-  /// Fetches all historical days left until questions exhaust records for the logged-in user.
-  Future<List<Map<String, dynamic>>> getHistoricalDaysLeftUntilQuestionsExhaustStats() async {
-    try {
-      QuizzerLogger.logMessage('Entering getHistoricalDaysLeftUntilQuestionsExhaustStats()...');
-      
-      if (userId == null) {
-        QuizzerLogger.logWarning('SessionManager.getHistoricalDaysLeftUntilQuestionsExhaustStats: User ID is null.');
-        return [];
-      }
-
-      // Table function handles its own database access
-      final List<Map<String, dynamic>> result = await getUserStatsDaysLeftUntilQuestionsExhaustRecordsByUser(userId!);
-      
-      QuizzerLogger.logMessage('Successfully retrieved historical days left until questions exhaust stats for user: $userId');
-      return result;
-    } catch (e) {
-      QuizzerLogger.logWarning('SessionManager.getHistoricalDaysLeftUntilQuestionsExhaustStats: $e');
-      return [];
-    }
-  }
-  /// Updates the caches by manually querying for stat data.
-  /// This method bypasses the normal stat update flow to directly populate caches.
-  Future<void> updateCaches() async {
-    try {
-      QuizzerLogger.logMessage('SessionManager: Updating caches...');
-      
-      if (userId == null) {
-        QuizzerLogger.logWarning('SessionManager.updateCaches: User ID is null.');
-        return;
-      }
-
-      // Call the helper function
-      await fillSessionManagerStatCaches(userId!);
-      
-      QuizzerLogger.logMessage('SessionManager: Successfully updated caches.');
-    } catch (e) {
-      QuizzerLogger.logError('SessionManager.updateCaches: Error updating caches - $e');
-      rethrow;
-    }
-  }
 }
 
 // Global instance

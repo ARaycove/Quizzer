@@ -426,6 +426,10 @@ def update_db_with_cluster_ids(df: pd.DataFrame, db: Connection) -> None:
     finally:
         cursor.close()
 
+def sync_vectors_to_supabase():
+    db = initialize_and_fetch_db()
+    
+
 def main():
     df = load_vectorized_dataframe()
     k = 4

@@ -7,6 +7,35 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/modules_table
 import 'package:quizzer/backend_systems/07_user_question_management/user_question_processes.dart';
 import 'package:quizzer/backend_systems/session_manager/answer_validation/text_analysis_tools.dart';
 
+final List<Map<String, String>> expectedColumns = [
+  {'name': 'user_id',                   'type': 'TEXT NOT NULL'},
+  {'name': 'module_name',               'type': 'TEXT NOT NULL'},
+  {'name': 'is_active',                 'type': 'INTEGER DEFAULT 0'}, //TODO Implement function to calculate on question answered
+  {'name': 'num_mcq',                   'type': 'INTEGER DEFAULT 0'},
+  {'name': 'num_fitb',                  'type': 'INTEGER DEFAULT 0'},
+  {'name': 'num_sata',                  'type': 'INTEGER DEFAULT 0'},
+  {'name': 'num_tf',                    'type': 'INTEGER DEFAULT 0'},
+  {'name': 'num_so',                    'type': 'INTEGER DEFAULT 0'},
+  {'name': 'num_total',                 'type': 'INTEGER DEFAULT 0'},
+  {'name': 'total_seen',                'type': 'INTEGER DEFAULT 0'},
+  {'name': 'percentage_seen',           'type': 'REAL DEFAULT 0'},
+  
+  
+  {'name': 'total_correct_attempts',    'type': 'INTEGER DEFAULT 0'},
+  {'name': 'total_incorrect_attempts',  'type': 'INTEGER DEFAULT 0'},
+  {'name': 'total_attempts',            'type': 'INTEGER DEFAULT 0'},
+  {'name': 'overall_accuracy',          'type': 'REAL DEFAULT 0'},
+  {'name': 'avg_attempts_per_question', 'type': 'REAL DEFAULT 0'},
+
+  {'name': 'avg_reaction_time',         'type': 'REAL DEFAULT 0'},
+  {'name': 'days_since_last_seen',      'type': 'REAL DEFAULT 0'}, //TODO This will only be calculated when getting the module_vector for the module_attempt
+
+  // Sync Fields
+  {'name': 'has_been_synced',           'type': 'INTEGER DEFAULT 0'},
+  {'name': 'edits_are_synced',          'type': 'INTEGER DEFAULT 0'},
+  {'name': 'last_modified_timestamp',   'type': 'TEXT'},
+];
+
 /// Verifies that the user_module_activation_status table exists in the database
 /// Creates the table if it doesn't exist
 /// Private function that requires a database parameter to avoid race conditions
@@ -16,50 +45,83 @@ Future<void> verifyUserModuleActivationStatusTable(dynamic db, String userId) as
     
     // Check if the table exists
     final List<Map<String, dynamic>> tables = await db.rawQuery(
-      "SELECT name FROM sqlite_master WHERE type='table' AND name='user_module_activation_status'"
+      "SELECT name FROM sqlite_master WHERE type='table' AND name=?",
+      ['user_module_activation_status']
     );
-    
+
     if (tables.isEmpty) {
-      QuizzerLogger.logMessage('User module activation status table does not exist, creating it');
-      await db.execute('''
-        CREATE TABLE user_module_activation_status(
-          user_id TEXT NOT NULL,
-          module_name TEXT NOT NULL,
-          is_active INTEGER DEFAULT 0,
-          -- Sync Fields --
-          has_been_synced INTEGER DEFAULT 0,
-          edits_are_synced INTEGER DEFAULT 0,
-          last_modified_timestamp TEXT,
-          -- ------------- --
-          PRIMARY KEY (user_id, module_name)
-        )
-      ''');
+      // Create the table if it doesn't exist
+      QuizzerLogger.logMessage('user_module_activation_status table not found, creating...');
       
-      QuizzerLogger.logSuccess('User module activation status table created successfully');
+      String createTableSQL = 'CREATE TABLE user_module_activation_status(\n';
+      createTableSQL += expectedColumns.map((col) => '  ${col['name']} ${col['type']}').join(',\n');
+      createTableSQL += ',\n  PRIMARY KEY (user_id, module_name)\n)';
+      
+      await db.execute(createTableSQL);
+      QuizzerLogger.logSuccess('user_module_activation_status table created successfully.');
     } else {
-      // Table exists, check for sync columns
-      final List<Map<String, dynamic>> columns = await db.rawQuery(
+      // Table exists, check for column differences
+      QuizzerLogger.logMessage('user_module_activation_status table already exists. Checking column structure...');
+      
+      // Get current table structure
+      final List<Map<String, dynamic>> currentColumns = await db.rawQuery(
         "PRAGMA table_info(user_module_activation_status)"
       );
-      final Set<String> columnNames = columns.map((column) => column['name'] as String).toSet();
-
-      // Add checks for sync columns if they don't exist
-      if (!columnNames.contains('has_been_synced')) {
-        QuizzerLogger.logMessage('Adding has_been_synced column to user_module_activation_status table.');
-        await db.execute('ALTER TABLE user_module_activation_status ADD COLUMN has_been_synced INTEGER DEFAULT 0');
+      
+      final Set<String> currentColumnNames = currentColumns
+          .map((column) => column['name'] as String)
+          .toSet();
+      
+      final Set<String> expectedColumnNames = expectedColumns
+          .map((column) => column['name']!)
+          .toSet();
+      
+      // Find columns to add (expected but not current)
+      final Set<String> columnsToAdd = expectedColumnNames.difference(currentColumnNames);
+      
+      // Find columns to remove (current but not expected)
+      final Set<String> columnsToRemove = currentColumnNames.difference(expectedColumnNames);
+      
+      // Add missing columns
+      for (String columnName in columnsToAdd) {
+        final columnDef = expectedColumns.firstWhere((col) => col['name'] == columnName);
+        QuizzerLogger.logMessage('Adding missing column: $columnName');
+        await db.execute('ALTER TABLE user_module_activation_status ADD COLUMN ${columnDef['name']} ${columnDef['type']}');
       }
-      if (!columnNames.contains('edits_are_synced')) {
-        QuizzerLogger.logMessage('Adding edits_are_synced column to user_module_activation_status table.');
-        await db.execute('ALTER TABLE user_module_activation_status ADD COLUMN edits_are_synced INTEGER DEFAULT 0');
+      
+      // Remove unexpected columns (SQLite doesn't support DROP COLUMN directly)
+      if (columnsToRemove.isNotEmpty) {
+        QuizzerLogger.logMessage('Removing unexpected columns: ${columnsToRemove.join(', ')}');
+        
+        // Create temporary table with only expected columns
+        String tempTableSQL = 'CREATE TABLE user_module_activation_status_temp(\n';
+        tempTableSQL += expectedColumns.map((col) => '  ${col['name']} ${col['type']}').join(',\n');
+        tempTableSQL += ',\n  PRIMARY KEY (user_id, module_name)\n)';
+        
+        await db.execute(tempTableSQL);
+        
+        // Copy data from old table to temp table (only expected columns)
+        String columnList = expectedColumnNames.join(', ');
+        await db.execute('INSERT INTO user_module_activation_status_temp ($columnList) SELECT $columnList FROM user_module_activation_status');
+        
+        // Drop old table and rename temp table
+        await db.execute('DROP TABLE user_module_activation_status');
+        await db.execute('ALTER TABLE user_module_activation_status_temp RENAME TO user_module_activation_status');
+        
+        QuizzerLogger.logSuccess('Removed unexpected columns and restructured table');
       }
-      if (!columnNames.contains('last_modified_timestamp')) {
-        QuizzerLogger.logMessage('Adding last_modified_timestamp column to user_module_activation_status table.');
-        await db.execute('ALTER TABLE user_module_activation_status ADD COLUMN last_modified_timestamp TEXT');
+      
+      if (columnsToAdd.isEmpty && columnsToRemove.isEmpty) {
+        QuizzerLogger.logMessage('Table structure is already up to date');
+      } else {
+        QuizzerLogger.logSuccess('Table structure updated successfully');
       }
-      _ensureAllModulesHaveActivationStatusForUser(db, userId);
     }
+
+    // After table verification, ensure all modules have activation status for the user
+    await _ensureAllModulesHaveActivationStatusForUser(db, userId);
   } catch (e) {
-    QuizzerLogger.logError('Error verifying user module activation status table - $e');
+    QuizzerLogger.logError('Error verifying user_module_activation_status table - $e');
     rethrow;
   }
 }
@@ -512,22 +574,34 @@ Future<void> updateModuleActivationStatusSyncFlags({
 
 /// Inserts or updates module activation status records from inbound sync
 /// Sets sync flags to indicate the record is synced and edits are synced
+/// Automatically handles schema mismatches by only processing columns defined in expectedColumns
 Future<void> batchUpsertUserModuleActivationStatusFromInboundSync({
   required List<Map<String, dynamic>> userModuleActivationStatusRecords,
   required dynamic db,
 }) async {
   try {
     for (Map<String, dynamic> actRecord in userModuleActivationStatusRecords) {
-      // Define the map for insert
-      final Map<String, dynamic> data = {
-        'user_id': actRecord['user_id'],
-        'module_name': await normalizeString(actRecord['module_name']), // module name get's normalized
-        'is_active': actRecord['is_active'],
-        'has_been_synced': 1, // Mark as synced from cloud
-        'edits_are_synced': 1, // Mark edits as synced (as it's from cloud)
-        'last_modified_timestamp': actRecord['last_modified_timestamp'],
-      };
-      // insert the map
+      // Create processed record with only columns that exist in expectedColumns schema
+      final Map<String, dynamic> data = <String, dynamic>{};
+      
+      // Only include columns that are defined in expectedColumns
+      for (final col in expectedColumns) {
+        final name = col['name'] as String;
+        if (actRecord.containsKey(name)) {
+          if (name == 'module_name') {
+            // Normalize module name
+            data[name] = await normalizeString(actRecord[name]);
+          } else {
+            data[name] = actRecord[name];
+          }
+        }
+      }
+      
+      // Set sync flags to indicate synced status
+      data['has_been_synced'] = 1;
+      data['edits_are_synced'] = 1;
+      
+      // Insert the processed record
       await insertRawData(
         'user_module_activation_status',
         data,
@@ -538,5 +612,188 @@ Future<void> batchUpsertUserModuleActivationStatusFromInboundSync({
   } catch (e) {
     QuizzerLogger.logError('Error upserting module activation status from inbound sync - $e');
     rethrow;
+  }
+}
+
+/// Updates module performance statistics when a user answers a question
+/// Efficiently updates counters and running averages without querying individual records
+/// 
+/// Args:
+///   userId: The user ID
+///   moduleName: The module name (will be normalized)
+///   isCorrect: Whether the answer was correct
+///   reactionTime: The reaction time for this specific attempt
+Future<void> updateModulePerformanceStats({
+  required String userId,
+  required String moduleName,
+  required bool isCorrect,
+  required double reactionTime,
+}) async {
+  try {
+    // Normalize the module name
+    final String normalizedModuleName = await normalizeString(moduleName);
+    
+    QuizzerLogger.logMessage('Updating module performance stats for user: $userId, module: $normalizedModuleName, isCorrect: $isCorrect, reactionTime: $reactionTime');
+    
+    final db = await getDatabaseMonitor().requestDatabaseAccess();
+    if (db == null) {
+      throw Exception('Failed to acquire database access');
+    }
+    
+    // Get current module activation record
+    final List<Map<String, dynamic>> currentRecords = await queryAndDecodeDatabase(
+      'user_module_activation_status',
+      db,
+      where: 'user_id = ? AND module_name = ?',
+      whereArgs: [userId, normalizedModuleName],
+    );
+    
+    final bool recordExists = currentRecords.isNotEmpty;
+    final Map<String, dynamic> currentStats = recordExists ? currentRecords.first : {};
+    
+    // Get current values with defaults from schema
+    final int oldTotalAttempts = currentStats['total_attempts'] as int? ?? 0;
+    final int oldCorrectAttempts = currentStats['total_correct_attempts'] as int? ?? 0;
+    final int oldIncorrectAttempts = currentStats['total_incorrect_attempts'] as int? ?? 0;
+    final double oldAvgReactionTime = currentStats['avg_reaction_time'] as double? ?? 0.0;
+    
+    // Update counters based on this attempt
+    final int newTotalAttempts = oldTotalAttempts + 1;
+    final int newCorrectAttempts = isCorrect ? oldCorrectAttempts + 1 : oldCorrectAttempts;
+    final int newIncorrectAttempts = !isCorrect ? oldIncorrectAttempts + 1 : oldIncorrectAttempts;
+    
+    // Calculate new running average for reaction time
+    final double newAvgReactionTime = oldTotalAttempts == 0 
+        ? reactionTime 
+        : ((oldAvgReactionTime * oldTotalAttempts) + reactionTime) / newTotalAttempts;
+    
+    // FIXED: Query actual unique questions seen by user in this module
+    final List<Map<String, dynamic>> uniqueQuestionsSeenResult = await db.rawQuery('''
+      SELECT COUNT(DISTINCT uqap.question_id) as unique_questions_seen
+      FROM user_question_answer_pairs uqap
+      INNER JOIN question_answer_pairs qap ON uqap.question_id = qap.question_id
+      WHERE uqap.user_uuid = ? AND qap.module_name = ?
+    ''', [userId, normalizedModuleName]);
+    
+    final int newTotalSeen = uniqueQuestionsSeenResult.isNotEmpty 
+        ? (uniqueQuestionsSeenResult.first['unique_questions_seen'] as int? ?? 0)
+        : 0;
+    
+    // Get question type counts and total questions in single query
+    final List<Map<String, dynamic>> questionTypeCounts = await db.rawQuery('''
+      SELECT 
+        question_type,
+        COUNT(*) as count
+      FROM question_answer_pairs 
+      WHERE module_name = ?
+      GROUP BY question_type
+    ''', [normalizedModuleName]);
+    
+    // Parse question type counts
+    int numMcq = 0, numFitb = 0, numSata = 0, numTf = 0, numSo = 0, totalQuestionsInModule = 0;
+    for (final row in questionTypeCounts) {
+      final String questionType = row['question_type'] as String;
+      final int count = row['count'] as int;
+      totalQuestionsInModule += count;
+      
+      switch (questionType) {
+        case 'multiple_choice':
+          numMcq = count;
+          break;
+        case 'fill_in_the_blank':
+          numFitb = count;
+          break;
+        case 'select_all_that_apply':
+          numSata = count;
+          break;
+        case 'true_false':
+          numTf = count;
+          break;
+        case 'sort_order':
+          numSo = count;
+          break;
+      }
+    }
+    
+    // Calculate derived metrics
+    final double newOverallAccuracy = newTotalAttempts > 0 ? newCorrectAttempts / newTotalAttempts : 0.0;
+    final double newAvgAttemptsPerQuestion = totalQuestionsInModule > 0 ? newTotalAttempts / totalQuestionsInModule : 0.0;
+    final double newPercentageSeen = totalQuestionsInModule > 0 ? newTotalSeen / totalQuestionsInModule : 0.0;
+    
+
+    
+    const double daysSinceLastSeen = 0.0; // Current attempt means 0 days since last seen
+    
+    // Prepare update data dynamically based on calculated values
+    final Map<String, dynamic> calculatedValues = {
+      'num_mcq': numMcq,
+      'num_fitb': numFitb,
+      'num_sata': numSata,
+      'num_tf': numTf,
+      'num_so': numSo,
+      'num_total': totalQuestionsInModule,
+      'total_seen': newTotalSeen,
+      'percentage_seen': newPercentageSeen,
+      'total_correct_attempts': newCorrectAttempts,
+      'total_incorrect_attempts': newIncorrectAttempts,
+      'total_attempts': newTotalAttempts,
+      'overall_accuracy': newOverallAccuracy,
+      'avg_attempts_per_question': newAvgAttemptsPerQuestion,
+      'avg_reaction_time': newAvgReactionTime,
+      'days_since_last_seen': daysSinceLastSeen,
+      'edits_are_synced': 0,
+      'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
+    };
+    
+    // Only include fields that exist in expectedColumns
+    final Map<String, dynamic> updateData = {};
+    for (final col in expectedColumns) {
+      final String fieldName = col['name']!;
+      if (calculatedValues.containsKey(fieldName)) {
+        updateData[fieldName] = calculatedValues[fieldName];
+      }
+    }
+    
+    // QuizzerLogger.logMessage("Module Record Stat has been updated for module: $moduleName, feed is:");
+    // updateData.forEach((key, value) {
+    //   QuizzerLogger.logMessage("${key.padRight(20)}, $value");
+    // });
+    
+    if (recordExists) {
+      // Update existing record
+      final int rowsAffected = await updateRawData(
+        'user_module_activation_status',
+        updateData,
+        'user_id = ? AND module_name = ?',
+        [userId, normalizedModuleName],
+        db,
+      );
+      
+      if (rowsAffected > 0) {
+        QuizzerLogger.logSuccess('Successfully updated module performance stats for user: $userId, module: $normalizedModuleName');
+      }
+    } else {
+      // Insert new record with calculated values
+      updateData['user_id'] = userId;
+      updateData['module_name'] = normalizedModuleName;
+      updateData['has_been_synced'] = 0;
+      
+      await insertRawData(
+        'user_module_activation_status',
+        updateData,
+        db,
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+      
+      QuizzerLogger.logSuccess('Created new module performance record for user: $userId, module: $normalizedModuleName');
+    }
+    
+    signalOutboundSyncNeeded();
+    
+  } catch (e) {
+    QuizzerLogger.logError('Error updating module performance stats for user: $userId, module: $moduleName - $e');
+    rethrow;
+  } finally {
+    getDatabaseMonitor().releaseDatabaseAccess();
   }
 }

@@ -14,8 +14,84 @@ import 'package:quizzer/backend_systems/session_manager/answer_validation/text_a
 import 'package:quizzer/backend_systems/00_database_manager/tables/modules_table.dart';
 import 'package:quizzer/backend_systems/00_helper_utils/utils.dart';
 
-// --- Universal Encoding/Decoding Helpers --- Removed, moved to 00_table_helper.dart ---
+// ALL question_type:
+// - multiple_choice:       ✅ IMPLEMENTED
+// - select_all_that_apply: ✅ IMPLEMENTED
+// - true_false:            ✅ IMPLEMENTED
+// - sort_order:            ✅ IMPLEMENTED
+// - fill_in_the_blank:     ✅ IMPLEMENTED
+// - short_answer:          NOT IMPLEMENTED
+// - matching:              NOT IMPLEMENTED
+// - hot_spot:              NOT IMPLEMENTED
+// - label_diagram:         NOT IMPLEMENTED
+// - math:                  NOT IMPLEMENTED
+// - speech:                NOT IMPLEMENTED
 
+// question/answer element format:
+// List<Map<String, dynamic>> where each element is:
+// {'type': 'text', 'content': 'text content'} OR
+// {'type': 'image', 'content': 'filename.ext'} OR
+// {'type': 'blank', content: '$lengthOfBlank'}
+// 
+// Supported element types:
+// - 'text': Displays text content (content field contains the text)
+// - 'image': Displays image (content field contains filename from media directory)
+// 
+// Element rendering:
+// - Elements are rendered in order using ElementRenderer widget
+// - Text elements render synchronously
+// - Image elements load asynchronously from staging or media paths
+// - Images are stored as filenames, not full paths
+// 
+// Media handling:
+// - Images are staged in input_staging directory during creation
+// - Finalized images are moved to question_answer_pair_assets directory
+// - hasMediaCheck() function detects image elements and updates has_media flag
+// 
+// Example question_elements:
+// [
+//   {'type': 'text', 'content': 'What is the capital of France?'},
+//   {'type': 'image', 'content': 'france_map.png'},
+//   {'type': 'text', 'content': 'Choose the correct answer:'}
+// ]
+// 
+// Example question_elements with blanks (for fill_in_the_blank):
+// [
+//   {'type': 'text', 'content': 'The capital of France is'},
+//   {'type': 'blank', 'content': '10'},
+//   {'type': 'text', 'content': 'and it is known for the Eiffel Tower.'}
+// ]
+// 
+// Example answer_elements:
+// [
+//   {'type': 'text', 'content': 'Paris is the capital of France.'},
+//   {'type': 'image', 'content': 'paris_landmark.jpg'}
+// ]
+
+final List<Map<String, String>> expectedColumns = [
+  {'name': 'question_id',              'type': 'TEXT PRIMARY KEY'},
+  {'name': 'time_stamp',               'type': 'TEXT'},
+  {'name': 'question_elements',        'type': 'TEXT'},
+  {'name': 'answer_elements',          'type': 'TEXT'},
+  {'name': 'ans_flagged',              'type': 'INTEGER'},
+  {'name': 'ans_contrib',              'type': 'TEXT'},
+  {'name': 'qst_contrib',              'type': 'TEXT'},
+  {'name': 'qst_reviewer',             'type': 'TEXT'},
+  {'name': 'has_been_reviewed',        'type': 'INTEGER'},
+  {'name': 'flag_for_removal',         'type': 'INTEGER'},
+  {'name': 'module_name',              'type': 'TEXT'},
+  {'name': 'question_type',            'type': 'TEXT'},
+  {'name': 'options',                  'type': 'TEXT'},
+  {'name': 'correct_option_index',     'type': 'INTEGER'},
+  {'name': 'correct_order',            'type': 'TEXT'},
+  {'name': 'index_options_that_apply', 'type': 'TEXT'},
+  {'name': 'answers_to_blanks',        'type': 'TEXT'},
+  {'name': 'has_been_synced',          'type': 'INTEGER DEFAULT 0'},
+  {'name': 'edits_are_synced',         'type': 'INTEGER DEFAULT 0'},
+  {'name': 'last_modified_timestamp',  'type': 'TEXT'},
+  {'name': 'has_media',                'type': 'INTEGER DEFAULT NULL'},
+  {'name': 'question_vector',          'type': 'TEXT DEFAULT NULL'},
+];
 
 /// Verifies that the question_answer_pairs table exists and creates it if it doesn't.
 /// This function handles table creation, column additions, and index creation for the
@@ -35,170 +111,146 @@ import 'package:quizzer/backend_systems/00_helper_utils/utils.dart';
 /// This function is called by all other functions in this file to ensure
 /// the table structure is up-to-date before performing operations.
 Future<void> verifyQuestionAnswerPairTable(dynamic db) async {
-  // ALL question_type:
-  // - multiple_choice:       ✅ IMPLEMENTED
-  // - select_all_that_apply: ✅ IMPLEMENTED
-  // - true_false:            ✅ IMPLEMENTED
-  // - sort_order:            ✅ IMPLEMENTED
-  // - fill_in_the_blank:     ✅ IMPLEMENTED
-  // - short_answer:          NOT IMPLEMENTED
-  // - matching:              NOT IMPLEMENTED
-  // - hot_spot:              NOT IMPLEMENTED
-  // - label_diagram:         NOT IMPLEMENTED
-  // - math:                  NOT IMPLEMENTED
-  // - speech:                NOT IMPLEMENTED
-
-
-  // question/answer element format:
-  // List<Map<String, dynamic>> where each element is:
-  // {'type': 'text', 'content': 'text content'} OR
-  // {'type': 'image', 'content': 'filename.ext'} OR
-  // {'type': 'blank', content: '$lengthOfBlank'}
-  // 
-  // Supported element types:
-  // - 'text': Displays text content (content field contains the text)
-  // - 'image': Displays image (content field contains filename from media directory)
-  // 
-  // Element rendering:
-  // - Elements are rendered in order using ElementRenderer widget
-  // - Text elements render synchronously
-  // - Image elements load asynchronously from staging or media paths
-  // - Images are stored as filenames, not full paths
-  // 
-  // Media handling:
-  // - Images are staged in input_staging directory during creation
-  // - Finalized images are moved to question_answer_pair_assets directory
-  // - hasMediaCheck() function detects image elements and updates has_media flag
-  // 
-  // Example question_elements:
-  // [
-  //   {'type': 'text', 'content': 'What is the capital of France?'},
-  //   {'type': 'image', 'content': 'france_map.png'},
-  //   {'type': 'text', 'content': 'Choose the correct answer:'}
-  // ]
-  // 
-  // Example question_elements with blanks (for fill_in_the_blank):
-  // [
-  //   {'type': 'text', 'content': 'The capital of France is'},
-  //   {'type': 'blank', 'content': '10'},
-  //   {'type': 'text', 'content': 'and it is known for the Eiffel Tower.'}
-  // ]
-  // 
-  // Example answer_elements:
-  // [
-  //   {'type': 'text', 'content': 'Paris is the capital of France.'},
-  //   {'type': 'image', 'content': 'paris_landmark.jpg'}
-  // ]
-  //
-  // A single, comprehensive map of required columns and their SQLite data types
-  final requiredColumns = {
-    'question_id': 'TEXT UNIQUE', 
-    'time_stamp': 'TEXT',
-    'question_elements': 'TEXT',
-    'answer_elements': 'TEXT',
-    'ans_flagged': 'INTEGER',
-    'ans_contrib': 'TEXT',
-    'qst_contrib': 'TEXT',
-    'qst_reviewer': 'TEXT',
-    'has_been_reviewed': 'INTEGER',
-    'flag_for_removal': 'INTEGER',
-    'module_name': 'TEXT',
-    'question_type': 'TEXT',
-    'options': 'TEXT',
-    'correct_option_index': 'INTEGER',
-    'correct_order': 'TEXT',
-    'index_options_that_apply': 'TEXT',
-    'answers_to_blanks': 'TEXT',
-    'has_been_synced': 'INTEGER DEFAULT 0',
-    'edits_are_synced': 'INTEGER DEFAULT 0',
-    'last_modified_timestamp': 'TEXT',
-    'has_media': 'INTEGER DEFAULT NULL',
-  };
-  
-  final List<Map<String, dynamic>> tables = await db.rawQuery(
-    "SELECT name FROM sqlite_master WHERE type='table' AND name='question_answer_pairs'"
-  );
-
-  bool tableExists = tables.isNotEmpty;
-  List<Map<String, dynamic>>? recordsToMigrate;
-
-  if (tableExists) {
-    // Check if the primary key is question_id
-    final List<Map<String, dynamic>> tableInfo = await db.rawQuery(
-      "PRAGMA table_info(question_answer_pairs)"
+  try {
+    QuizzerLogger.logMessage('Verifying question_answer_pairs table existence');
+    
+    // Check if the table exists
+    final List<Map<String, dynamic>> tables = await db.rawQuery(
+      "SELECT name FROM sqlite_master WHERE type='table' AND name=?",
+      ['question_answer_pairs']
     );
-    final hasCorrectPrimaryKey = tableInfo.any((col) => col['name'] == 'question_id' && col['pk'] == 1);
 
-    if (!hasCorrectPrimaryKey) {
-      QuizzerLogger.logWarning('question_answer_pairs table has incorrect primary key. Migrating data and recreating table.');
+    bool tableExists = tables.isNotEmpty;
+    List<Map<String, dynamic>>? recordsToMigrate;
+
+    if (tableExists) {
+      // Check if the primary key is question_id
+      final List<Map<String, dynamic>> tableInfo = await db.rawQuery(
+        "PRAGMA table_info(question_answer_pairs)"
+      );
+      final hasCorrectPrimaryKey = tableInfo.any((col) => col['name'] == 'question_id' && col['pk'] == 1);
       
-      // Backup all data before dropping the table
-      try {
-        recordsToMigrate = await db.query('question_answer_pairs');
-        QuizzerLogger.logMessage('Successfully backed up ${recordsToMigrate!.length} records.');
-      } catch (e) {
-        QuizzerLogger.logError('Failed to backup data before migration: $e');
-        recordsToMigrate = null;
-      }
-      
-      await db.execute('DROP TABLE IF EXISTS question_answer_pairs');
-      tableExists = false;
-    }
-  }
-
-  if (!tableExists) {
-    QuizzerLogger.logMessage('question_answer_pairs table not found. Creating it.');
-    final columnsSql = requiredColumns.entries.map((e) => '${e.key} ${e.value}').join(',\n');
-    
-    await db.execute('''
-      CREATE TABLE question_answer_pairs (
-        $columnsSql,
-        PRIMARY KEY (question_id)
-      )
-    ''');
-    
-    await db.execute('CREATE INDEX idx_question_answer_pairs_module_name ON question_answer_pairs(module_name)');
-    QuizzerLogger.logSuccess('question_answer_pairs table created successfully.');
-  } else {
-    final List<Map<String, dynamic>> existingColumnsInfo = await db.rawQuery("PRAGMA table_info(question_answer_pairs)");
-    final existingColumns = existingColumnsInfo.map((e) => e['name'] as String).toSet();
-
-    final missingColumns = requiredColumns.keys.toSet().difference(existingColumns);
-
-    if (missingColumns.isNotEmpty) {
-      QuizzerLogger.logMessage('Found missing columns. Adding them to question_answer_pairs table.');
-      for (final column in missingColumns) {
-        await db.execute('ALTER TABLE question_answer_pairs ADD COLUMN $column ${requiredColumns[column]}');
-        QuizzerLogger.logMessage('Added column: $column');
-      }
-    }
-    
-    // Check and create indexes if they don't exist
-    final List<Map<String, dynamic>> indexes = await db.rawQuery("SELECT name FROM sqlite_master WHERE type='index' AND tbl_name='question_answer_pairs'");
-    final existingIndexes = indexes.map((index) => index['name'] as String).toSet();
-    
-    if (!existingIndexes.contains('idx_question_answer_pairs_module_name')) {
-      await db.execute('CREATE INDEX idx_question_answer_pairs_module_name ON question_answer_pairs(module_name)');
-      QuizzerLogger.logMessage('Created index on module_name.');
-    }
-  }
-
-  // Re-insert backed-up data if migration occurred
-  if (recordsToMigrate != null && recordsToMigrate.isNotEmpty) {
-    QuizzerLogger.logMessage('Migrating ${recordsToMigrate.length} records back into the table.');
-    await db.transaction((txn) async {
-      for (final record in recordsToMigrate!) {
-        final Map<String, dynamic> newRecord = Map<String, dynamic>.from(record);
-        if (newRecord['question_id'] == null) {
-          // Recreate the question_id if it was null
-          final String timeStamp = newRecord['time_stamp'] as String? ?? '';
-          final String qstContrib = newRecord['qst_contrib'] as String? ?? '';
-          newRecord['question_id'] = '${timeStamp}_$qstContrib';
+      if (!hasCorrectPrimaryKey) {
+        QuizzerLogger.logWarning('question_answer_pairs table has incorrect primary key. Migrating data and recreating table.');
+        
+        // Backup all data before dropping the table
+        try {
+          recordsToMigrate = await db.query('question_answer_pairs');
+          QuizzerLogger.logMessage('Successfully backed up ${recordsToMigrate!.length} records.');
+        } catch (e) {
+          QuizzerLogger.logError('Failed to backup data before migration: $e');
+          recordsToMigrate = null;
         }
-        await txn.insert('question_answer_pairs', newRecord);
+        
+        await db.execute('DROP TABLE IF EXISTS question_answer_pairs');
+        tableExists = false;
       }
-    });
-    QuizzerLogger.logSuccess('Data migration completed successfully.');
+    }
+
+    if (!tableExists) {
+      // Create the table if it doesn't exist
+      QuizzerLogger.logMessage('question_answer_pairs table does not exist, creating it');
+      
+      String createTableSQL = 'CREATE TABLE question_answer_pairs(\n';
+      createTableSQL += expectedColumns.map((col) => '  ${col['name']} ${col['type']}').join(',\n');
+      createTableSQL += '\n)';
+      
+      await db.execute(createTableSQL);
+      
+      // Create indexes
+      await db.execute('CREATE INDEX idx_question_answer_pairs_module_name ON question_answer_pairs(module_name)');
+      
+      QuizzerLogger.logSuccess('question_answer_pairs table created successfully');
+    } else {
+      // Table exists, check for column differences
+      QuizzerLogger.logMessage('question_answer_pairs table exists, checking column structure');
+      
+      // Get current table structure
+      final List<Map<String, dynamic>> currentColumns = await db.rawQuery(
+        "PRAGMA table_info(question_answer_pairs)"
+      );
+      
+      final Set<String> currentColumnNames = currentColumns
+          .map((column) => column['name'] as String)
+          .toSet();
+      
+      final Set<String> expectedColumnNames = expectedColumns
+          .map((column) => column['name']!)
+          .toSet();
+      
+      // Find columns to add (expected but not current)
+      final Set<String> columnsToAdd = expectedColumnNames.difference(currentColumnNames);
+      
+      // Find columns to remove (current but not expected)
+      final Set<String> columnsToRemove = currentColumnNames.difference(expectedColumnNames);
+      
+      // Add missing columns
+      for (String columnName in columnsToAdd) {
+        final columnDef = expectedColumns.firstWhere((col) => col['name'] == columnName);
+        QuizzerLogger.logMessage('Adding missing column: $columnName');
+        await db.execute('ALTER TABLE question_answer_pairs ADD COLUMN ${columnDef['name']} ${columnDef['type']}');
+      }
+      
+      // Remove unexpected columns (SQLite doesn't support DROP COLUMN directly)
+      if (columnsToRemove.isNotEmpty) {
+        QuizzerLogger.logMessage('Removing unexpected columns: ${columnsToRemove.join(', ')}');
+        
+        // Create temporary table with only expected columns
+        String tempTableSQL = 'CREATE TABLE question_answer_pairs_temp(\n';
+        tempTableSQL += expectedColumns.map((col) => '  ${col['name']} ${col['type']}').join(',\n');
+        tempTableSQL += '\n)';
+        
+        await db.execute(tempTableSQL);
+        
+        // Copy data from old table to temp table (only expected columns)
+        String columnList = expectedColumnNames.join(', ');
+        await db.execute('INSERT INTO question_answer_pairs_temp ($columnList) SELECT $columnList FROM question_answer_pairs');
+        
+        // Drop old table and rename temp table
+        await db.execute('DROP TABLE question_answer_pairs');
+        await db.execute('ALTER TABLE question_answer_pairs_temp RENAME TO question_answer_pairs');
+        
+        QuizzerLogger.logSuccess('Removed unexpected columns and restructured table');
+      }
+      
+      // Check and create indexes if they don't exist
+      final List<Map<String, dynamic>> indexes = await db.rawQuery(
+        "SELECT name FROM sqlite_master WHERE type='index' AND tbl_name='question_answer_pairs'"
+      );
+      final existingIndexes = indexes.map((index) => index['name'] as String).toSet();
+      
+      if (!existingIndexes.contains('idx_question_answer_pairs_module_name')) {
+        await db.execute('CREATE INDEX idx_question_answer_pairs_module_name ON question_answer_pairs(module_name)');
+        QuizzerLogger.logMessage('Created index on module_name');
+      }
+      
+      if (columnsToAdd.isEmpty && columnsToRemove.isEmpty) {
+        QuizzerLogger.logMessage('Table structure is already up to date');
+      } else {
+        QuizzerLogger.logSuccess('Table structure updated successfully');
+      }
+    }
+
+    // Re-insert backed-up data if migration occurred
+    if (recordsToMigrate != null && recordsToMigrate.isNotEmpty) {
+      QuizzerLogger.logMessage('Migrating ${recordsToMigrate.length} records back into the table.');
+      await db.transaction((txn) async {
+        for (final record in recordsToMigrate!) {
+          final Map<String, dynamic> newRecord = Map<String, dynamic>.from(record);
+          if (newRecord['question_id'] == null) {
+            // Recreate the question_id if it was null
+            final String timeStamp = newRecord['time_stamp'] as String? ?? '';
+            final String qstContrib = newRecord['qst_contrib'] as String? ?? '';
+            newRecord['question_id'] = '${timeStamp}_$qstContrib';
+          }
+          await txn.insert('question_answer_pairs', newRecord);
+        }
+      });
+      QuizzerLogger.logSuccess('Data migration completed successfully.');
+    }
+  } catch (e) {
+    QuizzerLogger.logError('Error verifying question_answer_pairs table - $e');
+    rethrow;
   }
 }
 
@@ -1962,6 +2014,7 @@ Future<void> processNullMediaStatusPairs() async {
 }
 
 /// True batch upsert for question_answer_pairs using a single SQL statement
+/// Automatically handles schema mismatches by only processing columns defined in expectedColumns
 Future<void> batchUpsertQuestionAnswerPairs({
   required List<Map<String, dynamic>> records,
   required dynamic db,
@@ -1974,7 +2027,6 @@ Future<void> batchUpsertQuestionAnswerPairs({
     
     // Process all records before batch processing
     final List<Map<String, dynamic>> processedRecords = [];
-
     for (final record in records) {
       final String? questionId = record['question_id'] as String?;
       if (questionId == null) {
@@ -1982,14 +2034,16 @@ Future<void> batchUpsertQuestionAnswerPairs({
         continue;
       }
       
-      // Create processed record with legacy fields removed and sync flags set
-      final Map<String, dynamic> processedRecord = Map<String, dynamic>.from(record);
+      // Create processed record with only columns that exist in expectedColumns schema
+      final Map<String, dynamic> processedRecord = <String, dynamic>{};
       
-      // Remove fields not present in local schema
-      processedRecord.remove('citation');
-      processedRecord.remove('concepts');
-      processedRecord.remove('subjects');
-      processedRecord.remove('completed');
+      // Only include columns that are defined in expectedColumns
+      for (final col in expectedColumns) {
+        final name = col['name'] as String;
+        if (record.containsKey(name)) {
+          processedRecord[name] = record[name];
+        }
+      }
       
       // Normalize the module name if it exists
       if (processedRecord['module_name'] != null) {
@@ -2002,11 +2056,11 @@ Future<void> batchUpsertQuestionAnswerPairs({
       
       processedRecords.add(processedRecord);
     }
-
+    
     if (processedRecords.isEmpty) {
       return;
     }
-
+    
     for (int i = 0; i < processedRecords.length; i += chunkSize) {
       final batch = processedRecords.sublist(i, i + chunkSize > processedRecords.length ? processedRecords.length : i + chunkSize);
       
@@ -2021,7 +2075,7 @@ Future<void> batchUpsertQuestionAnswerPairs({
         }
         return '(${List.filled(columns.length, '?').join(',')})';
       }).join(', ');
-
+      
       // Use question_id as the upsert key since it has a UNIQUE constraint
       final updateSet = columns.where((c) => c != 'question_id').map((c) => '$c=excluded.$c').join(', ');
       final sql = 'INSERT INTO question_answer_pairs (${columns.join(',')}) VALUES $valuePlaceholders ON CONFLICT(question_id) DO UPDATE SET $updateSet;';

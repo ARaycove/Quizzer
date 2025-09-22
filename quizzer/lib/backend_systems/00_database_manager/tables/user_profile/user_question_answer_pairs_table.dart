@@ -4,75 +4,118 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/table_helper.
 import 'package:quizzer/backend_systems/10_switch_board/sb_sync_worker_signals.dart'; // Import sync signals
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_module_activation_status_table.dart';
+import 'package:sqflite/sqflite.dart';
+final List<Map<String, String>> expectedColumns = [
+  {'name': 'user_uuid',                       'type': 'TEXT'},
+  {'name': 'question_id',                     'type': 'TEXT'},
+  {'name': 'revision_streak',                 'type': 'INTEGER'},
+  {'name': 'last_revised',                    'type': 'TEXT'},
+  // Days_since_last_revision calculated live
+  // Current_time calculated live
+  {'name': 'day_time_introduced',             'type': 'TEXT DEFAULT NULL'},
+  // days since first introduced calculated live
+  {'name': 'avg_hesitation',                  'type': 'REAL NOT NULL DEFAULT 0'},
+  {'name': 'avg_reaction_time',               'type': 'REAL NOT NULL DEFAULT 0'},
+
+  {'name': 'next_revision_due',               'type': 'TEXT'},
+  {'name': 'total_incorect_attempts',         'type': 'INTEGER NOT NULL DEFAULT 0'},
+  {'name': 'total_correct_attempts',          'type': 'INTEGER NOT NULL DEFAULT 0'},
+  {'name': 'total_attempts',                  'type': 'INTEGER NOT NULL DEFAULT 0'},
+  {'name': 'question_accuracy_rate',          'type': 'REAL NOT NULL DEFAULT 0'},
+  {'name': 'question_inaccuracy_rate',        'type': 'REAL NOT NULL DEFAULT 0'},
+  
+  // These features will be deprecated
+  {'name': 'time_between_revisions',          'type': 'REAL'},
+  {'name': 'average_times_shown_per_day',     'type': 'REAL'},
+  {'name': 'in_circulation',                  'type': 'INTEGER'}, // TODO Will be deprecated once probability model is introduced
+  // Tracking features
+  {'name': 'flagged',                         'type': 'INTEGER DEFAULT 0'},
+  {'name': 'has_been_synced',                 'type': 'INTEGER DEFAULT 0'},
+  {'name': 'edits_are_synced',                'type': 'INTEGER DEFAULT 0'},
+  {'name': 'last_modified_timestamp',         'type': 'TEXT'},
+];
 
 Future<void> verifyUserQuestionAnswerPairTable(dynamic db) async {
-  
-  // Check if the table exists
-  final List<Map<String, dynamic>> tables = await db.rawQuery(
-    "SELECT name FROM sqlite_master WHERE type='table' AND name='user_question_answer_pairs'"
-  );
-  
-  if (tables.isEmpty) {
-    await db.execute('''
-      CREATE TABLE user_question_answer_pairs (
-        user_uuid TEXT,
-        question_id TEXT,
-        revision_streak INTEGER,
-        last_revised TEXT,
-        predicted_revision_due_history TEXT,
-        next_revision_due TEXT,
-        time_between_revisions REAL,
-        average_times_shown_per_day REAL,
-        in_circulation INTEGER,
-        total_attempts INTEGER NOT NULL DEFAULT 0,
-        flagged INTEGER DEFAULT 0,
-        -- Sync Fields --
-        has_been_synced INTEGER DEFAULT 0,
-        edits_are_synced INTEGER DEFAULT 0,
-        last_modified_timestamp TEXT,
-        -- ------------- --
-        PRIMARY KEY (user_uuid, question_id)
-      )
-    ''');
+  try {
+    QuizzerLogger.logMessage('Verifying user_question_answer_pairs table existence');
     
-
-  } else {
-    // Table exists, check columns
-    final List<Map<String, dynamic>> columns = await db.rawQuery(
-      "PRAGMA table_info(user_question_answer_pairs)"
+    // Check if the table exists
+    final List<Map<String, dynamic>> tables = await db.rawQuery(
+      "SELECT name FROM sqlite_master WHERE type='table' AND name=?",
+      ['user_question_answer_pairs']
     );
-    final Set<String> columnNames = columns.map((col) => col['name'] as String).toSet();
 
-    // Check for total_attempts (new check)
-    if (!columnNames.contains('total_attempts')) {
-       QuizzerLogger.logWarning('Adding missing column: total_attempts');
-      // Add with default 0 for existing rows
-      await db.execute("ALTER TABLE user_question_answer_pairs ADD COLUMN total_attempts INTEGER NOT NULL DEFAULT 0");
+    if (tables.isEmpty) {
+      // Create the table if it doesn't exist
+      QuizzerLogger.logMessage('user_question_answer_pairs table does not exist, creating it');
+      
+      String createTableSQL = 'CREATE TABLE user_question_answer_pairs(\n';
+      createTableSQL += expectedColumns.map((col) => '  ${col['name']} ${col['type']}').join(',\n');
+      createTableSQL += ',\n  PRIMARY KEY (user_uuid, question_id)\n)';
+      
+      await db.execute(createTableSQL);
+      QuizzerLogger.logSuccess('user_question_answer_pairs table created successfully');
+    } else {
+      // Table exists, check for column differences
+      QuizzerLogger.logMessage('user_question_answer_pairs table exists, checking column structure');
+      
+      // Get current table structure
+      final List<Map<String, dynamic>> currentColumns = await db.rawQuery(
+        "PRAGMA table_info(user_question_answer_pairs)"
+      );
+      
+      final Set<String> currentColumnNames = currentColumns
+          .map((column) => column['name'] as String)
+          .toSet();
+      
+      final Set<String> expectedColumnNames = expectedColumns
+          .map((column) => column['name']!)
+          .toSet();
+      
+      // Find columns to add (expected but not current)
+      final Set<String> columnsToAdd = expectedColumnNames.difference(currentColumnNames);
+      
+      // Find columns to remove (current but not expected)
+      final Set<String> columnsToRemove = currentColumnNames.difference(expectedColumnNames);
+      
+      // Add missing columns
+      for (String columnName in columnsToAdd) {
+        final columnDef = expectedColumns.firstWhere((col) => col['name'] == columnName);
+        QuizzerLogger.logMessage('Adding missing column: $columnName');
+        await db.execute('ALTER TABLE user_question_answer_pairs ADD COLUMN ${columnDef['name']} ${columnDef['type']}');
+      }
+      
+      // Remove unexpected columns (SQLite doesn't support DROP COLUMN directly)
+      if (columnsToRemove.isNotEmpty) {
+        QuizzerLogger.logMessage('Removing unexpected columns: ${columnsToRemove.join(', ')}');
+        
+        // Create temporary table with only expected columns
+        String tempTableSQL = 'CREATE TABLE user_question_answer_pairs_temp(\n';
+        tempTableSQL += expectedColumns.map((col) => '  ${col['name']} ${col['type']}').join(',\n');
+        tempTableSQL += ',\n  PRIMARY KEY (user_uuid, question_id)\n)';
+        
+        await db.execute(tempTableSQL);
+        
+        // Copy data from old table to temp table (only expected columns)
+        String columnList = expectedColumnNames.join(', ');
+        await db.execute('INSERT INTO user_question_answer_pairs_temp ($columnList) SELECT $columnList FROM user_question_answer_pairs');
+        
+        // Drop old table and rename temp table
+        await db.execute('DROP TABLE user_question_answer_pairs');
+        await db.execute('ALTER TABLE user_question_answer_pairs_temp RENAME TO user_question_answer_pairs');
+        
+        QuizzerLogger.logSuccess('Removed unexpected columns and restructured table');
+      }
+      
+      if (columnsToAdd.isEmpty && columnsToRemove.isEmpty) {
+        QuizzerLogger.logMessage('Table structure is already up to date');
+      } else {
+        QuizzerLogger.logSuccess('Table structure updated successfully');
+      }
     }
-
-    // Check for flagged column
-    if (!columnNames.contains('flagged')) {
-      QuizzerLogger.logMessage('Adding flagged column to user_question_answer_pairs table.');
-      await db.execute('ALTER TABLE user_question_answer_pairs ADD COLUMN flagged INTEGER DEFAULT 0');
-    }
-
-    // Add checks for new sync columns
-    if (!columnNames.contains('has_been_synced')) {
-      QuizzerLogger.logMessage('Adding has_been_synced column to user_question_answer_pairs table.');
-      await db.execute('ALTER TABLE user_question_answer_pairs ADD COLUMN has_been_synced INTEGER DEFAULT 0');
-    }
-    if (!columnNames.contains('edits_are_synced')) {
-      QuizzerLogger.logMessage('Adding edits_are_synced column to user_question_answer_pairs table.');
-      await db.execute('ALTER TABLE user_question_answer_pairs ADD COLUMN edits_are_synced INTEGER DEFAULT 0');
-    }
-    if (!columnNames.contains('last_modified_timestamp')) {
-      QuizzerLogger.logMessage('Adding last_modified_timestamp column to user_question_answer_pairs table.');
-      await db.execute('ALTER TABLE user_question_answer_pairs ADD COLUMN last_modified_timestamp TEXT');
-      // Optionally backfill with last_updated for existing rows
-      // await db.rawUpdate('UPDATE user_question_answer_pairs SET last_modified_timestamp = last_updated WHERE last_modified_timestamp IS NULL');
-    }
-    
-
+  } catch (e) {
+    QuizzerLogger.logError('Error verifying user_question_answer_pairs table - $e');
+    rethrow;
   }
 }
 
@@ -99,7 +142,6 @@ Future<int> addUserQuestionAnswerPair({
       'question_id': questionAnswerReference,
       'revision_streak': revisionStreak,
       'last_revised': lastRevised,
-      'predicted_revision_due_history': predictedRevisionDueHistory,
       'next_revision_due': nextRevisionDue,
       'time_between_revisions': timeBetweenRevisions,
       'average_times_shown_per_day': averageTimesShownPerDay,
@@ -137,47 +179,45 @@ Future<int> addUserQuestionAnswerPair({
   }
 }
 
+/// Updates a user question answer pair with any combination of fields.
+/// Accepts a map of field names to values for maximum flexibility.
+/// Only updates fields that are provided in the updates map.
 Future<int> editUserQuestionAnswerPair({
   required String userUuid,
   required String questionId,
-  int? revisionStreak,
-  String? lastRevised,
-  String? predictedRevisionDueHistory,
-  String? nextRevisionDue,
-  double? timeBetweenRevisions,
-  double? averageTimesShownPerDay,
-  bool? isEligible,
-  bool? inCirculation,
+  Map<String, dynamic>? updates,
   bool disableOutboundSync = false,
 }) async {
   try {
-    final Map<String, dynamic> currentRecord = await getUserQuestionAnswerPairById(userUuid, questionId);
-    // Build the new record with updated values
-    final Map<String, dynamic> newRecord = Map<String, dynamic>.from(currentRecord);
-    if (revisionStreak != null) newRecord['revision_streak'] = revisionStreak;
-    if (lastRevised != null) newRecord['last_revised'] = lastRevised;
-    if (predictedRevisionDueHistory != null) newRecord['predicted_revision_due_history'] = predictedRevisionDueHistory;
-    if (nextRevisionDue != null) newRecord['next_revision_due'] = nextRevisionDue;
-    if (timeBetweenRevisions != null) newRecord['time_between_revisions'] = timeBetweenRevisions;
-    if (averageTimesShownPerDay != null) newRecord['average_times_shown_per_day'] = averageTimesShownPerDay;
-    if (inCirculation != null) newRecord['in_circulation'] = inCirculation ? 1 : 0;
-    
     final db = await getDatabaseMonitor().requestDatabaseAccess();
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
     QuizzerLogger.logMessage('Starting editUserQuestionAnswerPair for User: $userUuid, Q: $questionId');
 
+    // Build the values map
     Map<String, dynamic> values = {};
-    if (revisionStreak != null) values['revision_streak'] = revisionStreak;
-    if (lastRevised != null) values['last_revised'] = lastRevised;
-    if (predictedRevisionDueHistory != null) values['predicted_revision_due_history'] = predictedRevisionDueHistory;
-    if (nextRevisionDue != null) values['next_revision_due'] = nextRevisionDue;
-    if (timeBetweenRevisions != null) values['time_between_revisions'] = timeBetweenRevisions;
-    if (averageTimesShownPerDay != null) values['average_times_shown_per_day'] = averageTimesShownPerDay;
-    if (inCirculation != null) values['in_circulation'] = inCirculation;
+    
+    if (updates != null) {
+      for (final entry in updates.entries) {
+        // Handle boolean conversion for known boolean fields
+        if ((entry.key == 'in_circulation' || entry.key == 'flagged') && entry.value is bool) {
+          values[entry.key] = entry.value ? 1 : 0;
+        } else {
+          values[entry.key] = entry.value;
+        }
+      }
+    }
+
+    // Always set sync-related fields
     values['edits_are_synced'] = 0;
     values['last_modified_timestamp'] = DateTime.now().toUtc().toIso8601String();
+
+    // Early return if no updates to apply
+    if (values.length <= 2) { // Only sync fields were added
+      QuizzerLogger.logMessage('No updates to apply for User: $userUuid, Q: $questionId');
+      return 0;
+    }
 
     final int result = await updateRawData(
       'user_question_answer_pairs',
@@ -189,7 +229,7 @@ Future<int> editUserQuestionAnswerPair({
 
     // Log based on result
     if (result > 0) {
-      QuizzerLogger.logSuccess('Edited user_question_answer_pair for User: $userUuid, Q: $questionId ($result row affected).');
+      QuizzerLogger.logSuccess('Edited user_question_answer_pair for User: $userUuid, Q: $questionId ($result row affected). Updated fields: ${values.keys.where((k) => k != 'edits_are_synced' && k != 'last_modified_timestamp').join(', ')}');
       // Signal SwitchBoard conditionally
       if (!disableOutboundSync) {
         signalOutboundSyncNeeded();
@@ -558,6 +598,7 @@ Future<int> insertOrUpdateUserQuestionAnswerPair({
       throw Exception('Failed to acquire database access');
     }
     QuizzerLogger.logMessage('Starting insertOrUpdateUserQuestionAnswerPair for User: $userUuid, Q: $questionId');
+    
     // First try to get existing record
     QuizzerLogger.logMessage('Checking for existing record...');
     final List<Map<String, dynamic>> existing = await queryAndDecodeDatabase(
@@ -588,12 +629,13 @@ Future<int> insertOrUpdateUserQuestionAnswerPair({
       return await editUserQuestionAnswerPair(
         userUuid: userUuid,
         questionId: questionId,
-        revisionStreak: revisionStreak,
-        lastRevised: lastRevised,
-        predictedRevisionDueHistory: predictedRevisionDueHistory,
-        nextRevisionDue: nextRevisionDue,
-        timeBetweenRevisions: timeBetweenRevisions,
-        averageTimesShownPerDay: averageTimesShownPerDay,
+        updates: {
+          'revision_streak': revisionStreak,
+          'last_revised': lastRevised,
+          'next_revision_due': nextRevisionDue,
+          'time_between_revisions': timeBetweenRevisions,
+          'average_times_shown_per_day': averageTimesShownPerDay,
+        },
       );
     }
   } catch (e) {
@@ -604,6 +646,7 @@ Future<int> insertOrUpdateUserQuestionAnswerPair({
 }
 
 /// True batch upsert for user_question_answer_pairs using a single SQL statement
+/// Automatically handles schema mismatches by only processing columns defined in expectedColumns
 Future<void> batchUpsertUserQuestionAnswerPairs({
   required List<Map<String, dynamic>> records,
   required dynamic db,
@@ -611,33 +654,83 @@ Future<void> batchUpsertUserQuestionAnswerPairs({
 }) async {
   try {
     if (records.isEmpty) return;
-    QuizzerLogger.logMessage('Starting TRUE batch upsert for user_question_answer_pairs: ${records.length} records');
-    // Get all columns dynamically from the table
-    final List<Map<String, dynamic>> columnInfo = await db.rawQuery("PRAGMA table_info(user_question_answer_pairs)");
-    final List<String> columns = columnInfo.map((col) => col['name'] as String).toList();
-
-    // Helper to get value or null/default
+    QuizzerLogger.logMessage('Starting batch upsert for user_question_answer_pairs: ${records.length} records');
+    
+    // Process all records before batch processing
+    final List<Map<String, dynamic>> processedRecords = [];
+    for (final record in records) {
+      final String? userUuid = record['user_uuid'] as String?;
+      final String? questionId = record['question_id'] as String?;
+      
+      if (userUuid == null || questionId == null) {
+        QuizzerLogger.logWarning('Skipping record with missing user_uuid or question_id. This record cannot be upserted.');
+        continue;
+      }
+      
+      // Create processed record with only columns that exist in expectedColumns schema
+      final Map<String, dynamic> processedRecord = <String, dynamic>{};
+      
+      // Only include columns that are defined in expectedColumns
+      for (final col in expectedColumns) {
+        final name = col['name'] as String;
+        if (record.containsKey(name)) {
+          processedRecord[name] = record[name];
+        }
+      }
+      
+      // Set sync flags to indicate synced status
+      processedRecord['has_been_synced'] = 1;
+      processedRecord['edits_are_synced'] = 1;
+      
+      processedRecords.add(processedRecord);
+    }
+    
+    if (processedRecords.isEmpty) {
+      return;
+    }
+    
+    // Helper to get value or default
     dynamic getVal(Map<String, dynamic> r, String k, dynamic def) => r[k] ?? def;
 
-    for (int i = 0; i < records.length; i += chunkSize) {
-      final batch = records.sublist(i, i + chunkSize > records.length ? records.length : i + chunkSize);
+    for (int i = 0; i < processedRecords.length; i += chunkSize) {
+      final batch = processedRecords.sublist(i, i + chunkSize > processedRecords.length ? processedRecords.length : i + chunkSize);
       final values = <dynamic>[];
       final valuePlaceholders = batch.map((r) {
         // Ensure sync flags are set to 1 for inbound sync
         r = Map<String, dynamic>.from(r);
         r['has_been_synced'] = 1;
         r['edits_are_synced'] = 1;
-        for (final col in columns) {
-          values.add(getVal(r, col, null));
+        for (final col in expectedColumns) {
+          final name = col['name'] as String;
+          values.add(getVal(r, name, null));
         }
-        return '(${List.filled(columns.length, '?').join(',')})';
+        return '(${List.filled(expectedColumns.length, '?').join(',')})';
       }).join(', ');
 
-      final updateSet = columns.where((c) => c != 'user_uuid' && c != 'question_id').map((c) => '$c=excluded.$c').join(', ');
-      final sql = 'INSERT INTO user_question_answer_pairs (${columns.join(',')}) VALUES $valuePlaceholders ON CONFLICT(user_uuid, question_id) DO UPDATE SET $updateSet;';
-      await db.rawInsert(sql, values);
+      final columnNames = expectedColumns.map((col) => col['name'] as String).toList();
+      final updateSet = columnNames.where((c) => c != 'user_uuid' && c != 'question_id').map((c) => '$c=excluded.$c').join(', ');
+      final sql = 'INSERT INTO user_question_answer_pairs (${columnNames.join(',')}) VALUES $valuePlaceholders ON CONFLICT(user_uuid, question_id) DO UPDATE SET $updateSet;';
+      
+      try {
+        await db.rawInsert(sql, values);
+      } catch (e) {
+        if (e.toString().contains('UNIQUE constraint failed') || e.toString().contains('2067')) {
+          QuizzerLogger.logWarning('Unique constraint violation in batch upsert. Falling back to individual inserts.');
+          // Fall back to individual inserts for this batch
+          for (final record in batch) {
+            try {
+              await insertRawData('user_question_answer_pairs', record, db, conflictAlgorithm: ConflictAlgorithm.replace);
+            } catch (individualError) {
+              QuizzerLogger.logError('Failed to insert individual record: $individualError');
+              // Continue with other records instead of failing the entire batch
+            }
+          }
+        } else {
+          rethrow;
+        }
+      }
     }
-    QuizzerLogger.logSuccess('TRUE batch upsert for user_question_answer_pairs complete.');
+    QuizzerLogger.logSuccess('Batch upsert for user_question_answer_pairs complete.');
   } catch (e) {
     QuizzerLogger.logError('Error batch upserting user question answer pairs - $e');
     rethrow;
@@ -678,7 +771,6 @@ Future<List<Map<String, dynamic>>> getEligibleUserQuestionAnswerPairs(String use
         user_question_answer_pairs.question_id,
         user_question_answer_pairs.revision_streak,
         user_question_answer_pairs.last_revised,
-        user_question_answer_pairs.predicted_revision_due_history,
         user_question_answer_pairs.next_revision_due,
         user_question_answer_pairs.time_between_revisions,
         user_question_answer_pairs.average_times_shown_per_day,

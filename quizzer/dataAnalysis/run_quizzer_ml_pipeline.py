@@ -1,6 +1,6 @@
 import supabase
 import sqlite3
-from sync_fetch_data import initialize_supabase_session
+from sync_fetch_data import initialize_supabase_session, sync_vectors_to_supabase
 from sync_fetch_data import initialize_and_fetch_db, get_last_sync_date, fetch_new_records_from_supabase, update_last_sync_date,find_newest_timestamp,upsert_records_to_db
 import datetime
 from transform_question_to_vector import vectorize_records
@@ -65,19 +65,19 @@ k = 4 #Set by the elbow method
 print(df.head(5))
 
 
-encoded_df = filter_df_for_k_means(df)
-encoded_df, shape = create_onehot_features(df = encoded_df) # Use one principle component per subject field identified in the taxonomy
+# encoded_df = filter_df_for_k_means(df)
+# encoded_df, shape = create_onehot_features(df = encoded_df) # Use one principle component per subject field identified in the taxonomy
 
-# We'll reduce this using PCA
-# let's say we want 100 samples per core component 
-samples = shape[0]
-print(f"Samples: {samples}")
-d = shape[1] + 1408 # 1408 is the size of our transformer vector (subtract one add one is_math - the single feature in here that represents the vector)
-print(f"Dimensionality: {d}")
+# # We'll reduce this using PCA
+# # let's say we want 100 samples per core component 
+# samples = shape[0]
+# print(f"Samples: {samples}")
+# d = shape[1] + 1408 # 1408 is the size of our transformer vector (subtract one add one is_math - the single feature in here that represents the vector)
+# print(f"Dimensionality: {d}")
 
-cluster_data = umap_plot(df = encoded_df, min_k=65, max_k = 65, filename="cluster_plots/umap_plot")
-update_db_with_cluster_ids(cluster_data, initialize_and_fetch_db())
-
+# cluster_data = umap_plot(df = encoded_df, min_k=65, max_k = 65, filename="cluster_plots/umap_plot")
+# update_db_with_cluster_ids(cluster_data, initialize_and_fetch_db())
+sync_vectors_to_supabase()
 
 # OLD CODE, not using this right now:
 # # Since we are working in extremely high dimensional space, with a relatively limited sample size, we will run a calculation on the spot to determine the optimal reduction

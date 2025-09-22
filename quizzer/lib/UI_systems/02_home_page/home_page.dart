@@ -4,7 +4,6 @@ import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/app_theme.dart';
 import 'widget_home_page_top_bar.dart'; // Import the refactored Top Bar
-import 'stat_display_section/stat_section_widget.dart'; // Import the stat section widget
 // Corrected package imports for MOVED question widgets
 import 'package:quizzer/UI_systems/question_widgets/widget_multiple_choice_question.dart'; 
 import 'package:quizzer/UI_systems/question_widgets/widget_select_all_that_apply_question.dart'; 
@@ -24,7 +23,6 @@ class HomePage extends StatefulWidget { // Change to StatefulWidget
 class _HomePageState extends State<HomePage> { // State class
   final SessionManager session = SessionManager(); // Get session instance once
   Map<String, dynamic>? _editedQuestionData; // <-- ADDED State variable for callback data
-  final GlobalKey _statSectionKey = GlobalKey();
   ExpressionParser p = GrammarParser();
 
   @override
@@ -116,13 +114,6 @@ class _HomePageState extends State<HomePage> { // State class
             Column(
               children: [
                 AppTheme.sizedBoxMed,
-                StatSectionWidget(
-                  key: _statSectionKey,
-                  onRefresh: () {
-                    setState(() {});
-                  },
-                ),
-                AppTheme.sizedBoxSml,
                 Expanded(child: _buildQuestionBody()),
               ],
             ),

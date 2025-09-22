@@ -3,159 +3,208 @@ import 'dart:async';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'table_helper.dart'; // Import the helper file
 import 'package:quizzer/backend_systems/10_switch_board/sb_sync_worker_signals.dart'; // Import sync signals
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_question_answer_pairs_table.dart'; // Use package import for user_question_answer_pairs_table
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
+final List<Map<String, String>> expectedColumns = [
+  // ===================================
+  // Meta Data
+  // ===================================
+  // When was this entered?
+  {'name': 'time_stamp',                'type': 'TEXT NOT NULL'},
+  // What question was answered
+  {'name': 'question_id',               'type': 'TEXT NOT NULL'},
+  // The uuid of the user in question
+  {'name': 'participant_id',            'type': 'TEXT NOT NULL'},
+  // ===================================
+  // Question_Metrics (not performance related, what is the question?)
+  // ===================================
+  {'name': "question_vector",           'type': 'TEXT NOT NULL'}, // What does the transformer say?
+  {'name': "module_name",               'type': 'TEXT NOT NULL'}, // Which module is this question in?
+  {'name': "question_type",             'type': 'TEXT NOT NULL'}, // What is the question type?
+  {'name': "num_mcq_options",           'type': 'INTEGER NULL DEFAULT 0'}, // How many mcq options does this have (should be 0 if the type is not mcq)
+  {'name': "num_so_options",            'type': 'INTEGER NULL DEFAULT 0'},
+  {'name': "num_sata_options",          'type': 'INTEGER NULL DEFAULT 0'},
+  {'name': "num_blanks",                'type': 'INTEGER NULL DEFAULT 0'},
+  // ===================================
+  // Individual Question Performance
+  // ===================================
+  {'name': 'avg_react_time',             'type': 'REAL NOT NULL'}, // FIXME
+  {'name': 'response_result',           'type': 'INTEGER NOT NULL'}, // Did the user get this question correct after presentation 0 or 1
+  {'name': 'was_first_attempt',         'type': 'INTEGER NOT NULL'}, // At time of presentation, had user attempted this before? 0 or 1
+  {'name': 'total_correct_attempts',    'type': 'INTEGER NOT NULL'},
+  {'name': 'total_incorrect_attempts',  'type': 'INTEGER NOT NULL'},
+  {'name': 'total_attempts',            'type': 'INTEGER NOT NULL'},
+  {'name': 'accuracy_rate',             'type': 'REAL NOT NULL'},
+  {'name': 'revision_streak',           'type': 'INTEGER NOT NULL'},
+
+  // Temporal metrics
+  {'name': 'time_of_presentation',      'type': 'TEXT NULL'},
+  {'name': 'last_revised_date',         'type': 'TEXT NULL'},
+  {'name': 'days_since_last_revision',  'type': 'REAL NULL'},
+  {'name': 'days_since_first_introduced','type':'REAL NULL'},
+  {'name': 'attempt_day_ratio',         'type': 'REAL NULL'}, // total_attempts/days_since_introduced
+  
+
+  // User Stats metrics Vector
+  // The current state of global statistics at time of answer, array of maps
+  {'name': 'user_stats_vector',         'type': 'TEXT'},
+  // User Modules Metrics Vector
+  // Array of Maps, that contains the user's performance metric for every module in their profile:
+  {'name': 'module_performance_vector',        'type': 'TEXT NULL'},
+  // User Profile at time of presentation -> Vector (Fixed)
+  {'name': 'user_profile_record',              'type': 'TEXT NULL'},
+  // Sync tracking metrics
+  {'name': 'has_been_synced',           'type': 'INTEGER DEFAULT 0'},
+  {'name': 'edits_are_synced',          'type': 'INTEGER DEFAULT 0'},
+  {'name': 'last_modified_timestamp',   'type': 'TEXT'},
+];
 
 /// Verifies the existence and schema of the question_answer_attempts table.
 Future<void> verifyQuestionAnswerAttemptTable(dynamic db) async {
-  QuizzerLogger.logMessage('Verifying question_answer_attempts table...');
-  final List<Map<String, dynamic>> tables = await db.rawQuery(
-    "SELECT name FROM sqlite_master WHERE type='table' AND name='question_answer_attempts'"
-  );
-
-  if (tables.isEmpty) {
-    QuizzerLogger.logMessage('question_answer_attempts table not found, creating...');
-    await db.execute('''
-      CREATE TABLE question_answer_attempts (
-        time_stamp TEXT NOT NULL,            -- ISO8601 DateTime string
-        question_id TEXT NOT NULL,           
-        participant_id TEXT NOT NULL,        -- user_uuid
-        response_time REAL NOT NULL,         -- time in seconds (double)
-        response_result INTEGER NOT NULL,    -- Accuracy rating (0=incorrect, 1=correct)
-        was_first_attempt INTEGER NOT NULL,  -- 0 for false, 1 for true
-        knowledge_base REAL NULL,            -- Calculation result (double), nullable
-        question_context_csv TEXT NOT NULL,  -- JSON {subject: list, concept, list}
-        last_revised_date TEXT NULL,         -- Timestamp of last revision (nullable)
-        days_since_last_revision REAL NULL,  -- Calculated days since last revision (nullable)
-        total_attempts INTEGER NOT NULL,     -- Renamed: Count of previous attempts + 1 (i.e., attempt number)
-        revision_streak INTEGER NOT NULL,    -- Renamed: Streak *before* this attempt
-        -- Sync Fields --
-        has_been_synced INTEGER DEFAULT 0,
-        edits_are_synced INTEGER DEFAULT 0,
-        last_modified_timestamp TEXT,        -- Store as ISO8601 UTC string
-        -- ------------- --
-        PRIMARY KEY (participant_id, question_id, time_stamp) 
-      )
-    ''');
-    QuizzerLogger.logSuccess('question_answer_attempts table created successfully.');
-  } else {
-    QuizzerLogger.logMessage('question_answer_attempts table already exists. Checking columns...');
-    // Check for new columns and add if missing
-    final List<Map<String, dynamic>> columns = await db.rawQuery(
-      "PRAGMA table_info(question_answer_attempts)"
+  try {
+    QuizzerLogger.logMessage('Verifying question_answer_attempts table existence');
+    
+    // Check if the table exists
+    final List<Map<String, dynamic>> tables = await db.rawQuery(
+      "SELECT name FROM sqlite_master WHERE type='table' AND name=?",
+      ['question_answer_attempts']
     );
-    final Set<String> columnNames = columns.map((col) => col['name'] as String).toSet();
 
-    // Check for potentially renamed/new columns
-    if (!columnNames.contains('last_revised_date')) {
-      QuizzerLogger.logWarning('Adding missing column: last_revised_date');
-      await db.execute("ALTER TABLE question_answer_attempts ADD COLUMN last_revised_date TEXT NULL");
+    if (tables.isEmpty) {
+      // Create the table if it doesn't exist
+      QuizzerLogger.logMessage('question_answer_attempts table not found, creating...');
+      
+      String createTableSQL = 'CREATE TABLE question_answer_attempts(\n';
+      createTableSQL += expectedColumns.map((col) => '  ${col['name']} ${col['type']}').join(',\n');
+      createTableSQL += ',\n  PRIMARY KEY (participant_id, question_id, time_stamp)\n)';
+      
+      await db.execute(createTableSQL);
+      QuizzerLogger.logSuccess('question_answer_attempts table created successfully.');
+    } else {
+      // Table exists, check for column differences
+      QuizzerLogger.logMessage('question_answer_attempts table already exists. Checking column structure...');
+      
+      // Get current table structure
+      final List<Map<String, dynamic>> currentColumns = await db.rawQuery(
+        "PRAGMA table_info(question_answer_attempts)"
+      );
+      
+      final Set<String> currentColumnNames = currentColumns
+          .map((column) => column['name'] as String)
+          .toSet();
+      
+      final Set<String> expectedColumnNames = expectedColumns
+          .map((column) => column['name']!)
+          .toSet();
+      
+      // Find columns to add (expected but not current)
+      final Set<String> columnsToAdd = expectedColumnNames.difference(currentColumnNames);
+      
+      // Find columns to remove (current but not expected)
+      final Set<String> columnsToRemove = currentColumnNames.difference(expectedColumnNames);
+      
+      // Add missing columns
+      for (String columnName in columnsToAdd) {
+        final columnDef = expectedColumns.firstWhere((col) => col['name'] == columnName);
+        QuizzerLogger.logMessage('Adding missing column: $columnName');
+        await db.execute('ALTER TABLE question_answer_attempts ADD COLUMN ${columnDef['name']} ${columnDef['type']}');
+      }
+      
+      // Remove unexpected columns (SQLite doesn't support DROP COLUMN directly)
+      if (columnsToRemove.isNotEmpty) {
+        QuizzerLogger.logMessage('Removing unexpected columns: ${columnsToRemove.join(', ')}');
+        
+        // Create temporary table with only expected columns
+        String tempTableSQL = 'CREATE TABLE question_answer_attempts_temp(\n';
+        tempTableSQL += expectedColumns.map((col) => '  ${col['name']} ${col['type']}').join(',\n');
+        tempTableSQL += ',\n  PRIMARY KEY (participant_id, question_id, time_stamp)\n)';
+        
+        await db.execute(tempTableSQL);
+        
+        // Copy data from old table to temp table (only expected columns)
+        String columnList = expectedColumnNames.join(', ');
+        await db.execute('INSERT INTO question_answer_attempts_temp ($columnList) SELECT $columnList FROM question_answer_attempts');
+        
+        // Drop old table and rename temp table
+        await db.execute('DROP TABLE question_answer_attempts');
+        await db.execute('ALTER TABLE question_answer_attempts_temp RENAME TO question_answer_attempts');
+        
+        QuizzerLogger.logSuccess('Removed unexpected columns and restructured table');
+      }
+      
+      if (columnsToAdd.isEmpty && columnsToRemove.isEmpty) {
+        QuizzerLogger.logMessage('Table structure is already up to date');
+      } else {
+        QuizzerLogger.logSuccess('Table structure updated successfully');
+      }
     }
-    if (!columnNames.contains('days_since_last_revision')) {
-      QuizzerLogger.logWarning('Adding missing column: days_since_last_revision');
-      await db.execute("ALTER TABLE question_answer_attempts ADD COLUMN days_since_last_revision REAL NULL");
-    }
-    if (!columnNames.contains('total_attempts')) {
-      QuizzerLogger.logWarning('Adding missing column: total_attempts (renamed from total_attempts_before)');
-      // Add with default 0 for existing rows - Adjust default if needed
-      await db.execute("ALTER TABLE question_answer_attempts ADD COLUMN total_attempts INTEGER NOT NULL DEFAULT 1"); 
-    }
-    if (!columnNames.contains('revision_streak')) {
-       QuizzerLogger.logWarning('Adding missing column: revision_streak (renamed from revision_streak_before)');
-      // Add with default 0 for existing rows
-      await db.execute("ALTER TABLE question_answer_attempts ADD COLUMN revision_streak INTEGER NOT NULL DEFAULT 0");
-    }
-
-    // Add checks for new sync columns
-    if (!columnNames.contains('has_been_synced')) {
-      QuizzerLogger.logMessage('Adding has_been_synced column to question_answer_attempts table.');
-      await db.execute('ALTER TABLE question_answer_attempts ADD COLUMN has_been_synced INTEGER DEFAULT 0');
-    }
-    if (!columnNames.contains('edits_are_synced')) {
-      QuizzerLogger.logMessage('Adding edits_are_synced column to question_answer_attempts table.');
-      await db.execute('ALTER TABLE question_answer_attempts ADD COLUMN edits_are_synced INTEGER DEFAULT 0');
-    }
-    if (!columnNames.contains('last_modified_timestamp')) {
-      QuizzerLogger.logMessage('Adding last_modified_timestamp column to question_answer_attempts table.');
-      await db.execute('ALTER TABLE question_answer_attempts ADD COLUMN last_modified_timestamp TEXT');
-    }
-
-    QuizzerLogger.logMessage('Column check complete.');
+  } catch (e) {
+    QuizzerLogger.logError('Error verifying question_answer_attempts table - $e');
+    rethrow;
   }
-}
-
-// --- Private Helper Functions ---
-
-/// Checks if this is the first attempt for a given user and question.
-Future<bool> _checkWasFirstAttempt(String questionId, String userId) async {
-  QuizzerLogger.logMessage('Checking if first attempt for Q: $questionId, User: $userId');
-  // Get the user-question pair record to check total_attempts
-  final Map<String, dynamic> pairRecord = await getUserQuestionAnswerPairById(userId, questionId);
-  final int totalAttempts = pairRecord['total_attempts'] as int;
-  final bool isFirst = totalAttempts == 0;
-  QuizzerLogger.logMessage('Is first attempt? $isFirst (total_attempts: $totalAttempts)');
-  return isFirst;
 }
 
 // --- Public Database Operations ---
 
 /// Adds a new question answer attempt record to the database.
-/// Calculates `was_first_attempt` automatically.
+/// Accepts any dynamic field data and validates against the schema.
+/// Logs warnings for any fields that don't exist in the expected schema.
 Future<int> addQuestionAnswerAttempt({
-  required String timeStamp,          // Should be DateTime.now().toIso8601String()
-  required String questionId,         
-  required String participantId,      
-  required double responseTime,       
-  required int responseResult,       // Accuracy rating (0=incorrect, 1=correct)
-  required String questionContextCsv, // NOTE: Schema expects TEXT, ensure input is string/JSON
-  required int totalAttempts,        // Renamed: Total attempts *before* this one
-  required int revisionStreak,       // Renamed: Streak *before* this attempt
-  String? lastRevisedDate,           // Nullable timestamp of last revision
-  double? daysSinceLastRevision,   // New: Nullable calculated days
-  double? knowledgeBase,             
+  required String participantId,
+  required String questionId, 
+  required String timeStamp,
+  Map<String, dynamic>? additionalFields,
 }) async {
   try {
-    final bool wasFirstAttempt = await _checkWasFirstAttempt(questionId, participantId);
     final db = await getDatabaseMonitor().requestDatabaseAccess();
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
     QuizzerLogger.logMessage('Adding question attempt for Q: $questionId, User: $participantId');
     
-    // Prepare the raw data map
+    // Create set of valid column names for validation
+    final Set<String> validColumnNames = expectedColumns
+        .map((col) => col['name']!)
+        .toSet();
+    
+    // Start with primary key fields
     final Map<String, dynamic> attemptData = {
-      'time_stamp': timeStamp,
-      'question_id': questionId,
       'participant_id': participantId,
-      'response_time': responseTime,
-      'response_result': responseResult, 
-      'was_first_attempt': wasFirstAttempt, // Pass bool, helper encodes to 1/0
-      'knowledge_base': knowledgeBase,
-      'question_context_csv': questionContextCsv, // Expecting String/JSON based on schema comment
-      'last_revised_date': lastRevisedDate, 
-      'days_since_last_revision': daysSinceLastRevision,
-      'total_attempts': totalAttempts,
-      'revision_streak': revisionStreak,
-      // Add sync fields
-      'has_been_synced': 0,
-      'edits_are_synced': 0,
-      'last_modified_timestamp': timeStamp, // Use creation timestamp for initial last_modified
+      'question_id': questionId,
+      'time_stamp': timeStamp,
     };
+    
+    // Process additional fields if provided
+    if (additionalFields != null) {
+      for (final entry in additionalFields.entries) {
+        final String fieldName = entry.key;
+        final dynamic fieldValue = entry.value;
+        
+        // Validate field exists in schema
+        if (validColumnNames.contains(fieldName)) {
+          attemptData[fieldName] = fieldValue;
+        } else {
+          // Log warning for invalid field names
+          QuizzerLogger.logWarning('Attempted to insert invalid field "$fieldName" with value "$fieldValue" into question_answer_attempts table. Field not found in expected schema. Skipping field.');
+        }
+      }
+    }
+
+    QuizzerLogger.logMessage('Prepared attempt data with ${attemptData.length} fields: ${attemptData.keys.join(', ')}');
 
     // Use the universal insert helper
     final int resultId = await insertRawData(
       'question_answer_attempts',
       attemptData,
       db,
-      conflictAlgorithm: ConflictAlgorithm.ignore, // Or .fail if duplicates are critical errors
+      conflictAlgorithm: ConflictAlgorithm.ignore,
     );
 
     if (resultId > 0) {
-      QuizzerLogger.logSuccess('Successfully added question attempt record with result ID: $resultId. Data: $attemptData');
+      QuizzerLogger.logSuccess('Successfully added question attempt record with result ID: $resultId for Q: $questionId, User: $participantId');
       // Signal the SwitchBoard that new data might need syncing
       signalOutboundSyncNeeded();
     } else {
-      QuizzerLogger.logWarning('Insert operation for attempt (Q: $questionId, User: $participantId, Time: $timeStamp) returned $resultId. Might be ignored duplicate.');
+      QuizzerLogger.logWarning('Insert operation for attempt (Q: $questionId, User: $participantId) returned $resultId. Might be ignored duplicate.');
     }
     return resultId;
   } catch (e) {

@@ -6,16 +6,6 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_question_answer_pairs_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_settings_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/modules_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_eligible_questions_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_non_circulating_questions_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_in_circulation_questions_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_revision_streak_sum_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_total_user_question_answer_pairs_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_average_questions_shown_per_day_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_total_questions_answered_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_daily_questions_answered_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_days_left_until_questions_exhaust_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_stats/user_stats_average_daily_questions_learned_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_module_activation_status_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/academic_archive.dart/subject_details_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/inbound_sync/inbound_sync_helper.dart';
@@ -106,16 +96,6 @@ Future<void> runInboundSync(SessionManager sessionManager) async {
     await upsertUserProfileFromInboundSync(profileDataList: tableDataForSync[2], db: txn); // user should have only one profile record, so index the first in the list (should be only in the list)
     await batchUpsertUserSettingsFromSupabase(settingsData: tableDataForSync[3], userId: userId, db: txn);
     await batchUpsertModuleFromInboundSync(moduleRecords: tableDataForSync[4], db: txn);
-    await batchUpsertUserStatsEligibleQuestionsFromInboundSync(userStatsEligibleQuestionsRecords: tableDataForSync[5], db: txn);
-    await batchUpsertUserStatsNonCirculatingQuestionsFromInboundSync(userStatsNonCirculatingQuestionsRecords: tableDataForSync[6], db: txn);
-    await batchUpsertUserStatsInCirculationQuestionsFromInboundSync(userStatsInCirculationQuestionsRecords: tableDataForSync[7], db: txn);
-    await batchUpsertUserStatsRevisionStreakSumFromInboundSync(userStatsRevisionStreakSumRecords: tableDataForSync[8], db: txn);
-    await batchUpsertUserStatsTotalUserQuestionAnswerPairsFromInboundSync(userStatsTotalUserQuestionAnswerPairsRecords: tableDataForSync[9], db: txn);
-    await batchUpsertUserStatsAverageQuestionsShownPerDayFromInboundSync(userStatsAverageQuestionsShownPerDayRecords: tableDataForSync[10], db: txn);
-    await batchUpsertUserStatsTotalQuestionsAnsweredFromInboundSync(userStatsTotalQuestionsAnsweredRecords: tableDataForSync[11], db: txn);
-    await batchUpsertUserStatsDailyQuestionsAnsweredFromInboundSync(userStatsDailyQuestionsAnsweredRecords: tableDataForSync[12], db: txn);
-    await batchUpsertUserStatsDaysLeftUntilQuestionsExhaustFromInboundSync(userStatsDaysLeftUntilQuestionsExhaustRecords: tableDataForSync[13], db: txn);
-    await batchUpsertUserStatsAverageDailyQuestionsLearnedFromInboundSync(userStatsAverageDailyQuestionsLearnedRecords: tableDataForSync[14], db: txn);
     await batchUpsertUserModuleActivationStatusFromInboundSync(userModuleActivationStatusRecords: tableDataForSync[15], db: txn);
     await batchUpsertSubjectDetails(subjectDetailRecords: tableDataForSync[16], db: txn);
     });

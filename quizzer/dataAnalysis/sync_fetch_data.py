@@ -387,6 +387,102 @@ def fetch_and_save_data_locally() -> None:
     
     print(f"Hello?")
 
+def sync_vectors_to_supabase():
+    """
+    Syncs question_vector data from local database to Supabase.
+    Only updates records that are missing question_vector on Supabase.
+    Continues until all records on Supabase have been updated or no more can be updated.
+    """
+    db = initialize_and_fetch_db()
+    supabase_client = initialize_supabase_session()
+    
+    if not supabase_client:
+        print("Error: Could not initialize Supabase session")
+        return False
+    
+    # Authenticate with email and password
+    try:
+        auth_response = supabase_client.auth.sign_in_with_password({
+            "email": "aacra0820@gmail.com",
+            "password": "Starting11Over!"
+        })
+        print("Successfully authenticated with Supabase")
+    except Exception as e:
+        print(f"Error authenticating with Supabase: {e}")
+        return False
+    
+    cursor = db.cursor()
+    
+    try:
+        total_updated = 0
+        batch_size = 100  # Process in batches to avoid overwhelming the server
+        
+        while True:
+            # Query Supabase for records missing question_vector
+            response = supabase_client.table('question_answer_pairs')\
+                .select('question_id')\
+                .is_('question_vector', 'null')\
+                .limit(batch_size)\
+                .execute()
+            
+            if not response.data:
+                print(f"Sync complete. Total records updated: {total_updated}")
+                break
+            
+            missing_question_ids = [record['question_id'] for record in response.data]
+            print(f"Found {len(missing_question_ids)} records missing question_vector on Supabase")
+            
+            batch_updated = 0
+            
+            for question_id in missing_question_ids:
+                # Get the question_vector from local database
+                cursor.execute(
+                    "SELECT question_vector FROM question_answer_pairs WHERE question_id = ?", 
+                    (question_id,)
+                )
+                local_record = cursor.fetchone()
+                
+                if not local_record or not local_record[0]:
+                    print(f"Warning: No question_vector found in local DB for question_id: {question_id}")
+                    continue
+                
+                question_vector = local_record[0]
+                
+                # Update the record on Supabase
+                try:
+                    update_response = supabase_client.table('question_answer_pairs')\
+                        .update({'question_vector': question_vector})\
+                        .eq('question_id', question_id)\
+                        .execute()
+                    
+                    if update_response.data:
+                        batch_updated += 1
+                        print(f"Updated question_vector for question_id: {question_id}")
+                    else:
+                        print(f"Warning: Failed to update question_id: {question_id}")
+                        
+                except Exception as e:
+                    print(f"Error updating question_id {question_id}: {e}")
+                    continue
+            
+            total_updated += batch_updated
+            print(f"Batch complete. Updated {batch_updated} records in this batch.")
+            
+            # If no records were updated in this batch, break to avoid infinite loop
+            if batch_updated == 0:
+                print("No more records could be updated. Stopping sync.")
+                break
+        
+        return True
+        
+    except Exception as e:
+        print(f"Error during sync: {e}")
+        return False
+    
+    finally:
+        if db:
+            db.close()
+
 def main():
     fetch_and_save_data_locally()
 

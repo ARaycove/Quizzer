@@ -111,14 +111,7 @@ class OutboundSyncWorker {
       // Add cooldown period to prevent infinite loops from self-signaling
       QuizzerLogger.logMessage('OutboundSyncWorker: Sync completed, entering 30-second cooldown...');
       // FIXME wait logic interferes with prompt shutting down of the worker on logout
-      _doWaitingcycle(); // Don't care if this returns, just trigger the boolean to true, and flip back to false after 30 seconds
-      // redundancy because explicit
-      _inWaitingCycle = true;
-      while (_inWaitingCycle) {
-        // If we're in a waiting cycle do nothing at all, loop should break when _inWaitingCycle is flipped
-        await Future.delayed(const Duration(minutes: 60));
-      }
-      
+      await _doWaitingcycle(); // Don't care if this returns, just trigger the boolean to true, and flip back to false after 30 seconds      
       
       // Check if sync is needed after cooldown
       if (_syncNeeded) {
@@ -180,36 +173,6 @@ class OutboundSyncWorker {
 
     // 12. Check and Sync User Feedback
     await syncUserFeedback();
-    
-    // 13. Check and Sync User Stats Eligible Questions
-    await syncUserStatsEligibleQuestions();
-
-    // 14. Check and Sync User Stats Non-Circulating Questions
-    await syncUserStatsNonCirculatingQuestions();
-
-    // 15. Check and Sync User Stats In Circulation Questions
-    await syncUserStatsInCirculationQuestions();
-
-    // 16. Check and Sync User Stats Revision Streak Sum
-    await syncUserStatsRevisionStreakSum();
-    
-    // 17. Check and Sync User Stats Total User Question Answer Pairs
-    await syncUserStatsTotalUserQuestionAnswerPairs();
-
-    // 18. Check and Sync User Stats Average Questions Shown Per Day
-    await syncUserStatsAverageQuestionsShownPerDay();
-
-    // 19. Check and Sync User Stats Total Questions Answered
-    await syncUserStatsTotalQuestionsAnswered();
-
-    // 20. Check and Sync User Stats Daily Questions Answered
-    await syncUserStatsDailyQuestionsAnswered();
-
-    // 21. Check and Sync User Stats Days Left Until Questions Exhaust
-    await syncUserStatsDaysLeftUntilQuestionsExhaust();
-
-    // 22. Check and Sync User Stats Average Daily Questions Learned
-    await syncUserStatsAverageDailyQuestionsLearned();
 
     QuizzerLogger.logMessage('All outbound sync functions completed.');
   }
