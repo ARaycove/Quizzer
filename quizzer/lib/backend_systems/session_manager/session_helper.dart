@@ -482,7 +482,6 @@ Map<String, dynamic> _calculateNextRevisionDate({
 /// Calculates new SRS values and directly updates the database.
 /// All updates happen in a single atomic operation.
 Future<void> updateUserQuestionRecordOnAnswer({
-  required Map<String, dynamic> currentUserRecord,
   required bool isCorrect,
   required String userId,
   required String questionId,
@@ -491,7 +490,10 @@ Future<void> updateUserQuestionRecordOnAnswer({
   try {
     QuizzerLogger.logMessage('Entering updateUserQuestionRecordOnAnswer()...');
     
-    // --- 1. Extract necessary current values ---
+    // --- 1. Get current user record from database ---
+    final Map<String, dynamic> currentUserRecord = await getUserQuestionAnswerPairById(userId, questionId);
+    
+    // --- 2. Extract necessary current values ---
     final int currentRevisionStreak = currentUserRecord['revision_streak'] as int;
     final double currentTimeBetweenRevisions = currentUserRecord['time_between_revisions'] as double;
     final int currentTotalAttempts = currentUserRecord['total_attempts'] as int;
@@ -502,8 +504,7 @@ Future<void> updateUserQuestionRecordOnAnswer({
     
     QuizzerLogger.logMessage('Current values - streak: $currentRevisionStreak, timeBetweenRevisions: $currentTimeBetweenRevisions, totalAttempts: $currentTotalAttempts, isCorrect: $isCorrect');
     
-    // --- 2. Calculate Updates ---
-    
+    // --- 3. Calculate Updates ---
     // Calculate correct/incorrect attempt counters
     final int currentTotalCorrectAttempts = (currentUserRecord['total_correct_attempts'] as int?) ?? 0;
     final int currentTotalIncorrectAttempts = (currentUserRecord['total_incorect_attempts'] as int?) ?? 0;
@@ -559,7 +560,7 @@ Future<void> updateUserQuestionRecordOnAnswer({
     final String? dayTimeIntroduced = currentUserRecord['day_time_introduced'] as String?;
     final String finalDayTimeIntroduced = dayTimeIntroduced ?? DateTime.now().toUtc().toIso8601String();
     
-    // --- 3. CONDITIONAL REMOVAL FROM CIRCULATION ---
+    // --- 4. CONDITIONAL REMOVAL FROM CIRCULATION ---
     // Determine final values based on circulation removal logic
     int finalTotalAttempts = newTotalAttempts;
     bool finalInCirculation = (currentUserRecord['in_circulation'] as int? ?? 1) == 1;
@@ -591,13 +592,11 @@ Future<void> updateUserQuestionRecordOnAnswer({
         'question_accuracy_rate': newQuestionAccuracyRate,
         'question_inaccuracy_rate': newQuestionInaccuracyRate,
       };
-
     // QuizzerLogger.logMessage("Individual Question Record Updated, feed is:");
     // updateData.forEach((key, value) {
     //   QuizzerLogger.logMessage("${key.padRight(20)}, $value");
     // });
-
-    // --- 4. Update Database in Single Atomic Operation ---
+    // --- 5. Update Database in Single Atomic Operation ---
     await editUserQuestionAnswerPair(
       userUuid: userId,
       questionId: questionId,

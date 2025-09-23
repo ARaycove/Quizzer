@@ -1034,7 +1034,18 @@ class SessionManager {
       );
       
       double reactionTime = _timeAnswerGiven!.difference(_timeDisplayed!).inMicroseconds / Duration.microsecondsPerSecond;
-      // --- 5. Update Module Performance Stats ---
+
+      // --- 5. Update User-Question Pair Record ---
+      // Update user-question pair record (this now handles all DB operations internally)
+      await updateUserQuestionRecordOnAnswer(
+        isCorrect: isCorrect,
+        userId: userId!,
+        questionId: questionId,
+        reactionTime: reactionTime,
+      );
+
+      // --- 6. Update Module Performance Stats ---
+      // Updates after the question record update (module performance is derived from individual quesiton performance)
       await updateModulePerformanceStats(
         userId: userId!,
         moduleName: currentModuleName, // Use getter
@@ -1042,15 +1053,7 @@ class SessionManager {
         reactionTime: reactionTime,
       );
 
-      // --- 6. Update User-Question Pair Record ---
-      // Update user-question pair record (this now handles all DB operations internally)
-      await updateUserQuestionRecordOnAnswer(
-        currentUserRecord: _currentQuestionRecord!,
-        isCorrect: isCorrect,
-        userId: userId!,
-        questionId: questionId,
-        reactionTime: reactionTime,
-      );
+
 
       // --- 7. Update Daily User Stats ---
       await updateAllUserDailyStats(userId!, isCorrect: isCorrect, reactionTime: reactionTime, questionId: questionId);

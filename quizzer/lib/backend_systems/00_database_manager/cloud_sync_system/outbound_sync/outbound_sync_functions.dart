@@ -523,11 +523,9 @@ Future<void> syncUserQuestionAnswerPairs() async {
     final SessionManager sessionManager = getSessionManager();
     if (sessionManager.userId == null) {return;}
     final List<Map<String, dynamic>> unsyncedRecords = await getUnsyncedUserQuestionAnswerPairs(sessionManager.userId!);
-
     if (unsyncedRecords.isEmpty) {
       return;
     }
-
     // Ensure all records have last_modified_timestamp and sanitize Infinity values
     for (final record in unsyncedRecords) {
       if (record['last_modified_timestamp'] == null || (record['last_modified_timestamp'] is String && (record['last_modified_timestamp'] as String).isEmpty)) {
@@ -539,11 +537,13 @@ Future<void> syncUserQuestionAnswerPairs() async {
           record[key] = 1.0;
         }
       });
+      
+      // Remove local-only fields that should not be synced to server
+      record.remove('accuracy_probability');
+      record.remove('last_prob_calc');
     }
-
     // Push records individually
     const String tableName = 'user_question_answer_pairs';
-
     for (final record in unsyncedRecords) {
       final bool pushSuccess = await pushRecordToSupabase(tableName, record);
       if (pushSuccess) {

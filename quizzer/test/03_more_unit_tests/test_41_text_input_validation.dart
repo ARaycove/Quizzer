@@ -112,21 +112,30 @@ void main() async {
         {"photosynthesis": ["light reaction", "solar energy conversion", "plant food making"]},
         {"nucleus": ["control center", "brain of cell", "genetic headquarters"]},
         {"cytoplasm": ["cell fluid", "cellular matrix", "intracellular space"]}
-      ], ["enzyme", "mitochondria"], false],
-      [[{"evaporative cooling": [""]}], ["evaporation"], false],
+      ],                                        ["enzyme", "mitochondria"],     false],
+      [[{"evaporative cooling": [""]}],         ["evaporation"],                false],
       // These cases are explicitely wrong, even though they would pass a basic typo check
-      [[{"positively": [""]}], ["negatively"], false],
-      [[{"negatively": [""]}], ["positively"], false],
-      [[{"charged": [""]}], ["uncharged"], false],
-      [[{"uncharged": [""]}], ["charged"], false], 
-      [[{"asexual reproduction": [""]}], ["sexual reproduction"], false], 
-      [[{"sexual reproduction": [""]}], ["asexual reproduction"], false],
+      [[{"positively": [""]}],                  ["negatively"],                 false],
+      [[{"negatively": [""]}],                  ["positively"],                 false],
+      [[{"charged": [""]}],                     ["uncharged"],                  false],
+      [[{"uncharged": [""]}],                   ["charged"],                    false], 
+      [[{"asexual reproduction": [""]}],        ["sexual reproduction"],        false], 
+      [[{"sexual reproduction": [""]}],         ["asexual reproduction"],       false],
       // passes similarity check, but still not correct answer
-      [[{"carbonic acid": [""]}], ["carbonate"], false],
-      [[{"hydrogen bonds": [""]}], ["bonds"], false], // Answer contains part of the correct response but is incomplete and thus should not pass validation (perhaps a simple ensure the provided answer is the same number of words heuristic?)
-      [[{"closed system": [""]}], ["system"], false], // incomple answer, not quite correct, should not pass
-      [[{"every element": [""]}], ["all elements", true]], // semantically the same both contains the core meaning (all components of elements)
-
+      [[{"carbonic acid": [""]}],               ["carbonate"],                  false],
+      [[{"hydrogen bonds": [""]}],              ["bonds"],                      false], // Answer contains part of the correct response but is incomplete and thus should not pass validation (perhaps a simple ensure the provided answer is the same number of words heuristic?)
+      [[{"closed system": [""]}],               ["system"],                     false], // incomple answer, not quite correct, should not pass
+      [[{"every element": [""]}],               ["all elements",                true]], // semantically the same both contains the core meaning (all components of elements)
+      [[{"RNA": [""]}],                         ["DNA"],                        false],
+      [[{"DNA": [""]}],                         ["RNA"],                        false],
+      [[{"covalent peptide bonds": [""]}],      ["noncovalent peptide bonds"],  false], 
+      [[{"noncovalent peptide bonds": [""]}],   ["covalent peptide bonds"],     false],
+      [[{"phytosterols": [""]}],                ["phytoclerosts"],              false], // phytoclerosts is similar but is a nonsense word
+      [[{"hydrophilic": [""]}],                 ["hydrophilic"],                false],
+      [[{"population regression line": [""]}],  ["linear regression"],          false], // Close but not at all the same thing
+      [[{"basic": [""]}],                       ["base"],                       true],
+      [[{"endergonic": [""]}],                  ["exergonic"],                  false], //endergonic and exergonic have polar meanings
+      [[{"exergonic": [""]}],                   ["endergonic"],                 false],
     ];
 
     test('Cases should all validate correctly', () async {

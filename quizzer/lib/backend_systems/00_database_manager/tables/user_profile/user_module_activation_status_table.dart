@@ -374,24 +374,30 @@ Future<bool> updateModuleActivationStatus(String userId, String moduleName, bool
   }
 }
 
-/// Ensures that every module in the modules table has a corresponding record
-/// in the user_module_activation_status table for the given user.
-/// Creates records with default is_active = 0 for any missing modules.
+/// Ensures that every module that has questions in the question_answer_pairs table 
+/// has a corresponding record in the user_module_activation_status table for the given user.
+/// Creates records with default is_active = 0 for any missing modules that have questions.
+/// Removes activation status records for modules that no longer have any questions.
 Future<void> ensureAllModulesHaveActivationStatus(String userId) async {
   try {
-    QuizzerLogger.logMessage('Ensuring all modules have activation status for user: $userId');
+    QuizzerLogger.logMessage('Ensuring all modules with questions have activation status for user: $userId');
     
     final db = await getDatabaseMonitor().requestDatabaseAccess();
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
-    final List<Map<String, dynamic>> allModules = await getAllModules(db);
+
+    // Get all unique module names that actually have questions in the question_answer_pairs table
+    final List<Map<String, dynamic>> moduleResults = await db.rawQuery(
+      'SELECT DISTINCT module_name FROM question_answer_pairs WHERE module_name IS NOT NULL AND module_name != ""'
+    );
     
-    // Get all module names from the modules table
+    final List<String> modulesWithQuestions = moduleResults
+        .map((row) => row['module_name'] as String)
+        .where((name) => name.isNotEmpty)
+        .toList();
     
-    final List<String> allModuleNames = allModules.map((module) => module['module_name'] as String).toList();
-    
-    QuizzerLogger.logMessage('Found ${allModuleNames.length} modules in modules table');
+    QuizzerLogger.logMessage('Found ${modulesWithQuestions.length} modules with questions in question_answer_pairs table');
     
     // Get existing activation status records for this user
     final List<Map<String, dynamic>> existingRecords = await queryAndDecodeDatabase(
@@ -403,45 +409,66 @@ Future<void> ensureAllModulesHaveActivationStatus(String userId) async {
     
     final Set<String> existingModuleNames = existingRecords.map((record) => record['module_name'] as String).toSet();
     
-    // Find modules that don't have activation status records
-    final List<String> missingModules = allModuleNames.where((moduleName) => !existingModuleNames.contains(moduleName)).toList();
+    // Find modules with questions that don't have activation status records
+    final List<String> missingModules = modulesWithQuestions.where((moduleName) => !existingModuleNames.contains(moduleName)).toList();
     
-    if (missingModules.isEmpty) {
-      QuizzerLogger.logMessage('All modules already have activation status records for user: $userId');
-      return;
-    }
+    // Find activation status records for modules that no longer have questions
+    final List<String> orphanedModules = existingModuleNames.where((moduleName) => !modulesWithQuestions.contains(moduleName)).toList();
     
-    QuizzerLogger.logMessage('Creating activation status records for ${missingModules.length} missing modules');
-    
-    // Create records for missing modules with default is_active = 0
-    for (final moduleName in missingModules) {
-      // Normalize the module name
-      final String normalizedModuleName = await normalizeString(moduleName);
+    // Remove orphaned activation status records
+    if (orphanedModules.isNotEmpty) {
+      QuizzerLogger.logMessage('Removing activation status records for ${orphanedModules.length} modules that no longer have questions');
       
-      final Map<String, dynamic> data = {
-        'user_id': userId,
-        'module_name': normalizedModuleName,
-        'is_active': 0, // Default to inactive
-        'has_been_synced': 0,
-        'edits_are_synced': 0,
-        'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
-      };
-      
-      final int result = await insertRawData(
-        'user_module_activation_status',
-        data,
-        db,
-        conflictAlgorithm: ConflictAlgorithm.ignore, // Ignore if somehow already exists
-      );
-      
-      if (result > 0) {
-        QuizzerLogger.logMessage('Created activation status record for module: $moduleName (normalized: $normalizedModuleName)');
+      for (final orphanedModule in orphanedModules) {
+        final int deletedRows = await db.delete(
+          'user_module_activation_status',
+          where: 'user_id = ? AND module_name = ?',
+          whereArgs: [userId, orphanedModule],
+        );
+        
+        if (deletedRows > 0) {
+          QuizzerLogger.logMessage('Removed activation status record for module without questions: $orphanedModule');
+        }
       }
     }
     
-    QuizzerLogger.logSuccess('Successfully ensured all modules have activation status records for user: $userId');
-    // Signal SwitchBoard for the new records
-    signalOutboundSyncNeeded();
+    // Create records for missing modules that have questions
+    if (missingModules.isNotEmpty) {
+      QuizzerLogger.logMessage('Creating activation status records for ${missingModules.length} missing modules that have questions');
+      
+      for (final moduleName in missingModules) {
+        // Normalize the module name
+        final String normalizedModuleName = await normalizeString(moduleName);
+        
+        final Map<String, dynamic> data = {
+          'user_id': userId,
+          'module_name': normalizedModuleName,
+          'is_active': 0, // Default to inactive
+          'has_been_synced': 0,
+          'edits_are_synced': 0,
+          'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
+        };
+        
+        final int result = await insertRawData(
+          'user_module_activation_status',
+          data,
+          db,
+          conflictAlgorithm: ConflictAlgorithm.ignore, // Ignore if somehow already exists
+        );
+        
+        if (result > 0) {
+          QuizzerLogger.logMessage('Created activation status record for module with questions: $moduleName (normalized: $normalizedModuleName)');
+        }
+      }
+    }
+    
+    if (missingModules.isEmpty && orphanedModules.isEmpty) {
+      QuizzerLogger.logMessage('All modules with questions already have activation status records, and no orphaned records found for user: $userId');
+    } else {
+      QuizzerLogger.logSuccess('Successfully updated activation status records for user: $userId (added ${missingModules.length}, removed ${orphanedModules.length})');
+      // Signal SwitchBoard for the changes
+      signalOutboundSyncNeeded();
+    }
   } catch (e) {
     QuizzerLogger.logError('Error ensuring all modules have activation status for user ID: $userId - $e');
     rethrow;
@@ -616,115 +643,119 @@ Future<void> batchUpsertUserModuleActivationStatusFromInboundSync({
 }
 
 /// Updates module performance statistics when a user answers a question
-/// Efficiently updates counters and running averages without querying individual records
+/// Recalculates all statistics based on current questions in the module from user_question_answer_pairs
 /// 
 /// Args:
 ///   userId: The user ID
 ///   moduleName: The module name (will be normalized)
-///   isCorrect: Whether the answer was correct
-///   reactionTime: The reaction time for this specific attempt
+///   isCorrect: Whether the answer was correct (optional, for logging context)
+///   reactionTime: The reaction time for this specific attempt (optional, for logging context)
 Future<void> updateModulePerformanceStats({
   required String userId,
   required String moduleName,
-  required bool isCorrect,
-  required double reactionTime,
+  bool? isCorrect,
+  double? reactionTime,
 }) async {
   try {
     // Normalize the module name
     final String normalizedModuleName = await normalizeString(moduleName);
     
-    QuizzerLogger.logMessage('Updating module performance stats for user: $userId, module: $normalizedModuleName, isCorrect: $isCorrect, reactionTime: $reactionTime');
+    QuizzerLogger.logMessage('Updating module performance stats for user: $userId, module: $normalizedModuleName${isCorrect != null ? ', isCorrect: $isCorrect' : ''}${reactionTime != null ? ', reactionTime: $reactionTime' : ''}');
     
     final db = await getDatabaseMonitor().requestDatabaseAccess();
     if (db == null) {
       throw Exception('Failed to acquire database access');
     }
     
-    // Get current module activation record
-    final List<Map<String, dynamic>> currentRecords = await queryAndDecodeDatabase(
+    // Get all user question pairs for this module with their current statistics
+    final List<Map<String, dynamic>> userQuestionPairs = await db.rawQuery('''
+      SELECT 
+        uqap.total_correct_attempts,
+        uqap.total_incorect_attempts,
+        uqap.total_attempts,
+        uqap.avg_reaction_time,
+        qap.question_type
+      FROM user_question_answer_pairs uqap
+      INNER JOIN question_answer_pairs qap ON uqap.question_id = qap.question_id
+      WHERE uqap.user_uuid = ? AND qap.module_name = ?
+    ''', [userId, normalizedModuleName]);
+    
+    // Calculate aggregated statistics from all questions in the module
+    int totalCorrectAttempts = 0;
+    int totalIncorrectAttempts = 0;
+    int totalAttempts = 0;
+    double totalWeightedReactionTime = 0.0;
+    
+    // Count questions by type that the user has in their profile
+    int numMcq = 0, numFitb = 0, numSata = 0, numTf = 0, numSo = 0;
+    
+    for (final pair in userQuestionPairs) {
+      final int correct = pair['total_correct_attempts'] as int? ?? 0;
+      final int incorrect = pair['total_incorect_attempts'] as int? ?? 0;
+      final int attempts = pair['total_attempts'] as int? ?? 0;
+      final double avgReactionTime = pair['avg_reaction_time'] as double? ?? 0.0;
+      final String questionType = pair['question_type'] as String? ?? '';
+      
+      totalCorrectAttempts += correct;
+      totalIncorrectAttempts += incorrect;
+      totalAttempts += attempts;
+      
+      // Weight reaction time by number of attempts for this question
+      if (attempts > 0 && avgReactionTime > 0) {
+        totalWeightedReactionTime += avgReactionTime * attempts;
+      }
+      
+      // Count question types that user actually has in their profile
+      switch (questionType) {
+        case 'multiple_choice':
+          numMcq++;
+          break;
+        case 'fill_in_the_blank':
+          numFitb++;
+          break;
+        case 'select_all_that_apply':
+          numSata++;
+          break;
+        case 'true_false':
+          numTf++;
+          break;
+        case 'sort_order':
+          numSo++;
+          break;
+      }
+    }
+    
+    // Calculate number of unique questions user has seen in this module
+    final int totalSeen = userQuestionPairs.length;
+    
+    // Get total questions available in the module (not just what user has)
+    final List<Map<String, dynamic>> moduleQuestionCounts = await db.rawQuery('''
+      SELECT COUNT(*) as total_questions
+      FROM question_answer_pairs 
+      WHERE module_name = ?
+    ''', [normalizedModuleName]);
+    
+    final int totalQuestionsInModule = moduleQuestionCounts.isNotEmpty 
+        ? (moduleQuestionCounts.first['total_questions'] as int? ?? 0)
+        : 0;
+    
+    // Calculate derived metrics
+    final double overallAccuracy = totalAttempts > 0 ? totalCorrectAttempts / totalAttempts : 0.0;
+    final double avgAttemptsPerQuestion = totalSeen > 0 ? totalAttempts / totalSeen : 0.0;
+    final double percentageSeen = totalQuestionsInModule > 0 ? totalSeen / totalQuestionsInModule : 0.0;
+    final double avgReactionTime = totalAttempts > 0 ? totalWeightedReactionTime / totalAttempts : 0.0;
+    
+    // Get existing record if it exists
+    final List<Map<String, dynamic>> existingRecords = await queryAndDecodeDatabase(
       'user_module_activation_status',
       db,
       where: 'user_id = ? AND module_name = ?',
       whereArgs: [userId, normalizedModuleName],
     );
     
-    final bool recordExists = currentRecords.isNotEmpty;
-    final Map<String, dynamic> currentStats = recordExists ? currentRecords.first : {};
+    const double daysSinceLastSeen = 0.0; // Always 0 when function is called after an attempt
     
-    // Get current values with defaults from schema
-    final int oldTotalAttempts = currentStats['total_attempts'] as int? ?? 0;
-    final int oldCorrectAttempts = currentStats['total_correct_attempts'] as int? ?? 0;
-    final int oldIncorrectAttempts = currentStats['total_incorrect_attempts'] as int? ?? 0;
-    final double oldAvgReactionTime = currentStats['avg_reaction_time'] as double? ?? 0.0;
-    
-    // Update counters based on this attempt
-    final int newTotalAttempts = oldTotalAttempts + 1;
-    final int newCorrectAttempts = isCorrect ? oldCorrectAttempts + 1 : oldCorrectAttempts;
-    final int newIncorrectAttempts = !isCorrect ? oldIncorrectAttempts + 1 : oldIncorrectAttempts;
-    
-    // Calculate new running average for reaction time
-    final double newAvgReactionTime = oldTotalAttempts == 0 
-        ? reactionTime 
-        : ((oldAvgReactionTime * oldTotalAttempts) + reactionTime) / newTotalAttempts;
-    
-    // FIXED: Query actual unique questions seen by user in this module
-    final List<Map<String, dynamic>> uniqueQuestionsSeenResult = await db.rawQuery('''
-      SELECT COUNT(DISTINCT uqap.question_id) as unique_questions_seen
-      FROM user_question_answer_pairs uqap
-      INNER JOIN question_answer_pairs qap ON uqap.question_id = qap.question_id
-      WHERE uqap.user_uuid = ? AND qap.module_name = ?
-    ''', [userId, normalizedModuleName]);
-    
-    final int newTotalSeen = uniqueQuestionsSeenResult.isNotEmpty 
-        ? (uniqueQuestionsSeenResult.first['unique_questions_seen'] as int? ?? 0)
-        : 0;
-    
-    // Get question type counts and total questions in single query
-    final List<Map<String, dynamic>> questionTypeCounts = await db.rawQuery('''
-      SELECT 
-        question_type,
-        COUNT(*) as count
-      FROM question_answer_pairs 
-      WHERE module_name = ?
-      GROUP BY question_type
-    ''', [normalizedModuleName]);
-    
-    // Parse question type counts
-    int numMcq = 0, numFitb = 0, numSata = 0, numTf = 0, numSo = 0, totalQuestionsInModule = 0;
-    for (final row in questionTypeCounts) {
-      final String questionType = row['question_type'] as String;
-      final int count = row['count'] as int;
-      totalQuestionsInModule += count;
-      
-      switch (questionType) {
-        case 'multiple_choice':
-          numMcq = count;
-          break;
-        case 'fill_in_the_blank':
-          numFitb = count;
-          break;
-        case 'select_all_that_apply':
-          numSata = count;
-          break;
-        case 'true_false':
-          numTf = count;
-          break;
-        case 'sort_order':
-          numSo = count;
-          break;
-      }
-    }
-    
-    // Calculate derived metrics
-    final double newOverallAccuracy = newTotalAttempts > 0 ? newCorrectAttempts / newTotalAttempts : 0.0;
-    final double newAvgAttemptsPerQuestion = totalQuestionsInModule > 0 ? newTotalAttempts / totalQuestionsInModule : 0.0;
-    final double newPercentageSeen = totalQuestionsInModule > 0 ? newTotalSeen / totalQuestionsInModule : 0.0;
-    
-
-    
-    const double daysSinceLastSeen = 0.0; // Current attempt means 0 days since last seen
-    
-    // Prepare update data dynamically based on calculated values
+    // Prepare update data with recalculated values
     final Map<String, dynamic> calculatedValues = {
       'num_mcq': numMcq,
       'num_fitb': numFitb,
@@ -732,14 +763,14 @@ Future<void> updateModulePerformanceStats({
       'num_tf': numTf,
       'num_so': numSo,
       'num_total': totalQuestionsInModule,
-      'total_seen': newTotalSeen,
-      'percentage_seen': newPercentageSeen,
-      'total_correct_attempts': newCorrectAttempts,
-      'total_incorrect_attempts': newIncorrectAttempts,
-      'total_attempts': newTotalAttempts,
-      'overall_accuracy': newOverallAccuracy,
-      'avg_attempts_per_question': newAvgAttemptsPerQuestion,
-      'avg_reaction_time': newAvgReactionTime,
+      'total_seen': totalSeen,
+      'percentage_seen': percentageSeen,
+      'total_correct_attempts': totalCorrectAttempts,
+      'total_incorrect_attempts': totalIncorrectAttempts,
+      'total_attempts': totalAttempts,
+      'overall_accuracy': overallAccuracy,
+      'avg_attempts_per_question': avgAttemptsPerQuestion,
+      'avg_reaction_time': avgReactionTime,
       'days_since_last_seen': daysSinceLastSeen,
       'edits_are_synced': 0,
       'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
@@ -754,10 +785,7 @@ Future<void> updateModulePerformanceStats({
       }
     }
     
-    // QuizzerLogger.logMessage("Module Record Stat has been updated for module: $moduleName, feed is:");
-    // updateData.forEach((key, value) {
-    //   QuizzerLogger.logMessage("${key.padRight(20)}, $value");
-    // });
+    final bool recordExists = existingRecords.isNotEmpty;
     
     if (recordExists) {
       // Update existing record
@@ -770,7 +798,7 @@ Future<void> updateModulePerformanceStats({
       );
       
       if (rowsAffected > 0) {
-        QuizzerLogger.logSuccess('Successfully updated module performance stats for user: $userId, module: $normalizedModuleName');
+        QuizzerLogger.logSuccess('Successfully updated module performance stats for user: $userId, module: $normalizedModuleName (recalculated from ${totalSeen} questions)');
       }
     } else {
       // Insert new record with calculated values
@@ -785,7 +813,7 @@ Future<void> updateModulePerformanceStats({
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
       
-      QuizzerLogger.logSuccess('Created new module performance record for user: $userId, module: $normalizedModuleName');
+      QuizzerLogger.logSuccess('Created new module performance record for user: $userId, module: $normalizedModuleName (calculated from ${totalSeen} questions)');
     }
     
     signalOutboundSyncNeeded();

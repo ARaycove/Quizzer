@@ -30,9 +30,13 @@ final List<Map<String, String>> expectedColumns = [
   {'name': 'in_circulation',                  'type': 'INTEGER'}, // TODO Will be deprecated once probability model is introduced
   // Tracking features
   {'name': 'flagged',                         'type': 'INTEGER DEFAULT 0'},
+  {'name': 'last_modified_timestamp',         'type': 'TEXT'},
+
+  // NOT TO BE TO BE SYNCED TO SUPABASE
+  {'name': 'accuracy_probability',            'type': 'REAL DEFAULT 0'},  // What was the prediction models accuracy probability that it estimated?
+  {'name': 'last_prob_calc',                  'type': 'TEXT'},            // When was the last time the probability for this question was calculated?
   {'name': 'has_been_synced',                 'type': 'INTEGER DEFAULT 0'},
   {'name': 'edits_are_synced',                'type': 'INTEGER DEFAULT 0'},
-  {'name': 'last_modified_timestamp',         'type': 'TEXT'},
 ];
 
 Future<void> verifyUserQuestionAnswerPairTable(dynamic db) async {
