@@ -136,6 +136,8 @@ void main() async {
       [[{"basic": [""]}],                       ["base"],                       true],
       [[{"endergonic": [""]}],                  ["exergonic"],                  false], //endergonic and exergonic have polar meanings
       [[{"exergonic": [""]}],                   ["endergonic"],                 false],
+      [[{"casting down": [""]}],                ["upcasting"],                  false],
+      
     ];
 
     test('Cases should all validate correctly', () async {

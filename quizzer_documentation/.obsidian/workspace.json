@@ -55,12 +55,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Core Documentation/Chapter 09 - Algorithms and Background Processes/09_00_Feature_Outline.md",
+                "file": "Core Documentation/Chapter 09 - Algorithms and Background Processes/09_01_Central_Algorithms_Overview.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "09_00_Feature_Outline"
+              "title": "09_01_Central_Algorithms_Overview"
             }
           }
         ],
@@ -215,13 +215,13 @@
   },
   "active": "d477a20869bd563d",
   "lastOpenFiles": [
+    "Core Documentation/Chapter 09 - Algorithms and Background Processes/09_00_Feature_Outline.md",
     "Core Documentation/Chapter 09 - Algorithms and Background Processes/09_01_Central_Algorithms_Overview.md",
     "Core Documentation/Chapter 09 - Algorithms and Background Processes/09_02_Memory_Retention_Algorithm.md",
     "Core Documentation/Chapter 09 - Algorithms and Background Processes/09_13_Question_Selection_Background_Process.md",
     "Core Documentation/Chapter 09 - Algorithms and Background Processes/09_04_Question_Selection_Algorithm.md",
     "Core Documentation/Chapter 09 - Algorithms and Background Processes/09_12_Geographic_Coordinates_Recording_Background_Process.md",
     "Core Documentation/Chapter 09 - Algorithms and Background Processes/09_11_Background_Noise_Process.md",
-    "Core Documentation/Chapter 09 - Algorithms and Background Processes/09_00_Feature_Outline.md",
     "Excalidraw/Drawing 2025-04-17 10.16.39.excalidraw.md",
     "CSCI_447 Assignment 0.md",
     "Core Documentation/Chapter 09 - Algorithms and Background Processes/Neural-Net Layer.md",

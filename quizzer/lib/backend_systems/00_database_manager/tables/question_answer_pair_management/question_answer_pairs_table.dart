@@ -234,18 +234,16 @@ Future<void> verifyQuestionAnswerPairTable(dynamic db) async {
     // Re-insert backed-up data if migration occurred
     if (recordsToMigrate != null && recordsToMigrate.isNotEmpty) {
       QuizzerLogger.logMessage('Migrating ${recordsToMigrate.length} records back into the table.');
-      await db.transaction((txn) async {
-        for (final record in recordsToMigrate!) {
-          final Map<String, dynamic> newRecord = Map<String, dynamic>.from(record);
-          if (newRecord['question_id'] == null) {
-            // Recreate the question_id if it was null
-            final String timeStamp = newRecord['time_stamp'] as String? ?? '';
-            final String qstContrib = newRecord['qst_contrib'] as String? ?? '';
-            newRecord['question_id'] = '${timeStamp}_$qstContrib';
-          }
-          await txn.insert('question_answer_pairs', newRecord);
+      for (final record in recordsToMigrate) {
+        final Map<String, dynamic> newRecord = Map<String, dynamic>.from(record);
+        if (newRecord['question_id'] == null) {
+          // Recreate the question_id if it was null
+          final String timeStamp = newRecord['time_stamp'] as String? ?? '';
+          final String qstContrib = newRecord['qst_contrib'] as String? ?? '';
+          newRecord['question_id'] = '${timeStamp}_$qstContrib';
         }
-      });
+        await db.insert('question_answer_pairs', newRecord);
+      }
       QuizzerLogger.logSuccess('Data migration completed successfully.');
     }
   } catch (e) {
