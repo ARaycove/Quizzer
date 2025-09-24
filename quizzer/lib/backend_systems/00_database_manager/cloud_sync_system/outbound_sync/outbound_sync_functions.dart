@@ -526,25 +526,32 @@ Future<void> syncUserQuestionAnswerPairs() async {
     if (unsyncedRecords.isEmpty) {
       return;
     }
-    // Ensure all records have last_modified_timestamp and sanitize Infinity values
+    
+    // Create mutable copies and process them
+    final List<Map<String, dynamic>> mutableRecords = [];
     for (final record in unsyncedRecords) {
-      if (record['last_modified_timestamp'] == null || (record['last_modified_timestamp'] is String && (record['last_modified_timestamp'] as String).isEmpty)) {
-        record['last_modified_timestamp'] = DateTime.now().toUtc().toIso8601String();
+      final Map<String, dynamic> mutableRecord = Map<String, dynamic>.from(record);
+      
+      if (mutableRecord['last_modified_timestamp'] == null || (mutableRecord['last_modified_timestamp'] is String && (mutableRecord['last_modified_timestamp'] as String).isEmpty)) {
+        mutableRecord['last_modified_timestamp'] = DateTime.now().toUtc().toIso8601String();
       }
       // Sanitize Infinity values
-      record.forEach((key, value) {
+      mutableRecord.forEach((key, value) {
         if (value is double && value.isInfinite) {
-          record[key] = 1.0;
+          mutableRecord[key] = 1.0;
         }
       });
       
       // Remove local-only fields that should not be synced to server
-      record.remove('accuracy_probability');
-      record.remove('last_prob_calc');
+      mutableRecord.remove('accuracy_probability');
+      mutableRecord.remove('last_prob_calc');
+      
+      mutableRecords.add(mutableRecord);
     }
+    
     // Push records individually
     const String tableName = 'user_question_answer_pairs';
-    for (final record in unsyncedRecords) {
+    for (final record in mutableRecords) {
       final bool pushSuccess = await pushRecordToSupabase(tableName, record);
       if (pushSuccess) {
         await updateUserQuestionAnswerPairSyncFlags(
