@@ -96,8 +96,8 @@ Future<void> runInboundSync(SessionManager sessionManager) async {
     await upsertUserProfileFromInboundSync(profileDataList: tableDataForSync[2], db: txn); // user should have only one profile record, so index the first in the list (should be only in the list)
     await batchUpsertUserSettingsFromSupabase(settingsData: tableDataForSync[3], userId: userId, db: txn);
     await batchUpsertModuleFromInboundSync(moduleRecords: tableDataForSync[4], db: txn);
-    await batchUpsertUserModuleActivationStatusFromInboundSync(userModuleActivationStatusRecords: tableDataForSync[15], db: txn);
-    await batchUpsertSubjectDetails(subjectDetailRecords: tableDataForSync[16], db: txn);
+    await batchUpsertUserModuleActivationStatusFromInboundSync(userModuleActivationStatusRecords: tableDataForSync[5], db: txn);
+    await batchUpsertSubjectDetails(subjectDetailRecords: tableDataForSync[6], db: txn);
     });
     getDatabaseMonitor().releaseDatabaseAccess();
     QuizzerLogger.logSuccess('Inbound sync completed successfully.');

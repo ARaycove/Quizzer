@@ -34,6 +34,7 @@ Future<void> verifyAllTablesExist(userId) async {
   db!.transaction((txn) async {
     // User Profile not included, because it is verified separately in the performLogin
       await verifyUserDailyStatsTable(txn);
+      await verifyModulesTable(txn);
       await verifyUserModuleActivationStatusTable(txn, userId);
       await verifyUserQuestionAnswerPairTable(txn);
       await verifyUserSettingsTable(txn);
@@ -42,7 +43,6 @@ Future<void> verifyAllTablesExist(userId) async {
       await verifyQuestionAnswerPairTable(txn);
       await verifyErrorLogsTable(txn);
       await verifyUserFeedbackTable(txn);
-      await verifyModulesTable(txn);
       await verifyQuestionAnswerAttemptTable(txn);
       await verifySubjectDetailsTable(txn);
   });

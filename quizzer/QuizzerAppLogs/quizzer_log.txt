@@ -1,192 +1,65 @@
-Quizzer: [19:50:07] [34m[INFO][0m [<asynchronous suspension>] QuizzerLogger successfully set up file logging to: ./QuizzerAppLogs/quizzer_log.txt
-Quizzer: [19:50:07] [34m[INFO][0m [<asynchronous suspension>] QuizzerLogger: Attempting a SECOND test log message to file.
-Quizzer: [19:50:07] [34m[INFO][0m [switch_board.dart] SwitchBoard initialized.
-Quizzer: [19:50:07] [34m[INFO][0m [file_locations.dart] [PATH] Path provider not available (likely test environment), using current directory for Hive.
-Quizzer: [19:50:07] [34m[INFO][0m [file_locations.dart] [PATH] QuizzerHive path: ./QuizzerAppHive
-Quizzer: [19:50:07] [34m[INFO][0m [session_manager.dart] SessionManager: Initializing Hive at path: ./QuizzerAppHive
-Quizzer: [19:50:07] [34m[INFO][0m [login_initialization.dart] Entering loginInitialization()...
-Quizzer: [19:50:07] [34m[INFO][0m [file_locations.dart] [PATH] Path provider not available (likely test environment), using current directory.
-Quizzer: [19:50:07] [34m[INFO][0m [file_locations.dart] [PATH] Quizzer database path: ./QuizzerApp/sqlite/quizzer.db
-Quizzer: [19:50:07] [34m[INFO][0m [database_native.dart] [DB_INIT] Starting database initialization. Desktop: true
-Quizzer: [19:50:07] [34m[INFO][0m [database_native.dart] [DB_INIT] Using sqflite FFI factory (Desktop)
-Quizzer: [19:50:07] [34m[INFO][0m [database_native.dart] [DB_INIT] Original target path: ./QuizzerApp/sqlite/quizzer.db
-Quizzer: [19:50:07] [34m[INFO][0m [database_native.dart] [DB_INIT] Absolute target path: /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/./QuizzerApp/sqlite/quizzer.db
-Quizzer: [19:50:07] [34m[INFO][0m [database_native.dart] [DB_INIT] Normalized target path: /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/QuizzerApp/sqlite/quizzer.db
-Quizzer: [19:50:07] [34m[INFO][0m [database_native.dart] [DB_INIT] Checking existence of dbFile at /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/QuizzerApp/sqlite/quizzer.db. Exists: true
-Quizzer: [19:50:07] [34m[INFO][0m [database_native.dart] [DB_INIT] Existing database found at /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/QuizzerApp/sqlite/quizzer.db. Using it.
-Quizzer: [19:50:07] [34m[INFO][0m [database_native.dart] [DB_INIT] Attempting to open database at /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/QuizzerApp/sqlite/quizzer.db
-Quizzer: [19:50:07] [34m[INFO][0m [database_native.dart] [DB_INIT] Database opened at actual path: /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/QuizzerApp/sqlite/quizzer.db
-Quizzer: [19:50:07] [34m[INFO][0m [database_native.dart] [DB_INIT] Expected path: /home/araycove/Documents/coding-projects/apps/study_tools/quizzer_v04/quizzer/QuizzerApp/sqlite/quizzer.db
-Quizzer: [19:50:07] [34m[INFO][0m [database_native.dart] [DB_INIT] Paths match: true
-Quizzer: [19:50:07] [34m[INFO][0m [user_profile_table.dart] Verifying user profile table existence
-Quizzer: [19:50:07] [34m[INFO][0m [user_profile_table.dart] User profile table exists, checking column structure
-Quizzer: [19:50:07] [34m[INFO][0m [user_profile_table.dart] Table structure is already up to date
-Quizzer: [19:50:07] [34m[INFO][0m [login_initialization.dart] Entering performLoginProcess()...
-Quizzer: [19:50:07] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Starting login process...
-Quizzer: [19:50:07] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Validating your information...
-Quizzer: [19:50:07] [34m[INFO][0m [login_initialization.dart] Entering _validateLoginForm()...
-Quizzer: [19:50:07] [34m[INFO][0m [login_initialization.dart] Form validation passed for email: test_user_5@example.com
-Quizzer: [19:50:07] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Checking connection...
-Quizzer: [19:50:07] [34m[INFO][0m [utils.dart] Network check successful.
-Quizzer: [19:50:07] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Connecting to your account...
-Quizzer: [19:50:07] [34m[INFO][0m [user_auth.dart] Attempting Supabase authentication for test_user_5@example.com
-Quizzer: [19:50:07] [34m[INFO][0m [user_auth.dart] Attempting Supabase authentication
-Quizzer: [19:50:08] [34m[INFO][0m [session_helper.dart] Entering determineUserRoleFromSupabaseSession()...
-Quizzer: [19:50:08] [34m[INFO][0m [user_auth.dart] Ensuring local profile exists for test_user_5@example.com
-Quizzer: [19:50:08] [34m[INFO][0m [user_profile_table.dart] Fetching all emails from user_profile table.
-Quizzer: [19:50:08] [34m[INFO][0m [user_auth.dart] Is user in local profile list -> true
-Quizzer: [19:50:08] [34m[INFO][0m [user_profile_table.dart] Fetching all emails from user_profile table.
-Quizzer: [19:50:08] [34m[INFO][0m [user_auth.dart] Final check - is user in local profile list -> true
-Quizzer: [19:50:08] [34m[INFO][0m [user_auth.dart] Verifying local user ID matches Supabase user ID for test_user_5@example.com
-Quizzer: [19:50:08] [34m[INFO][0m [user_profile_table.dart] Getting user ID for email: test_user_5@example.com
-Quizzer: [19:50:08] [34m[INFO][0m [user_auth.dart] Local user ID: 2d63fe56-405b-4715-85ff-8fcb7245936c, Supabase user profile UUID: 2d63fe56-405b-4715-85ff-8fcb7245936c
-Quizzer: [19:50:08] [34m[INFO][0m [offline_login.dart] Storing offline login data for test_user_5@example.com
-Quizzer: [19:50:08] [34m[INFO][0m [user_profile_table.dart] Getting user ID for email: test_user_5@example.com
-Quizzer: [19:50:08] [34m[INFO][0m [user_profile_table.dart] Getting user ID for email: test_user_5@example.com
-Quizzer: [19:50:08] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Login successful...
-Quizzer: [19:50:08] [34m[INFO][0m [login_initialization.dart] Supabase login successful, offline login data already stored
-Quizzer: [19:50:08] [34m[INFO][0m [login_initialization.dart] Recording login attempt...
-Quizzer: [19:50:08] [34m[INFO][0m [login_attempts_record.dart] Recording login Attempt test_user_5@example.com with result Login successful
-Quizzer: [19:50:08] [34m[INFO][0m [user_profile_table.dart] Getting user ID for email: test_user_5@example.com
-Quizzer: [19:50:08] [34m[INFO][0m [table_helper.dart] Attempting to get IP address with multiple fallback methods
-Quizzer: [19:50:08] [34m[INFO][0m [table_helper.dart] Trying IP service: https://api.ipify.org
-Quizzer: [19:50:08] [34m[INFO][0m [login_attempts_record.dart] Login attempt recorded for user: test_user_5@example.com with status: Login successful
-Quizzer: [19:50:08] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Setting up your profile...
-Quizzer: [19:50:08] [34m[INFO][0m [login_initialization.dart] Ensuring local profile exists for online login...
-Quizzer: [19:50:08] [34m[INFO][0m [user_auth.dart] Ensuring local profile exists for test_user_5@example.com
-Quizzer: [19:50:08] [34m[INFO][0m [user_profile_table.dart] Fetching all emails from user_profile table.
-Quizzer: [19:50:08] [34m[INFO][0m [user_auth.dart] Is user in local profile list -> true
-Quizzer: [19:50:08] [34m[INFO][0m [user_profile_table.dart] Fetching all emails from user_profile table.
-Quizzer: [19:50:08] [34m[INFO][0m [user_auth.dart] Final check - is user in local profile list -> true
-Quizzer: [19:50:08] [34m[INFO][0m [user_auth.dart] Verifying local user ID matches Supabase user ID for test_user_5@example.com
-Quizzer: [19:50:08] [34m[INFO][0m [user_profile_table.dart] Getting user ID for email: test_user_5@example.com
-Quizzer: [19:50:09] [34m[INFO][0m [user_auth.dart] Local user ID: 2d63fe56-405b-4715-85ff-8fcb7245936c, Supabase user profile UUID: 2d63fe56-405b-4715-85ff-8fcb7245936c
-Quizzer: [19:50:09] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Syncing your profile...
-Quizzer: [19:50:09] [34m[INFO][0m [login_initialization.dart] Ensuring profile exists in Supabase for online login...
-Quizzer: [19:50:09] [34m[INFO][0m [login_initialization.dart] SessionManager already initialized by attemptSupabaseLogin for online login
-Quizzer: [19:50:09] [34m[INFO][0m [login_initialization.dart] Skipping sync workers for test run
-Quizzer: [19:50:09] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Starting question queue server...
-Quizzer: [19:50:09] [34m[INFO][0m [login_initialization.dart] Initializing question queue server...
-Quizzer: [19:50:09] [34m[INFO][0m [queue_server_init.dart] Starting question queue server workers...
-Quizzer: [19:50:09] [34m[INFO][0m [user_daily_stats_table.dart] Verifying user_daily_stats table existence
-Quizzer: [19:50:09] [34m[INFO][0m [user_daily_stats_table.dart] user_daily_stats table already exists. Checking column structure...
-Quizzer: [19:50:09] [34m[INFO][0m [user_daily_stats_table.dart] Table structure is already up to date
-Quizzer: [19:50:09] [34m[INFO][0m [user_module_activation_status_table.dart] Verifying user_module_activation_status table existence
-Quizzer: [19:50:09] [34m[INFO][0m [user_module_activation_status_table.dart] user_module_activation_status table already exists. Checking column structure...
-Quizzer: [19:50:09] [34m[INFO][0m [user_module_activation_status_table.dart] Table structure is already up to date
-Quizzer: [19:50:09] [34m[INFO][0m [user_module_activation_status_table.dart] Checking for existing records with non-normalized module names for user: 2d63fe56-405b-4715-85ff-8fcb7245936c
-Quizzer: [19:50:09] [34m[INFO][0m [user_module_activation_status_table.dart] Creating activation status records for 31 missing modules for user: 2d63fe56-405b-4715-85ff-8fcb7245936c
-Quizzer: [19:50:09] [34m[INFO][0m [user_module_activation_status_table.dart] Created activation status record for module: advance algebra (normalized: advance algebra), user: 2d63fe56-405b-4715-85ff-8fcb7245936c
-Quizzer: [19:50:09] [34m[INFO][0m [user_module_activation_status_table.dart] Created activation status record for module: algebra 1-3 (normalized: algebra 1-3), user: 2d63fe56-405b-4715-85ff-8fcb7245936c
-Quizzer: [19:50:09] [34m[INFO][0m [user_module_activation_status_table.dart] Created activation status record for module: mcat genetic engineering (normalized: mcat genetic engineering), user: 2d63fe56-405b-4715-85ff-8fcb7245936c
-Quizzer: [19:50:09] [34m[INFO][0m [user_module_activation_status_table.dart] Created activation status record for module: mcat biology (normalized: mcat biology), user: 2d63fe56-405b-4715-85ff-8fcb7245936c
-Quizzer: [19:50:09] [34m[INFO][0m [user_module_activation_status_table.dart] Created activation status record for module: mcat clep calculus (normalized: mcat clep calculus), user: 2d63fe56-405b-4715-85ff-8fcb7245936c
-Quizzer: [19:50:09] [34m[INFO][0m [user_module_activation_status_table.dart] Created activation status record for module: mcat plant biotechnology (normalized: mcat plant biotechnology), user: 2d63fe56-405b-4715-85ff-8fcb7245936c
-Quizzer: [19:50:09] [34m[INFO][0m [user_module_activation_status_table.dart] Created activation status record for module: basic addition (normalized: basic addition), user: 2d63fe56-405b-4715-85ff-8fcb7245936c
-Quizzer: [19:50:09] [34m[INFO][0m [user_module_activation_status_table.dart] Created activation status record for module: clep chemistry (normalized: clep chemistry), user: 2d63fe56-405b-4715-85ff-8fcb7245936c
-Quizzer: [19:50:09] [34m[INFO][0m [user_module_activation_status_table.dart] Created activation status record for module: calculus (normalized: calculus), user: 2d63fe56-405b-4715-85ff-8fcb7245936c
-Quizzer: [19:50:09] [34m[INFO][0m [user_module_activation_status_table.dart] Created activation status record for module: general (normalized: general), user: 2d63fe56-405b-4715-85ff-8fcb7245936c
-Quizzer: [19:50:09] [34m[INFO][0m [user_module_activation_status_table.dart] Created activation status record for module: dummy module (normalized: dummy module), user: 2d63fe56-405b-4715-85ff-8fcb7245936c
-Quizzer: [19:50:09] [34m[INFO][0m [user_module_activation_status_table.dart] Created activation status record for module: mcat clep psycology (normalized: mcat clep psycology), user: 2d63fe56-405b-4715-85ff-8fcb7245936c
-Quizzer: [19:50:09] [34m[INFO][0m [user_module_activation_status_table.dart] Created activation status record for module: new module name (normalized: new module name), user: 2d63fe56-405b-4715-85ff-8fcb7245936c
-Quizzer: [19:50:09] [34m[INFO][0m [user_module_activation_status_table.dart] Created activation status record for module: multi field test (normalized: multi field test), user: 2d63fe56-405b-4715-85ff-8fcb7245936c
-Quizzer: [19:50:09] [34m[INFO][0m [user_module_activation_status_table.dart] Created activation status record for module: mcat clep chemistry (normalized: mcat clep chemistry), user: 2d63fe56-405b-4715-85ff-8fcb7245936c
-Quizzer: [19:50:09] [34m[INFO][0m [user_module_activation_status_table.dart] Created activation status record for module: mcat clep health biology (normalized: mcat clep health biology), user: 2d63fe56-405b-4715-85ff-8fcb7245936c
-Quizzer: [19:50:09] [34m[INFO][0m [user_module_activation_status_table.dart] Created activation status record for module: mcat clep molecular biology (normalized: mcat clep molecular biology), user: 2d63fe56-405b-4715-85ff-8fcb7245936c
-Quizzer: [19:50:09] [34m[INFO][0m [user_module_activation_status_table.dart] Created activation status record for module: mcat clep psychology (normalized: mcat clep psychology), user: 2d63fe56-405b-4715-85ff-8fcb7245936c
-Quizzer: [19:50:09] [34m[INFO][0m [user_module_activation_status_table.dart] Created activation status record for module: mcat clep sociology (normalized: mcat clep sociology), user: 2d63fe56-405b-4715-85ff-8fcb7245936c
-Quizzer: [19:50:09] [34m[INFO][0m [user_module_activation_status_table.dart] Created activation status record for module: math (normalized: math), user: 2d63fe56-405b-4715-85ff-8fcb7245936c
-Quizzer: [19:50:09] [34m[INFO][0m [user_module_activation_status_table.dart] Created activation status record for module: testmodule0 (normalized: testmodule0), user: 2d63fe56-405b-4715-85ff-8fcb7245936c
-Quizzer: [19:50:09] [34m[INFO][0m [user_module_activation_status_table.dart] Created activation status record for module: algebra & trigonometry (normalized: algebra & trigonometry), user: 2d63fe56-405b-4715-85ff-8fcb7245936c
-Quizzer: [19:50:09] [34m[INFO][0m [user_module_activation_status_table.dart] Created activation status record for module: science (normalized: science), user: 2d63fe56-405b-4715-85ff-8fcb7245936c
-Quizzer: [19:50:09] [34m[INFO][0m [user_module_activation_status_table.dart] Created activation status record for module: history (normalized: history), user: 2d63fe56-405b-4715-85ff-8fcb7245936c
-Quizzer: [19:50:09] [34m[INFO][0m [user_module_activation_status_table.dart] Created activation status record for module: mcat biochemistry (normalized: mcat biochemistry), user: 2d63fe56-405b-4715-85ff-8fcb7245936c
-Quizzer: [19:50:09] [34m[INFO][0m [user_module_activation_status_table.dart] Created activation status record for module: mcat clep biochemistry (normalized: mcat clep biochemistry), user: 2d63fe56-405b-4715-85ff-8fcb7245936c
-Quizzer: [19:50:09] [34m[INFO][0m [user_module_activation_status_table.dart] Created activation status record for module: mcat chemistry (normalized: mcat chemistry), user: 2d63fe56-405b-4715-85ff-8fcb7245936c
-Quizzer: [19:50:09] [34m[INFO][0m [user_module_activation_status_table.dart] Created activation status record for module: mcat health biology (normalized: mcat health biology), user: 2d63fe56-405b-4715-85ff-8fcb7245936c
-Quizzer: [19:50:09] [34m[INFO][0m [user_module_activation_status_table.dart] Created activation status record for module: mcat molecular biology (normalized: mcat molecular biology), user: 2d63fe56-405b-4715-85ff-8fcb7245936c
-Quizzer: [19:50:09] [34m[INFO][0m [user_module_activation_status_table.dart] Created activation status record for module: mcat psychology (normalized: mcat psychology), user: 2d63fe56-405b-4715-85ff-8fcb7245936c
-Quizzer: [19:50:09] [34m[INFO][0m [user_module_activation_status_table.dart] Created activation status record for module: mcat sociology (normalized: mcat sociology), user: 2d63fe56-405b-4715-85ff-8fcb7245936c
-Quizzer: [19:50:09] [34m[INFO][0m [media_sync_status_table.dart] media_sync_status table already exists.
-Quizzer: [19:50:09] [34m[INFO][0m [question_answer_pairs_table.dart] Verifying question_answer_pairs table existence
-Quizzer: [19:50:09] [34m[INFO][0m [question_answer_pairs_table.dart] question_answer_pairs table exists, checking column structure
-Quizzer: [19:50:09] [34m[INFO][0m [question_answer_pairs_table.dart] Table structure is already up to date
-Quizzer: [19:50:09] [34m[INFO][0m [error_logs_table.dart] error_logs table already exists. Checking columns...
-Quizzer: [19:50:09] [34m[INFO][0m [error_logs_table.dart] Column check complete for error_logs.
-Quizzer: [19:50:09] [34m[INFO][0m [user_feedback_table.dart] Verifying user_feedback table...
-Quizzer: [19:50:09] [34m[INFO][0m [user_feedback_table.dart] user_feedback table already exists. Checking columns...
-Quizzer: [19:50:09] [34m[INFO][0m [user_feedback_table.dart] Column check complete for user_feedback.
-Quizzer: [19:50:09] [34m[INFO][0m [subject_details_table.dart] Verifying subject_details table existence
-Quizzer: [19:50:09] [34m[INFO][0m [subject_details_table.dart] Subject details table exists
-Quizzer: [19:50:09] [34m[INFO][0m [user_module_activation_status_table.dart] Retrieved activation status for 44 modules for user: 2d63fe56-405b-4715-85ff-8fcb7245936c
-Quizzer: [19:50:09] [34m[INFO][0m [queue_server_init.dart] Starting CirculationWorker...
-Quizzer: [19:50:09] [34m[INFO][0m [circulation_worker.dart] Entering CirculationWorker start()...
-Quizzer: [19:50:09] [34m[INFO][0m [circulation_worker.dart] CirculationWorker: Subscribed to onQuestionAnsweredCorrectly stream.
-Quizzer: [19:50:09] [34m[INFO][0m [circulation_worker.dart] Entering CirculationWorker _runLoop()...
-Quizzer: [19:50:09] [34m[INFO][0m [circulation_worker.dart] Entering CirculationWorker _shouldAddNewQuestion()...
-Quizzer: [19:50:09] [34m[INFO][0m [circulation_worker.dart] Querying database for eligible questions data...
-Quizzer: [19:50:09] [34m[INFO][0m [queue_server_init.dart] Starting PresentationSelectionWorker...
-Quizzer: [19:50:09] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker start()...
-Quizzer: [19:50:09] [34m[INFO][0m [question_selection_worker.dart] Clearing QuestionQueueCache and AnswerHistoryCache...
-Quizzer: [19:50:09] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache clear()...
-Quizzer: [19:50:09] [34m[INFO][0m [answer_history_cache.dart] Entering AnswerHistoryCache clear()...
-Quizzer: [19:50:09] [34m[INFO][0m [question_selection_worker.dart] PresentationSelectionWorker started.
-Quizzer: [19:50:09] [34m[INFO][0m [question_selection_worker.dart] Entering PresentationSelectionWorker _runLoop()...
-Quizzer: [19:50:09] [34m[INFO][0m [question_queue_cache.dart] Entering QuestionQueueCache getLength()...
-Quizzer: [19:50:09] [34m[INFO][0m [queue_server_init.dart] Question queue server worker startup initiated
-Quizzer: [19:50:09] [34m[INFO][0m [user_module_activation_status_table.dart] Ensuring all modules with questions have activation status for user: 2d63fe56-405b-4715-85ff-8fcb7245936c
-Quizzer: [19:50:09] [34m[INFO][0m [user_module_activation_status_table.dart] Ensuring all modules with questions have activation status for user: 2d63fe56-405b-4715-85ff-8fcb7245936c
-Quizzer: [19:50:09] [34m[INFO][0m [circulation_worker.dart] No non-circulating questions available, shouldAdd evaluates to -> false
-Quizzer: [19:50:09] [34m[INFO][0m [circulation_worker.dart] CirculationWorker: Conditions not met, waiting for question answered correctly signal...
-Quizzer: [19:50:09] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling circulation worker finished
-Quizzer: [19:50:09] [34m[INFO][0m [user_module_activation_status_table.dart] Found 13 modules with questions in question_answer_pairs table
-Quizzer: [19:50:09] [34m[INFO][0m [user_module_activation_status_table.dart] Removing activation status records for 31 modules that no longer have questions
-Quizzer: [19:50:09] [34m[INFO][0m [user_module_activation_status_table.dart] Removed activation status record for module without questions: advance algebra
-Quizzer: [19:50:09] [34m[INFO][0m [user_module_activation_status_table.dart] Removed activation status record for module without questions: algebra & trigonometry
-Quizzer: [19:50:09] [34m[INFO][0m [user_module_activation_status_table.dart] Removed activation status record for module without questions: algebra 1-3
-Quizzer: [19:50:09] [34m[INFO][0m [user_module_activation_status_table.dart] Removed activation status record for module without questions: basic addition
-Quizzer: [19:50:09] [34m[INFO][0m [user_module_activation_status_table.dart] Removed activation status record for module without questions: calculus
-Quizzer: [19:50:09] [34m[INFO][0m [user_module_activation_status_table.dart] Removed activation status record for module without questions: clep chemistry
-Quizzer: [19:50:09] [34m[INFO][0m [user_module_activation_status_table.dart] Removed activation status record for module without questions: dummy module
-Quizzer: [19:50:09] [34m[INFO][0m [user_module_activation_status_table.dart] Removed activation status record for module without questions: general
-Quizzer: [19:50:09] [34m[INFO][0m [user_module_activation_status_table.dart] Removed activation status record for module without questions: history
-Quizzer: [19:50:09] [34m[INFO][0m [user_module_activation_status_table.dart] Removed activation status record for module without questions: math
-Quizzer: [19:50:09] [34m[INFO][0m [user_module_activation_status_table.dart] Removed activation status record for module without questions: mcat biochemistry
-Quizzer: [19:50:09] [34m[INFO][0m [user_module_activation_status_table.dart] Removed activation status record for module without questions: mcat biology
-Quizzer: [19:50:09] [34m[INFO][0m [user_module_activation_status_table.dart] Removed activation status record for module without questions: mcat chemistry
-Quizzer: [19:50:10] [34m[INFO][0m [user_module_activation_status_table.dart] Removed activation status record for module without questions: mcat clep biochemistry
-Quizzer: [19:50:10] [34m[INFO][0m [user_module_activation_status_table.dart] Removed activation status record for module without questions: mcat clep calculus
-Quizzer: [19:50:10] [34m[INFO][0m [user_module_activation_status_table.dart] Removed activation status record for module without questions: mcat clep chemistry
-Quizzer: [19:50:10] [34m[INFO][0m [user_module_activation_status_table.dart] Removed activation status record for module without questions: mcat clep health biology
-Quizzer: [19:50:10] [34m[INFO][0m [user_module_activation_status_table.dart] Removed activation status record for module without questions: mcat clep molecular biology
-Quizzer: [19:50:10] [34m[INFO][0m [user_module_activation_status_table.dart] Removed activation status record for module without questions: mcat clep psychology
-Quizzer: [19:50:10] [34m[INFO][0m [user_module_activation_status_table.dart] Removed activation status record for module without questions: mcat clep psycology
-Quizzer: [19:50:10] [34m[INFO][0m [user_module_activation_status_table.dart] Removed activation status record for module without questions: mcat clep sociology
-Quizzer: [19:50:10] [34m[INFO][0m [user_module_activation_status_table.dart] Removed activation status record for module without questions: mcat genetic engineering
-Quizzer: [19:50:10] [34m[INFO][0m [user_module_activation_status_table.dart] Removed activation status record for module without questions: mcat health biology
-Quizzer: [19:50:10] [34m[INFO][0m [user_module_activation_status_table.dart] Removed activation status record for module without questions: mcat molecular biology
-Quizzer: [19:50:10] [34m[INFO][0m [user_module_activation_status_table.dart] Removed activation status record for module without questions: mcat plant biotechnology
-Quizzer: [19:50:10] [34m[INFO][0m [user_module_activation_status_table.dart] Removed activation status record for module without questions: mcat psychology
-Quizzer: [19:50:10] [34m[INFO][0m [user_module_activation_status_table.dart] Removed activation status record for module without questions: mcat sociology
-Quizzer: [19:50:10] [34m[INFO][0m [user_module_activation_status_table.dart] Removed activation status record for module without questions: multi field test
-Quizzer: [19:50:10] [34m[INFO][0m [user_module_activation_status_table.dart] Removed activation status record for module without questions: new module name
-Quizzer: [19:50:10] [34m[INFO][0m [user_module_activation_status_table.dart] Removed activation status record for module without questions: science
-Quizzer: [19:50:10] [34m[INFO][0m [user_module_activation_status_table.dart] Removed activation status record for module without questions: testmodule0
-Quizzer: [19:50:10] [34m[INFO][0m [user_module_activation_status_table.dart] Found 13 modules with questions in question_answer_pairs table
-Quizzer: [19:50:10] [34m[INFO][0m [user_module_activation_status_table.dart] All modules with questions already have activation status records, and no orphaned records found for user: 2d63fe56-405b-4715-85ff-8fcb7245936c
-Quizzer: [19:50:10] [34m[INFO][0m [user_module_activation_status_table.dart] Retrieved 0 active module names for user: 2d63fe56-405b-4715-85ff-8fcb7245936c
-Quizzer: [19:50:10] [34m[INFO][0m [user_module_activation_status_table.dart] Retrieved 0 active module names for user: 2d63fe56-405b-4715-85ff-8fcb7245936c
-Quizzer: [19:50:10] [34m[INFO][0m [queue_server_init.dart] No eligible questions found - proceeding without waiting
-Quizzer: [19:50:10] [34m[INFO][0m [sb_other_signals.dart] SwitchBoard: Signaling login progress: Welcome back! You're all set.
-Quizzer: [19:50:10] [34m[INFO][0m [login_initialization.dart] Login initialization completed for email: test_user_5@example.com
-Quizzer: [19:50:10] [34m[INFO][0m [question_selection_worker.dart] No eligible questions available after filtering recently answered questions. Waiting for question answered signal.
-Quizzer: [19:50:10] [34m[INFO][0m [sb_question_worker_signals.dart] SwitchBoard: Signaling PresentationSelectionWorker Cycle Complete
-Quizzer: [19:50:10] [34m[INFO][0m [prediction_model.dart] === STEP 1: Loading DataFrame from Supabase ===
-Quizzer: [19:50:10] [34m[INFO][0m [attempt_pre_process.dart] Starting to load question answer attempts from Supabase...
-Quizzer: [19:50:10] [34m[INFO][0m [attempt_pre_process.dart] Executing limited Supabase query for 5 records...
-Quizzer: [19:50:10] [34m[INFO][0m [attempt_pre_process.dart] Retrieved 5 total records from Supabase
-Quizzer: [19:50:10] [34m[INFO][0m [attempt_pre_process.dart] Processing data for DataFrame conversion...
-Quizzer: [19:50:10] [34m[INFO][0m [prediction_model.dart] === STEP 2: Converting DataFrame with JSON decoding ===
-Quizzer: [19:50:10] [34m[INFO][0m [attempt_pre_process.dart] Starting to decode JSON fields in DataFrame...
-Quizzer: [19:50:10] [34m[INFO][0m [prediction_model.dart] === STEP 3: Unpacking DataFrame features ===
-Quizzer: [19:50:10] [34m[INFO][0m [attempt_pre_process.dart] Starting to unpack DataFrame features...
+Quizzer: [20:49:18] [34m[INFO][0m [<asynchronous suspension>] QuizzerLogger successfully set up file logging to: ./QuizzerAppLogs/quizzer_log.txt
+Quizzer: [20:49:18] [34m[INFO][0m [<asynchronous suspension>] QuizzerLogger: Attempting a SECOND test log message to file.
+Quizzer: [20:49:18] [34m[INFO][0m [how_many_lines.dart] Calculating total lines of code...
+Quizzer: [20:49:19] [34m[INFO][0m [how_many_lines.dart] 
+--- Line Count Summary ---
+Quizzer: [20:49:19] [34m[INFO][0m [how_many_lines.dart] Total_Backend_Systems: 22276
+Quizzer: [20:49:19] [34m[INFO][0m [how_many_lines.dart] Total_UI_Systems:      13783
+Quizzer: [20:49:19] [34m[INFO][0m [how_many_lines.dart] Total_Test_Lines:      13234
+Quizzer: [20:49:19] [34m[INFO][0m [how_many_lines.dart] --------------------------
+Quizzer: [20:49:19] [34m[INFO][0m [how_many_lines.dart] Total_Lines:           49293
+Quizzer: [20:49:19] [34m[INFO][0m [how_many_lines.dart] --------------------------
+Quizzer: [20:49:19] [34m[INFO][0m [how_many_lines.dart] 
+--- Backend Systems Breakdown (recursive, alphabetical) ---
+Quizzer: [20:49:19] [34m[INFO][0m [how_many_lines.dart] 00_database_manager/                      14223
+Quizzer: [20:49:19] [34m[INFO][0m [how_many_lines.dart] ├── cloud_sync_system/                         1947
+Quizzer: [20:49:19] [34m[INFO][0m [how_many_lines.dart] │   ├── inbound_sync/                               526
+Quizzer: [20:49:19] [34m[INFO][0m [how_many_lines.dart] │   └── outbound_sync/                             1119
+Quizzer: [20:49:19] [34m[INFO][0m [how_many_lines.dart] ├── data_consistency/                           153
+Quizzer: [20:49:19] [34m[INFO][0m [how_many_lines.dart] ├── platform/                                    65
+Quizzer: [20:49:19] [34m[INFO][0m [how_many_lines.dart] ├── review_system/                              662
+Quizzer: [20:49:19] [34m[INFO][0m [how_many_lines.dart] └── tables/                                   10758
+Quizzer: [20:49:19] [34m[INFO][0m [how_many_lines.dart]     ├── academic_archive.dart/                     2014
+Quizzer: [20:49:19] [34m[INFO][0m [how_many_lines.dart]     │   └── relationship_data/                          214
+Quizzer: [20:49:19] [34m[INFO][0m [how_many_lines.dart]     ├── question_answer_pair_management/           2660
+Quizzer: [20:49:19] [34m[INFO][0m [how_many_lines.dart]     ├── system_data/                                897
+Quizzer: [20:49:19] [34m[INFO][0m [how_many_lines.dart]     └── user_profile/                              3860
+Quizzer: [20:49:19] [34m[INFO][0m [how_many_lines.dart] 00_helper_utils/                            262
+Quizzer: [20:49:19] [34m[INFO][0m [how_many_lines.dart] 02_login_authentication/                    888
+Quizzer: [20:49:19] [34m[INFO][0m [how_many_lines.dart] 03_account_creation/                        134
+Quizzer: [20:49:19] [34m[INFO][0m [how_many_lines.dart] 04_module_management/                       490
+Quizzer: [20:49:19] [34m[INFO][0m [how_many_lines.dart] 05_ml_modeling/                             425
+Quizzer: [20:49:19] [34m[INFO][0m [how_many_lines.dart] 06_question_queue_server/                   833
+Quizzer: [20:49:19] [34m[INFO][0m [how_many_lines.dart] 07_user_question_management/                112
+Quizzer: [20:49:19] [34m[INFO][0m [how_many_lines.dart] 08_memory_retention_algo/                    90
+Quizzer: [20:49:19] [34m[INFO][0m [how_many_lines.dart] 09_data_caches/                             402
+Quizzer: [20:49:19] [34m[INFO][0m [how_many_lines.dart] 10_switch_board/                            746
+Quizzer: [20:49:19] [34m[INFO][0m [how_many_lines.dart] 11_ai_management/                           247
+Quizzer: [20:49:19] [34m[INFO][0m [how_many_lines.dart] 12_subject_concept_classifier/                0
+Quizzer: [20:49:19] [34m[INFO][0m [how_many_lines.dart] logger/                                     380
+Quizzer: [20:49:19] [34m[INFO][0m [how_many_lines.dart] session_manager/                           3044
+Quizzer: [20:49:19] [34m[INFO][0m [how_many_lines.dart] └── answer_validation/                          659
+Quizzer: [20:49:19] [34m[INFO][0m [how_many_lines.dart] 
+--- UI Systems Breakdown (recursive, alphabetical) ---
+Quizzer: [20:49:19] [34m[INFO][0m [how_many_lines.dart] 00_login_page/                              261
+Quizzer: [20:49:19] [34m[INFO][0m [how_many_lines.dart] 01_new_user_page/                           271
+Quizzer: [20:49:19] [34m[INFO][0m [how_many_lines.dart] 02_home_page/                               586
+Quizzer: [20:49:19] [34m[INFO][0m [how_many_lines.dart] └── stat_display_section/                        70
+Quizzer: [20:49:19] [34m[INFO][0m [how_many_lines.dart] 03_add_question_page/                      4341
+Quizzer: [20:49:19] [34m[INFO][0m [how_many_lines.dart] ├── helpers/                                    173
+Quizzer: [20:49:19] [34m[INFO][0m [how_many_lines.dart] └── widgets/                                   3366
+Quizzer: [20:49:19] [34m[INFO][0m [how_many_lines.dart]     └── add_question_widget/                       2604
+Quizzer: [20:49:19] [34m[INFO][0m [how_many_lines.dart]         └── edit_elements/                             1740
+Quizzer: [20:49:19] [34m[INFO][0m [how_many_lines.dart] 04_display_modules_page/                   1592
+Quizzer: [20:49:19] [34m[INFO][0m [how_many_lines.dart] └── module_card/                               1101
+Quizzer: [20:49:19] [34m[INFO][0m [how_many_lines.dart] 05_menu_page/                               163
+Quizzer: [20:49:19] [34m[INFO][0m [how_many_lines.dart] 06_admin_panel/                             845
+Quizzer: [20:49:19] [34m[INFO][0m [how_many_lines.dart] 07_critical_error_page/                     303
+Quizzer: [20:49:19] [34m[INFO][0m [how_many_lines.dart] 08_settings_page/                          1153
+Quizzer: [20:49:19] [34m[INFO][0m [how_many_lines.dart] └── individual_setting_widgets/                 811
+Quizzer: [20:49:19] [34m[INFO][0m [how_many_lines.dart]     └── stat_display_widgets/                       690
+Quizzer: [20:49:19] [34m[INFO][0m [how_many_lines.dart] 09_feedback_page/                           176
+Quizzer: [20:49:19] [34m[INFO][0m [how_many_lines.dart] 10_stats_page/                              516
+Quizzer: [20:49:19] [34m[INFO][0m [how_many_lines.dart] UI_Utils/                                    73
+Quizzer: [20:49:19] [34m[INFO][0m [how_many_lines.dart] global_widgets/                            1656
+Quizzer: [20:49:19] [34m[INFO][0m [how_many_lines.dart] question_widgets/                          1847

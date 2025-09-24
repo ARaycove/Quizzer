@@ -226,16 +226,6 @@ Future<bool> _isTableEmpty(String tableName, String? userId) async {
 /// syncData[2]   == user_profile \n
 /// syncData[3]   == user_settings \n
 /// syncData[4]   == modules \n
-/// syncData[5]   == user_stats_eligible_questions \n
-/// syncData[6]   == user_stats_non_circulating_questions \n
-/// syncData[7]   == user_stats_in_circulation_questions \n
-/// syncData[8]   == user_stats_revision_streak_sum \n
-/// syncData[9]   == user_stats_total_user_question_answer_pairs \n
-/// syncData[10]  == user_stats_average_questions_shown_per_day \n
-/// syncData[11]  == user_stats_total_questions_answered \n
-/// syncData[12]  == user_stats_daily_questions_answered \n
-/// syncData[13]  == user_stats_days_left_until_questions_exhaust \n
-/// syncData[14]  == user_stats_average_daily_questions_learned \n
 /// syncData[15]  == user_module_activation_status \n
 /// syncData[16]  == subject_details \n
 Future<List<List<Map<String,dynamic>>>> fetchDataForAllTables(SupabaseClient supabase, String? userId) async {
@@ -258,36 +248,6 @@ Future<List<List<Map<String,dynamic>>>> fetchDataForAllTables(SupabaseClient sup
 
     fetchAllRecordsOlderThanLastLogin(supabase: supabase, tableName: 'modules',                       
     userId: null, useLastLogin: false), //Get all modules regardless
-
-    fetchAllRecordsOlderThanLastLogin(supabase: supabase, tableName: 'user_stats_eligible_questions', 
-    userId: userId, additionalFilters: {'user_id': userId}),
-
-    fetchAllRecordsOlderThanLastLogin(supabase: supabase, tableName: 'user_stats_non_circulating_questions',
-    userId: userId, additionalFilters: {'user_id': userId}),
-
-    fetchAllRecordsOlderThanLastLogin(supabase: supabase, tableName: 'user_stats_in_circulation_questions',
-    userId: userId, additionalFilters: {'user_id': userId}),
-
-    fetchAllRecordsOlderThanLastLogin(supabase: supabase, tableName: 'user_stats_revision_streak_sum',
-    userId: userId, additionalFilters: {'user_id': userId}),
-
-    fetchAllRecordsOlderThanLastLogin(supabase: supabase, tableName: 'user_stats_total_user_question_answer_pairs',
-    userId: userId, additionalFilters: {'user_id': userId}),
-
-    fetchAllRecordsOlderThanLastLogin(supabase: supabase, tableName: 'user_stats_average_questions_shown_per_day',
-    userId: userId, additionalFilters: {'user_id': userId}),
-
-    fetchAllRecordsOlderThanLastLogin(supabase: supabase, tableName: 'user_stats_total_questions_answered',
-    userId: userId, additionalFilters: {'user_id': userId}),
-
-    fetchAllRecordsOlderThanLastLogin(supabase: supabase, tableName: 'user_stats_daily_questions_answered',
-    userId: userId, additionalFilters: {'user_id': userId}),
-
-    fetchAllRecordsOlderThanLastLogin(supabase: supabase, tableName: 'user_stats_days_left_until_questions_exhaust',
-    userId: userId, additionalFilters: {'user_id': userId}),
-
-    fetchAllRecordsOlderThanLastLogin(supabase: supabase, tableName: 'user_stats_average_daily_questions_learned',
-    userId: userId, additionalFilters: {'user_id': userId}),
 
     fetchAllRecordsOlderThanLastLogin(supabase: supabase, tableName: 'user_module_activation_status',
     userId: userId, additionalFilters: {'user_id': userId}),
