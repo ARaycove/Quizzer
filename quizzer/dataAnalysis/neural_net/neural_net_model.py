@@ -33,20 +33,20 @@ def grid_search_quizzer_model(X_train, y_train, X_test, y_test):
     # Comprehensive parameter grid
     param_grid = {
         # Neural network parameters
-        'layer_width': [1],
-        'reduction_percent': [0.95],
-        'stop_condition': [5],
-        'dropout_rate': [0.1, 0.2, 0.3, 0.4, 0.5],
-        'focal_gamma': [0.5, 1, 2, 3, 4, 5.0],
-        'focal_alpha': [0.05, 0.1, 0.25, 0.5],
+        'layer_width': [1, 2, 3],
+        'reduction_percent': [0.70, 0.80, 0.90],
+        'stop_condition': [5, 10, 25],
+        'dropout_rate': [0.1, 0.3, 0.5],
+        'focal_gamma': [0.5, 2.0, 5.0],
+        'focal_alpha': [0.1, 0.25, 0.5],
         
         # SMOTE parameters
-        'sampling_strategy': ['minority', 0.25, 0.5, 0.75], # Removed: 'auto',
+        'sampling_strategy': ['auto', 'minority', 0.25, 0.5, 0.75],
         'k_neighbors': [3, 5, 7],
         
         # K-fold validation parameters
         'k_folds': [2, 3, 5],
-        'epochs': [5, 10, 15, 20, 25],
+        'epochs': [5, 10, 15],
         'batch_size': [8, 16, 32]
     }
     
@@ -167,6 +167,15 @@ def grid_search_quizzer_model(X_train, y_train, X_test, y_test):
             
             print(f"  DISCRIMINATION: {mean_discrimination:.4f}, ROC_AUC: {roc_auc:.3f}, Range: {prob_range:.3f}")
             print(f"  Class means: 0={class_0_mean:.3f}, 1={class_1_mean:.3f}")
+            
+            # Write result to file immediately
+            current_df = pd.DataFrame([result])
+            if i == 1:
+                # First iteration - create new file with header
+                current_df.to_csv('grid_search_progress.csv', index=False, mode='w')
+            else:
+                # Append to existing file without header
+                current_df.to_csv('grid_search_progress.csv', index=False, mode='a', header=False)
             
         except Exception as e:
             print(f"  ERROR: {str(e)}")
