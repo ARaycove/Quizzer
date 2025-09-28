@@ -13,6 +13,7 @@ from sklearn.model_selection import KFold
 import numpy as np
 from sklearn.model_selection import ParameterGrid
 from attempt_pre_process import apply_smote_balancing
+from sklearn.metrics import f1_score, roc_auc_score, balanced_accuracy_score
 import itertools
 import pandas as pd
 import random
@@ -33,34 +34,59 @@ def grid_search_quizzer_model(X_train, y_train, X_test, y_test):
     # Comprehensive parameter grid
     param_grid = {
         # Neural network parameters
-        'layer_width': [1, 2, 3],
-        'reduction_percent': [0.70, 0.80, 0.90],
-        'stop_condition': [5, 10, 25],
-        'dropout_rate': [0.1, 0.3, 0.5],
-        'focal_gamma': [0.5, 2.0, 5.0],
-        'focal_alpha': [0.1, 0.25, 0.5],
+        'layer_width': [1, 2],
+        'reduction_percent': [0.90, 0.91, 0.92, 0.93, 0.94, 0.945, 0.95, 0.955, 0.96, 0.97, 0.98, 0.99],
+        'stop_condition': [3, 5, 10, 15, 20, 25],
+        'dropout_rate': [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9],
+        'focal_gamma': [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5],
+        'focal_alpha': [0.05, 0.1, 0.15, 0.20, 0.25, 0.30, 0.35, 0.4, 0.45, 0.5],
         
         # SMOTE parameters
-        'sampling_strategy': ['auto', 'minority', 0.25, 0.5, 0.75],
-        'k_neighbors': [3, 5, 7],
+        'sampling_strategy': ['minority', 0.20, 0.25, 0.30, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95],
+        'k_neighbors': [2, 3, 4, 5, 6, 7, 8, 9, 10],
         
         # K-fold validation parameters
-        'k_folds': [2, 3, 5],
-        'epochs': [5, 10, 15],
-        'batch_size': [8, 16, 32]
+        'k_folds': [2, 3, 4, 5],
+        'epochs': [5, 10, 15, 20, 25],
+        'batch_size': [2, 4, 8, 16, 32, 64]
     }
     
-    # Generate all combinations
-    param_combinations = list(ParameterGrid(param_grid))
+    # Generate all combinations using itertools to avoid memory explosion
+    import itertools
+    param_names = list(param_grid.keys())
+    param_values = list(param_grid.values())
+    param_combinations = itertools.product(*param_values)
     
-    print(f"Testing {len(param_combinations)} parameter combinations...")
+    # Convert to shuffled list for random exploration (sample if too large)
+    total_combinations = 1
+    for values in param_values:
+        total_combinations *= len(values)
+    
+    print(f"Total possible combinations: {total_combinations:,}")
+    
+    # For very large spaces, sample a reasonable subset
+    if total_combinations > 50000:
+        print(f"Sampling 50,000 random combinations from {total_combinations:,} total")
+        # Convert to list, shuffle, and take first 50k
+        all_combinations = list(itertools.product(*param_values))
+        random.shuffle(all_combinations)
+        param_combinations = all_combinations[:50000]
+    else:
+        # Convert to list and shuffle for smaller spaces
+        param_combinations = list(itertools.product(*param_values))
+        random.shuffle(param_combinations)
+    
+    print(f"Testing {len(param_combinations):,} parameter combinations (shuffled order)...")
     print("Optimizing for: MEAN DISCRIMINATION")
     print("=" * 80)
     
     results = []
     input_features = X_train.shape[1]
     
-    for i, params in enumerate(param_combinations, 1):
+    for i, param_values in enumerate(param_combinations, 1):
+        # Convert tuple to dict
+        params = dict(zip(param_names, param_values))
+        
         print(f"Combination {i}/{len(param_combinations)}:")
         print(f"  NN: layer_width={params['layer_width']}, reduction={params['reduction_percent']}, dropout={params['dropout_rate']}")
         print(f"  SMOTE: strategy={params['sampling_strategy']}, k_neighbors={params['k_neighbors']}")
@@ -123,7 +149,6 @@ def grid_search_quizzer_model(X_train, y_train, X_test, y_test):
                 class_1_mean = 0
             
             # Additional metrics
-            from sklearn.metrics import balanced_accuracy_score, f1_score, roc_auc_score
             balanced_acc = balanced_accuracy_score(y_test, y_pred)
             f1 = f1_score(y_test, y_pred)
             roc_auc = roc_auc_score(y_test, y_pred_prob_flat)
@@ -168,14 +193,31 @@ def grid_search_quizzer_model(X_train, y_train, X_test, y_test):
             print(f"  DISCRIMINATION: {mean_discrimination:.4f}, ROC_AUC: {roc_auc:.3f}, Range: {prob_range:.3f}")
             print(f"  Class means: 0={class_0_mean:.3f}, 1={class_1_mean:.3f}")
             
-            # Write result to file immediately
-            current_df = pd.DataFrame([result])
-            if i == 1:
-                # First iteration - create new file with header
-                current_df.to_csv('grid_search_progress.csv', index=False, mode='w')
-            else:
-                # Append to existing file without header
-                current_df.to_csv('grid_search_progress.csv', index=False, mode='a', header=False)
+            # Update top 10 results in CSV
+            try:
+                # Try to read existing top 10 results
+                if os.path.exists('grid_search_top10.csv'):
+                    top_results = pd.read_csv('grid_search_top10.csv')
+                else:
+                    top_results = pd.DataFrame()
+                
+                # Add current result
+                current_result_df = pd.DataFrame([result])
+                top_results = pd.concat([top_results, current_result_df], ignore_index=True)
+                
+                # Sort by mean_discrimination (descending) and keep top 10
+                top_results = top_results.sort_values('mean_discrimination', ascending=False).head(10)
+                
+                # Save updated top 10
+                top_results.to_csv('grid_search_top10.csv', index=False)
+                
+                # Print current ranking if this result made it to top 10
+                if mean_discrimination >= top_results['mean_discrimination'].min():
+                    rank = (top_results['mean_discrimination'] >= mean_discrimination).sum()
+                    print(f"  *** NEW TOP 10 RESULT - RANK #{rank} ***")
+                    
+            except Exception as e:
+                print(f"  Error updating top 10: {e}")
             
         except Exception as e:
             print(f"  ERROR: {str(e)}")
@@ -197,19 +239,22 @@ def grid_search_quizzer_model(X_train, y_train, X_test, y_test):
     results_df.to_csv('comprehensive_grid_search_results.csv', index=False)
     
     print("\n" + "=" * 80)
-    print("COMPREHENSIVE GRID SEARCH RESULTS (Top 10)")
+    print("FINAL TOP 10 RESULTS")
     print("=" * 80)
     
-    top_10 = results_df.head(10)
-    for idx, row in top_10.iterrows():
-        print(f"Rank {row.name + 1}:")
-        print(f"  DISCRIMINATION: {row['mean_discrimination']:.4f}, ROC_AUC: {row['roc_auc']:.3f}, Range: {row['prob_range']:.3f}")
-        print(f"  NN: layer_width={row['layer_width']}, reduction={row['reduction_percent']:.2f}, dropout={row['dropout_rate']:.2f}")
-        print(f"  SMOTE: strategy={row['sampling_strategy']}, k_neighbors={row['k_neighbors']}")
-        print(f"  K-fold: folds={row['k_folds']}, epochs={row['epochs']}, batch_size={row['batch_size']}")
-        print(f"  Class means: 0={row['class_0_mean']:.3f}, 1={row['class_1_mean']:.3f}")
-        print()
+    # Load and display final top 10
+    if os.path.exists('grid_search_top10.csv'):
+        final_top10 = pd.read_csv('grid_search_top10.csv')
+        for idx, row in final_top10.iterrows():
+            print(f"Rank {idx + 1}:")
+            print(f"  DISCRIMINATION: {row['mean_discrimination']:.4f}, ROC_AUC: {row['roc_auc']:.3f}, Range: {row['prob_range']:.3f}")
+            print(f"  NN: layer_width={row['layer_width']}, reduction={row['reduction_percent']:.3f}, dropout={row['dropout_rate']:.2f}")
+            print(f"  SMOTE: strategy={row['sampling_strategy']}, k_neighbors={row['k_neighbors']}")
+            print(f"  K-fold: folds={row['k_folds']}, epochs={row['epochs']}, batch_size={row['batch_size']}")
+            print(f"  Class means: 0={row['class_0_mean']:.3f}, 1={row['class_1_mean']:.3f}")
+            print()
     
+    print("Top 10 results maintained in 'grid_search_top10.csv'")
     print("Full results saved to 'comprehensive_grid_search_results.csv'")
     return results_df
 
