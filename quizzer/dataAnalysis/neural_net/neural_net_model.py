@@ -49,7 +49,10 @@ def grid_search_quizzer_model(X_train, y_train, X_test, y_test):
         # K-fold validation parameters
         'k_folds': [2, 3, 4, 5],
         'epochs': [5, 10, 15, 20, 25],
-        'batch_size': [2, 4, 8, 16, 32, 64]
+        'batch_size': [2, 4, 8, 16, 32, 64],
+        
+        # Random seed parameter
+        'random_state': [42]
     }
     
     # Generate all combinations using itertools to avoid memory explosion
@@ -93,12 +96,17 @@ def grid_search_quizzer_model(X_train, y_train, X_test, y_test):
         print(f"  K-fold: folds={params['k_folds']}, epochs={params['epochs']}, batch_size={params['batch_size']}")
         
         try:
+            # Set seeds for this iteration
+            random.seed(params['random_state'])
+            np.random.seed(params['random_state'])
+            tf.random.set_seed(params['random_state'])
+            
             # Apply SMOTE with current parameters
             X_train_smote, y_train_smote = apply_smote_balancing(
                 X_train=X_train.copy(), 
                 y_train=y_train.copy(),
                 sampling_strategy=params['sampling_strategy'],
-                random_state=42,
+                random_state=params['random_state'],
                 k_neighbors=params['k_neighbors']
             )
             
@@ -122,7 +130,8 @@ def grid_search_quizzer_model(X_train, y_train, X_test, y_test):
                 y_train_smote, 
                 k_folds=params['k_folds'], 
                 epochs=params['epochs'], 
-                batch_size=params['batch_size']
+                batch_size=params['batch_size'],
+                random_state=params['random_state']
             )
             
             # Evaluate on test set
@@ -172,6 +181,7 @@ def grid_search_quizzer_model(X_train, y_train, X_test, y_test):
                 'k_folds': params['k_folds'],
                 'epochs': params['epochs'],
                 'batch_size': params['batch_size'],
+                'random_state': params['random_state'],
                 # Primary metrics
                 'mean_discrimination': mean_discrimination,
                 'roc_auc': roc_auc,
@@ -386,7 +396,7 @@ def create_quizzer_neural_network(input_dim,
     
     return model
 
-def kfold_cross_validation(model, X_train, y_train, k_folds=5, epochs=100, batch_size=32, verbose=1):
+def kfold_cross_validation(model, X_train, y_train, k_folds=5, epochs=100, batch_size=32, verbose=1, random_state=42):
     """
     Performs K-Fold cross validation on the model and returns the trained model.
     
@@ -398,6 +408,7 @@ def kfold_cross_validation(model, X_train, y_train, k_folds=5, epochs=100, batch
         epochs: Number of epochs per fold
         batch_size: Batch size for training
         verbose: Verbosity level
+        random_state: Random seed for KFold splits
         
     Returns:
         Trained model (fitted on full training data after cross validation)
@@ -406,8 +417,8 @@ def kfold_cross_validation(model, X_train, y_train, k_folds=5, epochs=100, batch
     print(f"Starting {k_folds}-Fold Cross Validation")
     print("=" * 50)
     
-    # Initialize K-Fold
-    kfold = KFold(n_splits=k_folds, shuffle=True, random_state=42)
+    # Initialize K-Fold with passed random state
+    kfold = KFold(n_splits=k_folds, shuffle=True, random_state=random_state)
     
     # Store results
     fold_scores = []
@@ -427,7 +438,10 @@ def kfold_cross_validation(model, X_train, y_train, k_folds=5, epochs=100, batch
         print(f"Train samples: {len(X_fold_train)}, Validation samples: {len(X_fold_val)}")
         
         # Reset model weights for each fold
-        model.set_weights([np.random.normal(size=w.shape) for w in model.get_weights()])
+        initial_weights = []
+        for w in model.get_weights():
+            initial_weights.append(np.random.normal(0, 0.1, size=w.shape))
+        model.set_weights(initial_weights)
         
         # Train on this fold
         history = model.fit(
@@ -470,8 +484,11 @@ def kfold_cross_validation(model, X_train, y_train, k_folds=5, epochs=100, batch
     print("Training final model on full training dataset...")
     print("-" * 50)
     
-    # Reset model weights
-    model.set_weights([np.random.normal(size=w.shape) for w in model.get_weights()])
+    # Reset model weights for final training
+    final_weights = []
+    for w in model.get_weights():
+        final_weights.append(np.random.normal(0, 0.1, size=w.shape))
+    model.set_weights(final_weights)
     
     # Train on full training data
     final_history = model.fit(
