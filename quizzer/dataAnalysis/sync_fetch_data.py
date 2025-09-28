@@ -161,127 +161,139 @@ def get_empty_vector_record(db: Connection):
         print(f"Error fetching empty vector record: {e}")
         return None
 
-def upsert_records_to_db(records: typing.List[typing.Dict], db: sqlite3.Connection) -> None:
+def upsert_records_to_db(records: typing.Union[typing.List[typing.Dict], typing.Dict[str, typing.List[typing.Dict]]], db: sqlite3.Connection) -> None:
     """
-    Upserts a list of records into the local SQLite database.
-
-    This function dynamically constructs the SQL query and data list
-    based on the keys of the first record, making it more concise.
-
+    Upserts records into the local SQLite database.
+    This function handles both the old format (list of records for question_answer_pairs)
+    and new format (dictionary with table names as keys).
     Args:
-        records: A list of dictionaries representing the records to be upserted.
+        records: Either a list of records (legacy) or a dictionary with table names as keys.
         db: The SQLite database connection object.
     """
     print("\n--- Starting upsert_records_to_db ---")
-    if not records:
-        print("No records to upsert. Exiting.")
-        return
-
-    print(f"Received {len(records)} records for upsert.")
-    cursor = db.cursor()
-
-    # Explicitly define the column order to ensure correct mapping.
-    # This list must match the schema of your SQLite table.
-    columns = [
-        "question_id", "time_stamp", "citation", "question_elements",
-        "answer_elements", "concepts", "subjects", "module_name",
-        "question_type", "options", "correct_option_index",
-        "correct_order", "index_options_that_apply", "qst_contrib",
-        "ans_contrib", "qst_reviewer", "has_been_reviewed",
-        "ans_flagged", "flag_for_removal", "completed",
-        "last_modified_timestamp", "has_media", "answers_to_blanks"
-    ]
     
-    column_names = ', '.join(columns)
-    placeholders = ', '.join('?' * len(columns))
+    # Handle different input formats
+    if isinstance(records, list):
+        # Legacy format - assume question_answer_pairs
+        records_dict = {'question_answer_pairs': records}
+    elif isinstance(records, dict):
+        # New format - dictionary with table names
+        records_dict = records
+    else:
+        print("Invalid records format. Exiting.")
+        return
+    
+    if not records_dict:
+        print("No records dictionary provided. Exiting.")
+        return
+    
+    cursor = db.cursor()
+    
+    for table_name, table_records in records_dict.items():
+        if not table_records:
+            print(f"No records to upsert for table {table_name}. Skipping.")
+            continue
+            
+        print(f"Processing {len(table_records)} records for table: {table_name}")
+        
+        # Get column names from the first record
+        columns = list(table_records[0].keys())
+        column_names = ', '.join(columns)
+        placeholders = ', '.join('?' * len(columns))
+        
+        # Build the SQL statement
+        upsert_sql = f"REPLACE INTO {table_name} ({column_names}) VALUES ({placeholders})"
+        
+        # Create data tuples for bulk upsert
+        data_to_upsert = [
+            tuple(record.get(col) for col in columns) for record in table_records
+        ]
+        
+        try:
+            cursor.executemany(upsert_sql, data_to_upsert)
+            print(f"executemany command executed for {table_name}.")
+            db.commit()
+            print(f"Successfully committed {len(table_records)} records to {table_name}.")
+        except sqlite3.Error as e:
+            print(f"SQLite error during upsert for {table_name}: {e}")
+    
+    print("--- upsert_records_to_db finished ---")
 
-    # Dynamically build the SQL statement
-    upsert_sql = f"REPLACE INTO question_answer_pairs ({column_names}) VALUES ({placeholders})"
-    print(f"Generated SQL: {upsert_sql}")
-
-    # Create a list of tuples from the dictionaries for bulk upserting.
-    data_to_upsert = [
-        tuple(record.get(col) for col in columns) for record in records
-    ]
-
-    print(f"Data to upsert (first record): {data_to_upsert[0]}")
-
-    try:
-        cursor.executemany(upsert_sql, data_to_upsert)
-        print("executemany command executed.")
-        db.commit()
-        print(f"Successfully committed {len(records)} records to the database.")
-    except sqlite3.Error as e:
-        print(f"SQLite error during upsert: {e}")
-    finally:
-        print("--- upsert_records_to_db finished ---")
-
-def find_newest_timestamp(records: typing.List[typing.Dict]) -> typing.Union[str, None]:
+def find_newest_timestamp(records: typing.Dict[str, typing.List[typing.Dict]]) -> typing.Union[str, None]:
     """
-    Finds the newest 'last_modified_timestamp' in a list of record dictionaries.
-
+    Finds the newest timestamp across all tables in a records dictionary.
+    For question_answer_pairs table, uses 'last_modified_timestamp'.
+    For question_answer_attempts table, uses 'time_stamp'.
     Args:
-        records: A list of dictionaries, where each dictionary represents a record
-                 and is expected to have a 'last_modified_timestamp' key.
-
+        records: A dictionary with table names as keys and lists of record dictionaries as values.
     Returns:
-        The string value of the newest timestamp, or None if the list is empty.
+        The string value of the newest timestamp, or None if no records exist.
     """
     if not records:
         return None
+    
+    newest_timestamp = None
+    
+    for table_name, table_records in records.items():
+        if not table_records:
+            continue
+            
+        # Determine which timestamp column to use
+        timestamp_column = 'last_modified_timestamp' if table_name == 'question_answer_pairs' else 'time_stamp'
+        
+        # Find newest timestamp in this table
+        table_newest = max(table_records, key=lambda x: x.get(timestamp_column, ''))
+        table_newest_timestamp = table_newest.get(timestamp_column)
+        
+        # Compare with overall newest
+        if table_newest_timestamp and (newest_timestamp is None or table_newest_timestamp > newest_timestamp):
+            newest_timestamp = table_newest_timestamp
+    
+    return newest_timestamp
 
-    newest_record = max(records, key=lambda x: x.get('last_modified_timestamp', ''))
-    return newest_record.get('last_modified_timestamp')
-
-def fetch_new_records_from_supabase(supabase_client: supabase.Client, last_sync_date: str) -> list:
+def fetch_new_records_from_supabase(supabase_client: supabase.Client, last_sync_date: str) -> dict:
     """
-    Fetches all new records from the Supabase table since the last sync date.
-
+    Fetches all new records from both Supabase tables since the last sync date.
     This function uses a timestamp filter and pagination to retrieve all records
     that have been created or modified after the provided `last_sync_date`.
-
     Args:
         supabase_client: The initialized Supabase client object.
         last_sync_date: The timestamp string to filter records by. Records newer
                         than this timestamp will be returned.
-
     Returns:
-        A list of dictionaries, where each dictionary represents a row from the
-        Supabase table.
+        A dictionary with 'question_answer_pairs' and 'question_answer_attempts' keys,
+        each containing a list of dictionaries representing rows from the respective tables.
     """
-    all_records = []
-    page_limit = 500
-    offset = 0
-
-    while True:
-        # Query the database for records with a newer timestamp
-        # Paginate by `page_limit` and `offset`
-        response = (
-            supabase_client.table(SUPABASE_TABLE)
-            .select('*')
-            .gt('last_modified_timestamp', last_sync_date)
-            .order('last_modified_timestamp')
-            .range(offset, offset + page_limit - 1)
-            .execute()
-        )
-
-        page_data = response.data
-        
-        # If the page is empty, we've reached the end of the data
-        if not page_data:
-            break
-        
-        # Add the fetched records to the list
-        all_records.extend(page_data)
-        
-        # If the number of records on the page is less than the page limit, it's the last page
-        if len(page_data) < page_limit:
-            break
-        
-        # Move to the next page
-        offset += page_limit
-
-    return all_records
+    def fetch_table_records(table_name: str, timestamp_column: str) -> list:
+        all_records = []
+        page_limit = 500
+        offset = 0
+        while True:
+            response = (
+                supabase_client.table(table_name)
+                .select('*')
+                .gt(timestamp_column, last_sync_date)
+                .order(timestamp_column)
+                .range(offset, offset + page_limit - 1)
+                .execute()
+            )
+            page_data = response.data
+            
+            if not page_data:
+                break
+            
+            all_records.extend(page_data)
+            
+            if len(page_data) < page_limit:
+                break
+            
+            offset += page_limit
+        return all_records
+    
+    return {
+        'question_answer_pairs': fetch_table_records('question_answer_pairs', 'last_modified_timestamp'),
+        'question_answer_attempts': fetch_table_records('question_answer_attempts', 'time_stamp')
+    }
 
 def get_last_sync_date():
     last_sync_date = "1970-01-01T00:00:00+00:00"
@@ -323,15 +335,26 @@ def initialize_supabase_session():
     
     return supabase_client
 
-def initialize_and_fetch_db() -> Connection:
+def initialize_and_fetch_db(reset_question_vector=False) -> Connection:
     db: Connection = sqlite3.connect(DB_FILE)
-
     create_sql_table_if_not_exists(db)
-
+    
+    if reset_question_vector:
+        print("Resetting all question_vector fields to null in local database...")
+        try:
+            cursor = db.cursor()
+            cursor.execute("UPDATE question_answer_pairs SET question_vector = NULL")
+            db.commit()
+            print(f"Reset complete. Affected {cursor.rowcount} records.")
+        except Exception as e:
+            print(f"Error resetting question_vector fields in local DB: {e}")
+            db.rollback()
+    
     return db
 
 def create_sql_table_if_not_exists(db) -> None:
-    create_table_sql = """
+    # Create question_answer_pairs table
+    create_pairs_table_sql = """
     CREATE TABLE IF NOT EXISTS question_answer_pairs (
         question_id TEXT NOT NULL PRIMARY KEY,
         time_stamp TEXT,
@@ -358,7 +381,43 @@ def create_sql_table_if_not_exists(db) -> None:
         answers_to_blanks TEXT
     );
     """
-    db.cursor().execute(create_table_sql)
+    
+    # Create question_answer_attempts table
+    create_attempts_table_sql = """
+    CREATE TABLE IF NOT EXISTS question_answer_attempts (
+        time_stamp TEXT NOT NULL,
+        question_id TEXT NOT NULL,
+        participant_id TEXT NOT NULL,
+        avg_react_time REAL NOT NULL,
+        response_result INTEGER NOT NULL,
+        was_first_attempt INTEGER NOT NULL,
+        last_revised_date TEXT,
+        days_since_last_revision REAL,
+        total_attempts INTEGER NOT NULL,
+        revision_streak INTEGER NOT NULL,
+        question_vector TEXT,
+        module_name TEXT,
+        question_type TEXT,
+        num_mcq_options INTEGER DEFAULT 0,
+        num_so_options INTEGER DEFAULT 0,
+        num_sata_options INTEGER DEFAULT 0,
+        num_blanks INTEGER DEFAULT 0,
+        total_correct_attempts INTEGER,
+        total_incorrect_attempts INTEGER,
+        accuracy_rate REAL,
+        time_of_presentation TEXT,
+        days_since_first_introduced REAL,
+        attempt_day_ratio REAL,
+        user_stats_vector TEXT,
+        module_performance_vector TEXT,
+        user_profile_record TEXT,
+        PRIMARY KEY (time_stamp, question_id, participant_id)
+    );
+    """
+    
+    cursor = db.cursor()
+    cursor.execute(create_pairs_table_sql)
+    cursor.execute(create_attempts_table_sql)
 
 def fetch_and_save_data_locally() -> None:
     # First we need initialize our supabase client and the local db file:
@@ -387,11 +446,15 @@ def fetch_and_save_data_locally() -> None:
     
     print(f"Hello?")
 
-def sync_vectors_to_supabase():
+def sync_vectors_to_supabase(reset_question_vector=False, reset_attempts_vector=False):
     """
     Syncs question_vector data from local database to Supabase.
     Only updates records that are missing question_vector on Supabase.
     Continues until all records on Supabase have been updated or no more can be updated.
+    
+    Args:
+        reset_question_vector: If True, sets all question_vector fields to null in question_answer_pairs before syncing
+        reset_attempts_vector: If True, sets all question_vector fields to null in question_answer_attempts before syncing
     """
     db = initialize_and_fetch_db()
     supabase_client = initialize_supabase_session()
@@ -411,68 +474,92 @@ def sync_vectors_to_supabase():
         print(f"Error authenticating with Supabase: {e}")
         return False
     
+    # Reset question_vector fields if requested
+    if reset_question_vector:
+        print("Resetting question_vector fields in question_answer_pairs...")
+        try:
+            supabase_client.table('question_answer_pairs').update({'question_vector': None}).neq('question_id', '').execute()
+            print("Reset complete for question_answer_pairs")
+        except Exception as e:
+            print(f"Error resetting question_answer_pairs: {e}")
+            return False
+    
+    if reset_attempts_vector:
+        print("Resetting question_vector fields in question_answer_attempts...")
+        try:
+            supabase_client.table('question_answer_attempts').update({'question_vector': None}).neq('question_id', '').execute()
+            print("Reset complete for question_answer_attempts")
+        except Exception as e:
+            print(f"Error resetting question_answer_attempts: {e}")
+            return False
+    
     cursor = db.cursor()
     
     try:
-        total_updated = 0
-        batch_size = 100  # Process in batches to avoid overwhelming the server
-        
+        # Sync question_answer_pairs
+        total_pairs = 0
+        print("Syncing question_answer_pairs...")
         while True:
-            # Query Supabase for records missing question_vector
-            response = supabase_client.table('question_answer_pairs')\
-                .select('question_id')\
-                .is_('question_vector', 'null')\
-                .limit(batch_size)\
-                .execute()
-            
+            response = supabase_client.table('question_answer_pairs').select('question_id').is_('question_vector', 'null').limit(100).execute()
             if not response.data:
-                print(f"Sync complete. Total records updated: {total_updated}")
+                print(f"Sync complete for question_answer_pairs. Total records updated: {total_pairs}")
                 break
-            
+                
             missing_question_ids = [record['question_id'] for record in response.data]
-            print(f"Found {len(missing_question_ids)} records missing question_vector on Supabase")
+            print(f"Found {len(missing_question_ids)} records missing question_vector in question_answer_pairs")
             
             batch_updated = 0
-            
-            for question_id in missing_question_ids:
-                # Get the question_vector from local database
-                cursor.execute(
-                    "SELECT question_vector FROM question_answer_pairs WHERE question_id = ?", 
-                    (question_id,)
-                )
+            for record in response.data:
+                question_id = record['question_id']
+                cursor.execute("SELECT question_vector FROM question_answer_pairs WHERE question_id = ?", (question_id,))
                 local_record = cursor.fetchone()
                 
-                if not local_record or not local_record[0]:
-                    print(f"Warning: No question_vector found in local DB for question_id: {question_id}")
-                    continue
-                
-                question_vector = local_record[0]
-                
-                # Update the record on Supabase
-                try:
-                    update_response = supabase_client.table('question_answer_pairs')\
-                        .update({'question_vector': question_vector})\
-                        .eq('question_id', question_id)\
-                        .execute()
-                    
-                    if update_response.data:
+                if local_record and local_record[0]:
+                    try:
+                        supabase_client.table('question_answer_pairs').update({'question_vector': local_record[0]}).eq('question_id', question_id).execute()
                         batch_updated += 1
                         print(f"Updated question_vector for question_id: {question_id}")
-                    else:
-                        print(f"Warning: Failed to update question_id: {question_id}")
-                        
-                except Exception as e:
-                    print(f"Error updating question_id {question_id}: {e}")
-                    continue
+                    except Exception as e:
+                        print(f"Error updating pairs {question_id}: {e}")
             
-            total_updated += batch_updated
-            print(f"Batch complete. Updated {batch_updated} records in this batch.")
-            
-            # If no records were updated in this batch, break to avoid infinite loop
+            total_pairs += batch_updated
+            print(f"Batch complete for question_answer_pairs. Updated {batch_updated} records in this batch.")
             if batch_updated == 0:
-                print("No more records could be updated. Stopping sync.")
+                print("No more records could be updated in question_answer_pairs. Stopping sync for this table.")
                 break
         
+        # Sync question_answer_attempts with same vectors
+        total_attempts = 0
+        print("Syncing question_answer_attempts...")
+        while True:
+            response = supabase_client.table('question_answer_attempts').select('time_stamp, question_id, participant_id').is_('question_vector', 'null').limit(100).execute()
+            if not response.data:
+                print(f"Sync complete for question_answer_attempts. Total records updated: {total_attempts}")
+                break
+                
+            print(f"Found {len(response.data)} records missing question_vector in question_answer_attempts")
+            
+            batch_updated = 0
+            for record in response.data:
+                question_id = record['question_id']
+                cursor.execute("SELECT question_vector FROM question_answer_pairs WHERE question_id = ?", (question_id,))
+                local_record = cursor.fetchone()
+                
+                if local_record and local_record[0]:
+                    try:
+                        supabase_client.table('question_answer_attempts').update({'question_vector': local_record[0]}).eq('time_stamp', record['time_stamp']).eq('question_id', record['question_id']).eq('participant_id', record['participant_id']).execute()
+                        batch_updated += 1
+                        print(f"Updated question_vector for attempt: {record['time_stamp']}, {question_id}, {record['participant_id']}")
+                    except Exception as e:
+                        print(f"Error updating attempts record: {e}")
+            
+            total_attempts += batch_updated
+            print(f"Batch complete for question_answer_attempts. Updated {batch_updated} records in this batch.")
+            if batch_updated == 0:
+                print("No more records could be updated in question_answer_attempts. Stopping sync for this table.")
+                break
+        
+        print(f"Sync complete. Pairs: {total_pairs}, Attempts: {total_attempts}")
         return True
         
     except Exception as e:

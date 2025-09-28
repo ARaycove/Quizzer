@@ -226,8 +226,9 @@ Future<bool> _isTableEmpty(String tableName, String? userId) async {
 /// syncData[2]   == user_profile \n
 /// syncData[3]   == user_settings \n
 /// syncData[4]   == modules \n
-/// syncData[15]  == user_module_activation_status \n
-/// syncData[16]  == subject_details \n
+/// syncData[5]   == user_module_activation_status \n
+/// syncData[6]   == subject_details \n
+/// syncData[7]   == ml_models \n
 Future<List<List<Map<String,dynamic>>>> fetchDataForAllTables(SupabaseClient supabase, String? userId) async {
   // Let's assume you have a SupabaseClient instance named `supabaseClient`.
   // SupabaseClient supabaseClient = SupabaseClient('url', 'key');
@@ -255,7 +256,7 @@ Future<List<List<Map<String,dynamic>>>> fetchDataForAllTables(SupabaseClient sup
     fetchAllRecordsOlderThanLastLogin(supabase: supabase, tableName: 'subject_details',
     userId: null),
 
-
+    fetchAllRecordsOlderThanLastLogin(supabase: supabase, tableName: 'ml_models'),
   ]);
   return allResults;
 }

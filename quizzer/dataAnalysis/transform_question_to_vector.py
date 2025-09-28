@@ -6,7 +6,8 @@ import time
 from PIL import Image
 import torch
 from data_utils import load_image, text_to_image, combine_images_vertically, get_is_math, get_keywords
-from transformers import InstructBlipProcessor, InstructBlipForConditionalGeneration
+from transformers import BlipProcessor, BlipForConditionalGeneration, AutoTokenizer, AutoModel
+import pytesseract
 import torch.nn.functional as F
 from sync_fetch_data import get_empty_vector_record, upsert_question_record, initialize_and_fetch_db
 from load_question_data import pre_process_record
@@ -106,25 +107,30 @@ def simplify_question_record(record: Dict[str, Any]) -> Dict[str, Any]:
     print(data_map)
     return data_map
 
-processor = InstructBlipProcessor.from_pretrained("Salesforce/instructblip-vicuna-7b")
-model = InstructBlipForConditionalGeneration.from_pretrained("Salesforce/instructblip-vicuna-7b")
+processor = BlipProcessor.from_pretrained("Salesforce/blip-image-captioning-base")
+model = BlipForConditionalGeneration.from_pretrained("Salesforce/blip-image-captioning-base")
+scibert_tokenizer = AutoTokenizer.from_pretrained("allenai/scibert_scivocab_uncased")
+scibert_model = AutoModel.from_pretrained("allenai/scibert_scivocab_uncased")
 
 def vectorize_records() -> None:
     """
-    Vectorizes question records from database using InstructBLIP multi-modal transformer.
-    Processes records one by one until all have vectors.
-    Uses combined embeddings that capture cross-modal educational semantic meaning.
+    Vectorizes question records from database using image-to-text pipeline with SciBERT.
     
-    InstructBLIP is specifically designed for instruction-following with visual content,
-    making it ideal for educational Q&A that combines text explanations with images,
-    diagrams, equations, and other visual learning materials.
+    Pipeline:
+    1. Extract text from images using OCR (if applicable)
+    2. Generate image captions using BLIP
+    3. Combine question text + OCR text + image captions
+    4. Vectorize combined text using SciBERT for scientific/academic domain knowledge
+    
+    This approach maintains SciBERT's academic vocabulary while handling multimodal content
+    by converting all visual information into textual descriptions.
     
     Fetches records from DB, processes them, and saves back to DB until complete.
     """
     db = initialize_and_fetch_db()
     processed_count = 0
     
-    print("Starting vectorization process...")
+    print("Starting vectorization process with SciBERT pipeline...")
     
     while True:
         # Get next record that needs vectorization
@@ -147,9 +153,6 @@ def vectorize_records() -> None:
             combined_text = f"{question_text} {answer_text}".strip()
             keywords = get_keywords(combined_text)
             is_math = get_is_math(combined_text)
-
-            # Create educational instruction that emphasizes subject matter and concept understanding
-            instruction_text = f"Analyze the educational concept and subject matter in this learning material. Question: {question_text} Answer: {answer_text}. What is the main educational topic and key concepts being taught?"
             
             # Helper function to safely convert tensor to PIL
             def safe_tensor_to_pil(img_tensor):
@@ -185,11 +188,12 @@ def vectorize_records() -> None:
                         return Image.fromarray(img_array, mode='RGB')
                 
                 return None
-
-            # Handle images - load actual media images if they exist
-            all_images = []
             
-            # Load question media images
+            # Process images to text descriptions
+            image_descriptions = []
+            ocr_texts = []
+            
+            # Process question media images
             if question_media:
                 for img_name in question_media:
                     if img_name:
@@ -197,11 +201,24 @@ def vectorize_records() -> None:
                             img_tensor = load_image(img_name)
                             img_pil = safe_tensor_to_pil(img_tensor)
                             if img_pil is not None:
-                                all_images.append(img_pil)
+                                # Generate image caption using BLIP
+                                inputs = processor(img_pil, return_tensors="pt")
+                                with torch.no_grad():
+                                    out = model.generate(**inputs, max_length=50, num_beams=5)
+                                    caption = processor.decode(out[0], skip_special_tokens=True)
+                                    image_descriptions.append(f"Question image: {caption}")
+                                
+                                # Extract text using OCR if image contains text
+                                try:
+                                    ocr_text = pytesseract.image_to_string(img_pil, config='--psm 6').strip()
+                                    if ocr_text and len(ocr_text) > 3:  # Filter out noise
+                                        ocr_texts.append(f"Text from question image: {ocr_text}")
+                                except:
+                                    pass  # OCR failed, continue without it
                         except Exception as e:
-                            print(f"Error loading question image {img_name}: {e}")
+                            print(f"Error processing question image {img_name}: {e}")
             
-            # Load answer media images  
+            # Process answer media images
             if answer_media:
                 for img_name in answer_media:
                     if img_name:
@@ -209,74 +226,61 @@ def vectorize_records() -> None:
                             img_tensor = load_image(img_name)
                             img_pil = safe_tensor_to_pil(img_tensor)
                             if img_pil is not None:
-                                all_images.append(img_pil)
+                                # Generate image caption using BLIP
+                                inputs = processor(img_pil, return_tensors="pt")
+                                with torch.no_grad():
+                                    out = model.generate(**inputs, max_length=50, num_beams=5)
+                                    caption = processor.decode(out[0], skip_special_tokens=True)
+                                    image_descriptions.append(f"Answer image: {caption}")
+                                
+                                # Extract text using OCR if image contains text
+                                try:
+                                    ocr_text = pytesseract.image_to_string(img_pil, config='--psm 6').strip()
+                                    if ocr_text and len(ocr_text) > 3:  # Filter out noise
+                                        ocr_texts.append(f"Text from answer image: {ocr_text}")
+                                except:
+                                    pass  # OCR failed, continue without it
                         except Exception as e:
-                            print(f"Error loading answer image {img_name}: {e}")
+                            print(f"Error processing answer image {img_name}: {e}")
             
-            # If no actual images, create a simple white image as placeholder
-            if not all_images:
-                placeholder_image = Image.new('RGB', (224, 224), color='white')
-                all_images = [placeholder_image]
+            # Combine all textual information
+            all_text_components = []
             
-            # Combine multiple images if present
-            if len(all_images) > 1:
-                combined_image = combine_images_vertically(all_images)
-            else:
-                combined_image = all_images[0]
+            # Add original question and answer text
+            if question_text:
+                all_text_components.append(f"Question: {question_text}")
+            if answer_text:
+                all_text_components.append(f"Answer: {answer_text}")
             
-            # Process through InstructBLIP
-            inputs = processor(
-                images=combined_image, 
-                text=instruction_text, 
+            # Add OCR extracted text
+            if ocr_texts:
+                all_text_components.extend(ocr_texts)
+            
+            # Add image descriptions
+            if image_descriptions:
+                all_text_components.extend(image_descriptions)
+            
+            # Create final text for SciBERT processing
+            final_text = " ".join(all_text_components)
+            
+            # Ensure we have some text to process
+            if not final_text.strip():
+                final_text = "Empty educational content"
+            
+            # Tokenize and encode with SciBERT
+            inputs = scibert_tokenizer(
+                final_text,
+                max_length=512,
+                truncation=True,
+                padding=True,
                 return_tensors="pt"
             )
             
             with torch.no_grad():
-                # Get the full model outputs which include cross-modal interactions
-                outputs = model.vision_model(
-                    pixel_values=inputs.pixel_values,
-                    return_dict=True
-                )
-                
-                # Get vision features
-                vision_features = outputs.last_hidden_state  # [batch, patches, hidden_size]
-                vision_pooled = outputs.pooler_output  # [batch, hidden_size]
-                
-                # Get text embeddings
-                text_embeddings = model.language_model.get_input_embeddings()(inputs.input_ids)
-                text_pooled = text_embeddings.mean(dim=1)  # [batch, hidden_size]
-                
-                # Create combined cross-modal embedding
-                # This captures the interaction between visual and textual educational content
-                
-                # Method 1: Concatenate vision and text features
-                vision_flat = vision_pooled.squeeze()  # Remove batch dim
-                text_flat = text_pooled.squeeze()      # Remove batch dim
-                
-                # Ensure same dimensionality for proper combination
-                if vision_flat.shape[0] != text_flat.shape[0]:
-                    # Project to common dimension
-                    target_dim = min(vision_flat.shape[0], text_flat.shape[0])
-                    vision_projected = F.linear(vision_flat.unsqueeze(0), 
-                                              torch.randn(target_dim, vision_flat.shape[0])).squeeze()
-                    text_projected = F.linear(text_flat.unsqueeze(0), 
-                                            torch.randn(target_dim, text_flat.shape[0])).squeeze()
-                else:
-                    vision_projected = vision_flat
-                    text_projected = text_flat
-                
-                # Create combined embedding that captures cross-modal educational semantics
-                # Weighted combination emphasizing both modalities
-                alpha = 0.6  # Weight for vision (important for educational diagrams/images)
-                beta = 0.4   # Weight for text (important for concepts/explanations)
-                
-                combined_embedding = alpha * vision_projected + beta * text_projected
-                
-                # Optional: Add interaction term to capture cross-modal relationships
-                interaction_term = vision_projected * text_projected * 0.1
-                final_embedding = combined_embedding + interaction_term
-                
-                embedding = final_embedding.cpu().numpy()
+                outputs = scibert_model(**inputs)
+                # Use [CLS] token embedding as the document representation
+                embedding = outputs.last_hidden_state[:, 0, :].squeeze()  # [CLS] token
+                embedding = embedding.cpu().numpy()
             
             # Update the original record with computed values
             record['question_vector'] = embedding
@@ -291,8 +295,10 @@ def vectorize_records() -> None:
                 print(f"Processed record {processed_count}: {question_id}")
                 print(f"  - Is math: {is_math}")
                 print(f"  - Keywords: {len(keywords) if keywords else 0}")
-                print(f"  - Images processed: {len(all_images)}")
-                print(f"  - Embedding shape: {embedding.shape}")
+                print(f"  - Image descriptions: {len(image_descriptions)}")
+                print(f"  - OCR extractions: {len(ocr_texts)}")
+                print(f"  - Final text length: {len(final_text)} chars")
+                print(f"  - SciBERT embedding shape: {embedding.shape}")
             else:
                 print(f"Failed to save record: {question_id}")
             
@@ -301,7 +307,7 @@ def vectorize_records() -> None:
             
             # Still try to save a fallback record to avoid infinite loop
             try:
-                record['question_vector'] = np.zeros(4096, dtype=np.float32)  # Fallback embedding
+                record['question_vector'] = np.zeros(768, dtype=np.float32)  # SciBERT embedding size
                 record['is_math'] = False
                 record['keywords'] = []
                 upsert_question_record(db, record)

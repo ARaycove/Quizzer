@@ -16,6 +16,7 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/system_data/u
 
 import 'package:quizzer/backend_systems/00_database_manager/tables/modules_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_attempts_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/ml_models_table.dart';
 
 
 //TODO Academic Archive tables
@@ -45,6 +46,7 @@ Future<void> verifyAllTablesExist(userId) async {
       await verifyUserFeedbackTable(txn);
       await verifyQuestionAnswerAttemptTable(txn);
       await verifySubjectDetailsTable(txn);
+      await verifyMlModelsTable(txn);
   });
   dbMonitor.releaseDatabaseAccess();
 }

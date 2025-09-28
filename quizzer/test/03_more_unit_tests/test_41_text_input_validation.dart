@@ -137,7 +137,15 @@ void main() async {
       [[{"endergonic": [""]}],                  ["exergonic"],                  false], //endergonic and exergonic have polar meanings
       [[{"exergonic": [""]}],                   ["endergonic"],                 false],
       [[{"casting down": [""]}],                ["upcasting"],                  false],
-      
+      [[{"phagocytosis": [""]}],                ["endocytosis"],                false], // these are not the same thing
+      [[{"polar": [""]}],                       ["nonpolar"],                   false], // opposites are not correct
+      [[{"logistic regression": [""]}],         ["linear regression"],          false],
+      [[{"import java.io.File": [""]}],         ["java.lang"],                  false], // These are different import statements
+      [[{"pentoses": [""]}],                    ["pentides"],                   false], // Not same term, though share prefix
+      [[{"transpiration": [""]}],               ["attraction"],                 false], // Yes this got marked as correct
+      [[{"java.io.Scanner;": [""]}],            ["java.io.Scanner;"],           false], // The answer provided does not exist, that's a syntax error
+      [[{"decreases": [""]}],                   ["increases"],                  false], // opposites
+      [[{"increases": [""]}],                   ["decreases"],                  false], // opposites
     ];
 
     test('Cases should all validate correctly', () async {

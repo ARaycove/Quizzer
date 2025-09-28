@@ -9,6 +9,7 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/modules_table
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_module_activation_status_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/academic_archive.dart/subject_details_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/inbound_sync/inbound_sync_helper.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/ml_models_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
 import 'dart:io'; // For SocketException
 import 'dart:async'; // For Future.delayed
@@ -98,6 +99,7 @@ Future<void> runInboundSync(SessionManager sessionManager) async {
     await batchUpsertModuleFromInboundSync(moduleRecords: tableDataForSync[4], db: txn);
     await batchUpsertUserModuleActivationStatusFromInboundSync(userModuleActivationStatusRecords: tableDataForSync[5], db: txn);
     await batchUpsertSubjectDetails(subjectDetailRecords: tableDataForSync[6], db: txn);
+    await batchUpsertMlModelsFromInboundSync(modelRecords: tableDataForSync[7], db: txn);
     });
     getDatabaseMonitor().releaseDatabaseAccess();
     QuizzerLogger.logSuccess('Inbound sync completed successfully.');
