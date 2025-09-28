@@ -17,6 +17,7 @@ from sklearn.metrics import f1_score, roc_auc_score, balanced_accuracy_score
 import itertools
 import pandas as pd
 import random
+import itertools
 import os
 
 def grid_search_quizzer_model(X_train, y_train, X_test, y_test):
@@ -52,25 +53,24 @@ def grid_search_quizzer_model(X_train, y_train, X_test, y_test):
     }
     
     # Generate all combinations using itertools to avoid memory explosion
-    import itertools
     param_names = list(param_grid.keys())
     param_values = list(param_grid.values())
-    param_combinations = itertools.product(*param_values)
     
-    # Convert to shuffled list for random exploration (sample if too large)
+    # Calculate total combinations
     total_combinations = 1
     for values in param_values:
         total_combinations *= len(values)
     
     print(f"Total possible combinations: {total_combinations:,}")
     
-    # For very large spaces, sample a reasonable subset
+    # For very large spaces, sample without creating full list
     if total_combinations > 50000:
         print(f"Sampling 50,000 random combinations from {total_combinations:,} total")
-        # Convert to list, shuffle, and take first 50k
-        all_combinations = list(itertools.product(*param_values))
-        random.shuffle(all_combinations)
-        param_combinations = all_combinations[:50000]
+        param_combinations = []
+        for _ in range(50000):
+            # Sample one random combination
+            random_combo = tuple(random.choice(values) for values in param_values)
+            param_combinations.append(random_combo)
     else:
         # Convert to list and shuffle for smaller spaces
         param_combinations = list(itertools.product(*param_values))
