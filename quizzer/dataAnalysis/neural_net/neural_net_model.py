@@ -32,6 +32,37 @@ def grid_search_quizzer_model(X_train, y_train, X_test, y_test):
         DataFrame with results sorted by mean discrimination
     """
     
+    # First, try previous top n configurations if they exist
+    previous_configs = []
+    if os.path.exists('grid_search_top_results.csv'):
+        print("Found previous top results - testing these configurations first...")
+        previous_df = pd.read_csv('grid_search_top_results.csv')
+        
+        # Convert DataFrame rows to parameter dictionaries
+        for _, row in previous_df.iterrows():
+            config = {
+                'layer_width': int(row['layer_width']),
+                'reduction_percent': float(row['reduction_percent']),
+                'stop_condition': int(row['stop_condition']),
+                'dropout_rate': float(row['dropout_rate']),
+                'focal_gamma': float(row['focal_gamma']),
+                'focal_alpha': float(row['focal_alpha']),
+                'sampling_strategy': row['sampling_strategy'],
+                'k_neighbors': int(row['k_neighbors']),
+                'k_folds': int(row['k_folds']),
+                'epochs': int(row['epochs']),
+                'batch_size': int(row['batch_size']),
+                'random_state': int(row['random_state'])
+            }
+            previous_configs.append(config)
+        
+        print(f"Will test {len(previous_configs)} previous top configurations first")
+        
+        # Clear the existing CSV to start fresh
+        if os.path.exists('grid_search_top_results.csv'):
+            os.remove('grid_search_top_results.csv')
+            print("Cleared previous top results CSV for fresh results")
+    
     # Comprehensive parameter grid
     param_grid = {
         # Neural network parameters
@@ -48,7 +79,7 @@ def grid_search_quizzer_model(X_train, y_train, X_test, y_test):
         
         # K-fold validation parameters
         'k_folds': [2, 3, 4, 5],
-        'epochs': [5, 10, 15, 20, 25],
+        'epochs': [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100],
         'batch_size': [2, 4, 8, 16, 32, 64],
         
         # Random seed parameter
@@ -66,18 +97,42 @@ def grid_search_quizzer_model(X_train, y_train, X_test, y_test):
     
     print(f"Total possible combinations: {total_combinations:,}")
     
-    # For very large spaces, sample without creating full list
-    if total_combinations > 50000:
-        print(f"Sampling 50,000 random combinations from {total_combinations:,} total")
-        param_combinations = []
-        for _ in range(50000):
-            # Sample one random combination
-            random_combo = tuple(random.choice(values) for values in param_values)
-            param_combinations.append(random_combo)
+    # Combine previous configs with new random sampling
+    if previous_configs:
+        # Test previous top 25 first, then add random sampling
+        all_combinations = previous_configs.copy()
+        
+        # Always add random sampling after testing previous configs
+        remaining_samples = 50000 - len(previous_configs)
+        if total_combinations > remaining_samples:
+            print(f"Adding {remaining_samples} random combinations from {total_combinations:,} total")
+            for _ in range(remaining_samples):
+                random_combo = tuple(random.choice(values) for values in param_values)
+                # Convert to dict format
+                random_config = dict(zip(param_names, random_combo))
+                all_combinations.append(random_config)
+        else:
+            # Add all possible combinations
+            all_remaining = list(itertools.product(*param_values))
+            random.shuffle(all_remaining)
+            for combo in all_remaining:
+                random_config = dict(zip(param_names, combo))
+                all_combinations.append(random_config)
+        
+        param_combinations = all_combinations
     else:
-        # Convert to list and shuffle for smaller spaces
-        param_combinations = list(itertools.product(*param_values))
-        random.shuffle(param_combinations)
+        # No previous configs - do normal random sampling
+        if total_combinations > 50000:
+            print(f"Sampling 50,000 random combinations from {total_combinations:,} total")
+            param_combinations = []
+            for _ in range(50000):
+                random_combo = tuple(random.choice(values) for values in param_values)
+                random_config = dict(zip(param_names, random_combo))
+                param_combinations.append(random_config)
+        else:
+            all_combinations = list(itertools.product(*param_values))
+            random.shuffle(all_combinations)
+            param_combinations = [dict(zip(param_names, combo)) for combo in all_combinations]
     
     print(f"Testing {len(param_combinations):,} parameter combinations (shuffled order)...")
     print("Optimizing for: MEAN DISCRIMINATION")
@@ -86,10 +141,7 @@ def grid_search_quizzer_model(X_train, y_train, X_test, y_test):
     results = []
     input_features = X_train.shape[1]
     
-    for i, param_values in enumerate(param_combinations, 1):
-        # Convert tuple to dict
-        params = dict(zip(param_names, param_values))
-        
+    for i, params in enumerate(param_combinations, 1):
         print(f"Combination {i}/{len(param_combinations)}:")
         print(f"  NN: layer_width={params['layer_width']}, reduction={params['reduction_percent']}, dropout={params['dropout_rate']}")
         print(f"  SMOTE: strategy={params['sampling_strategy']}, k_neighbors={params['k_neighbors']}")
@@ -203,11 +255,11 @@ def grid_search_quizzer_model(X_train, y_train, X_test, y_test):
             print(f"  DISCRIMINATION: {mean_discrimination:.4f}, ROC_AUC: {roc_auc:.3f}, Range: {prob_range:.3f}")
             print(f"  Class means: 0={class_0_mean:.3f}, 1={class_1_mean:.3f}")
             
-            # Update top 10 results in CSV
+            # Update top 25 results in CSV
             try:
-                # Try to read existing top 10 results
-                if os.path.exists('grid_search_top10.csv'):
-                    top_results = pd.read_csv('grid_search_top10.csv')
+                # Try to read existing top results
+                if os.path.exists('grid_search_top_results.csv'):
+                    top_results = pd.read_csv('grid_search_top_results.csv')
                 else:
                     top_results = pd.DataFrame()
                 
@@ -215,19 +267,19 @@ def grid_search_quizzer_model(X_train, y_train, X_test, y_test):
                 current_result_df = pd.DataFrame([result])
                 top_results = pd.concat([top_results, current_result_df], ignore_index=True)
                 
-                # Sort by mean_discrimination (descending) and keep top 10
-                top_results = top_results.sort_values('mean_discrimination', ascending=False).head(10)
+                # Sort by mean_discrimination (descending) and keep top 25
+                top_results = top_results.sort_values('mean_discrimination', ascending=False).head(25)
                 
-                # Save updated top 10
-                top_results.to_csv('grid_search_top10.csv', index=False)
+                # Save updated top results
+                top_results.to_csv('grid_search_top_results.csv', index=False)
                 
-                # Print current ranking if this result made it to top 10
+                # Print current ranking if this result made it to top results
                 if mean_discrimination >= top_results['mean_discrimination'].min():
                     rank = (top_results['mean_discrimination'] >= mean_discrimination).sum()
-                    print(f"  *** NEW TOP 10 RESULT - RANK #{rank} ***")
+                    print(f"  *** NEW TOP RESULT - RANK #{rank} ***")
                     
             except Exception as e:
-                print(f"  Error updating top 10: {e}")
+                print(f"  Error updating top results: {e}")
             
         except Exception as e:
             print(f"  ERROR: {str(e)}")
@@ -252,10 +304,10 @@ def grid_search_quizzer_model(X_train, y_train, X_test, y_test):
     print("FINAL TOP 10 RESULTS")
     print("=" * 80)
     
-    # Load and display final top 10
-    if os.path.exists('grid_search_top10.csv'):
-        final_top10 = pd.read_csv('grid_search_top10.csv')
-        for idx, row in final_top10.iterrows():
+    # Load and display final top results
+    if os.path.exists('grid_search_top_results.csv'):
+        final_top_results = pd.read_csv('grid_search_top_results.csv')
+        for idx, row in final_top_results.iterrows():
             print(f"Rank {idx + 1}:")
             print(f"  DISCRIMINATION: {row['mean_discrimination']:.4f}, ROC_AUC: {row['roc_auc']:.3f}, Range: {row['prob_range']:.3f}")
             print(f"  NN: layer_width={row['layer_width']}, reduction={row['reduction_percent']:.3f}, dropout={row['dropout_rate']:.2f}")
@@ -264,7 +316,7 @@ def grid_search_quizzer_model(X_train, y_train, X_test, y_test):
             print(f"  Class means: 0={row['class_0_mean']:.3f}, 1={row['class_1_mean']:.3f}")
             print()
     
-    print("Top 10 results maintained in 'grid_search_top10.csv'")
+    print("Top results maintained in 'grid_search_top_results.csv'")
     print("Full results saved to 'comprehensive_grid_search_results.csv'")
     return results_df
 
