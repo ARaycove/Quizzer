@@ -18,14 +18,21 @@ import 'package:quizzer/backend_systems/session_manager/session_manager.dart'; /
 import 'package:quizzer/UI_systems/10_stats_page/stats_page.dart';
 import 'package:quizzer/app_theme.dart';
 
+import 'backend_systems/00_database_manager/database_monitor.dart';
+import 'backend_systems/00_database_manager/tables/user_profile/user_profile_table.dart';
+
 // Global Key for NavigatorState - MOVED HERE
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   // Zone-based error handler
-  runZonedGuarded(() {
+  runZonedGuarded(() async {
     WidgetsFlutterBinding.ensureInitialized();
     SessionManager session = getSessionManager(); // Force initialization of session at startup
+    // Initialize DB and schema before UI starts
+    final db = await getDatabaseMonitor().requestDatabaseAccess();
+    await verifyUserProfileTable(db);
+    getDatabaseMonitor().releaseDatabaseAccess();
     session.userId; // Just here to get rid of the warning message. . .
     QuizzerLogger.setupLogging(level: Level.FINE);
 
