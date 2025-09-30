@@ -6,9 +6,7 @@ Quizzer is an intelligent learning system that maximizes memory retention using 
 
 Quizzer transforms how you learn and retain information by:
 
-- Leveraging research-backed memory models to present material at the optimal moment
 - Adapting to your individual learning capacity and cognitive load
-- Building a personalized review schedule based on your performance
 - Creating a systematic approach to mastering complex knowledge
 
 ## What makes Quizzer different
@@ -22,24 +20,10 @@ Unlike conventional flashcard apps, Quizzer:
 
 ## Features
 
-- **Evidence-based algorithm**: Built on Hermann Ebbinghaus's forgetting curve research and modern cognitive load theory
+- **Data-driven algorithms**: Uses advanced classification model to predict your capabilities and dynamically serve questions in real time.
 - **Dynamic question circulation**: Intelligently manages which questions enter your active learning pool
-- **Confidence-based learning**: Answer with different confidence levels to fine-tune your personal learning path
-- **Performance analytics**: Track your revision streak statistics and learning progress
+- **Performance analytics**: Track your performance across domains
 - **Balanced cognitive approach**: Automatically adjusts to prevent mental fatigue and burnout
-
-## Getting Started
-
-Clone the repository and follow the setup instructions to begin building your personalized knowledge base.
-
-## Future Development
-
-Quizzer is continuously evolving with planned features including:
-- GUI with image support for science and math problems
-- Automated backup functionality
-- Concept relationship mapping
-- Community question sharing
-- AI-assisted question generation and analysis
 
 ## Open Source
 
