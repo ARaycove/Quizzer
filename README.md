@@ -1,6 +1,6 @@
 # Quizzer
 
-Quizzer is an intelligent learning system that maximizes memory retention using cognitive science principles and adaptive algorithms.
+Quizzer is an intelligent learning system that optimizes learning rates and maximizes memory retention using cognitive science principles and adaptive machine learning algorithms.
 
 ## What it does
 
