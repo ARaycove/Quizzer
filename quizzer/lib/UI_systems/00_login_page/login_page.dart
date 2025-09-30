@@ -57,9 +57,9 @@ class _LoginPageState extends State<LoginPage> {
 
     // Attempt to log in using credentials
     QuizzerLogger.logMessage('Login attempt for: $email');
-    
+
     Map<String, dynamic> results = await session.attemptLogin(email, password);
-    
+
     if (results['success']) {
       // Login successful, keep loading state true until navigation completes
       QuizzerLogger.logMessage('Login successful for: $email. Navigating home.');
@@ -90,8 +90,8 @@ class _LoginPageState extends State<LoginPage> {
     // reset the loading state.
     if (mounted && _isLoading) { // Check mounted and isLoading before setting state
       setState(() {
-          _isLoading = false;
-          _loginProgressMessage = "Login"; // Reset button text
+        _isLoading = false;
+        _loginProgressMessage = "Login"; // Reset button text
       });
     }
   }
@@ -99,7 +99,7 @@ class _LoginPageState extends State<LoginPage> {
   // Function to navigate to new user signup page
   void newUserSignUp() {
     // Prevent navigation if already loading
-    if (_isLoading) return; 
+    if (_isLoading) return;
     QuizzerLogger.logMessage('Navigating to new user page');
     Navigator.pushNamed(context, '/signup');
   }
@@ -119,103 +119,103 @@ class _LoginPageState extends State<LoginPage> {
     final logoWidth         = screenWidth > 600 ? 460.0 : screenWidth * 0.85;
     final fieldWidth        = logoWidth;
     final buttonWidth       = logoWidth / 2;
-    
+
     return Scaffold(
       body: Center(child: SingleChildScrollView(child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Quizzer Logo
-              Image.asset(
-                "images/quizzer_assets/quizzer_logo.png",
-                width: logoWidth,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Quizzer Logo
+          Image.asset(
+            "images/quizzer_assets/quizzer_logo.png",
+            width: logoWidth,
+          ),
+          AppTheme.sizedBoxLrg,
+
+          // Email Field
+          SizedBox(
+            width: fieldWidth,
+            child: TextField(
+              controller: _emailController,
+              enabled: !_isLoading,
+              style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+              decoration: const InputDecoration(
+                labelText: "Email Address",
+                hintText: "Enter your email address to login",
               ),
-              AppTheme.sizedBoxLrg,
-              
-              // Email Field
-              SizedBox(
-                width: fieldWidth,
-                child: TextField(
-                  controller: _emailController,
-                  enabled: !_isLoading,
-                  style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
-                  decoration: const InputDecoration(
-                    labelText: "Email Address",
-                    hintText: "Enter your email address to login",
-                  ),
-                ),
+            ),
+          ),
+          AppTheme.sizedBoxMed,
+
+          // Password Field
+          SizedBox(
+            width: fieldWidth,
+            child: TextField(
+              controller: _passwordController,
+              obscureText: true,
+              enabled: !_isLoading,
+              style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+              decoration: const InputDecoration(
+                labelText: "Password",
+                hintText: "Enter your account password to login",
               ),
-              AppTheme.sizedBoxMed,
-              
-              // Password Field
-              SizedBox(
-                width: fieldWidth,
-                child: TextField(
-                  controller: _passwordController,
-                  obscureText: true,
-                  enabled: !_isLoading,
-                  style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
-                  decoration: const InputDecoration(
-                    labelText: "Password",
-                    hintText: "Enter your account password to login",
-                  ),
-                ),
-              ),
-              AppTheme.sizedBoxLrg,
-              
-              // Submit Button
-              SizedBox(
-                width: _isLoading ? fieldWidth : buttonWidth, // Expand to full width when loading
-                child: ElevatedButton(
-                  onPressed: _isLoading ? null : submitLogin,
-                  child: _isLoading 
-                      ? Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const CircularProgressIndicator(),
-                            AppTheme.sizedBoxMed,
-                            Expanded(
-                                child: Text(
-                                  _loginProgressMessage, 
-                                  textAlign: TextAlign.center,
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 2,
-                                ),
-                            )
-                          ],
-                        ) 
-                        : const Text("Login"),
-                ),
-              ),
-              
-              // Space for Social Login buttons
-              AppTheme.sizedBoxLrg,
-              
-              // Social Login Grid
-              Wrap(
-                alignment: WrapAlignment.center,
+            ),
+          ),
+          AppTheme.sizedBoxLrg,
+
+          // Submit Button
+          SizedBox(
+            width: _isLoading ? fieldWidth : buttonWidth, // Expand to full width when loading
+            child: ElevatedButton(
+              onPressed: _isLoading ? null : submitLogin,
+              child: _isLoading
+                  ? Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // These would be replaced with actual social login buttons
-                  _buildSocialLoginButton(Icons.g_mobiledata, "Google"),
-                  _buildSocialLoginButton(Icons.facebook, "Facebook"),
-                  _buildSocialLoginButton(Icons.code, "GitHub"),
-                  _buildSocialLoginButton(Icons.code_outlined, "GitLab"),
+                  const CircularProgressIndicator(),
+                  AppTheme.sizedBoxMed,
+                  Expanded(
+                    child: Text(
+                      _loginProgressMessage,
+                      textAlign: TextAlign.center,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
+                    ),
+                  )
                 ],
-              ),
-              
-              AppTheme.sizedBoxLrg,
-              
-              // New User Sign Up Button
-              ElevatedButton(
-                onPressed: _isLoading ? null : newUserSignUp,
-                child: const Text("New User"),
-              ),
+              )
+                  : const Text("Login"),
+            ),
+          ),
+
+          // Space for Social Login buttons
+          AppTheme.sizedBoxLrg,
+
+          // Social Login Grid
+          Wrap(
+            alignment: WrapAlignment.center,
+            children: [
+              // These would be replaced with actual social login buttons
+              _buildSocialLoginButton(Icons.g_mobiledata, "Google"),
+              _buildSocialLoginButton(Icons.facebook, "Facebook"),
+              _buildSocialLoginButton(Icons.code, "GitHub"),
+              _buildSocialLoginButton(Icons.code_outlined, "GitLab"),
             ],
           ),
-        ),
+
+          AppTheme.sizedBoxLrg,
+
+          // New User Sign Up Button
+          ElevatedButton(
+            onPressed: _isLoading ? null : newUserSignUp,
+            child: const Text("New User"),
+          ),
+        ],
+      ),
+      ),
       ),
     );
   }
-  
+
   // Helper method to build social login buttons
   Widget _buildSocialLoginButton(IconData icon, String service) {
     return IconButton(

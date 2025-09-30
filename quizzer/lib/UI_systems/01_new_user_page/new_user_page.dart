@@ -2,6 +2,9 @@ import 'package:quizzer/UI_systems/01_new_user_page/new_user_page_field_validati
 import 'package:flutter/material.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/app_theme.dart';
+
+import '../../backend_systems/logger/quizzer_logging.dart';
+
 // =======================================================================================================
 // Widgets
 class NewUserPage extends StatefulWidget {
@@ -15,7 +18,8 @@ class _NewUserPageState extends State<NewUserPage> {
     final TextEditingController _emailController = TextEditingController();
     final TextEditingController _usernameController = TextEditingController();
     final TextEditingController _passwordController = TextEditingController();
-    final TextEditingController _confirmPasswordController = TextEditingController();
+    final TextEditingController _confirmPasswordController =
+    TextEditingController();
     SessionManager session = getSessionManager();
 
     @override
@@ -61,7 +65,8 @@ class _NewUserPageState extends State<NewUserPage> {
             );
             return;
         }
-        Map<String, dynamic> results = await session.createNewUserAccount(email: email, username: username, password: password);
+        Map<String, dynamic> results = await session.createNewUserAccount(
+            email: email, username: username, password: password);
 
         if (!results['success']) {
             if (!mounted) return;
@@ -84,10 +89,11 @@ class _NewUserPageState extends State<NewUserPage> {
         final logoWidth = screenWidth > 600 ? 460.0 : screenWidth * 0.85;
         final fieldWidth = logoWidth;
         final buttonWidth = logoWidth / 2;
-        
+
         final elementHeight = MediaQuery.of(context).size.height * 0.04;
-        final elementHeight25px = elementHeight > 25.0 ? 25.0 : elementHeight;
-        
+        // final elementHeight25px = elementHeight > 25.0 ? 25.0 : elementHeight;
+        final elementHeight40px = elementHeight > 40.0 ? 40.0 : elementHeight * 2;
+
         return Scaffold(
             body: Center(
                 child: SingleChildScrollView(
@@ -99,62 +105,61 @@ class _NewUserPageState extends State<NewUserPage> {
                                 width: logoWidth,
                             ),
                             AppTheme.sizedBoxLrg,
-                            
+
                             SizedBox(
                                 width: fieldWidth,
-                                child: TextField(
+                            ),
+                            AppTheme.sizedBoxMed,
+
+                            SizedBox(
+                                width: fieldWidth,
+                                child: _buildTextField(
+                                    label: 'Email Address',
+                                    hint: 'Enter your email address',
                                     controller: _emailController,
-                                    style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
-                                    decoration: const InputDecoration(
-                                        labelText: 'Email Address',
-                                        hintText: 'Enter your email address',
-                                    ),
+                                    keyboardType: TextInputType.emailAddress,
+                                    textInputAction: TextInputAction.next,
                                 ),
                             ),
                             AppTheme.sizedBoxMed,
-                            
+
                             SizedBox(
                                 width: fieldWidth,
-                                child: TextField(
+                                child: _buildTextField(
+                                    label: 'Username',
+                                    hint: 'Enter your desired username',
                                     controller: _usernameController,
-                                    style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
-                                    decoration: const InputDecoration(
-                                        labelText: 'Username',
-                                        hintText: 'Enter your desired username',
-                                    ),
+                                    keyboardType: TextInputType.text,
+                                    textInputAction: TextInputAction.next,
                                 ),
                             ),
                             AppTheme.sizedBoxMed,
-                            
+
                             SizedBox(
                                 width: fieldWidth,
-                                child: TextField(
+                                child: _buildTextField(
+                                    label: 'Password',
+                                    hint: 'Create a password',
                                     controller: _passwordController,
                                     obscureText: true,
-                                    style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
-                                    decoration: const InputDecoration(
-                                        labelText: 'Password',
-                                        hintText: 'Create a password',
-                                    ),
+                                    textInputAction: TextInputAction.next,
                                 ),
                             ),
                             AppTheme.sizedBoxMed,
-                            
+
                             // Confirm Password Field
                             SizedBox(
                                 width: fieldWidth,
-                                child: TextField(
+                                child: _buildTextField(
+                                    label: 'Confirm Password',
+                                    hint: 'Confirm your password',
                                     controller: _confirmPasswordController,
                                     obscureText: true,
-                                    style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
-                                    decoration: const InputDecoration(
-                                        labelText: 'Confirm Password',
-                                        hintText: 'Confirm your password',
-                                    ),
+                                    textInputAction: TextInputAction.done,
                                 ),
                             ),
                             AppTheme.sizedBoxLrg,
-                            
+
                             // Button Row with Back and Submit buttons
                             Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -162,24 +167,41 @@ class _NewUserPageState extends State<NewUserPage> {
                                     // Back Button
                                     SizedBox(
                                         width: buttonWidth / 1.1,
-                                        height: elementHeight25px,
+                                        height: elementHeight40px,
                                         child: ElevatedButton(
                                             onPressed: () {
-                                              Navigator.pushReplacementNamed(context, '/login');
+                                                // if login screen is previous routes then just pop
+                                                // else navigate to login screen
+                                                if (Navigator.canPop(context)) {
+                                                    QuizzerLogger.logMessage(
+                                                        'Navigating back to previous screen',
+                                                    );
+                                                    Navigator.pop(context);
+                                                    return;
+                                                }
+
+                                                // yes it will replace the current screen but if
+                                                // user presses back again it will go to the login screen
+                                                // instead of going back to the new user screen
+                                                // Otherwise navigate to login screen
+                                                Navigator.pushReplacementNamed(context, '/login');
                                             },
                                             child: const Text('Back'),
                                         ),
                                     ),
-                                    
+
                                     AppTheme.sizedBoxMed,
-                                    
+
                                     // Create Account Button
                                     SizedBox(
                                         width: buttonWidth / 1.1,
-                                        height: elementHeight25px,
+                                        height: elementHeight40px,
                                         child: ElevatedButton(
                                             onPressed: _handleSignUpButton,
-                                            child: const Text('Create Account'),
+                                            child: const Text(
+                                                'Create Account',
+                                                textAlign: TextAlign.center,
+                                            ),
                                         ),
                                     ),
                                 ],
@@ -187,6 +209,27 @@ class _NewUserPageState extends State<NewUserPage> {
                         ],
                     ),
                 ),
+            ),
+        );
+    }
+
+    Widget _buildTextField({
+        required String label,
+        required String hint,
+        required TextEditingController controller,
+        bool obscureText = false,
+        TextInputType? keyboardType,
+        TextInputAction? textInputAction,
+    }) {
+        return TextField(
+            controller: controller,
+            obscureText: obscureText,
+            keyboardType: keyboardType,
+            textInputAction: textInputAction,
+            style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+            decoration: InputDecoration(
+                labelText: label,
+                hintText: hint,
             ),
         );
     }
