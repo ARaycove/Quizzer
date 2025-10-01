@@ -1,5 +1,7 @@
 import attempt_pre_process as ap
-from neural_net_model import create_quizzer_neural_network, kfold_cross_validation, grid_search_quizzer_model
+from neural_net_model import create_quizzer_neural_network, kfold_cross_validation
+from grid_search import grid_search_quizzer_model
+
 
 import reports as rp
 import pandas as pd
