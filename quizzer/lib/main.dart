@@ -18,6 +18,9 @@ import 'package:quizzer/backend_systems/session_manager/session_manager.dart'; /
 import 'package:quizzer/UI_systems/10_stats_page/stats_page.dart';
 import 'package:quizzer/app_theme.dart';
 
+import 'UI_systems/11_resetPassword_page/newPassword_page.dart';
+import 'UI_systems/11_resetPassword_page/otp_page.dart';
+import 'UI_systems/11_resetPassword_page/resetPassword_page.dart';
 import 'backend_systems/00_database_manager/database_monitor.dart';
 import 'backend_systems/00_database_manager/tables/user_profile/user_profile_table.dart';
 
@@ -121,6 +124,9 @@ class _QuizzerAppState extends State<QuizzerApp> {
       initialRoute: '/login',
       routes: {
         '/login':           (context) => const LoginPage(),
+        '/resetPassword':           (context) => const ResetPasswordPage(),
+        '/verifyOtp':           (context) => const VerifyOtpPage(),
+        '/newPassword':           (context) => const NewPasswordPage(),
         '/home':            (context) => const HomePage(),
         '/menu':            (context) => const MenuPage(),
         '/add_question':    (context) => const AddQuestionAnswerPage(),
