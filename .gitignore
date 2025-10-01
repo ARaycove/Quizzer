@@ -171,3 +171,4 @@ quizzer/google-chrome-stable_current_amd64.deb
 quizzer/lib/main.dart
 quizzer/dataAnalysis/data.db
 quizzer/dataAnalysis/last_sync.json
+quizzer/dataAnalysis/global_best_model.keras
