@@ -1,0 +1,1394 @@
+================================================================================
+FEATURE ANALYSIS REPORT
+================================================================================
+Dataset Shape: 2,392 rows x 1,375 columns
+Total Features: 1,375
+Memory Usage: 25.09 MB
+
+Feature Type Breakdown:
+  Non-numeric: 0
+  Integer:     297
+  Float:       1,078
+
+Null Value Summary:
+  Total null values: 0
+  Columns with nulls: 0
+================================================================================
+
+| feature_name | value | type |
+|--------------------------------------------------|------------------------------|---------------|
+| mvec_acid base_num_fitb                          | 0                            | int64         |
+| mvec_acid base_num_total                         | 0                            | int64         |
+| mvec_acid base_total_attempts                    | 0                            | int64         |
+| mvec_acid base_total_correct_attempts            | 0                            | int64         |
+| mvec_acid base_total_incorrect_attempts          | 0                            | int64         |
+| mvec_acid base_total_seen                        | 0                            | int64         |
+| mvec_biology_num_fitb                            | 0                            | int64         |
+| mvec_biology_num_mcq                             | 0                            | int64         |
+| mvec_biology_num_sata                            | 0                            | int64         |
+| mvec_biology_num_tf                              | 0                            | int64         |
+| mvec_biology_num_total                           | 0                            | int64         |
+| mvec_biology_total_attempts                      | 0                            | int64         |
+| mvec_biology_total_correct_attempts              | 0                            | int64         |
+| mvec_biology_total_incorrect_attempts            | 0                            | int64         |
+| mvec_biology_total_seen                          | 0                            | int64         |
+| mvec_calculus 1_num_fitb                         | 0                            | int64         |
+| mvec_calculus 1_num_mcq                          | 0                            | int64         |
+| mvec_calculus 1_num_total                        | 0                            | int64         |
+| mvec_calculus 1_total_attempts                   | 0                            | int64         |
+| mvec_calculus 1_total_correct_attempts           | 0                            | int64         |
+| mvec_calculus 1_total_incorrect_attempts         | 0                            | int64         |
+| mvec_calculus 1_total_seen                       | 0                            | int64         |
+| mvec_cell and biomolecules_num_fitb              | 0                            | int64         |
+| mvec_cell and biomolecules_num_mcq               | 0                            | int64         |
+| mvec_cell and biomolecules_num_tf                | 0                            | int64         |
+| mvec_cell and biomolecules_num_total             | 0                            | int64         |
+| mvec_cell and biomolecules_total_attempts        | 0                            | int64         |
+| mvec_cell and biomolecules_total_correct_attempts | 0                            | int64         |
+| mvec_cell and biomolecules_total_incorrect_attempts | 0                            | int64         |
+| mvec_cell and biomolecules_total_seen            | 0                            | int64         |
+| mvec_cell and fluid dynamics_num_fitb            | 0                            | int64         |
+| mvec_cell and fluid dynamics_num_mcq             | 0                            | int64         |
+| mvec_cell and fluid dynamics_num_tf              | 0                            | int64         |
+| mvec_cell and fluid dynamics_num_total           | 0                            | int64         |
+| mvec_cell and fluid dynamics_total_attempts      | 0                            | int64         |
+| mvec_cell and fluid dynamics_total_correct_attempts | 0                            | int64         |
+| mvec_cell and fluid dynamics_total_incorrect_attempts | 0                            | int64         |
+| mvec_cell and fluid dynamics_total_seen          | 0                            | int64         |
+| mvec_cell and transport_num_fitb                 | 0                            | int64         |
+| mvec_cell and transport_num_mcq                  | 0                            | int64         |
+| mvec_cell and transport_num_total                | 0                            | int64         |
+| mvec_cell and transport_total_attempts           | 0                            | int64         |
+| mvec_cell and transport_total_correct_attempts   | 0                            | int64         |
+| mvec_cell and transport_total_incorrect_attempts | 0                            | int64         |
+| mvec_cell and transport_total_seen               | 0                            | int64         |
+| mvec_cell as a building block_num_fitb           | 0                            | int64         |
+| mvec_cell as a building block_num_mcq            | 0                            | int64         |
+| mvec_cell as a building block_num_tf             | 0                            | int64         |
+| mvec_cell as a building block_num_total          | 0                            | int64         |
+| mvec_cell as a building block_total_attempts     | 0                            | int64         |
+| mvec_cell as a building block_total_correct_attempts | 0                            | int64         |
+| mvec_cell as a building block_total_incorrect_attempts | 0                            | int64         |
+| mvec_cell as a building block_total_seen         | 0                            | int64         |
+| mvec_chemistry and structural biology_num_fitb   | 0                            | int64         |
+| mvec_chemistry and structural biology_num_mcq    | 0                            | int64         |
+| mvec_chemistry and structural biology_num_total  | 0                            | int64         |
+| mvec_chemistry and structural biology_total_attempts | 0                            | int64         |
+| mvec_chemistry and structural biology_total_correct_attempts | 0                            | int64         |
+| mvec_chemistry and structural biology_total_incorrect_attempts | 0                            | int64         |
+| mvec_chemistry and structural biology_total_seen | 0                            | int64         |
+| mvec_chemistry_num_fitb                          | 0                            | int64         |
+| mvec_chemistry_num_mcq                           | 0                            | int64         |
+| mvec_chemistry_num_sata                          | 0                            | int64         |
+| mvec_chemistry_num_tf                            | 0                            | int64         |
+| mvec_chemistry_num_total                         | 0                            | int64         |
+| mvec_chemistry_total_attempts                    | 0                            | int64         |
+| mvec_chemistry_total_correct_attempts            | 0                            | int64         |
+| mvec_chemistry_total_incorrect_attempts          | 0                            | int64         |
+| mvec_chemistry_total_seen                        | 0                            | int64         |
+| mvec_classification_num_mcq                      | 0                            | int64         |
+| mvec_classification_num_tf                       | 0                            | int64         |
+| mvec_classification_num_total                    | 0                            | int64         |
+| mvec_classification_total_attempts               | 0                            | int64         |
+| mvec_classification_total_correct_attempts       | 0                            | int64         |
+| mvec_classification_total_seen                   | 0                            | int64         |
+| mvec_clep western civ ii_num_fitb                | 0                            | int64         |
+| mvec_clep western civ ii_num_mcq                 | 0                            | int64         |
+| mvec_clep western civ ii_num_total               | 0                            | int64         |
+| mvec_clep western civ ii_total_attempts          | 0                            | int64         |
+| mvec_clep western civ ii_total_correct_attempts  | 0                            | int64         |
+| mvec_clep western civ ii_total_incorrect_attempts | 0                            | int64         |
+| mvec_clep western civ ii_total_seen              | 0                            | int64         |
+| mvec_code of life_num_fitb                       | 0                            | int64         |
+| mvec_code of life_num_mcq                        | 0                            | int64         |
+| mvec_code of life_num_total                      | 0                            | int64         |
+| mvec_code of life_total_attempts                 | 0                            | int64         |
+| mvec_code of life_total_correct_attempts         | 0                            | int64         |
+| mvec_code of life_total_incorrect_attempts       | 0                            | int64         |
+| mvec_code of life_total_seen                     | 0                            | int64         |
+| mvec_cognitive and logical fallacies_num_fitb    | 0                            | int64         |
+| mvec_cognitive and logical fallacies_num_total   | 0                            | int64         |
+| mvec_cognitive and logical fallacies_total_attempts | 0                            | int64         |
+| mvec_cognitive and logical fallacies_total_correct_attempts | 0                            | int64         |
+| mvec_cognitive and logical fallacies_total_seen  | 0                            | int64         |
+| mvec_composition of life_num_fitb                | 0                            | int64         |
+| mvec_composition of life_num_mcq                 | 0                            | int64         |
+| mvec_composition of life_num_total               | 0                            | int64         |
+| mvec_composition of life_total_attempts          | 0                            | int64         |
+| mvec_composition of life_total_correct_attempts  | 0                            | int64         |
+| mvec_composition of life_total_seen              | 0                            | int64         |
+| mvec_cost function_num_mcq                       | 0                            | int64         |
+| mvec_cost function_num_tf                        | 0                            | int64         |
+| mvec_cost function_num_total                     | 0                            | int64         |
+| mvec_cost function_total_attempts                | 0                            | int64         |
+| mvec_cost function_total_incorrect_attempts      | 0                            | int64         |
+| mvec_cost function_total_seen                    | 0                            | int64         |
+| mvec_daily life science_num_fitb                 | 0                            | int64         |
+| mvec_daily life science_num_total                | 0                            | int64         |
+| mvec_daily life science_total_attempts           | 0                            | int64         |
+| mvec_daily life science_total_correct_attempts   | 0                            | int64         |
+| mvec_daily life science_total_seen               | 0                            | int64         |
+| mvec_disease managment_num_mcq                   | 0                            | int64         |
+| mvec_disease managment_num_total                 | 0                            | int64         |
+| mvec_disease managment_total_attempts            | 0                            | int64         |
+| mvec_disease managment_total_correct_attempts    | 0                            | int64         |
+| mvec_disease managment_total_incorrect_attempts  | 0                            | int64         |
+| mvec_disease managment_total_seen                | 0                            | int64         |
+| mvec_experimental design_num_fitb                | 0                            | int64         |
+| mvec_experimental design_num_mcq                 | 0                            | int64         |
+| mvec_experimental design_num_total               | 0                            | int64         |
+| mvec_experimental design_total_attempts          | 0                            | int64         |
+| mvec_experimental design_total_correct_attempts  | 0                            | int64         |
+| mvec_experimental design_total_incorrect_attempts | 0                            | int64         |
+| mvec_experimental design_total_seen              | 0                            | int64         |
+| mvec_general_num_fitb                            | 0                            | int64         |
+| mvec_general_num_mcq                             | 0                            | int64         |
+| mvec_general_num_sata                            | 0                            | int64         |
+| mvec_general_num_tf                              | 0                            | int64         |
+| mvec_general_num_total                           | 0                            | int64         |
+| mvec_general_total_attempts                      | 0                            | int64         |
+| mvec_general_total_correct_attempts              | 0                            | int64         |
+| mvec_general_total_incorrect_attempts            | 0                            | int64         |
+| mvec_general_total_seen                          | 0                            | int64         |
+| mvec_greek mythology_num_fitb                    | 0                            | int64         |
+| mvec_greek mythology_num_total                   | 0                            | int64         |
+| mvec_greek mythology_total_attempts              | 0                            | int64         |
+| mvec_greek mythology_total_correct_attempts      | 0                            | int64         |
+| mvec_greek mythology_total_seen                  | 0                            | int64         |
+| mvec_history of biology_num_fitb                 | 0                            | int64         |
+| mvec_history of biology_num_total                | 0                            | int64         |
+| mvec_history of biology_total_attempts           | 0                            | int64         |
+| mvec_history of biology_total_correct_attempts   | 0                            | int64         |
+| mvec_history of biology_total_incorrect_attempts | 0                            | int64         |
+| mvec_history of biology_total_seen               | 0                            | int64         |
+| mvec_history of machine learning_num_fitb        | 0                            | int64         |
+| mvec_history of machine learning_num_mcq         | 0                            | int64         |
+| mvec_history of machine learning_num_tf          | 0                            | int64         |
+| mvec_history of machine learning_num_total       | 0                            | int64         |
+| mvec_history of machine learning_total_attempts  | 0                            | int64         |
+| mvec_history of machine learning_total_correct_attempts | 0                            | int64         |
+| mvec_history of machine learning_total_seen      | 0                            | int64         |
+| mvec_introductory computer science with python_num_fitb | 0                            | int64         |
+| mvec_introductory computer science with python_num_so | 0                            | int64         |
+| mvec_introductory computer science with python_num_tf | 0                            | int64         |
+| mvec_introductory computer science with python_num_total | 0                            | int64         |
+| mvec_introductory computer science with python_total_attempts | 0                            | int64         |
+| mvec_introductory computer science with python_total_correct_attempts | 0                            | int64         |
+| mvec_introductory computer science with python_total_incorrect_attempts | 0                            | int64         |
+| mvec_introductory computer science with python_total_seen | 0                            | int64         |
+| mvec_introductory geology_num_fitb               | 0                            | int64         |
+| mvec_introductory geology_num_total              | 0                            | int64         |
+| mvec_introductory geology_total_attempts         | 0                            | int64         |
+| mvec_introductory geology_total_correct_attempts | 0                            | int64         |
+| mvec_introductory geology_total_seen             | 0                            | int64         |
+| mvec_introductory philosophy_num_fitb            | 0                            | int64         |
+| mvec_introductory philosophy_num_total           | 0                            | int64         |
+| mvec_introductory philosophy_total_attempts      | 0                            | int64         |
+| mvec_introductory philosophy_total_correct_attempts | 0                            | int64         |
+| mvec_introductory philosophy_total_incorrect_attempts | 0                            | int64         |
+| mvec_introductory philosophy_total_seen          | 0                            | int64         |
+| mvec_java data types_num_fitb                    | 0                            | int64         |
+| mvec_java data types_num_mcq                     | 0                            | int64         |
+| mvec_java data types_num_sata                    | 0                            | int64         |
+| mvec_java data types_num_tf                      | 0                            | int64         |
+| mvec_java data types_num_total                   | 0                            | int64         |
+| mvec_java data types_total_attempts              | 0                            | int64         |
+| mvec_java data types_total_correct_attempts      | 0                            | int64         |
+| mvec_java data types_total_incorrect_attempts    | 0                            | int64         |
+| mvec_java data types_total_seen                  | 0                            | int64         |
+| mvec_java general principles_num_fitb            | 0                            | int64         |
+| mvec_java general principles_num_mcq             | 0                            | int64         |
+| mvec_java general principles_num_total           | 0                            | int64         |
+| mvec_java general principles_total_attempts      | 0                            | int64         |
+| mvec_java general principles_total_correct_attempts | 0                            | int64         |
+| mvec_java general principles_total_incorrect_attempts | 0                            | int64         |
+| mvec_java general principles_total_seen          | 0                            | int64         |
+| mvec_java syntax_num_fitb                        | 0                            | int64         |
+| mvec_java syntax_num_mcq                         | 0                            | int64         |
+| mvec_java syntax_num_tf                          | 0                            | int64         |
+| mvec_java syntax_num_total                       | 0                            | int64         |
+| mvec_java syntax_total_attempts                  | 0                            | int64         |
+| mvec_java syntax_total_correct_attempts          | 0                            | int64         |
+| mvec_java syntax_total_incorrect_attempts        | 0                            | int64         |
+| mvec_java syntax_total_seen                      | 0                            | int64         |
+| mvec_least squares method_num_mcq                | 0                            | int64         |
+| mvec_least squares method_num_tf                 | 0                            | int64         |
+| mvec_least squares method_num_total              | 0                            | int64         |
+| mvec_least squares method_total_attempts         | 0                            | int64         |
+| mvec_least squares method_total_correct_attempts | 0                            | int64         |
+| mvec_least squares method_total_seen             | 0                            | int64         |
+| mvec_linear regression_num_fitb                  | 0                            | int64         |
+| mvec_linear regression_num_mcq                   | 0                            | int64         |
+| mvec_linear regression_num_tf                    | 0                            | int64         |
+| mvec_linear regression_num_total                 | 0                            | int64         |
+| mvec_linear regression_total_attempts            | 0                            | int64         |
+| mvec_linear regression_total_correct_attempts    | 0                            | int64         |
+| mvec_linear regression_total_incorrect_attempts  | 0                            | int64         |
+| mvec_linear regression_total_seen                | 0                            | int64         |
+| mvec_machine learning_num_fitb                   | 0                            | int64         |
+| mvec_machine learning_num_mcq                    | 0                            | int64         |
+| mvec_machine learning_num_tf                     | 0                            | int64         |
+| mvec_machine learning_num_total                  | 0                            | int64         |
+| mvec_machine learning_total_attempts             | 0                            | int64         |
+| mvec_machine learning_total_correct_attempts     | 0                            | int64         |
+| mvec_machine learning_total_incorrect_attempts   | 0                            | int64         |
+| mvec_machine learning_total_seen                 | 0                            | int64         |
+| mvec_multiplication table_num_fitb               | 0                            | int64         |
+| mvec_multiplication table_num_total              | 0                            | int64         |
+| mvec_multiplication table_total_attempts         | 0                            | int64         |
+| mvec_multiplication table_total_correct_attempts | 0                            | int64         |
+| mvec_multiplication table_total_incorrect_attempts | 0                            | int64         |
+| mvec_multiplication table_total_seen             | 0                            | int64         |
+| mvec_neurosciences_num_mcq                       | 0                            | int64         |
+| mvec_neurosciences_num_total                     | 0                            | int64         |
+| mvec_neurosciences_total_attempts                | 0                            | int64         |
+| mvec_neurosciences_total_correct_attempts        | 0                            | int64         |
+| mvec_neurosciences_total_incorrect_attempts      | 0                            | int64         |
+| mvec_neurosciences_total_seen                    | 0                            | int64         |
+| mvec_probability theory_num_fitb                 | 0                            | int64         |
+| mvec_probability theory_num_total                | 0                            | int64         |
+| mvec_probability theory_total_seen               | 0                            | int64         |
+| mvec_ridge regression_num_mcq                    | 0                            | int64         |
+| mvec_ridge regression_num_tf                     | 0                            | int64         |
+| mvec_ridge regression_num_total                  | 0                            | int64         |
+| mvec_ridge regression_total_attempts             | 0                            | int64         |
+| mvec_ridge regression_total_correct_attempts     | 0                            | int64         |
+| mvec_ridge regression_total_seen                 | 0                            | int64         |
+| mvec_scientific theory_num_fitb                  | 0                            | int64         |
+| mvec_scientific theory_num_total                 | 0                            | int64         |
+| mvec_scientific theory_total_seen                | 0                            | int64         |
+| mvec_set theory_num_fitb                         | 0                            | int64         |
+| mvec_set theory_num_total                        | 0                            | int64         |
+| mvec_set theory_total_attempts                   | 0                            | int64         |
+| mvec_set theory_total_correct_attempts           | 0                            | int64         |
+| mvec_set theory_total_incorrect_attempts         | 0                            | int64         |
+| mvec_set theory_total_seen                       | 0                            | int64         |
+| mvec_statistical basics_num_fitb                 | 0                            | int64         |
+| mvec_statistical basics_num_total                | 0                            | int64         |
+| mvec_statistical basics_total_attempts           | 0                            | int64         |
+| mvec_statistical basics_total_correct_attempts   | 0                            | int64         |
+| mvec_statistical basics_total_seen               | 0                            | int64         |
+| mvec_statistics_num_fitb                         | 0                            | int64         |
+| mvec_statistics_num_mcq                          | 0                            | int64         |
+| mvec_statistics_num_tf                           | 0                            | int64         |
+| mvec_statistics_num_total                        | 0                            | int64         |
+| mvec_statistics_total_attempts                   | 0                            | int64         |
+| mvec_statistics_total_correct_attempts           | 0                            | int64         |
+| mvec_statistics_total_incorrect_attempts         | 0                            | int64         |
+| mvec_statistics_total_seen                       | 0                            | int64         |
+| mvec_support vector machines_num_mcq             | 0                            | int64         |
+| mvec_support vector machines_num_tf              | 0                            | int64         |
+| mvec_support vector machines_num_total           | 0                            | int64         |
+| mvec_support vector machines_total_attempts      | 0                            | int64         |
+| mvec_support vector machines_total_correct_attempts | 0                            | int64         |
+| mvec_support vector machines_total_seen          | 0                            | int64         |
+| mvec_thermodynamics_num_fitb                     | 0                            | int64         |
+| mvec_thermodynamics_num_total                    | 0                            | int64         |
+| mvec_thermodynamics_total_attempts               | 0                            | int64         |
+| mvec_thermodynamics_total_correct_attempts       | 0                            | int64         |
+| mvec_thermodynamics_total_seen                   | 0                            | int64         |
+| mvec_trigonometry_num_fitb                       | 0                            | int64         |
+| mvec_trigonometry_num_mcq                        | 0                            | int64         |
+| mvec_trigonometry_num_tf                         | 0                            | int64         |
+| mvec_trigonometry_num_total                      | 0                            | int64         |
+| mvec_trigonometry_total_attempts                 | 0                            | int64         |
+| mvec_trigonometry_total_correct_attempts         | 0                            | int64         |
+| mvec_trigonometry_total_incorrect_attempts       | 0                            | int64         |
+| mvec_trigonometry_total_seen                     | 0                            | int64         |
+| mvec_western civ ii_num_fitb                     | 0                            | int64         |
+| mvec_western civ ii_num_total                    | 0                            | int64         |
+| mvec_western civ ii_total_seen                   | 0                            | int64         |
+| num_blanks                                       | 0                            | int64         |
+| num_mcq_options                                  | 4                            | int64         |
+| num_sata_options                                 | 0                            | int64         |
+| num_so_options                                   | 0                            | int64         |
+| response_result                                  | 1                            | int64         |
+| revision_streak                                  | 0                            | int64         |
+| rs_0                                             | 0                            | int64         |
+| rs_1                                             | 0                            | int64         |
+| rs_2                                             | 0                            | int64         |
+| rs_3                                             | 0                            | int64         |
+| rs_4                                             | 0                            | int64         |
+| rs_5                                             | 0                            | int64         |
+| total_attempts                                   | 0                            | int64         |
+| total_correct_attempts                           | 0                            | int64         |
+| total_incorrect_attempts                         | 0                            | int64         |
+| was_first_attempt                                | 1                            | int64         |
+| accuracy_rate                                    | 0.0                          | float64       |
+| attempt_day_ratio                                | 0.0                          | float64       |
+| avg_react_time                                   | 0.0                          | float64       |
+| days_since_first_introduced                      | 0.0                          | float64       |
+| days_since_last_revision                         | 0.0                          | float64       |
+| module_name_acid base                            | 0.0                          | float64       |
+| module_name_bio 160                              | 0.0                          | float64       |
+| module_name_biology                              | 0.0                          | float64       |
+| module_name_calculus 1                           | 0.0                          | float64       |
+| module_name_cell and biomolecules                | 0.0                          | float64       |
+| module_name_cell and fluid dynamics              | 0.0                          | float64       |
+| module_name_cell and transport                   | 0.0                          | float64       |
+| module_name_cell as a building block             | 0.0                          | float64       |
+| module_name_chemistry                            | 0.0                          | float64       |
+| module_name_chemistry and strcutural biology     | 0.0                          | float64       |
+| module_name_chemistry and structural biology     | 0.0                          | float64       |
+| module_name_classification                       | 0.0                          | float64       |
+| module_name_clep western civ ii                  | 0.0                          | float64       |
+| module_name_code of life                         | 0.0                          | float64       |
+| module_name_cognitive and logical fallacies      | 0.0                          | float64       |
+| module_name_composition of life                  | 0.0                          | float64       |
+| module_name_cost function                        | 0.0                          | float64       |
+| module_name_daily life science                   | 0.0                          | float64       |
+| module_name_experimental design                  | 0.0                          | float64       |
+| module_name_general                              | 0.0                          | float64       |
+| module_name_greek mythology                      | 0.0                          | float64       |
+| module_name_history of biology                   | 0.0                          | float64       |
+| module_name_history of machine learning          | 0.0                          | float64       |
+| module_name_introductory computer science with python | 0.0                          | float64       |
+| module_name_introductory geology                 | 0.0                          | float64       |
+| module_name_introductory philosophy              | 0.0                          | float64       |
+| module_name_java data types                      | 0.0                          | float64       |
+| module_name_java general principles              | 0.0                          | float64       |
+| module_name_java syntax                          | 0.0                          | float64       |
+| module_name_linear regression                    | 0.0                          | float64       |
+| module_name_machine learning                     | 1.0                          | float64       |
+| module_name_math                                 | 0.0                          | float64       |
+| module_name_multiplication table                 | 0.0                          | float64       |
+| module_name_neurosciences                        | 0.0                          | float64       |
+| module_name_set theory                           | 0.0                          | float64       |
+| module_name_statistical basics                   | 0.0                          | float64       |
+| module_name_statistics                           | 0.0                          | float64       |
+| module_name_support vector machines              | 0.0                          | float64       |
+| module_name_thermodynamics                       | 0.0                          | float64       |
+| module_name_trigonometry                         | 0.0                          | float64       |
+| mvec_acid base_avg_attempts_per_question         | 0.0                          | float64       |
+| mvec_acid base_avg_reaction_time                 | 0.0                          | float64       |
+| mvec_acid base_days_since_last_seen              | 0.0                          | float64       |
+| mvec_acid base_overall_accuracy                  | 0.0                          | float64       |
+| mvec_acid base_percentage_seen                   | 0.0                          | float64       |
+| mvec_algebra 1_days_since_last_seen              | 0.0                          | float64       |
+| mvec_biology_avg_attempts_per_question           | 0.0                          | float64       |
+| mvec_biology_avg_reaction_time                   | 0.0                          | float64       |
+| mvec_biology_days_since_last_seen                | 0.0                          | float64       |
+| mvec_biology_overall_accuracy                    | 0.0                          | float64       |
+| mvec_biology_percentage_seen                     | 0.0                          | float64       |
+| mvec_calculus 1_avg_attempts_per_question        | 0.0                          | float64       |
+| mvec_calculus 1_avg_reaction_time                | 0.0                          | float64       |
+| mvec_calculus 1_days_since_last_seen             | 0.0                          | float64       |
+| mvec_calculus 1_overall_accuracy                 | 0.0                          | float64       |
+| mvec_calculus 1_percentage_seen                  | 0.0                          | float64       |
+| mvec_calculus 2_days_since_last_seen             | 0.0                          | float64       |
+| mvec_cell and biomolecules_avg_attempts_per_question | 0.0                          | float64       |
+| mvec_cell and biomolecules_avg_reaction_time     | 0.0                          | float64       |
+| mvec_cell and biomolecules_days_since_last_seen  | 0.0                          | float64       |
+| mvec_cell and biomolecules_overall_accuracy      | 0.0                          | float64       |
+| mvec_cell and biomolecules_percentage_seen       | 0.0                          | float64       |
+| mvec_cell and fluid dynamics_avg_attempts_per_question | 0.0                          | float64       |
+| mvec_cell and fluid dynamics_avg_reaction_time   | 0.0                          | float64       |
+| mvec_cell and fluid dynamics_days_since_last_seen | 0.0                          | float64       |
+| mvec_cell and fluid dynamics_overall_accuracy    | 0.0                          | float64       |
+| mvec_cell and fluid dynamics_percentage_seen     | 0.0                          | float64       |
+| mvec_cell and transport_avg_attempts_per_question | 0.0                          | float64       |
+| mvec_cell and transport_avg_reaction_time        | 0.0                          | float64       |
+| mvec_cell and transport_days_since_last_seen     | 0.0                          | float64       |
+| mvec_cell and transport_overall_accuracy         | 0.0                          | float64       |
+| mvec_cell and transport_percentage_seen          | 0.0                          | float64       |
+| mvec_cell as a building block_avg_attempts_per_question | 0.0                          | float64       |
+| mvec_cell as a building block_avg_reaction_time  | 0.0                          | float64       |
+| mvec_cell as a building block_days_since_last_seen | 0.0                          | float64       |
+| mvec_cell as a building block_overall_accuracy   | 0.0                          | float64       |
+| mvec_cell as a building block_percentage_seen    | 0.0                          | float64       |
+| mvec_chemistry and structural biology_avg_attempts_per_question | 0.0                          | float64       |
+| mvec_chemistry and structural biology_avg_reaction_time | 0.0                          | float64       |
+| mvec_chemistry and structural biology_days_since_last_seen | 0.0                          | float64       |
+| mvec_chemistry and structural biology_overall_accuracy | 0.0                          | float64       |
+| mvec_chemistry and structural biology_percentage_seen | 0.0                          | float64       |
+| mvec_chemistry_avg_attempts_per_question         | 0.0                          | float64       |
+| mvec_chemistry_avg_reaction_time                 | 0.0                          | float64       |
+| mvec_chemistry_days_since_last_seen              | 0.0                          | float64       |
+| mvec_chemistry_overall_accuracy                  | 0.0                          | float64       |
+| mvec_chemistry_percentage_seen                   | 0.0                          | float64       |
+| mvec_classification_avg_attempts_per_question    | 0.0                          | float64       |
+| mvec_classification_avg_reaction_time            | 0.0                          | float64       |
+| mvec_classification_days_since_last_seen         | 0.0                          | float64       |
+| mvec_classification_overall_accuracy             | 0.0                          | float64       |
+| mvec_classification_percentage_seen              | 0.0                          | float64       |
+| mvec_clep western civ ii_avg_attempts_per_question | 0.0                          | float64       |
+| mvec_clep western civ ii_avg_reaction_time       | 0.0                          | float64       |
+| mvec_clep western civ ii_days_since_last_seen    | 0.0                          | float64       |
+| mvec_clep western civ ii_overall_accuracy        | 0.0                          | float64       |
+| mvec_clep western civ ii_percentage_seen         | 0.0                          | float64       |
+| mvec_code of life_avg_attempts_per_question      | 0.0                          | float64       |
+| mvec_code of life_avg_reaction_time              | 0.0                          | float64       |
+| mvec_code of life_days_since_last_seen           | 0.0                          | float64       |
+| mvec_code of life_overall_accuracy               | 0.0                          | float64       |
+| mvec_code of life_percentage_seen                | 0.0                          | float64       |
+| mvec_cognitive and logical fallacies_avg_attempts_per_question | 0.0                          | float64       |
+| mvec_cognitive and logical fallacies_avg_reaction_time | 0.0                          | float64       |
+| mvec_cognitive and logical fallacies_days_since_last_seen | 0.0                          | float64       |
+| mvec_cognitive and logical fallacies_overall_accuracy | 0.0                          | float64       |
+| mvec_cognitive and logical fallacies_percentage_seen | 0.0                          | float64       |
+| mvec_composition of life_avg_attempts_per_question | 0.0                          | float64       |
+| mvec_composition of life_avg_reaction_time       | 0.0                          | float64       |
+| mvec_composition of life_days_since_last_seen    | 0.0                          | float64       |
+| mvec_composition of life_overall_accuracy        | 0.0                          | float64       |
+| mvec_composition of life_percentage_seen         | 0.0                          | float64       |
+| mvec_cost function_avg_attempts_per_question     | 0.0                          | float64       |
+| mvec_cost function_avg_reaction_time             | 0.0                          | float64       |
+| mvec_cost function_days_since_last_seen          | 0.0                          | float64       |
+| mvec_cost function_percentage_seen               | 0.0                          | float64       |
+| mvec_daily life science_avg_attempts_per_question | 0.0                          | float64       |
+| mvec_daily life science_avg_reaction_time        | 0.0                          | float64       |
+| mvec_daily life science_days_since_last_seen     | 0.0                          | float64       |
+| mvec_daily life science_overall_accuracy         | 0.0                          | float64       |
+| mvec_daily life science_percentage_seen          | 0.0                          | float64       |
+| mvec_disease managment_avg_attempts_per_question | 0.0                          | float64       |
+| mvec_disease managment_avg_reaction_time         | 0.0                          | float64       |
+| mvec_disease managment_days_since_last_seen      | 0.0                          | float64       |
+| mvec_disease managment_overall_accuracy          | 0.0                          | float64       |
+| mvec_disease managment_percentage_seen           | 0.0                          | float64       |
+| mvec_energy conversion_days_since_last_seen      | 0.0                          | float64       |
+| mvec_experimental design_avg_attempts_per_question | 0.0                          | float64       |
+| mvec_experimental design_avg_reaction_time       | 0.0                          | float64       |
+| mvec_experimental design_days_since_last_seen    | 0.0                          | float64       |
+| mvec_experimental design_overall_accuracy        | 0.0                          | float64       |
+| mvec_experimental design_percentage_seen         | 0.0                          | float64       |
+| mvec_general_avg_attempts_per_question           | 0.0                          | float64       |
+| mvec_general_avg_reaction_time                   | 0.0                          | float64       |
+| mvec_general_days_since_last_seen                | 0.0                          | float64       |
+| mvec_general_overall_accuracy                    | 0.0                          | float64       |
+| mvec_general_percentage_seen                     | 0.0                          | float64       |
+| mvec_greek mythology_avg_attempts_per_question   | 0.0                          | float64       |
+| mvec_greek mythology_avg_reaction_time           | 0.0                          | float64       |
+| mvec_greek mythology_days_since_last_seen        | 0.0                          | float64       |
+| mvec_greek mythology_overall_accuracy            | 0.0                          | float64       |
+| mvec_greek mythology_percentage_seen             | 0.0                          | float64       |
+| mvec_history of biology_avg_attempts_per_question | 0.0                          | float64       |
+| mvec_history of biology_avg_reaction_time        | 0.0                          | float64       |
+| mvec_history of biology_days_since_last_seen     | 0.0                          | float64       |
+| mvec_history of biology_overall_accuracy         | 0.0                          | float64       |
+| mvec_history of biology_percentage_seen          | 0.0                          | float64       |
+| mvec_history of machine learning_avg_attempts_per_question | 0.0                          | float64       |
+| mvec_history of machine learning_avg_reaction_time | 0.0                          | float64       |
+| mvec_history of machine learning_days_since_last_seen | 0.0                          | float64       |
+| mvec_history of machine learning_overall_accuracy | 0.0                          | float64       |
+| mvec_history of machine learning_percentage_seen | 0.0                          | float64       |
+| mvec_introductory computer science with python_avg_attempts_per_question | 0.0                          | float64       |
+| mvec_introductory computer science with python_avg_reaction_time | 0.0                          | float64       |
+| mvec_introductory computer science with python_days_since_last_seen | 0.0                          | float64       |
+| mvec_introductory computer science with python_overall_accuracy | 0.0                          | float64       |
+| mvec_introductory computer science with python_percentage_seen | 0.0                          | float64       |
+| mvec_introductory geology_avg_attempts_per_question | 0.0                          | float64       |
+| mvec_introductory geology_avg_reaction_time      | 0.0                          | float64       |
+| mvec_introductory geology_days_since_last_seen   | 0.0                          | float64       |
+| mvec_introductory geology_overall_accuracy       | 0.0                          | float64       |
+| mvec_introductory geology_percentage_seen        | 0.0                          | float64       |
+| mvec_introductory philosophy_avg_attempts_per_question | 0.0                          | float64       |
+| mvec_introductory philosophy_avg_reaction_time   | 0.0                          | float64       |
+| mvec_introductory philosophy_days_since_last_seen | 0.0                          | float64       |
+| mvec_introductory philosophy_overall_accuracy    | 0.0                          | float64       |
+| mvec_introductory philosophy_percentage_seen     | 0.0                          | float64       |
+| mvec_java data types_avg_attempts_per_question   | 0.0                          | float64       |
+| mvec_java data types_avg_reaction_time           | 0.0                          | float64       |
+| mvec_java data types_days_since_last_seen        | 0.0                          | float64       |
+| mvec_java data types_overall_accuracy            | 0.0                          | float64       |
+| mvec_java data types_percentage_seen             | 0.0                          | float64       |
+| mvec_java general principles_avg_attempts_per_question | 0.0                          | float64       |
+| mvec_java general principles_avg_reaction_time   | 0.0                          | float64       |
+| mvec_java general principles_days_since_last_seen | 0.0                          | float64       |
+| mvec_java general principles_overall_accuracy    | 0.0                          | float64       |
+| mvec_java general principles_percentage_seen     | 0.0                          | float64       |
+| mvec_java syntax_avg_attempts_per_question       | 0.0                          | float64       |
+| mvec_java syntax_avg_reaction_time               | 0.0                          | float64       |
+| mvec_java syntax_days_since_last_seen            | 0.0                          | float64       |
+| mvec_java syntax_overall_accuracy                | 0.0                          | float64       |
+| mvec_java syntax_percentage_seen                 | 0.0                          | float64       |
+| mvec_least squares method_avg_attempts_per_question | 0.0                          | float64       |
+| mvec_least squares method_avg_reaction_time      | 0.0                          | float64       |
+| mvec_least squares method_days_since_last_seen   | 0.0                          | float64       |
+| mvec_least squares method_overall_accuracy       | 0.0                          | float64       |
+| mvec_least squares method_percentage_seen        | 0.0                          | float64       |
+| mvec_linear regression_avg_attempts_per_question | 0.0                          | float64       |
+| mvec_linear regression_avg_reaction_time         | 0.0                          | float64       |
+| mvec_linear regression_days_since_last_seen      | 0.0                          | float64       |
+| mvec_linear regression_overall_accuracy          | 0.0                          | float64       |
+| mvec_linear regression_percentage_seen           | 0.0                          | float64       |
+| mvec_machine learning_avg_attempts_per_question  | 0.0                          | float64       |
+| mvec_machine learning_avg_reaction_time          | 0.0                          | float64       |
+| mvec_machine learning_days_since_last_seen       | 0.0                          | float64       |
+| mvec_machine learning_overall_accuracy           | 0.0                          | float64       |
+| mvec_machine learning_percentage_seen            | 0.0                          | float64       |
+| mvec_math_percentage_seen                        | 0.0                          | float64       |
+| mvec_matrix_days_since_last_seen                 | 0.0                          | float64       |
+| mvec_multiplication table_avg_attempts_per_question | 0.0                          | float64       |
+| mvec_multiplication table_avg_reaction_time      | 0.0                          | float64       |
+| mvec_multiplication table_days_since_last_seen   | 0.0                          | float64       |
+| mvec_multiplication table_overall_accuracy       | 0.0                          | float64       |
+| mvec_multiplication table_percentage_seen        | 0.0                          | float64       |
+| mvec_neurosciences_avg_attempts_per_question     | 0.0                          | float64       |
+| mvec_neurosciences_avg_reaction_time             | 0.0                          | float64       |
+| mvec_neurosciences_days_since_last_seen          | 0.0                          | float64       |
+| mvec_neurosciences_overall_accuracy              | 0.0                          | float64       |
+| mvec_neurosciences_percentage_seen               | 0.0                          | float64       |
+| mvec_probability theory_days_since_last_seen     | 0.0                          | float64       |
+| mvec_probability theory_percentage_seen          | 0.0                          | float64       |
+| mvec_ridge regression_avg_attempts_per_question  | 0.0                          | float64       |
+| mvec_ridge regression_avg_reaction_time          | 0.0                          | float64       |
+| mvec_ridge regression_days_since_last_seen       | 0.0                          | float64       |
+| mvec_ridge regression_overall_accuracy           | 0.0                          | float64       |
+| mvec_ridge regression_percentage_seen            | 0.0                          | float64       |
+| mvec_scientific theory_days_since_last_seen      | 0.0                          | float64       |
+| mvec_scientific theory_percentage_seen           | 0.0                          | float64       |
+| mvec_set theory_avg_attempts_per_question        | 0.0                          | float64       |
+| mvec_set theory_avg_reaction_time                | 0.0                          | float64       |
+| mvec_set theory_days_since_last_seen             | 0.0                          | float64       |
+| mvec_set theory_overall_accuracy                 | 0.0                          | float64       |
+| mvec_set theory_percentage_seen                  | 0.0                          | float64       |
+| mvec_side chain chemistry_days_since_last_seen   | 0.0                          | float64       |
+| mvec_statistical basics_avg_attempts_per_question | 0.0                          | float64       |
+| mvec_statistical basics_avg_reaction_time        | 0.0                          | float64       |
+| mvec_statistical basics_days_since_last_seen     | 0.0                          | float64       |
+| mvec_statistical basics_overall_accuracy         | 0.0                          | float64       |
+| mvec_statistical basics_percentage_seen          | 0.0                          | float64       |
+| mvec_statistics_avg_attempts_per_question        | 0.0                          | float64       |
+| mvec_statistics_avg_reaction_time                | 0.0                          | float64       |
+| mvec_statistics_days_since_last_seen             | 0.0                          | float64       |
+| mvec_statistics_overall_accuracy                 | 0.0                          | float64       |
+| mvec_statistics_percentage_seen                  | 0.0                          | float64       |
+| mvec_support vector machines_avg_attempts_per_question | 0.0                          | float64       |
+| mvec_support vector machines_avg_reaction_time   | 0.0                          | float64       |
+| mvec_support vector machines_days_since_last_seen | 0.0                          | float64       |
+| mvec_support vector machines_overall_accuracy    | 0.0                          | float64       |
+| mvec_support vector machines_percentage_seen     | 0.0                          | float64       |
+| mvec_thermodynamics_avg_attempts_per_question    | 0.0                          | float64       |
+| mvec_thermodynamics_avg_reaction_time            | 0.0                          | float64       |
+| mvec_thermodynamics_days_since_last_seen         | 0.0                          | float64       |
+| mvec_thermodynamics_overall_accuracy             | 0.0                          | float64       |
+| mvec_thermodynamics_percentage_seen              | 0.0                          | float64       |
+| mvec_trigonometry_avg_attempts_per_question      | 0.0                          | float64       |
+| mvec_trigonometry_avg_reaction_time              | 0.0                          | float64       |
+| mvec_trigonometry_days_since_last_seen           | 0.0                          | float64       |
+| mvec_trigonometry_overall_accuracy               | 0.0                          | float64       |
+| mvec_trigonometry_percentage_seen                | 0.0                          | float64       |
+| mvec_western civ ii_days_since_last_seen         | 0.0                          | float64       |
+| mvec_western civ ii_percentage_seen              | 0.0                          | float64       |
+| question_type_fill_in_the_blank                  | 0.0                          | float64       |
+| question_type_multiple_choice                    | 1.0                          | float64       |
+| question_type_select_all_that_apply              | 0.0                          | float64       |
+| question_type_sort_order                         | 0.0                          | float64       |
+| question_type_true_false                         | 0.0                          | float64       |
+| qv_0                                             | -0.742530107498169           | float64       |
+| qv_1                                             | 0.5017150640487671           | float64       |
+| qv_10                                            | 0.694411039352417            | float64       |
+| qv_100                                           | -0.0454692542552948          | float64       |
+| qv_101                                           | 0.3183472752571106           | float64       |
+| qv_102                                           | 0.7202503681182861           | float64       |
+| qv_103                                           | -0.17956426739692688         | float64       |
+| qv_104                                           | 1.7117966413497925           | float64       |
+| qv_105                                           | -0.11958024650812149         | float64       |
+| qv_106                                           | -0.2956203520298004          | float64       |
+| qv_107                                           | -0.6703683137893677          | float64       |
+| qv_108                                           | -0.4324699342250824          | float64       |
+| qv_109                                           | -0.18245334923267365         | float64       |
+| qv_11                                            | 0.4479163587093353           | float64       |
+| qv_110                                           | -0.2742091715335846          | float64       |
+| qv_111                                           | -0.5228570103645325          | float64       |
+| qv_112                                           | -0.6714045405387878          | float64       |
+| qv_113                                           | -1.3306159973144531          | float64       |
+| qv_114                                           | 0.18106962740421295          | float64       |
+| qv_115                                           | 0.461404412984848            | float64       |
+| qv_116                                           | 0.26161038875579834          | float64       |
+| qv_117                                           | -0.8998647332191467          | float64       |
+| qv_118                                           | -1.035166621208191           | float64       |
+| qv_119                                           | 0.75080806016922             | float64       |
+| qv_12                                            | -0.28806227445602417         | float64       |
+| qv_120                                           | 0.16569775342941284          | float64       |
+| qv_121                                           | -0.34682977199554443         | float64       |
+| qv_122                                           | -0.3684666156768799          | float64       |
+| qv_123                                           | 0.18879088759422302          | float64       |
+| qv_124                                           | 0.6561610698699951           | float64       |
+| qv_125                                           | 1.4186186790466309           | float64       |
+| qv_126                                           | 0.3485289514064789           | float64       |
+| qv_127                                           | 0.0967230424284935           | float64       |
+| qv_128                                           | 1.2531416416168213           | float64       |
+| qv_129                                           | 0.7460806369781494           | float64       |
+| qv_13                                            | -0.609523355960846           | float64       |
+| qv_130                                           | -1.2464439868927002          | float64       |
+| qv_131                                           | -0.4701383113861084          | float64       |
+| qv_132                                           | 0.722192108631134            | float64       |
+| qv_133                                           | 0.2550787329673767           | float64       |
+| qv_134                                           | 0.13968545198440552          | float64       |
+| qv_135                                           | 0.3328535854816437           | float64       |
+| qv_136                                           | -0.48047786951065063         | float64       |
+| qv_137                                           | -0.6100650429725647          | float64       |
+| qv_138                                           | -0.6460955739021301          | float64       |
+| qv_139                                           | -0.4318857491016388          | float64       |
+| qv_14                                            | -0.5806536078453064          | float64       |
+| qv_140                                           | -0.012464168481528759        | float64       |
+| qv_141                                           | -0.2519237995147705          | float64       |
+| qv_142                                           | 1.003628134727478            | float64       |
+| qv_143                                           | 1.207456350326538            | float64       |
+| qv_144                                           | -0.3271724581718445          | float64       |
+| qv_145                                           | 1.0499262809753418           | float64       |
+| qv_146                                           | -0.6493467688560486          | float64       |
+| qv_147                                           | 0.17344625294208527          | float64       |
+| qv_148                                           | 0.7569341659545898           | float64       |
+| qv_149                                           | 0.3861818015575409           | float64       |
+| qv_15                                            | -0.07526212185621262         | float64       |
+| qv_150                                           | -0.547249436378479           | float64       |
+| qv_151                                           | 0.3915659487247467           | float64       |
+| qv_152                                           | -0.06167062371969223         | float64       |
+| qv_153                                           | 1.1505314111709595           | float64       |
+| qv_154                                           | -0.21915237605571747         | float64       |
+| qv_155                                           | -1.5831938982009888          | float64       |
+| qv_156                                           | 0.9535745978355408           | float64       |
+| qv_157                                           | -0.273813396692276           | float64       |
+| qv_158                                           | -0.6455639600753784          | float64       |
+| qv_159                                           | -0.002958228811621666        | float64       |
+| qv_16                                            | -1.9894764423370361          | float64       |
+| qv_160                                           | -0.2472241371870041          | float64       |
+| qv_161                                           | -0.8762224316596985          | float64       |
+| qv_162                                           | 0.4725748300552368           | float64       |
+| qv_163                                           | -0.250875324010849           | float64       |
+| qv_164                                           | -0.24423037469387054         | float64       |
+| qv_165                                           | -1.0431088209152222          | float64       |
+| qv_166                                           | 0.29217708110809326          | float64       |
+| qv_167                                           | 0.41270971298217773          | float64       |
+| qv_168                                           | -0.5881593823432922          | float64       |
+| qv_169                                           | 0.15890148282051086          | float64       |
+| qv_17                                            | 0.3630257248878479           | float64       |
+| qv_170                                           | 0.8467020988464355           | float64       |
+| qv_171                                           | -0.2841549515724182          | float64       |
+| qv_172                                           | 0.00625872565433383          | float64       |
+| qv_173                                           | 0.008250635117292404         | float64       |
+| qv_174                                           | 0.6408208608627319           | float64       |
+| qv_175                                           | -0.7343160510063171          | float64       |
+| qv_176                                           | 0.00043630163418129086       | float64       |
+| qv_177                                           | -0.11253777146339417         | float64       |
+| qv_178                                           | 0.03295764699578285          | float64       |
+| qv_179                                           | 0.6908215880393982           | float64       |
+| qv_18                                            | 0.47066816687583923          | float64       |
+| qv_180                                           | -0.6023585796356201          | float64       |
+| qv_181                                           | 0.7824567556381226           | float64       |
+| qv_182                                           | 0.5818608999252319           | float64       |
+| qv_183                                           | 0.16558323800563812          | float64       |
+| qv_184                                           | 0.2750256657600403           | float64       |
+| qv_185                                           | -0.6750187277793884          | float64       |
+| qv_186                                           | 0.41544654965400696          | float64       |
+| qv_187                                           | -0.648273766040802           | float64       |
+| qv_188                                           | 0.00802567508071661          | float64       |
+| qv_189                                           | -0.15477719902992249         | float64       |
+| qv_19                                            | 0.042512357234954834         | float64       |
+| qv_190                                           | 1.71066415309906             | float64       |
+| qv_191                                           | -0.24794913828372955         | float64       |
+| qv_192                                           | 0.4196470081806183           | float64       |
+| qv_193                                           | -0.20595590770244598         | float64       |
+| qv_194                                           | -1.2319512367248535          | float64       |
+| qv_195                                           | -0.3961639404296875          | float64       |
+| qv_196                                           | -0.056314218789339066        | float64       |
+| qv_197                                           | -0.0017377911135554314       | float64       |
+| qv_198                                           | -0.5102117657661438          | float64       |
+| qv_199                                           | 0.009146900847554207         | float64       |
+| qv_2                                             | 0.724299967288971            | float64       |
+| qv_20                                            | 0.09843291342258453          | float64       |
+| qv_200                                           | -0.5436947345733643          | float64       |
+| qv_201                                           | 1.7065192461013794           | float64       |
+| qv_202                                           | -0.6876071095466614          | float64       |
+| qv_203                                           | -0.11586994677782059         | float64       |
+| qv_204                                           | 0.7438815236091614           | float64       |
+| qv_205                                           | 0.634839653968811            | float64       |
+| qv_206                                           | 0.8388936519622803           | float64       |
+| qv_207                                           | 0.25374189019203186          | float64       |
+| qv_208                                           | 0.4571113586425781           | float64       |
+| qv_209                                           | 0.005852251313626766         | float64       |
+| qv_21                                            | 0.3958898186683655           | float64       |
+| qv_210                                           | 0.15508954226970673          | float64       |
+| qv_211                                           | -0.05699576437473297         | float64       |
+| qv_212                                           | 0.02619049698114395          | float64       |
+| qv_213                                           | 1.1207355260849              | float64       |
+| qv_214                                           | -0.7942042946815491          | float64       |
+| qv_215                                           | 0.09046358615159988          | float64       |
+| qv_216                                           | -0.3913598656654358          | float64       |
+| qv_217                                           | 0.39827629923820496          | float64       |
+| qv_218                                           | -0.41717973351478577         | float64       |
+| qv_219                                           | 0.052568819373846054         | float64       |
+| qv_22                                            | -1.2104660272598267          | float64       |
+| qv_220                                           | 0.0024787448346614838        | float64       |
+| qv_221                                           | 0.0006522203329950571        | float64       |
+| qv_222                                           | 0.4759722352027893           | float64       |
+| qv_223                                           | -0.7760501503944397          | float64       |
+| qv_224                                           | 0.9798438549041748           | float64       |
+| qv_225                                           | -0.41283029317855835         | float64       |
+| qv_226                                           | -0.2505667209625244          | float64       |
+| qv_227                                           | 0.43671363592147827          | float64       |
+| qv_228                                           | -0.11823433637619019         | float64       |
+| qv_229                                           | 1.1980295181274414           | float64       |
+| qv_23                                            | 0.32099565863609314          | float64       |
+| qv_230                                           | -0.18451891839504242         | float64       |
+| qv_231                                           | -0.931767463684082           | float64       |
+| qv_232                                           | 0.5548447370529175           | float64       |
+| qv_233                                           | 0.5774859189987183           | float64       |
+| qv_234                                           | -0.4153759777545929          | float64       |
+| qv_235                                           | 0.7059997320175171           | float64       |
+| qv_236                                           | -0.4109477698802948          | float64       |
+| qv_237                                           | -0.3358533978462219          | float64       |
+| qv_238                                           | 0.24452266097068787          | float64       |
+| qv_239                                           | -0.2731773257255554          | float64       |
+| qv_24                                            | -0.1340464949607849          | float64       |
+| qv_240                                           | -0.5993233919143677          | float64       |
+| qv_241                                           | -0.1403018981218338          | float64       |
+| qv_242                                           | -0.3146613538265228          | float64       |
+| qv_243                                           | 1.205009937286377            | float64       |
+| qv_244                                           | -0.2138158231973648          | float64       |
+| qv_245                                           | -1.4806996583938599          | float64       |
+| qv_246                                           | -0.1599154770374298          | float64       |
+| qv_247                                           | 0.45761194825172424          | float64       |
+| qv_248                                           | 0.7534716129302979           | float64       |
+| qv_249                                           | 0.5609878897666931           | float64       |
+| qv_25                                            | -0.044309649616479874        | float64       |
+| qv_250                                           | -0.4465829133987427          | float64       |
+| qv_251                                           | 0.36567482352256775          | float64       |
+| qv_252                                           | -0.5613175630569458          | float64       |
+| qv_253                                           | -0.6520200371742249          | float64       |
+| qv_254                                           | 0.21286310255527496          | float64       |
+| qv_255                                           | -0.26992759108543396         | float64       |
+| qv_256                                           | 0.3416445255279541           | float64       |
+| qv_257                                           | 0.16454164683818817          | float64       |
+| qv_258                                           | -0.20857110619544983         | float64       |
+| qv_259                                           | -0.336478590965271           | float64       |
+| qv_26                                            | -0.1773732453584671          | float64       |
+| qv_260                                           | -0.540524959564209           | float64       |
+| qv_261                                           | -1.250632643699646           | float64       |
+| qv_262                                           | 0.354038804769516            | float64       |
+| qv_263                                           | 0.9864060878753662           | float64       |
+| qv_264                                           | -0.031721509993076324        | float64       |
+| qv_265                                           | 0.3251796364784241           | float64       |
+| qv_266                                           | 0.16706795990467072          | float64       |
+| qv_267                                           | -0.043236274272203445        | float64       |
+| qv_268                                           | 0.4281470775604248           | float64       |
+| qv_269                                           | 0.5212610960006714           | float64       |
+| qv_27                                            | -0.2849017381668091          | float64       |
+| qv_270                                           | 0.0921683982014656           | float64       |
+| qv_271                                           | -0.08926919847726822         | float64       |
+| qv_272                                           | -0.5331182479858398          | float64       |
+| qv_273                                           | -1.250288486480713           | float64       |
+| qv_274                                           | -0.29960259795188904         | float64       |
+| qv_275                                           | -0.2577514946460724          | float64       |
+| qv_276                                           | -0.3771306574344635          | float64       |
+| qv_277                                           | -0.8422483205795288          | float64       |
+| qv_278                                           | -1.8899544477462769          | float64       |
+| qv_279                                           | -0.2849564552307129          | float64       |
+| qv_28                                            | -0.05738157778978348         | float64       |
+| qv_280                                           | 0.1649659276008606           | float64       |
+| qv_281                                           | -0.4475512206554413          | float64       |
+| qv_282                                           | 0.2565394639968872           | float64       |
+| qv_283                                           | 0.5700652599334717           | float64       |
+| qv_284                                           | -1.1392520666122437          | float64       |
+| qv_285                                           | 0.08535400032997131          | float64       |
+| qv_286                                           | 0.40130093693733215          | float64       |
+| qv_287                                           | -0.07838833332061768         | float64       |
+| qv_288                                           | -1.1941758394241333          | float64       |
+| qv_289                                           | -0.2471913993358612          | float64       |
+| qv_29                                            | 1.2769510746002197           | float64       |
+| qv_290                                           | 0.9926561117172241           | float64       |
+| qv_291                                           | -0.8328006267547607          | float64       |
+| qv_292                                           | 0.908820390701294            | float64       |
+| qv_293                                           | 0.3506804406642914           | float64       |
+| qv_294                                           | -0.42556455731391907         | float64       |
+| qv_295                                           | -0.7515323758125305          | float64       |
+| qv_296                                           | -1.446175456047058           | float64       |
+| qv_297                                           | 0.312919557094574            | float64       |
+| qv_298                                           | -0.1898161619901657          | float64       |
+| qv_299                                           | 0.2438841611146927           | float64       |
+| qv_3                                             | -0.4772660732269287          | float64       |
+| qv_30                                            | -0.16263848543167114         | float64       |
+| qv_300                                           | 0.5810948014259338           | float64       |
+| qv_301                                           | -0.09330572187900543         | float64       |
+| qv_302                                           | -0.7173253297805786          | float64       |
+| qv_303                                           | 0.6048688292503357           | float64       |
+| qv_304                                           | -0.7572457194328308          | float64       |
+| qv_305                                           | -0.34746798872947693         | float64       |
+| qv_306                                           | -0.2297174483537674          | float64       |
+| qv_307                                           | -0.7834329009056091          | float64       |
+| qv_308                                           | 0.7969970107078552           | float64       |
+| qv_309                                           | 0.9206360578536987           | float64       |
+| qv_31                                            | 0.07073276489973068          | float64       |
+| qv_310                                           | 0.8511601686477661           | float64       |
+| qv_311                                           | -0.8924811482429504          | float64       |
+| qv_312                                           | 1.2027466297149658           | float64       |
+| qv_313                                           | 0.1723869889974594           | float64       |
+| qv_314                                           | 0.43557798862457275          | float64       |
+| qv_315                                           | 0.7943375110626221           | float64       |
+| qv_316                                           | -0.3660202920436859          | float64       |
+| qv_317                                           | 1.6921436786651611           | float64       |
+| qv_318                                           | -0.7526348829269409          | float64       |
+| qv_319                                           | -0.05448850989341736         | float64       |
+| qv_32                                            | 0.0013536715414375067        | float64       |
+| qv_320                                           | -0.5244356393814087          | float64       |
+| qv_321                                           | 0.9258131980895996           | float64       |
+| qv_322                                           | -0.23629826307296753         | float64       |
+| qv_323                                           | -0.08955509960651398         | float64       |
+| qv_324                                           | -0.5556288957595825          | float64       |
+| qv_325                                           | 0.04535577446222305          | float64       |
+| qv_326                                           | 0.3480917513370514           | float64       |
+| qv_327                                           | 0.18281544744968414          | float64       |
+| qv_328                                           | 0.053849682211875916         | float64       |
+| qv_329                                           | -0.14631374180316925         | float64       |
+| qv_33                                            | -0.5846256017684937          | float64       |
+| qv_330                                           | 0.6426408886909485           | float64       |
+| qv_331                                           | 0.012385205365717411         | float64       |
+| qv_332                                           | 0.6557649374008179           | float64       |
+| qv_333                                           | 0.6561313271522522           | float64       |
+| qv_334                                           | -0.29797160625457764         | float64       |
+| qv_335                                           | 0.0028525127563625574        | float64       |
+| qv_336                                           | -0.4987471103668213          | float64       |
+| qv_337                                           | -0.19210344552993774         | float64       |
+| qv_338                                           | 0.5753933191299438           | float64       |
+| qv_339                                           | 0.5898820161819458           | float64       |
+| qv_34                                            | -7.869977707741782e-05       | float64       |
+| qv_340                                           | -0.09560176730155945         | float64       |
+| qv_341                                           | 0.919090211391449            | float64       |
+| qv_342                                           | 0.5159100890159607           | float64       |
+| qv_343                                           | -0.4993695318698883          | float64       |
+| qv_344                                           | 0.9467907547950745           | float64       |
+| qv_345                                           | -0.3573915362358093          | float64       |
+| qv_346                                           | 0.1278741955757141           | float64       |
+| qv_347                                           | -0.9318950176239014          | float64       |
+| qv_348                                           | -0.029385751113295555        | float64       |
+| qv_349                                           | 0.7388623952865601           | float64       |
+| qv_35                                            | -1.0235943794250488          | float64       |
+| qv_350                                           | -1.1311041116714478          | float64       |
+| qv_351                                           | 0.6044169664382935           | float64       |
+| qv_352                                           | 0.39991921186447144          | float64       |
+| qv_353                                           | -0.6026790738105774          | float64       |
+| qv_354                                           | -0.1273697316646576          | float64       |
+| qv_355                                           | 0.15658484399318695          | float64       |
+| qv_356                                           | 0.08550120145082474          | float64       |
+| qv_357                                           | -0.4147927165031433          | float64       |
+| qv_358                                           | 0.34215840697288513          | float64       |
+| qv_359                                           | 0.9932714700698853           | float64       |
+| qv_36                                            | 0.7737925052642822           | float64       |
+| qv_360                                           | -0.2356298714876175          | float64       |
+| qv_361                                           | -0.9119181036949158          | float64       |
+| qv_362                                           | -0.10356853902339935         | float64       |
+| qv_363                                           | -0.1441357135772705          | float64       |
+| qv_364                                           | 0.6335136890411377           | float64       |
+| qv_365                                           | -0.18750227987766266         | float64       |
+| qv_366                                           | -0.5035472512245178          | float64       |
+| qv_367                                           | 0.03990381211042404          | float64       |
+| qv_368                                           | 0.16301773488521576          | float64       |
+| qv_369                                           | -1.4271374940872192          | float64       |
+| qv_37                                            | -0.28790950775146484         | float64       |
+| qv_370                                           | -0.25003698468208313         | float64       |
+| qv_371                                           | 1.0034619569778442           | float64       |
+| qv_372                                           | -0.3212001919746399          | float64       |
+| qv_373                                           | -0.014321795664727688        | float64       |
+| qv_374                                           | -0.0554359070956707          | float64       |
+| qv_375                                           | -0.11807196587324142         | float64       |
+| qv_376                                           | 0.29762688279151917          | float64       |
+| qv_377                                           | -0.3079153895378113          | float64       |
+| qv_378                                           | 0.5829932689666748           | float64       |
+| qv_379                                           | 1.4133689403533936           | float64       |
+| qv_38                                            | 0.18676456809043884          | float64       |
+| qv_380                                           | 1.1332817077636719           | float64       |
+| qv_381                                           | -0.16523288190364838         | float64       |
+| qv_382                                           | 0.2230692207813263           | float64       |
+| qv_383                                           | 0.009430098347365856         | float64       |
+| qv_384                                           | 0.23842734098434448          | float64       |
+| qv_385                                           | -0.9880368709564209          | float64       |
+| qv_386                                           | 0.9946771264076233           | float64       |
+| qv_387                                           | 0.2534984052181244           | float64       |
+| qv_388                                           | -0.2986624240875244          | float64       |
+| qv_389                                           | 1.196565866470337            | float64       |
+| qv_39                                            | 0.4736754596233368           | float64       |
+| qv_390                                           | -0.25066953897476196         | float64       |
+| qv_391                                           | -0.3397350609302521          | float64       |
+| qv_392                                           | 0.0006096619181334972        | float64       |
+| qv_393                                           | -0.2522416114807129          | float64       |
+| qv_394                                           | 0.10813447833061218          | float64       |
+| qv_395                                           | -0.036362603306770325        | float64       |
+| qv_396                                           | 0.16163988411426544          | float64       |
+| qv_397                                           | 0.06289846450090408          | float64       |
+| qv_398                                           | -0.21492917835712433         | float64       |
+| qv_399                                           | 0.297193706035614            | float64       |
+| qv_4                                             | -0.4902689754962921          | float64       |
+| qv_40                                            | 0.26663118600845337          | float64       |
+| qv_400                                           | -0.019596343860030174        | float64       |
+| qv_401                                           | -0.6458134055137634          | float64       |
+| qv_402                                           | -1.1960786581039429          | float64       |
+| qv_403                                           | -0.8606885075569153          | float64       |
+| qv_404                                           | -0.909440815448761           | float64       |
+| qv_405                                           | -1.225516438484192           | float64       |
+| qv_406                                           | 0.9148504734039307           | float64       |
+| qv_407                                           | 0.47389090061187744          | float64       |
+| qv_408                                           | 0.483137845993042            | float64       |
+| qv_409                                           | -0.1469140499830246          | float64       |
+| qv_41                                            | 0.5222500562667847           | float64       |
+| qv_410                                           | -0.3779670000076294          | float64       |
+| qv_411                                           | 0.46191757917404175          | float64       |
+| qv_412                                           | 0.08613009005784988          | float64       |
+| qv_413                                           | -0.41903752088546753         | float64       |
+| qv_414                                           | -0.02190311998128891         | float64       |
+| qv_415                                           | -0.16283364593982697         | float64       |
+| qv_416                                           | -0.021309085190296173        | float64       |
+| qv_417                                           | 0.8139234781265259           | float64       |
+| qv_418                                           | 0.09774070978164673          | float64       |
+| qv_419                                           | 1.211096167564392            | float64       |
+| qv_42                                            | 0.022776851430535316         | float64       |
+| qv_420                                           | -0.20288804173469543         | float64       |
+| qv_421                                           | -0.5966697335243225          | float64       |
+| qv_422                                           | 15.239273071289062           | float64       |
+| qv_423                                           | 0.28911206126213074          | float64       |
+| qv_424                                           | -0.4301166832447052          | float64       |
+| qv_425                                           | 0.5544154047966003           | float64       |
+| qv_426                                           | 0.015590015798807144         | float64       |
+| qv_427                                           | 0.1831715852022171           | float64       |
+| qv_428                                           | -0.4633898437023163          | float64       |
+| qv_429                                           | 0.4459036588668823           | float64       |
+| qv_43                                            | -0.5556667447090149          | float64       |
+| qv_430                                           | -0.33192211389541626         | float64       |
+| qv_431                                           | 0.0344594269990921           | float64       |
+| qv_432                                           | -0.1449994444847107          | float64       |
+| qv_433                                           | -0.5887258052825928          | float64       |
+| qv_434                                           | -0.21663062274456024         | float64       |
+| qv_435                                           | 0.19809755682945251          | float64       |
+| qv_436                                           | -0.42498061060905457         | float64       |
+| qv_437                                           | 0.06203277036547661          | float64       |
+| qv_438                                           | -0.519763708114624           | float64       |
+| qv_439                                           | -0.04460514709353447         | float64       |
+| qv_44                                            | 0.19255682826042175          | float64       |
+| qv_440                                           | 0.1969277262687683           | float64       |
+| qv_441                                           | -1.0126780271530151          | float64       |
+| qv_442                                           | 0.0832706168293953           | float64       |
+| qv_443                                           | 0.4060390889644623           | float64       |
+| qv_444                                           | 0.6736480593681335           | float64       |
+| qv_445                                           | -0.3573777675628662          | float64       |
+| qv_446                                           | -0.06197846680879593         | float64       |
+| qv_447                                           | 0.17341507971286774          | float64       |
+| qv_448                                           | -0.3520009219646454          | float64       |
+| qv_449                                           | -1.0798975229263306          | float64       |
+| qv_45                                            | -0.19659268856048584         | float64       |
+| qv_450                                           | 0.5952015519142151           | float64       |
+| qv_451                                           | 0.3011108338832855           | float64       |
+| qv_452                                           | 0.8687788844108582           | float64       |
+| qv_453                                           | -0.2749179005622864          | float64       |
+| qv_454                                           | 0.01972222700715065          | float64       |
+| qv_455                                           | 0.7233790755271912           | float64       |
+| qv_456                                           | 0.033885978162288666         | float64       |
+| qv_457                                           | -0.4383833408355713          | float64       |
+| qv_458                                           | 0.69659823179245             | float64       |
+| qv_459                                           | 0.19675372540950775          | float64       |
+| qv_46                                            | 0.5632674098014832           | float64       |
+| qv_460                                           | -0.1918318271636963          | float64       |
+| qv_461                                           | -0.20539544522762299         | float64       |
+| qv_462                                           | 0.0029541924595832825        | float64       |
+| qv_463                                           | -0.0601397342979908          | float64       |
+| qv_464                                           | 1.2242600917816162           | float64       |
+| qv_465                                           | 0.02483418770134449          | float64       |
+| qv_466                                           | 0.01375829242169857          | float64       |
+| qv_467                                           | 0.7710214257240295           | float64       |
+| qv_468                                           | -0.6168968677520752          | float64       |
+| qv_469                                           | 0.5747252702713013           | float64       |
+| qv_47                                            | 0.4658958911895752           | float64       |
+| qv_470                                           | -0.5311265587806702          | float64       |
+| qv_471                                           | -1.0406289100646973          | float64       |
+| qv_472                                           | -0.8980116248130798          | float64       |
+| qv_473                                           | 1.2180163860321045           | float64       |
+| qv_474                                           | 0.7679727077484131           | float64       |
+| qv_475                                           | -0.07452519983053207         | float64       |
+| qv_476                                           | 0.23810352385044098          | float64       |
+| qv_477                                           | -0.32859277725219727         | float64       |
+| qv_478                                           | -0.8885499835014343          | float64       |
+| qv_479                                           | -0.3834972083568573          | float64       |
+| qv_48                                            | 0.4339175522327423           | float64       |
+| qv_480                                           | -0.13015738129615784         | float64       |
+| qv_481                                           | 0.08230425417423248          | float64       |
+| qv_482                                           | -0.3965601921081543          | float64       |
+| qv_483                                           | -0.6070691347122192          | float64       |
+| qv_484                                           | 0.28505557775497437          | float64       |
+| qv_485                                           | -0.33492374420166016         | float64       |
+| qv_486                                           | 0.36956194043159485          | float64       |
+| qv_487                                           | -0.2290271520614624          | float64       |
+| qv_488                                           | 0.9393255710601807           | float64       |
+| qv_489                                           | -1.0809940099716187          | float64       |
+| qv_49                                            | -0.2820824086666107          | float64       |
+| qv_490                                           | 0.1950054168701172           | float64       |
+| qv_491                                           | -0.9352834820747375          | float64       |
+| qv_492                                           | -0.006328646093606949        | float64       |
+| qv_493                                           | 0.08592599630355835          | float64       |
+| qv_494                                           | -0.5419875383377075          | float64       |
+| qv_495                                           | -0.07749021053314209         | float64       |
+| qv_496                                           | -1.2552683353424072          | float64       |
+| qv_497                                           | 0.18977545201778412          | float64       |
+| qv_498                                           | 0.7407833337783813           | float64       |
+| qv_499                                           | -0.4407981038093567          | float64       |
+| qv_5                                             | -0.5204023122787476          | float64       |
+| qv_50                                            | 0.10376099497079849          | float64       |
+| qv_500                                           | -0.804033100605011           | float64       |
+| qv_501                                           | -1.3536509275436401          | float64       |
+| qv_502                                           | -0.18613727390766144         | float64       |
+| qv_503                                           | -0.02918207459151745         | float64       |
+| qv_504                                           | -0.5768920183181763          | float64       |
+| qv_505                                           | -0.1448879987001419          | float64       |
+| qv_506                                           | -0.42732423543930054         | float64       |
+| qv_507                                           | -0.11864453554153442         | float64       |
+| qv_508                                           | 0.5163663029670715           | float64       |
+| qv_509                                           | -0.25468820333480835         | float64       |
+| qv_51                                            | 0.896287202835083            | float64       |
+| qv_510                                           | -0.07341993600130081         | float64       |
+| qv_511                                           | -0.19824102520942688         | float64       |
+| qv_512                                           | -0.4395887553691864          | float64       |
+| qv_513                                           | -0.09250541031360626         | float64       |
+| qv_514                                           | -0.3868650496006012          | float64       |
+| qv_515                                           | 0.876166582107544            | float64       |
+| qv_516                                           | -0.5673649311065674          | float64       |
+| qv_517                                           | -0.17676818370819092         | float64       |
+| qv_518                                           | 0.023625848814845085         | float64       |
+| qv_519                                           | -0.6868304014205933          | float64       |
+| qv_52                                            | 0.7211092114448547           | float64       |
+| qv_520                                           | -0.19659213721752167         | float64       |
+| qv_521                                           | 0.3231763541698456           | float64       |
+| qv_522                                           | 0.5137667655944824           | float64       |
+| qv_523                                           | -0.18565955758094788         | float64       |
+| qv_524                                           | -0.20463545620441437         | float64       |
+| qv_525                                           | -0.3323625922203064          | float64       |
+| qv_526                                           | -1.007346749305725           | float64       |
+| qv_527                                           | -0.14564956724643707         | float64       |
+| qv_528                                           | 1.1984761953353882           | float64       |
+| qv_529                                           | -0.4193163216114044          | float64       |
+| qv_53                                            | 1.0692975521087646           | float64       |
+| qv_530                                           | -0.29204410314559937         | float64       |
+| qv_531                                           | 0.19987806677818298          | float64       |
+| qv_532                                           | 0.3779148757457733           | float64       |
+| qv_533                                           | 0.15256518125534058          | float64       |
+| qv_534                                           | -0.6399631500244141          | float64       |
+| qv_535                                           | -0.07954445481300354         | float64       |
+| qv_536                                           | -1.6878000497817993          | float64       |
+| qv_537                                           | 0.04041344299912453          | float64       |
+| qv_538                                           | -0.8832379579544067          | float64       |
+| qv_539                                           | 0.21075758337974548          | float64       |
+| qv_54                                            | 0.5943223237991333           | float64       |
+| qv_540                                           | -0.2949267625808716          | float64       |
+| qv_541                                           | -0.2234794646501541          | float64       |
+| qv_542                                           | 0.6917331218719482           | float64       |
+| qv_543                                           | 1.2200924158096313           | float64       |
+| qv_544                                           | 0.3266494870185852           | float64       |
+| qv_545                                           | -0.6330522298812866          | float64       |
+| qv_546                                           | -0.37045517563819885         | float64       |
+| qv_547                                           | -0.5311442613601685          | float64       |
+| qv_548                                           | -0.2558668851852417          | float64       |
+| qv_549                                           | -1.0868891477584839          | float64       |
+| qv_55                                            | 0.628409206867218            | float64       |
+| qv_550                                           | -0.9637518525123596          | float64       |
+| qv_551                                           | 0.4866880774497986           | float64       |
+| qv_552                                           | -0.27445775270462036         | float64       |
+| qv_553                                           | 0.1878792643547058           | float64       |
+| qv_554                                           | -0.032299675047397614        | float64       |
+| qv_555                                           | 0.6287980675697327           | float64       |
+| qv_556                                           | 1.4696909189224243           | float64       |
+| qv_557                                           | -0.2833560109138489          | float64       |
+| qv_558                                           | 0.022834494709968567         | float64       |
+| qv_559                                           | 0.3801949918270111           | float64       |
+| qv_56                                            | -1.2287862300872803          | float64       |
+| qv_560                                           | 0.7028470039367676           | float64       |
+| qv_561                                           | -0.24716871976852417         | float64       |
+| qv_562                                           | -0.5412012338638306          | float64       |
+| qv_563                                           | 0.1861037015914917           | float64       |
+| qv_564                                           | -0.059586990624666214        | float64       |
+| qv_565                                           | -0.7514570355415344          | float64       |
+| qv_566                                           | 0.170791357755661            | float64       |
+| qv_567                                           | -0.21303124725818634         | float64       |
+| qv_568                                           | -0.10986465960741043         | float64       |
+| qv_569                                           | -0.23004494607448578         | float64       |
+| qv_57                                            | -0.8106772899627686          | float64       |
+| qv_570                                           | -0.26077213883399963         | float64       |
+| qv_571                                           | 0.4927339255809784           | float64       |
+| qv_572                                           | 0.7401644587516785           | float64       |
+| qv_573                                           | -1.0052073001861572          | float64       |
+| qv_574                                           | 0.5286146998405457           | float64       |
+| qv_575                                           | -1.156889796257019           | float64       |
+| qv_576                                           | 0.41008260846138             | float64       |
+| qv_577                                           | -0.3687720000743866          | float64       |
+| qv_578                                           | 0.3645893335342407           | float64       |
+| qv_579                                           | 1.188454270362854            | float64       |
+| qv_58                                            | 0.28981566429138184          | float64       |
+| qv_580                                           | 0.2959303557872772           | float64       |
+| qv_581                                           | -0.05127759650349617         | float64       |
+| qv_582                                           | 0.6678775548934937           | float64       |
+| qv_583                                           | -0.47532007098197937         | float64       |
+| qv_584                                           | 0.2937333881855011           | float64       |
+| qv_585                                           | -0.14985239505767822         | float64       |
+| qv_586                                           | 0.9706519842147827           | float64       |
+| qv_587                                           | -0.7607187628746033          | float64       |
+| qv_588                                           | 0.05651792883872986          | float64       |
+| qv_589                                           | -0.201876699924469           | float64       |
+| qv_59                                            | -0.07812640815973282         | float64       |
+| qv_590                                           | -0.4788336753845215          | float64       |
+| qv_591                                           | -1.0996346473693848          | float64       |
+| qv_592                                           | -0.5562667846679688          | float64       |
+| qv_593                                           | -0.6586302518844604          | float64       |
+| qv_594                                           | -0.7827940583229065          | float64       |
+| qv_595                                           | -1.0081677436828613          | float64       |
+| qv_596                                           | 0.10938604921102524          | float64       |
+| qv_597                                           | 0.2912684977054596           | float64       |
+| qv_598                                           | 0.15944986045360565          | float64       |
+| qv_599                                           | 0.4016522467136383           | float64       |
+| qv_6                                             | -0.3158642053604126          | float64       |
+| qv_60                                            | -0.41770732402801514         | float64       |
+| qv_600                                           | -0.10798916965723038         | float64       |
+| qv_601                                           | -0.398563027381897           | float64       |
+| qv_602                                           | -0.4047742486000061          | float64       |
+| qv_603                                           | -0.043895866721868515        | float64       |
+| qv_604                                           | 0.14299187064170837          | float64       |
+| qv_605                                           | -0.5102023482322693          | float64       |
+| qv_606                                           | 0.7241305708885193           | float64       |
+| qv_607                                           | -0.1798723340034485          | float64       |
+| qv_608                                           | -0.22067584097385406         | float64       |
+| qv_609                                           | -0.3142295777797699          | float64       |
+| qv_61                                            | 0.527387261390686            | float64       |
+| qv_610                                           | -0.5886028409004211          | float64       |
+| qv_611                                           | 0.4676475524902344           | float64       |
+| qv_612                                           | 0.3558981716632843           | float64       |
+| qv_613                                           | -0.4775262475013733          | float64       |
+| qv_614                                           | -0.8603960871696472          | float64       |
+| qv_615                                           | -0.637387752532959           | float64       |
+| qv_616                                           | 0.19630785286426544          | float64       |
+| qv_617                                           | -0.6139775514602661          | float64       |
+| qv_618                                           | -0.24451154470443726         | float64       |
+| qv_619                                           | -0.9558497667312622          | float64       |
+| qv_62                                            | -0.08985942602157593         | float64       |
+| qv_620                                           | -0.7238860130310059          | float64       |
+| qv_621                                           | -0.09929150342941284         | float64       |
+| qv_622                                           | 0.9846807718276978           | float64       |
+| qv_623                                           | -0.10745097696781158         | float64       |
+| qv_624                                           | -0.10622000694274902         | float64       |
+| qv_625                                           | 0.7560264468193054           | float64       |
+| qv_626                                           | 0.5058725476264954           | float64       |
+| qv_627                                           | -0.5525389313697815          | float64       |
+| qv_628                                           | -0.6213929057121277          | float64       |
+| qv_629                                           | 0.20207639038562775          | float64       |
+| qv_63                                            | -0.04671527445316315         | float64       |
+| qv_630                                           | -0.06024777144193649         | float64       |
+| qv_631                                           | 0.44692906737327576          | float64       |
+| qv_632                                           | -0.015015728771686554        | float64       |
+| qv_633                                           | 0.48295751214027405          | float64       |
+| qv_634                                           | 0.2586910128593445           | float64       |
+| qv_635                                           | -1.1536256074905396          | float64       |
+| qv_636                                           | -0.07786751538515091         | float64       |
+| qv_637                                           | -0.4820672571659088          | float64       |
+| qv_638                                           | -0.6008385419845581          | float64       |
+| qv_639                                           | -0.2760505974292755          | float64       |
+| qv_64                                            | 0.8684222102165222           | float64       |
+| qv_640                                           | 0.6456174850463867           | float64       |
+| qv_641                                           | 0.3563007712364197           | float64       |
+| qv_642                                           | 0.45448485016822815          | float64       |
+| qv_643                                           | -1.6517153978347778          | float64       |
+| qv_644                                           | -0.8981178402900696          | float64       |
+| qv_645                                           | 0.18011213839054108          | float64       |
+| qv_646                                           | -0.13509544730186462         | float64       |
+| qv_647                                           | -0.03254501521587372         | float64       |
+| qv_648                                           | 0.5256875157356262           | float64       |
+| qv_649                                           | 0.1447186917066574           | float64       |
+| qv_65                                            | 0.9578651189804077           | float64       |
+| qv_650                                           | -0.6449217200279236          | float64       |
+| qv_651                                           | 0.0072147841565310955        | float64       |
+| qv_652                                           | -0.5271167755126953          | float64       |
+| qv_653                                           | -0.4131753146648407          | float64       |
+| qv_654                                           | -0.2283310890197754          | float64       |
+| qv_655                                           | 0.22947028279304504          | float64       |
+| qv_656                                           | -1.0473768711090088          | float64       |
+| qv_657                                           | 0.415549099445343            | float64       |
+| qv_658                                           | -0.2521883547306061          | float64       |
+| qv_659                                           | 0.09653760492801666          | float64       |
+| qv_66                                            | 0.31067192554473877          | float64       |
+| qv_660                                           | -0.8758031725883484          | float64       |
+| qv_661                                           | 0.19085873663425446          | float64       |
+| qv_662                                           | 1.4176839590072632           | float64       |
+| qv_663                                           | 0.5346770882606506           | float64       |
+| qv_664                                           | 0.6635779738426208           | float64       |
+| qv_665                                           | 1.4268200397491455           | float64       |
+| qv_666                                           | -0.5467528104782104          | float64       |
+| qv_667                                           | 0.25768840312957764          | float64       |
+| qv_668                                           | -0.0975937470793724          | float64       |
+| qv_669                                           | -1.0384249687194824          | float64       |
+| qv_67                                            | 0.5088699460029602           | float64       |
+| qv_670                                           | -0.689226508140564           | float64       |
+| qv_671                                           | 0.23670387268066406          | float64       |
+| qv_672                                           | 0.2346135377883911           | float64       |
+| qv_673                                           | -0.18156519532203674         | float64       |
+| qv_674                                           | -0.7871854305267334          | float64       |
+| qv_675                                           | 0.012209523469209671         | float64       |
+| qv_676                                           | -0.240204319357872           | float64       |
+| qv_677                                           | -0.12293842434883118         | float64       |
+| qv_678                                           | 0.48901548981666565          | float64       |
+| qv_679                                           | -0.9824311137199402          | float64       |
+| qv_68                                            | 0.0718512311577797           | float64       |
+| qv_680                                           | 1.1770780086517334           | float64       |
+| qv_681                                           | 0.18668970465660095          | float64       |
+| qv_682                                           | 0.35761573910713196          | float64       |
+| qv_683                                           | -0.23887301981449127         | float64       |
+| qv_684                                           | 0.3126024603843689           | float64       |
+| qv_685                                           | -0.20812548696994781         | float64       |
+| qv_686                                           | 0.8106796741485596           | float64       |
+| qv_687                                           | -0.17874053120613098         | float64       |
+| qv_688                                           | 0.5307683944702148           | float64       |
+| qv_689                                           | -0.2665533423423767          | float64       |
+| qv_69                                            | 1.0075474977493286           | float64       |
+| qv_690                                           | 1.1307203769683838           | float64       |
+| qv_691                                           | -0.4857470393180847          | float64       |
+| qv_692                                           | -0.759364128112793           | float64       |
+| qv_693                                           | 0.3370963931083679           | float64       |
+| qv_694                                           | 0.5865541696548462           | float64       |
+| qv_695                                           | -0.18211674690246582         | float64       |
+| qv_696                                           | 0.027341460809111595         | float64       |
+| qv_697                                           | -0.3090057373046875          | float64       |
+| qv_698                                           | 0.07013210654258728          | float64       |
+| qv_699                                           | -0.6836389899253845          | float64       |
+| qv_7                                             | -1.4179767370224             | float64       |
+| qv_70                                            | 0.6012358665466309           | float64       |
+| qv_700                                           | 0.13912299275398254          | float64       |
+| qv_701                                           | -0.15846507251262665         | float64       |
+| qv_702                                           | -0.6011878252029419          | float64       |
+| qv_703                                           | 0.4095345139503479           | float64       |
+| qv_704                                           | 0.9175530672073364           | float64       |
+| qv_705                                           | -0.5966266989707947          | float64       |
+| qv_706                                           | 0.8426762819290161           | float64       |
+| qv_707                                           | 0.12126433849334717          | float64       |
+| qv_708                                           | -1.5291199684143066          | float64       |
+| qv_709                                           | 0.7472434639930725           | float64       |
+| qv_71                                            | 0.33786967396736145          | float64       |
+| qv_710                                           | -0.12906567752361298         | float64       |
+| qv_711                                           | 0.5086219310760498           | float64       |
+| qv_712                                           | 0.21885767579078674          | float64       |
+| qv_713                                           | 0.5908045768737793           | float64       |
+| qv_714                                           | -0.5896502137184143          | float64       |
+| qv_715                                           | -0.11525538563728333         | float64       |
+| qv_716                                           | -0.5377345681190491          | float64       |
+| qv_717                                           | 0.33116650581359863          | float64       |
+| qv_718                                           | 1.1055179834365845           | float64       |
+| qv_719                                           | 0.24579831957817078          | float64       |
+| qv_72                                            | -0.5804782509803772          | float64       |
+| qv_720                                           | 0.11049721390008926          | float64       |
+| qv_721                                           | 0.4711330831050873           | float64       |
+| qv_722                                           | 0.31809744238853455          | float64       |
+| qv_723                                           | 0.38545799255371094          | float64       |
+| qv_724                                           | 0.05001167953014374          | float64       |
+| qv_725                                           | -0.46697938442230225         | float64       |
+| qv_726                                           | 0.12946069240570068          | float64       |
+| qv_727                                           | 0.09461862593889236          | float64       |
+| qv_728                                           | -0.1220499724149704          | float64       |
+| qv_729                                           | -0.7596540451049805          | float64       |
+| qv_73                                            | -0.014086530543863773        | float64       |
+| qv_730                                           | -1.0246212482452393          | float64       |
+| qv_731                                           | 1.1488186120986938           | float64       |
+| qv_732                                           | -0.061513759195804596        | float64       |
+| qv_733                                           | 0.20417705178260803          | float64       |
+| qv_734                                           | -1.4574041366577148          | float64       |
+| qv_735                                           | 0.7948877811431885           | float64       |
+| qv_736                                           | 0.3604375123977661           | float64       |
+| qv_737                                           | 0.5897518396377563           | float64       |
+| qv_738                                           | -0.7191005349159241          | float64       |
+| qv_739                                           | 0.20937904715538025          | float64       |
+| qv_74                                            | 0.8735169768333435           | float64       |
+| qv_740                                           | -0.2923802137374878          | float64       |
+| qv_741                                           | 0.42731529474258423          | float64       |
+| qv_742                                           | 0.7533875703811646           | float64       |
+| qv_743                                           | -0.5915614366531372          | float64       |
+| qv_744                                           | -0.8414578437805176          | float64       |
+| qv_745                                           | -1.2833807468414307          | float64       |
+| qv_746                                           | 0.4502464234828949           | float64       |
+| qv_747                                           | 0.08184094727039337          | float64       |
+| qv_748                                           | 0.1329602301120758           | float64       |
+| qv_749                                           | -0.6822553277015686          | float64       |
+| qv_75                                            | 1.036142110824585            | float64       |
+| qv_750                                           | -0.40720605850219727         | float64       |
+| qv_751                                           | -0.5611337423324585          | float64       |
+| qv_752                                           | -0.5640758275985718          | float64       |
+| qv_753                                           | 0.6304997801780701           | float64       |
+| qv_754                                           | -0.026557711884379387        | float64       |
+| qv_755                                           | 0.5750555992126465           | float64       |
+| qv_756                                           | 0.36601871252059937          | float64       |
+| qv_757                                           | 1.0035099983215332           | float64       |
+| qv_758                                           | -0.1986907422542572          | float64       |
+| qv_759                                           | 0.30006131529808044          | float64       |
+| qv_76                                            | 0.3691504895687103           | float64       |
+| qv_760                                           | -1.2795770168304443          | float64       |
+| qv_761                                           | -0.02097710780799389         | float64       |
+| qv_762                                           | 0.10818752646446228          | float64       |
+| qv_763                                           | -0.21064482629299164         | float64       |
+| qv_764                                           | -0.0018037714762613177       | float64       |
+| qv_765                                           | -0.23540350794792175         | float64       |
+| qv_766                                           | -0.6089658141136169          | float64       |
+| qv_767                                           | -0.840901792049408           | float64       |
+| qv_77                                            | -0.5510833263397217          | float64       |
+| qv_78                                            | -0.4143466651439667          | float64       |
+| qv_79                                            | 0.3401159942150116           | float64       |
+| qv_8                                             | 0.30304035544395447          | float64       |
+| qv_80                                            | 0.6002082228660583           | float64       |
+| qv_81                                            | -0.04317057505249977         | float64       |
+| qv_82                                            | -0.36931899189949036         | float64       |
+| qv_83                                            | -0.5362900495529175          | float64       |
+| qv_84                                            | 0.15721218287944794          | float64       |
+| qv_85                                            | 0.8722735643386841           | float64       |
+| qv_86                                            | -0.1652214378118515          | float64       |
+| qv_87                                            | 0.3984012305736542           | float64       |
+| qv_88                                            | 0.5977345705032349           | float64       |
+| qv_89                                            | 0.49958890676498413          | float64       |
+| qv_9                                             | 0.3480309247970581           | float64       |
+| qv_90                                            | 0.8336947560310364           | float64       |
+| qv_91                                            | 0.7849903106689453           | float64       |
+| qv_92                                            | -0.423046350479126           | float64       |
+| qv_93                                            | 0.6223429441452026           | float64       |
+| qv_94                                            | 0.037858255207538605         | float64       |
+| qv_95                                            | 0.1421142816543579           | float64       |
+| qv_96                                            | -1.1024607419967651          | float64       |
+| qv_97                                            | 0.1156344935297966           | float64       |
+| qv_98                                            | -0.5219976902008057          | float64       |
+| qv_99                                            | 0.7621573209762573           | float64       |
+| user_stats_avg_reaction_time                     | 151.32                       | float64       |
+| user_stats_consecutive_correct_streak            | 18.0                         | float64       |
+| user_stats_consecutive_incorrect_streak          | 0.0                          | float64       |
+| user_stats_global_accuracy                       | 0.0                          | float64       |
+| user_stats_global_fitb_accuracy                  | 0.0                          | float64       |
+| user_stats_global_mcq_accuracy                   | 0.0                          | float64       |
+| user_stats_global_sata_accuracy                  | 0.0                          | float64       |
+| user_stats_global_so_accuracy                    | 0.0                          | float64       |
+| user_stats_global_tf_accuracy                    | 0.0                          | float64       |
+| user_stats_max_correct_streak_achieved           | 74.0                         | float64       |
+| user_stats_today_accuracy_rate                   | 0.0                          | float64       |
+| user_stats_today_correct_attempts                | 0.0                          | float64       |
+| user_stats_today_fitb_accuracy_rate              | 0.0                          | float64       |
+| user_stats_today_fitb_correct_attempts           | 0.0                          | float64       |
+| user_stats_today_fitb_incorrect_attempts         | 0.0                          | float64       |
+| user_stats_today_fitb_total_attempts             | 0.0                          | float64       |
+| user_stats_today_incorrect_attempts              | 0.0                          | float64       |
+| user_stats_today_mcq_accuracy_rate               | 0.0                          | float64       |
+| user_stats_today_mcq_correct_attempts            | 0.0                          | float64       |
+| user_stats_today_mcq_incorrect_attempts          | 0.0                          | float64       |
+| user_stats_today_mcq_total_attempts              | 0.0                          | float64       |
+| user_stats_today_sata_accuracy_rate              | 0.0                          | float64       |
+| user_stats_today_sata_correct_attempts           | 0.0                          | float64       |
+| user_stats_today_sata_total_attempts             | 0.0                          | float64       |
+| user_stats_today_so_accuracy_rate                | 0.0                          | float64       |
+| user_stats_today_so_correct_attempts             | 0.0                          | float64       |
+| user_stats_today_so_total_attempts               | 0.0                          | float64       |
+| user_stats_today_tf_accuracy_rate                | 0.0                          | float64       |
+| user_stats_today_tf_correct_attempts             | 0.0                          | float64       |
+| user_stats_today_tf_incorrect_attempts           | 0.0                          | float64       |
+| user_stats_today_tf_total_attempts               | 0.0                          | float64       |
+| user_stats_today_total_attempts                  | 0.0                          | float64       |
+| user_stats_total_attempts                        | 0.0                          | float64       |
+| user_stats_total_correct_attempts                | 0.0                          | float64       |
+| user_stats_total_fitb_attempts                   | 0.0                          | float64       |
+| user_stats_total_fitb_correct_attempts           | 0.0                          | float64       |
+| user_stats_total_fitb_incorrrect_attempts        | 0.0                          | float64       |
+| user_stats_total_incorrect_attempts              | 0.0                          | float64       |
+| user_stats_total_mcq_attempts                    | 0.0                          | float64       |
+| user_stats_total_mcq_correct_attempts            | 0.0                          | float64       |
+| user_stats_total_mcq_incorrrect_attempts         | 0.0                          | float64       |
+| user_stats_total_non_circ_questions              | 0.0                          | float64       |
+| user_stats_total_sata_attempts                   | 0.0                          | float64       |
+| user_stats_total_sata_correct_attempts           | 0.0                          | float64       |
+| user_stats_total_so_attempts                     | 0.0                          | float64       |
+| user_stats_total_so_correct_attempts             | 0.0                          | float64       |
+| user_stats_total_tf_attempts                     | 0.0                          | float64       |
+| user_stats_total_tf_correct_attempts             | 0.0                          | float64       |
+| user_stats_total_tf_incorrrect_attempts          | 0.0                          | float64       |

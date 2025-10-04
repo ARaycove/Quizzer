@@ -10,6 +10,30 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+def question_type_distribution_bar_chart(df: pd.DataFrame, save_prefix: str = 'question_type_dist'):
+    """Bar chart of count by question_type from one-hot encoded columns."""
+    import matplotlib.pyplot as plt
+    
+    qt_cols = [col for col in df.columns if col.startswith('question_type_')]
+    
+    if not qt_cols:
+        print("No question_type columns found")
+        return
+    
+    counts = {col.replace('question_type_', ''): df[col].sum() for col in qt_cols}
+    
+    plt.figure(figsize=(10, 6))
+    plt.bar(counts.keys(), counts.values(), color='steelblue', alpha=0.7)
+    plt.xlabel('Question Type')
+    plt.ylabel('Count')
+    plt.title('Question Distribution by Type')
+    plt.xticks(rotation=45, ha='right')
+    plt.tight_layout()
+    plt.savefig(f'{save_prefix}.png', dpi=300, bbox_inches='tight')
+    plt.close()
+    
+    print(f"Question type distribution saved to {save_prefix}.png")
+
 def create_comprehensive_visualizations(metrics, save_prefix=None):
     """
     Creates comprehensive visualizations from model analytics metrics.
@@ -708,60 +732,61 @@ def analyze_feature_imbalance(df: pd.DataFrame) -> None:
 
 def feature_importance_analysis(df: pd.DataFrame, target_col: str, filename: str = "feature_importance_analysis.txt") -> None:
     """
-    Analyzes feature importance using RandomForest and Mutual Information.
-    Saves top features and grouped analysis by prefix to a text file.
+    Analyzes feature characteristics using correlation and mutual information before model training.
     
     Args:
         df: DataFrame with features and target
         target_col: Name of target column (e.g., 'response_result')
         filename: Output filename
     """
-    # Separate features and target
     X = df.drop(columns=[target_col])
     y = df[target_col]
     
-    print(f"Running feature importance analysis on {X.shape[1]} features...")
+    print(f"Running feature analysis on {X.shape[1]} features...")
     
-    # RandomForest feature importance
-    rf = RandomForestClassifier(n_estimators=100, random_state=42, n_jobs=-1)
-    rf.fit(X, y)
-    rf_importance = pd.Series(rf.feature_importances_, index=X.columns).sort_values(ascending=False)
+    # Correlation with target
+    correlations = X.corrwith(y).abs().sort_values(ascending=False)
     
-    # Mutual Information scores
+    # Mutual Information
     mi_scores = mutual_info_classif(X, y, random_state=42)
     mi_importance = pd.Series(mi_scores, index=X.columns).sort_values(ascending=False)
     
-    # Group analysis by feature prefix
+    # Feature variance
+    variances = X.var().sort_values(ascending=False)
+    
+    # Identify noise features (low correlation AND low MI)
+    corr_threshold = correlations.quantile(0.25)
+    mi_threshold = mi_importance.quantile(0.25)
+    noise_features = X.columns[(correlations < corr_threshold) & (mi_importance < mi_threshold)]
+    
+    # Feature prefix analysis
     prefix_importance = {}
     for feature in X.columns:
         if '_' in feature:
             prefix = feature.split('_')[0]
             if prefix not in prefix_importance:
                 prefix_importance[prefix] = []
-            prefix_importance[prefix].append(rf_importance[feature])
+            prefix_importance[prefix].append(mi_importance[feature])
     
-    # Calculate mean importance by prefix
     prefix_means = {prefix: np.mean(scores) for prefix, scores in prefix_importance.items()}
     prefix_means_sorted = sorted(prefix_means.items(), key=lambda x: x[1], reverse=True)
     
     with open(filename, 'w') as f:
         f.write("=" * 80 + "\n")
-        f.write("FEATURE IMPORTANCE ANALYSIS\n")
+        f.write("FEATURE ANALYSIS (PRE-TRAINING)\n")
         f.write("=" * 80 + "\n")
         f.write(f"Dataset: {X.shape[0]} samples x {X.shape[1]} features\n")
         f.write(f"Target: {target_col}\n")
         f.write(f"Target distribution: {y.value_counts().to_dict()}\n")
         f.write("=" * 80 + "\n\n")
         
-        # Top 50 RandomForest features
-        f.write("TOP 50 FEATURES - RANDOM FOREST IMPORTANCE\n")
+        f.write("TOP 50 FEATURES - CORRELATION WITH TARGET\n")
         f.write("-" * 60 + "\n")
-        for i, (feature, importance) in enumerate(rf_importance.head(50).items(), 1):
-            f.write(f"{i:2d}. {feature:<45} | {importance:.6f}\n")
+        for i, (feature, corr) in enumerate(correlations.head(50).items(), 1):
+            f.write(f"{i:2d}. {feature:<45} | {corr:.6f}\n")
         
         f.write("\n" + "=" * 80 + "\n")
         
-        # Top 50 Mutual Information features
         f.write("TOP 50 FEATURES - MUTUAL INFORMATION\n")
         f.write("-" * 60 + "\n")
         for i, (feature, mi_score) in enumerate(mi_importance.head(50).items(), 1):
@@ -769,8 +794,7 @@ def feature_importance_analysis(df: pd.DataFrame, target_col: str, filename: str
         
         f.write("\n" + "=" * 80 + "\n")
         
-        # Feature prefix analysis
-        f.write("FEATURE IMPORTANCE BY PREFIX (Mean RandomForest Importance)\n")
+        f.write("FEATURE IMPORTANCE BY PREFIX (Mean MI)\n")
         f.write("-" * 60 + "\n")
         for i, (prefix, mean_importance) in enumerate(prefix_means_sorted, 1):
             count = len(prefix_importance[prefix])
@@ -778,37 +802,41 @@ def feature_importance_analysis(df: pd.DataFrame, target_col: str, filename: str
         
         f.write("\n" + "=" * 80 + "\n")
         
-        # Module-specific analysis if mvec features exist
         module_features = [f for f in X.columns if f.startswith('mvec_')]
         if module_features:
             f.write("TOP MODULE PERFORMANCE FEATURES\n")
             f.write("-" * 60 + "\n")
-            module_importance = rf_importance[module_features].head(20)
+            module_importance = mi_importance[module_features].head(20)
             for i, (feature, importance) in enumerate(module_importance.items(), 1):
                 f.write(f"{i:2d}. {feature:<45} | {importance:.6f}\n")
+            f.write("\n" + "=" * 80 + "\n")
+        
+        f.write("POTENTIAL NOISE FEATURES (Low Correlation & Low MI)\n")
+        f.write(f"Threshold: Corr < {corr_threshold:.6f}, MI < {mi_threshold:.6f}\n")
+        f.write(f"Total: {len(noise_features)} features\n")
+        f.write("-" * 60 + "\n")
+        for i, feature in enumerate(sorted(noise_features), 1):
+            corr_val = correlations[feature]
+            mi_val = mi_importance[feature]
+            f.write(f"{i:2d}. {feature:<45} | Corr: {corr_val:.6f} | MI: {mi_val:.6f}\n")
     
-    # Create visualizations
     fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(16, 12))
     
-    # Top 20 RandomForest features
-    rf_importance.head(20).plot(kind='barh', ax=ax1)
-    ax1.set_title('Top 20 Features - Random Forest Importance')
-    ax1.set_xlabel('Importance Score')
+    correlations.head(20).plot(kind='barh', ax=ax1)
+    ax1.set_title('Top 20 Features - Correlation with Target')
+    ax1.set_xlabel('Correlation')
     
-    # Top 20 Mutual Information features  
     mi_importance.head(20).plot(kind='barh', ax=ax2)
     ax2.set_title('Top 20 Features - Mutual Information')
     ax2.set_xlabel('MI Score')
     
-    # Feature prefix importance
     prefix_df = pd.DataFrame(prefix_means_sorted[:15], columns=['Prefix', 'Mean_Importance'])
     sns.barplot(data=prefix_df, x='Mean_Importance', y='Prefix', ax=ax3)
     ax3.set_title('Feature Importance by Prefix')
     
-    # Importance distribution
-    ax4.hist(rf_importance.values, bins=50, alpha=0.7)
-    ax4.set_title('Distribution of Feature Importance Scores')
-    ax4.set_xlabel('Importance Score')
+    ax4.hist(mi_importance.values, bins=50, alpha=0.7)
+    ax4.set_title('Distribution of MI Scores')
+    ax4.set_xlabel('MI Score')
     ax4.set_ylabel('Frequency')
     
     plt.tight_layout()
@@ -816,10 +844,11 @@ def feature_importance_analysis(df: pd.DataFrame, target_col: str, filename: str
     plt.savefig(chart_filename, dpi=300, bbox_inches='tight')
     plt.close()
     
-    print(f"Feature importance analysis saved to {filename}")
+    print(f"Feature analysis saved to {filename}")
     print(f"Visualization saved to {chart_filename}")
     print(f"Top 3 feature prefixes: {[p[0] for p in prefix_means_sorted[:3]]}")
-    print(f"Most important single feature: {rf_importance.index[0]} ({rf_importance.iloc[0]:.6f})")
+    print(f"Most important single feature: {mi_importance.index[0]} ({mi_importance.iloc[0]:.6f})")
+    print(f"Potential noise features identified: {len(noise_features)}")
 
 def save_feature_analysis(df: pd.DataFrame, filename: str = "feature_analysis.txt") -> None:
     """
@@ -888,7 +917,6 @@ def save_feature_analysis(df: pd.DataFrame, filename: str = "feature_analysis.tx
     
     print(f"Feature analysis saved to {filename}")
     print(f"Report summary: {df.shape[0]:,} rows, {df.shape[1]:,} features, {memory_usage_mb:.1f}MB")
-
 def model_analytics_report(model, X_test, y_test, save_to_file=True, filename=None):
     """
     Comprehensive evaluation and analysis of model performance on test set.
@@ -916,7 +944,7 @@ def model_analytics_report(model, X_test, y_test, save_to_file=True, filename=No
             file_handle.write(text + "\n")
     
     # Open file if saving
-    file_handle = open(filename, 'w') if save_to_file else None
+    file_handle = open(filename, 'w', encoding='utf-8') if save_to_file else None
     
     try:
         # Test set evaluation
@@ -990,18 +1018,18 @@ def model_analytics_report(model, X_test, y_test, save_to_file=True, filename=No
         
         # Print results (same as before but with additional metrics)
         results_text = f"""Test Loss: {test_loss:.4f}
-Test Accuracy: {test_accuracy:.4f}
-Test Precision: {test_precision:.4f}
-Test Recall: {test_recall:.4f}
-Test F1-Score: {f1:.4f}
-Test AUC-ROC: {auc:.4f}
-Brier Score: {brier_score:.4f}
+            Test Accuracy: {test_accuracy:.4f}
+            Test Precision: {test_precision:.4f}
+            Test Recall: {test_recall:.4f}
+            Test F1-Score: {f1:.4f}
+            Test AUC-ROC: {auc:.4f}
+            Brier Score: {brier_score:.4f}
 
-Confusion Matrix:
-{conf_matrix}
+            Confusion Matrix:
+            {conf_matrix}
 
-Classification Report:
-{class_report}"""
+            Classification Report:
+            {class_report}"""
         
         print_and_write(results_text, file_handle)
         
@@ -1011,10 +1039,10 @@ Classification Report:
         
         # Overall probability distribution
         prob_dist = f"""Overall Probability Distribution:
-Min: {y_pred_prob_flat.min():.4f}
-Max: {y_pred_prob_flat.max():.4f}
-Mean: {y_pred_prob_flat.mean():.4f}
-Std: {y_pred_prob_flat.std():.4f}"""
+            Min: {y_pred_prob_flat.min():.4f}
+            Max: {y_pred_prob_flat.max():.4f}
+            Mean: {y_pred_prob_flat.mean():.4f}
+            Std: {y_pred_prob_flat.std():.4f}"""
         
         print_and_write(prob_dist, file_handle)
         
@@ -1024,11 +1052,11 @@ Std: {y_pred_prob_flat.std():.4f}"""
         
         if len(incorrect_probs) > 0:
             incorrect_text = f"""INCORRECT ANSWERS (Class 0) - {len(incorrect_probs)} samples:
-  Min: {incorrect_probs.min():.4f}
-  Max: {incorrect_probs.max():.4f}
-  Mean: {incorrect_probs.mean():.4f}
-  Std: {incorrect_probs.std():.4f}
-  Percentiles [10,25,50,75,90]: {class_0_percentiles}"""
+                Min: {incorrect_probs.min():.4f}
+                Max: {incorrect_probs.max():.4f}
+                Mean: {incorrect_probs.mean():.4f}
+                Std: {incorrect_probs.std():.4f}
+                Percentiles [10,25,50,75,90]: {class_0_percentiles}"""
         else:
             incorrect_text = "INCORRECT ANSWERS (Class 0): No samples in test set"
         
@@ -1036,12 +1064,12 @@ Std: {y_pred_prob_flat.std():.4f}"""
         
         if len(correct_probs) > 0:
             correct_text = f"""
-CORRECT ANSWERS (Class 1) - {len(correct_probs)} samples:
-  Min: {correct_probs.min():.4f}
-  Max: {correct_probs.max():.4f}
-  Mean: {correct_probs.mean():.4f}
-  Std: {correct_probs.std():.4f}
-  Percentiles [10,25,50,75,90]: {class_1_percentiles}"""
+                CORRECT ANSWERS (Class 1) - {len(correct_probs)} samples:
+                Min: {correct_probs.min():.4f}
+                Max: {correct_probs.max():.4f}
+                Mean: {correct_probs.mean():.4f}
+                Std: {correct_probs.std():.4f}
+                Percentiles [10,25,50,75,90]: {class_1_percentiles}"""
         else:
             correct_text = "CORRECT ANSWERS (Class 1): No samples in test set"
         
@@ -1051,12 +1079,12 @@ CORRECT ANSWERS (Class 1) - {len(correct_probs)} samples:
         if len(incorrect_probs) > 0 and len(correct_probs) > 0:
             mean_diff = correct_probs.mean() - incorrect_probs.mean()
             discrimination_text = f"""
-DISCRIMINATION ANALYSIS:
-Mean probability difference (Correct - Incorrect): {mean_diff:.4f}
-Overlap analysis: {overlap_count}/{total_comparisons} comparisons ({overlap_percentage:.2f}%)
-Perfect separation: {perfect_separation}
-Max Class 0 probability: {max_class_0:.4f}
-Min Class 1 probability: {min_class_1:.4f}"""
+                DISCRIMINATION ANALYSIS:
+                Mean probability difference (Correct - Incorrect): {mean_diff:.4f}
+                Overlap analysis: {overlap_count}/{total_comparisons} comparisons ({overlap_percentage:.2f}%)
+                Perfect separation: {perfect_separation}
+                Max Class 0 probability: {max_class_0:.4f}
+                Min Class 1 probability: {min_class_1:.4f}"""
             if mean_diff > 0:
                 discrimination_text += "\n✓ Model assigns higher probabilities to correct answers"
             else:

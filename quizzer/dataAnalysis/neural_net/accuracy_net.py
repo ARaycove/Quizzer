@@ -1,10 +1,7 @@
-import attempt_pre_process as ap
-from neural_net_model import create_quizzer_neural_network, kfold_cross_validation
-from grid_search import grid_search_quizzer_model
-
-
-import reports as rp
-import pandas as pd
+import neural_net.attempt_pre_process as ap
+from neural_net.grid_search import grid_search_quizzer_model
+import os
+import neural_net.reports as rp
 import numpy as np
 import tensorflow as tf
 import random
@@ -33,9 +30,10 @@ def pre_process_training_data():
     # Save the feature names we kept, for use in ml_models_table.dart
 
     # Run initial reporting and analysis on processed frame
-    # rp.save_feature_analysis(df)
-    # rp.feature_importance_analysis(df, "response_result")
-    # rp.analyze_feature_imbalance(df)
+    rp.question_type_distribution_bar_chart(df)
+    rp.save_feature_analysis(df)
+    rp.feature_importance_analysis(df, "response_result")
+    rp.analyze_feature_imbalance(df)
     # data should be ready for plotting and analysis
     return df
 
@@ -57,57 +55,17 @@ if __name__ == "__main__":
     # Run comprehensive grid search
     results_df = grid_search_quizzer_model(X_train, y_train, X_test, y_test)
     
-    if results_df is not None:
-        best_row = results_df.iloc[0]
-        print(f"\nBEST CONFIGURATION:")
-        print(f"Mean Discrimination: {best_row['mean_discrimination']:.4f}")
-        print(f"ROC AUC: {best_row['roc_auc']:.3f}")
-        print(f"Probability Range: {best_row['prob_range']:.3f}")
+    if os.path.exists('global_best_model.keras'):
+        print(f"\nLoading global best model from disk...")
+        final_model = tf.keras.models.load_model('global_best_model.keras')
         
-        # Extract best parameters and rebuild model for full report
-        print("\nBuilding final model with best parameters...")
+        print(f"Model loaded with {X_train.shape[1]} input features")
         
-        # Apply SMOTE with best parameters
-        X_train_final, y_train_final = ap.apply_smote_balancing(
-            X_train=X_train.copy(), 
-            y_train=y_train.copy(),
-            sampling_strategy=best_row['sampling_strategy'],
-            random_state=seed,
-            k_neighbors=int(best_row['k_neighbors'])
-        )
-        
-        # Create final model with best neural network parameters
-        input_features = X_train.shape[1]
-        final_model = create_quizzer_neural_network(
-            input_dim=input_features,
-            layer_width=int(best_row['layer_width']),
-            reduction_percent=best_row['reduction_percent'],
-            stop_condition=int(best_row['stop_condition']),
-            activation='relu',
-            dropout_rate=best_row['dropout_rate'],
-            batch_norm=True,
-            focal_gamma=best_row['focal_gamma'],
-            focal_alpha=best_row['focal_alpha']
-        )
-        
-        # Train final model with best k-fold parameters
-        final_model = kfold_cross_validation(
-            final_model, 
-            X_train_final, 
-            y_train_final, 
-            k_folds=int(best_row['k_folds']), 
-            epochs=int(best_row['epochs']), 
-            batch_size=int(best_row['batch_size'])
-        )
-        
-        print(f"Final model created with {input_features} input features")
-        
-        # Generate comprehensive analytics report
         metrics = rp.model_analytics_report(final_model, X_test, y_test, filename="NN_Text_Report.txt")
         rp.create_comprehensive_visualizations(metrics, "Quizzer_NN")
         
     else:
-        print("Grid search failed - no successful combinations found")
+        print("Grid search failed - no model saved")
 
     
 

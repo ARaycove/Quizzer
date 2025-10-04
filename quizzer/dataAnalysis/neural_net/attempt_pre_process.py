@@ -7,6 +7,8 @@ import pandas as pd
 import json
 from typing import List, Dict, Any
 from imblearn.over_sampling import SMOTE
+import numpy as np
+import tensorflow as tf
 
 def get_attempt_dataframe() -> pd.DataFrame:
     """
@@ -126,7 +128,28 @@ def flatten_attempts_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     additional_drops = [
         "user_stats_user_id", "user_stats_record_date", 
         "user_stats_last_modified_timestamp", "up_birth_date",
-        "user_stats_has_been_synced", "user_stats_edits_are_synced"
+        "user_stats_has_been_synced", "user_stats_edits_are_synced",
+        "module_name_bio 160", # bio 160, was misnamed, a course title, not even a subject category, this vector get's stripped
+        "mvec_bio 160_num_fitb", "mvec_bio 160_num_total",  "mvec_bio 160_overall_accuracy",
+        "mvec_bio 160_num_mcq", "mvec_bio 160_num_mcq", "mvec_bio 160_num_tf", "mvec_bio 160_days_since_last_seen",
+        "mvec_bio 160_total_attempts", "mvec_bio 160_total_correct_attempts", "mvec_bio 160_total_incorrect_attempts",
+        "mvec_bio 160_total_seen","mvec_bio 160_avg_attempts_per_question", "mvec_bio 160_avg_reaction_time",
+        "mvec_bio 160_percentage_seen",
+        
+        "module_name_chemistry and strcutural biology", # Typo module name get's stripped (just noise)
+        "mvec_chemistry and strcutural biology_days_since_last_seen",
+         
+         
+        "module_name_math", # Generic math module, noisy, serves as a catch all for unclassified math shit
+        "mvec_math_num_fitb", "mvec_math_num_mcq", "mvec_math_num_total", "mvec_math_total_attempts",
+        "mvec_math_total_correct_attempts", "mvec_math_total_incorrect_attempts", "mvec_math_total_seen",
+        "mvec_math_avg_attempts_per_question", "mvec_math_avg_reaction_time", "mvec_math_days_since_last_seen",
+        "mvec_math_overall_accuracy", "mvec_math_percentage_seen"
+
+        
+
+        # Noisy Stats, not really related to accuracy
+        "user_stats_total_non_circ_questions", "user_stats_total_in_circ_questions", "user_stats_total_eligible_questions",
     ]
     processed_df = processed_df.drop(columns=[col for col in additional_drops if col in processed_df.columns])
     
@@ -297,30 +320,17 @@ def flatten_question_vector(df: pd.DataFrame, prefix: str) -> pd.DataFrame:
 
 def handle_nulls(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Handles null values for numeric features only.
-    
-    - user_stats_: Fill with 0
-    - rs_: Fill with 0 
-    - mvec_: Fill with 0
-    
-    Categorical features (up_*, module_name, question_type) are left as-is 
-    for OneHotEncoder to handle.
+    Handles null values by filling all NaN values with 0.
     
     Args:
         df: DataFrame with flattened features
         
     Returns:
-        DataFrame with numeric nulls filled
+        DataFrame with all nulls filled with 0
     """
     df = df.copy()
-    
-    # Fill numeric columns with 0
-    for col in df.columns:
-        if col.startswith(('user_stats_', 'rs_', 'mvec_')):
-            df[col] = df[col].fillna(0)
-    
-    print("Filled nulls with 0 for user_stats_, rs_, and mvec_ columns")
-    
+    df = df.fillna(0)
+    print("Filled all NaN values with 0")
     return df
 
 def oneHotEncodeDataframe(df: pd.DataFrame) -> pd.DataFrame:
@@ -363,11 +373,11 @@ def oneHotEncodeDataframe(df: pd.DataFrame) -> pd.DataFrame:
     return result_df
 
 def drop_zero_columns(df: pd.DataFrame) -> pd.DataFrame:
-    """Remove columns where all values are 0."""
-    zero_cols = df.columns[(df == 0).all()].tolist()
-    if zero_cols:
-        print(f"Dropped {len(zero_cols)} zero-only columns")
-    return df.drop(columns=zero_cols)
+    """Remove columns with zero variance (all values identical)."""
+    zero_var_cols = df.columns[df.nunique() <= 1].tolist()
+    if zero_var_cols:
+        print(f"Dropped {len(zero_var_cols)} zero-variance columns")
+    return df.drop(columns=zero_var_cols)
 
 def cap_reaction_times(df: pd.DataFrame, method: str = 'iqr', factor: float = 1.5) -> pd.DataFrame:
     """
@@ -499,3 +509,79 @@ def apply_smote_balancing(X_train: pd.DataFrame, y_train: pd.Series,
     print(f"\nSMOTE complete: {len(X_train)} → {len(X_train_balanced)} samples")
     
     return X_train_balanced, y_train_balanced
+
+def vectorize_sample(sample_dict, feature_map):
+    """
+    Transform a sample dictionary into a properly ordered vector for model input.
+    
+    Args:
+        sample_dict: Dictionary with feature names as keys and values
+        feature_map: Dictionary loaded from feature_map.json with structure:
+                     {feature_name: {"default_value": float, "pos": int}}
+    
+    Returns:
+        numpy array of shape (1, n_features) ready for model.predict()
+    """
+    import numpy as np
+    
+    n_features = len(feature_map)
+    vector = np.zeros(n_features)
+    
+    for feature_name, feature_info in feature_map.items():
+        pos = feature_info['pos']
+        default_value = feature_info['default_value']
+        
+        if feature_name in sample_dict:
+            vector[pos] = sample_dict[feature_name]
+        else:
+            vector[pos] = default_value
+    
+    return vector.reshape(1, -1)
+
+def load_model_and_transform_test_data(model_path='global_best_model.keras', 
+                                       feature_map_path='input_feature_map.json',
+                                       X_test=None):
+    """
+    Load saved .keras model and transform X_test into proper vector format.
+    
+    Args:
+        model_path: Path to saved .keras model file
+        feature_map_path: Path to saved feature map JSON
+        X_test: Test data DataFrame to transform
+        
+    Returns:
+        Tuple of (model, X_test_transformed)
+    """
+    # Load the model
+    model = tf.keras.models.load_model(model_path)
+    
+    # Load feature map
+    with open(feature_map_path, 'r') as f:
+        feature_map = json.load(f)
+    
+    # Get expected feature order from feature map
+    expected_features = sorted(feature_map.items(), key=lambda x: x[1]['pos'])
+    feature_order = [feat[0] for feat in expected_features]
+    n_features = len(feature_order)
+    
+    # Transform X_test to match expected feature order and fill missing features
+    X_test_transformed = np.zeros((len(X_test), n_features))
+    
+    for feature_name, feature_info in feature_map.items():
+        pos = feature_info['pos']
+        default_value = feature_info['default_value']
+        
+        if feature_name in X_test.columns:
+            X_test_transformed[:, pos] = X_test[feature_name].fillna(default_value).values
+        else:
+            X_test_transformed[:, pos] = default_value
+    
+    # Convert back to DataFrame with proper column names and preserve original index
+    X_test_transformed = pd.DataFrame(X_test_transformed, columns=feature_order, index=X_test.index)
+    
+    print(f"Model loaded from: {model_path}")
+    print(f"Feature map loaded from: {feature_map_path}")
+    print(f"Transformed test data shape: {X_test_transformed.shape}")
+    print(f"Expected features: {n_features}")
+    
+    return model, X_test_transformed

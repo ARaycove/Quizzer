@@ -48,16 +48,8 @@ def create_quizzer_neural_network(input_dim,
     inputs = tf.keras.Input(shape=(input_dim,))
     x = inputs
     
-    # print(f"Creating neural network with input_dim={input_dim}, layer_width={layer_width}")
-    # print(f"Reduction: {reduction_percent*100}% per step, stopping at {stop_condition} neurons")
-    # print(f"Focal loss: gamma={focal_gamma}, alpha={focal_alpha}")
-    # print("-" * 60)
-    
-    # Create layer_width number of layers, each with input_dim neurons
-    # print(f"Creating {layer_width} initial layers with {input_dim} neurons each:")
     for i in range(layer_width):
         x = layers.Dense(input_dim)(x)
-        # print(f"  Layer {i+1}: {input_dim} neurons")
         
         if batch_norm:
             x = layers.BatchNormalization()(x)
@@ -70,26 +62,17 @@ def create_quizzer_neural_network(input_dim,
         if dropout_rate > 0:
             x = layers.Dropout(dropout_rate)(x)
     
-    # print(f"Initial layers complete: {layer_width} layers created")
-    # print("-" * 60)
-    
-    # Create reducing layers - layer_width layers at each reduction step
     current_size = input_dim
     reduction_step = 1
     
-    # print("Starting reduction phase:")
     while True:
         next_size = int(current_size * (1 - reduction_percent))
         
         if next_size <= stop_condition:
             next_size = stop_condition
-            
-        # print(f"Reduction step {reduction_step}: Creating {layer_width} layers with {next_size} neurons each:")
         
-        # Create layer_width layers at this size
         for i in range(layer_width):
             x = layers.Dense(next_size)(x)
-            # print(f"  Layer {i+1}: {next_size} neurons")
             
             if batch_norm:
                 x = layers.BatchNormalization()(x)
@@ -106,34 +89,24 @@ def create_quizzer_neural_network(input_dim,
         reduction_step += 1
         
         if current_size <= stop_condition:
-            # print(f"Reached stop condition ({stop_condition} neurons), ending reduction")
             break
     
-    # print("-" * 60)
-    
-    # Output layer - always sigmoid for probability
     outputs = layers.Dense(1, activation='sigmoid')(x)
-    # print("Creating output layer: 1 neuron with sigmoid activation")
     
     model = Model(inputs=inputs, outputs=outputs)
     
-    total_layers = len(model.layers)
-    # print(f"Model created successfully with {total_layers} total layers")
-    # print("=" * 60)
-    
-    # Configure optimizer
     if optimizer == 'adam':
-        opt = Adam(learning_rate=learning_rate)
+        opt = Adam(learning_rate=learning_rate, clipnorm=1.0)
     elif optimizer == 'sgd':
-        opt = tf.keras.optimizers.SGD(learning_rate=learning_rate)
+        opt = tf.keras.optimizers.SGD(learning_rate=learning_rate, clipnorm=1.0)
     elif optimizer == 'rmsprop':
-        opt = tf.keras.optimizers.RMSprop(learning_rate=learning_rate)
+        opt = tf.keras.optimizers.RMSprop(learning_rate=learning_rate, clipnorm=1.0)
     
     model.compile(
         optimizer=opt,
         loss=tf.keras.losses.BinaryFocalCrossentropy(
-            gamma=focal_gamma,     # Use parameter
-            alpha=focal_alpha      # Use parameter
+            gamma=focal_gamma,
+            alpha=focal_alpha
         ),
         metrics=['accuracy', 'precision', 'recall']
     )
