@@ -4,6 +4,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_selection import mutual_info_classif
 from sklearn.metrics import (classification_report, confusion_matrix, f1_score, roc_auc_score, 
                            roc_curve, precision_recall_curve, brier_score_loss)
+from sklearn.metrics import f1_score, accuracy_score, precision_score, recall_score
 from sklearn.metrics import ConfusionMatrixDisplay
 import datetime
 import numpy as np
@@ -917,12 +918,14 @@ def save_feature_analysis(df: pd.DataFrame, filename: str = "feature_analysis.tx
     
     print(f"Feature analysis saved to {filename}")
     print(f"Report summary: {df.shape[0]:,} rows, {df.shape[1]:,} features, {memory_usage_mb:.1f}MB")
-def model_analytics_report(model, X_test, y_test, save_to_file=True, filename=None):
+
+
+def model_analytics_report(interpreter, X_test, y_test, save_to_file=True, filename=None):
     """
-    Comprehensive evaluation and analysis of model performance on test set.
+    Comprehensive evaluation and analysis of TFLite model performance on test set.
     
     Args:
-        model: Trained TensorFlow model
+        interpreter: TFLite interpreter
         X_test: Test features
         y_test: Test targets
         save_to_file: Whether to save output to file
@@ -943,6 +946,23 @@ def model_analytics_report(model, X_test, y_test, save_to_file=True, filename=No
         if file_handle:
             file_handle.write(text + "\n")
     
+    # Get input/output details
+    input_details = interpreter.get_input_details()
+    output_details = interpreter.get_output_details()
+    
+    # Get predictions using TFLite interpreter
+    y_pred_prob = []
+    for i in range(len(X_test)):
+        input_data = X_test.iloc[i:i+1].values.astype(np.float32)
+        interpreter.set_tensor(input_details[0]['index'], input_data)
+        interpreter.invoke()
+        output_data = interpreter.get_tensor(output_details[0]['index'])
+        y_pred_prob.append(output_data[0])
+    
+    y_pred_prob = np.array(y_pred_prob)
+    y_pred_prob_flat = y_pred_prob.flatten()
+    y_pred = (y_pred_prob_flat > 0.5).astype(int)
+    
     # Open file if saving
     file_handle = open(filename, 'w', encoding='utf-8') if save_to_file else None
     
@@ -951,16 +971,12 @@ def model_analytics_report(model, X_test, y_test, save_to_file=True, filename=No
         header = "\n" + "="*60 + "\nFINAL TEST SET EVALUATION\n" + "="*60
         print_and_write(header, file_handle)
         
-        test_loss, test_accuracy, test_precision, test_recall = model.evaluate(X_test, y_test, verbose=1)
-        
-        # Get predictions
-        y_pred_prob = model.predict(X_test)
-        y_pred = (y_pred_prob > 0.5).astype(int).flatten()
-        y_pred_prob_flat = y_pred_prob.flatten()
-        
         # Calculate comprehensive metrics
+        test_accuracy = accuracy_score(y_test, y_pred)
+        test_precision = precision_score(y_test, y_pred)
+        test_recall = recall_score(y_test, y_pred)
         f1 = f1_score(y_test, y_pred)
-        auc = roc_auc_score(y_test, y_pred_prob)
+        auc = roc_auc_score(y_test, y_pred_prob_flat)
         conf_matrix = confusion_matrix(y_test, y_pred)
         class_report = classification_report(y_test, y_pred)
         
@@ -986,7 +1002,6 @@ def model_analytics_report(model, X_test, y_test, save_to_file=True, filename=No
         
         # Overlap analysis - key metric for discrimination
         if len(incorrect_probs) > 0 and len(correct_probs) > 0:
-            # Count how many class 0 predictions are higher than class 1 predictions
             overlap_count = 0
             for inc_prob in incorrect_probs:
                 overlap_count += (correct_probs < inc_prob).sum()
@@ -994,7 +1009,6 @@ def model_analytics_report(model, X_test, y_test, save_to_file=True, filename=No
             total_comparisons = len(incorrect_probs) * len(correct_probs)
             overlap_percentage = (overlap_count / total_comparisons) * 100 if total_comparisons > 0 else 0
             
-            # Perfect separation threshold
             max_class_0 = incorrect_probs.max() if len(incorrect_probs) > 0 else 0
             min_class_1 = correct_probs.min() if len(correct_probs) > 0 else 1
             perfect_separation = max_class_0 < min_class_1
@@ -1016,20 +1030,19 @@ def model_analytics_report(model, X_test, y_test, save_to_file=True, filename=No
         else:
             class_1_percentiles = np.array([0, 0, 0, 0, 0])
         
-        # Print results (same as before but with additional metrics)
-        results_text = f"""Test Loss: {test_loss:.4f}
-            Test Accuracy: {test_accuracy:.4f}
-            Test Precision: {test_precision:.4f}
-            Test Recall: {test_recall:.4f}
-            Test F1-Score: {f1:.4f}
-            Test AUC-ROC: {auc:.4f}
-            Brier Score: {brier_score:.4f}
+        # Print results
+        results_text = f"""Test Accuracy: {test_accuracy:.4f}
+Test Precision: {test_precision:.4f}
+Test Recall: {test_recall:.4f}
+Test F1-Score: {f1:.4f}
+Test AUC-ROC: {auc:.4f}
+Brier Score: {brier_score:.4f}
 
-            Confusion Matrix:
-            {conf_matrix}
+Confusion Matrix:
+{conf_matrix}
 
-            Classification Report:
-            {class_report}"""
+Classification Report:
+{class_report}"""
         
         print_and_write(results_text, file_handle)
         
@@ -1039,10 +1052,10 @@ def model_analytics_report(model, X_test, y_test, save_to_file=True, filename=No
         
         # Overall probability distribution
         prob_dist = f"""Overall Probability Distribution:
-            Min: {y_pred_prob_flat.min():.4f}
-            Max: {y_pred_prob_flat.max():.4f}
-            Mean: {y_pred_prob_flat.mean():.4f}
-            Std: {y_pred_prob_flat.std():.4f}"""
+  Min: {y_pred_prob_flat.min():.4f}
+  Max: {y_pred_prob_flat.max():.4f}
+  Mean: {y_pred_prob_flat.mean():.4f}
+  Std: {y_pred_prob_flat.std():.4f}"""
         
         print_and_write(prob_dist, file_handle)
         
@@ -1052,11 +1065,11 @@ def model_analytics_report(model, X_test, y_test, save_to_file=True, filename=No
         
         if len(incorrect_probs) > 0:
             incorrect_text = f"""INCORRECT ANSWERS (Class 0) - {len(incorrect_probs)} samples:
-                Min: {incorrect_probs.min():.4f}
-                Max: {incorrect_probs.max():.4f}
-                Mean: {incorrect_probs.mean():.4f}
-                Std: {incorrect_probs.std():.4f}
-                Percentiles [10,25,50,75,90]: {class_0_percentiles}"""
+  Min: {incorrect_probs.min():.4f}
+  Max: {incorrect_probs.max():.4f}
+  Mean: {incorrect_probs.mean():.4f}
+  Std: {incorrect_probs.std():.4f}
+  Percentiles [10,25,50,75,90]: {class_0_percentiles}"""
         else:
             incorrect_text = "INCORRECT ANSWERS (Class 0): No samples in test set"
         
@@ -1064,12 +1077,12 @@ def model_analytics_report(model, X_test, y_test, save_to_file=True, filename=No
         
         if len(correct_probs) > 0:
             correct_text = f"""
-                CORRECT ANSWERS (Class 1) - {len(correct_probs)} samples:
-                Min: {correct_probs.min():.4f}
-                Max: {correct_probs.max():.4f}
-                Mean: {correct_probs.mean():.4f}
-                Std: {correct_probs.std():.4f}
-                Percentiles [10,25,50,75,90]: {class_1_percentiles}"""
+CORRECT ANSWERS (Class 1) - {len(correct_probs)} samples:
+  Min: {correct_probs.min():.4f}
+  Max: {correct_probs.max():.4f}
+  Mean: {correct_probs.mean():.4f}
+  Std: {correct_probs.std():.4f}
+  Percentiles [10,25,50,75,90]: {class_1_percentiles}"""
         else:
             correct_text = "CORRECT ANSWERS (Class 1): No samples in test set"
         
@@ -1079,16 +1092,16 @@ def model_analytics_report(model, X_test, y_test, save_to_file=True, filename=No
         if len(incorrect_probs) > 0 and len(correct_probs) > 0:
             mean_diff = correct_probs.mean() - incorrect_probs.mean()
             discrimination_text = f"""
-                DISCRIMINATION ANALYSIS:
-                Mean probability difference (Correct - Incorrect): {mean_diff:.4f}
-                Overlap analysis: {overlap_count}/{total_comparisons} comparisons ({overlap_percentage:.2f}%)
-                Perfect separation: {perfect_separation}
-                Max Class 0 probability: {max_class_0:.4f}
-                Min Class 1 probability: {min_class_1:.4f}"""
+DISCRIMINATION ANALYSIS:
+  Mean probability difference (Correct - Incorrect): {mean_diff:.4f}
+  Overlap analysis: {overlap_count}/{total_comparisons} comparisons ({overlap_percentage:.2f}%)
+  Perfect separation: {perfect_separation}
+  Max Class 0 probability: {max_class_0:.4f}
+  Min Class 1 probability: {min_class_1:.4f}"""
             if mean_diff > 0:
-                discrimination_text += "\n✓ Model assigns higher probabilities to correct answers"
+                discrimination_text += "\n  ✓ Model assigns higher probabilities to correct answers"
             else:
-                discrimination_text += "\n✗ Model assigns higher probabilities to incorrect answers"
+                discrimination_text += "\n  ✗ Model assigns higher probabilities to incorrect answers"
             
             print_and_write(discrimination_text, file_handle)
         
@@ -1100,7 +1113,7 @@ def model_analytics_report(model, X_test, y_test, save_to_file=True, filename=No
         for low, high in ranges:
             count = ((y_pred_prob_flat >= low) & (y_pred_prob_flat < high)).sum()
             pct = count / len(y_pred_prob_flat) * 100
-            range_text = f"{low:.1f}-{high:.1f}: {count:3d} samples ({pct:5.1f}%)"
+            range_text = f"  {low:.1f}-{high:.1f}: {count:3d} samples ({pct:5.1f}%)"
             print_and_write(range_text, file_handle)
         
         # Sample predictions table
@@ -1123,8 +1136,6 @@ def model_analytics_report(model, X_test, y_test, save_to_file=True, filename=No
     
     # Return ALL metrics for comprehensive analysis
     return {
-        # Basic performance metrics
-        'test_loss': test_loss,
         'test_accuracy': test_accuracy,
         'test_precision': test_precision,
         'test_recall': test_recall,
@@ -1132,47 +1143,31 @@ def model_analytics_report(model, X_test, y_test, save_to_file=True, filename=No
         'auc_roc': auc,
         'brier_score': brier_score,
         'confusion_matrix': conf_matrix,
-        
-        # Probability distributions
         'y_pred_prob': y_pred_prob_flat,
         'y_pred': y_pred,
         'y_true': y_test.values,
-        
-        # Class-specific probability arrays
         'class_0_probabilities': incorrect_probs,
         'class_1_probabilities': correct_probs,
-        
-        # Summary statistics
         'prob_min': y_pred_prob_flat.min(),
         'prob_max': y_pred_prob_flat.max(),
         'prob_mean': y_pred_prob_flat.mean(),
         'prob_std': y_pred_prob_flat.std(),
         'prob_range': y_pred_prob_flat.max() - y_pred_prob_flat.min(),
-        
-        # Class-specific statistics
         'class_0_mean': incorrect_probs.mean() if len(incorrect_probs) > 0 else np.nan,
         'class_0_std': incorrect_probs.std() if len(incorrect_probs) > 0 else np.nan,
         'class_1_mean': correct_probs.mean() if len(correct_probs) > 0 else np.nan,
         'class_1_std': correct_probs.std() if len(correct_probs) > 0 else np.nan,
         'mean_discrimination': correct_probs.mean() - incorrect_probs.mean() if len(incorrect_probs) > 0 and len(correct_probs) > 0 else np.nan,
-        
-        # Class counts
         'class_0_count': class_0_count,
         'class_1_count': class_1_count,
         'total_samples': len(y_test),
-        
-        # Percentiles
         'class_0_percentiles': class_0_percentiles,
         'class_1_percentiles': class_1_percentiles,
-        
-        # Overlap/separation analysis
         'overlap_count': overlap_count,
         'overlap_percentage': overlap_percentage,
         'perfect_separation': perfect_separation,
         'max_class_0_prob': max_class_0,
         'min_class_1_prob': min_class_1,
-        
-        # Curve data for plotting
         'roc_fpr': fpr,
         'roc_tpr': tpr,
         'roc_thresholds': roc_thresholds,

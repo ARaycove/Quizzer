@@ -23,8 +23,8 @@ TOP 30 FEATURES WITH HIGHEST CLASS VARIANCE DIFFERENCES:
 11. user_stats_total_non_circ_questions                | 7194.625267
 12. mvec_general_num_fitb                              | 3660.310987
 13. rs_4                                               | 3344.872043
-14. mvec_general_total_seen                            | 3293.401805
-15. mvec_general_num_total                             | 3293.401805
+14. mvec_general_num_total                             | 3293.401805
+15. mvec_general_total_seen                            | 3293.401805
 16. rs_3                                               | 2773.937243
 17. mvec_chemistry_avg_reaction_time                   | 2742.634747
 18. attempt_day_ratio                                  | 2700.706812
@@ -70,22 +70,22 @@ ZERO VALUE PATTERNS BY CLASS (Top 20):
  2. module_name_cell as a building block     | Class 0:  145 | Class 1: 2241
  3. module_name_java general principles      | Class 0:  147 | Class 1: 2243
  4. module_name_code of life                 | Class 0:  147 | Class 1: 2242
- 5. module_name_chemistry and strcutural biology | Class 0:  148 | Class 1: 2242
- 6. module_name_classification               | Class 0:  148 | Class 1: 2242
- 7. module_name_history of biology           | Class 0:  147 | Class 1: 2241
- 8. module_name_thermodynamics               | Class 0:  148 | Class 1: 2242
+ 5. module_name_thermodynamics               | Class 0:  148 | Class 1: 2242
+ 6. module_name_history of biology           | Class 0:  147 | Class 1: 2241
+ 7. module_name_classification               | Class 0:  148 | Class 1: 2242
+ 8. module_name_chemistry and strcutural biology | Class 0:  148 | Class 1: 2242
  9. module_name_history of machine learning  | Class 0:  148 | Class 1: 2241
 10. module_name_support vector machines      | Class 0:  148 | Class 1: 2241
-11. mvec_cell as a building block_num_tf     | Class 0:  147 | Class 1: 2239
-12. module_name_statistical basics           | Class 0:  148 | Class 1: 2240
-13. question_type_select_all_that_apply      | Class 0:  148 | Class 1: 2240
-14. module_name_acid base                    | Class 0:  147 | Class 1: 2239
-15. num_so_options                           | Class 0:  148 | Class 1: 2240
-16. num_sata_options                         | Class 0:  148 | Class 1: 2240
-17. module_name_introductory geology         | Class 0:  148 | Class 1: 2240
-18. module_name_daily life science           | Class 0:  148 | Class 1: 2240
-19. question_type_sort_order                 | Class 0:  148 | Class 1: 2240
-20. module_name_cell and transport           | Class 0:  148 | Class 1: 2239
+11. module_name_acid base                    | Class 0:  147 | Class 1: 2239
+12. module_name_introductory geology         | Class 0:  148 | Class 1: 2240
+13. question_type_sort_order                 | Class 0:  148 | Class 1: 2240
+14. question_type_select_all_that_apply      | Class 0:  148 | Class 1: 2240
+15. num_sata_options                         | Class 0:  148 | Class 1: 2240
+16. module_name_daily life science           | Class 0:  148 | Class 1: 2240
+17. module_name_statistical basics           | Class 0:  148 | Class 1: 2240
+18. mvec_cell as a building block_num_tf     | Class 0:  147 | Class 1: 2239
+19. num_so_options                           | Class 0:  148 | Class 1: 2240
+20. module_name_calculus 1                   | Class 0:  147 | Class 1: 2238
 
 FEATURE IMBALANCE BY PREFIX:
  1. user                 | Avg Mean Diff: 19.1871 (  49 features)

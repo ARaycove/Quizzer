@@ -150,9 +150,15 @@ def update_top_results(result, model=None):
     if result['f1_mean_discrimination_auc'] > best_ever_score:
         pd.DataFrame([result]).to_csv('global_best_model.csv', index=False)
         if model:
-            model.save('global_best_model.keras')
+            # Convert to TFLite and save
+            converter = tf.lite.TFLiteConverter.from_keras_model(model)
+            tflite_model = converter.convert()
+            
+            with open('global_best_model.tflite', 'wb') as f:
+                f.write(tflite_model)
+            
         print(f"  *** NEW GLOBAL BEST: {result['f1_mean_discrimination_auc']:.6f} (previous: {best_ever_score:.6f}) ***")
-        print(f"  *** MODEL SAVED TO global_best_model.keras ***")
+        print(f"  *** MODEL SAVED TO global_best_model.tflite ***")
 
 def _load_previous_configs():
     previous_configs = []

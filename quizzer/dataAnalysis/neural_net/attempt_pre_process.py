@@ -9,6 +9,8 @@ from typing import List, Dict, Any
 from imblearn.over_sampling import SMOTE
 import numpy as np
 import tensorflow as tf
+from datetime import datetime, timezone
+from sync_fetch_data import initialize_supabase_session
 
 def get_attempt_dataframe() -> pd.DataFrame:
     """
@@ -510,50 +512,23 @@ def apply_smote_balancing(X_train: pd.DataFrame, y_train: pd.Series,
     
     return X_train_balanced, y_train_balanced
 
-def vectorize_sample(sample_dict, feature_map):
-    """
-    Transform a sample dictionary into a properly ordered vector for model input.
-    
-    Args:
-        sample_dict: Dictionary with feature names as keys and values
-        feature_map: Dictionary loaded from feature_map.json with structure:
-                     {feature_name: {"default_value": float, "pos": int}}
-    
-    Returns:
-        numpy array of shape (1, n_features) ready for model.predict()
-    """
-    import numpy as np
-    
-    n_features = len(feature_map)
-    vector = np.zeros(n_features)
-    
-    for feature_name, feature_info in feature_map.items():
-        pos = feature_info['pos']
-        default_value = feature_info['default_value']
-        
-        if feature_name in sample_dict:
-            vector[pos] = sample_dict[feature_name]
-        else:
-            vector[pos] = default_value
-    
-    return vector.reshape(1, -1)
-
-def load_model_and_transform_test_data(model_path='global_best_model.keras', 
+def load_model_and_transform_test_data(model_path='global_best_model.tflite', 
                                        feature_map_path='input_feature_map.json',
                                        X_test=None):
     """
-    Load saved .keras model and transform X_test into proper vector format.
+    Load saved .tflite model and transform X_test into proper vector format.
     
     Args:
-        model_path: Path to saved .keras model file
+        model_path: Path to saved .tflite model file
         feature_map_path: Path to saved feature map JSON
         X_test: Test data DataFrame to transform
         
     Returns:
-        Tuple of (model, X_test_transformed)
+        Tuple of (interpreter, X_test_transformed)
     """
-    # Load the model
-    model = tf.keras.models.load_model(model_path)
+    # Load the TFLite model
+    interpreter = tf.lite.Interpreter(model_path=model_path)
+    interpreter.allocate_tensors()
     
     # Load feature map
     with open(feature_map_path, 'r') as f:
@@ -584,4 +559,82 @@ def load_model_and_transform_test_data(model_path='global_best_model.keras',
     print(f"Transformed test data shape: {X_test_transformed.shape}")
     print(f"Expected features: {n_features}")
     
-    return model, X_test_transformed
+    return interpreter, X_test_transformed
+
+
+def push_model_to_supabase(model_name, metrics, model_path='global_best_model.tflite', 
+                          feature_map_path='input_feature_map.json'):
+    """
+    Upload TFLite model to Supabase storage and update ml_models table.
+    
+    Args:
+        model_name: Name for the model (used as primary key)
+        metrics: Metrics dictionary from model_analytics_report()
+        model_path: Path to .tflite model file
+        feature_map_path: Path to feature map JSON
+        
+    Returns:
+        Response from database insert/update
+    """
+    # Calculate optimal threshold from ROC curve (maximize Youden's J statistic)
+    fpr = metrics['roc_fpr']
+    tpr = metrics['roc_tpr']
+    thresholds = metrics['roc_thresholds']
+    
+    j_scores = tpr - fpr
+    optimal_idx = np.argmax(j_scores)
+    optimal_threshold = float(thresholds[optimal_idx])
+    
+    print(f"Calculated optimal threshold: {optimal_threshold:.4f}")
+    
+    supabase_client = initialize_supabase_session()
+    
+    if not supabase_client:
+        print("Error: Could not initialize Supabase session")
+        return None
+    
+    # Authenticate
+    try:
+        auth_response = supabase_client.auth.sign_in_with_password({
+            "email": "aacra0820@gmail.com",
+            "password": "Starting11Over!"
+        })
+        print("Successfully authenticated with Supabase")
+    except Exception as e:
+        print(f"Error authenticating with Supabase: {e}")
+        return None
+    
+    # Read feature map
+    with open(feature_map_path, 'r') as f:
+        feature_map = json.load(f)
+    
+    # Upload to storage bucket
+    filename = f"{model_name}.tflite"
+    try:
+        with open(model_path, 'rb') as f:
+            supabase_client.storage.from_('ml_models').upload(filename, f, {'content-type': 'application/octet-stream', 'upsert': 'true'})
+        print(f"Model uploaded to storage: ml_models/{filename}")
+    except Exception as e:
+        print(f"Error uploading model to storage: {e}")
+        return None
+    
+    # Prepare data for table
+    timestamp = datetime.now(timezone.utc).isoformat()
+    
+    data = {
+        'model_name': model_name,
+        'input_features': json.dumps(feature_map),
+        'model_json': filename,
+        'last_modified_timestamp': timestamp,
+        'optimal_threshold': optimal_threshold
+    }
+    
+    # Upsert to table
+    try:
+        response = supabase_client.table('ml_models').upsert(data).execute()
+        print(f"Database record updated: {model_name}")
+        print(f"Timestamp: {timestamp}")
+        return response
+    except Exception as e:
+        print(f"Error updating database: {e}")
+        return None
