@@ -1,104 +1,104 @@
 ================================================================================
 COMPREHENSIVE FEATURE IMBALANCE ANALYSIS
 ================================================================================
-Dataset: 2392 samples, 1374 features
+Dataset: 2612 samples, 1395 features
 Target: response_result
 
 CLASS DISTRIBUTION:
-  Class 1: 2,244 samples (93.8%)
-  Class 0: 148 samples (6.2%)
+  Class 1: 2,451 samples (93.8%)
+  Class 0: 161 samples (6.2%)
   Imbalance ratio: 15.2:1
 
 TOP 30 FEATURES WITH HIGHEST CLASS VARIANCE DIFFERENCES:
- 1. user_stats_total_attempts                          | 268922.668592
- 2. user_stats_total_correct_attempts                  | 222770.668202
- 3. user_stats_total_fitb_attempts                     | 108421.551753
- 4. user_stats_total_fitb_correct_attempts             | 88781.318107
- 5. user_stats_total_mcq_attempts                      | 28031.136921
- 6. user_stats_total_mcq_correct_attempts              | 23525.411661
- 7. mvec_general_total_attempts                        | 10001.568230
- 8. mvec_multiplication table_total_attempts           | 9687.971929
- 9. mvec_multiplication table_total_correct_attempts   | 9572.244195
-10. mvec_general_total_correct_attempts                | 9338.256154
-11. user_stats_total_non_circ_questions                | 7194.625267
-12. mvec_general_num_fitb                              | 3660.310987
-13. rs_4                                               | 3344.872043
-14. mvec_general_num_total                             | 3293.401805
-15. mvec_general_total_seen                            | 3293.401805
-16. rs_3                                               | 2773.937243
-17. mvec_chemistry_avg_reaction_time                   | 2742.634747
-18. attempt_day_ratio                                  | 2700.706812
-19. mvec_machine learning_total_attempts               | 2624.259346
-20. mvec_machine learning_total_correct_attempts       | 2445.769330
-21. user_stats_total_incorrect_attempts                | 2176.520639
-22. mvec_general_num_mcq                               | 1953.076993
-23. mvec_experimental design_total_attempts            | 1557.757913
-24. mvec_experimental design_total_correct_attempts    | 1550.931427
-25. mvec_machine learning_total_seen                   | 1261.196120
-26. mvec_machine learning_num_total                    | 1261.196120
-27. mvec_biology_total_seen                            | 1076.456324
-28. mvec_biology_num_total                             | 1076.456324
-29. rs_2                                               | 1073.496775
-30. mvec_clep western civ ii_total_attempts            | 986.268688
+ 1. user_stats_total_attempts                          | 297546.832793
+ 2. user_stats_total_correct_attempts                  | 246565.882968
+ 3. user_stats_total_fitb_attempts                     | 120326.330773
+ 4. user_stats_total_fitb_correct_attempts             | 98636.711406
+ 5. user_stats_total_mcq_attempts                      | 30712.394530
+ 6. user_stats_total_mcq_correct_attempts              | 25790.656917
+ 7. mvec_general_total_attempts                        | 10964.317687
+ 8. mvec_multiplication table_total_attempts           | 10744.511129
+ 9. mvec_multiplication table_total_correct_attempts   | 10628.089332
+10. mvec_general_total_correct_attempts                | 10228.186493
+11. user_stats_total_non_circ_questions                | 8842.845044
+12. mvec_general_num_fitb                              | 3707.559734
+13. rs_4                                               | 3380.563592
+14. mvec_chemistry_avg_reaction_time                   | 2990.267912
+15. mvec_machine learning_total_attempts               | 2887.089273
+16. mvec_general_num_total                             | 2865.268563
+17. mvec_general_total_seen                            | 2865.268563
+18. mvec_machine learning_total_correct_attempts       | 2698.211799
+19. rs_3                                               | 2559.953099
+20. attempt_day_ratio                                  | 2436.703243
+21. user_stats_total_incorrect_attempts                | 2387.585674
+22. mvec_experimental design_total_attempts            | 1747.746996
+23. mvec_experimental design_total_correct_attempts    | 1738.985163
+24. mvec_general_num_mcq                               | 1660.550243
+25. mvec_machine learning_num_total                    | 1379.581240
+26. mvec_machine learning_total_seen                   | 1379.581240
+27. rs_2                                               | 1169.742904
+28. mvec_clep western civ ii_total_attempts            | 1093.129931
+29. mvec_clep western civ ii_total_correct_attempts    | 1080.051040
+30. user_stats_total_fitb_incorrrect_attempts          | 1070.697468
 
 FEATURE MEANS BY CLASS (Top 20 differences):
- 1. user_stats_total_attempts                | Class 0: 1548.1351 | Class 1: 1746.6898 | Diff: 198.5547
- 2. user_stats_total_correct_attempts        | Class 0: 1387.4932 | Class 1: 1565.6707 | Diff: 178.1774
- 3. user_stats_total_fitb_attempts           | Class 0: 1029.6351 | Class 1: 1162.9443 | Diff: 133.3092
- 4. user_stats_total_fitb_correct_attempts   | Class 0: 916.1081 | Class 1: 1034.7736 | Diff: 118.6655
- 5. user_stats_total_mcq_attempts            | Class 0: 460.4189 | Class 1: 518.1907 | Diff: 57.7718
- 6. mvec_general_total_attempts              | Class 0: 335.1622 | Class 1: 391.4202 | Diff: 56.2581
- 7. mvec_general_total_correct_attempts      | Class 0: 317.6824 | Class 1: 371.5686 | Diff: 53.8862
- 8. user_stats_total_mcq_correct_attempts    | Class 0: 416.3311 | Class 1: 468.9274 | Diff: 52.5963
- 9. rs_3                                     | Class 0: 117.4595 | Class 1: 157.0419 | Diff: 39.5824
-10. mvec_multiplication table_total_attempts | Class 0: 296.6757 | Class 1: 335.3164 | Diff: 38.6407
-11. mvec_multiplication table_total_correct_attempts | Class 0: 295.2973 | Class 1: 333.7772 | Diff: 38.4799
-12. user_stats_total_non_circ_questions      | Class 0: 1679.5608 | Class 1: 1643.1934 | Diff: 36.3674
-13. mvec_chemistry_avg_reaction_time         | Class 0: 145.8065 | Class 1: 121.6073 | Diff: 24.1993
-14. user_stats_today_total_attempts          | Class 0: 217.7432 | Class 1: 194.4229 | Diff: 23.3203
-15. user_stats_total_incorrect_attempts      | Class 0: 160.6419 | Class 1: 181.0192 | Diff: 20.3773
-16. user_stats_today_fitb_total_attempts     | Class 0: 143.5000 | Class 1: 124.3333 | Diff: 19.1667
-17. mvec_machine learning_total_attempts     | Class 0: 141.3311 | Class 1: 160.2674 | Diff: 18.9363
-18. mvec_machine learning_total_correct_attempts | Class 0: 135.9932 | Class 1: 154.2941 | Diff: 18.3009
-19. mvec_general_num_mcq                     | Class 0: 170.3716 | Class 1: 188.3578 | Diff: 17.9862
-20. user_stats_today_correct_attempts        | Class 0: 195.9122 | Class 1: 178.3988 | Diff: 17.5133
+ 1. user_stats_total_attempts                | Class 0: 1711.3913 | Class 1: 1901.0126 | Diff: 189.6213
+ 2. user_stats_total_correct_attempts        | Class 0: 1538.4720 | Class 1: 1708.7919 | Diff: 170.3199
+ 3. user_stats_total_fitb_attempts           | Class 0: 1127.9006 | Class 1: 1254.6703 | Diff: 126.7697
+ 4. user_stats_total_fitb_correct_attempts   | Class 0: 1007.0870 | Class 1: 1120.0588 | Diff: 112.9718
+ 5. user_stats_total_mcq_attempts            | Class 0: 516.9565 | Class 1: 572.5361 | Diff: 55.5796
+ 6. mvec_general_total_attempts              | Class 0: 354.6273 | Class 1: 407.1571 | Diff: 52.5297
+ 7. user_stats_total_mcq_correct_attempts    | Class 0: 468.6273 | Class 1: 519.2579 | Diff: 50.6305
+ 8. mvec_general_total_correct_attempts      | Class 0: 336.4099 | Class 1: 386.7026 | Diff: 50.2926
+ 9. mvec_multiplication table_total_attempts | Class 0: 327.3665 | Class 1: 364.2362 | Diff: 36.8698
+10. mvec_multiplication table_total_correct_attempts | Class 0: 325.8012 | Class 1: 362.5014 | Diff: 36.7002
+11. rs_3                                     | Class 0: 118.4161 | Class 1: 154.5459 | Diff: 36.1298
+12. user_stats_total_non_circ_questions      | Class 0: 1707.2422 | Class 1: 1675.2281 | Diff: 32.0142
+13. mvec_chemistry_avg_reaction_time         | Class 0: 137.8517 | Class 1: 114.9059 | Diff: 22.9458
+14. user_stats_today_total_attempts          | Class 0: 210.5776 | Class 1: 189.2330 | Diff: 21.3447
+15. user_stats_total_incorrect_attempts      | Class 0: 172.9193 | Class 1: 192.2207 | Diff: 19.3015
+16. mvec_machine learning_total_attempts     | Class 0: 157.7702 | Class 1: 175.9123 | Diff: 18.1421
+17. user_stats_today_fitb_total_attempts     | Class 0: 137.7391 | Class 1: 120.1228 | Diff: 17.6163
+18. mvec_machine learning_total_correct_attempts | Class 0: 152.0807 | Class 1: 169.6189 | Diff: 17.5382
+19. mvec_general_num_mcq                     | Class 0: 167.0870 | Class 1: 183.3713 | Diff: 16.2843
+20. user_stats_today_correct_attempts        | Class 0: 189.8075 | Class 1: 173.7532 | Diff: 16.0543
 
 MISSING VALUE PATTERNS BY CLASS:
 
 ZERO VALUE PATTERNS BY CLASS (Top 20):
- 1. module_name_cost function                | Class 0:  147 | Class 1: 2244
- 2. module_name_cell as a building block     | Class 0:  145 | Class 1: 2241
- 3. module_name_java general principles      | Class 0:  147 | Class 1: 2243
- 4. module_name_code of life                 | Class 0:  147 | Class 1: 2242
- 5. module_name_thermodynamics               | Class 0:  148 | Class 1: 2242
- 6. module_name_history of biology           | Class 0:  147 | Class 1: 2241
- 7. module_name_classification               | Class 0:  148 | Class 1: 2242
- 8. module_name_chemistry and strcutural biology | Class 0:  148 | Class 1: 2242
- 9. module_name_history of machine learning  | Class 0:  148 | Class 1: 2241
-10. module_name_support vector machines      | Class 0:  148 | Class 1: 2241
-11. module_name_acid base                    | Class 0:  147 | Class 1: 2239
-12. module_name_introductory geology         | Class 0:  148 | Class 1: 2240
-13. question_type_sort_order                 | Class 0:  148 | Class 1: 2240
-14. question_type_select_all_that_apply      | Class 0:  148 | Class 1: 2240
-15. num_sata_options                         | Class 0:  148 | Class 1: 2240
-16. module_name_daily life science           | Class 0:  148 | Class 1: 2240
-17. module_name_statistical basics           | Class 0:  148 | Class 1: 2240
-18. mvec_cell as a building block_num_tf     | Class 0:  147 | Class 1: 2239
-19. num_so_options                           | Class 0:  148 | Class 1: 2240
-20. module_name_calculus 1                   | Class 0:  147 | Class 1: 2238
+ 1. module_name_cost function                | Class 0:  159 | Class 1: 2451
+ 2. module_name_cell as a building block     | Class 0:  158 | Class 1: 2448
+ 3. module_name_energy conversion            | Class 0:  161 | Class 1: 2450
+ 4. module_name_disease managment            | Class 0:  161 | Class 1: 2450
+ 5. module_name_least squares method         | Class 0:  161 | Class 1: 2450
+ 6. module_name_java general principles      | Class 0:  160 | Class 1: 2449
+ 7. module_name_probability theory           | Class 0:  161 | Class 1: 2450
+ 8. module_name_ridge regression             | Class 0:  161 | Class 1: 2450
+ 9. module_name_chemistry and strcutural biology | Class 0:  161 | Class 1: 2449
+10. module_name_code of life                 | Class 0:  160 | Class 1: 2448
+11. module_name_history of biology           | Class 0:  160 | Class 1: 2448
+12. module_name_history of machine learning  | Class 0:  161 | Class 1: 2448
+13. module_name_thermodynamics               | Class 0:  161 | Class 1: 2448
+14. num_sata_options                         | Class 0:  160 | Class 1: 2447
+15. question_type_select_all_that_apply      | Class 0:  160 | Class 1: 2447
+16. module_name_support vector machines      | Class 0:  160 | Class 1: 2447
+17. module_name_statistical basics           | Class 0:  161 | Class 1: 2447
+18. module_name_classification               | Class 0:  161 | Class 1: 2447
+19. question_type_sort_order                 | Class 0:  161 | Class 1: 2446
+20. module_name_daily life science           | Class 0:  161 | Class 1: 2446
 
 FEATURE IMBALANCE BY PREFIX:
- 1. user                 | Avg Mean Diff: 19.1871 (  49 features)
- 2. rs                   | Avg Mean Diff: 12.2662 (   6 features)
- 3. avg                  | Avg Mean Diff: 4.5113 (   1 features)
- 4. attempt              | Avg Mean Diff: 3.8293 (   1 features)
- 5. mvec                 | Avg Mean Diff: 1.2623 ( 492 features)
- 6. days                 | Avg Mean Diff: 1.2083 (   2 features)
- 7. revision             | Avg Mean Diff: 1.0791 (   1 features)
- 8. total                | Avg Mean Diff: 0.7159 (   3 features)
- 9. accuracy             | Avg Mean Diff: 0.4710 (   1 features)
-10. was                  | Avg Mean Diff: 0.4425 (   1 features)
-11. num                  | Avg Mean Diff: 0.1190 (   4 features)
-12. qv                   | Avg Mean Diff: 0.0986 ( 768 features)
-13. question             | Avg Mean Diff: 0.0488 (   5 features)
-14. module               | Avg Mean Diff: 0.0220 (  40 features)
+ 1. user                 | Avg Mean Diff: 17.4657 (  51 features)
+ 2. rs                   | Avg Mean Diff: 11.1680 (   6 features)
+ 3. avg                  | Avg Mean Diff: 4.7645 (   1 features)
+ 4. attempt              | Avg Mean Diff: 3.1173 (   1 features)
+ 5. days                 | Avg Mean Diff: 1.4376 (   2 features)
+ 6. revision             | Avg Mean Diff: 1.2066 (   1 features)
+ 7. mvec                 | Avg Mean Diff: 1.1505 ( 506 features)
+ 8. total                | Avg Mean Diff: 0.8022 (   3 features)
+ 9. accuracy             | Avg Mean Diff: 0.4857 (   1 features)
+10. was                  | Avg Mean Diff: 0.4491 (   1 features)
+11. num                  | Avg Mean Diff: 0.1187 (   4 features)
+12. qv                   | Avg Mean Diff: 0.0932 ( 768 features)
+13. question             | Avg Mean Diff: 0.0507 (   5 features)
+14. module               | Avg Mean Diff: 0.0185 (  45 features)

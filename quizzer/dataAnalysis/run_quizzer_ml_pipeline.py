@@ -102,7 +102,7 @@ if __name__ == "__main__":
     print(f"Training set: {len(X_train)} samples, Test set: {len(X_test)} samples")
 
     # # Run comprehensive grid search
-    # results_df = grid_search_quizzer_model(X_train, y_train, X_test, y_test, n_search=10, batch_size=25)
+    results_df = grid_search_quizzer_model(X_train, y_train, X_test, y_test, n_search=300, batch_size=50)
 
     if os.path.exists('global_best_model.tflite'):
         print(f"\nLoading global best model from disk...")

@@ -1,14 +1,14 @@
 ================================================================================
 FEATURE ANALYSIS REPORT
 ================================================================================
-Dataset Shape: 2,392 rows x 1,375 columns
-Total Features: 1,375
-Memory Usage: 25.09 MB
+Dataset Shape: 2,612 rows x 1,396 columns
+Total Features: 1,396
+Memory Usage: 27.82 MB
 
 Feature Type Breakdown:
   Non-numeric: 0
-  Integer:     297
-  Float:       1,078
+  Integer:     307
+  Float:       1,089
 
 Null Value Summary:
   Total null values: 0
@@ -41,6 +41,7 @@ Null Value Summary:
 | mvec_calculus 1_total_seen                       | 0                            | int64         |
 | mvec_cell and biomolecules_num_fitb              | 0                            | int64         |
 | mvec_cell and biomolecules_num_mcq               | 0                            | int64         |
+| mvec_cell and biomolecules_num_sata              | 0                            | int64         |
 | mvec_cell and biomolecules_num_tf                | 0                            | int64         |
 | mvec_cell and biomolecules_num_total             | 0                            | int64         |
 | mvec_cell and biomolecules_total_attempts        | 0                            | int64         |
@@ -86,6 +87,7 @@ Null Value Summary:
 | mvec_chemistry_total_correct_attempts            | 0                            | int64         |
 | mvec_chemistry_total_incorrect_attempts          | 0                            | int64         |
 | mvec_chemistry_total_seen                        | 0                            | int64         |
+| mvec_classification_num_fitb                     | 0                            | int64         |
 | mvec_classification_num_mcq                      | 0                            | int64         |
 | mvec_classification_num_tf                       | 0                            | int64         |
 | mvec_classification_num_total                    | 0                            | int64         |
@@ -134,6 +136,11 @@ Null Value Summary:
 | mvec_disease managment_total_correct_attempts    | 0                            | int64         |
 | mvec_disease managment_total_incorrect_attempts  | 0                            | int64         |
 | mvec_disease managment_total_seen                | 0                            | int64         |
+| mvec_energy conversion_num_fitb                  | 0                            | int64         |
+| mvec_energy conversion_num_total                 | 0                            | int64         |
+| mvec_energy conversion_total_attempts            | 0                            | int64         |
+| mvec_energy conversion_total_correct_attempts    | 0                            | int64         |
+| mvec_energy conversion_total_seen                | 0                            | int64         |
 | mvec_experimental design_num_fitb                | 0                            | int64         |
 | mvec_experimental design_num_mcq                 | 0                            | int64         |
 | mvec_experimental design_num_total               | 0                            | int64         |
@@ -211,11 +218,13 @@ Null Value Summary:
 | mvec_java syntax_total_correct_attempts          | 0                            | int64         |
 | mvec_java syntax_total_incorrect_attempts        | 0                            | int64         |
 | mvec_java syntax_total_seen                      | 0                            | int64         |
+| mvec_least squares method_num_fitb               | 0                            | int64         |
 | mvec_least squares method_num_mcq                | 0                            | int64         |
 | mvec_least squares method_num_tf                 | 0                            | int64         |
 | mvec_least squares method_num_total              | 0                            | int64         |
 | mvec_least squares method_total_attempts         | 0                            | int64         |
 | mvec_least squares method_total_correct_attempts | 0                            | int64         |
+| mvec_least squares method_total_incorrect_attempts | 0                            | int64         |
 | mvec_least squares method_total_seen             | 0                            | int64         |
 | mvec_linear regression_num_fitb                  | 0                            | int64         |
 | mvec_linear regression_num_mcq                   | 0                            | int64         |
@@ -281,6 +290,7 @@ Null Value Summary:
 | mvec_support vector machines_num_total           | 0                            | int64         |
 | mvec_support vector machines_total_attempts      | 0                            | int64         |
 | mvec_support vector machines_total_correct_attempts | 0                            | int64         |
+| mvec_support vector machines_total_incorrect_attempts | 0                            | int64         |
 | mvec_support vector machines_total_seen          | 0                            | int64         |
 | mvec_thermodynamics_num_fitb                     | 0                            | int64         |
 | mvec_thermodynamics_num_total                    | 0                            | int64         |
@@ -337,6 +347,8 @@ Null Value Summary:
 | module_name_composition of life                  | 0.0                          | float64       |
 | module_name_cost function                        | 0.0                          | float64       |
 | module_name_daily life science                   | 0.0                          | float64       |
+| module_name_disease managment                    | 0.0                          | float64       |
+| module_name_energy conversion                    | 0.0                          | float64       |
 | module_name_experimental design                  | 0.0                          | float64       |
 | module_name_general                              | 0.0                          | float64       |
 | module_name_greek mythology                      | 0.0                          | float64       |
@@ -348,11 +360,14 @@ Null Value Summary:
 | module_name_java data types                      | 0.0                          | float64       |
 | module_name_java general principles              | 0.0                          | float64       |
 | module_name_java syntax                          | 0.0                          | float64       |
+| module_name_least squares method                 | 0.0                          | float64       |
 | module_name_linear regression                    | 0.0                          | float64       |
 | module_name_machine learning                     | 1.0                          | float64       |
 | module_name_math                                 | 0.0                          | float64       |
 | module_name_multiplication table                 | 0.0                          | float64       |
 | module_name_neurosciences                        | 0.0                          | float64       |
+| module_name_probability theory                   | 0.0                          | float64       |
+| module_name_ridge regression                     | 0.0                          | float64       |
 | module_name_set theory                           | 0.0                          | float64       |
 | module_name_statistical basics                   | 0.0                          | float64       |
 | module_name_statistics                           | 0.0                          | float64       |
@@ -445,7 +460,11 @@ Null Value Summary:
 | mvec_disease managment_days_since_last_seen      | 0.0                          | float64       |
 | mvec_disease managment_overall_accuracy          | 0.0                          | float64       |
 | mvec_disease managment_percentage_seen           | 0.0                          | float64       |
+| mvec_energy conversion_avg_attempts_per_question | 0.0                          | float64       |
+| mvec_energy conversion_avg_reaction_time         | 0.0                          | float64       |
 | mvec_energy conversion_days_since_last_seen      | 0.0                          | float64       |
+| mvec_energy conversion_overall_accuracy          | 0.0                          | float64       |
+| mvec_energy conversion_percentage_seen           | 0.0                          | float64       |
 | mvec_experimental design_avg_attempts_per_question | 0.0                          | float64       |
 | mvec_experimental design_avg_reaction_time       | 0.0                          | float64       |
 | mvec_experimental design_days_since_last_seen    | 0.0                          | float64       |
@@ -1366,6 +1385,7 @@ Null Value Summary:
 | user_stats_today_mcq_total_attempts              | 0.0                          | float64       |
 | user_stats_today_sata_accuracy_rate              | 0.0                          | float64       |
 | user_stats_today_sata_correct_attempts           | 0.0                          | float64       |
+| user_stats_today_sata_incorrect_attempts         | 0.0                          | float64       |
 | user_stats_today_sata_total_attempts             | 0.0                          | float64       |
 | user_stats_today_so_accuracy_rate                | 0.0                          | float64       |
 | user_stats_today_so_correct_attempts             | 0.0                          | float64       |
@@ -1387,6 +1407,7 @@ Null Value Summary:
 | user_stats_total_non_circ_questions              | 0.0                          | float64       |
 | user_stats_total_sata_attempts                   | 0.0                          | float64       |
 | user_stats_total_sata_correct_attempts           | 0.0                          | float64       |
+| user_stats_total_sata_incorrrect_attempts        | 0.0                          | float64       |
 | user_stats_total_so_attempts                     | 0.0                          | float64       |
 | user_stats_total_so_correct_attempts             | 0.0                          | float64       |
 | user_stats_total_tf_attempts                     | 0.0                          | float64       |

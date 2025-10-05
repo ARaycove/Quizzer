@@ -9,7 +9,7 @@ from multiprocessing import Process
 import random
 import os
 
-def train_and_save_batch_configs(config_batch, X_train, y_train, X_test, y_test, input_features):
+def train_and_save_batch_configs(config_batch, X_train, y_train, X_test, y_test, input_features, total_iterations=0, n_search=0):
     """
     Train and evaluate a batch of model configurations in a single subprocess.
     Saves results to disk for each config in the batch.
@@ -20,6 +20,8 @@ def train_and_save_batch_configs(config_batch, X_train, y_train, X_test, y_test,
         config_batch: List of parameter dictionaries to test
         X_train, y_train, X_test, y_test: Train/test data
         input_features: Number of input features
+        total_iterations: Number of iterations completed so far (default 0)
+        n_search: Total number of searches to perform (default 0)
     """
     for params in config_batch:
         random.seed(params['random_state'])
@@ -123,6 +125,10 @@ def train_and_save_batch_configs(config_batch, X_train, y_train, X_test, y_test,
         }
         
         update_top_results(result, model)
+        
+        total_iterations += 1
+        if n_search > 0:
+            print(f"Progress: {total_iterations}/{n_search} iterations completed ({100 * total_iterations / n_search:.1f}%)")
 
 def update_top_results(result, model=None):
     if os.path.exists('grid_search_top_results.csv'):
@@ -321,6 +327,7 @@ def grid_search_quizzer_model(X_train, y_train, X_test, y_test, n_search=200, ba
     all_configs = [dict(zip(param_names, combo)) for combo in unique_samples]
     
     # Batch random samples
+    total_iterations = 0
     for batch_start in range(0, len(all_configs), batch_size):
         batch_end = min(batch_start + batch_size, len(all_configs))
         config_batch = all_configs[batch_start:batch_end]
@@ -331,10 +338,12 @@ def grid_search_quizzer_model(X_train, y_train, X_test, y_test, n_search=200, ba
         
         p = Process(
             target=train_and_save_batch_configs,
-            args=(config_batch, X_train, y_train, X_test, y_test, input_features)
+            args=(config_batch, X_train, y_train, X_test, y_test, input_features, total_iterations, n_search)
         )
         p.start()
         p.join()
+        
+        total_iterations += len(config_batch)
         print("-" * 80)
     
     if os.path.exists('grid_search_top_results.csv'):
