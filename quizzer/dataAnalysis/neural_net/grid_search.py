@@ -7,6 +7,7 @@ from sklearn.metrics import f1_score, roc_auc_score, balanced_accuracy_score
 import pandas as pd
 from multiprocessing import Process
 import random
+from sklearn.metrics import roc_curve
 import os
 
 def train_and_save_batch_configs(config_batch, X_train, y_train, X_test, y_test, input_features, total_iterations=0, n_search=0):
@@ -70,11 +71,19 @@ def train_and_save_batch_configs(config_batch, X_train, y_train, X_test, y_test,
         test_loss, test_accuracy, test_precision, test_recall = model.evaluate(X_test, y_test, verbose=0)
         
         y_pred_prob = model.predict(X_test, verbose=0)
-        y_pred = (y_pred_prob > 0.5).astype(int).flatten()
         y_pred_prob_flat = y_pred_prob.flatten()
         
         if np.isnan(y_pred_prob_flat).any() or np.isnan(test_loss):
             continue
+        
+        # Calculate optimal threshold using Youden's J statistic
+        fpr, tpr, thresholds = roc_curve(y_test, y_pred_prob_flat)
+        j_scores = tpr - fpr
+        optimal_idx = np.argmax(j_scores)
+        optimal_threshold = thresholds[optimal_idx]
+        
+        # Use optimal threshold for predictions
+        y_pred = (y_pred_prob_flat > optimal_threshold).astype(int)
         
         class_0_probs = y_pred_prob_flat[y_test == 0]
         class_1_probs = y_pred_prob_flat[y_test == 1]
@@ -92,10 +101,19 @@ def train_and_save_batch_configs(config_batch, X_train, y_train, X_test, y_test,
         prob_range = np.max(y_pred_prob_flat) - np.min(y_pred_prob_flat)
         
         roc_auc = roc_auc_score(y_test, y_pred_prob_flat)
-        f1 = f1_score(y_test, y_pred)
+        f1_class_0 = f1_score(y_test, y_pred, pos_label=0)
+        f1_class_1 = f1_score(y_test, y_pred, pos_label=1)
         bacc = balanced_accuracy_score(y_test, y_pred)
         
-        f1_mean_discrimination_auc = 2 * (mean_discrimination * roc_auc) / (mean_discrimination + roc_auc) if (mean_discrimination + roc_auc) > 0 else 0
+        # Loss penalty: inverse of (1 + test_loss) to penalize high loss
+        loss_penalty = 1 / (1 + test_loss)
+        
+        # Harmonic mean of roc_auc, f1_class_0, f1_class_1, and loss_penalty
+        metrics = [roc_auc, f1_class_0, f1_class_1, loss_penalty]
+        if all(m > 0 for m in metrics):
+            composite_score = len(metrics) / sum(1/m for m in metrics)
+        else:
+            composite_score = 0
         
         result = {
             'layer_width': params['layer_width'],
@@ -112,7 +130,8 @@ def train_and_save_batch_configs(config_batch, X_train, y_train, X_test, y_test,
             'prob_range': prob_range,
             'mean_discrimination': mean_discrimination,
             'roc_auc': roc_auc,
-            'f1_mean_discrimination_auc': f1_mean_discrimination_auc,
+            'composite_score': composite_score,
+            'loss_penalty': loss_penalty,
             'class_0_mean': class_0_mean,
             'class_1_mean': class_1_mean,
             'prob_std': prob_std,
@@ -121,7 +140,8 @@ def train_and_save_batch_configs(config_batch, X_train, y_train, X_test, y_test,
             'test_precision': test_precision,
             'test_recall': test_recall,
             'balanced_accuracy': bacc,
-            'f1_score': f1
+            'f1_class_0': f1_class_0,
+            'f1_class_1': f1_class_1
         }
         
         update_top_results(result, model)
@@ -138,22 +158,29 @@ def update_top_results(result, model=None):
     
     current_result_df = pd.DataFrame([result])
     top_results = pd.concat([top_results, current_result_df], ignore_index=True)
-    top_results = top_results.sort_values('f1_mean_discrimination_auc', ascending=False).head(25)
+    
+    # Remove duplicates based on hyperparameters
+    param_cols = ['layer_width', 'reduction_percent', 'stop_condition', 'dropout_rate', 
+                  'focal_gamma', 'focal_alpha', 'sampling_strategy', 'k_neighbors', 
+                  'epochs', 'batch_size', 'random_state']
+    top_results = top_results.drop_duplicates(subset=param_cols, keep='last')
+    
+    top_results = top_results.sort_values('composite_score', ascending=False).head(25)
     top_results.to_csv('grid_search_top_results.csv', index=False)
     
     if len(top_results) > 0:
-        f1_mean_discrimination_auc = result['f1_mean_discrimination_auc']
-        if f1_mean_discrimination_auc >= top_results['f1_mean_discrimination_auc'].min():
-            rank = (top_results['f1_mean_discrimination_auc'] >= f1_mean_discrimination_auc).sum()
+        composite_score = result['composite_score']
+        if composite_score >= top_results['composite_score'].min():
+            rank = (top_results['composite_score'] >= composite_score).sum()
             print(f"  *** NEW TOP RESULT - RANK #{rank} ***")
     
     if os.path.exists('global_best_model.csv'):
         best_ever = pd.read_csv('global_best_model.csv')
-        best_ever_score = best_ever['f1_mean_discrimination_auc'].values[0]
+        best_ever_score = best_ever['composite_score'].values[0]
     else:
         best_ever_score = -1
     
-    if result['f1_mean_discrimination_auc'] > best_ever_score:
+    if result['composite_score'] > best_ever_score:
         pd.DataFrame([result]).to_csv('global_best_model.csv', index=False)
         if model:
             # Convert to TFLite and save
@@ -163,7 +190,7 @@ def update_top_results(result, model=None):
             with open('global_best_model.tflite', 'wb') as f:
                 f.write(tflite_model)
             
-        print(f"  *** NEW GLOBAL BEST: {result['f1_mean_discrimination_auc']:.6f} (previous: {best_ever_score:.6f}) ***")
+        print(f"  *** NEW GLOBAL BEST: {result['composite_score']:.6f} (previous: {best_ever_score:.6f}) ***")
         print(f"  *** MODEL SAVED TO global_best_model.tflite ***")
 
 def _load_previous_configs():
@@ -207,14 +234,14 @@ def _load_previous_configs():
 
 def _print_final_results():
     print("\n" + "=" * 80)
-    print("FINAL TOP 10 RESULTS")
+    print("FINAL TOP RESULTS")
     print("=" * 80)
     
     if os.path.exists('grid_search_top_results.csv'):
         final_top_results = pd.read_csv('grid_search_top_results.csv')
         for idx, row in final_top_results.iterrows():
             print(f"Rank {idx + 1}:")
-            print(f"  F1(Discrim,AUC): {row['f1_mean_discrimination_auc']:.4f} (Discrim: {row['mean_discrimination']:.4f}, AUC: {row['roc_auc']:.3f})")
+            print(f"  F1(Discrim,AUC): {row['composite_score']:.4f} (Discrim: {row['mean_discrimination']:.4f}, AUC: {row['roc_auc']:.3f})")
             print(f"  NN: layer_width={row['layer_width']}, reduction={row['reduction_percent']:.3f}, dropout={row['dropout_rate']:.2f}")
             print(f"  SMOTE: strategy={row['sampling_strategy']}, k_neighbors={row['k_neighbors']}")
             print(f"  Training: epochs={row['epochs']}, batch_size={row['batch_size']}")
@@ -222,7 +249,6 @@ def _print_final_results():
             print()
     
     print("Top results maintained in 'grid_search_top_results.csv'")
-    print("Full results saved to 'comprehensive_grid_search_results.csv'")
 
 def save_feature_map(X_train, filename='feature_map.json'):
     """
@@ -348,7 +374,7 @@ def grid_search_quizzer_model(X_train, y_train, X_test, y_test, n_search=200, ba
     
     if os.path.exists('grid_search_top_results.csv'):
         results_df = pd.read_csv('grid_search_top_results.csv')
-        results_df = results_df.sort_values('f1_mean_discrimination_auc', ascending=False)
+        results_df = results_df.sort_values('composite_score', ascending=False)
         _print_final_results()
         return results_df
     else:

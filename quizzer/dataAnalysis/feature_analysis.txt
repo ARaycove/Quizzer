@@ -1,14 +1,14 @@
 ================================================================================
 FEATURE ANALYSIS REPORT
 ================================================================================
-Dataset Shape: 2,612 rows x 1,396 columns
-Total Features: 1,396
-Memory Usage: 27.82 MB
+Dataset Shape: 3,044 rows x 1,491 columns
+Total Features: 1,491
+Memory Usage: 34.63 MB
 
 Feature Type Breakdown:
   Non-numeric: 0
-  Integer:     307
-  Float:       1,089
+  Integer:     357
+  Float:       1,134
 
 Null Value Summary:
   Total null values: 0
@@ -58,6 +58,7 @@ Null Value Summary:
 | mvec_cell and fluid dynamics_total_seen          | 0                            | int64         |
 | mvec_cell and transport_num_fitb                 | 0                            | int64         |
 | mvec_cell and transport_num_mcq                  | 0                            | int64         |
+| mvec_cell and transport_num_sata                 | 0                            | int64         |
 | mvec_cell and transport_num_total                | 0                            | int64         |
 | mvec_cell and transport_total_attempts           | 0                            | int64         |
 | mvec_cell and transport_total_correct_attempts   | 0                            | int64         |
@@ -73,6 +74,7 @@ Null Value Summary:
 | mvec_cell as a building block_total_seen         | 0                            | int64         |
 | mvec_chemistry and structural biology_num_fitb   | 0                            | int64         |
 | mvec_chemistry and structural biology_num_mcq    | 0                            | int64         |
+| mvec_chemistry and structural biology_num_sata   | 0                            | int64         |
 | mvec_chemistry and structural biology_num_total  | 0                            | int64         |
 | mvec_chemistry and structural biology_total_attempts | 0                            | int64         |
 | mvec_chemistry and structural biology_total_correct_attempts | 0                            | int64         |
@@ -93,6 +95,7 @@ Null Value Summary:
 | mvec_classification_num_total                    | 0                            | int64         |
 | mvec_classification_total_attempts               | 0                            | int64         |
 | mvec_classification_total_correct_attempts       | 0                            | int64         |
+| mvec_classification_total_incorrect_attempts     | 0                            | int64         |
 | mvec_classification_total_seen                   | 0                            | int64         |
 | mvec_clep western civ ii_num_fitb                | 0                            | int64         |
 | mvec_clep western civ ii_num_mcq                 | 0                            | int64         |
@@ -115,6 +118,7 @@ Null Value Summary:
 | mvec_cognitive and logical fallacies_total_seen  | 0                            | int64         |
 | mvec_composition of life_num_fitb                | 0                            | int64         |
 | mvec_composition of life_num_mcq                 | 0                            | int64         |
+| mvec_composition of life_num_sata                | 0                            | int64         |
 | mvec_composition of life_num_total               | 0                            | int64         |
 | mvec_composition of life_total_attempts          | 0                            | int64         |
 | mvec_composition of life_total_correct_attempts  | 0                            | int64         |
@@ -130,6 +134,13 @@ Null Value Summary:
 | mvec_daily life science_total_attempts           | 0                            | int64         |
 | mvec_daily life science_total_correct_attempts   | 0                            | int64         |
 | mvec_daily life science_total_seen               | 0                            | int64         |
+| mvec_decision trees_num_mcq                      | 0                            | int64         |
+| mvec_decision trees_num_tf                       | 0                            | int64         |
+| mvec_decision trees_num_total                    | 0                            | int64         |
+| mvec_decision trees_total_attempts               | 0                            | int64         |
+| mvec_decision trees_total_correct_attempts       | 0                            | int64         |
+| mvec_decision trees_total_incorrect_attempts     | 0                            | int64         |
+| mvec_decision trees_total_seen                   | 0                            | int64         |
 | mvec_disease managment_num_mcq                   | 0                            | int64         |
 | mvec_disease managment_num_total                 | 0                            | int64         |
 | mvec_disease managment_total_attempts            | 0                            | int64         |
@@ -141,6 +152,11 @@ Null Value Summary:
 | mvec_energy conversion_total_attempts            | 0                            | int64         |
 | mvec_energy conversion_total_correct_attempts    | 0                            | int64         |
 | mvec_energy conversion_total_seen                | 0                            | int64         |
+| mvec_environmental biology and chemistry_num_fitb | 0                            | int64         |
+| mvec_environmental biology and chemistry_num_total | 0                            | int64         |
+| mvec_environmental biology and chemistry_total_attempts | 0                            | int64         |
+| mvec_environmental biology and chemistry_total_correct_attempts | 0                            | int64         |
+| mvec_environmental biology and chemistry_total_seen | 0                            | int64         |
 | mvec_experimental design_num_fitb                | 0                            | int64         |
 | mvec_experimental design_num_mcq                 | 0                            | int64         |
 | mvec_experimental design_num_total               | 0                            | int64         |
@@ -175,6 +191,12 @@ Null Value Summary:
 | mvec_history of machine learning_total_attempts  | 0                            | int64         |
 | mvec_history of machine learning_total_correct_attempts | 0                            | int64         |
 | mvec_history of machine learning_total_seen      | 0                            | int64         |
+| mvec_id3 algorithm_num_mcq                       | 0                            | int64         |
+| mvec_id3 algorithm_num_tf                        | 0                            | int64         |
+| mvec_id3 algorithm_num_total                     | 0                            | int64         |
+| mvec_id3 algorithm_total_attempts                | 0                            | int64         |
+| mvec_id3 algorithm_total_correct_attempts        | 0                            | int64         |
+| mvec_id3 algorithm_total_seen                    | 0                            | int64         |
 | mvec_introductory computer science with python_num_fitb | 0                            | int64         |
 | mvec_introductory computer science with python_num_so | 0                            | int64         |
 | mvec_introductory computer science with python_num_tf | 0                            | int64         |
@@ -234,6 +256,11 @@ Null Value Summary:
 | mvec_linear regression_total_correct_attempts    | 0                            | int64         |
 | mvec_linear regression_total_incorrect_attempts  | 0                            | int64         |
 | mvec_linear regression_total_seen                | 0                            | int64         |
+| mvec_linux command line_num_fitb                 | 0                            | int64         |
+| mvec_linux command line_num_total                | 0                            | int64         |
+| mvec_linux command line_total_attempts           | 0                            | int64         |
+| mvec_linux command line_total_correct_attempts   | 0                            | int64         |
+| mvec_linux command line_total_seen               | 0                            | int64         |
 | mvec_machine learning_num_fitb                   | 0                            | int64         |
 | mvec_machine learning_num_mcq                    | 0                            | int64         |
 | mvec_machine learning_num_tf                     | 0                            | int64         |
@@ -248,6 +275,13 @@ Null Value Summary:
 | mvec_multiplication table_total_correct_attempts | 0                            | int64         |
 | mvec_multiplication table_total_incorrect_attempts | 0                            | int64         |
 | mvec_multiplication table_total_seen             | 0                            | int64         |
+| mvec_neural networks_num_mcq                     | 0                            | int64         |
+| mvec_neural networks_num_tf                      | 0                            | int64         |
+| mvec_neural networks_num_total                   | 0                            | int64         |
+| mvec_neural networks_total_attempts              | 0                            | int64         |
+| mvec_neural networks_total_correct_attempts      | 0                            | int64         |
+| mvec_neural networks_total_incorrect_attempts    | 0                            | int64         |
+| mvec_neural networks_total_seen                  | 0                            | int64         |
 | mvec_neurosciences_num_mcq                       | 0                            | int64         |
 | mvec_neurosciences_num_total                     | 0                            | int64         |
 | mvec_neurosciences_total_attempts                | 0                            | int64         |
@@ -257,11 +291,17 @@ Null Value Summary:
 | mvec_probability theory_num_fitb                 | 0                            | int64         |
 | mvec_probability theory_num_total                | 0                            | int64         |
 | mvec_probability theory_total_seen               | 0                            | int64         |
+| mvec_random forest algorithm_num_tf              | 0                            | int64         |
+| mvec_random forest algorithm_num_total           | 0                            | int64         |
+| mvec_random forest algorithm_total_attempts      | 0                            | int64         |
+| mvec_random forest algorithm_total_correct_attempts | 0                            | int64         |
+| mvec_random forest algorithm_total_seen          | 0                            | int64         |
 | mvec_ridge regression_num_mcq                    | 0                            | int64         |
 | mvec_ridge regression_num_tf                     | 0                            | int64         |
 | mvec_ridge regression_num_total                  | 0                            | int64         |
 | mvec_ridge regression_total_attempts             | 0                            | int64         |
 | mvec_ridge regression_total_correct_attempts     | 0                            | int64         |
+| mvec_ridge regression_total_incorrect_attempts   | 0                            | int64         |
 | mvec_ridge regression_total_seen                 | 0                            | int64         |
 | mvec_scientific theory_num_fitb                  | 0                            | int64         |
 | mvec_scientific theory_num_total                 | 0                            | int64         |
@@ -272,6 +312,13 @@ Null Value Summary:
 | mvec_set theory_total_correct_attempts           | 0                            | int64         |
 | mvec_set theory_total_incorrect_attempts         | 0                            | int64         |
 | mvec_set theory_total_seen                       | 0                            | int64         |
+| mvec_side chain chemistry_num_fitb               | 0                            | int64         |
+| mvec_side chain chemistry_num_mcq                | 0                            | int64         |
+| mvec_side chain chemistry_num_tf                 | 0                            | int64         |
+| mvec_side chain chemistry_num_total              | 0                            | int64         |
+| mvec_side chain chemistry_total_attempts         | 0                            | int64         |
+| mvec_side chain chemistry_total_incorrect_attempts | 0                            | int64         |
+| mvec_side chain chemistry_total_seen             | 0                            | int64         |
 | mvec_statistical basics_num_fitb                 | 0                            | int64         |
 | mvec_statistical basics_num_total                | 0                            | int64         |
 | mvec_statistical basics_total_attempts           | 0                            | int64         |
@@ -320,6 +367,9 @@ Null Value Summary:
 | rs_3                                             | 0                            | int64         |
 | rs_4                                             | 0                            | int64         |
 | rs_5                                             | 0                            | int64         |
+| rs_6                                             | 0                            | int64         |
+| rs_7                                             | 0                            | int64         |
+| rs_8                                             | 0                            | int64         |
 | total_attempts                                   | 0                            | int64         |
 | total_correct_attempts                           | 0                            | int64         |
 | total_incorrect_attempts                         | 0                            | int64         |
@@ -347,28 +397,37 @@ Null Value Summary:
 | module_name_composition of life                  | 0.0                          | float64       |
 | module_name_cost function                        | 0.0                          | float64       |
 | module_name_daily life science                   | 0.0                          | float64       |
+| module_name_data science                         | 0.0                          | float64       |
+| module_name_decision trees                       | 0.0                          | float64       |
 | module_name_disease managment                    | 0.0                          | float64       |
 | module_name_energy conversion                    | 0.0                          | float64       |
+| module_name_environmental biology and chemistry  | 0.0                          | float64       |
 | module_name_experimental design                  | 0.0                          | float64       |
 | module_name_general                              | 0.0                          | float64       |
 | module_name_greek mythology                      | 0.0                          | float64       |
 | module_name_history of biology                   | 0.0                          | float64       |
 | module_name_history of machine learning          | 0.0                          | float64       |
+| module_name_id3 algorithm                        | 0.0                          | float64       |
 | module_name_introductory computer science with python | 0.0                          | float64       |
 | module_name_introductory geology                 | 0.0                          | float64       |
 | module_name_introductory philosophy              | 0.0                          | float64       |
 | module_name_java data types                      | 0.0                          | float64       |
 | module_name_java general principles              | 0.0                          | float64       |
 | module_name_java syntax                          | 0.0                          | float64       |
+| module_name_k-nearest neighbors                  | 0.0                          | float64       |
 | module_name_least squares method                 | 0.0                          | float64       |
 | module_name_linear regression                    | 0.0                          | float64       |
+| module_name_linux command line                   | 0.0                          | float64       |
 | module_name_machine learning                     | 1.0                          | float64       |
 | module_name_math                                 | 0.0                          | float64       |
 | module_name_multiplication table                 | 0.0                          | float64       |
+| module_name_neural networks                      | 0.0                          | float64       |
 | module_name_neurosciences                        | 0.0                          | float64       |
 | module_name_probability theory                   | 0.0                          | float64       |
+| module_name_random forest algorithm              | 0.0                          | float64       |
 | module_name_ridge regression                     | 0.0                          | float64       |
 | module_name_set theory                           | 0.0                          | float64       |
+| module_name_side chain chemistry                 | 0.0                          | float64       |
 | module_name_statistical basics                   | 0.0                          | float64       |
 | module_name_statistics                           | 0.0                          | float64       |
 | module_name_support vector machines              | 0.0                          | float64       |
@@ -446,6 +505,7 @@ Null Value Summary:
 | mvec_composition of life_days_since_last_seen    | 0.0                          | float64       |
 | mvec_composition of life_overall_accuracy        | 0.0                          | float64       |
 | mvec_composition of life_percentage_seen         | 0.0                          | float64       |
+| mvec_concept learning_days_since_last_seen       | 0.0                          | float64       |
 | mvec_cost function_avg_attempts_per_question     | 0.0                          | float64       |
 | mvec_cost function_avg_reaction_time             | 0.0                          | float64       |
 | mvec_cost function_days_since_last_seen          | 0.0                          | float64       |
@@ -455,6 +515,12 @@ Null Value Summary:
 | mvec_daily life science_days_since_last_seen     | 0.0                          | float64       |
 | mvec_daily life science_overall_accuracy         | 0.0                          | float64       |
 | mvec_daily life science_percentage_seen          | 0.0                          | float64       |
+| mvec_data science_days_since_last_seen           | 0.0                          | float64       |
+| mvec_decision trees_avg_attempts_per_question    | 0.0                          | float64       |
+| mvec_decision trees_avg_reaction_time            | 0.0                          | float64       |
+| mvec_decision trees_days_since_last_seen         | 0.0                          | float64       |
+| mvec_decision trees_overall_accuracy             | 0.0                          | float64       |
+| mvec_decision trees_percentage_seen              | 0.0                          | float64       |
 | mvec_disease managment_avg_attempts_per_question | 0.0                          | float64       |
 | mvec_disease managment_avg_reaction_time         | 0.0                          | float64       |
 | mvec_disease managment_days_since_last_seen      | 0.0                          | float64       |
@@ -465,6 +531,11 @@ Null Value Summary:
 | mvec_energy conversion_days_since_last_seen      | 0.0                          | float64       |
 | mvec_energy conversion_overall_accuracy          | 0.0                          | float64       |
 | mvec_energy conversion_percentage_seen           | 0.0                          | float64       |
+| mvec_environmental biology and chemistry_avg_attempts_per_question | 0.0                          | float64       |
+| mvec_environmental biology and chemistry_avg_reaction_time | 0.0                          | float64       |
+| mvec_environmental biology and chemistry_days_since_last_seen | 0.0                          | float64       |
+| mvec_environmental biology and chemistry_overall_accuracy | 0.0                          | float64       |
+| mvec_environmental biology and chemistry_percentage_seen | 0.0                          | float64       |
 | mvec_experimental design_avg_attempts_per_question | 0.0                          | float64       |
 | mvec_experimental design_avg_reaction_time       | 0.0                          | float64       |
 | mvec_experimental design_days_since_last_seen    | 0.0                          | float64       |
@@ -490,6 +561,11 @@ Null Value Summary:
 | mvec_history of machine learning_days_since_last_seen | 0.0                          | float64       |
 | mvec_history of machine learning_overall_accuracy | 0.0                          | float64       |
 | mvec_history of machine learning_percentage_seen | 0.0                          | float64       |
+| mvec_id3 algorithm_avg_attempts_per_question     | 0.0                          | float64       |
+| mvec_id3 algorithm_avg_reaction_time             | 0.0                          | float64       |
+| mvec_id3 algorithm_days_since_last_seen          | 0.0                          | float64       |
+| mvec_id3 algorithm_overall_accuracy              | 0.0                          | float64       |
+| mvec_id3 algorithm_percentage_seen               | 0.0                          | float64       |
 | mvec_introductory computer science with python_avg_attempts_per_question | 0.0                          | float64       |
 | mvec_introductory computer science with python_avg_reaction_time | 0.0                          | float64       |
 | mvec_introductory computer science with python_days_since_last_seen | 0.0                          | float64       |
@@ -520,6 +596,7 @@ Null Value Summary:
 | mvec_java syntax_days_since_last_seen            | 0.0                          | float64       |
 | mvec_java syntax_overall_accuracy                | 0.0                          | float64       |
 | mvec_java syntax_percentage_seen                 | 0.0                          | float64       |
+| mvec_k-nearest neighbors_days_since_last_seen    | 0.0                          | float64       |
 | mvec_least squares method_avg_attempts_per_question | 0.0                          | float64       |
 | mvec_least squares method_avg_reaction_time      | 0.0                          | float64       |
 | mvec_least squares method_days_since_last_seen   | 0.0                          | float64       |
@@ -530,6 +607,11 @@ Null Value Summary:
 | mvec_linear regression_days_since_last_seen      | 0.0                          | float64       |
 | mvec_linear regression_overall_accuracy          | 0.0                          | float64       |
 | mvec_linear regression_percentage_seen           | 0.0                          | float64       |
+| mvec_linux command line_avg_attempts_per_question | 0.0                          | float64       |
+| mvec_linux command line_avg_reaction_time        | 0.0                          | float64       |
+| mvec_linux command line_days_since_last_seen     | 0.0                          | float64       |
+| mvec_linux command line_overall_accuracy         | 0.0                          | float64       |
+| mvec_linux command line_percentage_seen          | 0.0                          | float64       |
 | mvec_machine learning_avg_attempts_per_question  | 0.0                          | float64       |
 | mvec_machine learning_avg_reaction_time          | 0.0                          | float64       |
 | mvec_machine learning_days_since_last_seen       | 0.0                          | float64       |
@@ -542,6 +624,11 @@ Null Value Summary:
 | mvec_multiplication table_days_since_last_seen   | 0.0                          | float64       |
 | mvec_multiplication table_overall_accuracy       | 0.0                          | float64       |
 | mvec_multiplication table_percentage_seen        | 0.0                          | float64       |
+| mvec_neural networks_avg_attempts_per_question   | 0.0                          | float64       |
+| mvec_neural networks_avg_reaction_time           | 0.0                          | float64       |
+| mvec_neural networks_days_since_last_seen        | 0.0                          | float64       |
+| mvec_neural networks_overall_accuracy            | 0.0                          | float64       |
+| mvec_neural networks_percentage_seen             | 0.0                          | float64       |
 | mvec_neurosciences_avg_attempts_per_question     | 0.0                          | float64       |
 | mvec_neurosciences_avg_reaction_time             | 0.0                          | float64       |
 | mvec_neurosciences_days_since_last_seen          | 0.0                          | float64       |
@@ -549,6 +636,11 @@ Null Value Summary:
 | mvec_neurosciences_percentage_seen               | 0.0                          | float64       |
 | mvec_probability theory_days_since_last_seen     | 0.0                          | float64       |
 | mvec_probability theory_percentage_seen          | 0.0                          | float64       |
+| mvec_random forest algorithm_avg_attempts_per_question | 0.0                          | float64       |
+| mvec_random forest algorithm_avg_reaction_time   | 0.0                          | float64       |
+| mvec_random forest algorithm_days_since_last_seen | 0.0                          | float64       |
+| mvec_random forest algorithm_overall_accuracy    | 0.0                          | float64       |
+| mvec_random forest algorithm_percentage_seen     | 0.0                          | float64       |
 | mvec_ridge regression_avg_attempts_per_question  | 0.0                          | float64       |
 | mvec_ridge regression_avg_reaction_time          | 0.0                          | float64       |
 | mvec_ridge regression_days_since_last_seen       | 0.0                          | float64       |
@@ -561,7 +653,10 @@ Null Value Summary:
 | mvec_set theory_days_since_last_seen             | 0.0                          | float64       |
 | mvec_set theory_overall_accuracy                 | 0.0                          | float64       |
 | mvec_set theory_percentage_seen                  | 0.0                          | float64       |
+| mvec_side chain chemistry_avg_attempts_per_question | 0.0                          | float64       |
+| mvec_side chain chemistry_avg_reaction_time      | 0.0                          | float64       |
 | mvec_side chain chemistry_days_since_last_seen   | 0.0                          | float64       |
+| mvec_side chain chemistry_percentage_seen        | 0.0                          | float64       |
 | mvec_statistical basics_avg_attempts_per_question | 0.0                          | float64       |
 | mvec_statistical basics_avg_reaction_time        | 0.0                          | float64       |
 | mvec_statistical basics_days_since_last_seen     | 0.0                          | float64       |

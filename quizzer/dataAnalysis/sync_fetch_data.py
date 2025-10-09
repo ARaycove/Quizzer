@@ -71,7 +71,7 @@ def upsert_question_record(db: Connection, question_record) -> bool:
         
         if exists:
             # UPDATE existing record - only update the fields we want to change
-            update_fields = ['question_vector', 'is_math', 'keywords']
+            update_fields = ['question_vector', 'doc']
             update_values = []
             set_clauses = []
             
@@ -160,6 +160,58 @@ def get_empty_vector_record(db: Connection):
     except Exception as e:
         print(f"Error fetching empty vector record: {e}")
         return None
+
+def get_empty_doc_record(db: Connection):
+    """
+    Fetches one record from question_answer_pairs where doc is empty/null.
+    Creates the doc column if it doesn't exist.
+    
+    Args:
+        db: SQLite database connection
+        
+    Returns:
+        Dictionary containing the record data, or None if no empty records found
+    """
+    cursor = db.cursor()
+    
+    # Check if doc column exists, create if not
+    try:
+        cursor.execute(f"PRAGMA table_info({SUPABASE_TABLE})")
+        columns = [column[1] for column in cursor.fetchall()]
+        
+        if 'doc' not in columns:
+            print("Creating doc column...")
+            cursor.execute("ALTER TABLE question_answer_pairs ADD COLUMN doc TEXT")
+            db.commit()
+            print("doc column created successfully.")
+    
+    except Exception as e:
+        print(f"Error checking/creating doc column: {e}")
+        return None
+    
+    # Fetch one record where doc is null or empty
+    try:
+        cursor.execute("""
+            SELECT * FROM question_answer_pairs 
+            WHERE doc IS NULL OR doc = '' 
+            LIMIT 1
+        """)
+        
+        row = cursor.fetchone()
+        if row is None:
+            return None
+            
+        # Get column names
+        column_names = [description[0] for description in cursor.description]
+        
+        # Convert row to dictionary
+        record = dict(zip(column_names, row))
+        return record
+        
+    except Exception as e:
+        print(f"Error fetching empty doc record: {e}")
+        return None
+
 
 def upsert_records_to_db(records: typing.Union[typing.List[typing.Dict], typing.Dict[str, typing.List[typing.Dict]]], db: sqlite3.Connection) -> None:
     """
@@ -335,7 +387,7 @@ def initialize_supabase_session():
     
     return supabase_client
 
-def initialize_and_fetch_db(reset_question_vector=False) -> Connection:
+def initialize_and_fetch_db(reset_question_vector=False, reset_doc=False) -> Connection:
     db: Connection = sqlite3.connect(DB_FILE)
     create_sql_table_if_not_exists(db)
     
@@ -348,6 +400,17 @@ def initialize_and_fetch_db(reset_question_vector=False) -> Connection:
             print(f"Reset complete. Affected {cursor.rowcount} records.")
         except Exception as e:
             print(f"Error resetting question_vector fields in local DB: {e}")
+            db.rollback()
+    
+    if reset_doc:
+        print("Resetting all doc fields to null in local database...")
+        try:
+            cursor = db.cursor()
+            cursor.execute("UPDATE question_answer_pairs SET doc = NULL")
+            db.commit()
+            print(f"Reset complete. Affected {cursor.rowcount} records.")
+        except Exception as e:
+            print(f"Error resetting doc fields in local DB: {e}")
             db.rollback()
     
     return db
@@ -570,8 +633,39 @@ def sync_vectors_to_supabase(reset_question_vector=False, reset_attempts_vector=
         if db:
             db.close()
 
+def fetch_data_for_bertopic(db: Connection):
+    """
+    Fetches documents, embeddings, and IDs for BERTopic processing.
+    """
+    cursor = db.cursor()
+    
+    cursor.execute("""
+        SELECT question_id, doc, question_vector 
+        FROM question_answer_pairs 
+        WHERE doc IS NOT NULL AND doc != '' 
+        AND question_vector IS NOT NULL AND question_vector != ''
+        ORDER BY question_id
+    """)
+    
+    rows = cursor.fetchall()
+    
+    if not rows:
+        print("No records with both doc and question_vector found!")
+        return [], [], None
+    
+    question_ids = [row[0] for row in rows]
+    docs = [row[1] for row in rows]
+    embeddings = [json.loads(row[2]) for row in rows]
+    embeddings = np.array(embeddings)
+    
+    print(f"Fetched {len(docs)} documents with pre-computed embeddings")
+    
+    return docs, embeddings, question_ids 
+
+
 def main():
     fetch_and_save_data_locally()
+
 
 
 if __name__ == "__main__":
