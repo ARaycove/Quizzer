@@ -131,21 +131,33 @@ void main() async {
       [[{"covalent peptide bonds": [""]}],      ["noncovalent peptide bonds"],  false], 
       [[{"noncovalent peptide bonds": [""]}],   ["covalent peptide bonds"],     false],
       [[{"phytosterols": [""]}],                ["phytoclerosts"],              false], // phytoclerosts is similar but is a nonsense word
-      [[{"hydrophilic": [""]}],                 ["hydrophilic"],                false],
+      [[{"hydrophilic": [""]}],                 ["hydrophobic"],                false],
       [[{"population regression line": [""]}],  ["linear regression"],          false], // Close but not at all the same thing
       [[{"basic": [""]}],                       ["base"],                       true],
       [[{"endergonic": [""]}],                  ["exergonic"],                  false], //endergonic and exergonic have polar meanings
       [[{"exergonic": [""]}],                   ["endergonic"],                 false],
       [[{"casting down": [""]}],                ["upcasting"],                  false],
-      [[{"phagocytosis": [""]}],                ["endocytosis"],                false], // these are not the same thing
-      [[{"polar": [""]}],                       ["nonpolar"],                   false], // opposites are not correct
-      [[{"logistic regression": [""]}],         ["linear regression"],          false],
-      [[{"import java.io.File": [""]}],         ["java.lang"],                  false], // These are different import statements
-      [[{"pentoses": [""]}],                    ["pentides"],                   false], // Not same term, though share prefix
-      [[{"transpiration": [""]}],               ["attraction"],                 false], // Yes this got marked as correct
-      [[{"java.io.Scanner;": [""]}],            ["java.io.Scanner;"],           false], // The answer provided does not exist, that's a syntax error
-      [[{"decreases": [""]}],                   ["increases"],                  false], // opposites
-      [[{"increases": [""]}],                   ["decreases"],                  false], // opposites
+      [[{"phagocytosis": [""]}],                  ["endocytosis"],                false], // these are not the same thing
+      [[{"polar": [""]}],                         ["nonpolar"],                   false], // opposites are not correct
+      [[{"logistic regression": [""]}],           ["linear regression"],          false],
+      [[{"import java.io.File": [""]}],           ["java.lang"],                  false], // These are different import statements
+      [[{"pentoses": [""]}],                      ["pentides"],                   false], // Not same term, though share prefix
+      [[{"transpiration": [""]}],                   ["attraction"],                   false], // Yes this got marked as correct
+      [[{"java.io.Scanner;": [""]}],                ["java.io.Scanner;"],             false], // The answer provided does not exist, that's a syntax error
+      [[{"decreases": [""]}],                       ["increases"],                    false], // opposites
+      [[{"increases": [""]}],                       ["decreases"],                    false], // opposites
+      [[{"uncharged": [""]}],                       ["non-charged"],                  true],  // synonymous
+      [[{'(darkmode) ? "Black" : "White"': [""]}],  ['(darkmode) White ?? "Black";'], false], // bad syntax for coding blank
+      [[{'cumulative distribution function': [""]}],['probability function'],         false], // just because function is in both does not make two kinds of functions equivalent
+      [[{'oligopeptides': [""]}],                   ['polypeptides'],                 false], // Both are peptides, but oligo and poly are not the same thing
+      [[{'translation': [""]}],                     ['transcription'],                false], // Not the same term
+      [[{'structural and motor': [""]}],            ['structure'],                    false], // incomplete answer
+      [[{'adhesion': [""]}],                        ['cohesion'],                     false], // cohesion and adhesion are separate concepts with separate meanings
+      [[{'dp1': [""]}],                             ['rp1'],                          false], // dp1 protein is not a rp1, scientific terminology is highly specific, thus this is not subject to typo check.
+      [[{'organic chemistry': [""]}],               ['bio chemistry'],                false], // bio =/= organic
+      [[{'interphase': [""]}],                      ['telophase'],                    false], // interphase != telophase
+      [[{'JAVA_HOME': [""]}],                       ['JAVA'],                         false], // incomplete answer
+      [[{'telophase': [""]}],                       ['anaphase'],                     false], // telophase != anaphase
     ];
 
     test('Cases should all validate correctly', () async {

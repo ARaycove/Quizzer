@@ -1,3 +1,4 @@
+import 'package:quizzer/backend_systems/05_ml_modeling/accuracy_net_worker.dart';
 import 'package:quizzer/backend_systems/06_question_queue_server/circulation_worker.dart';
 import 'package:quizzer/backend_systems/06_question_queue_server/question_selection_worker.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
@@ -24,6 +25,10 @@ Future<void> startQuestionQueueServer() async {
     final presentationSelectionWorker = PresentationSelectionWorker();
     presentationSelectionWorker.start(); // Don't await - start in rapid succession
     
+    QuizzerLogger.logMessage('Starting AccuracyNetWorker...');
+    final accuracyNetWorker = AccuracyNetWorker();
+    await accuracyNetWorker.start();
+
     QuizzerLogger.logMessage('Question queue server worker startup initiated');
     
     // Check if there are eligible questions for the user

@@ -1053,8 +1053,6 @@ class SessionManager {
         reactionTime: reactionTime,
       );
 
-
-
       // --- 7. Update Daily User Stats ---
       await updateAllUserDailyStats(userId!, isCorrect: isCorrect, reactionTime: reactionTime, questionId: questionId);
 
@@ -1063,7 +1061,6 @@ class SessionManager {
       if (isCorrect) {
         signalQuestionAnsweredCorrectly(questionId);
       }
-      
       
       // Note: We no longer update _currentQuestionRecord since the function doesn't return the updated record
       // The in-memory state will be refreshed when the next question is requested

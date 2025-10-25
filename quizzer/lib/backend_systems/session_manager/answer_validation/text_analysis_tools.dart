@@ -84,40 +84,30 @@ Future<List<String>> callSynonymAPI(String input) async {
 /// Map<String, dynamic> result = await isSimilarTo("enzyme", "enyzme");
 /// // Returns: {"sim_score": 0.8, "leven_score": 85.0, "success": true}
 /// ```
-Future<Map<String, dynamic>> isSimilarTo(String input, String comparison) async{
+Future<Map<String, dynamic>> isSimilarTo(String input, String comparison) async {
   input = await normalizeString(input);
+  comparison = await normalizeString(comparison);
+  
   Map<String, dynamic> result = {
     "sim_score": null,
     "leven_score": null,
     "success": false
   };
-  double output = input.similarityTo(comparison);
-  QuizzerLogger.logMessage("$input Sim Score: $output");
-  result["sim_score"] = output;
-  double threshold = 0.5;
-  double typoThreshold = 80;
   
-  // if the strings are similar after the first check return the result:
-  if (output >= threshold) {
-    result["success"] = true;
-    return result;
-  } else {
-    QuizzerLogger.logMessage("Sim score below threshold, additional checks required");
-    result["success"] = false;}
-  // if the strings are not similar move to next steps:
-
-  // Do we have a typo?
-  double fuzzyScore = fuzzy.ratio(input,comparison).toDouble();
+  double simScore = input.similarityTo(comparison);
+  result["sim_score"] = simScore;
+  
+  double fuzzyScore = fuzzy.ratio(input, comparison) / 100.0;
   result["leven_score"] = fuzzyScore;
-  QuizzerLogger.logMessage("$input => $comparison; Levenshteing_ratio: $fuzzyScore");
-  if (fuzzyScore >= typoThreshold) {
-    result["success"] = true;
-    return result;
-  } else {result["success"] = false;}
-
-
+  
+  QuizzerLogger.logMessage("$input => $comparison; Sim: $simScore, Fuzzy: $fuzzyScore");
+  
+  // Much stricter thresholds
+  result["success"] = simScore >= 0.85 || fuzzyScore >= 0.92;
+  
   return result;
 }
+
 
 Future<List<String>> returnKeywords(String input) async{
   List<String> splitTerms = await analyzer.phraseSplitter(input);
@@ -162,18 +152,43 @@ dynamic expandText(String input) async{
 
 /// Validates a single string-based answer.
 Future<bool> validateStringAnswer(String userAnswer, String correctAnswer) async {
-  userAnswer = userAnswer.toLowerCase();
-  correctAnswer = correctAnswer.toLowerCase();
+  userAnswer = userAnswer.toLowerCase().trim();
+  correctAnswer = correctAnswer.toLowerCase().trim();
   
-  if (userAnswer == correctAnswer) {
-    return true;
-  }
+  if (userAnswer == correctAnswer) return true;
   
-  // You would need to provide the `isSimilarTo` function from your codebase.
+  // Reject if word count differs significantly
+  int userWords = userAnswer.split(RegExp(r'\s+')).length;
+  int correctWords = correctAnswer.split(RegExp(r'\s+')).length;
+  if ((userWords - correctWords).abs() > 1) return false;
+  
+  // Check known opposites/antonyms
+  if (_areOpposites(userAnswer, correctAnswer)) return false;
+  
   Map<String, dynamic> similarityResult = await isSimilarTo(userAnswer, correctAnswer);
   return similarityResult["success"];
 }
 
+bool _areOpposites(String a, String b) {
+  final opposites = [
+    ['hydrophilic', 'hydrophobic'],
+    ['polar', 'nonpolar'],
+    ['endergonic', 'exergonic'],
+    ['positively', 'negatively'],
+    ['increases', 'decreases'],
+    ['covalent', 'noncovalent'],
+    ['dna', 'rna'],
+    ['anaphase', 'telophase', 'metaphase', 'prophase', 'interphase'],
+    ['transcription', 'translation'],
+    ['adhesion', 'cohesion'],
+  ];
+  
+  for (var group in opposites) {
+    if (group.contains(a) && group.contains(b) && a != b) return true;
+  }
+  return false;
+}
+
 Future<double> getFuzzyScoreForTypo(String userAnswer, String correctAnswer) async {
-  return fuzzy.ratio(userAnswer,correctAnswer).toDouble();
+  return (fuzzy.ratio(userAnswer, correctAnswer) / 100.0);
 }

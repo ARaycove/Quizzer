@@ -1,3 +1,4 @@
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_daily_stats_table.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart'; // To get Supabase client
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pair_management/question_answer_pairs_table.dart'; // Import for table functions
 import 'package:quizzer/backend_systems/00_database_manager/tables/system_data/login_attempts_table.dart'; // Import for login attempts table functions
@@ -227,16 +228,15 @@ Future<bool> updateRecordWithCompositeKeyInSupabase(
 /// Fetches unsynced question-answer pairs and attempts to push them.
 Future<void> syncQuestionAnswerPairs() async {
   try {
-    // Fetch records needing sync
     final List<Map<String, dynamic>> unsyncedRecords = await getUnsyncedQuestionAnswerPairs();
-
     if (unsyncedRecords.isEmpty) {
       return;
     }
-    // Ensure all records have last_modified_timestamp and time_stamp
     final List<Map<String, dynamic>> processedRecords = [];
     final SessionManager sessionManager = getSessionManager();
     final String? currentUserId = sessionManager.userId;
+    final String currentUserRole = sessionManager.userRole;
+    final bool isPrivilegedUser = currentUserRole == 'admin' || currentUserRole == 'contributor';
     
     for (final record in unsyncedRecords) {
       Map<String, dynamic> mutableRecord = Map<String, dynamic>.from(record);
@@ -245,12 +245,10 @@ Future<void> syncQuestionAnswerPairs() async {
         mutableRecord['last_modified_timestamp'] = DateTime.now().toUtc().toIso8601String();
       }
       
-      // Ensure time_stamp is not null (required by review tables)
       if (record['time_stamp'] == null || (record['time_stamp'] is String && (record['time_stamp'] as String).isEmpty)) {
         mutableRecord['time_stamp'] = DateTime.now().toUtc().toIso8601String();
       }
       
-      // Ensure ans_contrib is not null (required by review tables)
       if (record['ans_contrib'] == null || (record['ans_contrib'] is String && (record['ans_contrib'] as String).isEmpty)) {
         if (currentUserId != null) {
           mutableRecord['ans_contrib'] = currentUserId;
@@ -259,9 +257,7 @@ Future<void> syncQuestionAnswerPairs() async {
         }
       }
       
-      // Ensure completed is not null (required by review tables)
       if (record['completed'] == null) {
-        // Import the function from question_answer_pairs_table.dart
         final int completionStatus = checkCompletionStatus(
           record['question_elements'] as String? ?? '',
           record['answer_elements'] as String? ?? ''
@@ -271,13 +267,11 @@ Future<void> syncQuestionAnswerPairs() async {
       
       processedRecords.add(mutableRecord);
     }
-
+    
     for (final record in processedRecords) {
-      // Handle corrupted sync flags: treat -1 as 1 (synced)
       int hasBeenSynced = record['has_been_synced'] as int? ?? -1;
       int editsAreSynced = record['edits_are_synced'] as int? ?? -1;
       
-      // Fix corrupted sync flags
       if (hasBeenSynced == -1) {
         hasBeenSynced = 1;
       }
@@ -294,13 +288,20 @@ Future<void> syncQuestionAnswerPairs() async {
         continue;
       }
       
-      // Normalize the module name before sending to server
       if (record['module_name'] != null && record['module_name'] is String) {
         final String normalizedModuleName = await normalizeString(record['module_name'] as String);
         record['module_name'] = normalizedModuleName;
       }
       
-      final bool pushSuccess = await pushRecordToSupabase(reviewTable, record);
+      bool pushSuccess = await pushRecordToSupabase(reviewTable, record);
+      
+      if (pushSuccess && isPrivilegedUser) {
+        final bool mainTablePushSuccess = await pushRecordToSupabase('question_answer_pairs', record);
+        if (!mainTablePushSuccess) {
+          pushSuccess = false;
+        }
+      }
+      
       if (pushSuccess) {
         await updateQuestionSyncFlags(
           questionId: record['question_id'],
@@ -309,7 +310,6 @@ Future<void> syncQuestionAnswerPairs() async {
         );
       }
     }
-
   } catch (e) {
     QuizzerLogger.logError('syncQuestionAnswerPairs: Error - $e');
     rethrow;
@@ -871,6 +871,86 @@ Future<void> syncUserModuleActivationStatus() async {
     }
   } catch (e) {
     QuizzerLogger.logError('syncUserModuleActivationStatus: Error - $e');
+    rethrow;
+  }
+}
+
+Future<void> syncUserDailyStats() async {
+  try {
+    final SessionManager sessionManager = getSessionManager();
+    final String? currentUserId = sessionManager.userId;
+    if (currentUserId == null) {
+      QuizzerLogger.logWarning('syncUserDailyStats: No current user logged in. Cannot proceed.');
+      return;
+    }
+
+    // Fetch records needing sync for the current user
+    final List<Map<String, dynamic>> unsyncedRecords = await getUnsyncedUserDailyStatsRecords(currentUserId);
+    if (unsyncedRecords.isEmpty) {
+      return;
+    }
+    const String tableName = 'user_daily_stats';
+
+    for (final record in unsyncedRecords) {
+      final String? userId = record['user_id'] as String?;
+      final String? recordDate = record['record_date'] as String?; // CORRECTED FIELD NAME
+      final int hasBeenSynced = record['has_been_synced'] as int? ?? 0;
+
+      // Primary Key check for user_daily_stats is (user_id, record_date)
+      if (userId == null || recordDate == null) {
+        QuizzerLogger.logWarning('Skipping unsynced user daily stats record due to missing PK (user_id or record_date): $record');
+        continue;
+      }
+
+      // Ensure the record belongs to the current user
+      if (userId != currentUserId) {
+        QuizzerLogger.logWarning('syncUserDailyStats: Skipping record not belonging to current user. User in record: $userId, Current User: $currentUserId');
+        continue;
+      }
+
+      // Ensure last_modified_timestamp is present before push/update
+      Map<String, dynamic> mutableRecord = Map<String, dynamic>.from(record);
+      if (mutableRecord['last_modified_timestamp'] == null || 
+          (mutableRecord['last_modified_timestamp'] is String && (mutableRecord['last_modified_timestamp'] as String).isEmpty)) {
+        QuizzerLogger.logWarning('syncUserDailyStats: Record (User: $userId, Date: $recordDate) missing last_modified_timestamp. Assigning current time.');
+        mutableRecord['last_modified_timestamp'] = DateTime.now().toUtc().toIso8601String();
+      }
+
+      bool operationSuccess = false;
+
+      // The composite key for user_daily_stats is (user_id, record_date)
+      final Map<String, dynamic> compositeKeyFilters = {'user_id': userId, 'record_date': recordDate}; // CORRECTED FIELD NAME
+
+      if (hasBeenSynced == 0) {
+        // This is a new record, use insert
+        QuizzerLogger.logValue('Preparing to insert UserDailyStats (User: $userId, Date: $recordDate) into $tableName');
+        operationSuccess = await pushRecordToSupabase(tableName, mutableRecord);
+      } else {
+        // This is an existing record with edits, use update
+        QuizzerLogger.logValue('Preparing to update UserDailyStats (User: $userId, Date: $recordDate) in $tableName');
+        operationSuccess = await updateRecordWithCompositeKeyInSupabase(
+          tableName,
+          mutableRecord,
+          compositeKeyFilters: compositeKeyFilters,
+        );
+      }
+
+      if (operationSuccess) {
+        // Update local sync flags
+        // Assumed a helper function updateUserDailyStatsSyncFlags exists that takes the correct PK
+        await updateUserDailyStatsSyncFlags(
+          userId: userId,
+          recordDate: recordDate,
+          hasBeenSynced: true, 
+          editsAreSynced: true, 
+        );
+      } else {
+        final operation = (hasBeenSynced == 0) ? 'Insert' : 'Update';
+        QuizzerLogger.logWarning('$operation FAILED for UserDailyStats (User: $userId, Date: $recordDate). Local flags remain unchanged.');
+      }
+    }
+  } catch(e) {
+    QuizzerLogger.logError('syncUserDailyStats: Error - $e');
     rethrow;
   }
 }

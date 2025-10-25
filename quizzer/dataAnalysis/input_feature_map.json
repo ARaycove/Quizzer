@@ -23,5940 +23,5340 @@
     "default_value": 0.0,
     "pos": 5
   },
-  "num_so_options": {
+  "num_sata_options": {
     "default_value": 0.0,
     "pos": 6
   },
-  "num_sata_options": {
+  "num_blanks": {
     "default_value": 0.0,
     "pos": 7
   },
-  "num_blanks": {
+  "total_correct_attempts": {
     "default_value": 0.0,
     "pos": 8
   },
-  "total_correct_attempts": {
+  "total_incorrect_attempts": {
     "default_value": 0.0,
     "pos": 9
   },
-  "total_incorrect_attempts": {
+  "accuracy_rate": {
     "default_value": 0.0,
     "pos": 10
   },
-  "accuracy_rate": {
+  "days_since_first_introduced": {
     "default_value": 0.0,
     "pos": 11
   },
-  "days_since_first_introduced": {
+  "attempt_day_ratio": {
     "default_value": 0.0,
     "pos": 12
   },
-  "attempt_day_ratio": {
+  "user_stats_global_accuracy": {
     "default_value": 0.0,
     "pos": 13
   },
-  "user_stats_total_non_circ_questions": {
+  "user_stats_global_mcq_accuracy": {
     "default_value": 0.0,
     "pos": 14
   },
-  "user_stats_total_correct_attempts": {
+  "user_stats_global_fitb_accuracy": {
     "default_value": 0.0,
     "pos": 15
   },
-  "user_stats_total_incorrect_attempts": {
+  "user_stats_global_sata_accuracy": {
     "default_value": 0.0,
     "pos": 16
   },
-  "user_stats_total_attempts": {
+  "user_stats_global_tf_accuracy": {
     "default_value": 0.0,
     "pos": 17
   },
-  "user_stats_global_accuracy": {
+  "user_stats_global_so_accuracy": {
     "default_value": 0.0,
     "pos": 18
   },
-  "user_stats_total_mcq_correct_attempts": {
+  "user_stats_consecutive_correct_streak": {
     "default_value": 0.0,
     "pos": 19
   },
-  "user_stats_total_mcq_incorrrect_attempts": {
+  "user_stats_consecutive_incorrect_streak": {
     "default_value": 0.0,
     "pos": 20
   },
-  "user_stats_total_mcq_attempts": {
+  "user_stats_max_correct_streak_achieved": {
     "default_value": 0.0,
     "pos": 21
   },
-  "user_stats_global_mcq_accuracy": {
+  "user_stats_today_correct_attempts": {
     "default_value": 0.0,
     "pos": 22
   },
-  "user_stats_total_fitb_correct_attempts": {
+  "user_stats_today_incorrect_attempts": {
     "default_value": 0.0,
     "pos": 23
   },
-  "user_stats_total_fitb_incorrrect_attempts": {
+  "user_stats_today_total_attempts": {
     "default_value": 0.0,
     "pos": 24
   },
-  "user_stats_total_fitb_attempts": {
+  "user_stats_today_accuracy_rate": {
     "default_value": 0.0,
     "pos": 25
   },
-  "user_stats_global_fitb_accuracy": {
+  "user_stats_today_mcq_correct_attempts": {
     "default_value": 0.0,
     "pos": 26
   },
-  "user_stats_total_sata_correct_attempts": {
+  "user_stats_today_mcq_incorrect_attempts": {
     "default_value": 0.0,
     "pos": 27
   },
-  "user_stats_total_sata_incorrrect_attempts": {
+  "user_stats_today_mcq_total_attempts": {
     "default_value": 0.0,
     "pos": 28
   },
-  "user_stats_total_sata_attempts": {
+  "user_stats_today_mcq_accuracy_rate": {
     "default_value": 0.0,
     "pos": 29
   },
-  "user_stats_global_sata_accuracy": {
+  "user_stats_today_fitb_correct_attempts": {
     "default_value": 0.0,
     "pos": 30
   },
-  "user_stats_total_tf_correct_attempts": {
+  "user_stats_today_fitb_incorrect_attempts": {
     "default_value": 0.0,
     "pos": 31
   },
-  "user_stats_total_tf_incorrrect_attempts": {
+  "user_stats_today_fitb_total_attempts": {
     "default_value": 0.0,
     "pos": 32
   },
-  "user_stats_total_tf_attempts": {
+  "user_stats_today_fitb_accuracy_rate": {
     "default_value": 0.0,
     "pos": 33
   },
-  "user_stats_global_tf_accuracy": {
+  "user_stats_today_sata_correct_attempts": {
     "default_value": 0.0,
     "pos": 34
   },
-  "user_stats_total_so_correct_attempts": {
+  "user_stats_today_sata_incorrect_attempts": {
     "default_value": 0.0,
     "pos": 35
   },
-  "user_stats_total_so_attempts": {
+  "user_stats_today_sata_total_attempts": {
     "default_value": 0.0,
     "pos": 36
   },
-  "user_stats_global_so_accuracy": {
+  "user_stats_today_sata_accuracy_rate": {
     "default_value": 0.0,
     "pos": 37
   },
-  "user_stats_consecutive_correct_streak": {
+  "user_stats_today_tf_correct_attempts": {
     "default_value": 0.0,
     "pos": 38
   },
-  "user_stats_consecutive_incorrect_streak": {
+  "user_stats_today_tf_incorrect_attempts": {
     "default_value": 0.0,
     "pos": 39
   },
-  "user_stats_max_correct_streak_achieved": {
+  "user_stats_today_tf_total_attempts": {
     "default_value": 0.0,
     "pos": 40
   },
-  "user_stats_today_correct_attempts": {
+  "user_stats_today_tf_accuracy_rate": {
     "default_value": 0.0,
     "pos": 41
   },
-  "user_stats_today_incorrect_attempts": {
+  "user_stats_avg_reaction_time": {
     "default_value": 0.0,
     "pos": 42
   },
-  "user_stats_today_total_attempts": {
+  "qv_0": {
     "default_value": 0.0,
     "pos": 43
   },
-  "user_stats_today_accuracy_rate": {
+  "qv_1": {
     "default_value": 0.0,
     "pos": 44
   },
-  "user_stats_today_mcq_correct_attempts": {
+  "qv_2": {
     "default_value": 0.0,
     "pos": 45
   },
-  "user_stats_today_mcq_incorrect_attempts": {
+  "qv_3": {
     "default_value": 0.0,
     "pos": 46
   },
-  "user_stats_today_mcq_total_attempts": {
+  "qv_4": {
     "default_value": 0.0,
     "pos": 47
   },
-  "user_stats_today_mcq_accuracy_rate": {
+  "qv_5": {
     "default_value": 0.0,
     "pos": 48
   },
-  "user_stats_today_fitb_correct_attempts": {
+  "qv_6": {
     "default_value": 0.0,
     "pos": 49
   },
-  "user_stats_today_fitb_incorrect_attempts": {
+  "qv_7": {
     "default_value": 0.0,
     "pos": 50
   },
-  "user_stats_today_fitb_total_attempts": {
+  "qv_8": {
     "default_value": 0.0,
     "pos": 51
   },
-  "user_stats_today_fitb_accuracy_rate": {
+  "qv_9": {
     "default_value": 0.0,
     "pos": 52
   },
-  "user_stats_today_sata_correct_attempts": {
+  "qv_10": {
     "default_value": 0.0,
     "pos": 53
   },
-  "user_stats_today_sata_incorrect_attempts": {
+  "qv_11": {
     "default_value": 0.0,
     "pos": 54
   },
-  "user_stats_today_sata_total_attempts": {
+  "qv_12": {
     "default_value": 0.0,
     "pos": 55
   },
-  "user_stats_today_sata_accuracy_rate": {
+  "qv_13": {
     "default_value": 0.0,
     "pos": 56
   },
-  "user_stats_today_tf_correct_attempts": {
+  "qv_14": {
     "default_value": 0.0,
     "pos": 57
   },
-  "user_stats_today_tf_incorrect_attempts": {
+  "qv_15": {
     "default_value": 0.0,
     "pos": 58
   },
-  "user_stats_today_tf_total_attempts": {
+  "qv_16": {
     "default_value": 0.0,
     "pos": 59
   },
-  "user_stats_today_tf_accuracy_rate": {
+  "qv_17": {
     "default_value": 0.0,
     "pos": 60
   },
-  "user_stats_today_so_correct_attempts": {
+  "qv_18": {
     "default_value": 0.0,
     "pos": 61
   },
-  "user_stats_today_so_total_attempts": {
+  "qv_19": {
     "default_value": 0.0,
     "pos": 62
   },
-  "user_stats_today_so_accuracy_rate": {
+  "qv_20": {
     "default_value": 0.0,
     "pos": 63
   },
-  "user_stats_avg_reaction_time": {
+  "qv_21": {
     "default_value": 0.0,
     "pos": 64
   },
-  "rs_0": {
+  "qv_22": {
     "default_value": 0.0,
     "pos": 65
   },
-  "rs_1": {
+  "qv_23": {
     "default_value": 0.0,
     "pos": 66
   },
-  "rs_2": {
+  "qv_24": {
     "default_value": 0.0,
     "pos": 67
   },
-  "rs_3": {
+  "qv_25": {
     "default_value": 0.0,
     "pos": 68
   },
-  "rs_4": {
+  "qv_26": {
     "default_value": 0.0,
     "pos": 69
   },
-  "rs_5": {
+  "qv_27": {
     "default_value": 0.0,
     "pos": 70
   },
-  "rs_6": {
+  "qv_28": {
     "default_value": 0.0,
     "pos": 71
   },
-  "rs_7": {
+  "qv_29": {
     "default_value": 0.0,
     "pos": 72
   },
-  "rs_8": {
+  "qv_30": {
     "default_value": 0.0,
     "pos": 73
   },
-  "mvec_algebra 1_days_since_last_seen": {
+  "qv_31": {
     "default_value": 0.0,
     "pos": 74
   },
-  "mvec_biology_total_seen": {
+  "qv_32": {
     "default_value": 0.0,
     "pos": 75
   },
-  "mvec_biology_total_correct_attempts": {
+  "qv_33": {
     "default_value": 0.0,
     "pos": 76
   },
-  "mvec_biology_avg_attempts_per_question": {
+  "qv_34": {
     "default_value": 0.0,
     "pos": 77
   },
-  "mvec_biology_num_total": {
+  "qv_35": {
     "default_value": 0.0,
     "pos": 78
   },
-  "mvec_biology_percentage_seen": {
+  "qv_36": {
     "default_value": 0.0,
     "pos": 79
   },
-  "mvec_biology_num_fitb": {
+  "qv_37": {
     "default_value": 0.0,
     "pos": 80
   },
-  "mvec_biology_overall_accuracy": {
+  "qv_38": {
     "default_value": 0.0,
     "pos": 81
   },
-  "mvec_biology_num_tf": {
+  "qv_39": {
     "default_value": 0.0,
     "pos": 82
   },
-  "mvec_biology_num_mcq": {
+  "qv_40": {
     "default_value": 0.0,
     "pos": 83
   },
-  "mvec_biology_total_attempts": {
+  "qv_41": {
     "default_value": 0.0,
     "pos": 84
   },
-  "mvec_biology_days_since_last_seen": {
+  "qv_42": {
     "default_value": 0.0,
     "pos": 85
   },
-  "mvec_biology_num_sata": {
+  "qv_43": {
     "default_value": 0.0,
     "pos": 86
   },
-  "mvec_biology_total_incorrect_attempts": {
+  "qv_44": {
     "default_value": 0.0,
     "pos": 87
   },
-  "mvec_biology_avg_reaction_time": {
+  "qv_45": {
     "default_value": 0.0,
     "pos": 88
   },
-  "mvec_calculus 1_total_seen": {
+  "qv_46": {
     "default_value": 0.0,
     "pos": 89
   },
-  "mvec_calculus 1_total_correct_attempts": {
+  "qv_47": {
     "default_value": 0.0,
     "pos": 90
   },
-  "mvec_calculus 1_avg_attempts_per_question": {
+  "qv_48": {
     "default_value": 0.0,
     "pos": 91
   },
-  "mvec_calculus 1_num_total": {
+  "qv_49": {
     "default_value": 0.0,
     "pos": 92
   },
-  "mvec_calculus 1_percentage_seen": {
+  "qv_50": {
     "default_value": 0.0,
     "pos": 93
   },
-  "mvec_calculus 1_num_fitb": {
+  "qv_51": {
     "default_value": 0.0,
     "pos": 94
   },
-  "mvec_calculus 1_overall_accuracy": {
+  "qv_52": {
     "default_value": 0.0,
     "pos": 95
   },
-  "mvec_calculus 1_num_mcq": {
+  "qv_53": {
     "default_value": 0.0,
     "pos": 96
   },
-  "mvec_calculus 1_total_attempts": {
+  "qv_54": {
     "default_value": 0.0,
     "pos": 97
   },
-  "mvec_calculus 1_days_since_last_seen": {
+  "qv_55": {
     "default_value": 0.0,
     "pos": 98
   },
-  "mvec_calculus 1_total_incorrect_attempts": {
+  "qv_56": {
     "default_value": 0.0,
     "pos": 99
   },
-  "mvec_calculus 1_avg_reaction_time": {
+  "qv_57": {
     "default_value": 0.0,
     "pos": 100
   },
-  "mvec_chemistry_total_seen": {
+  "qv_58": {
     "default_value": 0.0,
     "pos": 101
   },
-  "mvec_chemistry_total_correct_attempts": {
+  "qv_59": {
     "default_value": 0.0,
     "pos": 102
   },
-  "mvec_chemistry_avg_attempts_per_question": {
+  "qv_60": {
     "default_value": 0.0,
     "pos": 103
   },
-  "mvec_chemistry_num_total": {
+  "qv_61": {
     "default_value": 0.0,
     "pos": 104
   },
-  "mvec_chemistry_percentage_seen": {
+  "qv_62": {
     "default_value": 0.0,
     "pos": 105
   },
-  "mvec_chemistry_num_fitb": {
+  "qv_63": {
     "default_value": 0.0,
     "pos": 106
   },
-  "mvec_chemistry_overall_accuracy": {
+  "qv_64": {
     "default_value": 0.0,
     "pos": 107
   },
-  "mvec_chemistry_num_tf": {
+  "qv_65": {
     "default_value": 0.0,
     "pos": 108
   },
-  "mvec_chemistry_num_mcq": {
+  "qv_66": {
     "default_value": 0.0,
     "pos": 109
   },
-  "mvec_chemistry_total_attempts": {
+  "qv_67": {
     "default_value": 0.0,
     "pos": 110
   },
-  "mvec_chemistry_days_since_last_seen": {
+  "qv_68": {
     "default_value": 0.0,
     "pos": 111
   },
-  "mvec_chemistry_num_sata": {
+  "qv_69": {
     "default_value": 0.0,
     "pos": 112
   },
-  "mvec_chemistry_total_incorrect_attempts": {
+  "qv_70": {
     "default_value": 0.0,
     "pos": 113
   },
-  "mvec_chemistry_avg_reaction_time": {
+  "qv_71": {
     "default_value": 0.0,
     "pos": 114
   },
-  "mvec_clep western civ ii_total_seen": {
+  "qv_72": {
     "default_value": 0.0,
     "pos": 115
   },
-  "mvec_clep western civ ii_total_correct_attempts": {
+  "qv_73": {
     "default_value": 0.0,
     "pos": 116
   },
-  "mvec_clep western civ ii_avg_attempts_per_question": {
+  "qv_74": {
     "default_value": 0.0,
     "pos": 117
   },
-  "mvec_clep western civ ii_num_total": {
+  "qv_75": {
     "default_value": 0.0,
     "pos": 118
   },
-  "mvec_clep western civ ii_percentage_seen": {
+  "qv_76": {
     "default_value": 0.0,
     "pos": 119
   },
-  "mvec_clep western civ ii_num_fitb": {
+  "qv_77": {
     "default_value": 0.0,
     "pos": 120
   },
-  "mvec_clep western civ ii_overall_accuracy": {
+  "qv_78": {
     "default_value": 0.0,
     "pos": 121
   },
-  "mvec_clep western civ ii_num_mcq": {
+  "qv_79": {
     "default_value": 0.0,
     "pos": 122
   },
-  "mvec_clep western civ ii_total_attempts": {
+  "qv_80": {
     "default_value": 0.0,
     "pos": 123
   },
-  "mvec_clep western civ ii_days_since_last_seen": {
+  "qv_81": {
     "default_value": 0.0,
     "pos": 124
   },
-  "mvec_clep western civ ii_total_incorrect_attempts": {
+  "qv_82": {
     "default_value": 0.0,
     "pos": 125
   },
-  "mvec_clep western civ ii_avg_reaction_time": {
+  "qv_83": {
     "default_value": 0.0,
     "pos": 126
   },
-  "mvec_cognitive and logical fallacies_total_seen": {
+  "qv_84": {
     "default_value": 0.0,
     "pos": 127
   },
-  "mvec_cognitive and logical fallacies_total_correct_attempts": {
+  "qv_85": {
     "default_value": 0.0,
     "pos": 128
   },
-  "mvec_cognitive and logical fallacies_avg_attempts_per_question": {
+  "qv_86": {
     "default_value": 0.0,
     "pos": 129
   },
-  "mvec_cognitive and logical fallacies_num_total": {
+  "qv_87": {
     "default_value": 0.0,
     "pos": 130
   },
-  "mvec_cognitive and logical fallacies_percentage_seen": {
+  "qv_88": {
     "default_value": 0.0,
     "pos": 131
   },
-  "mvec_cognitive and logical fallacies_num_fitb": {
+  "qv_89": {
     "default_value": 0.0,
     "pos": 132
   },
-  "mvec_cognitive and logical fallacies_overall_accuracy": {
+  "qv_90": {
     "default_value": 0.0,
     "pos": 133
   },
-  "mvec_cognitive and logical fallacies_total_attempts": {
+  "qv_91": {
     "default_value": 0.0,
     "pos": 134
   },
-  "mvec_cognitive and logical fallacies_days_since_last_seen": {
+  "qv_92": {
     "default_value": 0.0,
     "pos": 135
   },
-  "mvec_cognitive and logical fallacies_avg_reaction_time": {
+  "qv_93": {
     "default_value": 0.0,
     "pos": 136
   },
-  "mvec_experimental design_total_seen": {
+  "qv_94": {
     "default_value": 0.0,
     "pos": 137
   },
-  "mvec_experimental design_total_correct_attempts": {
+  "qv_95": {
     "default_value": 0.0,
     "pos": 138
   },
-  "mvec_experimental design_avg_attempts_per_question": {
+  "qv_96": {
     "default_value": 0.0,
     "pos": 139
   },
-  "mvec_experimental design_num_total": {
+  "qv_97": {
     "default_value": 0.0,
     "pos": 140
   },
-  "mvec_experimental design_percentage_seen": {
+  "qv_98": {
     "default_value": 0.0,
     "pos": 141
   },
-  "mvec_experimental design_num_fitb": {
+  "qv_99": {
     "default_value": 0.0,
     "pos": 142
   },
-  "mvec_experimental design_overall_accuracy": {
+  "qv_100": {
     "default_value": 0.0,
     "pos": 143
   },
-  "mvec_experimental design_num_mcq": {
+  "qv_101": {
     "default_value": 0.0,
     "pos": 144
   },
-  "mvec_experimental design_total_attempts": {
+  "qv_102": {
     "default_value": 0.0,
     "pos": 145
   },
-  "mvec_experimental design_days_since_last_seen": {
+  "qv_103": {
     "default_value": 0.0,
     "pos": 146
   },
-  "mvec_experimental design_total_incorrect_attempts": {
+  "qv_104": {
     "default_value": 0.0,
     "pos": 147
   },
-  "mvec_experimental design_avg_reaction_time": {
+  "qv_105": {
     "default_value": 0.0,
     "pos": 148
   },
-  "mvec_general_total_seen": {
+  "qv_106": {
     "default_value": 0.0,
     "pos": 149
   },
-  "mvec_general_total_correct_attempts": {
+  "qv_107": {
     "default_value": 0.0,
     "pos": 150
   },
-  "mvec_general_avg_attempts_per_question": {
+  "qv_108": {
     "default_value": 0.0,
     "pos": 151
   },
-  "mvec_general_num_total": {
+  "qv_109": {
     "default_value": 0.0,
     "pos": 152
   },
-  "mvec_general_percentage_seen": {
+  "qv_110": {
     "default_value": 0.0,
     "pos": 153
   },
-  "mvec_general_num_fitb": {
+  "qv_111": {
     "default_value": 0.0,
     "pos": 154
   },
-  "mvec_general_overall_accuracy": {
+  "qv_112": {
     "default_value": 0.0,
     "pos": 155
   },
-  "mvec_general_num_tf": {
+  "qv_113": {
     "default_value": 0.0,
     "pos": 156
   },
-  "mvec_general_num_mcq": {
+  "qv_114": {
     "default_value": 0.0,
     "pos": 157
   },
-  "mvec_general_total_attempts": {
+  "qv_115": {
     "default_value": 0.0,
     "pos": 158
   },
-  "mvec_general_days_since_last_seen": {
+  "qv_116": {
     "default_value": 0.0,
     "pos": 159
   },
-  "mvec_general_num_sata": {
+  "qv_117": {
     "default_value": 0.0,
     "pos": 160
   },
-  "mvec_general_total_incorrect_attempts": {
+  "qv_118": {
     "default_value": 0.0,
     "pos": 161
   },
-  "mvec_general_avg_reaction_time": {
+  "qv_119": {
     "default_value": 0.0,
     "pos": 162
   },
-  "mvec_greek mythology_total_seen": {
+  "qv_120": {
     "default_value": 0.0,
     "pos": 163
   },
-  "mvec_greek mythology_total_correct_attempts": {
+  "qv_121": {
     "default_value": 0.0,
     "pos": 164
   },
-  "mvec_greek mythology_avg_attempts_per_question": {
+  "qv_122": {
     "default_value": 0.0,
     "pos": 165
   },
-  "mvec_greek mythology_num_total": {
+  "qv_123": {
     "default_value": 0.0,
     "pos": 166
   },
-  "mvec_greek mythology_percentage_seen": {
+  "qv_124": {
     "default_value": 0.0,
     "pos": 167
   },
-  "mvec_greek mythology_num_fitb": {
+  "qv_125": {
     "default_value": 0.0,
     "pos": 168
   },
-  "mvec_greek mythology_overall_accuracy": {
+  "qv_126": {
     "default_value": 0.0,
     "pos": 169
   },
-  "mvec_greek mythology_total_attempts": {
+  "qv_127": {
     "default_value": 0.0,
     "pos": 170
   },
-  "mvec_greek mythology_days_since_last_seen": {
+  "qv_128": {
     "default_value": 0.0,
     "pos": 171
   },
-  "mvec_greek mythology_avg_reaction_time": {
+  "qv_129": {
     "default_value": 0.0,
     "pos": 172
   },
-  "mvec_history of machine learning_total_seen": {
+  "qv_130": {
     "default_value": 0.0,
     "pos": 173
   },
-  "mvec_history of machine learning_total_correct_attempts": {
+  "qv_131": {
     "default_value": 0.0,
     "pos": 174
   },
-  "mvec_history of machine learning_avg_attempts_per_question": {
+  "qv_132": {
     "default_value": 0.0,
     "pos": 175
   },
-  "mvec_history of machine learning_num_total": {
+  "qv_133": {
     "default_value": 0.0,
     "pos": 176
   },
-  "mvec_history of machine learning_percentage_seen": {
+  "qv_134": {
     "default_value": 0.0,
     "pos": 177
   },
-  "mvec_history of machine learning_num_fitb": {
+  "qv_135": {
     "default_value": 0.0,
     "pos": 178
   },
-  "mvec_history of machine learning_overall_accuracy": {
+  "qv_136": {
     "default_value": 0.0,
     "pos": 179
   },
-  "mvec_history of machine learning_num_tf": {
+  "qv_137": {
     "default_value": 0.0,
     "pos": 180
   },
-  "mvec_history of machine learning_num_mcq": {
+  "qv_138": {
     "default_value": 0.0,
     "pos": 181
   },
-  "mvec_history of machine learning_total_attempts": {
+  "qv_139": {
     "default_value": 0.0,
     "pos": 182
   },
-  "mvec_history of machine learning_days_since_last_seen": {
+  "qv_140": {
     "default_value": 0.0,
     "pos": 183
   },
-  "mvec_history of machine learning_avg_reaction_time": {
+  "qv_141": {
     "default_value": 0.0,
     "pos": 184
   },
-  "mvec_introductory computer science with python_total_seen": {
+  "qv_142": {
     "default_value": 0.0,
     "pos": 185
   },
-  "mvec_introductory computer science with python_total_correct_attempts": {
+  "qv_143": {
     "default_value": 0.0,
     "pos": 186
   },
-  "mvec_introductory computer science with python_avg_attempts_per_question": {
+  "qv_144": {
     "default_value": 0.0,
     "pos": 187
   },
-  "mvec_introductory computer science with python_num_so": {
+  "qv_145": {
     "default_value": 0.0,
     "pos": 188
   },
-  "mvec_introductory computer science with python_num_total": {
+  "qv_146": {
     "default_value": 0.0,
     "pos": 189
   },
-  "mvec_introductory computer science with python_percentage_seen": {
+  "qv_147": {
     "default_value": 0.0,
     "pos": 190
   },
-  "mvec_introductory computer science with python_num_fitb": {
+  "qv_148": {
     "default_value": 0.0,
     "pos": 191
   },
-  "mvec_introductory computer science with python_overall_accuracy": {
+  "qv_149": {
     "default_value": 0.0,
     "pos": 192
   },
-  "mvec_introductory computer science with python_num_tf": {
+  "qv_150": {
     "default_value": 0.0,
     "pos": 193
   },
-  "mvec_introductory computer science with python_total_attempts": {
+  "qv_151": {
     "default_value": 0.0,
     "pos": 194
   },
-  "mvec_introductory computer science with python_days_since_last_seen": {
+  "qv_152": {
     "default_value": 0.0,
     "pos": 195
   },
-  "mvec_introductory computer science with python_total_incorrect_attempts": {
+  "qv_153": {
     "default_value": 0.0,
     "pos": 196
   },
-  "mvec_introductory computer science with python_avg_reaction_time": {
+  "qv_154": {
     "default_value": 0.0,
     "pos": 197
   },
-  "mvec_introductory geology_total_seen": {
+  "qv_155": {
     "default_value": 0.0,
     "pos": 198
   },
-  "mvec_introductory geology_total_correct_attempts": {
+  "qv_156": {
     "default_value": 0.0,
     "pos": 199
   },
-  "mvec_introductory geology_avg_attempts_per_question": {
+  "qv_157": {
     "default_value": 0.0,
     "pos": 200
   },
-  "mvec_introductory geology_num_total": {
+  "qv_158": {
     "default_value": 0.0,
     "pos": 201
   },
-  "mvec_introductory geology_percentage_seen": {
+  "qv_159": {
     "default_value": 0.0,
     "pos": 202
   },
-  "mvec_introductory geology_num_fitb": {
+  "qv_160": {
     "default_value": 0.0,
     "pos": 203
   },
-  "mvec_introductory geology_overall_accuracy": {
+  "qv_161": {
     "default_value": 0.0,
     "pos": 204
   },
-  "mvec_introductory geology_total_attempts": {
+  "qv_162": {
     "default_value": 0.0,
     "pos": 205
   },
-  "mvec_introductory geology_days_since_last_seen": {
+  "qv_163": {
     "default_value": 0.0,
     "pos": 206
   },
-  "mvec_introductory geology_avg_reaction_time": {
+  "qv_164": {
     "default_value": 0.0,
     "pos": 207
   },
-  "mvec_introductory philosophy_total_seen": {
+  "qv_165": {
     "default_value": 0.0,
     "pos": 208
   },
-  "mvec_introductory philosophy_total_correct_attempts": {
+  "qv_166": {
     "default_value": 0.0,
     "pos": 209
   },
-  "mvec_introductory philosophy_avg_attempts_per_question": {
+  "qv_167": {
     "default_value": 0.0,
     "pos": 210
   },
-  "mvec_introductory philosophy_num_total": {
+  "qv_168": {
     "default_value": 0.0,
     "pos": 211
   },
-  "mvec_introductory philosophy_percentage_seen": {
+  "qv_169": {
     "default_value": 0.0,
     "pos": 212
   },
-  "mvec_introductory philosophy_num_fitb": {
+  "qv_170": {
     "default_value": 0.0,
     "pos": 213
   },
-  "mvec_introductory philosophy_overall_accuracy": {
+  "qv_171": {
     "default_value": 0.0,
     "pos": 214
   },
-  "mvec_introductory philosophy_total_attempts": {
+  "qv_172": {
     "default_value": 0.0,
     "pos": 215
   },
-  "mvec_introductory philosophy_days_since_last_seen": {
+  "qv_173": {
     "default_value": 0.0,
     "pos": 216
   },
-  "mvec_introductory philosophy_total_incorrect_attempts": {
+  "qv_174": {
     "default_value": 0.0,
     "pos": 217
   },
-  "mvec_introductory philosophy_avg_reaction_time": {
+  "qv_175": {
     "default_value": 0.0,
     "pos": 218
   },
-  "mvec_java data types_total_seen": {
+  "qv_176": {
     "default_value": 0.0,
     "pos": 219
   },
-  "mvec_java data types_total_correct_attempts": {
+  "qv_177": {
     "default_value": 0.0,
     "pos": 220
   },
-  "mvec_java data types_avg_attempts_per_question": {
+  "qv_178": {
     "default_value": 0.0,
     "pos": 221
   },
-  "mvec_java data types_num_total": {
+  "qv_179": {
     "default_value": 0.0,
     "pos": 222
   },
-  "mvec_java data types_percentage_seen": {
+  "qv_180": {
     "default_value": 0.0,
     "pos": 223
   },
-  "mvec_java data types_num_fitb": {
+  "qv_181": {
     "default_value": 0.0,
     "pos": 224
   },
-  "mvec_java data types_overall_accuracy": {
+  "qv_182": {
     "default_value": 0.0,
     "pos": 225
   },
-  "mvec_java data types_num_tf": {
+  "qv_183": {
     "default_value": 0.0,
     "pos": 226
   },
-  "mvec_java data types_num_mcq": {
+  "qv_184": {
     "default_value": 0.0,
     "pos": 227
   },
-  "mvec_java data types_total_attempts": {
+  "qv_185": {
     "default_value": 0.0,
     "pos": 228
   },
-  "mvec_java data types_days_since_last_seen": {
+  "qv_186": {
     "default_value": 0.0,
     "pos": 229
   },
-  "mvec_java data types_num_sata": {
+  "qv_187": {
     "default_value": 0.0,
     "pos": 230
   },
-  "mvec_java data types_total_incorrect_attempts": {
+  "qv_188": {
     "default_value": 0.0,
     "pos": 231
   },
-  "mvec_java data types_avg_reaction_time": {
+  "qv_189": {
     "default_value": 0.0,
     "pos": 232
   },
-  "mvec_java syntax_total_seen": {
+  "qv_190": {
     "default_value": 0.0,
     "pos": 233
   },
-  "mvec_java syntax_total_correct_attempts": {
+  "qv_191": {
     "default_value": 0.0,
     "pos": 234
   },
-  "mvec_java syntax_avg_attempts_per_question": {
+  "qv_192": {
     "default_value": 0.0,
     "pos": 235
   },
-  "mvec_java syntax_num_total": {
+  "qv_193": {
     "default_value": 0.0,
     "pos": 236
   },
-  "mvec_java syntax_percentage_seen": {
+  "qv_194": {
     "default_value": 0.0,
     "pos": 237
   },
-  "mvec_java syntax_num_fitb": {
+  "qv_195": {
     "default_value": 0.0,
     "pos": 238
   },
-  "mvec_java syntax_overall_accuracy": {
+  "qv_196": {
     "default_value": 0.0,
     "pos": 239
   },
-  "mvec_java syntax_num_tf": {
+  "qv_197": {
     "default_value": 0.0,
     "pos": 240
   },
-  "mvec_java syntax_num_mcq": {
+  "qv_198": {
     "default_value": 0.0,
     "pos": 241
   },
-  "mvec_java syntax_total_attempts": {
+  "qv_199": {
     "default_value": 0.0,
     "pos": 242
   },
-  "mvec_java syntax_days_since_last_seen": {
+  "qv_200": {
     "default_value": 0.0,
     "pos": 243
   },
-  "mvec_java syntax_total_incorrect_attempts": {
+  "qv_201": {
     "default_value": 0.0,
     "pos": 244
   },
-  "mvec_java syntax_avg_reaction_time": {
+  "qv_202": {
     "default_value": 0.0,
     "pos": 245
   },
-  "mvec_linux command line_total_seen": {
+  "qv_203": {
     "default_value": 0.0,
     "pos": 246
   },
-  "mvec_linux command line_total_correct_attempts": {
+  "qv_204": {
     "default_value": 0.0,
     "pos": 247
   },
-  "mvec_linux command line_avg_attempts_per_question": {
+  "qv_205": {
     "default_value": 0.0,
     "pos": 248
   },
-  "mvec_linux command line_num_total": {
+  "qv_206": {
     "default_value": 0.0,
     "pos": 249
   },
-  "mvec_linux command line_percentage_seen": {
+  "qv_207": {
     "default_value": 0.0,
     "pos": 250
   },
-  "mvec_linux command line_num_fitb": {
+  "qv_208": {
     "default_value": 0.0,
     "pos": 251
   },
-  "mvec_linux command line_overall_accuracy": {
+  "qv_209": {
     "default_value": 0.0,
     "pos": 252
   },
-  "mvec_linux command line_total_attempts": {
+  "qv_210": {
     "default_value": 0.0,
     "pos": 253
   },
-  "mvec_linux command line_days_since_last_seen": {
+  "qv_211": {
     "default_value": 0.0,
     "pos": 254
   },
-  "mvec_linux command line_avg_reaction_time": {
+  "qv_212": {
     "default_value": 0.0,
     "pos": 255
   },
-  "mvec_machine learning_total_seen": {
+  "qv_213": {
     "default_value": 0.0,
     "pos": 256
   },
-  "mvec_machine learning_total_correct_attempts": {
+  "qv_214": {
     "default_value": 0.0,
     "pos": 257
   },
-  "mvec_machine learning_avg_attempts_per_question": {
+  "qv_215": {
     "default_value": 0.0,
     "pos": 258
   },
-  "mvec_machine learning_num_total": {
+  "qv_216": {
     "default_value": 0.0,
     "pos": 259
   },
-  "mvec_machine learning_percentage_seen": {
+  "qv_217": {
     "default_value": 0.0,
     "pos": 260
   },
-  "mvec_machine learning_num_fitb": {
+  "qv_218": {
     "default_value": 0.0,
     "pos": 261
   },
-  "mvec_machine learning_overall_accuracy": {
+  "qv_219": {
     "default_value": 0.0,
     "pos": 262
   },
-  "mvec_machine learning_num_tf": {
+  "qv_220": {
     "default_value": 0.0,
     "pos": 263
   },
-  "mvec_machine learning_num_mcq": {
+  "qv_221": {
     "default_value": 0.0,
     "pos": 264
   },
-  "mvec_machine learning_total_attempts": {
+  "qv_222": {
     "default_value": 0.0,
     "pos": 265
   },
-  "mvec_machine learning_days_since_last_seen": {
+  "qv_223": {
     "default_value": 0.0,
     "pos": 266
   },
-  "mvec_machine learning_total_incorrect_attempts": {
+  "qv_224": {
     "default_value": 0.0,
     "pos": 267
   },
-  "mvec_machine learning_avg_reaction_time": {
+  "qv_225": {
     "default_value": 0.0,
     "pos": 268
   },
-  "mvec_math_percentage_seen": {
+  "qv_226": {
     "default_value": 0.0,
     "pos": 269
   },
-  "mvec_multiplication table_total_seen": {
+  "qv_227": {
     "default_value": 0.0,
     "pos": 270
   },
-  "mvec_multiplication table_total_correct_attempts": {
+  "qv_228": {
     "default_value": 0.0,
     "pos": 271
   },
-  "mvec_multiplication table_avg_attempts_per_question": {
+  "qv_229": {
     "default_value": 0.0,
     "pos": 272
   },
-  "mvec_multiplication table_num_total": {
+  "qv_230": {
     "default_value": 0.0,
     "pos": 273
   },
-  "mvec_multiplication table_percentage_seen": {
+  "qv_231": {
     "default_value": 0.0,
     "pos": 274
   },
-  "mvec_multiplication table_num_fitb": {
+  "qv_232": {
     "default_value": 0.0,
     "pos": 275
   },
-  "mvec_multiplication table_overall_accuracy": {
+  "qv_233": {
     "default_value": 0.0,
     "pos": 276
   },
-  "mvec_multiplication table_total_attempts": {
+  "qv_234": {
     "default_value": 0.0,
     "pos": 277
   },
-  "mvec_multiplication table_days_since_last_seen": {
+  "qv_235": {
     "default_value": 0.0,
     "pos": 278
   },
-  "mvec_multiplication table_total_incorrect_attempts": {
+  "qv_236": {
     "default_value": 0.0,
     "pos": 279
   },
-  "mvec_multiplication table_avg_reaction_time": {
+  "qv_237": {
     "default_value": 0.0,
     "pos": 280
   },
-  "mvec_neurosciences_total_seen": {
+  "qv_238": {
     "default_value": 0.0,
     "pos": 281
   },
-  "mvec_neurosciences_total_correct_attempts": {
+  "qv_239": {
     "default_value": 0.0,
     "pos": 282
   },
-  "mvec_neurosciences_avg_attempts_per_question": {
+  "qv_240": {
     "default_value": 0.0,
     "pos": 283
   },
-  "mvec_neurosciences_num_total": {
+  "qv_241": {
     "default_value": 0.0,
     "pos": 284
   },
-  "mvec_neurosciences_percentage_seen": {
+  "qv_242": {
     "default_value": 0.0,
     "pos": 285
   },
-  "mvec_neurosciences_overall_accuracy": {
+  "qv_243": {
     "default_value": 0.0,
     "pos": 286
   },
-  "mvec_neurosciences_num_mcq": {
+  "qv_244": {
     "default_value": 0.0,
     "pos": 287
   },
-  "mvec_neurosciences_total_attempts": {
+  "qv_245": {
     "default_value": 0.0,
     "pos": 288
   },
-  "mvec_neurosciences_days_since_last_seen": {
+  "qv_246": {
     "default_value": 0.0,
     "pos": 289
   },
-  "mvec_neurosciences_total_incorrect_attempts": {
+  "qv_247": {
     "default_value": 0.0,
     "pos": 290
   },
-  "mvec_neurosciences_avg_reaction_time": {
+  "qv_248": {
     "default_value": 0.0,
     "pos": 291
   },
-  "mvec_set theory_total_seen": {
+  "qv_249": {
     "default_value": 0.0,
     "pos": 292
   },
-  "mvec_set theory_total_correct_attempts": {
+  "qv_250": {
     "default_value": 0.0,
     "pos": 293
   },
-  "mvec_set theory_avg_attempts_per_question": {
+  "qv_251": {
     "default_value": 0.0,
     "pos": 294
   },
-  "mvec_set theory_num_total": {
+  "qv_252": {
     "default_value": 0.0,
     "pos": 295
   },
-  "mvec_set theory_percentage_seen": {
+  "qv_253": {
     "default_value": 0.0,
     "pos": 296
   },
-  "mvec_set theory_num_fitb": {
+  "qv_254": {
     "default_value": 0.0,
     "pos": 297
   },
-  "mvec_set theory_overall_accuracy": {
+  "qv_255": {
     "default_value": 0.0,
     "pos": 298
   },
-  "mvec_set theory_total_attempts": {
+  "qv_256": {
     "default_value": 0.0,
     "pos": 299
   },
-  "mvec_set theory_days_since_last_seen": {
+  "qv_257": {
     "default_value": 0.0,
     "pos": 300
   },
-  "mvec_set theory_total_incorrect_attempts": {
+  "qv_258": {
     "default_value": 0.0,
     "pos": 301
   },
-  "mvec_set theory_avg_reaction_time": {
+  "qv_259": {
     "default_value": 0.0,
     "pos": 302
   },
-  "mvec_statistical basics_total_seen": {
+  "qv_260": {
     "default_value": 0.0,
     "pos": 303
   },
-  "mvec_statistical basics_total_correct_attempts": {
+  "qv_261": {
     "default_value": 0.0,
     "pos": 304
   },
-  "mvec_statistical basics_avg_attempts_per_question": {
+  "qv_262": {
     "default_value": 0.0,
     "pos": 305
   },
-  "mvec_statistical basics_num_total": {
+  "qv_263": {
     "default_value": 0.0,
     "pos": 306
   },
-  "mvec_statistical basics_percentage_seen": {
+  "qv_264": {
     "default_value": 0.0,
     "pos": 307
   },
-  "mvec_statistical basics_num_fitb": {
+  "qv_265": {
     "default_value": 0.0,
     "pos": 308
   },
-  "mvec_statistical basics_overall_accuracy": {
+  "qv_266": {
     "default_value": 0.0,
     "pos": 309
   },
-  "mvec_statistical basics_total_attempts": {
+  "qv_267": {
     "default_value": 0.0,
     "pos": 310
   },
-  "mvec_statistical basics_days_since_last_seen": {
+  "qv_268": {
     "default_value": 0.0,
     "pos": 311
   },
-  "mvec_statistical basics_avg_reaction_time": {
+  "qv_269": {
     "default_value": 0.0,
     "pos": 312
   },
-  "mvec_statistics_total_seen": {
+  "qv_270": {
     "default_value": 0.0,
     "pos": 313
   },
-  "mvec_statistics_total_correct_attempts": {
+  "qv_271": {
     "default_value": 0.0,
     "pos": 314
   },
-  "mvec_statistics_avg_attempts_per_question": {
+  "qv_272": {
     "default_value": 0.0,
     "pos": 315
   },
-  "mvec_statistics_num_total": {
+  "qv_273": {
     "default_value": 0.0,
     "pos": 316
   },
-  "mvec_statistics_percentage_seen": {
+  "qv_274": {
     "default_value": 0.0,
     "pos": 317
   },
-  "mvec_statistics_num_fitb": {
+  "qv_275": {
     "default_value": 0.0,
     "pos": 318
   },
-  "mvec_statistics_overall_accuracy": {
+  "qv_276": {
     "default_value": 0.0,
     "pos": 319
   },
-  "mvec_statistics_num_tf": {
+  "qv_277": {
     "default_value": 0.0,
     "pos": 320
   },
-  "mvec_statistics_num_mcq": {
+  "qv_278": {
     "default_value": 0.0,
     "pos": 321
   },
-  "mvec_statistics_total_attempts": {
+  "qv_279": {
     "default_value": 0.0,
     "pos": 322
   },
-  "mvec_statistics_days_since_last_seen": {
+  "qv_280": {
     "default_value": 0.0,
     "pos": 323
   },
-  "mvec_statistics_total_incorrect_attempts": {
+  "qv_281": {
     "default_value": 0.0,
     "pos": 324
   },
-  "mvec_statistics_avg_reaction_time": {
+  "qv_282": {
     "default_value": 0.0,
     "pos": 325
   },
-  "mvec_trigonometry_total_seen": {
+  "qv_283": {
     "default_value": 0.0,
     "pos": 326
   },
-  "mvec_trigonometry_total_correct_attempts": {
+  "qv_284": {
     "default_value": 0.0,
     "pos": 327
   },
-  "mvec_trigonometry_avg_attempts_per_question": {
+  "qv_285": {
     "default_value": 0.0,
     "pos": 328
   },
-  "mvec_trigonometry_num_total": {
+  "qv_286": {
     "default_value": 0.0,
     "pos": 329
   },
-  "mvec_trigonometry_percentage_seen": {
+  "qv_287": {
     "default_value": 0.0,
     "pos": 330
   },
-  "mvec_trigonometry_num_fitb": {
+  "qv_288": {
     "default_value": 0.0,
     "pos": 331
   },
-  "mvec_trigonometry_overall_accuracy": {
+  "qv_289": {
     "default_value": 0.0,
     "pos": 332
   },
-  "mvec_trigonometry_num_tf": {
+  "qv_290": {
     "default_value": 0.0,
     "pos": 333
   },
-  "mvec_trigonometry_num_mcq": {
+  "qv_291": {
     "default_value": 0.0,
     "pos": 334
   },
-  "mvec_trigonometry_total_attempts": {
+  "qv_292": {
     "default_value": 0.0,
     "pos": 335
   },
-  "mvec_trigonometry_days_since_last_seen": {
+  "qv_293": {
     "default_value": 0.0,
     "pos": 336
   },
-  "mvec_trigonometry_total_incorrect_attempts": {
+  "qv_294": {
     "default_value": 0.0,
     "pos": 337
   },
-  "mvec_trigonometry_avg_reaction_time": {
+  "qv_295": {
     "default_value": 0.0,
     "pos": 338
   },
-  "mvec_western civ ii_total_seen": {
+  "qv_296": {
     "default_value": 0.0,
     "pos": 339
   },
-  "mvec_western civ ii_num_total": {
+  "qv_297": {
     "default_value": 0.0,
     "pos": 340
   },
-  "mvec_western civ ii_percentage_seen": {
+  "qv_298": {
     "default_value": 0.0,
     "pos": 341
   },
-  "mvec_western civ ii_num_fitb": {
+  "qv_299": {
     "default_value": 0.0,
     "pos": 342
   },
-  "mvec_western civ ii_days_since_last_seen": {
+  "qv_300": {
     "default_value": 0.0,
     "pos": 343
   },
-  "mvec_cost function_total_seen": {
+  "qv_301": {
     "default_value": 0.0,
     "pos": 344
   },
-  "mvec_cost function_avg_attempts_per_question": {
+  "qv_302": {
     "default_value": 0.0,
     "pos": 345
   },
-  "mvec_cost function_num_total": {
+  "qv_303": {
     "default_value": 0.0,
     "pos": 346
   },
-  "mvec_cost function_percentage_seen": {
+  "qv_304": {
     "default_value": 0.0,
     "pos": 347
   },
-  "mvec_cost function_num_tf": {
+  "qv_305": {
     "default_value": 0.0,
     "pos": 348
   },
-  "mvec_cost function_num_mcq": {
+  "qv_306": {
     "default_value": 0.0,
     "pos": 349
   },
-  "mvec_cost function_total_attempts": {
+  "qv_307": {
     "default_value": 0.0,
     "pos": 350
   },
-  "mvec_cost function_days_since_last_seen": {
+  "qv_308": {
     "default_value": 0.0,
     "pos": 351
   },
-  "mvec_cost function_total_incorrect_attempts": {
+  "qv_309": {
     "default_value": 0.0,
     "pos": 352
   },
-  "mvec_cost function_avg_reaction_time": {
+  "qv_310": {
     "default_value": 0.0,
     "pos": 353
   },
-  "mvec_linear regression_total_seen": {
+  "qv_311": {
     "default_value": 0.0,
     "pos": 354
   },
-  "mvec_linear regression_total_correct_attempts": {
+  "qv_312": {
     "default_value": 0.0,
     "pos": 355
   },
-  "mvec_linear regression_avg_attempts_per_question": {
+  "qv_313": {
     "default_value": 0.0,
     "pos": 356
   },
-  "mvec_linear regression_num_total": {
+  "qv_314": {
     "default_value": 0.0,
     "pos": 357
   },
-  "mvec_linear regression_percentage_seen": {
+  "qv_315": {
     "default_value": 0.0,
     "pos": 358
   },
-  "mvec_linear regression_num_fitb": {
+  "qv_316": {
     "default_value": 0.0,
     "pos": 359
   },
-  "mvec_linear regression_overall_accuracy": {
+  "qv_317": {
     "default_value": 0.0,
     "pos": 360
   },
-  "mvec_linear regression_num_tf": {
+  "qv_318": {
     "default_value": 0.0,
     "pos": 361
   },
-  "mvec_linear regression_num_mcq": {
+  "qv_319": {
     "default_value": 0.0,
     "pos": 362
   },
-  "mvec_linear regression_total_attempts": {
+  "qv_320": {
     "default_value": 0.0,
     "pos": 363
   },
-  "mvec_linear regression_days_since_last_seen": {
+  "qv_321": {
     "default_value": 0.0,
     "pos": 364
   },
-  "mvec_linear regression_total_incorrect_attempts": {
+  "qv_322": {
     "default_value": 0.0,
     "pos": 365
   },
-  "mvec_linear regression_avg_reaction_time": {
+  "qv_323": {
     "default_value": 0.0,
     "pos": 366
   },
-  "mvec_least squares method_total_seen": {
+  "qv_324": {
     "default_value": 0.0,
     "pos": 367
   },
-  "mvec_least squares method_total_correct_attempts": {
+  "qv_325": {
     "default_value": 0.0,
     "pos": 368
   },
-  "mvec_least squares method_avg_attempts_per_question": {
+  "qv_326": {
     "default_value": 0.0,
     "pos": 369
   },
-  "mvec_least squares method_num_total": {
+  "qv_327": {
     "default_value": 0.0,
     "pos": 370
   },
-  "mvec_least squares method_percentage_seen": {
+  "qv_328": {
     "default_value": 0.0,
     "pos": 371
   },
-  "mvec_least squares method_num_fitb": {
+  "qv_329": {
     "default_value": 0.0,
     "pos": 372
   },
-  "mvec_least squares method_overall_accuracy": {
+  "qv_330": {
     "default_value": 0.0,
     "pos": 373
   },
-  "mvec_least squares method_num_tf": {
+  "qv_331": {
     "default_value": 0.0,
     "pos": 374
   },
-  "mvec_least squares method_num_mcq": {
+  "qv_332": {
     "default_value": 0.0,
     "pos": 375
   },
-  "mvec_least squares method_total_attempts": {
+  "qv_333": {
     "default_value": 0.0,
     "pos": 376
   },
-  "mvec_least squares method_days_since_last_seen": {
+  "qv_334": {
     "default_value": 0.0,
     "pos": 377
   },
-  "mvec_least squares method_total_incorrect_attempts": {
+  "qv_335": {
     "default_value": 0.0,
     "pos": 378
   },
-  "mvec_least squares method_avg_reaction_time": {
+  "qv_336": {
     "default_value": 0.0,
     "pos": 379
   },
-  "mvec_ridge regression_total_seen": {
+  "qv_337": {
     "default_value": 0.0,
     "pos": 380
   },
-  "mvec_ridge regression_total_correct_attempts": {
+  "qv_338": {
     "default_value": 0.0,
     "pos": 381
   },
-  "mvec_ridge regression_avg_attempts_per_question": {
+  "qv_339": {
     "default_value": 0.0,
     "pos": 382
   },
-  "mvec_ridge regression_num_total": {
+  "qv_340": {
     "default_value": 0.0,
     "pos": 383
   },
-  "mvec_ridge regression_percentage_seen": {
+  "qv_341": {
     "default_value": 0.0,
     "pos": 384
   },
-  "mvec_ridge regression_overall_accuracy": {
+  "qv_342": {
     "default_value": 0.0,
     "pos": 385
   },
-  "mvec_ridge regression_num_tf": {
+  "qv_343": {
     "default_value": 0.0,
     "pos": 386
   },
-  "mvec_ridge regression_num_mcq": {
+  "qv_344": {
     "default_value": 0.0,
     "pos": 387
   },
-  "mvec_ridge regression_total_attempts": {
+  "qv_345": {
     "default_value": 0.0,
     "pos": 388
   },
-  "mvec_ridge regression_days_since_last_seen": {
+  "qv_346": {
     "default_value": 0.0,
     "pos": 389
   },
-  "mvec_ridge regression_total_incorrect_attempts": {
+  "qv_347": {
     "default_value": 0.0,
     "pos": 390
   },
-  "mvec_ridge regression_avg_reaction_time": {
+  "qv_348": {
     "default_value": 0.0,
     "pos": 391
   },
-  "mvec_cell and fluid dynamics_total_seen": {
+  "qv_349": {
     "default_value": 0.0,
     "pos": 392
   },
-  "mvec_cell and fluid dynamics_total_correct_attempts": {
+  "qv_350": {
     "default_value": 0.0,
     "pos": 393
   },
-  "mvec_cell and fluid dynamics_avg_attempts_per_question": {
+  "qv_351": {
     "default_value": 0.0,
     "pos": 394
   },
-  "mvec_cell and fluid dynamics_num_total": {
+  "qv_352": {
     "default_value": 0.0,
     "pos": 395
   },
-  "mvec_cell and fluid dynamics_percentage_seen": {
+  "qv_353": {
     "default_value": 0.0,
     "pos": 396
   },
-  "mvec_cell and fluid dynamics_num_fitb": {
+  "qv_354": {
     "default_value": 0.0,
     "pos": 397
   },
-  "mvec_cell and fluid dynamics_overall_accuracy": {
+  "qv_355": {
     "default_value": 0.0,
     "pos": 398
   },
-  "mvec_cell and fluid dynamics_num_tf": {
+  "qv_356": {
     "default_value": 0.0,
     "pos": 399
   },
-  "mvec_cell and fluid dynamics_num_mcq": {
+  "qv_357": {
     "default_value": 0.0,
     "pos": 400
   },
-  "mvec_cell and fluid dynamics_total_attempts": {
+  "qv_358": {
     "default_value": 0.0,
     "pos": 401
   },
-  "mvec_cell and fluid dynamics_days_since_last_seen": {
+  "qv_359": {
     "default_value": 0.0,
     "pos": 402
   },
-  "mvec_cell and fluid dynamics_total_incorrect_attempts": {
+  "qv_360": {
     "default_value": 0.0,
     "pos": 403
   },
-  "mvec_cell and fluid dynamics_avg_reaction_time": {
+  "qv_361": {
     "default_value": 0.0,
     "pos": 404
   },
-  "mvec_matrix_days_since_last_seen": {
+  "qv_362": {
     "default_value": 0.0,
     "pos": 405
   },
-  "mvec_thermodynamics_total_seen": {
+  "qv_363": {
     "default_value": 0.0,
     "pos": 406
   },
-  "mvec_thermodynamics_total_correct_attempts": {
+  "qv_364": {
     "default_value": 0.0,
     "pos": 407
   },
-  "mvec_thermodynamics_avg_attempts_per_question": {
+  "qv_365": {
     "default_value": 0.0,
     "pos": 408
   },
-  "mvec_thermodynamics_num_total": {
+  "qv_366": {
     "default_value": 0.0,
     "pos": 409
   },
-  "mvec_thermodynamics_percentage_seen": {
+  "qv_367": {
     "default_value": 0.0,
     "pos": 410
   },
-  "mvec_thermodynamics_num_fitb": {
+  "qv_368": {
     "default_value": 0.0,
     "pos": 411
   },
-  "mvec_thermodynamics_overall_accuracy": {
+  "qv_369": {
     "default_value": 0.0,
     "pos": 412
   },
-  "mvec_thermodynamics_total_attempts": {
+  "qv_370": {
     "default_value": 0.0,
     "pos": 413
   },
-  "mvec_thermodynamics_days_since_last_seen": {
+  "qv_371": {
     "default_value": 0.0,
     "pos": 414
   },
-  "mvec_thermodynamics_avg_reaction_time": {
+  "qv_372": {
     "default_value": 0.0,
     "pos": 415
   },
-  "mvec_cell as a building block_total_seen": {
+  "qv_373": {
     "default_value": 0.0,
     "pos": 416
   },
-  "mvec_cell as a building block_total_correct_attempts": {
+  "qv_374": {
     "default_value": 0.0,
     "pos": 417
   },
-  "mvec_cell as a building block_avg_attempts_per_question": {
+  "qv_375": {
     "default_value": 0.0,
     "pos": 418
   },
-  "mvec_cell as a building block_num_total": {
+  "qv_376": {
     "default_value": 0.0,
     "pos": 419
   },
-  "mvec_cell as a building block_percentage_seen": {
+  "qv_377": {
     "default_value": 0.0,
     "pos": 420
   },
-  "mvec_cell as a building block_num_fitb": {
+  "qv_378": {
     "default_value": 0.0,
     "pos": 421
   },
-  "mvec_cell as a building block_overall_accuracy": {
+  "qv_379": {
     "default_value": 0.0,
     "pos": 422
   },
-  "mvec_cell as a building block_num_tf": {
+  "qv_380": {
     "default_value": 0.0,
     "pos": 423
   },
-  "mvec_cell as a building block_num_mcq": {
+  "qv_381": {
     "default_value": 0.0,
     "pos": 424
   },
-  "mvec_cell as a building block_total_attempts": {
+  "qv_382": {
     "default_value": 0.0,
     "pos": 425
   },
-  "mvec_cell as a building block_days_since_last_seen": {
+  "qv_383": {
     "default_value": 0.0,
     "pos": 426
   },
-  "mvec_cell as a building block_total_incorrect_attempts": {
+  "qv_384": {
     "default_value": 0.0,
     "pos": 427
   },
-  "mvec_cell as a building block_avg_reaction_time": {
+  "qv_385": {
     "default_value": 0.0,
     "pos": 428
   },
-  "mvec_chemistry and structural biology_total_seen": {
+  "qv_386": {
     "default_value": 0.0,
     "pos": 429
   },
-  "mvec_chemistry and structural biology_total_correct_attempts": {
+  "qv_387": {
     "default_value": 0.0,
     "pos": 430
   },
-  "mvec_chemistry and structural biology_avg_attempts_per_question": {
+  "qv_388": {
     "default_value": 0.0,
     "pos": 431
   },
-  "mvec_chemistry and structural biology_num_total": {
+  "qv_389": {
     "default_value": 0.0,
     "pos": 432
   },
-  "mvec_chemistry and structural biology_percentage_seen": {
+  "qv_390": {
     "default_value": 0.0,
     "pos": 433
   },
-  "mvec_chemistry and structural biology_num_fitb": {
+  "qv_391": {
     "default_value": 0.0,
     "pos": 434
   },
-  "mvec_chemistry and structural biology_overall_accuracy": {
+  "qv_392": {
     "default_value": 0.0,
     "pos": 435
   },
-  "mvec_chemistry and structural biology_num_mcq": {
+  "qv_393": {
     "default_value": 0.0,
     "pos": 436
   },
-  "mvec_chemistry and structural biology_total_attempts": {
+  "qv_394": {
     "default_value": 0.0,
     "pos": 437
   },
-  "mvec_chemistry and structural biology_days_since_last_seen": {
+  "qv_395": {
     "default_value": 0.0,
     "pos": 438
   },
-  "mvec_chemistry and structural biology_num_sata": {
+  "qv_396": {
     "default_value": 0.0,
     "pos": 439
   },
-  "mvec_chemistry and structural biology_total_incorrect_attempts": {
+  "qv_397": {
     "default_value": 0.0,
     "pos": 440
   },
-  "mvec_chemistry and structural biology_avg_reaction_time": {
+  "qv_398": {
     "default_value": 0.0,
     "pos": 441
   },
-  "mvec_java general principles_total_seen": {
+  "qv_399": {
     "default_value": 0.0,
     "pos": 442
   },
-  "mvec_java general principles_total_correct_attempts": {
+  "qv_400": {
     "default_value": 0.0,
     "pos": 443
   },
-  "mvec_java general principles_avg_attempts_per_question": {
+  "qv_401": {
     "default_value": 0.0,
     "pos": 444
   },
-  "mvec_java general principles_num_total": {
+  "qv_402": {
     "default_value": 0.0,
     "pos": 445
   },
-  "mvec_java general principles_percentage_seen": {
+  "qv_403": {
     "default_value": 0.0,
     "pos": 446
   },
-  "mvec_java general principles_num_fitb": {
+  "qv_404": {
     "default_value": 0.0,
     "pos": 447
   },
-  "mvec_java general principles_overall_accuracy": {
+  "qv_405": {
     "default_value": 0.0,
     "pos": 448
   },
-  "mvec_java general principles_num_mcq": {
+  "qv_406": {
     "default_value": 0.0,
     "pos": 449
   },
-  "mvec_java general principles_total_attempts": {
+  "qv_407": {
     "default_value": 0.0,
     "pos": 450
   },
-  "mvec_java general principles_days_since_last_seen": {
+  "qv_408": {
     "default_value": 0.0,
     "pos": 451
   },
-  "mvec_java general principles_total_incorrect_attempts": {
+  "qv_409": {
     "default_value": 0.0,
     "pos": 452
   },
-  "mvec_java general principles_avg_reaction_time": {
+  "qv_410": {
     "default_value": 0.0,
     "pos": 453
   },
-  "mvec_composition of life_total_seen": {
+  "qv_411": {
     "default_value": 0.0,
     "pos": 454
   },
-  "mvec_composition of life_total_correct_attempts": {
+  "qv_412": {
     "default_value": 0.0,
     "pos": 455
   },
-  "mvec_composition of life_avg_attempts_per_question": {
+  "qv_413": {
     "default_value": 0.0,
     "pos": 456
   },
-  "mvec_composition of life_num_total": {
+  "qv_414": {
     "default_value": 0.0,
     "pos": 457
   },
-  "mvec_composition of life_percentage_seen": {
+  "qv_415": {
     "default_value": 0.0,
     "pos": 458
   },
-  "mvec_composition of life_num_fitb": {
+  "qv_416": {
     "default_value": 0.0,
     "pos": 459
   },
-  "mvec_composition of life_overall_accuracy": {
+  "qv_417": {
     "default_value": 0.0,
     "pos": 460
   },
-  "mvec_composition of life_num_mcq": {
+  "qv_418": {
     "default_value": 0.0,
     "pos": 461
   },
-  "mvec_composition of life_total_attempts": {
+  "qv_419": {
     "default_value": 0.0,
     "pos": 462
   },
-  "mvec_composition of life_days_since_last_seen": {
+  "qv_420": {
     "default_value": 0.0,
     "pos": 463
   },
-  "mvec_composition of life_num_sata": {
+  "qv_421": {
     "default_value": 0.0,
     "pos": 464
   },
-  "mvec_composition of life_avg_reaction_time": {
+  "qv_422": {
     "default_value": 0.0,
     "pos": 465
   },
-  "mvec_probability theory_total_seen": {
+  "qv_423": {
     "default_value": 0.0,
     "pos": 466
   },
-  "mvec_probability theory_num_total": {
+  "qv_424": {
     "default_value": 0.0,
     "pos": 467
   },
-  "mvec_probability theory_percentage_seen": {
+  "qv_425": {
     "default_value": 0.0,
     "pos": 468
   },
-  "mvec_probability theory_num_fitb": {
+  "qv_426": {
     "default_value": 0.0,
     "pos": 469
   },
-  "mvec_probability theory_days_since_last_seen": {
+  "qv_427": {
     "default_value": 0.0,
     "pos": 470
   },
-  "mvec_daily life science_total_seen": {
+  "qv_428": {
     "default_value": 0.0,
     "pos": 471
   },
-  "mvec_daily life science_total_correct_attempts": {
+  "qv_429": {
     "default_value": 0.0,
     "pos": 472
   },
-  "mvec_daily life science_avg_attempts_per_question": {
+  "qv_430": {
     "default_value": 0.0,
     "pos": 473
   },
-  "mvec_daily life science_num_total": {
+  "qv_431": {
     "default_value": 0.0,
     "pos": 474
   },
-  "mvec_daily life science_percentage_seen": {
+  "qv_432": {
     "default_value": 0.0,
     "pos": 475
   },
-  "mvec_daily life science_num_fitb": {
+  "qv_433": {
     "default_value": 0.0,
     "pos": 476
   },
-  "mvec_daily life science_overall_accuracy": {
+  "qv_434": {
     "default_value": 0.0,
     "pos": 477
   },
-  "mvec_daily life science_total_attempts": {
+  "qv_435": {
     "default_value": 0.0,
     "pos": 478
   },
-  "mvec_daily life science_days_since_last_seen": {
+  "qv_436": {
     "default_value": 0.0,
     "pos": 479
   },
-  "mvec_daily life science_avg_reaction_time": {
+  "qv_437": {
     "default_value": 0.0,
     "pos": 480
   },
-  "mvec_support vector machines_total_seen": {
+  "qv_438": {
     "default_value": 0.0,
     "pos": 481
   },
-  "mvec_support vector machines_total_correct_attempts": {
+  "qv_439": {
     "default_value": 0.0,
     "pos": 482
   },
-  "mvec_support vector machines_avg_attempts_per_question": {
+  "qv_440": {
     "default_value": 0.0,
     "pos": 483
   },
-  "mvec_support vector machines_num_total": {
+  "qv_441": {
     "default_value": 0.0,
     "pos": 484
   },
-  "mvec_support vector machines_percentage_seen": {
+  "qv_442": {
     "default_value": 0.0,
     "pos": 485
   },
-  "mvec_support vector machines_overall_accuracy": {
+  "qv_443": {
     "default_value": 0.0,
     "pos": 486
   },
-  "mvec_support vector machines_num_tf": {
+  "qv_444": {
     "default_value": 0.0,
     "pos": 487
   },
-  "mvec_support vector machines_num_mcq": {
+  "qv_445": {
     "default_value": 0.0,
     "pos": 488
   },
-  "mvec_support vector machines_total_attempts": {
+  "qv_446": {
     "default_value": 0.0,
     "pos": 489
   },
-  "mvec_support vector machines_days_since_last_seen": {
+  "qv_447": {
     "default_value": 0.0,
     "pos": 490
   },
-  "mvec_support vector machines_total_incorrect_attempts": {
+  "qv_448": {
     "default_value": 0.0,
     "pos": 491
   },
-  "mvec_support vector machines_avg_reaction_time": {
+  "qv_449": {
     "default_value": 0.0,
     "pos": 492
   },
-  "mvec_concept learning_days_since_last_seen": {
+  "qv_450": {
     "default_value": 0.0,
     "pos": 493
   },
-  "mvec_cell and transport_total_seen": {
+  "qv_451": {
     "default_value": 0.0,
     "pos": 494
   },
-  "mvec_cell and transport_total_correct_attempts": {
+  "qv_452": {
     "default_value": 0.0,
     "pos": 495
   },
-  "mvec_cell and transport_avg_attempts_per_question": {
+  "qv_453": {
     "default_value": 0.0,
     "pos": 496
   },
-  "mvec_cell and transport_num_total": {
+  "qv_454": {
     "default_value": 0.0,
     "pos": 497
   },
-  "mvec_cell and transport_percentage_seen": {
+  "qv_455": {
     "default_value": 0.0,
     "pos": 498
   },
-  "mvec_cell and transport_num_fitb": {
+  "qv_456": {
     "default_value": 0.0,
     "pos": 499
   },
-  "mvec_cell and transport_overall_accuracy": {
+  "qv_457": {
     "default_value": 0.0,
     "pos": 500
   },
-  "mvec_cell and transport_num_mcq": {
+  "qv_458": {
     "default_value": 0.0,
     "pos": 501
   },
-  "mvec_cell and transport_total_attempts": {
+  "qv_459": {
     "default_value": 0.0,
     "pos": 502
   },
-  "mvec_cell and transport_days_since_last_seen": {
+  "qv_460": {
     "default_value": 0.0,
     "pos": 503
   },
-  "mvec_cell and transport_num_sata": {
+  "qv_461": {
     "default_value": 0.0,
     "pos": 504
   },
-  "mvec_cell and transport_total_incorrect_attempts": {
+  "qv_462": {
     "default_value": 0.0,
     "pos": 505
   },
-  "mvec_cell and transport_avg_reaction_time": {
+  "qv_463": {
     "default_value": 0.0,
     "pos": 506
   },
-  "mvec_disease managment_total_seen": {
+  "qv_464": {
     "default_value": 0.0,
     "pos": 507
   },
-  "mvec_disease managment_total_correct_attempts": {
+  "qv_465": {
     "default_value": 0.0,
     "pos": 508
   },
-  "mvec_disease managment_avg_attempts_per_question": {
+  "qv_466": {
     "default_value": 0.0,
     "pos": 509
   },
-  "mvec_disease managment_num_total": {
+  "qv_467": {
     "default_value": 0.0,
     "pos": 510
   },
-  "mvec_disease managment_percentage_seen": {
+  "qv_468": {
     "default_value": 0.0,
     "pos": 511
   },
-  "mvec_disease managment_overall_accuracy": {
+  "qv_469": {
     "default_value": 0.0,
     "pos": 512
   },
-  "mvec_disease managment_num_mcq": {
+  "qv_470": {
     "default_value": 0.0,
     "pos": 513
   },
-  "mvec_disease managment_total_attempts": {
+  "qv_471": {
     "default_value": 0.0,
     "pos": 514
   },
-  "mvec_disease managment_days_since_last_seen": {
+  "qv_472": {
     "default_value": 0.0,
     "pos": 515
   },
-  "mvec_disease managment_total_incorrect_attempts": {
+  "qv_473": {
     "default_value": 0.0,
     "pos": 516
   },
-  "mvec_disease managment_avg_reaction_time": {
+  "qv_474": {
     "default_value": 0.0,
     "pos": 517
   },
-  "mvec_environmental biology and chemistry_total_seen": {
+  "qv_475": {
     "default_value": 0.0,
     "pos": 518
   },
-  "mvec_environmental biology and chemistry_total_correct_attempts": {
+  "qv_476": {
     "default_value": 0.0,
     "pos": 519
   },
-  "mvec_environmental biology and chemistry_avg_attempts_per_question": {
+  "qv_477": {
     "default_value": 0.0,
     "pos": 520
   },
-  "mvec_environmental biology and chemistry_num_total": {
+  "qv_478": {
     "default_value": 0.0,
     "pos": 521
   },
-  "mvec_environmental biology and chemistry_percentage_seen": {
+  "qv_479": {
     "default_value": 0.0,
     "pos": 522
   },
-  "mvec_environmental biology and chemistry_num_fitb": {
+  "qv_480": {
     "default_value": 0.0,
     "pos": 523
   },
-  "mvec_environmental biology and chemistry_overall_accuracy": {
+  "qv_481": {
     "default_value": 0.0,
     "pos": 524
   },
-  "mvec_environmental biology and chemistry_total_attempts": {
+  "qv_482": {
     "default_value": 0.0,
     "pos": 525
   },
-  "mvec_environmental biology and chemistry_days_since_last_seen": {
+  "qv_483": {
     "default_value": 0.0,
     "pos": 526
   },
-  "mvec_environmental biology and chemistry_avg_reaction_time": {
+  "qv_484": {
     "default_value": 0.0,
     "pos": 527
   },
-  "mvec_classification_total_seen": {
+  "qv_485": {
     "default_value": 0.0,
     "pos": 528
   },
-  "mvec_classification_total_correct_attempts": {
+  "qv_486": {
     "default_value": 0.0,
     "pos": 529
   },
-  "mvec_classification_avg_attempts_per_question": {
+  "qv_487": {
     "default_value": 0.0,
     "pos": 530
   },
-  "mvec_classification_num_total": {
+  "qv_488": {
     "default_value": 0.0,
     "pos": 531
   },
-  "mvec_classification_percentage_seen": {
+  "qv_489": {
     "default_value": 0.0,
     "pos": 532
   },
-  "mvec_classification_num_fitb": {
+  "qv_490": {
     "default_value": 0.0,
     "pos": 533
   },
-  "mvec_classification_overall_accuracy": {
+  "qv_491": {
     "default_value": 0.0,
     "pos": 534
   },
-  "mvec_classification_num_tf": {
+  "qv_492": {
     "default_value": 0.0,
     "pos": 535
   },
-  "mvec_classification_num_mcq": {
+  "qv_493": {
     "default_value": 0.0,
     "pos": 536
   },
-  "mvec_classification_total_attempts": {
+  "qv_494": {
     "default_value": 0.0,
     "pos": 537
   },
-  "mvec_classification_days_since_last_seen": {
+  "qv_495": {
     "default_value": 0.0,
     "pos": 538
   },
-  "mvec_classification_total_incorrect_attempts": {
+  "qv_496": {
     "default_value": 0.0,
     "pos": 539
   },
-  "mvec_classification_avg_reaction_time": {
+  "qv_497": {
     "default_value": 0.0,
     "pos": 540
   },
-  "mvec_cell and biomolecules_total_seen": {
+  "qv_498": {
     "default_value": 0.0,
     "pos": 541
   },
-  "mvec_cell and biomolecules_total_correct_attempts": {
+  "qv_499": {
     "default_value": 0.0,
     "pos": 542
   },
-  "mvec_cell and biomolecules_avg_attempts_per_question": {
+  "qv_500": {
     "default_value": 0.0,
     "pos": 543
   },
-  "mvec_cell and biomolecules_num_total": {
+  "qv_501": {
     "default_value": 0.0,
     "pos": 544
   },
-  "mvec_cell and biomolecules_percentage_seen": {
+  "qv_502": {
     "default_value": 0.0,
     "pos": 545
   },
-  "mvec_cell and biomolecules_num_fitb": {
+  "qv_503": {
     "default_value": 0.0,
     "pos": 546
   },
-  "mvec_cell and biomolecules_overall_accuracy": {
+  "qv_504": {
     "default_value": 0.0,
     "pos": 547
   },
-  "mvec_cell and biomolecules_num_tf": {
+  "qv_505": {
     "default_value": 0.0,
     "pos": 548
   },
-  "mvec_cell and biomolecules_num_mcq": {
+  "qv_506": {
     "default_value": 0.0,
     "pos": 549
   },
-  "mvec_cell and biomolecules_total_attempts": {
+  "qv_507": {
     "default_value": 0.0,
     "pos": 550
   },
-  "mvec_cell and biomolecules_days_since_last_seen": {
+  "qv_508": {
     "default_value": 0.0,
     "pos": 551
   },
-  "mvec_cell and biomolecules_num_sata": {
+  "qv_509": {
     "default_value": 0.0,
     "pos": 552
   },
-  "mvec_cell and biomolecules_total_incorrect_attempts": {
+  "qv_510": {
     "default_value": 0.0,
     "pos": 553
   },
-  "mvec_cell and biomolecules_avg_reaction_time": {
+  "qv_511": {
     "default_value": 0.0,
     "pos": 554
   },
-  "mvec_neural networks_total_seen": {
+  "qv_512": {
     "default_value": 0.0,
     "pos": 555
   },
-  "mvec_neural networks_total_correct_attempts": {
+  "qv_513": {
     "default_value": 0.0,
     "pos": 556
   },
-  "mvec_neural networks_avg_attempts_per_question": {
+  "qv_514": {
     "default_value": 0.0,
     "pos": 557
   },
-  "mvec_neural networks_num_total": {
+  "qv_515": {
     "default_value": 0.0,
     "pos": 558
   },
-  "mvec_neural networks_percentage_seen": {
+  "qv_516": {
     "default_value": 0.0,
     "pos": 559
   },
-  "mvec_neural networks_overall_accuracy": {
+  "qv_517": {
     "default_value": 0.0,
     "pos": 560
   },
-  "mvec_neural networks_num_tf": {
+  "qv_518": {
     "default_value": 0.0,
     "pos": 561
   },
-  "mvec_neural networks_num_mcq": {
+  "qv_519": {
     "default_value": 0.0,
     "pos": 562
   },
-  "mvec_neural networks_total_attempts": {
+  "qv_520": {
     "default_value": 0.0,
     "pos": 563
   },
-  "mvec_neural networks_days_since_last_seen": {
+  "qv_521": {
     "default_value": 0.0,
     "pos": 564
   },
-  "mvec_neural networks_total_incorrect_attempts": {
+  "qv_522": {
     "default_value": 0.0,
     "pos": 565
   },
-  "mvec_neural networks_avg_reaction_time": {
+  "qv_523": {
     "default_value": 0.0,
     "pos": 566
   },
-  "mvec_decision trees_total_seen": {
+  "qv_524": {
     "default_value": 0.0,
     "pos": 567
   },
-  "mvec_decision trees_total_correct_attempts": {
+  "qv_525": {
     "default_value": 0.0,
     "pos": 568
   },
-  "mvec_decision trees_avg_attempts_per_question": {
+  "qv_526": {
     "default_value": 0.0,
     "pos": 569
   },
-  "mvec_decision trees_num_total": {
+  "qv_527": {
     "default_value": 0.0,
     "pos": 570
   },
-  "mvec_decision trees_percentage_seen": {
+  "qv_528": {
     "default_value": 0.0,
     "pos": 571
   },
-  "mvec_decision trees_overall_accuracy": {
+  "qv_529": {
     "default_value": 0.0,
     "pos": 572
   },
-  "mvec_decision trees_num_tf": {
+  "qv_530": {
     "default_value": 0.0,
     "pos": 573
   },
-  "mvec_decision trees_num_mcq": {
+  "qv_531": {
     "default_value": 0.0,
     "pos": 574
   },
-  "mvec_decision trees_total_attempts": {
+  "qv_532": {
     "default_value": 0.0,
     "pos": 575
   },
-  "mvec_decision trees_days_since_last_seen": {
+  "qv_533": {
     "default_value": 0.0,
     "pos": 576
   },
-  "mvec_decision trees_total_incorrect_attempts": {
+  "qv_534": {
     "default_value": 0.0,
     "pos": 577
   },
-  "mvec_decision trees_avg_reaction_time": {
+  "qv_535": {
     "default_value": 0.0,
     "pos": 578
   },
-  "mvec_random forest algorithm_total_seen": {
+  "qv_536": {
     "default_value": 0.0,
     "pos": 579
   },
-  "mvec_random forest algorithm_total_correct_attempts": {
+  "qv_537": {
     "default_value": 0.0,
     "pos": 580
   },
-  "mvec_random forest algorithm_avg_attempts_per_question": {
+  "qv_538": {
     "default_value": 0.0,
     "pos": 581
   },
-  "mvec_random forest algorithm_num_total": {
+  "qv_539": {
     "default_value": 0.0,
     "pos": 582
   },
-  "mvec_random forest algorithm_percentage_seen": {
+  "qv_540": {
     "default_value": 0.0,
     "pos": 583
   },
-  "mvec_random forest algorithm_overall_accuracy": {
+  "qv_541": {
     "default_value": 0.0,
     "pos": 584
   },
-  "mvec_random forest algorithm_num_tf": {
+  "qv_542": {
     "default_value": 0.0,
     "pos": 585
   },
-  "mvec_random forest algorithm_total_attempts": {
+  "qv_543": {
     "default_value": 0.0,
     "pos": 586
   },
-  "mvec_random forest algorithm_days_since_last_seen": {
+  "qv_544": {
     "default_value": 0.0,
     "pos": 587
   },
-  "mvec_random forest algorithm_avg_reaction_time": {
+  "qv_545": {
     "default_value": 0.0,
     "pos": 588
   },
-  "mvec_calculus 2_days_since_last_seen": {
+  "qv_546": {
     "default_value": 0.0,
     "pos": 589
   },
-  "mvec_id3 algorithm_total_seen": {
+  "qv_547": {
     "default_value": 0.0,
     "pos": 590
   },
-  "mvec_id3 algorithm_total_correct_attempts": {
+  "qv_548": {
     "default_value": 0.0,
     "pos": 591
   },
-  "mvec_id3 algorithm_avg_attempts_per_question": {
+  "qv_549": {
     "default_value": 0.0,
     "pos": 592
   },
-  "mvec_id3 algorithm_num_total": {
+  "qv_550": {
     "default_value": 0.0,
     "pos": 593
   },
-  "mvec_id3 algorithm_percentage_seen": {
+  "qv_551": {
     "default_value": 0.0,
     "pos": 594
   },
-  "mvec_id3 algorithm_overall_accuracy": {
+  "qv_552": {
     "default_value": 0.0,
     "pos": 595
   },
-  "mvec_id3 algorithm_num_tf": {
+  "qv_553": {
     "default_value": 0.0,
     "pos": 596
   },
-  "mvec_id3 algorithm_num_mcq": {
+  "qv_554": {
     "default_value": 0.0,
     "pos": 597
   },
-  "mvec_id3 algorithm_total_attempts": {
+  "qv_555": {
     "default_value": 0.0,
     "pos": 598
   },
-  "mvec_id3 algorithm_days_since_last_seen": {
+  "qv_556": {
     "default_value": 0.0,
     "pos": 599
   },
-  "mvec_id3 algorithm_avg_reaction_time": {
+  "qv_557": {
     "default_value": 0.0,
     "pos": 600
   },
-  "mvec_k-nearest neighbors_days_since_last_seen": {
+  "qv_558": {
     "default_value": 0.0,
     "pos": 601
   },
-  "mvec_data science_days_since_last_seen": {
+  "qv_559": {
     "default_value": 0.0,
     "pos": 602
   },
-  "mvec_acid base_total_seen": {
+  "qv_560": {
     "default_value": 0.0,
     "pos": 603
   },
-  "mvec_acid base_total_correct_attempts": {
+  "qv_561": {
     "default_value": 0.0,
     "pos": 604
   },
-  "mvec_acid base_avg_attempts_per_question": {
+  "qv_562": {
     "default_value": 0.0,
     "pos": 605
   },
-  "mvec_acid base_num_total": {
+  "qv_563": {
     "default_value": 0.0,
     "pos": 606
   },
-  "mvec_acid base_percentage_seen": {
+  "qv_564": {
     "default_value": 0.0,
     "pos": 607
   },
-  "mvec_acid base_num_fitb": {
+  "qv_565": {
     "default_value": 0.0,
     "pos": 608
   },
-  "mvec_acid base_overall_accuracy": {
+  "qv_566": {
     "default_value": 0.0,
     "pos": 609
   },
-  "mvec_acid base_total_attempts": {
+  "qv_567": {
     "default_value": 0.0,
     "pos": 610
   },
-  "mvec_acid base_days_since_last_seen": {
+  "qv_568": {
     "default_value": 0.0,
     "pos": 611
   },
-  "mvec_acid base_total_incorrect_attempts": {
+  "qv_569": {
     "default_value": 0.0,
     "pos": 612
   },
-  "mvec_acid base_avg_reaction_time": {
+  "qv_570": {
     "default_value": 0.0,
     "pos": 613
   },
-  "mvec_energy conversion_total_seen": {
+  "qv_571": {
     "default_value": 0.0,
     "pos": 614
   },
-  "mvec_energy conversion_total_correct_attempts": {
+  "qv_572": {
     "default_value": 0.0,
     "pos": 615
   },
-  "mvec_energy conversion_avg_attempts_per_question": {
+  "qv_573": {
     "default_value": 0.0,
     "pos": 616
   },
-  "mvec_energy conversion_num_total": {
+  "qv_574": {
     "default_value": 0.0,
     "pos": 617
   },
-  "mvec_energy conversion_percentage_seen": {
+  "qv_575": {
     "default_value": 0.0,
     "pos": 618
   },
-  "mvec_energy conversion_num_fitb": {
+  "qv_576": {
     "default_value": 0.0,
     "pos": 619
   },
-  "mvec_energy conversion_overall_accuracy": {
+  "qv_577": {
     "default_value": 0.0,
     "pos": 620
   },
-  "mvec_energy conversion_total_attempts": {
+  "qv_578": {
     "default_value": 0.0,
     "pos": 621
   },
-  "mvec_energy conversion_days_since_last_seen": {
+  "qv_579": {
     "default_value": 0.0,
     "pos": 622
   },
-  "mvec_energy conversion_avg_reaction_time": {
+  "qv_580": {
     "default_value": 0.0,
     "pos": 623
   },
-  "mvec_history of biology_total_seen": {
+  "qv_581": {
     "default_value": 0.0,
     "pos": 624
   },
-  "mvec_history of biology_total_correct_attempts": {
+  "qv_582": {
     "default_value": 0.0,
     "pos": 625
   },
-  "mvec_history of biology_avg_attempts_per_question": {
+  "qv_583": {
     "default_value": 0.0,
     "pos": 626
   },
-  "mvec_history of biology_num_total": {
+  "qv_584": {
     "default_value": 0.0,
     "pos": 627
   },
-  "mvec_history of biology_percentage_seen": {
+  "qv_585": {
     "default_value": 0.0,
     "pos": 628
   },
-  "mvec_history of biology_num_fitb": {
+  "qv_586": {
     "default_value": 0.0,
     "pos": 629
   },
-  "mvec_history of biology_overall_accuracy": {
+  "qv_587": {
     "default_value": 0.0,
     "pos": 630
   },
-  "mvec_history of biology_total_attempts": {
+  "qv_588": {
     "default_value": 0.0,
     "pos": 631
   },
-  "mvec_history of biology_days_since_last_seen": {
+  "qv_589": {
     "default_value": 0.0,
     "pos": 632
   },
-  "mvec_history of biology_total_incorrect_attempts": {
+  "qv_590": {
     "default_value": 0.0,
     "pos": 633
   },
-  "mvec_history of biology_avg_reaction_time": {
+  "qv_591": {
     "default_value": 0.0,
     "pos": 634
   },
-  "mvec_side chain chemistry_total_seen": {
+  "qv_592": {
     "default_value": 0.0,
     "pos": 635
   },
-  "mvec_side chain chemistry_avg_attempts_per_question": {
+  "qv_593": {
     "default_value": 0.0,
     "pos": 636
   },
-  "mvec_side chain chemistry_num_total": {
+  "qv_594": {
     "default_value": 0.0,
     "pos": 637
   },
-  "mvec_side chain chemistry_percentage_seen": {
+  "qv_595": {
     "default_value": 0.0,
     "pos": 638
   },
-  "mvec_side chain chemistry_num_fitb": {
+  "qv_596": {
     "default_value": 0.0,
     "pos": 639
   },
-  "mvec_side chain chemistry_num_tf": {
+  "qv_597": {
     "default_value": 0.0,
     "pos": 640
   },
-  "mvec_side chain chemistry_num_mcq": {
+  "qv_598": {
     "default_value": 0.0,
     "pos": 641
   },
-  "mvec_side chain chemistry_total_attempts": {
+  "qv_599": {
     "default_value": 0.0,
     "pos": 642
   },
-  "mvec_side chain chemistry_days_since_last_seen": {
+  "qv_600": {
     "default_value": 0.0,
     "pos": 643
   },
-  "mvec_side chain chemistry_total_incorrect_attempts": {
+  "qv_601": {
     "default_value": 0.0,
     "pos": 644
   },
-  "mvec_side chain chemistry_avg_reaction_time": {
+  "qv_602": {
     "default_value": 0.0,
     "pos": 645
   },
-  "mvec_scientific theory_total_seen": {
+  "qv_603": {
     "default_value": 0.0,
     "pos": 646
   },
-  "mvec_scientific theory_num_total": {
+  "qv_604": {
     "default_value": 0.0,
     "pos": 647
   },
-  "mvec_scientific theory_percentage_seen": {
+  "qv_605": {
     "default_value": 0.0,
     "pos": 648
   },
-  "mvec_scientific theory_num_fitb": {
+  "qv_606": {
     "default_value": 0.0,
     "pos": 649
   },
-  "mvec_scientific theory_days_since_last_seen": {
+  "qv_607": {
     "default_value": 0.0,
     "pos": 650
   },
-  "mvec_code of life_total_seen": {
+  "qv_608": {
     "default_value": 0.0,
     "pos": 651
   },
-  "mvec_code of life_total_correct_attempts": {
+  "qv_609": {
     "default_value": 0.0,
     "pos": 652
   },
-  "mvec_code of life_avg_attempts_per_question": {
+  "qv_610": {
     "default_value": 0.0,
     "pos": 653
   },
-  "mvec_code of life_num_total": {
+  "qv_611": {
     "default_value": 0.0,
     "pos": 654
   },
-  "mvec_code of life_percentage_seen": {
+  "qv_612": {
     "default_value": 0.0,
     "pos": 655
   },
-  "mvec_code of life_num_fitb": {
+  "qv_613": {
     "default_value": 0.0,
     "pos": 656
   },
-  "mvec_code of life_overall_accuracy": {
+  "qv_614": {
     "default_value": 0.0,
     "pos": 657
   },
-  "mvec_code of life_num_mcq": {
+  "qv_615": {
     "default_value": 0.0,
     "pos": 658
   },
-  "mvec_code of life_total_attempts": {
+  "qv_616": {
     "default_value": 0.0,
     "pos": 659
   },
-  "mvec_code of life_days_since_last_seen": {
+  "qv_617": {
     "default_value": 0.0,
     "pos": 660
   },
-  "mvec_code of life_total_incorrect_attempts": {
+  "qv_618": {
     "default_value": 0.0,
     "pos": 661
   },
-  "mvec_code of life_avg_reaction_time": {
+  "qv_619": {
     "default_value": 0.0,
     "pos": 662
   },
-  "qv_0": {
+  "qv_620": {
     "default_value": 0.0,
     "pos": 663
   },
-  "qv_1": {
+  "qv_621": {
     "default_value": 0.0,
     "pos": 664
   },
-  "qv_2": {
+  "qv_622": {
     "default_value": 0.0,
     "pos": 665
   },
-  "qv_3": {
+  "qv_623": {
     "default_value": 0.0,
     "pos": 666
   },
-  "qv_4": {
+  "qv_624": {
     "default_value": 0.0,
     "pos": 667
   },
-  "qv_5": {
+  "qv_625": {
     "default_value": 0.0,
     "pos": 668
   },
-  "qv_6": {
+  "qv_626": {
     "default_value": 0.0,
     "pos": 669
   },
-  "qv_7": {
+  "qv_627": {
     "default_value": 0.0,
     "pos": 670
   },
-  "qv_8": {
+  "qv_628": {
     "default_value": 0.0,
     "pos": 671
   },
-  "qv_9": {
+  "qv_629": {
     "default_value": 0.0,
     "pos": 672
   },
-  "qv_10": {
+  "qv_630": {
     "default_value": 0.0,
     "pos": 673
   },
-  "qv_11": {
+  "qv_631": {
     "default_value": 0.0,
     "pos": 674
   },
-  "qv_12": {
+  "qv_632": {
     "default_value": 0.0,
     "pos": 675
   },
-  "qv_13": {
+  "qv_633": {
     "default_value": 0.0,
     "pos": 676
   },
-  "qv_14": {
+  "qv_634": {
     "default_value": 0.0,
     "pos": 677
   },
-  "qv_15": {
+  "qv_635": {
     "default_value": 0.0,
     "pos": 678
   },
-  "qv_16": {
+  "qv_636": {
     "default_value": 0.0,
     "pos": 679
   },
-  "qv_17": {
+  "qv_637": {
     "default_value": 0.0,
     "pos": 680
   },
-  "qv_18": {
+  "qv_638": {
     "default_value": 0.0,
     "pos": 681
   },
-  "qv_19": {
+  "qv_639": {
     "default_value": 0.0,
     "pos": 682
   },
-  "qv_20": {
+  "qv_640": {
     "default_value": 0.0,
     "pos": 683
   },
-  "qv_21": {
+  "qv_641": {
     "default_value": 0.0,
     "pos": 684
   },
-  "qv_22": {
+  "qv_642": {
     "default_value": 0.0,
     "pos": 685
   },
-  "qv_23": {
+  "qv_643": {
     "default_value": 0.0,
     "pos": 686
   },
-  "qv_24": {
+  "qv_644": {
     "default_value": 0.0,
     "pos": 687
   },
-  "qv_25": {
+  "qv_645": {
     "default_value": 0.0,
     "pos": 688
   },
-  "qv_26": {
+  "qv_646": {
     "default_value": 0.0,
     "pos": 689
   },
-  "qv_27": {
+  "qv_647": {
     "default_value": 0.0,
     "pos": 690
   },
-  "qv_28": {
+  "qv_648": {
     "default_value": 0.0,
     "pos": 691
   },
-  "qv_29": {
+  "qv_649": {
     "default_value": 0.0,
     "pos": 692
   },
-  "qv_30": {
+  "qv_650": {
     "default_value": 0.0,
     "pos": 693
   },
-  "qv_31": {
+  "qv_651": {
     "default_value": 0.0,
     "pos": 694
   },
-  "qv_32": {
+  "qv_652": {
     "default_value": 0.0,
     "pos": 695
   },
-  "qv_33": {
+  "qv_653": {
     "default_value": 0.0,
     "pos": 696
   },
-  "qv_34": {
+  "qv_654": {
     "default_value": 0.0,
     "pos": 697
   },
-  "qv_35": {
+  "qv_655": {
     "default_value": 0.0,
     "pos": 698
   },
-  "qv_36": {
+  "qv_656": {
     "default_value": 0.0,
     "pos": 699
   },
-  "qv_37": {
+  "qv_657": {
     "default_value": 0.0,
     "pos": 700
   },
-  "qv_38": {
+  "qv_658": {
     "default_value": 0.0,
     "pos": 701
   },
-  "qv_39": {
+  "qv_659": {
     "default_value": 0.0,
     "pos": 702
   },
-  "qv_40": {
+  "qv_660": {
     "default_value": 0.0,
     "pos": 703
   },
-  "qv_41": {
+  "qv_661": {
     "default_value": 0.0,
     "pos": 704
   },
-  "qv_42": {
+  "qv_662": {
     "default_value": 0.0,
     "pos": 705
   },
-  "qv_43": {
+  "qv_663": {
     "default_value": 0.0,
     "pos": 706
   },
-  "qv_44": {
+  "qv_664": {
     "default_value": 0.0,
     "pos": 707
   },
-  "qv_45": {
+  "qv_665": {
     "default_value": 0.0,
     "pos": 708
   },
-  "qv_46": {
+  "qv_666": {
     "default_value": 0.0,
     "pos": 709
   },
-  "qv_47": {
+  "qv_667": {
     "default_value": 0.0,
     "pos": 710
   },
-  "qv_48": {
+  "qv_668": {
     "default_value": 0.0,
     "pos": 711
   },
-  "qv_49": {
+  "qv_669": {
     "default_value": 0.0,
     "pos": 712
   },
-  "qv_50": {
+  "qv_670": {
     "default_value": 0.0,
     "pos": 713
   },
-  "qv_51": {
+  "qv_671": {
     "default_value": 0.0,
     "pos": 714
   },
-  "qv_52": {
+  "qv_672": {
     "default_value": 0.0,
     "pos": 715
   },
-  "qv_53": {
+  "qv_673": {
     "default_value": 0.0,
     "pos": 716
   },
-  "qv_54": {
+  "qv_674": {
     "default_value": 0.0,
     "pos": 717
   },
-  "qv_55": {
+  "qv_675": {
     "default_value": 0.0,
     "pos": 718
   },
-  "qv_56": {
+  "qv_676": {
     "default_value": 0.0,
     "pos": 719
   },
-  "qv_57": {
+  "qv_677": {
     "default_value": 0.0,
     "pos": 720
   },
-  "qv_58": {
+  "qv_678": {
     "default_value": 0.0,
     "pos": 721
   },
-  "qv_59": {
+  "qv_679": {
     "default_value": 0.0,
     "pos": 722
   },
-  "qv_60": {
+  "qv_680": {
     "default_value": 0.0,
     "pos": 723
   },
-  "qv_61": {
+  "qv_681": {
     "default_value": 0.0,
     "pos": 724
   },
-  "qv_62": {
+  "qv_682": {
     "default_value": 0.0,
     "pos": 725
   },
-  "qv_63": {
+  "qv_683": {
     "default_value": 0.0,
     "pos": 726
   },
-  "qv_64": {
+  "qv_684": {
     "default_value": 0.0,
     "pos": 727
   },
-  "qv_65": {
+  "qv_685": {
     "default_value": 0.0,
     "pos": 728
   },
-  "qv_66": {
+  "qv_686": {
     "default_value": 0.0,
     "pos": 729
   },
-  "qv_67": {
+  "qv_687": {
     "default_value": 0.0,
     "pos": 730
   },
-  "qv_68": {
+  "qv_688": {
     "default_value": 0.0,
     "pos": 731
   },
-  "qv_69": {
+  "qv_689": {
     "default_value": 0.0,
     "pos": 732
   },
-  "qv_70": {
+  "qv_690": {
     "default_value": 0.0,
     "pos": 733
   },
-  "qv_71": {
+  "qv_691": {
     "default_value": 0.0,
     "pos": 734
   },
-  "qv_72": {
+  "qv_692": {
     "default_value": 0.0,
     "pos": 735
   },
-  "qv_73": {
+  "qv_693": {
     "default_value": 0.0,
     "pos": 736
   },
-  "qv_74": {
+  "qv_694": {
     "default_value": 0.0,
     "pos": 737
   },
-  "qv_75": {
+  "qv_695": {
     "default_value": 0.0,
     "pos": 738
   },
-  "qv_76": {
+  "qv_696": {
     "default_value": 0.0,
     "pos": 739
   },
-  "qv_77": {
+  "qv_697": {
     "default_value": 0.0,
     "pos": 740
   },
-  "qv_78": {
+  "qv_698": {
     "default_value": 0.0,
     "pos": 741
   },
-  "qv_79": {
+  "qv_699": {
     "default_value": 0.0,
     "pos": 742
   },
-  "qv_80": {
+  "qv_700": {
     "default_value": 0.0,
     "pos": 743
   },
-  "qv_81": {
+  "qv_701": {
     "default_value": 0.0,
     "pos": 744
   },
-  "qv_82": {
+  "qv_702": {
     "default_value": 0.0,
     "pos": 745
   },
-  "qv_83": {
+  "qv_703": {
     "default_value": 0.0,
     "pos": 746
   },
-  "qv_84": {
+  "qv_704": {
     "default_value": 0.0,
     "pos": 747
   },
-  "qv_85": {
+  "qv_705": {
     "default_value": 0.0,
     "pos": 748
   },
-  "qv_86": {
+  "qv_706": {
     "default_value": 0.0,
     "pos": 749
   },
-  "qv_87": {
+  "qv_707": {
     "default_value": 0.0,
     "pos": 750
   },
-  "qv_88": {
+  "qv_708": {
     "default_value": 0.0,
     "pos": 751
   },
-  "qv_89": {
+  "qv_709": {
     "default_value": 0.0,
     "pos": 752
   },
-  "qv_90": {
+  "qv_710": {
     "default_value": 0.0,
     "pos": 753
   },
-  "qv_91": {
+  "qv_711": {
     "default_value": 0.0,
     "pos": 754
   },
-  "qv_92": {
+  "qv_712": {
     "default_value": 0.0,
     "pos": 755
   },
-  "qv_93": {
+  "qv_713": {
     "default_value": 0.0,
     "pos": 756
   },
-  "qv_94": {
+  "qv_714": {
     "default_value": 0.0,
     "pos": 757
   },
-  "qv_95": {
+  "qv_715": {
     "default_value": 0.0,
     "pos": 758
   },
-  "qv_96": {
+  "qv_716": {
     "default_value": 0.0,
     "pos": 759
   },
-  "qv_97": {
+  "qv_717": {
     "default_value": 0.0,
     "pos": 760
   },
-  "qv_98": {
+  "qv_718": {
     "default_value": 0.0,
     "pos": 761
   },
-  "qv_99": {
+  "qv_719": {
     "default_value": 0.0,
     "pos": 762
   },
-  "qv_100": {
+  "qv_720": {
     "default_value": 0.0,
     "pos": 763
   },
-  "qv_101": {
+  "qv_721": {
     "default_value": 0.0,
     "pos": 764
   },
-  "qv_102": {
+  "qv_722": {
     "default_value": 0.0,
     "pos": 765
   },
-  "qv_103": {
+  "qv_723": {
     "default_value": 0.0,
     "pos": 766
   },
-  "qv_104": {
+  "qv_724": {
     "default_value": 0.0,
     "pos": 767
   },
-  "qv_105": {
+  "qv_725": {
     "default_value": 0.0,
     "pos": 768
   },
-  "qv_106": {
+  "qv_726": {
     "default_value": 0.0,
     "pos": 769
   },
-  "qv_107": {
+  "qv_727": {
     "default_value": 0.0,
     "pos": 770
   },
-  "qv_108": {
+  "qv_728": {
     "default_value": 0.0,
     "pos": 771
   },
-  "qv_109": {
+  "qv_729": {
     "default_value": 0.0,
     "pos": 772
   },
-  "qv_110": {
+  "qv_730": {
     "default_value": 0.0,
     "pos": 773
   },
-  "qv_111": {
+  "qv_731": {
     "default_value": 0.0,
     "pos": 774
   },
-  "qv_112": {
+  "qv_732": {
     "default_value": 0.0,
     "pos": 775
   },
-  "qv_113": {
+  "qv_733": {
     "default_value": 0.0,
     "pos": 776
   },
-  "qv_114": {
+  "qv_734": {
     "default_value": 0.0,
     "pos": 777
   },
-  "qv_115": {
+  "qv_735": {
     "default_value": 0.0,
     "pos": 778
   },
-  "qv_116": {
+  "qv_736": {
     "default_value": 0.0,
     "pos": 779
   },
-  "qv_117": {
+  "qv_737": {
     "default_value": 0.0,
     "pos": 780
   },
-  "qv_118": {
+  "qv_738": {
     "default_value": 0.0,
     "pos": 781
   },
-  "qv_119": {
+  "qv_739": {
     "default_value": 0.0,
     "pos": 782
   },
-  "qv_120": {
+  "qv_740": {
     "default_value": 0.0,
     "pos": 783
   },
-  "qv_121": {
+  "qv_741": {
     "default_value": 0.0,
     "pos": 784
   },
-  "qv_122": {
+  "qv_742": {
     "default_value": 0.0,
     "pos": 785
   },
-  "qv_123": {
+  "qv_743": {
     "default_value": 0.0,
     "pos": 786
   },
-  "qv_124": {
+  "qv_744": {
     "default_value": 0.0,
     "pos": 787
   },
-  "qv_125": {
+  "qv_745": {
     "default_value": 0.0,
     "pos": 788
   },
-  "qv_126": {
+  "qv_746": {
     "default_value": 0.0,
     "pos": 789
   },
-  "qv_127": {
+  "qv_747": {
     "default_value": 0.0,
     "pos": 790
   },
-  "qv_128": {
+  "qv_748": {
     "default_value": 0.0,
     "pos": 791
   },
-  "qv_129": {
+  "qv_749": {
     "default_value": 0.0,
     "pos": 792
   },
-  "qv_130": {
+  "qv_750": {
     "default_value": 0.0,
     "pos": 793
   },
-  "qv_131": {
+  "qv_751": {
     "default_value": 0.0,
     "pos": 794
   },
-  "qv_132": {
+  "qv_752": {
     "default_value": 0.0,
     "pos": 795
   },
-  "qv_133": {
+  "qv_753": {
     "default_value": 0.0,
     "pos": 796
   },
-  "qv_134": {
+  "qv_754": {
     "default_value": 0.0,
     "pos": 797
   },
-  "qv_135": {
+  "qv_755": {
     "default_value": 0.0,
     "pos": 798
   },
-  "qv_136": {
+  "qv_756": {
     "default_value": 0.0,
     "pos": 799
   },
-  "qv_137": {
+  "qv_757": {
     "default_value": 0.0,
     "pos": 800
   },
-  "qv_138": {
+  "qv_758": {
     "default_value": 0.0,
     "pos": 801
   },
-  "qv_139": {
+  "qv_759": {
     "default_value": 0.0,
     "pos": 802
   },
-  "qv_140": {
+  "qv_760": {
     "default_value": 0.0,
     "pos": 803
   },
-  "qv_141": {
+  "qv_761": {
     "default_value": 0.0,
     "pos": 804
   },
-  "qv_142": {
+  "qv_762": {
     "default_value": 0.0,
     "pos": 805
   },
-  "qv_143": {
+  "qv_763": {
     "default_value": 0.0,
     "pos": 806
   },
-  "qv_144": {
+  "qv_764": {
     "default_value": 0.0,
     "pos": 807
   },
-  "qv_145": {
+  "qv_765": {
     "default_value": 0.0,
     "pos": 808
   },
-  "qv_146": {
+  "qv_766": {
     "default_value": 0.0,
     "pos": 809
   },
-  "qv_147": {
+  "qv_767": {
     "default_value": 0.0,
     "pos": 810
   },
-  "qv_148": {
+  "knn_01_was_first_attempt": {
     "default_value": 0.0,
     "pos": 811
   },
-  "qv_149": {
+  "knn_01_num_so_options": {
     "default_value": 0.0,
     "pos": 812
   },
-  "qv_150": {
+  "knn_01_days_since_first_introduced": {
     "default_value": 0.0,
     "pos": 813
   },
-  "qv_151": {
+  "knn_01_num_sata_options": {
     "default_value": 0.0,
     "pos": 814
   },
-  "qv_152": {
+  "knn_01_total_correct_attempts": {
     "default_value": 0.0,
     "pos": 815
   },
-  "qv_153": {
+  "knn_01_total_attempts": {
     "default_value": 0.0,
     "pos": 816
   },
-  "qv_154": {
+  "knn_01_total_incorrect_attempts": {
     "default_value": 0.0,
     "pos": 817
   },
-  "qv_155": {
+  "knn_01_attempt_day_ratio": {
     "default_value": 0.0,
     "pos": 818
   },
-  "qv_156": {
+  "knn_01_days_since_last_revision": {
     "default_value": 0.0,
     "pos": 819
   },
-  "qv_157": {
+  "knn_01_num_mcq_options": {
     "default_value": 0.0,
     "pos": 820
   },
-  "qv_158": {
+  "knn_01_revision_streak": {
     "default_value": 0.0,
     "pos": 821
   },
-  "qv_159": {
+  "knn_01_accuracy_rate": {
     "default_value": 0.0,
     "pos": 822
   },
-  "qv_160": {
+  "knn_01_num_blanks": {
     "default_value": 0.0,
     "pos": 823
   },
-  "qv_161": {
+  "knn_01_distance": {
     "default_value": 0.0,
     "pos": 824
   },
-  "qv_162": {
+  "knn_01_avg_react_time": {
     "default_value": 0.0,
     "pos": 825
   },
-  "qv_163": {
+  "knn_02_was_first_attempt": {
     "default_value": 0.0,
     "pos": 826
   },
-  "qv_164": {
+  "knn_02_num_so_options": {
     "default_value": 0.0,
     "pos": 827
   },
-  "qv_165": {
+  "knn_02_days_since_first_introduced": {
     "default_value": 0.0,
     "pos": 828
   },
-  "qv_166": {
+  "knn_02_num_sata_options": {
     "default_value": 0.0,
     "pos": 829
   },
-  "qv_167": {
+  "knn_02_total_correct_attempts": {
     "default_value": 0.0,
     "pos": 830
   },
-  "qv_168": {
+  "knn_02_total_attempts": {
     "default_value": 0.0,
     "pos": 831
   },
-  "qv_169": {
+  "knn_02_total_incorrect_attempts": {
     "default_value": 0.0,
     "pos": 832
   },
-  "qv_170": {
+  "knn_02_attempt_day_ratio": {
     "default_value": 0.0,
     "pos": 833
   },
-  "qv_171": {
+  "knn_02_days_since_last_revision": {
     "default_value": 0.0,
     "pos": 834
   },
-  "qv_172": {
+  "knn_02_num_mcq_options": {
     "default_value": 0.0,
     "pos": 835
   },
-  "qv_173": {
+  "knn_02_revision_streak": {
     "default_value": 0.0,
     "pos": 836
   },
-  "qv_174": {
+  "knn_02_accuracy_rate": {
     "default_value": 0.0,
     "pos": 837
   },
-  "qv_175": {
+  "knn_02_num_blanks": {
     "default_value": 0.0,
     "pos": 838
   },
-  "qv_176": {
+  "knn_02_distance": {
     "default_value": 0.0,
     "pos": 839
   },
-  "qv_177": {
+  "knn_02_avg_react_time": {
     "default_value": 0.0,
     "pos": 840
   },
-  "qv_178": {
+  "knn_03_was_first_attempt": {
     "default_value": 0.0,
     "pos": 841
   },
-  "qv_179": {
+  "knn_03_num_so_options": {
     "default_value": 0.0,
     "pos": 842
   },
-  "qv_180": {
+  "knn_03_days_since_first_introduced": {
     "default_value": 0.0,
     "pos": 843
   },
-  "qv_181": {
+  "knn_03_num_sata_options": {
     "default_value": 0.0,
     "pos": 844
   },
-  "qv_182": {
+  "knn_03_total_correct_attempts": {
     "default_value": 0.0,
     "pos": 845
   },
-  "qv_183": {
+  "knn_03_total_attempts": {
     "default_value": 0.0,
     "pos": 846
   },
-  "qv_184": {
+  "knn_03_total_incorrect_attempts": {
     "default_value": 0.0,
     "pos": 847
   },
-  "qv_185": {
+  "knn_03_attempt_day_ratio": {
     "default_value": 0.0,
     "pos": 848
   },
-  "qv_186": {
+  "knn_03_days_since_last_revision": {
     "default_value": 0.0,
     "pos": 849
   },
-  "qv_187": {
+  "knn_03_num_mcq_options": {
     "default_value": 0.0,
     "pos": 850
   },
-  "qv_188": {
+  "knn_03_revision_streak": {
     "default_value": 0.0,
     "pos": 851
   },
-  "qv_189": {
+  "knn_03_accuracy_rate": {
     "default_value": 0.0,
     "pos": 852
   },
-  "qv_190": {
+  "knn_03_num_blanks": {
     "default_value": 0.0,
     "pos": 853
   },
-  "qv_191": {
+  "knn_03_distance": {
     "default_value": 0.0,
     "pos": 854
   },
-  "qv_192": {
+  "knn_03_avg_react_time": {
     "default_value": 0.0,
     "pos": 855
   },
-  "qv_193": {
+  "knn_04_was_first_attempt": {
     "default_value": 0.0,
     "pos": 856
   },
-  "qv_194": {
+  "knn_04_num_so_options": {
     "default_value": 0.0,
     "pos": 857
   },
-  "qv_195": {
+  "knn_04_days_since_first_introduced": {
     "default_value": 0.0,
     "pos": 858
   },
-  "qv_196": {
+  "knn_04_num_sata_options": {
     "default_value": 0.0,
     "pos": 859
   },
-  "qv_197": {
+  "knn_04_total_correct_attempts": {
     "default_value": 0.0,
     "pos": 860
   },
-  "qv_198": {
+  "knn_04_total_attempts": {
     "default_value": 0.0,
     "pos": 861
   },
-  "qv_199": {
+  "knn_04_total_incorrect_attempts": {
     "default_value": 0.0,
     "pos": 862
   },
-  "qv_200": {
+  "knn_04_attempt_day_ratio": {
     "default_value": 0.0,
     "pos": 863
   },
-  "qv_201": {
+  "knn_04_days_since_last_revision": {
     "default_value": 0.0,
     "pos": 864
   },
-  "qv_202": {
+  "knn_04_num_mcq_options": {
     "default_value": 0.0,
     "pos": 865
   },
-  "qv_203": {
+  "knn_04_revision_streak": {
     "default_value": 0.0,
     "pos": 866
   },
-  "qv_204": {
+  "knn_04_accuracy_rate": {
     "default_value": 0.0,
     "pos": 867
   },
-  "qv_205": {
+  "knn_04_num_blanks": {
     "default_value": 0.0,
     "pos": 868
   },
-  "qv_206": {
+  "knn_04_distance": {
     "default_value": 0.0,
     "pos": 869
   },
-  "qv_207": {
+  "knn_04_avg_react_time": {
     "default_value": 0.0,
     "pos": 870
   },
-  "qv_208": {
+  "knn_05_was_first_attempt": {
     "default_value": 0.0,
     "pos": 871
   },
-  "qv_209": {
+  "knn_05_num_so_options": {
     "default_value": 0.0,
     "pos": 872
   },
-  "qv_210": {
+  "knn_05_days_since_first_introduced": {
     "default_value": 0.0,
     "pos": 873
   },
-  "qv_211": {
+  "knn_05_num_sata_options": {
     "default_value": 0.0,
     "pos": 874
   },
-  "qv_212": {
+  "knn_05_total_correct_attempts": {
     "default_value": 0.0,
     "pos": 875
   },
-  "qv_213": {
+  "knn_05_total_attempts": {
     "default_value": 0.0,
     "pos": 876
   },
-  "qv_214": {
+  "knn_05_total_incorrect_attempts": {
     "default_value": 0.0,
     "pos": 877
   },
-  "qv_215": {
+  "knn_05_attempt_day_ratio": {
     "default_value": 0.0,
     "pos": 878
   },
-  "qv_216": {
+  "knn_05_days_since_last_revision": {
     "default_value": 0.0,
     "pos": 879
   },
-  "qv_217": {
+  "knn_05_num_mcq_options": {
     "default_value": 0.0,
     "pos": 880
   },
-  "qv_218": {
+  "knn_05_revision_streak": {
     "default_value": 0.0,
     "pos": 881
   },
-  "qv_219": {
+  "knn_05_accuracy_rate": {
     "default_value": 0.0,
     "pos": 882
   },
-  "qv_220": {
+  "knn_05_num_blanks": {
     "default_value": 0.0,
     "pos": 883
   },
-  "qv_221": {
+  "knn_05_distance": {
     "default_value": 0.0,
     "pos": 884
   },
-  "qv_222": {
+  "knn_05_avg_react_time": {
     "default_value": 0.0,
     "pos": 885
   },
-  "qv_223": {
+  "knn_06_was_first_attempt": {
     "default_value": 0.0,
     "pos": 886
   },
-  "qv_224": {
+  "knn_06_num_so_options": {
     "default_value": 0.0,
     "pos": 887
   },
-  "qv_225": {
+  "knn_06_days_since_first_introduced": {
     "default_value": 0.0,
     "pos": 888
   },
-  "qv_226": {
+  "knn_06_num_sata_options": {
     "default_value": 0.0,
     "pos": 889
   },
-  "qv_227": {
+  "knn_06_total_correct_attempts": {
     "default_value": 0.0,
     "pos": 890
   },
-  "qv_228": {
+  "knn_06_total_attempts": {
     "default_value": 0.0,
     "pos": 891
   },
-  "qv_229": {
+  "knn_06_total_incorrect_attempts": {
     "default_value": 0.0,
     "pos": 892
   },
-  "qv_230": {
+  "knn_06_attempt_day_ratio": {
     "default_value": 0.0,
     "pos": 893
   },
-  "qv_231": {
+  "knn_06_days_since_last_revision": {
     "default_value": 0.0,
     "pos": 894
   },
-  "qv_232": {
+  "knn_06_num_mcq_options": {
     "default_value": 0.0,
     "pos": 895
   },
-  "qv_233": {
+  "knn_06_revision_streak": {
     "default_value": 0.0,
     "pos": 896
   },
-  "qv_234": {
+  "knn_06_accuracy_rate": {
     "default_value": 0.0,
     "pos": 897
   },
-  "qv_235": {
+  "knn_06_num_blanks": {
     "default_value": 0.0,
     "pos": 898
   },
-  "qv_236": {
+  "knn_06_distance": {
     "default_value": 0.0,
     "pos": 899
   },
-  "qv_237": {
+  "knn_06_avg_react_time": {
     "default_value": 0.0,
     "pos": 900
   },
-  "qv_238": {
+  "knn_07_was_first_attempt": {
     "default_value": 0.0,
     "pos": 901
   },
-  "qv_239": {
+  "knn_07_num_so_options": {
     "default_value": 0.0,
     "pos": 902
   },
-  "qv_240": {
+  "knn_07_days_since_first_introduced": {
     "default_value": 0.0,
     "pos": 903
   },
-  "qv_241": {
+  "knn_07_num_sata_options": {
     "default_value": 0.0,
     "pos": 904
   },
-  "qv_242": {
+  "knn_07_total_correct_attempts": {
     "default_value": 0.0,
     "pos": 905
   },
-  "qv_243": {
+  "knn_07_total_attempts": {
     "default_value": 0.0,
     "pos": 906
   },
-  "qv_244": {
+  "knn_07_total_incorrect_attempts": {
     "default_value": 0.0,
     "pos": 907
   },
-  "qv_245": {
+  "knn_07_attempt_day_ratio": {
     "default_value": 0.0,
     "pos": 908
   },
-  "qv_246": {
+  "knn_07_days_since_last_revision": {
     "default_value": 0.0,
     "pos": 909
   },
-  "qv_247": {
+  "knn_07_num_mcq_options": {
     "default_value": 0.0,
     "pos": 910
   },
-  "qv_248": {
+  "knn_07_revision_streak": {
     "default_value": 0.0,
     "pos": 911
   },
-  "qv_249": {
+  "knn_07_accuracy_rate": {
     "default_value": 0.0,
     "pos": 912
   },
-  "qv_250": {
+  "knn_07_num_blanks": {
     "default_value": 0.0,
     "pos": 913
   },
-  "qv_251": {
+  "knn_07_distance": {
     "default_value": 0.0,
     "pos": 914
   },
-  "qv_252": {
+  "knn_07_avg_react_time": {
     "default_value": 0.0,
     "pos": 915
   },
-  "qv_253": {
+  "knn_08_was_first_attempt": {
     "default_value": 0.0,
     "pos": 916
   },
-  "qv_254": {
+  "knn_08_num_so_options": {
     "default_value": 0.0,
     "pos": 917
   },
-  "qv_255": {
+  "knn_08_days_since_first_introduced": {
     "default_value": 0.0,
     "pos": 918
   },
-  "qv_256": {
+  "knn_08_num_sata_options": {
     "default_value": 0.0,
     "pos": 919
   },
-  "qv_257": {
+  "knn_08_total_correct_attempts": {
     "default_value": 0.0,
     "pos": 920
   },
-  "qv_258": {
+  "knn_08_total_attempts": {
     "default_value": 0.0,
     "pos": 921
   },
-  "qv_259": {
+  "knn_08_total_incorrect_attempts": {
     "default_value": 0.0,
     "pos": 922
   },
-  "qv_260": {
+  "knn_08_attempt_day_ratio": {
     "default_value": 0.0,
     "pos": 923
   },
-  "qv_261": {
+  "knn_08_days_since_last_revision": {
     "default_value": 0.0,
     "pos": 924
   },
-  "qv_262": {
+  "knn_08_num_mcq_options": {
     "default_value": 0.0,
     "pos": 925
   },
-  "qv_263": {
+  "knn_08_revision_streak": {
     "default_value": 0.0,
     "pos": 926
   },
-  "qv_264": {
+  "knn_08_accuracy_rate": {
     "default_value": 0.0,
     "pos": 927
   },
-  "qv_265": {
+  "knn_08_num_blanks": {
     "default_value": 0.0,
     "pos": 928
   },
-  "qv_266": {
+  "knn_08_distance": {
     "default_value": 0.0,
     "pos": 929
   },
-  "qv_267": {
+  "knn_08_avg_react_time": {
     "default_value": 0.0,
     "pos": 930
   },
-  "qv_268": {
+  "knn_09_was_first_attempt": {
     "default_value": 0.0,
     "pos": 931
   },
-  "qv_269": {
+  "knn_09_num_so_options": {
     "default_value": 0.0,
     "pos": 932
   },
-  "qv_270": {
+  "knn_09_days_since_first_introduced": {
     "default_value": 0.0,
     "pos": 933
   },
-  "qv_271": {
+  "knn_09_num_sata_options": {
     "default_value": 0.0,
     "pos": 934
   },
-  "qv_272": {
+  "knn_09_total_correct_attempts": {
     "default_value": 0.0,
     "pos": 935
   },
-  "qv_273": {
+  "knn_09_total_attempts": {
     "default_value": 0.0,
     "pos": 936
   },
-  "qv_274": {
+  "knn_09_total_incorrect_attempts": {
     "default_value": 0.0,
     "pos": 937
   },
-  "qv_275": {
+  "knn_09_attempt_day_ratio": {
     "default_value": 0.0,
     "pos": 938
   },
-  "qv_276": {
+  "knn_09_days_since_last_revision": {
     "default_value": 0.0,
     "pos": 939
   },
-  "qv_277": {
+  "knn_09_num_mcq_options": {
     "default_value": 0.0,
     "pos": 940
   },
-  "qv_278": {
+  "knn_09_revision_streak": {
     "default_value": 0.0,
     "pos": 941
   },
-  "qv_279": {
+  "knn_09_accuracy_rate": {
     "default_value": 0.0,
     "pos": 942
   },
-  "qv_280": {
+  "knn_09_num_blanks": {
     "default_value": 0.0,
     "pos": 943
   },
-  "qv_281": {
+  "knn_09_distance": {
     "default_value": 0.0,
     "pos": 944
   },
-  "qv_282": {
+  "knn_09_avg_react_time": {
     "default_value": 0.0,
     "pos": 945
   },
-  "qv_283": {
+  "knn_10_was_first_attempt": {
     "default_value": 0.0,
     "pos": 946
   },
-  "qv_284": {
+  "knn_10_num_so_options": {
     "default_value": 0.0,
     "pos": 947
   },
-  "qv_285": {
+  "knn_10_days_since_first_introduced": {
     "default_value": 0.0,
     "pos": 948
   },
-  "qv_286": {
+  "knn_10_num_sata_options": {
     "default_value": 0.0,
     "pos": 949
   },
-  "qv_287": {
+  "knn_10_total_correct_attempts": {
     "default_value": 0.0,
     "pos": 950
   },
-  "qv_288": {
+  "knn_10_total_attempts": {
     "default_value": 0.0,
     "pos": 951
   },
-  "qv_289": {
+  "knn_10_total_incorrect_attempts": {
     "default_value": 0.0,
     "pos": 952
   },
-  "qv_290": {
+  "knn_10_attempt_day_ratio": {
     "default_value": 0.0,
     "pos": 953
   },
-  "qv_291": {
+  "knn_10_days_since_last_revision": {
     "default_value": 0.0,
     "pos": 954
   },
-  "qv_292": {
+  "knn_10_num_mcq_options": {
     "default_value": 0.0,
     "pos": 955
   },
-  "qv_293": {
+  "knn_10_revision_streak": {
     "default_value": 0.0,
     "pos": 956
   },
-  "qv_294": {
+  "knn_10_accuracy_rate": {
     "default_value": 0.0,
     "pos": 957
   },
-  "qv_295": {
+  "knn_10_num_blanks": {
     "default_value": 0.0,
     "pos": 958
   },
-  "qv_296": {
+  "knn_10_distance": {
     "default_value": 0.0,
     "pos": 959
   },
-  "qv_297": {
+  "knn_10_avg_react_time": {
     "default_value": 0.0,
     "pos": 960
   },
-  "qv_298": {
+  "knn_11_was_first_attempt": {
     "default_value": 0.0,
     "pos": 961
   },
-  "qv_299": {
+  "knn_11_num_so_options": {
     "default_value": 0.0,
     "pos": 962
   },
-  "qv_300": {
+  "knn_11_days_since_first_introduced": {
     "default_value": 0.0,
     "pos": 963
   },
-  "qv_301": {
+  "knn_11_num_sata_options": {
     "default_value": 0.0,
     "pos": 964
   },
-  "qv_302": {
+  "knn_11_total_correct_attempts": {
     "default_value": 0.0,
     "pos": 965
   },
-  "qv_303": {
+  "knn_11_total_attempts": {
     "default_value": 0.0,
     "pos": 966
   },
-  "qv_304": {
+  "knn_11_total_incorrect_attempts": {
     "default_value": 0.0,
     "pos": 967
   },
-  "qv_305": {
+  "knn_11_attempt_day_ratio": {
     "default_value": 0.0,
     "pos": 968
   },
-  "qv_306": {
+  "knn_11_days_since_last_revision": {
     "default_value": 0.0,
     "pos": 969
   },
-  "qv_307": {
+  "knn_11_num_mcq_options": {
     "default_value": 0.0,
     "pos": 970
   },
-  "qv_308": {
+  "knn_11_revision_streak": {
     "default_value": 0.0,
     "pos": 971
   },
-  "qv_309": {
+  "knn_11_accuracy_rate": {
     "default_value": 0.0,
     "pos": 972
   },
-  "qv_310": {
+  "knn_11_num_blanks": {
     "default_value": 0.0,
     "pos": 973
   },
-  "qv_311": {
+  "knn_11_distance": {
     "default_value": 0.0,
     "pos": 974
   },
-  "qv_312": {
+  "knn_11_avg_react_time": {
     "default_value": 0.0,
     "pos": 975
   },
-  "qv_313": {
+  "knn_12_was_first_attempt": {
     "default_value": 0.0,
     "pos": 976
   },
-  "qv_314": {
+  "knn_12_num_so_options": {
     "default_value": 0.0,
     "pos": 977
   },
-  "qv_315": {
+  "knn_12_days_since_first_introduced": {
     "default_value": 0.0,
     "pos": 978
   },
-  "qv_316": {
+  "knn_12_num_sata_options": {
     "default_value": 0.0,
     "pos": 979
   },
-  "qv_317": {
+  "knn_12_total_correct_attempts": {
     "default_value": 0.0,
     "pos": 980
   },
-  "qv_318": {
+  "knn_12_total_attempts": {
     "default_value": 0.0,
     "pos": 981
   },
-  "qv_319": {
+  "knn_12_total_incorrect_attempts": {
     "default_value": 0.0,
     "pos": 982
   },
-  "qv_320": {
+  "knn_12_attempt_day_ratio": {
     "default_value": 0.0,
     "pos": 983
   },
-  "qv_321": {
+  "knn_12_days_since_last_revision": {
     "default_value": 0.0,
     "pos": 984
   },
-  "qv_322": {
+  "knn_12_num_mcq_options": {
     "default_value": 0.0,
     "pos": 985
   },
-  "qv_323": {
+  "knn_12_revision_streak": {
     "default_value": 0.0,
     "pos": 986
   },
-  "qv_324": {
+  "knn_12_accuracy_rate": {
     "default_value": 0.0,
     "pos": 987
   },
-  "qv_325": {
+  "knn_12_num_blanks": {
     "default_value": 0.0,
     "pos": 988
   },
-  "qv_326": {
+  "knn_12_distance": {
     "default_value": 0.0,
     "pos": 989
   },
-  "qv_327": {
+  "knn_12_avg_react_time": {
     "default_value": 0.0,
     "pos": 990
   },
-  "qv_328": {
+  "knn_13_was_first_attempt": {
     "default_value": 0.0,
     "pos": 991
   },
-  "qv_329": {
+  "knn_13_num_so_options": {
     "default_value": 0.0,
     "pos": 992
   },
-  "qv_330": {
+  "knn_13_days_since_first_introduced": {
     "default_value": 0.0,
     "pos": 993
   },
-  "qv_331": {
+  "knn_13_num_sata_options": {
     "default_value": 0.0,
     "pos": 994
   },
-  "qv_332": {
+  "knn_13_total_correct_attempts": {
     "default_value": 0.0,
     "pos": 995
   },
-  "qv_333": {
+  "knn_13_total_attempts": {
     "default_value": 0.0,
     "pos": 996
   },
-  "qv_334": {
+  "knn_13_total_incorrect_attempts": {
     "default_value": 0.0,
     "pos": 997
   },
-  "qv_335": {
+  "knn_13_attempt_day_ratio": {
     "default_value": 0.0,
     "pos": 998
   },
-  "qv_336": {
+  "knn_13_days_since_last_revision": {
     "default_value": 0.0,
     "pos": 999
   },
-  "qv_337": {
+  "knn_13_num_mcq_options": {
     "default_value": 0.0,
     "pos": 1000
   },
-  "qv_338": {
+  "knn_13_revision_streak": {
     "default_value": 0.0,
     "pos": 1001
   },
-  "qv_339": {
+  "knn_13_accuracy_rate": {
     "default_value": 0.0,
     "pos": 1002
   },
-  "qv_340": {
+  "knn_13_num_blanks": {
     "default_value": 0.0,
     "pos": 1003
   },
-  "qv_341": {
+  "knn_13_distance": {
     "default_value": 0.0,
     "pos": 1004
   },
-  "qv_342": {
+  "knn_13_avg_react_time": {
     "default_value": 0.0,
     "pos": 1005
   },
-  "qv_343": {
+  "knn_14_was_first_attempt": {
     "default_value": 0.0,
     "pos": 1006
   },
-  "qv_344": {
+  "knn_14_num_so_options": {
     "default_value": 0.0,
     "pos": 1007
   },
-  "qv_345": {
+  "knn_14_days_since_first_introduced": {
     "default_value": 0.0,
     "pos": 1008
   },
-  "qv_346": {
+  "knn_14_num_sata_options": {
     "default_value": 0.0,
     "pos": 1009
   },
-  "qv_347": {
+  "knn_14_total_correct_attempts": {
     "default_value": 0.0,
     "pos": 1010
   },
-  "qv_348": {
+  "knn_14_total_attempts": {
     "default_value": 0.0,
     "pos": 1011
   },
-  "qv_349": {
+  "knn_14_total_incorrect_attempts": {
     "default_value": 0.0,
     "pos": 1012
   },
-  "qv_350": {
+  "knn_14_attempt_day_ratio": {
     "default_value": 0.0,
     "pos": 1013
   },
-  "qv_351": {
+  "knn_14_days_since_last_revision": {
     "default_value": 0.0,
     "pos": 1014
   },
-  "qv_352": {
+  "knn_14_num_mcq_options": {
     "default_value": 0.0,
     "pos": 1015
   },
-  "qv_353": {
+  "knn_14_revision_streak": {
     "default_value": 0.0,
     "pos": 1016
   },
-  "qv_354": {
+  "knn_14_accuracy_rate": {
     "default_value": 0.0,
     "pos": 1017
   },
-  "qv_355": {
+  "knn_14_num_blanks": {
     "default_value": 0.0,
     "pos": 1018
   },
-  "qv_356": {
+  "knn_14_distance": {
     "default_value": 0.0,
     "pos": 1019
   },
-  "qv_357": {
+  "knn_14_avg_react_time": {
     "default_value": 0.0,
     "pos": 1020
   },
-  "qv_358": {
+  "knn_15_was_first_attempt": {
     "default_value": 0.0,
     "pos": 1021
   },
-  "qv_359": {
+  "knn_15_num_so_options": {
     "default_value": 0.0,
     "pos": 1022
   },
-  "qv_360": {
+  "knn_15_days_since_first_introduced": {
     "default_value": 0.0,
     "pos": 1023
   },
-  "qv_361": {
+  "knn_15_num_sata_options": {
     "default_value": 0.0,
     "pos": 1024
   },
-  "qv_362": {
+  "knn_15_total_correct_attempts": {
     "default_value": 0.0,
     "pos": 1025
   },
-  "qv_363": {
+  "knn_15_total_attempts": {
     "default_value": 0.0,
     "pos": 1026
   },
-  "qv_364": {
+  "knn_15_total_incorrect_attempts": {
     "default_value": 0.0,
     "pos": 1027
   },
-  "qv_365": {
+  "knn_15_attempt_day_ratio": {
     "default_value": 0.0,
     "pos": 1028
   },
-  "qv_366": {
+  "knn_15_days_since_last_revision": {
     "default_value": 0.0,
     "pos": 1029
   },
-  "qv_367": {
+  "knn_15_num_mcq_options": {
     "default_value": 0.0,
     "pos": 1030
   },
-  "qv_368": {
+  "knn_15_revision_streak": {
     "default_value": 0.0,
     "pos": 1031
   },
-  "qv_369": {
+  "knn_15_accuracy_rate": {
     "default_value": 0.0,
     "pos": 1032
   },
-  "qv_370": {
+  "knn_15_num_blanks": {
     "default_value": 0.0,
     "pos": 1033
   },
-  "qv_371": {
+  "knn_15_distance": {
     "default_value": 0.0,
     "pos": 1034
   },
-  "qv_372": {
+  "knn_15_avg_react_time": {
     "default_value": 0.0,
     "pos": 1035
   },
-  "qv_373": {
+  "knn_16_was_first_attempt": {
     "default_value": 0.0,
     "pos": 1036
   },
-  "qv_374": {
+  "knn_16_num_so_options": {
     "default_value": 0.0,
     "pos": 1037
   },
-  "qv_375": {
+  "knn_16_days_since_first_introduced": {
     "default_value": 0.0,
     "pos": 1038
   },
-  "qv_376": {
+  "knn_16_num_sata_options": {
     "default_value": 0.0,
     "pos": 1039
   },
-  "qv_377": {
+  "knn_16_total_correct_attempts": {
     "default_value": 0.0,
     "pos": 1040
   },
-  "qv_378": {
+  "knn_16_total_attempts": {
     "default_value": 0.0,
     "pos": 1041
   },
-  "qv_379": {
+  "knn_16_total_incorrect_attempts": {
     "default_value": 0.0,
     "pos": 1042
   },
-  "qv_380": {
+  "knn_16_attempt_day_ratio": {
     "default_value": 0.0,
     "pos": 1043
   },
-  "qv_381": {
+  "knn_16_days_since_last_revision": {
     "default_value": 0.0,
     "pos": 1044
   },
-  "qv_382": {
+  "knn_16_num_mcq_options": {
     "default_value": 0.0,
     "pos": 1045
   },
-  "qv_383": {
+  "knn_16_revision_streak": {
     "default_value": 0.0,
     "pos": 1046
   },
-  "qv_384": {
+  "knn_16_accuracy_rate": {
     "default_value": 0.0,
     "pos": 1047
   },
-  "qv_385": {
+  "knn_16_num_blanks": {
     "default_value": 0.0,
     "pos": 1048
   },
-  "qv_386": {
+  "knn_16_distance": {
     "default_value": 0.0,
     "pos": 1049
   },
-  "qv_387": {
+  "knn_16_avg_react_time": {
     "default_value": 0.0,
     "pos": 1050
   },
-  "qv_388": {
+  "knn_17_was_first_attempt": {
     "default_value": 0.0,
     "pos": 1051
   },
-  "qv_389": {
+  "knn_17_num_so_options": {
     "default_value": 0.0,
     "pos": 1052
   },
-  "qv_390": {
+  "knn_17_days_since_first_introduced": {
     "default_value": 0.0,
     "pos": 1053
   },
-  "qv_391": {
+  "knn_17_num_sata_options": {
     "default_value": 0.0,
     "pos": 1054
   },
-  "qv_392": {
+  "knn_17_total_correct_attempts": {
     "default_value": 0.0,
     "pos": 1055
   },
-  "qv_393": {
+  "knn_17_total_attempts": {
     "default_value": 0.0,
     "pos": 1056
   },
-  "qv_394": {
+  "knn_17_total_incorrect_attempts": {
     "default_value": 0.0,
     "pos": 1057
   },
-  "qv_395": {
+  "knn_17_attempt_day_ratio": {
     "default_value": 0.0,
     "pos": 1058
   },
-  "qv_396": {
+  "knn_17_days_since_last_revision": {
     "default_value": 0.0,
     "pos": 1059
   },
-  "qv_397": {
+  "knn_17_num_mcq_options": {
     "default_value": 0.0,
     "pos": 1060
   },
-  "qv_398": {
+  "knn_17_revision_streak": {
     "default_value": 0.0,
     "pos": 1061
   },
-  "qv_399": {
+  "knn_17_accuracy_rate": {
     "default_value": 0.0,
     "pos": 1062
   },
-  "qv_400": {
+  "knn_17_num_blanks": {
     "default_value": 0.0,
     "pos": 1063
   },
-  "qv_401": {
+  "knn_17_distance": {
     "default_value": 0.0,
     "pos": 1064
   },
-  "qv_402": {
+  "knn_17_avg_react_time": {
     "default_value": 0.0,
     "pos": 1065
   },
-  "qv_403": {
+  "knn_18_was_first_attempt": {
     "default_value": 0.0,
     "pos": 1066
   },
-  "qv_404": {
+  "knn_18_num_so_options": {
     "default_value": 0.0,
     "pos": 1067
   },
-  "qv_405": {
+  "knn_18_days_since_first_introduced": {
     "default_value": 0.0,
     "pos": 1068
   },
-  "qv_406": {
+  "knn_18_num_sata_options": {
     "default_value": 0.0,
     "pos": 1069
   },
-  "qv_407": {
+  "knn_18_total_correct_attempts": {
     "default_value": 0.0,
     "pos": 1070
   },
-  "qv_408": {
+  "knn_18_total_attempts": {
     "default_value": 0.0,
     "pos": 1071
   },
-  "qv_409": {
+  "knn_18_total_incorrect_attempts": {
     "default_value": 0.0,
     "pos": 1072
   },
-  "qv_410": {
+  "knn_18_attempt_day_ratio": {
     "default_value": 0.0,
     "pos": 1073
   },
-  "qv_411": {
+  "knn_18_days_since_last_revision": {
     "default_value": 0.0,
     "pos": 1074
   },
-  "qv_412": {
+  "knn_18_num_mcq_options": {
     "default_value": 0.0,
     "pos": 1075
   },
-  "qv_413": {
+  "knn_18_revision_streak": {
     "default_value": 0.0,
     "pos": 1076
   },
-  "qv_414": {
+  "knn_18_accuracy_rate": {
     "default_value": 0.0,
     "pos": 1077
   },
-  "qv_415": {
+  "knn_18_num_blanks": {
     "default_value": 0.0,
     "pos": 1078
   },
-  "qv_416": {
+  "knn_18_distance": {
     "default_value": 0.0,
     "pos": 1079
   },
-  "qv_417": {
+  "knn_18_avg_react_time": {
     "default_value": 0.0,
     "pos": 1080
   },
-  "qv_418": {
+  "knn_19_was_first_attempt": {
     "default_value": 0.0,
     "pos": 1081
   },
-  "qv_419": {
+  "knn_19_num_so_options": {
     "default_value": 0.0,
     "pos": 1082
   },
-  "qv_420": {
+  "knn_19_days_since_first_introduced": {
     "default_value": 0.0,
     "pos": 1083
   },
-  "qv_421": {
+  "knn_19_num_sata_options": {
     "default_value": 0.0,
     "pos": 1084
   },
-  "qv_422": {
+  "knn_19_total_correct_attempts": {
     "default_value": 0.0,
     "pos": 1085
   },
-  "qv_423": {
+  "knn_19_total_attempts": {
     "default_value": 0.0,
     "pos": 1086
   },
-  "qv_424": {
+  "knn_19_total_incorrect_attempts": {
     "default_value": 0.0,
     "pos": 1087
   },
-  "qv_425": {
+  "knn_19_attempt_day_ratio": {
     "default_value": 0.0,
     "pos": 1088
   },
-  "qv_426": {
+  "knn_19_days_since_last_revision": {
     "default_value": 0.0,
     "pos": 1089
   },
-  "qv_427": {
+  "knn_19_num_mcq_options": {
     "default_value": 0.0,
     "pos": 1090
   },
-  "qv_428": {
+  "knn_19_revision_streak": {
     "default_value": 0.0,
     "pos": 1091
   },
-  "qv_429": {
+  "knn_19_accuracy_rate": {
     "default_value": 0.0,
     "pos": 1092
   },
-  "qv_430": {
+  "knn_19_num_blanks": {
     "default_value": 0.0,
     "pos": 1093
   },
-  "qv_431": {
+  "knn_19_distance": {
     "default_value": 0.0,
     "pos": 1094
   },
-  "qv_432": {
+  "knn_19_avg_react_time": {
     "default_value": 0.0,
     "pos": 1095
   },
-  "qv_433": {
+  "knn_20_was_first_attempt": {
     "default_value": 0.0,
     "pos": 1096
   },
-  "qv_434": {
+  "knn_20_num_so_options": {
     "default_value": 0.0,
     "pos": 1097
   },
-  "qv_435": {
+  "knn_20_days_since_first_introduced": {
     "default_value": 0.0,
     "pos": 1098
   },
-  "qv_436": {
+  "knn_20_num_sata_options": {
     "default_value": 0.0,
     "pos": 1099
   },
-  "qv_437": {
+  "knn_20_total_correct_attempts": {
     "default_value": 0.0,
     "pos": 1100
   },
-  "qv_438": {
+  "knn_20_total_attempts": {
     "default_value": 0.0,
     "pos": 1101
   },
-  "qv_439": {
+  "knn_20_total_incorrect_attempts": {
     "default_value": 0.0,
     "pos": 1102
   },
-  "qv_440": {
+  "knn_20_attempt_day_ratio": {
     "default_value": 0.0,
     "pos": 1103
   },
-  "qv_441": {
+  "knn_20_days_since_last_revision": {
     "default_value": 0.0,
     "pos": 1104
   },
-  "qv_442": {
+  "knn_20_num_mcq_options": {
     "default_value": 0.0,
     "pos": 1105
   },
-  "qv_443": {
+  "knn_20_revision_streak": {
     "default_value": 0.0,
     "pos": 1106
   },
-  "qv_444": {
+  "knn_20_accuracy_rate": {
     "default_value": 0.0,
     "pos": 1107
   },
-  "qv_445": {
+  "knn_20_num_blanks": {
     "default_value": 0.0,
     "pos": 1108
   },
-  "qv_446": {
+  "knn_20_distance": {
     "default_value": 0.0,
     "pos": 1109
   },
-  "qv_447": {
+  "knn_20_avg_react_time": {
     "default_value": 0.0,
     "pos": 1110
   },
-  "qv_448": {
+  "knn_21_was_first_attempt": {
     "default_value": 0.0,
     "pos": 1111
   },
-  "qv_449": {
+  "knn_21_num_so_options": {
     "default_value": 0.0,
     "pos": 1112
   },
-  "qv_450": {
+  "knn_21_days_since_first_introduced": {
     "default_value": 0.0,
     "pos": 1113
   },
-  "qv_451": {
+  "knn_21_num_sata_options": {
     "default_value": 0.0,
     "pos": 1114
   },
-  "qv_452": {
+  "knn_21_total_correct_attempts": {
     "default_value": 0.0,
     "pos": 1115
   },
-  "qv_453": {
+  "knn_21_total_attempts": {
     "default_value": 0.0,
     "pos": 1116
   },
-  "qv_454": {
+  "knn_21_total_incorrect_attempts": {
     "default_value": 0.0,
     "pos": 1117
   },
-  "qv_455": {
+  "knn_21_attempt_day_ratio": {
     "default_value": 0.0,
     "pos": 1118
   },
-  "qv_456": {
+  "knn_21_days_since_last_revision": {
     "default_value": 0.0,
     "pos": 1119
   },
-  "qv_457": {
+  "knn_21_num_mcq_options": {
     "default_value": 0.0,
     "pos": 1120
   },
-  "qv_458": {
+  "knn_21_revision_streak": {
     "default_value": 0.0,
     "pos": 1121
   },
-  "qv_459": {
+  "knn_21_accuracy_rate": {
     "default_value": 0.0,
     "pos": 1122
   },
-  "qv_460": {
+  "knn_21_num_blanks": {
     "default_value": 0.0,
     "pos": 1123
   },
-  "qv_461": {
+  "knn_21_distance": {
     "default_value": 0.0,
     "pos": 1124
   },
-  "qv_462": {
+  "knn_21_avg_react_time": {
     "default_value": 0.0,
     "pos": 1125
   },
-  "qv_463": {
+  "knn_22_was_first_attempt": {
     "default_value": 0.0,
     "pos": 1126
   },
-  "qv_464": {
+  "knn_22_num_so_options": {
     "default_value": 0.0,
     "pos": 1127
   },
-  "qv_465": {
+  "knn_22_days_since_first_introduced": {
     "default_value": 0.0,
     "pos": 1128
   },
-  "qv_466": {
+  "knn_22_num_sata_options": {
     "default_value": 0.0,
     "pos": 1129
   },
-  "qv_467": {
+  "knn_22_total_correct_attempts": {
     "default_value": 0.0,
     "pos": 1130
   },
-  "qv_468": {
+  "knn_22_total_attempts": {
     "default_value": 0.0,
     "pos": 1131
   },
-  "qv_469": {
+  "knn_22_total_incorrect_attempts": {
     "default_value": 0.0,
     "pos": 1132
   },
-  "qv_470": {
+  "knn_22_attempt_day_ratio": {
     "default_value": 0.0,
     "pos": 1133
   },
-  "qv_471": {
+  "knn_22_days_since_last_revision": {
     "default_value": 0.0,
     "pos": 1134
   },
-  "qv_472": {
+  "knn_22_num_mcq_options": {
     "default_value": 0.0,
     "pos": 1135
   },
-  "qv_473": {
+  "knn_22_revision_streak": {
     "default_value": 0.0,
     "pos": 1136
   },
-  "qv_474": {
+  "knn_22_accuracy_rate": {
     "default_value": 0.0,
     "pos": 1137
   },
-  "qv_475": {
+  "knn_22_num_blanks": {
     "default_value": 0.0,
     "pos": 1138
   },
-  "qv_476": {
+  "knn_22_distance": {
     "default_value": 0.0,
     "pos": 1139
   },
-  "qv_477": {
+  "knn_22_avg_react_time": {
     "default_value": 0.0,
     "pos": 1140
   },
-  "qv_478": {
+  "knn_23_was_first_attempt": {
     "default_value": 0.0,
     "pos": 1141
   },
-  "qv_479": {
+  "knn_23_num_so_options": {
     "default_value": 0.0,
     "pos": 1142
   },
-  "qv_480": {
+  "knn_23_days_since_first_introduced": {
     "default_value": 0.0,
     "pos": 1143
   },
-  "qv_481": {
+  "knn_23_num_sata_options": {
     "default_value": 0.0,
     "pos": 1144
   },
-  "qv_482": {
+  "knn_23_total_correct_attempts": {
     "default_value": 0.0,
     "pos": 1145
   },
-  "qv_483": {
+  "knn_23_total_attempts": {
     "default_value": 0.0,
     "pos": 1146
   },
-  "qv_484": {
+  "knn_23_total_incorrect_attempts": {
     "default_value": 0.0,
     "pos": 1147
   },
-  "qv_485": {
+  "knn_23_attempt_day_ratio": {
     "default_value": 0.0,
     "pos": 1148
   },
-  "qv_486": {
+  "knn_23_days_since_last_revision": {
     "default_value": 0.0,
     "pos": 1149
   },
-  "qv_487": {
+  "knn_23_num_mcq_options": {
     "default_value": 0.0,
     "pos": 1150
   },
-  "qv_488": {
+  "knn_23_revision_streak": {
     "default_value": 0.0,
     "pos": 1151
   },
-  "qv_489": {
+  "knn_23_accuracy_rate": {
     "default_value": 0.0,
     "pos": 1152
   },
-  "qv_490": {
+  "knn_23_num_blanks": {
     "default_value": 0.0,
     "pos": 1153
   },
-  "qv_491": {
+  "knn_23_distance": {
     "default_value": 0.0,
     "pos": 1154
   },
-  "qv_492": {
+  "knn_23_avg_react_time": {
     "default_value": 0.0,
     "pos": 1155
   },
-  "qv_493": {
+  "knn_24_was_first_attempt": {
     "default_value": 0.0,
     "pos": 1156
   },
-  "qv_494": {
+  "knn_24_num_so_options": {
     "default_value": 0.0,
     "pos": 1157
   },
-  "qv_495": {
+  "knn_24_days_since_first_introduced": {
     "default_value": 0.0,
     "pos": 1158
   },
-  "qv_496": {
+  "knn_24_num_sata_options": {
     "default_value": 0.0,
     "pos": 1159
   },
-  "qv_497": {
+  "knn_24_total_correct_attempts": {
     "default_value": 0.0,
     "pos": 1160
   },
-  "qv_498": {
+  "knn_24_total_attempts": {
     "default_value": 0.0,
     "pos": 1161
   },
-  "qv_499": {
+  "knn_24_total_incorrect_attempts": {
     "default_value": 0.0,
     "pos": 1162
   },
-  "qv_500": {
+  "knn_24_attempt_day_ratio": {
     "default_value": 0.0,
     "pos": 1163
   },
-  "qv_501": {
+  "knn_24_days_since_last_revision": {
     "default_value": 0.0,
     "pos": 1164
   },
-  "qv_502": {
+  "knn_24_num_mcq_options": {
     "default_value": 0.0,
     "pos": 1165
   },
-  "qv_503": {
+  "knn_24_revision_streak": {
     "default_value": 0.0,
     "pos": 1166
   },
-  "qv_504": {
+  "knn_24_accuracy_rate": {
     "default_value": 0.0,
     "pos": 1167
   },
-  "qv_505": {
+  "knn_24_num_blanks": {
     "default_value": 0.0,
     "pos": 1168
   },
-  "qv_506": {
+  "knn_24_distance": {
     "default_value": 0.0,
     "pos": 1169
   },
-  "qv_507": {
+  "knn_24_avg_react_time": {
     "default_value": 0.0,
     "pos": 1170
   },
-  "qv_508": {
+  "knn_25_was_first_attempt": {
     "default_value": 0.0,
     "pos": 1171
   },
-  "qv_509": {
+  "knn_25_num_so_options": {
     "default_value": 0.0,
     "pos": 1172
   },
-  "qv_510": {
+  "knn_25_days_since_first_introduced": {
     "default_value": 0.0,
     "pos": 1173
   },
-  "qv_511": {
+  "knn_25_num_sata_options": {
     "default_value": 0.0,
     "pos": 1174
   },
-  "qv_512": {
+  "knn_25_total_correct_attempts": {
     "default_value": 0.0,
     "pos": 1175
   },
-  "qv_513": {
+  "knn_25_total_attempts": {
     "default_value": 0.0,
     "pos": 1176
   },
-  "qv_514": {
+  "knn_25_total_incorrect_attempts": {
     "default_value": 0.0,
     "pos": 1177
   },
-  "qv_515": {
+  "knn_25_attempt_day_ratio": {
     "default_value": 0.0,
     "pos": 1178
   },
-  "qv_516": {
+  "knn_25_days_since_last_revision": {
     "default_value": 0.0,
     "pos": 1179
   },
-  "qv_517": {
+  "knn_25_num_mcq_options": {
     "default_value": 0.0,
     "pos": 1180
   },
-  "qv_518": {
+  "knn_25_revision_streak": {
     "default_value": 0.0,
     "pos": 1181
   },
-  "qv_519": {
+  "knn_25_accuracy_rate": {
     "default_value": 0.0,
     "pos": 1182
   },
-  "qv_520": {
+  "knn_25_num_blanks": {
     "default_value": 0.0,
     "pos": 1183
   },
-  "qv_521": {
+  "knn_25_distance": {
     "default_value": 0.0,
     "pos": 1184
   },
-  "qv_522": {
+  "knn_25_avg_react_time": {
     "default_value": 0.0,
     "pos": 1185
   },
-  "qv_523": {
+  "question_type_fill_in_the_blank": {
     "default_value": 0.0,
     "pos": 1186
   },
-  "qv_524": {
+  "question_type_multiple_choice": {
     "default_value": 0.0,
     "pos": 1187
   },
-  "qv_525": {
+  "question_type_select_all_that_apply": {
     "default_value": 0.0,
     "pos": 1188
   },
-  "qv_526": {
+  "question_type_true_false": {
     "default_value": 0.0,
     "pos": 1189
   },
-  "qv_527": {
+  "knn_01_question_type_fill_in_the_blank": {
     "default_value": 0.0,
     "pos": 1190
   },
-  "qv_528": {
+  "knn_01_question_type_missing": {
     "default_value": 0.0,
     "pos": 1191
   },
-  "qv_529": {
+  "knn_01_question_type_multiple_choice": {
     "default_value": 0.0,
     "pos": 1192
   },
-  "qv_530": {
+  "knn_01_question_type_select_all_that_apply": {
     "default_value": 0.0,
     "pos": 1193
   },
-  "qv_531": {
+  "knn_01_question_type_sort_order": {
     "default_value": 0.0,
     "pos": 1194
   },
-  "qv_532": {
+  "knn_01_question_type_true_false": {
     "default_value": 0.0,
     "pos": 1195
   },
-  "qv_533": {
+  "knn_02_question_type_fill_in_the_blank": {
     "default_value": 0.0,
     "pos": 1196
   },
-  "qv_534": {
+  "knn_02_question_type_missing": {
     "default_value": 0.0,
     "pos": 1197
   },
-  "qv_535": {
+  "knn_02_question_type_multiple_choice": {
     "default_value": 0.0,
     "pos": 1198
   },
-  "qv_536": {
+  "knn_02_question_type_select_all_that_apply": {
     "default_value": 0.0,
     "pos": 1199
   },
-  "qv_537": {
+  "knn_02_question_type_sort_order": {
     "default_value": 0.0,
     "pos": 1200
   },
-  "qv_538": {
+  "knn_02_question_type_true_false": {
     "default_value": 0.0,
     "pos": 1201
   },
-  "qv_539": {
+  "knn_03_question_type_fill_in_the_blank": {
     "default_value": 0.0,
     "pos": 1202
   },
-  "qv_540": {
+  "knn_03_question_type_missing": {
     "default_value": 0.0,
     "pos": 1203
   },
-  "qv_541": {
+  "knn_03_question_type_multiple_choice": {
     "default_value": 0.0,
     "pos": 1204
   },
-  "qv_542": {
+  "knn_03_question_type_select_all_that_apply": {
     "default_value": 0.0,
     "pos": 1205
   },
-  "qv_543": {
+  "knn_03_question_type_sort_order": {
     "default_value": 0.0,
     "pos": 1206
   },
-  "qv_544": {
+  "knn_03_question_type_true_false": {
     "default_value": 0.0,
     "pos": 1207
   },
-  "qv_545": {
+  "knn_04_question_type_fill_in_the_blank": {
     "default_value": 0.0,
     "pos": 1208
   },
-  "qv_546": {
+  "knn_04_question_type_missing": {
     "default_value": 0.0,
     "pos": 1209
   },
-  "qv_547": {
+  "knn_04_question_type_multiple_choice": {
     "default_value": 0.0,
     "pos": 1210
   },
-  "qv_548": {
+  "knn_04_question_type_select_all_that_apply": {
     "default_value": 0.0,
     "pos": 1211
   },
-  "qv_549": {
+  "knn_04_question_type_sort_order": {
     "default_value": 0.0,
     "pos": 1212
   },
-  "qv_550": {
+  "knn_04_question_type_true_false": {
     "default_value": 0.0,
     "pos": 1213
   },
-  "qv_551": {
+  "knn_05_question_type_fill_in_the_blank": {
     "default_value": 0.0,
     "pos": 1214
   },
-  "qv_552": {
+  "knn_05_question_type_missing": {
     "default_value": 0.0,
     "pos": 1215
   },
-  "qv_553": {
+  "knn_05_question_type_multiple_choice": {
     "default_value": 0.0,
     "pos": 1216
   },
-  "qv_554": {
+  "knn_05_question_type_select_all_that_apply": {
     "default_value": 0.0,
     "pos": 1217
   },
-  "qv_555": {
+  "knn_05_question_type_sort_order": {
     "default_value": 0.0,
     "pos": 1218
   },
-  "qv_556": {
+  "knn_05_question_type_true_false": {
     "default_value": 0.0,
     "pos": 1219
   },
-  "qv_557": {
+  "knn_06_question_type_fill_in_the_blank": {
     "default_value": 0.0,
     "pos": 1220
   },
-  "qv_558": {
+  "knn_06_question_type_missing": {
     "default_value": 0.0,
     "pos": 1221
   },
-  "qv_559": {
+  "knn_06_question_type_multiple_choice": {
     "default_value": 0.0,
     "pos": 1222
   },
-  "qv_560": {
+  "knn_06_question_type_select_all_that_apply": {
     "default_value": 0.0,
     "pos": 1223
   },
-  "qv_561": {
+  "knn_06_question_type_sort_order": {
     "default_value": 0.0,
     "pos": 1224
   },
-  "qv_562": {
+  "knn_06_question_type_true_false": {
     "default_value": 0.0,
     "pos": 1225
   },
-  "qv_563": {
+  "knn_07_question_type_fill_in_the_blank": {
     "default_value": 0.0,
     "pos": 1226
   },
-  "qv_564": {
+  "knn_07_question_type_missing": {
     "default_value": 0.0,
     "pos": 1227
   },
-  "qv_565": {
+  "knn_07_question_type_multiple_choice": {
     "default_value": 0.0,
     "pos": 1228
   },
-  "qv_566": {
+  "knn_07_question_type_select_all_that_apply": {
     "default_value": 0.0,
     "pos": 1229
   },
-  "qv_567": {
+  "knn_07_question_type_sort_order": {
     "default_value": 0.0,
     "pos": 1230
   },
-  "qv_568": {
+  "knn_07_question_type_true_false": {
     "default_value": 0.0,
     "pos": 1231
   },
-  "qv_569": {
+  "knn_08_question_type_fill_in_the_blank": {
     "default_value": 0.0,
     "pos": 1232
   },
-  "qv_570": {
+  "knn_08_question_type_missing": {
     "default_value": 0.0,
     "pos": 1233
   },
-  "qv_571": {
+  "knn_08_question_type_multiple_choice": {
     "default_value": 0.0,
     "pos": 1234
   },
-  "qv_572": {
+  "knn_08_question_type_select_all_that_apply": {
     "default_value": 0.0,
     "pos": 1235
   },
-  "qv_573": {
+  "knn_08_question_type_sort_order": {
     "default_value": 0.0,
     "pos": 1236
   },
-  "qv_574": {
+  "knn_08_question_type_true_false": {
     "default_value": 0.0,
     "pos": 1237
   },
-  "qv_575": {
+  "knn_09_question_type_fill_in_the_blank": {
     "default_value": 0.0,
     "pos": 1238
   },
-  "qv_576": {
+  "knn_09_question_type_missing": {
     "default_value": 0.0,
     "pos": 1239
   },
-  "qv_577": {
+  "knn_09_question_type_multiple_choice": {
     "default_value": 0.0,
     "pos": 1240
   },
-  "qv_578": {
+  "knn_09_question_type_select_all_that_apply": {
     "default_value": 0.0,
     "pos": 1241
   },
-  "qv_579": {
+  "knn_09_question_type_sort_order": {
     "default_value": 0.0,
     "pos": 1242
   },
-  "qv_580": {
+  "knn_09_question_type_true_false": {
     "default_value": 0.0,
     "pos": 1243
   },
-  "qv_581": {
+  "knn_10_question_type_fill_in_the_blank": {
     "default_value": 0.0,
     "pos": 1244
   },
-  "qv_582": {
+  "knn_10_question_type_missing": {
     "default_value": 0.0,
     "pos": 1245
   },
-  "qv_583": {
+  "knn_10_question_type_multiple_choice": {
     "default_value": 0.0,
     "pos": 1246
   },
-  "qv_584": {
+  "knn_10_question_type_select_all_that_apply": {
     "default_value": 0.0,
     "pos": 1247
   },
-  "qv_585": {
+  "knn_10_question_type_sort_order": {
     "default_value": 0.0,
     "pos": 1248
   },
-  "qv_586": {
+  "knn_10_question_type_true_false": {
     "default_value": 0.0,
     "pos": 1249
   },
-  "qv_587": {
+  "knn_11_question_type_fill_in_the_blank": {
     "default_value": 0.0,
     "pos": 1250
   },
-  "qv_588": {
+  "knn_11_question_type_missing": {
     "default_value": 0.0,
     "pos": 1251
   },
-  "qv_589": {
+  "knn_11_question_type_multiple_choice": {
     "default_value": 0.0,
     "pos": 1252
   },
-  "qv_590": {
+  "knn_11_question_type_select_all_that_apply": {
     "default_value": 0.0,
     "pos": 1253
   },
-  "qv_591": {
+  "knn_11_question_type_sort_order": {
     "default_value": 0.0,
     "pos": 1254
   },
-  "qv_592": {
+  "knn_11_question_type_true_false": {
     "default_value": 0.0,
     "pos": 1255
   },
-  "qv_593": {
+  "knn_12_question_type_fill_in_the_blank": {
     "default_value": 0.0,
     "pos": 1256
   },
-  "qv_594": {
+  "knn_12_question_type_missing": {
     "default_value": 0.0,
     "pos": 1257
   },
-  "qv_595": {
+  "knn_12_question_type_multiple_choice": {
     "default_value": 0.0,
     "pos": 1258
   },
-  "qv_596": {
+  "knn_12_question_type_select_all_that_apply": {
     "default_value": 0.0,
     "pos": 1259
   },
-  "qv_597": {
+  "knn_12_question_type_sort_order": {
     "default_value": 0.0,
     "pos": 1260
   },
-  "qv_598": {
+  "knn_12_question_type_true_false": {
     "default_value": 0.0,
     "pos": 1261
   },
-  "qv_599": {
+  "knn_13_question_type_fill_in_the_blank": {
     "default_value": 0.0,
     "pos": 1262
   },
-  "qv_600": {
+  "knn_13_question_type_missing": {
     "default_value": 0.0,
     "pos": 1263
   },
-  "qv_601": {
+  "knn_13_question_type_multiple_choice": {
     "default_value": 0.0,
     "pos": 1264
   },
-  "qv_602": {
+  "knn_13_question_type_select_all_that_apply": {
     "default_value": 0.0,
     "pos": 1265
   },
-  "qv_603": {
+  "knn_13_question_type_sort_order": {
     "default_value": 0.0,
     "pos": 1266
   },
-  "qv_604": {
+  "knn_13_question_type_true_false": {
     "default_value": 0.0,
     "pos": 1267
   },
-  "qv_605": {
+  "knn_14_question_type_fill_in_the_blank": {
     "default_value": 0.0,
     "pos": 1268
   },
-  "qv_606": {
+  "knn_14_question_type_missing": {
     "default_value": 0.0,
     "pos": 1269
   },
-  "qv_607": {
+  "knn_14_question_type_multiple_choice": {
     "default_value": 0.0,
     "pos": 1270
   },
-  "qv_608": {
+  "knn_14_question_type_select_all_that_apply": {
     "default_value": 0.0,
     "pos": 1271
   },
-  "qv_609": {
+  "knn_14_question_type_sort_order": {
     "default_value": 0.0,
     "pos": 1272
   },
-  "qv_610": {
+  "knn_14_question_type_true_false": {
     "default_value": 0.0,
     "pos": 1273
   },
-  "qv_611": {
+  "knn_15_question_type_fill_in_the_blank": {
     "default_value": 0.0,
     "pos": 1274
   },
-  "qv_612": {
+  "knn_15_question_type_missing": {
     "default_value": 0.0,
     "pos": 1275
   },
-  "qv_613": {
+  "knn_15_question_type_multiple_choice": {
     "default_value": 0.0,
     "pos": 1276
   },
-  "qv_614": {
+  "knn_15_question_type_select_all_that_apply": {
     "default_value": 0.0,
     "pos": 1277
   },
-  "qv_615": {
+  "knn_15_question_type_sort_order": {
     "default_value": 0.0,
     "pos": 1278
   },
-  "qv_616": {
+  "knn_15_question_type_true_false": {
     "default_value": 0.0,
     "pos": 1279
   },
-  "qv_617": {
+  "knn_16_question_type_fill_in_the_blank": {
     "default_value": 0.0,
     "pos": 1280
   },
-  "qv_618": {
+  "knn_16_question_type_missing": {
     "default_value": 0.0,
     "pos": 1281
   },
-  "qv_619": {
+  "knn_16_question_type_multiple_choice": {
     "default_value": 0.0,
     "pos": 1282
   },
-  "qv_620": {
+  "knn_16_question_type_select_all_that_apply": {
     "default_value": 0.0,
     "pos": 1283
   },
-  "qv_621": {
+  "knn_16_question_type_sort_order": {
     "default_value": 0.0,
     "pos": 1284
   },
-  "qv_622": {
+  "knn_16_question_type_true_false": {
     "default_value": 0.0,
     "pos": 1285
   },
-  "qv_623": {
+  "knn_17_question_type_fill_in_the_blank": {
     "default_value": 0.0,
     "pos": 1286
   },
-  "qv_624": {
+  "knn_17_question_type_missing": {
     "default_value": 0.0,
     "pos": 1287
   },
-  "qv_625": {
+  "knn_17_question_type_multiple_choice": {
     "default_value": 0.0,
     "pos": 1288
   },
-  "qv_626": {
+  "knn_17_question_type_select_all_that_apply": {
     "default_value": 0.0,
     "pos": 1289
   },
-  "qv_627": {
+  "knn_17_question_type_sort_order": {
     "default_value": 0.0,
     "pos": 1290
   },
-  "qv_628": {
+  "knn_17_question_type_true_false": {
     "default_value": 0.0,
     "pos": 1291
   },
-  "qv_629": {
+  "knn_18_question_type_fill_in_the_blank": {
     "default_value": 0.0,
     "pos": 1292
   },
-  "qv_630": {
+  "knn_18_question_type_missing": {
     "default_value": 0.0,
     "pos": 1293
   },
-  "qv_631": {
+  "knn_18_question_type_multiple_choice": {
     "default_value": 0.0,
     "pos": 1294
   },
-  "qv_632": {
+  "knn_18_question_type_select_all_that_apply": {
     "default_value": 0.0,
     "pos": 1295
   },
-  "qv_633": {
+  "knn_18_question_type_sort_order": {
     "default_value": 0.0,
     "pos": 1296
   },
-  "qv_634": {
+  "knn_18_question_type_true_false": {
     "default_value": 0.0,
     "pos": 1297
   },
-  "qv_635": {
+  "knn_19_question_type_fill_in_the_blank": {
     "default_value": 0.0,
     "pos": 1298
   },
-  "qv_636": {
+  "knn_19_question_type_missing": {
     "default_value": 0.0,
     "pos": 1299
   },
-  "qv_637": {
+  "knn_19_question_type_multiple_choice": {
     "default_value": 0.0,
     "pos": 1300
   },
-  "qv_638": {
+  "knn_19_question_type_select_all_that_apply": {
     "default_value": 0.0,
     "pos": 1301
   },
-  "qv_639": {
+  "knn_19_question_type_sort_order": {
     "default_value": 0.0,
     "pos": 1302
   },
-  "qv_640": {
+  "knn_19_question_type_true_false": {
     "default_value": 0.0,
     "pos": 1303
   },
-  "qv_641": {
+  "knn_20_question_type_fill_in_the_blank": {
     "default_value": 0.0,
     "pos": 1304
   },
-  "qv_642": {
+  "knn_20_question_type_missing": {
     "default_value": 0.0,
     "pos": 1305
   },
-  "qv_643": {
+  "knn_20_question_type_multiple_choice": {
     "default_value": 0.0,
     "pos": 1306
   },
-  "qv_644": {
+  "knn_20_question_type_select_all_that_apply": {
     "default_value": 0.0,
     "pos": 1307
   },
-  "qv_645": {
+  "knn_20_question_type_sort_order": {
     "default_value": 0.0,
     "pos": 1308
   },
-  "qv_646": {
+  "knn_20_question_type_true_false": {
     "default_value": 0.0,
     "pos": 1309
   },
-  "qv_647": {
+  "knn_21_question_type_fill_in_the_blank": {
     "default_value": 0.0,
     "pos": 1310
   },
-  "qv_648": {
+  "knn_21_question_type_missing": {
     "default_value": 0.0,
     "pos": 1311
   },
-  "qv_649": {
+  "knn_21_question_type_multiple_choice": {
     "default_value": 0.0,
     "pos": 1312
   },
-  "qv_650": {
+  "knn_21_question_type_select_all_that_apply": {
     "default_value": 0.0,
     "pos": 1313
   },
-  "qv_651": {
+  "knn_21_question_type_sort_order": {
     "default_value": 0.0,
     "pos": 1314
   },
-  "qv_652": {
+  "knn_21_question_type_true_false": {
     "default_value": 0.0,
     "pos": 1315
   },
-  "qv_653": {
+  "knn_22_question_type_fill_in_the_blank": {
     "default_value": 0.0,
     "pos": 1316
   },
-  "qv_654": {
+  "knn_22_question_type_missing": {
     "default_value": 0.0,
     "pos": 1317
   },
-  "qv_655": {
+  "knn_22_question_type_multiple_choice": {
     "default_value": 0.0,
     "pos": 1318
   },
-  "qv_656": {
+  "knn_22_question_type_select_all_that_apply": {
     "default_value": 0.0,
     "pos": 1319
   },
-  "qv_657": {
+  "knn_22_question_type_sort_order": {
     "default_value": 0.0,
     "pos": 1320
   },
-  "qv_658": {
+  "knn_22_question_type_true_false": {
     "default_value": 0.0,
     "pos": 1321
   },
-  "qv_659": {
+  "knn_23_question_type_fill_in_the_blank": {
     "default_value": 0.0,
     "pos": 1322
   },
-  "qv_660": {
+  "knn_23_question_type_missing": {
     "default_value": 0.0,
     "pos": 1323
   },
-  "qv_661": {
+  "knn_23_question_type_multiple_choice": {
     "default_value": 0.0,
     "pos": 1324
   },
-  "qv_662": {
+  "knn_23_question_type_select_all_that_apply": {
     "default_value": 0.0,
     "pos": 1325
   },
-  "qv_663": {
+  "knn_23_question_type_sort_order": {
     "default_value": 0.0,
     "pos": 1326
   },
-  "qv_664": {
+  "knn_23_question_type_true_false": {
     "default_value": 0.0,
     "pos": 1327
   },
-  "qv_665": {
+  "knn_24_question_type_fill_in_the_blank": {
     "default_value": 0.0,
     "pos": 1328
   },
-  "qv_666": {
+  "knn_24_question_type_missing": {
     "default_value": 0.0,
     "pos": 1329
   },
-  "qv_667": {
+  "knn_24_question_type_multiple_choice": {
     "default_value": 0.0,
     "pos": 1330
   },
-  "qv_668": {
+  "knn_24_question_type_select_all_that_apply": {
     "default_value": 0.0,
     "pos": 1331
   },
-  "qv_669": {
+  "knn_24_question_type_sort_order": {
     "default_value": 0.0,
     "pos": 1332
   },
-  "qv_670": {
+  "knn_24_question_type_true_false": {
     "default_value": 0.0,
     "pos": 1333
   },
-  "qv_671": {
+  "knn_25_question_type_fill_in_the_blank": {
     "default_value": 0.0,
     "pos": 1334
   },
-  "qv_672": {
+  "knn_25_question_type_missing": {
     "default_value": 0.0,
     "pos": 1335
   },
-  "qv_673": {
+  "knn_25_question_type_multiple_choice": {
     "default_value": 0.0,
     "pos": 1336
   },
-  "qv_674": {
+  "knn_25_question_type_select_all_that_apply": {
     "default_value": 0.0,
     "pos": 1337
   },
-  "qv_675": {
+  "knn_25_question_type_sort_order": {
     "default_value": 0.0,
     "pos": 1338
   },
-  "qv_676": {
+  "knn_25_question_type_true_false": {
     "default_value": 0.0,
     "pos": 1339
-  },
-  "qv_677": {
-    "default_value": 0.0,
-    "pos": 1340
-  },
-  "qv_678": {
-    "default_value": 0.0,
-    "pos": 1341
-  },
-  "qv_679": {
-    "default_value": 0.0,
-    "pos": 1342
-  },
-  "qv_680": {
-    "default_value": 0.0,
-    "pos": 1343
-  },
-  "qv_681": {
-    "default_value": 0.0,
-    "pos": 1344
-  },
-  "qv_682": {
-    "default_value": 0.0,
-    "pos": 1345
-  },
-  "qv_683": {
-    "default_value": 0.0,
-    "pos": 1346
-  },
-  "qv_684": {
-    "default_value": 0.0,
-    "pos": 1347
-  },
-  "qv_685": {
-    "default_value": 0.0,
-    "pos": 1348
-  },
-  "qv_686": {
-    "default_value": 0.0,
-    "pos": 1349
-  },
-  "qv_687": {
-    "default_value": 0.0,
-    "pos": 1350
-  },
-  "qv_688": {
-    "default_value": 0.0,
-    "pos": 1351
-  },
-  "qv_689": {
-    "default_value": 0.0,
-    "pos": 1352
-  },
-  "qv_690": {
-    "default_value": 0.0,
-    "pos": 1353
-  },
-  "qv_691": {
-    "default_value": 0.0,
-    "pos": 1354
-  },
-  "qv_692": {
-    "default_value": 0.0,
-    "pos": 1355
-  },
-  "qv_693": {
-    "default_value": 0.0,
-    "pos": 1356
-  },
-  "qv_694": {
-    "default_value": 0.0,
-    "pos": 1357
-  },
-  "qv_695": {
-    "default_value": 0.0,
-    "pos": 1358
-  },
-  "qv_696": {
-    "default_value": 0.0,
-    "pos": 1359
-  },
-  "qv_697": {
-    "default_value": 0.0,
-    "pos": 1360
-  },
-  "qv_698": {
-    "default_value": 0.0,
-    "pos": 1361
-  },
-  "qv_699": {
-    "default_value": 0.0,
-    "pos": 1362
-  },
-  "qv_700": {
-    "default_value": 0.0,
-    "pos": 1363
-  },
-  "qv_701": {
-    "default_value": 0.0,
-    "pos": 1364
-  },
-  "qv_702": {
-    "default_value": 0.0,
-    "pos": 1365
-  },
-  "qv_703": {
-    "default_value": 0.0,
-    "pos": 1366
-  },
-  "qv_704": {
-    "default_value": 0.0,
-    "pos": 1367
-  },
-  "qv_705": {
-    "default_value": 0.0,
-    "pos": 1368
-  },
-  "qv_706": {
-    "default_value": 0.0,
-    "pos": 1369
-  },
-  "qv_707": {
-    "default_value": 0.0,
-    "pos": 1370
-  },
-  "qv_708": {
-    "default_value": 0.0,
-    "pos": 1371
-  },
-  "qv_709": {
-    "default_value": 0.0,
-    "pos": 1372
-  },
-  "qv_710": {
-    "default_value": 0.0,
-    "pos": 1373
-  },
-  "qv_711": {
-    "default_value": 0.0,
-    "pos": 1374
-  },
-  "qv_712": {
-    "default_value": 0.0,
-    "pos": 1375
-  },
-  "qv_713": {
-    "default_value": 0.0,
-    "pos": 1376
-  },
-  "qv_714": {
-    "default_value": 0.0,
-    "pos": 1377
-  },
-  "qv_715": {
-    "default_value": 0.0,
-    "pos": 1378
-  },
-  "qv_716": {
-    "default_value": 0.0,
-    "pos": 1379
-  },
-  "qv_717": {
-    "default_value": 0.0,
-    "pos": 1380
-  },
-  "qv_718": {
-    "default_value": 0.0,
-    "pos": 1381
-  },
-  "qv_719": {
-    "default_value": 0.0,
-    "pos": 1382
-  },
-  "qv_720": {
-    "default_value": 0.0,
-    "pos": 1383
-  },
-  "qv_721": {
-    "default_value": 0.0,
-    "pos": 1384
-  },
-  "qv_722": {
-    "default_value": 0.0,
-    "pos": 1385
-  },
-  "qv_723": {
-    "default_value": 0.0,
-    "pos": 1386
-  },
-  "qv_724": {
-    "default_value": 0.0,
-    "pos": 1387
-  },
-  "qv_725": {
-    "default_value": 0.0,
-    "pos": 1388
-  },
-  "qv_726": {
-    "default_value": 0.0,
-    "pos": 1389
-  },
-  "qv_727": {
-    "default_value": 0.0,
-    "pos": 1390
-  },
-  "qv_728": {
-    "default_value": 0.0,
-    "pos": 1391
-  },
-  "qv_729": {
-    "default_value": 0.0,
-    "pos": 1392
-  },
-  "qv_730": {
-    "default_value": 0.0,
-    "pos": 1393
-  },
-  "qv_731": {
-    "default_value": 0.0,
-    "pos": 1394
-  },
-  "qv_732": {
-    "default_value": 0.0,
-    "pos": 1395
-  },
-  "qv_733": {
-    "default_value": 0.0,
-    "pos": 1396
-  },
-  "qv_734": {
-    "default_value": 0.0,
-    "pos": 1397
-  },
-  "qv_735": {
-    "default_value": 0.0,
-    "pos": 1398
-  },
-  "qv_736": {
-    "default_value": 0.0,
-    "pos": 1399
-  },
-  "qv_737": {
-    "default_value": 0.0,
-    "pos": 1400
-  },
-  "qv_738": {
-    "default_value": 0.0,
-    "pos": 1401
-  },
-  "qv_739": {
-    "default_value": 0.0,
-    "pos": 1402
-  },
-  "qv_740": {
-    "default_value": 0.0,
-    "pos": 1403
-  },
-  "qv_741": {
-    "default_value": 0.0,
-    "pos": 1404
-  },
-  "qv_742": {
-    "default_value": 0.0,
-    "pos": 1405
-  },
-  "qv_743": {
-    "default_value": 0.0,
-    "pos": 1406
-  },
-  "qv_744": {
-    "default_value": 0.0,
-    "pos": 1407
-  },
-  "qv_745": {
-    "default_value": 0.0,
-    "pos": 1408
-  },
-  "qv_746": {
-    "default_value": 0.0,
-    "pos": 1409
-  },
-  "qv_747": {
-    "default_value": 0.0,
-    "pos": 1410
-  },
-  "qv_748": {
-    "default_value": 0.0,
-    "pos": 1411
-  },
-  "qv_749": {
-    "default_value": 0.0,
-    "pos": 1412
-  },
-  "qv_750": {
-    "default_value": 0.0,
-    "pos": 1413
-  },
-  "qv_751": {
-    "default_value": 0.0,
-    "pos": 1414
-  },
-  "qv_752": {
-    "default_value": 0.0,
-    "pos": 1415
-  },
-  "qv_753": {
-    "default_value": 0.0,
-    "pos": 1416
-  },
-  "qv_754": {
-    "default_value": 0.0,
-    "pos": 1417
-  },
-  "qv_755": {
-    "default_value": 0.0,
-    "pos": 1418
-  },
-  "qv_756": {
-    "default_value": 0.0,
-    "pos": 1419
-  },
-  "qv_757": {
-    "default_value": 0.0,
-    "pos": 1420
-  },
-  "qv_758": {
-    "default_value": 0.0,
-    "pos": 1421
-  },
-  "qv_759": {
-    "default_value": 0.0,
-    "pos": 1422
-  },
-  "qv_760": {
-    "default_value": 0.0,
-    "pos": 1423
-  },
-  "qv_761": {
-    "default_value": 0.0,
-    "pos": 1424
-  },
-  "qv_762": {
-    "default_value": 0.0,
-    "pos": 1425
-  },
-  "qv_763": {
-    "default_value": 0.0,
-    "pos": 1426
-  },
-  "qv_764": {
-    "default_value": 0.0,
-    "pos": 1427
-  },
-  "qv_765": {
-    "default_value": 0.0,
-    "pos": 1428
-  },
-  "qv_766": {
-    "default_value": 0.0,
-    "pos": 1429
-  },
-  "qv_767": {
-    "default_value": 0.0,
-    "pos": 1430
-  },
-  "module_name_acid base": {
-    "default_value": 0.0,
-    "pos": 1431
-  },
-  "module_name_bio 160": {
-    "default_value": 0.0,
-    "pos": 1432
-  },
-  "module_name_biology": {
-    "default_value": 0.0,
-    "pos": 1433
-  },
-  "module_name_calculus 1": {
-    "default_value": 0.0,
-    "pos": 1434
-  },
-  "module_name_cell and biomolecules": {
-    "default_value": 0.0,
-    "pos": 1435
-  },
-  "module_name_cell and fluid dynamics": {
-    "default_value": 0.0,
-    "pos": 1436
-  },
-  "module_name_cell and transport": {
-    "default_value": 0.0,
-    "pos": 1437
-  },
-  "module_name_cell as a building block": {
-    "default_value": 0.0,
-    "pos": 1438
-  },
-  "module_name_chemistry": {
-    "default_value": 0.0,
-    "pos": 1439
-  },
-  "module_name_chemistry and strcutural biology": {
-    "default_value": 0.0,
-    "pos": 1440
-  },
-  "module_name_chemistry and structural biology": {
-    "default_value": 0.0,
-    "pos": 1441
-  },
-  "module_name_classification": {
-    "default_value": 0.0,
-    "pos": 1442
-  },
-  "module_name_clep western civ ii": {
-    "default_value": 0.0,
-    "pos": 1443
-  },
-  "module_name_code of life": {
-    "default_value": 0.0,
-    "pos": 1444
-  },
-  "module_name_cognitive and logical fallacies": {
-    "default_value": 0.0,
-    "pos": 1445
-  },
-  "module_name_composition of life": {
-    "default_value": 0.0,
-    "pos": 1446
-  },
-  "module_name_cost function": {
-    "default_value": 0.0,
-    "pos": 1447
-  },
-  "module_name_daily life science": {
-    "default_value": 0.0,
-    "pos": 1448
-  },
-  "module_name_data science": {
-    "default_value": 0.0,
-    "pos": 1449
-  },
-  "module_name_decision trees": {
-    "default_value": 0.0,
-    "pos": 1450
-  },
-  "module_name_disease managment": {
-    "default_value": 0.0,
-    "pos": 1451
-  },
-  "module_name_energy conversion": {
-    "default_value": 0.0,
-    "pos": 1452
-  },
-  "module_name_environmental biology and chemistry": {
-    "default_value": 0.0,
-    "pos": 1453
-  },
-  "module_name_experimental design": {
-    "default_value": 0.0,
-    "pos": 1454
-  },
-  "module_name_general": {
-    "default_value": 0.0,
-    "pos": 1455
-  },
-  "module_name_greek mythology": {
-    "default_value": 0.0,
-    "pos": 1456
-  },
-  "module_name_history of biology": {
-    "default_value": 0.0,
-    "pos": 1457
-  },
-  "module_name_history of machine learning": {
-    "default_value": 0.0,
-    "pos": 1458
-  },
-  "module_name_id3 algorithm": {
-    "default_value": 0.0,
-    "pos": 1459
-  },
-  "module_name_introductory computer science with python": {
-    "default_value": 0.0,
-    "pos": 1460
-  },
-  "module_name_introductory geology": {
-    "default_value": 0.0,
-    "pos": 1461
-  },
-  "module_name_introductory philosophy": {
-    "default_value": 0.0,
-    "pos": 1462
-  },
-  "module_name_java data types": {
-    "default_value": 0.0,
-    "pos": 1463
-  },
-  "module_name_java general principles": {
-    "default_value": 0.0,
-    "pos": 1464
-  },
-  "module_name_java syntax": {
-    "default_value": 0.0,
-    "pos": 1465
-  },
-  "module_name_k-nearest neighbors": {
-    "default_value": 0.0,
-    "pos": 1466
-  },
-  "module_name_least squares method": {
-    "default_value": 0.0,
-    "pos": 1467
-  },
-  "module_name_linear regression": {
-    "default_value": 0.0,
-    "pos": 1468
-  },
-  "module_name_linux command line": {
-    "default_value": 0.0,
-    "pos": 1469
-  },
-  "module_name_machine learning": {
-    "default_value": 0.0,
-    "pos": 1470
-  },
-  "module_name_math": {
-    "default_value": 0.0,
-    "pos": 1471
-  },
-  "module_name_multiplication table": {
-    "default_value": 0.0,
-    "pos": 1472
-  },
-  "module_name_neural networks": {
-    "default_value": 0.0,
-    "pos": 1473
-  },
-  "module_name_neurosciences": {
-    "default_value": 0.0,
-    "pos": 1474
-  },
-  "module_name_probability theory": {
-    "default_value": 0.0,
-    "pos": 1475
-  },
-  "module_name_random forest algorithm": {
-    "default_value": 0.0,
-    "pos": 1476
-  },
-  "module_name_ridge regression": {
-    "default_value": 0.0,
-    "pos": 1477
-  },
-  "module_name_set theory": {
-    "default_value": 0.0,
-    "pos": 1478
-  },
-  "module_name_side chain chemistry": {
-    "default_value": 0.0,
-    "pos": 1479
-  },
-  "module_name_statistical basics": {
-    "default_value": 0.0,
-    "pos": 1480
-  },
-  "module_name_statistics": {
-    "default_value": 0.0,
-    "pos": 1481
-  },
-  "module_name_support vector machines": {
-    "default_value": 0.0,
-    "pos": 1482
-  },
-  "module_name_thermodynamics": {
-    "default_value": 0.0,
-    "pos": 1483
-  },
-  "module_name_trigonometry": {
-    "default_value": 0.0,
-    "pos": 1484
-  },
-  "question_type_fill_in_the_blank": {
-    "default_value": 0.0,
-    "pos": 1485
-  },
-  "question_type_multiple_choice": {
-    "default_value": 0.0,
-    "pos": 1486
-  },
-  "question_type_select_all_that_apply": {
-    "default_value": 0.0,
-    "pos": 1487
-  },
-  "question_type_sort_order": {
-    "default_value": 0.0,
-    "pos": 1488
-  },
-  "question_type_true_false": {
-    "default_value": 0.0,
-    "pos": 1489
   }
 }

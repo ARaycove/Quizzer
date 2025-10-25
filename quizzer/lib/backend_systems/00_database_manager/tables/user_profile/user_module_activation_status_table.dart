@@ -207,9 +207,9 @@ Future<void> _ensureAllModulesHaveActivationStatusForUser(dynamic db, String use
           
           final Map<String, dynamic> updateData = {
             'module_name': normalizedModuleName,
-            'has_been_synced': 0, // Mark for outbound sync
+            'has_been_synced': 0,
             'edits_are_synced': 0,
-            'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
+            'last_modified_timestamp': DateTime.utc(1970, 1, 1).toIso8601String(),
           };
           
           final int updateResult = await updateRawData(

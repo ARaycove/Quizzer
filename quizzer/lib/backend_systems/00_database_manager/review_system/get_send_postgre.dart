@@ -224,17 +224,21 @@ Future<bool> approveQuestion(Map<String, dynamic> questionDetails, String source
 ///   `true` if the delete operation succeeds, `false` otherwise (though errors usually throw).
 Future<bool> denyQuestion(String sourceTable, Map<String, dynamic> primaryKey) async {
   final supabase = getSessionManager().supabase;
-  final String questionId = primaryKey['question_id'] as String; // Log purposes
-  QuizzerLogger.logMessage('Denying question $questionId from $sourceTable...');
-
-  // Delete from the source review table using the primary key map
-  QuizzerLogger.logValue('Deleting denied question $questionId from $sourceTable using key: $primaryKey');
-  var deleteQuery = supabase.from(sourceTable).delete();
-  for (final entry in primaryKey.entries) {
-      deleteQuery = deleteQuery.eq(entry.key, entry.value);
+  final String questionId = primaryKey['question_id'] as String;
+  QuizzerLogger.logMessage('Denying question $questionId from all tables...');
+  
+  final tables = [
+    'question_answer_pairs',
+    'question_answer_pairs_new_review',
+    'question_answer_pairs_edits_review',
+    'question_answer_pair_flags'
+  ];
+  
+  for (final table in tables) {
+    QuizzerLogger.logValue('Deleting question $questionId from $table');
+    await supabase.from(table).delete().eq('question_id', questionId);
   }
-  await deleteQuery; // Let potential errors propagate
-  QuizzerLogger.logSuccess('Successfully deleted denied question $questionId from $sourceTable.');
-
-  return true; // Return true indicates completion without throwing errors
+  
+  QuizzerLogger.logSuccess('Successfully deleted question $questionId from all tables.');
+  return true;
 }

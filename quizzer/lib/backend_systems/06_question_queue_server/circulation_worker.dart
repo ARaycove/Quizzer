@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:math';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
+import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_module_activation_status_table.dart';
 // Caches
 // Table Access
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_question_answer_pairs_table.dart';
@@ -122,35 +124,61 @@ class CirculationWorker {
     /// Checks if conditions are met to add a new question to circulation.
   /// Uses direct database queries instead of caches for determination.
   Future<bool> _shouldAddNewQuestion() async {
+    QuizzerLogger.logMessage('Entering CirculationWorker _shouldAddNewQuestion()...');
+    
+    final userId = _sessionManager.userId!;
+    
+    final List<Map<String, dynamic>> nonCirculatingQuestions = await getNonCirculatingQuestionsWithDetails(userId);
+    if (nonCirculatingQuestions.isEmpty) {
+      QuizzerLogger.logMessage("No non-circulating questions available, shouldAdd -> false");
+      return false;
+    }
+    
+    final List<String> activeModuleNames = await getActiveModuleNames(userId);
+    
+    final db = await getDatabaseMonitor().requestDatabaseAccess();
+    if (db == null) throw Exception('Failed to acquire database access');
+    
     try {
-      QuizzerLogger.logMessage('Entering CirculationWorker _shouldAddNewQuestion()...');
+      List<dynamic> whereArgs = [userId];
       
-      assert(_sessionManager.userId != null, 'Circulation check requires logged-in user.');
-      final userId = _sessionManager.userId!;
-      
-      QuizzerLogger.logMessage("Querying database for eligible questions data...");
-
-      // Check if there are any non-circulating questions available first
-      final List<Map<String, dynamic>> nonCirculatingQuestions = await getNonCirculatingQuestionsWithDetails(userId);
-      if (nonCirculatingQuestions.isEmpty) {
-        QuizzerLogger.logMessage("No non-circulating questions available, shouldAdd evaluates to -> false");
-        return false;
+      String sql;
+      if (activeModuleNames.isNotEmpty) {
+        final placeholders = List.filled(activeModuleNames.length, '?').join(',');
+        whereArgs.addAll(activeModuleNames);
+        sql = '''
+          SELECT COUNT(*) as count
+          FROM user_question_answer_pairs
+          INNER JOIN question_answer_pairs ON user_question_answer_pairs.question_id = question_answer_pairs.question_id
+          WHERE user_question_answer_pairs.user_uuid = ?
+            AND user_question_answer_pairs.in_circulation = 1
+            AND user_question_answer_pairs.flagged = 0
+            AND user_question_answer_pairs.accuracy_probability < 0.90
+            AND question_answer_pairs.module_name IN ($placeholders)
+          LIMIT 101
+        ''';
+      } else {
+        sql = '''
+          SELECT COUNT(*) as count
+          FROM user_question_answer_pairs
+          INNER JOIN question_answer_pairs ON user_question_answer_pairs.question_id = question_answer_pairs.question_id
+          WHERE user_question_answer_pairs.user_uuid = ?
+            AND user_question_answer_pairs.in_circulation = 1
+            AND user_question_answer_pairs.flagged = 0
+            AND user_question_answer_pairs.accuracy_probability < 0.90
+          LIMIT 101
+        ''';
       }
-
-      // Use the optimized database query for revision_score == 0 questions
-      final int revisionScoreZeroCount = await getLowRevisionStreakEligibleCount(userId);
-
-      // Condition: Less than 10 eligible questions with revision_score == 0
-      final bool lowRevisionScoreCondition = revisionScoreZeroCount < 10;
-      QuizzerLogger.logMessage("lowRevisionScoreCondition evaluates to -> $lowRevisionScoreCondition (count: $revisionScoreZeroCount)");
       
-      // Return true if condition is met (we need more questions in circulation)
-      final bool shouldAdd = lowRevisionScoreCondition;
-      QuizzerLogger.logMessage("shouldAdd evaluates to -> $shouldAdd");
+      final result = await db.rawQuery(sql, whereArgs);
+      final int count = result.first['count'] as int;
+      
+      // FIXME higher threshold set, since model is not quite accurate yet:
+      final bool shouldAdd = count < 100;
+      QuizzerLogger.logMessage("shouldAdd -> $shouldAdd (count: $count)");
       return shouldAdd;
-    } catch (e) {
-      QuizzerLogger.logError('Error in CirculationWorker _shouldAddNewQuestion - $e');
-      rethrow;
+    } finally {
+      getDatabaseMonitor().releaseDatabaseAccess();
     }
   }
 

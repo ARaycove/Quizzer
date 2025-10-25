@@ -174,6 +174,9 @@ class OutboundSyncWorker {
     // 12. Check and Sync User Feedback
     await syncUserFeedback();
 
+    // 13. Check and Sync User Daily Stats
+    await syncUserDailyStats();
+
     QuizzerLogger.logMessage('All outbound sync functions completed.');
   }
   // ----------------------

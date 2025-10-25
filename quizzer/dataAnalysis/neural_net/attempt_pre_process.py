@@ -109,6 +109,7 @@ def flatten_attempts_dataframe(df: pd.DataFrame) -> pd.DataFrame:
         "time_stamp", "question_id", "participant_id", 
         "last_revised_date", "time_of_presentation"
     ]
+    
     processed_df = processed_df.drop(columns=[col for col in columns_to_drop if col in processed_df.columns])
     
     # unpack user_stats_vector
@@ -117,38 +118,23 @@ def flatten_attempts_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     # unpack user_stats_revision_streak_sum
     processed_df = flatten_revision_streak_sum(processed_df, "rs")
 
-    # unpack module_performance_vector
-    processed_df = flatten_module_performance_vector(processed_df, "mvec")
+    # unpack module_performance_vector -> moving to topic model, omitted for now #FIXME
+    # processed_df = flatten_module_performance_vector(processed_df, "mvec")
 
     # unpack user_profile_record
     processed_df = flatten_user_profile_record(processed_df, "up")
 
     # unpack question_vector
     processed_df = flatten_question_vector(processed_df, "qv")
-    
+
+    # unpack knn_performance_vector
+    processed_df = flatten_knn_performance_vector(processed_df, "knn")
+
     # Drop additional unwanted columns after unpacking
     additional_drops = [
         "user_stats_user_id", "user_stats_record_date", 
         "user_stats_last_modified_timestamp", "up_birth_date",
         "user_stats_has_been_synced", "user_stats_edits_are_synced",
-        "module_name_bio 160", # bio 160, was misnamed, a course title, not even a subject category, this vector get's stripped
-        "mvec_bio 160_num_fitb", "mvec_bio 160_num_total",  "mvec_bio 160_overall_accuracy",
-        "mvec_bio 160_num_mcq", "mvec_bio 160_num_mcq", "mvec_bio 160_num_tf", "mvec_bio 160_days_since_last_seen",
-        "mvec_bio 160_total_attempts", "mvec_bio 160_total_correct_attempts", "mvec_bio 160_total_incorrect_attempts",
-        "mvec_bio 160_total_seen","mvec_bio 160_avg_attempts_per_question", "mvec_bio 160_avg_reaction_time",
-        "mvec_bio 160_percentage_seen",
-        
-        "module_name_chemistry and strcutural biology", # Typo module name get's stripped (just noise)
-        "mvec_chemistry and strcutural biology_days_since_last_seen",
-         
-         
-        "module_name_math", # Generic math module, noisy, serves as a catch all for unclassified math shit
-        "mvec_math_num_fitb", "mvec_math_num_mcq", "mvec_math_num_total", "mvec_math_total_attempts",
-        "mvec_math_total_correct_attempts", "mvec_math_total_incorrect_attempts", "mvec_math_total_seen",
-        "mvec_math_avg_attempts_per_question", "mvec_math_avg_reaction_time", "mvec_math_days_since_last_seen",
-        "mvec_math_overall_accuracy", "mvec_math_percentage_seen"
-
-        
 
         # Noisy Stats, not really related to accuracy
         "user_stats_total_non_circ_questions", "user_stats_total_in_circ_questions", "user_stats_total_eligible_questions",
@@ -322,31 +308,45 @@ def flatten_question_vector(df: pd.DataFrame, prefix: str) -> pd.DataFrame:
 
 def handle_nulls(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Handles null values by filling all NaN values with 0.
+    Handles null values by filling with specified defaults per field pattern.
     
     Args:
         df: DataFrame with flattened features
         
     Returns:
-        DataFrame with all nulls filled with 0
+        DataFrame with all nulls filled according to default rules
     """
     df = df.copy()
-    df = df.fillna(0)
-    print("Filled all NaN values with 0")
+    
+    # Define default values for specific field patterns
+    field_defaults = {
+        '_was_first_attempt': 1,
+    }
+    
+    # Apply pattern-based defaults
+    for col in df.columns:
+        default_value = 0  # Global default
+        
+        # Check if column matches any pattern
+        for pattern, value in field_defaults.items():
+            if pattern in col:
+                default_value = value
+                break
+        
+        # Fill nulls with determined default
+        if df[col].isnull().any():
+            df[col] = df[col].fillna(default_value)
+    
+    print(f"Filled NaN values with pattern-based defaults")
+    print(f"  - Global default: 0")
+    for pattern, value in field_defaults.items():
+        affected_cols = [col for col in df.columns if pattern in col]
+        if affected_cols:
+            print(f"  - '{pattern}' fields: {value} ({len(affected_cols)} columns)")
+    
     return df
 
 def oneHotEncodeDataframe(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    One-hot encodes categorical columns, handling nulls as separate categories.
-    For user profile fields, fills nulls with 'unknown' before encoding to 
-    create clean category names instead of 'nan'.
-    
-    Args:
-        df: DataFrame with categorical features to encode
-        
-    Returns:
-        DataFrame with categorical features one-hot encoded
-    """
     df = df.copy()
     
     # Find categorical columns
@@ -357,10 +357,10 @@ def oneHotEncodeDataframe(df: pd.DataFrame) -> pd.DataFrame:
     if not categorical_cols:
         return df
     
-    # Fill nulls in user profile columns with 'unknown' for cleaner encoding
+    # Replace numeric values in categorical columns with NaN, then fill all NaN with 'missing'
     for col in categorical_cols:
-        if col.startswith('up_'):
-            df[col] = df[col].fillna('unknown')
+        df[col] = df[col].apply(lambda x: np.nan if isinstance(x, (int, float)) else x)
+        df[col] = df[col].fillna('missing')
     
     # One-hot encode
     encoder = OneHotEncoder(sparse_output=False, handle_unknown='ignore')
@@ -512,53 +512,32 @@ def apply_smote_balancing(X_train: pd.DataFrame, y_train: pd.Series,
     
     return X_train_balanced, y_train_balanced
 
-def load_model_and_transform_test_data(model_path='global_best_model.tflite', 
-                                       feature_map_path='input_feature_map.json',
-                                       X_test=None):
+def load_model_and_transform_test_data(X_train=None, X_test=None, y_train=None, y_test=None, model_path='global_best_model.tflite', feature_map_path='input_feature_map.json'):
     """
     Load saved .tflite model and transform X_test into proper vector format.
-    
-    Args:
-        model_path: Path to saved .tflite model file
-        feature_map_path: Path to saved feature map JSON
-        X_test: Test data DataFrame to transform
-        
-    Returns:
-        Tuple of (interpreter, X_test_transformed)
+    If model doesn't exist, retrain from best params in top results.
     """
-    # Load the TFLite model
+    
     interpreter = tf.lite.Interpreter(model_path=model_path)
     interpreter.allocate_tensors()
     
-    # Load feature map
     with open(feature_map_path, 'r') as f:
         feature_map = json.load(f)
     
-    # Get expected feature order from feature map
     expected_features = sorted(feature_map.items(), key=lambda x: x[1]['pos'])
     feature_order = [feat[0] for feat in expected_features]
     n_features = len(feature_order)
     
-    # Transform X_test to match expected feature order and fill missing features
     X_test_transformed = np.zeros((len(X_test), n_features))
-    
     for feature_name, feature_info in feature_map.items():
         pos = feature_info['pos']
         default_value = feature_info['default_value']
-        
         if feature_name in X_test.columns:
             X_test_transformed[:, pos] = X_test[feature_name].fillna(default_value).values
         else:
             X_test_transformed[:, pos] = default_value
     
-    # Convert back to DataFrame with proper column names and preserve original index
     X_test_transformed = pd.DataFrame(X_test_transformed, columns=feature_order, index=X_test.index)
-    
-    print(f"Model loaded from: {model_path}")
-    print(f"Feature map loaded from: {feature_map_path}")
-    print(f"Transformed test data shape: {X_test_transformed.shape}")
-    print(f"Expected features: {n_features}")
-    
     return interpreter, X_test_transformed
 
 
@@ -638,3 +617,89 @@ def push_model_to_supabase(model_name, metrics, model_path='global_best_model.tf
     except Exception as e:
         print(f"Error updating database: {e}")
         return None
+    
+def flatten_knn_performance_vector(df: pd.DataFrame, prefix: str) -> pd.DataFrame:
+    if 'knn_performance_vector' not in df.columns:
+        return df
+    
+    # Fields to exclude from unpacking
+    excluded_fields = {'time_of_presentation', 'last_revised_date'}
+    
+    parsed_series = df['knn_performance_vector'].apply(lambda x: json.loads(x) if isinstance(x, str) else x)
+    
+    max_neighbors = 0
+    all_fields = set()
+    for knn_list in parsed_series:
+        if isinstance(knn_list, list):
+            max_neighbors = max(max_neighbors, len(knn_list))
+            for neighbor in knn_list:
+                if isinstance(neighbor, dict):
+                    all_fields.update(neighbor.keys())
+    
+    # Remove excluded fields
+    all_fields = all_fields - excluded_fields
+    
+    knn_data = []
+    for knn_list in parsed_series:
+        row_data = {}
+        
+        # Add is_missing flag for entire vector
+        if knn_list is None or not isinstance(knn_list, list) or len(knn_list) == 0:
+            row_data[f"{prefix}_vector_is_missing"] = 1
+        else:
+            row_data[f"{prefix}_vector_is_missing"] = 0
+        
+        if isinstance(knn_list, list):
+            for i, neighbor in enumerate(knn_list):
+                neighbor_num = str(i + 1).zfill(2)
+                if isinstance(neighbor, dict):
+                    for field in all_fields:
+                        value = neighbor.get(field, 0)
+                        # Convert booleans to integers
+                        if isinstance(value, bool):
+                            value = 1 if value else 0
+                        row_data[f"{prefix}_{neighbor_num}_{field}"] = value
+        
+        for i in range(max_neighbors):
+            neighbor_num = str(i + 1).zfill(2)
+            for field in all_fields:
+                col_name = f"{prefix}_{neighbor_num}_{field}"
+                if col_name not in row_data:
+                    row_data[col_name] = 0
+        
+        knn_data.append(row_data)
+    
+    flattened_df = pd.DataFrame(knn_data)
+    
+    return pd.concat([
+        df.drop(columns=['knn_performance_vector']).reset_index(drop=True), 
+        flattened_df.reset_index(drop=True)
+    ], axis=1)
+
+
+def drop_features(df, features_to_drop=None, prefixes_to_drop=None):
+    """
+    Drop specified features from dataframe.
+    
+    Args:
+        df: pandas DataFrame
+        features_to_drop: list of column names to drop (default: empty list)
+        prefixes_to_drop: list of prefixes - drops all columns starting with these (default: empty list)
+    
+    Returns:
+        DataFrame with specified features removed
+    """
+    if features_to_drop is None:
+        features_to_drop = []
+    if prefixes_to_drop is None:
+        prefixes_to_drop = []
+    
+    # Drop exact column names
+    df = df.drop(columns=features_to_drop, errors='ignore')
+    
+    # Drop columns with specified prefixes
+    for prefix in prefixes_to_drop:
+        cols_to_drop = [col for col in df.columns if col.startswith(prefix)]
+        df = df.drop(columns=cols_to_drop, errors='ignore')
+    
+    return df

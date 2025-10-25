@@ -49,6 +49,9 @@ def train_and_save_batch_configs(config_batch, X_train, y_train, X_test, y_test,
         
         model = create_quizzer_neural_network(
             input_dim=input_features,
+            train_samples=len(X_train_smote),
+            epochs=params['epochs'],
+            batch_size=params['batch_size'],
             layer_width=params['layer_width'],
             reduction_percent=params['reduction_percent'],
             stop_condition=params['stop_condition'],
@@ -65,10 +68,10 @@ def train_and_save_batch_configs(config_batch, X_train, y_train, X_test, y_test,
             validation_split=0.2,
             epochs=params['epochs'],
             batch_size=params['batch_size'],
-            verbose=0
+            verbose=1
         )
         
-        test_loss, test_accuracy, test_precision, test_recall = model.evaluate(X_test, y_test, verbose=0)
+        test_loss, test_accuracy, test_precision, test_recall = model.evaluate(X_test, y_test, verbose=1)
         
         y_pred_prob = model.predict(X_test, verbose=0)
         y_pred_prob_flat = y_pred_prob.flatten()
@@ -105,11 +108,28 @@ def train_and_save_batch_configs(config_batch, X_train, y_train, X_test, y_test,
         f1_class_1 = f1_score(y_test, y_pred, pos_label=1)
         bacc = balanced_accuracy_score(y_test, y_pred)
         
+        # Calculate Expected Calibration Error (ECE)
+        n_bins = 10
+        bin_boundaries = np.linspace(0, 1, n_bins + 1)
+        bin_lowers = bin_boundaries[:-1]
+        bin_uppers = bin_boundaries[1:]
+        
+        ece = 0.0
+        for bin_lower, bin_upper in zip(bin_lowers, bin_uppers):
+            in_bin = (y_pred_prob_flat > bin_lower) & (y_pred_prob_flat <= bin_upper)
+            prop_in_bin = np.mean(in_bin)
+            if prop_in_bin > 0:
+                accuracy_in_bin = np.mean(y_test[in_bin])
+                avg_confidence_in_bin = np.mean(y_pred_prob_flat[in_bin])
+                ece += np.abs(avg_confidence_in_bin - accuracy_in_bin) * prop_in_bin
+        
         # Loss penalty: inverse of (1 + test_loss) to penalize high loss
         loss_penalty = 1 / (1 + test_loss)
         
-        # Harmonic mean of roc_auc, f1_class_0, f1_class_1, and loss_penalty
-        metrics = [roc_auc, f1_class_0, f1_class_1, loss_penalty]
+        # Normalize mean_discrimination by prob_range for relative separation measure
+        mean_discrimination = mean_discrimination / prob_range if prob_range > 0 else 0
+        
+        metrics = [roc_auc, f1_class_0, f1_class_1, loss_penalty, mean_discrimination]
         if all(m > 0 for m in metrics):
             composite_score = len(metrics) / sum(1/m for m in metrics)
         else:
@@ -141,7 +161,8 @@ def train_and_save_batch_configs(config_batch, X_train, y_train, X_test, y_test,
             'test_recall': test_recall,
             'balanced_accuracy': bacc,
             'f1_class_0': f1_class_0,
-            'f1_class_1': f1_class_1
+            'f1_class_1': f1_class_1,
+            'ece': ece
         }
         
         update_top_results(result, model)
@@ -150,6 +171,7 @@ def train_and_save_batch_configs(config_batch, X_train, y_train, X_test, y_test,
         if n_search > 0:
             print(f"Progress: {total_iterations}/{n_search} iterations completed ({100 * total_iterations / n_search:.1f}%)")
 
+            
 def update_top_results(result, model=None):
     if os.path.exists('grid_search_top_results.csv'):
         top_results = pd.read_csv('grid_search_top_results.csv')
@@ -279,7 +301,7 @@ def grid_search_quizzer_model(X_train, y_train, X_test, y_test, n_search=200, ba
     previous_configs = _load_previous_configs()
     
     reduction_percent = []
-    i = 0.90
+    i = 0.85
     while True:
         reduction_percent.append(i)
         i += 0.001
@@ -291,17 +313,21 @@ def grid_search_quizzer_model(X_train, y_train, X_test, y_test, n_search=200, ba
         'layer_width': [1,2,3,4,5], # increases depth of network range  # 1, 2, 3, 4, 
         'reduction_percent': reduction_percent,
         'stop_condition': [5, 10, 15, 20, 25],
-        'dropout_rate': [0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5], # , 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95
+        'dropout_rate': [0.05, 0.10, .15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95],
         'focal_gamma': [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5],
         'focal_alpha': [0.05, 0.1, 0.15, 0.20, 0.25, 0.30, 0.35, 0.4, 0.45, 0.5],
         
         # SMOTE parameters
-        'sampling_strategy': ['minority', 0.7, 0.75, 0.8, 0.85, 0.9, 0.95], # 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 
-        'k_neighbors': [2, 3, 4, 5], # k >= 6 did not make it into top results
+        'sampling_strategy': ['minority', 0.9, 0.95], # 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85,  
+        'k_neighbors': [5, 10], # k >= 6 did not make it into top results
         
         # Training parameters
-        'epochs': [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100], # Reduce training times: ,  , 
-        'batch_size': [32, 48, 64, 80, 96, 112, 128], # 8, 16, 
+        # Trying larger epochs, larger batch sizes
+        # Based on the output, we need a specific amount of 
+        # 5,10,20,30,40, 
+        'epochs': [10,20,30,40,50],
+        # ,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,300,400,500,600,700,800,900,1000
+        'batch_size': [256], # 8, 16, 128
         
         # Random seed parameter
         'random_state': [42]
@@ -359,8 +385,6 @@ def grid_search_quizzer_model(X_train, y_train, X_test, y_test, n_search=200, ba
         config_batch = all_configs[batch_start:batch_end]
         
         print(f"Random Sample Batch {batch_start+1}-{batch_end}/{n_search}")
-        for i, params in enumerate(config_batch, start=batch_start+1):
-            print(f"  Sample {i}: layer_width={params['layer_width']}, reduction={params['reduction_percent']}, dropout={params['dropout_rate']}")
         
         p = Process(
             target=train_and_save_batch_configs,

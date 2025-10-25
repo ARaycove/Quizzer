@@ -1,14 +1,11 @@
 import 'dart:math';
-import 'dart:convert'; 
 import 'package:quizzer/backend_systems/08_memory_retention_algo/memory_retention_algorithm.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_attempts_table.dart' as attempt_table;
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart'; // Logger needed for debugging
 import 'package:supabase/supabase.dart'; // For supabase.Session type
 import 'package:jwt_decode/jwt_decode.dart'; // For decoding JWT
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_question_answer_pairs_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart'; // Import for getDatabaseMonitor
-import 'package:quizzer/backend_systems/00_database_manager/tables/table_helper.dart'; // Import the helper file
-
+import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
 
 // ==========================================
 // Helper Function for Recording Answer Attempt
@@ -16,11 +13,16 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/table_helper.
 // This file contains helper functions for the session manager. 
 // These functions help to reduce the lines of code in the SessionManager class itself. This should simplify the SessionManager class and make it easier to maintain.
 
-Future<void> recordQuestionAnswerAttempt({
+Future<Map<String, dynamic>?> recordQuestionAnswerAttempt({
   required String userId,
   required String questionId,
-  required bool isCorrect,
+  bool? isCorrect,
+  bool forInference = false,
 }) async {
+  if (!forInference && isCorrect == null) {
+    throw ArgumentError('isCorrect is required when forInference is false');
+  }
+  
   try {
     QuizzerLogger.logMessage('Entering recordQuestionAnswerAttempt()...');
     
@@ -34,275 +36,85 @@ Future<void> recordQuestionAnswerAttempt({
     // ===================================
     // Query 1: Question Metadata
     // ===================================
-    const questionMetadataQuery = '''
-      SELECT 
-        question_vector,
-        module_name,
-        question_type,
-        options,
-        question_elements
-      FROM question_answer_pairs
-      WHERE question_id = ?
-      LIMIT 1
-    ''';
+    final Map<String, dynamic> questionMetadata = await attempt_table.fetchQuestionMetadata(
+      db: db,
+      questionId: questionId,
+    );
     
-    final List<Map<String, dynamic>> questionResults = await db.rawQuery(questionMetadataQuery, [questionId]);
-    
-    if (questionResults.isEmpty) {
-      throw Exception('Question not found: $questionId');
-    }
-    
-    final Map<String, dynamic> questionData = questionResults.first;
-    
-    // Extract question vector (if exists)
-    final String? questionVector = questionData['question_vector'] as String?;
-    
-    // Extract basic question info
-    final String moduleName = questionData['module_name'] as String;
-    final String questionType = questionData['question_type'] as String;
-    
-    // Calculate option counts based on question type and data
-    int numMcqOptions = 0;
-    int numSoOptions = 0;
-    int numSataOptions = 0;
-    int numBlanks = 0;
-    
-    if (questionType == 'multiple_choice' || questionType == 'select_all_that_apply' || questionType == 'sort_order') {
-      final String? optionsJson = questionData['options'] as String?;
-      if (optionsJson != null) {
-        final List<dynamic> options = decodeValueFromDB(optionsJson);
-        final int optionCount = options.length;
-        
-        switch (questionType) {
-          case 'multiple_choice':
-            numMcqOptions = optionCount;
-            break;
-          case 'select_all_that_apply':
-            numSataOptions = optionCount;
-            break;
-          case 'sort_order':
-            numSoOptions = optionCount;
-            break;
-        }
-      }
-    } else if (questionType == 'fill_in_the_blank') {
-      // Count blank elements in question_elements
-      final String? questionElementsJson = questionData['question_elements'] as String?;
-      if (questionElementsJson != null) {
-        final List<dynamic> questionElements = decodeValueFromDB(questionElementsJson);
-        numBlanks = questionElements.where((element) => 
-          element is Map && element['type'] == 'blank'
-        ).length;
-      }
-    }
+    final String? questionVector = questionMetadata['question_vector'] as String?;
+    final String moduleName = questionMetadata['module_name'] as String;
+    final String questionType = questionMetadata['question_type'] as String;
+    final int numMcqOptions = questionMetadata['num_mcq_options'] as int;
+    final int numSoOptions = questionMetadata['num_so_options'] as int;
+    final int numSataOptions = questionMetadata['num_sata_options'] as int;
+    final int numBlanks = questionMetadata['num_blanks'] as int;
+    final String? kNearestNeighbors = questionMetadata['k_nearest_neighbors'] as String?;
     
     // ===================================
     // Query 2: Individual Question Performance
     // ===================================
-    const userQuestionQuery = '''
-      SELECT 
-        avg_reaction_time,
-        total_correct_attempts,
-        total_incorect_attempts,
-        total_attempts,
-        question_accuracy_rate,
-        revision_streak,
-        last_revised,
-        day_time_introduced
-      FROM user_question_answer_pairs
-      WHERE user_uuid = ? AND question_id = ?
-      LIMIT 1
-    ''';
+    final Map<String, dynamic> userQuestionPerformance = await attempt_table.fetchUserQuestionPerformance(
+      db: db,
+      userId: userId,
+      questionId: questionId,
+      timeStamp: timeStamp,
+    );
     
-    final List<Map<String, dynamic>> userQuestionResults = await db.rawQuery(userQuestionQuery, [userId, questionId]);
+    final double avgReactTime = userQuestionPerformance['avg_react_time'] as double;
+    final bool wasFirstAttempt = userQuestionPerformance['was_first_attempt'] as bool;
+    final int totalCorrectAttempts = userQuestionPerformance['total_correct_attempts'] as int;
+    final int totalIncorrectAttempts = userQuestionPerformance['total_incorrect_attempts'] as int;
+    final int totalAttempts = userQuestionPerformance['total_attempts'] as int;
+    final double accuracyRate = userQuestionPerformance['accuracy_rate'] as double;
+    final int revisionStreak = userQuestionPerformance['revision_streak'] as int;
+    final String timeOfPresentation = userQuestionPerformance['time_of_presentation'] as String;
+    final String? lastRevisedDate = userQuestionPerformance['last_revised_date'] as String?;
+    final double daysSinceLastRevision = userQuestionPerformance['days_since_last_revision'] as double;
+    final double daysSinceFirstIntroduced = userQuestionPerformance['days_since_first_introduced'] as double;
+    final double attemptDayRatio = userQuestionPerformance['attempt_day_ratio'] as double;
     
-    if (userQuestionResults.isEmpty) {
-      throw Exception('User question pair not found: userId=$userId, questionId=$questionId');
-    }
-    
-    final Map<String, dynamic> userQuestionData = userQuestionResults.first;
-    
-    // Extract performance metrics
-    final double avgReactTime = userQuestionData['avg_reaction_time'] as double? ?? 0.0;
-    final int totalCorrectAttempts = userQuestionData['total_correct_attempts'] as int? ?? 0;
-    final int totalIncorrectAttempts = userQuestionData['total_incorect_attempts'] as int? ?? 0;
-    final int totalAttempts = userQuestionData['total_attempts'] as int? ?? 0;
-    final double accuracyRate = userQuestionData['question_accuracy_rate'] as double? ?? 0.0;
-    final int revisionStreak = userQuestionData['revision_streak'] as int? ?? 0;
-    final String? lastRevisedDate = userQuestionData['last_revised'] as String?;
-    final String? dayTimeIntroduced = userQuestionData['day_time_introduced'] as String?;
-    
-    // Calculate temporal metrics at time of recording
-    final String timeOfPresentation = timeStamp;
-    final bool wasFirstAttempt = totalAttempts == 0;
-    
-    // Calculate days since last revision
-    double daysSinceLastRevision = 0.0;
-    if (lastRevisedDate != null) {
-      final DateTime lastRevised = DateTime.parse(lastRevisedDate);
-      final DateTime now = DateTime.parse(timeStamp);
-      daysSinceLastRevision = now.difference(lastRevised).inMicroseconds / Duration.microsecondsPerDay;
-    }
-    
-    // Calculate days since first introduced
-    double daysSinceFirstIntroduced = 0.0;
-    double attemptDayRatio = 0.0;
-    if (dayTimeIntroduced != null) {
-      final DateTime firstIntroduced = DateTime.parse(dayTimeIntroduced);
-      final DateTime now = DateTime.parse(timeStamp);
-      daysSinceFirstIntroduced = now.difference(firstIntroduced).inMicroseconds / Duration.microsecondsPerDay;
-      
-      // Calculate attempt day ratio (avoid division by zero)
-      if (daysSinceFirstIntroduced > 0) {
-        attemptDayRatio = totalAttempts / daysSinceFirstIntroduced;
-      }
-    }
     
     // ===================================
     // Query 3: User Stats Vector
     // ===================================
-    final String today = DateTime.now().toUtc().toIso8601String().substring(0, 10);
-    
-    const userStatsQuery = '''
-      SELECT *
-      FROM user_daily_stats
-      WHERE user_id = ? AND record_date = ?
-      LIMIT 1
-    ''';
-    
-    final List<Map<String, dynamic>> userStatsResults = await db.rawQuery(userStatsQuery, [userId, today]);
-    
-    String? userStatsVector;
-    if (userStatsResults.isNotEmpty) {
-      userStatsVector = jsonEncode(userStatsResults.first);
-    }
+    final String? userStatsVector = await attempt_table.fetchUserStatsVector(
+      db: db,
+      userId: userId,
+    );
     
     // ===================================
     // Query 4: Module Performance Vector
     // ===================================
-    const modulePerformanceQuery = '''
-      SELECT 
-        module_name,
-        num_mcq,
-        num_fitb,
-        num_sata,
-        num_tf,
-        num_so,
-        num_total,
-        total_seen,
-        percentage_seen,
-        total_correct_attempts,
-        total_incorrect_attempts,
-        total_attempts,
-        overall_accuracy,
-        avg_attempts_per_question,
-        avg_reaction_time
-      FROM user_module_activation_status
-      WHERE user_id = ?
-      ORDER BY module_name
-    ''';
-    
-    final List<Map<String, dynamic>> modulePerformanceResults = await db.rawQuery(modulePerformanceQuery, [userId]);
-    
-    String? modulePerformanceVector;
-    if (modulePerformanceResults.isNotEmpty) {
-      // Calculate days_since_last_seen for each module and add to records
-      final DateTime now = DateTime.parse(timeStamp);
-      
-      // Get last seen dates for all user modules in a single query
-      const lastSeenQuery = '''
-        SELECT 
-          qap.module_name,
-          MAX(uqap.last_revised) as last_seen_date
-        FROM user_question_answer_pairs uqap
-        INNER JOIN question_answer_pairs qap ON uqap.question_id = qap.question_id
-        WHERE uqap.user_uuid = ?
-        GROUP BY qap.module_name
-      ''';
-      
-      final List<Map<String, dynamic>> lastSeenResults = await db.rawQuery(lastSeenQuery, [userId]);
-      
-      // Create map of module_name -> last_seen_date for quick lookup
-      final Map<String, String?> moduleLastSeen = {};
-      for (final result in lastSeenResults) {
-        moduleLastSeen[result['module_name'] as String] = result['last_seen_date'] as String?;
-      }
-      
-      // Process each module performance record
-      final List<Map<String, dynamic>> processedModuleRecords = [];
-      for (final moduleRecord in modulePerformanceResults) {
-        final Map<String, dynamic> processedRecord = Map<String, dynamic>.from(moduleRecord);
-        final String moduleNameKey = moduleRecord['module_name'] as String;
-        
-        // Calculate days_since_last_seen
-        double daysSinceLastSeen = 0.0;
-        final String? lastSeenDateStr = moduleLastSeen[moduleNameKey];
-        if (lastSeenDateStr != null) {
-          final DateTime lastSeenDate = DateTime.parse(lastSeenDateStr);
-          daysSinceLastSeen = now.difference(lastSeenDate).inMicroseconds / Duration.microsecondsPerDay;
-        }
-        
-        processedRecord['days_since_last_seen'] = daysSinceLastSeen;
-        processedModuleRecords.add(processedRecord);
-      }
-      
-      modulePerformanceVector = jsonEncode(processedModuleRecords);
-    }
+    const String? modulePerformanceVector = null;
+    // TODO - This can't be done until the topic model is tuned
+    // final String? modulePerformanceVector = await attempt_table.fetchModulePerformanceVector(
+    //   db: db,
+    //   userId: userId,
+    //   timeStamp: timeStamp,
+    // );
     
     // ===================================
     // Query 5: User Profile Record
     // ===================================
-    const userProfileQuery = '''
-      SELECT 
-        highest_level_edu,
-        undergrad_major,
-        undergrad_minor,
-        grad_major,
-        years_since_graduation,
-        education_background,
-        teaching_experience,
-        profile_picture,
-        country_of_origin,
-        current_country,
-        current_state,
-        current_city,
-        urban_rural,
-        religion,
-        political_affilition,
-        marital_status,
-        num_children,
-        veteran_status,
-        native_language,
-        secondary_languages,
-        num_languages_spoken,
-        birth_date,
-        age,
-        household_income,
-        learning_disabilities,
-        physical_disabilities,
-        housing_situation,
-        birth_order,
-        current_occupation,
-        years_work_experience,
-        hours_worked_per_week,
-        total_job_changes
-      FROM user_profile
-      WHERE uuid = ?
-      LIMIT 1
-    ''';
-    
-    final List<Map<String, dynamic>> userProfileResults = await db.rawQuery(userProfileQuery, [userId]);
-    
-    String? userProfileRecord;
-    if (userProfileResults.isNotEmpty) {
-      userProfileRecord = jsonEncode(userProfileResults.first);
-    }
-    
+    final String? userProfileRecord = await attempt_table.fetchUserProfileRecord(
+      db: db,
+      userId: userId,
+    );
+
     // ===================================
-    // Prepare Data for Insert
+    // Query 6: K Nearest Performance Vector
     // ===================================
-    final Map<String, dynamic> additionalFields = {
-      'response_result': isCorrect ? 1 : 0,
+    final String? kNearestPerformanceVector = await attempt_table.fetchKNearestPerformanceVector(
+      db: db,
+      userId: userId,
+      kNearestNeighbors: kNearestNeighbors,
+      timeStamp: timeStamp,
+    );
+
+    // ===================================
+    // Prepare Data for Insert/Return
+    // ===================================
+    final Map<String, dynamic> sampleData = {
       'module_name': moduleName,
       'question_type': questionType,
       'num_mcq_options': numMcqOptions,
@@ -325,38 +137,60 @@ Future<void> recordQuestionAnswerAttempt({
       'attempt_day_ratio': attemptDayRatio,
     };
     
+    // Add response_result only if not for inference
+    if (!forInference) {
+      sampleData['response_result'] = isCorrect! ? 1 : 0;
+    }
+    
     // Add question_vector if it exists
     if (questionVector != null) {
-      additionalFields['question_vector'] = questionVector;
+      sampleData['question_vector'] = questionVector;
+    }
+    
+    // Add k_nearest_neighbors if it exists
+    if (kNearestNeighbors != null) {
+      sampleData['k_nearest_neighbors'] = kNearestNeighbors;
     }
     
     // Add user_stats_vector if it exists
     if (userStatsVector != null) {
-      additionalFields['user_stats_vector'] = userStatsVector;
+      sampleData['user_stats_vector'] = userStatsVector;
     }
     
     // Add module_performance_vector if it exists
     if (modulePerformanceVector != null) {
-      additionalFields['module_performance_vector'] = modulePerformanceVector;
+      sampleData['module_performance_vector'] = modulePerformanceVector;
     }
     
     // Add user_profile_record if it exists
     if (userProfileRecord != null) {
-      additionalFields['user_profile_record'] = userProfileRecord;
+      sampleData['user_profile_record'] = userProfileRecord;
     }
     
-    // Release database access before calling table function
-    getDatabaseMonitor().releaseDatabaseAccess();
- 
-    // Insert the training sample (this function gets its own db access)
-    await attempt_table.addQuestionAnswerAttempt(
-      questionId: questionId,
-      participantId: userId,
-      timeStamp: timeStamp,
-      additionalFields: additionalFields,
-    );
+    // Add k_nearest_performance_vector if it exists
+    if (kNearestPerformanceVector != null) {
+      sampleData['knn_performance_vector'] = kNearestPerformanceVector;
+    }
     
-    QuizzerLogger.logMessage('Successfully recorded question answer attempt for QID: $questionId');
+    // Release database access before proceeding
+    getDatabaseMonitor().releaseDatabaseAccess();
+    
+    if (forInference) {
+      // Return the sample for inference
+      QuizzerLogger.logMessage('Successfully generated inference sample for QID: $questionId');
+      return sampleData;
+    } else {
+      // Insert the training sample (this function gets its own db access)
+      await attempt_table.addQuestionAnswerAttempt(
+        questionId: questionId,
+        participantId: userId,
+        timeStamp: timeStamp,
+        additionalFields: sampleData,
+      );
+      
+      QuizzerLogger.logMessage('Successfully recorded question answer attempt for QID: $questionId');
+      return null;
+    }
   } catch (e) {
     QuizzerLogger.logError('Error in recordQuestionAnswerAttempt - $e');
     // Make sure we release the connection even if there's an error
@@ -591,6 +425,7 @@ Future<void> updateUserQuestionRecordOnAnswer({
         'total_incorect_attempts': newTotalIncorrectAttempts,
         'question_accuracy_rate': newQuestionAccuracyRate,
         'question_inaccuracy_rate': newQuestionInaccuracyRate,
+        'last_prob_calc': DateTime.utc(1970, 1, 1).toIso8601String() // Immediately trigger this question to be re-evaluated by the accuracy net
       };
     // QuizzerLogger.logMessage("Individual Question Record Updated, feed is:");
     // updateData.forEach((key, value) {

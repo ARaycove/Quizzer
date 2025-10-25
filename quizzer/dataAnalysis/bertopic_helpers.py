@@ -5,6 +5,224 @@ from transformers import BlipProcessor, BlipForConditionalGeneration
 from PIL import Image
 import torch
 import pytesseract
+import json
+from sklearn.neighbors import NearestNeighbors
+from docx import Document
+from docx.shared import Pt, RGBColor
+from docx.enum.text import WD_ALIGN_PARAGRAPH
+import re
+from pylatexenc import macrospec, latexwalker, latex2text
+from pylatexenc.latexwalker import LatexMacroNode, LatexGroupNode, LatexCharsNode
+
+def convert_latex_to_plain_english(doc: str) -> str:
+    """
+    Converts LaTeX mathematical expressions to plain English.
+    Finds LaTeX delimited by $ or $$ and replaces with English equivalents.
+    Skips chemical notation.
+    """
+    lwc = latexwalker.get_default_latex_context_db()
+    lwc.add_context_category('powers', specials=[
+        macrospec.SpecialsSpec('^', args_parser=macrospec.MacroStandardArgsParser('{')),
+        macrospec.SpecialsSpec('_', args_parser=macrospec.MacroStandardArgsParser('{')),
+    ])
+    
+    def process_node(node):
+        """Recursively process a single LaTeX node to English."""
+        if isinstance(node, LatexCharsNode):
+            text = node.chars
+            text = text.replace('+', ' plus ')
+            text = text.replace('-', ' minus ')
+            text = text.replace('=', ' equals ')
+            text = text.replace('/', ' divided by ')
+            text = text.replace('*', ' times ')
+            text = text.replace('%', ' percent ')
+            text = text.replace('<', ' less than ')
+            text = text.replace('>', ' greater than ')
+            text = text.replace('(', ' open parenthesis ')
+            text = text.replace(')', ' close parenthesis ')
+            return text
+        
+        if isinstance(node, LatexGroupNode):
+            return ''.join(process_node(n) for n in node.nodelist)
+        
+        if isinstance(node, latexwalker.LatexSpecialsNode):
+            if node.specials_chars == '^':
+                if node.nodeargd and hasattr(node.nodeargd, 'argnlist') and len(node.nodeargd.argnlist) > 0:
+                    power = process_node(node.nodeargd.argnlist[0])
+                    return f' to the power of {power}'
+                return ' to the power of '
+            elif node.specials_chars == '_':
+                if node.nodeargd and hasattr(node.nodeargd, 'argnlist') and len(node.nodeargd.argnlist) > 0:
+                    sub = process_node(node.nodeargd.argnlist[0])
+                    return f' subscript {sub}'
+                return ' subscript '
+        
+        if isinstance(node, LatexMacroNode):
+            macro = node.macroname
+            
+            if macro == 'int':
+                return ' integral '
+            elif macro == 'sum':
+                return ' summation '
+            elif macro == 'prod':
+                return ' product '
+            elif macro == 'lim':
+                return ' limit '
+            elif macro == 'frac':
+                if node.nodeargd and hasattr(node.nodeargd, 'argnlist') and len(node.nodeargd.argnlist) >= 2:
+                    num = process_node(node.nodeargd.argnlist[0])
+                    denom = process_node(node.nodeargd.argnlist[1])
+                    return f' {num} divided by {denom} '
+                return ' fraction '
+            elif macro == 'sqrt':
+                if node.nodeargd and hasattr(node.nodeargd, 'argnlist') and len(node.nodeargd.argnlist) > 0:
+                    arg = process_node(node.nodeargd.argnlist[0])
+                    return f' square root of {arg} '
+                return ' square root '
+            elif macro in ['cdot', 'times']:
+                return ' times '
+            elif macro == 'div':
+                return ' divided by '
+            elif macro == 'pm':
+                return ' plus or minus '
+            elif macro == 'mp':
+                return ' minus or plus '
+            elif macro == 'neq':
+                return ' not equal to '
+            elif macro == 'leq':
+                return ' less than or equal to '
+            elif macro == 'geq':
+                return ' greater than or equal to '
+            elif macro == 'approx':
+                return ' approximately equal to '
+            elif macro == 'equiv':
+                return ' equivalent to '
+            elif macro == 'propto':
+                return ' proportional to '
+            elif macro == 'infty':
+                return ' infinity '
+            elif macro == 'partial':
+                return ' partial derivative '
+            elif macro == 'nabla':
+                return ' del '
+            elif macro in ['to', 'rightarrow']:
+                return ' approaches '
+            elif macro == 'sin':
+                return ' sine '
+            elif macro == 'cos':
+                return ' cosine '
+            elif macro == 'tan':
+                return ' tangent '
+            elif macro == 'sec':
+                return ' secant '
+            elif macro == 'csc':
+                return ' cosecant '
+            elif macro == 'cot':
+                return ' cotangent '
+            elif macro == 'arcsin':
+                return ' arcsine '
+            elif macro == 'arccos':
+                return ' arccosine '
+            elif macro == 'arctan':
+                return ' arctangent '
+            elif macro == 'sinh':
+                return ' hyperbolic sine '
+            elif macro == 'cosh':
+                return ' hyperbolic cosine '
+            elif macro == 'tanh':
+                return ' hyperbolic tangent '
+            elif macro == 'log':
+                return ' logarithm '
+            elif macro == 'ln':
+                return ' natural logarithm '
+            elif macro == 'exp':
+                return ' exponential '
+            elif macro == 'max':
+                return ' maximum '
+            elif macro == 'min':
+                return ' minimum '
+            elif macro == 'sup':
+                return ' supremum '
+            elif macro == 'inf':
+                return ' infimum '
+            elif macro == 'det':
+                return ' determinant '
+            elif macro == 'gcd':
+                return ' greatest common divisor '
+            elif macro == 'arg':
+                return ' argument '
+            elif macro == 'deg':
+                return ' degree '
+            elif macro == 'dim':
+                return ' dimension '
+            elif macro == 'cup':
+                return ' union '
+            elif macro == 'cap':
+                return ' intersection '
+            elif macro == 'in':
+                return ' element of '
+            elif macro == 'notin':
+                return ' not element of '
+            elif macro in ['subset', 'subseteq']:
+                return ' subset of '
+            elif macro in ['supset', 'supseteq']:
+                return ' superset of '
+            elif macro == 'emptyset':
+                return ' empty set '
+            elif macro == 'forall':
+                return ' for all '
+            elif macro == 'exists':
+                return ' there exists '
+            elif macro == 'land':
+                return ' logical and '
+            elif macro == 'wedge':
+                return ' wedge '
+            elif macro == 'lor':
+                return ' logical or '
+            elif macro == 'vee':
+                return ' vee '
+            elif macro in ['neg', 'lnot']:
+                return ' logical not '
+            elif macro in ['implies', 'Rightarrow']:
+                return ' implies '
+            elif macro in ['iff', 'Leftrightarrow']:
+                return ' biconditional '
+            else:
+                return f' {macro} '
+        
+        if hasattr(node, 'chars'):
+            return node.chars
+        
+        return ''
+    
+    def process_latex(latex_expr):
+        latex_expr = latex_expr.strip()
+        
+        chemical_patterns = [
+            r'\b(NADH|NAD|ATP|ADP|DNA|RNA|CO2|H2O|NH3|CH4|FAD|FADH|CoA)\b',
+            r'\b[A-Z][a-z]?\d*\^?[\+\-]?\d*\b',
+        ]
+        for pattern in chemical_patterns:
+            if re.search(pattern, latex_expr):
+                return latex_expr
+        
+        try:
+            walker = latexwalker.LatexWalker(latex_expr, latex_context=lwc)
+            nodes, _, _ = walker.get_latex_nodes()
+            result = ''.join(process_node(node) for node in nodes)
+            return result
+        except:
+            return latex_expr
+    
+    pattern = r'\$\$([^\$]+)\$\$|\$([^\$]+)\$'
+    
+    def handle_match(match):
+        latex_expr = match.group(1) if match.group(1) else match.group(2)
+        result = process_latex(latex_expr)
+        return result
+    
+    processed_doc = re.sub(pattern, handle_match, doc)
+    return processed_doc
 
 
 def create_docs() -> None:
@@ -106,7 +324,7 @@ def create_docs() -> None:
                                 try:
                                     ocr_text = pytesseract.image_to_string(img_pil, config='--psm 6').strip()
                                     if ocr_text and len(ocr_text) > 3:  # Filter out noise
-                                        ocr_texts.append(f"Text from question image: {ocr_text}")
+                                        ocr_texts.append(ocr_text) # only append the text, do not add random text to mark it.
                                 except:
                                     pass  # OCR failed, continue without it
                         except Exception as e:
@@ -125,13 +343,13 @@ def create_docs() -> None:
                                 with torch.no_grad():
                                     out = model.generate(**inputs, max_length=50, num_beams=5)
                                     caption = processor.decode(out[0], skip_special_tokens=True)
-                                    image_descriptions.append(f"Answer image: {caption}")
+                                    image_descriptions.append(caption) # Additional explanatory text muddies the topic model
                                 
                                 # Extract text using OCR if image contains text
                                 try:
                                     ocr_text = pytesseract.image_to_string(img_pil, config='--psm 6').strip()
                                     if ocr_text and len(ocr_text) > 3:  # Filter out noise
-                                        ocr_texts.append(f"Text from answer image: {ocr_text}")
+                                        ocr_texts.append(ocr_text)
                                 except:
                                     pass  # OCR failed, continue without it
                         except Exception as e:
@@ -159,10 +377,10 @@ def create_docs() -> None:
             
             # Ensure we have some text
             if not doc.strip():
-                doc = "Empty educational content"
+                doc = "a the is"
             
             # Update the record with the doc
-            record['doc'] = doc
+            record['doc'] = convert_latex_to_plain_english(doc)
             
             # Save back to database
             success = upsert_question_record(db, record)
@@ -170,11 +388,11 @@ def create_docs() -> None:
             if success:
                 processed_count += 1
                 print(f"Processed record {processed_count}: {question_id}")
-                print(f"  - Image descriptions: {len(image_descriptions)}")
-                print(f"  - OCR extractions: {len(ocr_texts)}")
-                print(f"  - Doc length: {len(doc)} chars")
+                # print(f"  - Image descriptions: {len(image_descriptions)}")
+                # print(f"  - OCR extractions: {len(ocr_texts)}")
+                # print(f"  - Doc length: {len(doc)} chars")
             else:
-                print(f"Failed to save record: {question_id}")
+                print(f"WARNING!!: Failed to save record: {question_id}")
             
         except Exception as e:
             print(f"Error processing record {record.get('question_id', 'unknown')}: {e}")
@@ -191,3 +409,107 @@ def create_docs() -> None:
     
     db.close()
     print("Database connection closed.")
+
+def save_bertopic_results_to_db(topic_model, embeddings, question_ids, db, k=10):
+    """
+    Extracts topic assignments and k-nearest neighbors from BERTopic model,
+    then saves to question_answer_pairs table.
+    
+    Args:
+        topic_model: Fitted BERTopic model
+        embeddings: Document embeddings used in model (numpy array)
+        question_ids: List of question_ids corresponding to documents
+        db: SQLite database connection
+        k: Number of nearest neighbors to find
+    """
+    cursor = db.cursor()
+    
+    # Ensure columns exist
+    cursor.execute("PRAGMA table_info(question_answer_pairs)")
+    columns = [col[1] for col in cursor.fetchall()]
+    
+    if 'topic_id' not in columns:
+        cursor.execute("ALTER TABLE question_answer_pairs ADD COLUMN topic_id INTEGER")
+    if 'k_nearest_neighbors' not in columns:
+        cursor.execute("ALTER TABLE question_answer_pairs ADD COLUMN k_nearest_neighbors TEXT")
+    
+    db.commit()
+    
+    # Get topic assignments
+    topics = topic_model.topics_
+    
+    # Fit k-NN on original embeddings
+    knn = NearestNeighbors(n_neighbors=k+1, metric='cosine')
+    knn.fit(embeddings)
+    distances, indices = knn.kneighbors(embeddings)
+    
+    # Update database
+    for i, question_id in enumerate(question_ids):
+        topic_id = int(topics[i])
+        neighbor_indices = indices[i][1:]
+        neighbor_distances = distances[i][1:]
+        
+        neighbors_map = {
+            question_ids[idx]: float(dist) 
+            for idx, dist in zip(neighbor_indices, neighbor_distances)
+        }
+        neighbors_json = json.dumps(neighbors_map)
+        
+        cursor.execute("""
+            UPDATE question_answer_pairs 
+            SET topic_id = ?, k_nearest_neighbors = ?
+            WHERE question_id = ?
+        """, (topic_id, neighbors_json, question_id))
+    
+    db.commit()
+    print(f"Updated {len(question_ids)} records with topic_id and {k} nearest neighbors")
+
+def export_outlier_topics_to_docx(topic_model, output_path='outlier_topics.docx'):
+    """
+    Exports questions with topic_id = -1 to a .docx file with topic info.
+    
+    Args:
+        topic_model: Fitted BERTopic model
+        output_path: Output .docx file path
+    """
+    db = initialize_and_fetch_db()
+    cursor = db.cursor()
+    
+    cursor.execute("""
+        SELECT question_id, doc 
+        FROM question_answer_pairs 
+        WHERE topic_id = -1
+    """)
+    outliers = cursor.fetchall()
+    
+    if not outliers:
+        print("No outlier questions found (topic_id = -1)")
+        return
+    
+    doc = Document()
+    
+    topic_info = topic_model.get_topic(-1)
+    
+    header = doc.add_heading('Outlier Topic (-1)', level=1)
+    header.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    
+    keywords_para = doc.add_paragraph('Keywords: ')
+    keywords_para.add_run(', '.join([word for word, _ in topic_info[:10]])).bold = True
+    
+    doc.add_paragraph('_' * 80)
+    
+    doc.add_heading('Representative Documents', level=2)
+    rep_docs = topic_model.get_representative_docs(-1)
+    for i, rep_doc in enumerate(rep_docs[:5], 1):
+        doc.add_paragraph(f"{i}. {rep_doc[:200]}...")
+    
+    doc.add_paragraph('_' * 80)
+    
+    doc.add_heading('All Outlier Questions', level=2)
+    for i, (question_id, doc_text) in enumerate(outliers, 1):
+        doc.add_paragraph(f"Question {i} (ID: {question_id})")
+        doc.add_paragraph(doc_text)
+        doc.add_paragraph('_' * 80)
+    
+    doc.save(output_path)
+    print(f"Exported {len(outliers)} outlier questions to {output_path}")

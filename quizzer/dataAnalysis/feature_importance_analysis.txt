@@ -1,284 +1,243 @@
 ================================================================================
 FEATURE ANALYSIS (PRE-TRAINING)
 ================================================================================
-Dataset: 3044 samples x 1490 features
+Dataset: 2017 samples x 1340 features
 Target: response_result
-Target distribution: {1: 2831, 0: 213}
+Target distribution: {1: 1527, 0: 490}
 ================================================================================
 
 TOP 50 FEATURES - CORRELATION WITH TARGET
 ------------------------------------------------------------
- 1. accuracy_rate                                 | 0.296397
- 2. was_first_attempt                             | 0.285454
- 3. revision_streak                               | 0.238778
- 4. total_correct_attempts                        | 0.234862
- 5. total_attempts                                | 0.221630
- 6. mvec_neural networks_avg_attempts_per_question | 0.203726
- 7. mvec_neural networks_total_attempts           | 0.203726
- 8. mvec_neural networks_total_correct_attempts   | 0.201425
- 9. mvec_neural networks_num_total                | 0.195959
-10. mvec_neural networks_total_seen               | 0.195959
-11. mvec_neural networks_num_tf                   | 0.195959
-12. mvec_neural networks_num_mcq                  | 0.195959
-13. mvec_neural networks_percentage_seen          | 0.195959
-14. mvec_chemistry and structural biology_num_sata | 0.195073
-15. mvec_neural networks_overall_accuracy         | 0.194265
-16. mvec_neural networks_avg_reaction_time        | 0.191888
-17. mvec_composition of life_num_sata             | 0.191371
-18. rs_0                                          | 0.190588
-19. mvec_classification_total_incorrect_attempts  | 0.187255
-20. days_since_first_introduced                   | 0.180214
-21. mvec_decision trees_total_attempts            | 0.176841
-22. mvec_decision trees_avg_attempts_per_question | 0.176841
-23. qv_105                                        | 0.172417
-24. user_stats_today_sata_incorrect_attempts      | 0.170911
-25. days_since_last_revision                      | 0.170734
-26. mvec_concept learning_days_since_last_seen    | 0.169869
-27. mvec_decision trees_total_incorrect_attempts  | 0.166517
-28. mvec_ridge regression_total_incorrect_attempts | 0.163882
-29. qv_391                                        | 0.163314
-30. mvec_k-nearest neighbors_days_since_last_seen | 0.159737
-31. mvec_linux command line_days_since_last_seen  | 0.159674
-32. mvec_decision trees_avg_reaction_time         | 0.159092
-33. mvec_linux command line_avg_reaction_time     | 0.158448
-34. mvec_linux command line_num_fitb              | 0.158448
-35. mvec_linux command line_overall_accuracy      | 0.158448
-36. mvec_linux command line_total_seen            | 0.158448
-37. mvec_linux command line_total_correct_attempts | 0.158448
-38. mvec_linux command line_num_total             | 0.158448
-39. mvec_linux command line_avg_attempts_per_question | 0.158448
-40. mvec_linux command line_total_attempts        | 0.158448
-41. mvec_linux command line_percentage_seen       | 0.158448
-42. user_stats_total_sata_incorrrect_attempts     | 0.158241
-43. user_stats_today_sata_total_attempts          | 0.157812
-44. user_stats_today_mcq_incorrect_attempts       | 0.157462
-45. user_stats_total_non_circ_questions           | 0.156950
-46. rs_7                                          | 0.156609
-47. mvec_decision trees_num_tf                    | 0.156198
-48. mvec_decision trees_num_mcq                   | 0.156198
-49. mvec_decision trees_num_total                 | 0.156198
-50. mvec_decision trees_total_seen                | 0.156198
+ 1. accuracy_rate                                 | 0.243908
+ 2. qv_180                                        | 0.243769
+ 3. qv_15                                         | 0.223612
+ 4. qv_533                                        | 0.219011
+ 5. qv_391                                        | 0.215972
+ 6. qv_414                                        | 0.195178
+ 7. qv_412                                        | 0.192006
+ 8. revision_streak                               | 0.188750
+ 9. qv_766                                        | 0.187709
+10. qv_358                                        | 0.187366
+11. qv_419                                        | 0.187063
+12. qv_472                                        | 0.186780
+13. was_first_attempt                             | 0.186734
+14. qv_501                                        | 0.186059
+15. total_correct_attempts                        | 0.185073
+16. qv_267                                        | 0.182996
+17. qv_306                                        | 0.182724
+18. qv_238                                        | 0.181415
+19. qv_396                                        | 0.180144
+20. qv_630                                        | 0.179866
+21. qv_693                                        | 0.177675
+22. qv_31                                         | 0.176732
+23. qv_8                                          | 0.176545
+24. qv_314                                        | 0.175827
+25. qv_221                                        | 0.174121
+26. qv_406                                        | 0.173607
+27. qv_622                                        | 0.171654
+28. qv_327                                        | 0.171143
+29. total_attempts                                | 0.171016
+30. qv_749                                        | 0.170358
+31. qv_105                                        | 0.170288
+32. qv_448                                        | 0.170199
+33. qv_567                                        | 0.169610
+34. qv_48                                         | 0.169407
+35. qv_536                                        | 0.169259
+36. qv_290                                        | 0.168419
+37. qv_608                                        | 0.166151
+38. qv_541                                        | 0.166108
+39. qv_747                                        | 0.165505
+40. qv_370                                        | 0.165065
+41. qv_725                                        | 0.164590
+42. qv_357                                        | 0.164311
+43. qv_545                                        | 0.163420
+44. qv_12                                         | 0.162708
+45. qv_674                                        | 0.161935
+46. qv_562                                        | 0.161282
+47. qv_129                                        | 0.160483
+48. knn_02_total_incorrect_attempts               | 0.160476
+49. qv_179                                        | 0.160426
+50. qv_341                                        | 0.160205
 
 ================================================================================
 TOP 50 FEATURES - MUTUAL INFORMATION
 ------------------------------------------------------------
- 1. qv_43                                         | 0.051628
- 2. qv_228                                        | 0.047368
- 3. qv_41                                         | 0.047132
- 4. qv_567                                        | 0.045967
- 5. qv_401                                        | 0.045823
- 6. qv_287                                        | 0.045635
- 7. qv_744                                        | 0.045478
- 8. qv_690                                        | 0.045133
- 9. qv_120                                        | 0.044938
-10. qv_103                                        | 0.044688
-11. qv_435                                        | 0.044660
-12. qv_473                                        | 0.044491
-13. qv_178                                        | 0.044305
-14. qv_698                                        | 0.044143
-15. qv_587                                        | 0.044141
-16. qv_320                                        | 0.044091
-17. qv_657                                        | 0.043928
-18. qv_714                                        | 0.043673
-19. qv_655                                        | 0.043562
-20. qv_621                                        | 0.043555
-21. qv_100                                        | 0.043509
-22. qv_483                                        | 0.043448
-23. qv_186                                        | 0.043410
-24. qv_391                                        | 0.043216
-25. qv_208                                        | 0.043173
-26. qv_250                                        | 0.043077
-27. qv_570                                        | 0.043042
-28. qv_70                                         | 0.042915
-29. qv_229                                        | 0.042869
-30. qv_377                                        | 0.042863
-31. qv_165                                        | 0.042842
-32. qv_26                                         | 0.042809
-33. qv_635                                        | 0.042804
-34. qv_1                                          | 0.042801
-35. revision_streak                               | 0.042793
-36. qv_757                                        | 0.042680
-37. qv_137                                        | 0.042656
-38. qv_105                                        | 0.042596
-39. qv_259                                        | 0.042524
-40. qv_766                                        | 0.042454
-41. qv_686                                        | 0.042443
-42. qv_384                                        | 0.042393
-43. qv_615                                        | 0.042372
-44. qv_592                                        | 0.042219
-45. qv_446                                        | 0.042155
-46. qv_598                                        | 0.042153
-47. qv_270                                        | 0.042073
-48. qv_304                                        | 0.041771
-49. qv_516                                        | 0.041674
-50. qv_397                                        | 0.041593
+ 1. qv_280                                        | 0.056062
+ 2. qv_209                                        | 0.054637
+ 3. qv_492                                        | 0.053250
+ 4. qv_660                                        | 0.052814
+ 5. qv_608                                        | 0.052584
+ 6. qv_657                                        | 0.052557
+ 7. qv_405                                        | 0.051574
+ 8. qv_561                                        | 0.050414
+ 9. qv_48                                         | 0.050229
+10. qv_144                                        | 0.050028
+11. qv_463                                        | 0.049772
+12. qv_633                                        | 0.049483
+13. qv_159                                        | 0.049482
+14. qv_448                                        | 0.049306
+15. qv_180                                        | 0.049180
+16. qv_419                                        | 0.049140
+17. qv_325                                        | 0.049073
+18. qv_134                                        | 0.047149
+19. qv_357                                        | 0.046947
+20. qv_298                                        | 0.046183
+21. qv_744                                        | 0.045884
+22. qv_424                                        | 0.045844
+23. qv_15                                         | 0.045753
+24. qv_366                                        | 0.045563
+25. qv_766                                        | 0.045562
+26. qv_229                                        | 0.045460
+27. qv_506                                        | 0.044787
+28. qv_495                                        | 0.044670
+29. qv_8                                          | 0.044359
+30. qv_128                                        | 0.044174
+31. qv_51                                         | 0.044144
+32. qv_105                                        | 0.043846
+33. qv_344                                        | 0.043782
+34. qv_64                                         | 0.043618
+35. qv_87                                         | 0.043524
+36. qv_751                                        | 0.043156
+37. qv_63                                         | 0.042438
+38. qv_2                                          | 0.041893
+39. qv_500                                        | 0.041654
+40. qv_622                                        | 0.041259
+41. qv_263                                        | 0.041250
+42. qv_100                                        | 0.041070
+43. qv_316                                        | 0.040886
+44. qv_522                                        | 0.040449
+45. qv_524                                        | 0.040259
+46. qv_93                                         | 0.040210
+47. qv_224                                        | 0.039747
+48. qv_168                                        | 0.039623
+49. qv_89                                         | 0.039585
+50. qv_721                                        | 0.039226
 
 ================================================================================
 FEATURE IMPORTANCE BY PREFIX (Mean MI)
 ------------------------------------------------------------
- 1. revision             | 0.042793 (   1 features)
- 2. avg                  | 0.040306 (   1 features)
- 3. accuracy             | 0.036518 (   1 features)
- 4. attempt              | 0.035832 (   1 features)
- 5. qv                   | 0.033964 ( 768 features)
- 6. days                 | 0.032248 (   2 features)
- 7. was                  | 0.032059 (   1 features)
- 8. total                | 0.023084 (   3 features)
- 9. rs                   | 0.014406 (   9 features)
-10. user                 | 0.013448 (  51 features)
-11. mvec                 | 0.007844 ( 589 features)
-12. question             | 0.003302 (   5 features)
-13. module               | 0.002562 (  54 features)
-14. num                  | 0.002191 (   4 features)
-
-================================================================================
-TOP MODULE PERFORMANCE FEATURES
-------------------------------------------------------------
- 1. mvec_algebra 1_days_since_last_seen           | 0.026980
- 2. mvec_biology_total_seen                       | 0.004044
- 3. mvec_biology_total_correct_attempts           | 0.020279
- 4. mvec_biology_avg_attempts_per_question        | 0.007540
- 5. mvec_biology_num_total                        | 0.012418
- 6. mvec_biology_percentage_seen                  | 0.000000
- 7. mvec_biology_num_fitb                         | 0.020765
- 8. mvec_biology_overall_accuracy                 | 0.001108
- 9. mvec_biology_num_tf                           | 0.008256
-10. mvec_biology_num_mcq                          | 0.011510
-11. mvec_biology_total_attempts                   | 0.012105
-12. mvec_biology_days_since_last_seen             | 0.003295
-13. mvec_biology_num_sata                         | 0.007294
-14. mvec_biology_total_incorrect_attempts         | 0.008904
-15. mvec_biology_avg_reaction_time                | 0.008854
-16. mvec_calculus 1_total_seen                    | 0.000000
-17. mvec_calculus 1_total_correct_attempts        | 0.002583
-18. mvec_calculus 1_avg_attempts_per_question     | 0.004951
-19. mvec_calculus 1_num_total                     | 0.000064
-20. mvec_calculus 1_percentage_seen               | 0.000366
+ 1. accuracy             | 0.034556 (   1 features)
+ 2. revision             | 0.024031 (   1 features)
+ 3. qv                   | 0.021456 ( 768 features)
+ 4. days                 | 0.020949 (   2 features)
+ 5. was                  | 0.017716 (   1 features)
+ 6. avg                  | 0.013935 (   1 features)
+ 7. total                | 0.012256 (   3 features)
+ 8. question             | 0.009367 (   4 features)
+ 9. attempt              | 0.008646 (   1 features)
+10. knn                  | 0.006346 ( 525 features)
+11. num                  | 0.005303 (   3 features)
+12. user                 | 0.004742 (  30 features)
 
 ================================================================================
 POTENTIAL NOISE FEATURES (Low Correlation & Low MI)
-Threshold: Corr < 0.022886, MI < 0.006476
-Total: 122 features
+Threshold: Corr < 0.025882, MI < 0.004130
+Total: 107 features
 ------------------------------------------------------------
- 1. accuracy_rate                                 | Corr: 0.296397 | MI: 0.036518
- 2. module_name_chemistry and structural biology  | Corr: 0.011743 | MI: 0.000848
- 3. module_name_java data types                   | Corr: 0.000323 | MI: 0.000000
- 4. module_name_java general principles           | Corr: 0.032425 | MI: 0.000000
- 5. module_name_java syntax                       | Corr: 0.020800 | MI: 0.002530
- 6. module_name_trigonometry                      | Corr: 0.009083 | MI: 0.003686
- 7. mvec_acid base_overall_accuracy               | Corr: 0.034202 | MI: 0.015167
- 8. mvec_acid base_percentage_seen                | Corr: 0.040008 | MI: 0.001134
- 9. mvec_biology_days_since_last_seen             | Corr: 0.037998 | MI: 0.003295
-10. mvec_biology_num_fitb                         | Corr: 0.028957 | MI: 0.020765
-11. mvec_biology_percentage_seen                  | Corr: 0.021252 | MI: 0.000000
-12. mvec_calculus 1_overall_accuracy              | Corr: 0.044826 | MI: 0.000194
-13. mvec_calculus 1_percentage_seen               | Corr: 0.038560 | MI: 0.000366
-14. mvec_cell and biomolecules_num_tf             | Corr: 0.109398 | MI: 0.009030
-15. mvec_cell and fluid dynamics_percentage_seen  | Corr: 0.047474 | MI: 0.000000
-16. mvec_cell and fluid dynamics_total_correct_attempts | Corr: 0.060485 | MI: 0.023133
-17. mvec_cell and fluid dynamics_total_seen       | Corr: 0.011469 | MI: 0.000796
-18. mvec_cell and transport_days_since_last_seen  | Corr: 0.048180 | MI: 0.008976
-19. mvec_cell and transport_num_mcq               | Corr: 0.056481 | MI: 0.000685
-20. mvec_cell and transport_overall_accuracy      | Corr: 0.052971 | MI: 0.007743
-21. mvec_chemistry and structural biology_days_since_last_seen | Corr: 0.048793 | MI: 0.010379
-22. mvec_chemistry and structural biology_num_mcq | Corr: 0.041535 | MI: 0.009278
-23. mvec_chemistry and structural biology_overall_accuracy | Corr: 0.039619 | MI: 0.016542
-24. mvec_chemistry and structural biology_total_attempts | Corr: 0.034719 | MI: 0.013909
-25. mvec_chemistry and structural biology_total_incorrect_attempts | Corr: 0.109002 | MI: 0.014848
-26. mvec_clep western civ ii_avg_attempts_per_question | Corr: 0.021414 | MI: 0.023488
-27. mvec_clep western civ ii_days_since_last_seen | Corr: 0.015467 | MI: 0.000000
-28. mvec_clep western civ ii_num_total            | Corr: 0.005809 | MI: 0.000000
-29. mvec_clep western civ ii_total_correct_attempts | Corr: 0.021247 | MI: 0.018563
-30. mvec_code of life_num_fitb                    | Corr: 0.040203 | MI: 0.000000
-31. mvec_code of life_percentage_seen             | Corr: 0.040821 | MI: 0.000000
-32. mvec_code of life_total_seen                  | Corr: 0.036938 | MI: 0.000493
-33. mvec_cost function_total_incorrect_attempts   | Corr: 0.059685 | MI: 0.000000
-34. mvec_decision trees_avg_attempts_per_question | Corr: 0.176841 | MI: 0.016771
-35. mvec_decision trees_num_tf                    | Corr: 0.156198 | MI: 0.005547
-36. mvec_decision trees_num_total                 | Corr: 0.156198 | MI: 0.005369
-37. mvec_decision trees_percentage_seen           | Corr: 0.156198 | MI: 0.004195
-38. mvec_disease managment_total_seen             | Corr: 0.053195 | MI: 0.000000
-39. mvec_environmental biology and chemistry_percentage_seen | Corr: 0.150327 | MI: 0.001439
-40. mvec_history of biology_avg_reaction_time     | Corr: 0.050862 | MI: 0.003039
-41. mvec_history of biology_total_incorrect_attempts | Corr: 0.052497 | MI: 0.003518
-42. mvec_history of machine learning_total_seen   | Corr: 0.037254 | MI: 0.007062
-43. mvec_id3 algorithm_avg_reaction_time          | Corr: 0.148932 | MI: 0.006880
-44. mvec_id3 algorithm_total_attempts             | Corr: 0.148932 | MI: 0.003948
-45. mvec_introductory computer science with python_days_since_last_seen | Corr: 0.044024 | MI: 0.013456
-46. mvec_introductory computer science with python_num_tf | Corr: 0.018212 | MI: 0.009900
-47. mvec_introductory computer science with python_total_attempts | Corr: 0.012375 | MI: 0.017819
-48. mvec_introductory computer science with python_total_incorrect_attempts | Corr: 0.064941 | MI: 0.000000
-49. mvec_introductory geology_percentage_seen     | Corr: 0.043794 | MI: 0.000000
-50. mvec_introductory geology_total_seen          | Corr: 0.043794 | MI: 0.000000
-51. mvec_java general principles_avg_attempts_per_question | Corr: 0.065325 | MI: 0.006479
-52. mvec_java syntax_avg_reaction_time            | Corr: 0.065458 | MI: 0.015839
-53. mvec_java syntax_num_fitb                     | Corr: 0.000611 | MI: 0.003240
-54. mvec_java syntax_overall_accuracy             | Corr: 0.003432 | MI: 0.013544
-55. mvec_k-nearest neighbors_days_since_last_seen | Corr: 0.159737 | MI: 0.008673
-56. mvec_least squares method_num_mcq             | Corr: 0.050025 | MI: 0.000000
-57. mvec_least squares method_total_attempts      | Corr: 0.128056 | MI: 0.008534
-58. mvec_least squares method_total_incorrect_attempts | Corr: 0.076040 | MI: 0.000550
-59. mvec_linux command line_avg_attempts_per_question | Corr: 0.158448 | MI: 0.007367
-60. mvec_neural networks_avg_reaction_time        | Corr: 0.191888 | MI: 0.010590
-61. mvec_ridge regression_overall_accuracy        | Corr: 0.044460 | MI: 0.006475
-62. mvec_ridge regression_percentage_seen         | Corr: 0.051076 | MI: 0.002008
-63. mvec_ridge regression_total_seen              | Corr: 0.051498 | MI: 0.001135
-64. mvec_scientific theory_num_total              | Corr: 0.053122 | MI: 0.000000
-65. mvec_side chain chemistry_avg_attempts_per_question | Corr: 0.130348 | MI: 0.003163
-66. mvec_side chain chemistry_avg_reaction_time   | Corr: 0.130348 | MI: 0.005832
-67. mvec_side chain chemistry_days_since_last_seen | Corr: 0.006423 | MI: 0.016014
-68. mvec_side chain chemistry_percentage_seen     | Corr: 0.130348 | MI: 0.004973
-69. mvec_side chain chemistry_total_attempts      | Corr: 0.130348 | MI: 0.004336
-70. mvec_side chain chemistry_total_incorrect_attempts | Corr: 0.130348 | MI: 0.003477
-71. mvec_side chain chemistry_total_seen          | Corr: 0.130348 | MI: 0.001844
-72. mvec_statistical basics_avg_attempts_per_question | Corr: 0.028402 | MI: 0.015012
-73. mvec_statistical basics_num_total             | Corr: 0.054097 | MI: 0.002069
-74. mvec_statistical basics_overall_accuracy      | Corr: 0.054097 | MI: 0.002647
-75. mvec_statistical basics_percentage_seen       | Corr: 0.054097 | MI: 0.002222
-76. mvec_statistics_days_since_last_seen          | Corr: 0.061851 | MI: 0.020555
-77. mvec_statistics_num_tf                        | Corr: 0.016063 | MI: 0.000000
-78. mvec_statistics_overall_accuracy              | Corr: 0.055246 | MI: 0.016087
-79. mvec_statistics_total_seen                    | Corr: 0.007738 | MI: 0.000000
-80. mvec_support vector machines_days_since_last_seen | Corr: 0.018273 | MI: 0.022403
-81. mvec_thermodynamics_avg_reaction_time         | Corr: 0.042290 | MI: 0.014721
-82. mvec_thermodynamics_days_since_last_seen      | Corr: 0.028405 | MI: 0.016556
-83. mvec_thermodynamics_num_total                 | Corr: 0.052994 | MI: 0.000248
-84. mvec_thermodynamics_overall_accuracy          | Corr: 0.037473 | MI: 0.000000
-85. mvec_thermodynamics_percentage_seen           | Corr: 0.037473 | MI: 0.004745
-86. mvec_trigonometry_num_mcq                     | Corr: 0.007002 | MI: 0.000000
-87. mvec_trigonometry_num_tf                      | Corr: 0.007002 | MI: 0.000322
-88. mvec_trigonometry_num_total                   | Corr: 0.007002 | MI: 0.003838
-89. mvec_trigonometry_overall_accuracy            | Corr: 0.021270 | MI: 0.024819
-90. mvec_trigonometry_total_incorrect_attempts    | Corr: 0.038432 | MI: 0.000000
-91. num_blanks                                    | Corr: 0.039522 | MI: 0.003746
-92. num_sata_options                              | Corr: 0.045879 | MI: 0.000045
-93. question_type_fill_in_the_blank               | Corr: 0.066970 | MI: 0.006752
-94. rs_4                                          | Corr: 0.003745 | MI: 0.011848
-95. user_stats_consecutive_incorrect_streak       | Corr: 0.075879 | MI: 0.004806
-96. user_stats_global_fitb_accuracy               | Corr: 0.011502 | MI: 0.006524
-97. user_stats_global_mcq_accuracy                | Corr: 0.013985 | MI: 0.015660
-98. user_stats_global_sata_accuracy               | Corr: 0.064252 | MI: 0.023044
-99. user_stats_global_so_accuracy                 | Corr: 0.059396 | MI: 0.000000
-100. user_stats_max_correct_streak_achieved        | Corr: 0.133012 | MI: 0.018289
-101. user_stats_today_fitb_accuracy_rate           | Corr: 0.043682 | MI: 0.022084
-102. user_stats_today_fitb_correct_attempts        | Corr: 0.079793 | MI: 0.018218
-103. user_stats_today_fitb_incorrect_attempts      | Corr: 0.090476 | MI: 0.011297
-104. user_stats_today_fitb_total_attempts          | Corr: 0.083544 | MI: 0.023813
-105. user_stats_today_incorrect_attempts           | Corr: 0.131158 | MI: 0.011340
-106. user_stats_today_mcq_total_attempts           | Corr: 0.124362 | MI: 0.006833
-107. user_stats_today_sata_accuracy_rate           | Corr: 0.034628 | MI: 0.008466
-108. user_stats_today_sata_incorrect_attempts      | Corr: 0.170911 | MI: 0.001679
-109. user_stats_today_so_total_attempts            | Corr: 0.002442 | MI: 0.000000
-110. user_stats_today_tf_correct_attempts          | Corr: 0.141427 | MI: 0.021369
-111. user_stats_today_tf_incorrect_attempts        | Corr: 0.049904 | MI: 0.009379
-112. user_stats_today_total_attempts               | Corr: 0.109876 | MI: 0.013520
-113. user_stats_total_correct_attempts             | Corr: 0.025650 | MI: 0.019354
-114. user_stats_total_fitb_attempts                | Corr: 0.017047 | MI: 0.023155
-115. user_stats_total_mcq_incorrrect_attempts      | Corr: 0.037050 | MI: 0.013998
-116. user_stats_total_non_circ_questions           | Corr: 0.156950 | MI: 0.017101
-117. user_stats_total_sata_correct_attempts        | Corr: 0.042655 | MI: 0.011501
-118. user_stats_total_sata_incorrrect_attempts     | Corr: 0.158241 | MI: 0.010977
-119. user_stats_total_so_attempts                  | Corr: 0.004753 | MI: 0.005390
-120. user_stats_total_so_correct_attempts          | Corr: 0.004753 | MI: 0.001821
-121. user_stats_total_tf_attempts                  | Corr: 0.050636 | MI: 0.027534
-122. user_stats_total_tf_incorrrect_attempts       | Corr: 0.041116 | MI: 0.010261
+ 1. knn_02_days_since_first_introduced            | Corr: 0.041929 | MI: 0.007798
+ 2. knn_02_revision_streak                        | Corr: 0.092921 | MI: 0.002459
+ 3. knn_04_total_correct_attempts                 | Corr: 0.101075 | MI: 0.000000
+ 4. knn_17_question_type_select_all_that_apply    | Corr: 0.028224 | MI: 0.004587
+ 5. knn_19_attempt_day_ratio                      | Corr: 0.015351 | MI: 0.020553
+ 6. knn_21_question_type_multiple_choice          | Corr: 0.084329 | MI: 0.010832
+ 7. knn_21_question_type_select_all_that_apply    | Corr: 0.031203 | MI: 0.000000
+ 8. knn_21_question_type_sort_order               | Corr: 0.021863 | MI: 0.000000
+ 9. knn_21_question_type_true_false               | Corr: 0.009029 | MI: 0.000000
+10. knn_22_question_type_fill_in_the_blank        | Corr: 0.061897 | MI: 0.007653
+11. knn_22_question_type_multiple_choice          | Corr: 0.082515 | MI: 0.000000
+12. knn_22_question_type_true_false               | Corr: 0.007893 | MI: 0.003363
+13. knn_23_question_type_missing                  | Corr: 0.027749 | MI: 0.000000
+14. knn_23_question_type_multiple_choice          | Corr: 0.078707 | MI: 0.016968
+15. knn_24_question_type_missing                  | Corr: 0.027749 | MI: 0.002902
+16. knn_24_question_type_select_all_that_apply    | Corr: 0.023893 | MI: 0.000000
+17. knn_24_question_type_sort_order               | Corr: 0.021863 | MI: 0.007471
+18. knn_24_question_type_true_false               | Corr: 0.007850 | MI: 0.000612
+19. knn_25_question_type_multiple_choice          | Corr: 0.063173 | MI: 0.000000
+20. knn_25_question_type_select_all_that_apply    | Corr: 0.062726 | MI: 0.000000
+21. knn_25_question_type_sort_order               | Corr: 0.021863 | MI: 0.003375
+22. knn_25_total_incorrect_attempts               | Corr: 0.096084 | MI: 0.023053
+23. num_sata_options                              | Corr: 0.129692 | MI: 0.000000
+24. qv_101                                        | Corr: 0.038359 | MI: 0.002886
+25. qv_102                                        | Corr: 0.030396 | MI: 0.006171
+26. qv_103                                        | Corr: 0.029306 | MI: 0.001390
+27. qv_117                                        | Corr: 0.136538 | MI: 0.034423
+28. qv_122                                        | Corr: 0.040418 | MI: 0.030821
+29. qv_123                                        | Corr: 0.006424 | MI: 0.000000
+30. qv_124                                        | Corr: 0.045030 | MI: 0.035227
+31. qv_138                                        | Corr: 0.066035 | MI: 0.008439
+32. qv_139                                        | Corr: 0.085580 | MI: 0.018722
+33. qv_143                                        | Corr: 0.091309 | MI: 0.028745
+34. qv_144                                        | Corr: 0.053730 | MI: 0.050028
+35. qv_159                                        | Corr: 0.153296 | MI: 0.049482
+36. qv_160                                        | Corr: 0.014344 | MI: 0.026851
+37. qv_164                                        | Corr: 0.057659 | MI: 0.014321
+38. qv_166                                        | Corr: 0.065543 | MI: 0.026328
+39. qv_18                                         | Corr: 0.004307 | MI: 0.007631
+40. qv_19                                         | Corr: 0.040327 | MI: 0.010647
+41. qv_194                                        | Corr: 0.040689 | MI: 0.016572
+42. qv_202                                        | Corr: 0.051880 | MI: 0.015443
+43. qv_207                                        | Corr: 0.077425 | MI: 0.018220
+44. qv_208                                        | Corr: 0.076057 | MI: 0.014449
+45. qv_215                                        | Corr: 0.047441 | MI: 0.029259
+46. qv_222                                        | Corr: 0.021800 | MI: 0.010866
+47. qv_227                                        | Corr: 0.053214 | MI: 0.025948
+48. qv_228                                        | Corr: 0.007311 | MI: 0.022730
+49. qv_229                                        | Corr: 0.064868 | MI: 0.045460
+50. qv_236                                        | Corr: 0.017666 | MI: 0.023732
+51. qv_244                                        | Corr: 0.093304 | MI: 0.000000
+52. qv_249                                        | Corr: 0.040565 | MI: 0.025860
+53. qv_257                                        | Corr: 0.121370 | MI: 0.006709
+54. qv_265                                        | Corr: 0.025652 | MI: 0.017197
+55. qv_270                                        | Corr: 0.117280 | MI: 0.015883
+56. qv_271                                        | Corr: 0.104172 | MI: 0.037647
+57. qv_278                                        | Corr: 0.077217 | MI: 0.028157
+58. qv_286                                        | Corr: 0.038490 | MI: 0.015979
+59. qv_291                                        | Corr: 0.060035 | MI: 0.005076
+60. qv_292                                        | Corr: 0.064787 | MI: 0.030587
+61. qv_300                                        | Corr: 0.090889 | MI: 0.028153
+62. qv_307                                        | Corr: 0.014086 | MI: 0.000000
+63. qv_328                                        | Corr: 0.067445 | MI: 0.027619
+64. qv_332                                        | Corr: 0.036780 | MI: 0.016301
+65. qv_34                                         | Corr: 0.020384 | MI: 0.021059
+66. qv_348                                        | Corr: 0.024222 | MI: 0.018282
+67. qv_354                                        | Corr: 0.030047 | MI: 0.006952
+68. qv_375                                        | Corr: 0.043542 | MI: 0.015474
+69. qv_376                                        | Corr: 0.111013 | MI: 0.021563
+70. qv_38                                         | Corr: 0.071710 | MI: 0.038724
+71. qv_39                                         | Corr: 0.016166 | MI: 0.003556
+72. qv_391                                        | Corr: 0.215972 | MI: 0.037876
+73. qv_396                                        | Corr: 0.180144 | MI: 0.031983
+74. qv_397                                        | Corr: 0.007808 | MI: 0.015896
+75. qv_405                                        | Corr: 0.093504 | MI: 0.051574
+76. qv_411                                        | Corr: 0.064214 | MI: 0.024278
+77. qv_416                                        | Corr: 0.046206 | MI: 0.035710
+78. qv_417                                        | Corr: 0.016400 | MI: 0.006005
+79. qv_418                                        | Corr: 0.065723 | MI: 0.031116
+80. qv_433                                        | Corr: 0.103408 | MI: 0.016864
+81. qv_437                                        | Corr: 0.075841 | MI: 0.031980
+82. qv_439                                        | Corr: 0.126480 | MI: 0.027129
+83. qv_449                                        | Corr: 0.026625 | MI: 0.007828
+84. qv_454                                        | Corr: 0.015426 | MI: 0.027727
+85. qv_458                                        | Corr: 0.074849 | MI: 0.012924
+86. qv_460                                        | Corr: 0.009473 | MI: 0.016694
+87. qv_475                                        | Corr: 0.120273 | MI: 0.029329
+88. qv_48                                         | Corr: 0.169407 | MI: 0.050229
+89. qv_480                                        | Corr: 0.091324 | MI: 0.028802
+90. qv_481                                        | Corr: 0.067717 | MI: 0.015264
+91. qv_509                                        | Corr: 0.039599 | MI: 0.022433
+92. qv_522                                        | Corr: 0.120692 | MI: 0.040449
+93. qv_55                                         | Corr: 0.114926 | MI: 0.035706
+94. qv_562                                        | Corr: 0.161282 | MI: 0.022374
+95. qv_576                                        | Corr: 0.028532 | MI: 0.004915
+96. qv_59                                         | Corr: 0.014565 | MI: 0.028435
+97. qv_60                                         | Corr: 0.086508 | MI: 0.007138
+98. qv_659                                        | Corr: 0.080117 | MI: 0.032261
+99. qv_726                                        | Corr: 0.050477 | MI: 0.023260
+100. qv_759                                        | Corr: 0.074158 | MI: 0.005325
+101. qv_89                                         | Corr: 0.049493 | MI: 0.039585
+102. qv_97                                         | Corr: 0.074649 | MI: 0.030953
+103. user_stats_consecutive_correct_streak         | Corr: 0.057838 | MI: 0.005432
+104. user_stats_global_mcq_accuracy                | Corr: 0.008517 | MI: 0.000000
+105. user_stats_today_fitb_correct_attempts        | Corr: 0.003426 | MI: 0.005262
+106. user_stats_today_sata_incorrect_attempts      | Corr: 0.022345 | MI: 0.002803
+107. user_stats_today_tf_accuracy_rate             | Corr: 0.013541 | MI: 0.007178

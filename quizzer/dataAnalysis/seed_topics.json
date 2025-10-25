@@ -1,0 +1,50 @@
+[
+    ["dimensionality", "high dimensional", "curse dimensionality", "dimensional pattern recognition", "high dimensional pattern", "effective dimensionality", "dimensional pattern", "dimensional spaces", "data manifold", "dimensional image"]
+    ,
+    ["bayes theorem", "probability"]
+    ,
+    ["overfitting", "underfitting", "bias", "variance"]
+    ,
+    ["glycolysis"]
+    ,
+    ["photosynthesis", "photosynthetic pigments", "chloroplast", "photosystems", "thylakoid"]
+    ,
+    ["replication", "transcription", "translation"]
+    ,
+    ["svm", "support vector", "hyperplane"]
+    ,
+    ["decision tree", "pruning", "information gain", "ig", "decision trees", "tree"]
+    ,
+    ["ensemble learning", "ensemble methods", "ensemble", "voting", "bagging", "boosting", "learning model"]
+    ,
+    ["logistic regression"]
+    ,
+    ["linear regression", "cost function", "parameters", "t statistic", "slope coefficient"]
+    ,
+    ["vowel", "consonant"]
+    ,
+    ["classification", "classifier"]
+    ,
+    ["gradient descent", "learning rate", "converge", "monotonic"]
+    ,
+    ["ridge regression", "regularization", "lasso", "ridge"]
+    ,
+    ["times 12", "times 10", "times 14", "times 15", "times times","times 11", "times 60", "times 30",
+    "20 times", "20times", "15 times"]
+    ,
+    ["python", "method"]
+    ,
+    ["java", "println", "system", "out", "in"]
+    ,
+    ["java", "method"]
+    ,
+    ["data type"]
+    ,
+    ["squares", "model", "variables", "parameter", "least squares"]
+    ,
+    ["neural network", "backpropogation"]
+    ,
+    ["chromosome", "nucleotide", "dna", "sugar chain"]
+
+    
+]

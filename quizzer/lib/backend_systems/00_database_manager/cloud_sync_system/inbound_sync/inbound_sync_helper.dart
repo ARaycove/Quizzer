@@ -257,6 +257,8 @@ Future<List<List<Map<String,dynamic>>>> fetchDataForAllTables(SupabaseClient sup
     userId: null),
 
     fetchAllRecordsOlderThanLastLogin(supabase: supabase, tableName: 'ml_models'),
+
+    fetchAllRecordsOlderThanLastLogin(supabase: supabase, tableName: 'user_daily_stats'),
   ]);
   return allResults;
 }

@@ -1,104 +1,102 @@
 ================================================================================
 COMPREHENSIVE FEATURE IMBALANCE ANALYSIS
 ================================================================================
-Dataset: 3044 samples, 1490 features
+Dataset: 2017 samples, 1340 features
 Target: response_result
 
 CLASS DISTRIBUTION:
-  Class 1: 2,831 samples (93.0%)
-  Class 0: 213 samples (7.0%)
-  Imbalance ratio: 13.3:1
+  Class 1: 1,527 samples (75.7%)
+  Class 0: 490 samples (24.3%)
+  Imbalance ratio: 3.1:1
 
 TOP 30 FEATURES WITH HIGHEST CLASS VARIANCE DIFFERENCES:
- 1. user_stats_total_attempts                          | 677231.479115
- 2. user_stats_total_correct_attempts                  | 567352.651626
- 3. rs_0                                               | 470648.269327
- 4. user_stats_total_non_circ_questions                | 289501.525929
- 5. user_stats_total_fitb_attempts                     | 229148.574839
- 6. user_stats_total_fitb_correct_attempts             | 192931.488016
- 7. user_stats_total_mcq_attempts                      | 86139.439389
- 8. user_stats_total_mcq_correct_attempts              | 71864.388124
- 9. mvec_multiplication table_total_attempts           | 21231.137262
-10. mvec_multiplication table_total_correct_attempts   | 20938.997060
-11. mvec_general_total_attempts                        | 10442.587853
-12. mvec_general_total_correct_attempts                | 9427.803146
-13. mvec_biology_num_total                             | 8342.722487
-14. mvec_biology_total_seen                            | 8342.722487
-15. mvec_machine learning_total_attempts               | 6832.323719
-16. mvec_machine learning_total_correct_attempts       | 6327.350606
-17. rs_5                                               | 5911.112604
-18. mvec_general_num_fitb                              | 5211.202011
-19. mvec_general_total_seen                            | 4975.103423
-20. mvec_general_num_total                             | 4975.103423
-21. user_stats_total_incorrect_attempts                | 4831.318233
-22. user_stats_today_total_attempts                    | 4779.722521
-23. mvec_biology_total_attempts                        | 4304.054056
-24. mvec_biology_total_correct_attempts                | 3736.805596
-25. user_stats_today_correct_attempts                  | 3511.892617
-26. rs_3                                               | 3457.566243
-27. mvec_experimental design_total_attempts            | 3419.879911
-28. mvec_experimental design_total_correct_attempts    | 3324.758061
-29. attempt_day_ratio                                  | 2959.042111
-30. mvec_chemistry_avg_reaction_time                   | 2447.724129
+ 1. knn_10_attempt_day_ratio                           | 309780.775649
+ 2. knn_17_attempt_day_ratio                           | 98915.705683
+ 3. knn_18_attempt_day_ratio                           | 89356.519406
+ 4. knn_14_attempt_day_ratio                           | 50597.767013
+ 5. knn_20_attempt_day_ratio                           | 48712.057508
+ 6. knn_06_attempt_day_ratio                           | 39225.542757
+ 7. knn_03_attempt_day_ratio                           | 30623.158580
+ 8. knn_01_attempt_day_ratio                           | 30158.874736
+ 9. knn_15_attempt_day_ratio                           | 25933.814012
+10. knn_05_attempt_day_ratio                           | 25831.759311
+11. knn_02_attempt_day_ratio                           | 24431.266087
+12. knn_23_attempt_day_ratio                           | 24286.710495
+13. knn_09_attempt_day_ratio                           | 21638.384640
+14. knn_21_attempt_day_ratio                           | 21439.492407
+15. knn_11_attempt_day_ratio                           | 19727.327017
+16. knn_04_attempt_day_ratio                           | 17995.610581
+17. knn_25_attempt_day_ratio                           | 16195.349217
+18. knn_19_attempt_day_ratio                           | 11910.973018
+19. knn_13_attempt_day_ratio                           | 8225.763593
+20. knn_24_attempt_day_ratio                           | 6720.054322
+21. knn_16_attempt_day_ratio                           | 4441.414248
+22. knn_08_attempt_day_ratio                           | 4178.767495
+23. knn_07_attempt_day_ratio                           | 4076.031787
+24. knn_12_attempt_day_ratio                           | 2633.604788
+25. knn_22_attempt_day_ratio                           | 2574.525892
+26. attempt_day_ratio                                  | 897.075465
+27. user_stats_today_total_attempts                    | 613.425379
+28. user_stats_today_correct_attempts                  | 354.872587
+29. user_stats_today_mcq_total_attempts                | 181.309643
+30. user_stats_today_mcq_correct_attempts              | 104.045200
 
 FEATURE MEANS BY CLASS (Top 20 differences):
- 1. rs_0                                     | Class 0: 416.3005 | Class 1: 92.7852 | Diff: 323.5152
- 2. user_stats_total_non_circ_questions      | Class 0: 1395.7840 | Class 1: 1656.8757 | Diff: 261.0916
- 3. user_stats_total_attempts                | Class 0: 2299.2911 | Class 1: 2177.5828 | Diff: 121.7082
- 4. user_stats_total_correct_attempts        | Class 0: 2081.6573 | Class 1: 1965.9339 | Diff: 115.7233
- 5. user_stats_today_total_attempts          | Class 0: 258.2535 | Class 1: 197.0668 | Diff: 61.1868
- 6. user_stats_total_mcq_attempts            | Class 0: 731.1362 | Class 1: 673.3366 | Diff: 57.7995
- 7. user_stats_total_mcq_correct_attempts    | Class 0: 665.6620 | Class 1: 612.5708 | Diff: 53.0911
- 8. user_stats_today_correct_attempts        | Class 0: 234.4507 | Class 1: 181.7580 | Diff: 52.6927
- 9. user_stats_total_fitb_correct_attempts   | Class 0: 1318.9859 | Class 1: 1268.2455 | Diff: 50.7404
-10. user_stats_total_fitb_attempts           | Class 0: 1463.6620 | Class 1: 1413.2187 | Diff: 50.4433
-11. mvec_biology_total_seen                  | Class 0: 173.3709 | Class 1: 134.0710 | Diff: 39.2999
-12. mvec_biology_num_total                   | Class 0: 173.3709 | Class 1: 134.0710 | Diff: 39.2999
-13. rs_3                                     | Class 0: 108.3897 | Class 1: 145.5857 | Diff: 37.1960
-14. rs_5                                     | Class 0: 108.3052 | Class 1: 73.7026 | Diff: 34.6026
-15. mvec_general_total_seen                  | Class 0: 576.6667 | Class 1: 605.7375 | Diff: 29.0709
-16. mvec_general_num_total                   | Class 0: 576.6667 | Class 1: 605.7375 | Diff: 29.0709
-17. user_stats_today_fitb_total_attempts     | Class 0: 147.2817 | Class 1: 118.6669 | Diff: 28.6148
-18. user_stats_today_mcq_total_attempts      | Class 0: 92.1174 | Class 1: 66.9177 | Diff: 25.1997
-19. mvec_biology_total_attempts              | Class 0: 107.7465 | Class 1: 82.6694 | Diff: 25.0771
-20. user_stats_today_fitb_correct_attempts   | Class 0: 133.7418 | Class 1: 109.2490 | Diff: 24.4928
+ 1. knn_10_attempt_day_ratio                 | Class 0: 2.5939 | Class 1: 26.6145 | Diff: 24.0206
+ 2. knn_02_attempt_day_ratio                 | Class 0: 20.5082 | Class 1: 7.0461 | Diff: 13.4621
+ 3. knn_05_attempt_day_ratio                 | Class 0: 16.5023 | Class 1: 4.8826 | Diff: 11.6198
+ 4. knn_17_attempt_day_ratio                 | Class 0: 1.9958 | Class 1: 13.1859 | Diff: 11.1901
+ 5. knn_09_attempt_day_ratio                 | Class 0: 14.2253 | Class 1: 3.2724 | Diff: 10.9529
+ 6. knn_20_attempt_day_ratio                 | Class 0: 12.8079 | Class 1: 3.2616 | Diff: 9.5464
+ 7. knn_06_attempt_day_ratio                 | Class 0: 2.4627 | Class 1: 11.6858 | Diff: 9.2231
+ 8. knn_25_attempt_day_ratio                 | Class 0: 12.0662 | Class 1: 3.1806 | Diff: 8.8855
+ 9. knn_11_attempt_day_ratio                 | Class 0: 4.1179 | Class 1: 11.3735 | Diff: 7.2556
+10. knn_23_attempt_day_ratio                 | Class 0: 11.3690 | Class 1: 4.3222 | Diff: 7.0468
+11. knn_04_attempt_day_ratio                 | Class 0: 11.6925 | Class 1: 5.3844 | Diff: 6.3081
+12. knn_18_attempt_day_ratio                 | Class 0: 3.7514 | Class 1: 9.7102 | Diff: 5.9588
+13. knn_24_attempt_day_ratio                 | Class 0: 1.5989 | Class 1: 6.9088 | Diff: 5.3100
+14. knn_22_attempt_day_ratio                 | Class 0: 12.3220 | Class 1: 7.0651 | Diff: 5.2569
+15. knn_15_attempt_day_ratio                 | Class 0: 4.0192 | Class 1: 9.1270 | Diff: 5.1079
+16. knn_07_attempt_day_ratio                 | Class 0: 13.1283 | Class 1: 8.0237 | Diff: 5.1046
+17. knn_19_attempt_day_ratio                 | Class 0: 3.9166 | Class 1: 7.5602 | Diff: 3.6436
+18. knn_21_attempt_day_ratio                 | Class 0: 11.8527 | Class 1: 8.6657 | Diff: 3.1870
+19. knn_13_attempt_day_ratio                 | Class 0: 6.8275 | Class 1: 3.6913 | Diff: 3.1363
+20. days_since_first_introduced              | Class 0: 1.9217 | Class 1: 4.9394 | Diff: 3.0177
 
 MISSING VALUE PATTERNS BY CLASS:
 
 ZERO VALUE PATTERNS BY CLASS (Top 20):
- 1. mvec_decision trees_total_correct_attempts | Class 0:  209 | Class 1: 2831
- 2. mvec_decision trees_overall_accuracy     | Class 0:  209 | Class 1: 2831
- 3. module_name_cost function                | Class 0:  211 | Class 1: 2831
- 4. mvec_neural networks_total_incorrect_attempts | Class 0:  211 | Class 1: 2831
- 5. module_name_cell as a building block     | Class 0:  208 | Class 1: 2827
- 6. module_name_decision trees               | Class 0:  211 | Class 1: 2830
- 7. module_name_data science                 | Class 0:  212 | Class 1: 2831
- 8. module_name_side chain chemistry         | Class 0:  212 | Class 1: 2830
- 9. module_name_disease managment            | Class 0:  213 | Class 1: 2830
-10. module_name_energy conversion            | Class 0:  213 | Class 1: 2830
-11. module_name_environmental biology and chemistry | Class 0:  213 | Class 1: 2830
-12. module_name_id3 algorithm                | Class 0:  213 | Class 1: 2830
-13. module_name_java general principles      | Class 0:  212 | Class 1: 2829
-14. module_name_probability theory           | Class 0:  213 | Class 1: 2830
-15. module_name_random forest algorithm      | Class 0:  213 | Class 1: 2830
-16. module_name_k-nearest neighbors          | Class 0:  213 | Class 1: 2830
-17. module_name_linux command line           | Class 0:  213 | Class 1: 2830
-18. module_name_chemistry and strcutural biology | Class 0:  213 | Class 1: 2829
-19. module_name_history of biology           | Class 0:  212 | Class 1: 2828
-20. mvec_id3 algorithm_total_correct_attempts | Class 0:  200 | Class 1: 2816
+ 1. knn_02_question_type_sort_order          | Class 0:  490 | Class 1: 1526
+ 2. knn_02_num_so_options                    | Class 0:  490 | Class 1: 1526
+ 3. knn_08_question_type_sort_order          | Class 0:  490 | Class 1: 1525
+ 4. knn_08_num_so_options                    | Class 0:  490 | Class 1: 1525
+ 5. knn_01_num_so_options                    | Class 0:  490 | Class 1: 1524
+ 6. knn_15_num_so_options                    | Class 0:  490 | Class 1: 1524
+ 7. knn_18_num_so_options                    | Class 0:  490 | Class 1: 1524
+ 8. knn_15_question_type_sort_order          | Class 0:  490 | Class 1: 1524
+ 9. knn_17_num_so_options                    | Class 0:  490 | Class 1: 1524
+10. knn_04_question_type_sort_order          | Class 0:  490 | Class 1: 1524
+11. knn_16_num_so_options                    | Class 0:  490 | Class 1: 1524
+12. knn_14_num_so_options                    | Class 0:  490 | Class 1: 1524
+13. knn_17_question_type_sort_order          | Class 0:  490 | Class 1: 1524
+14. knn_19_num_so_options                    | Class 0:  490 | Class 1: 1524
+15. knn_18_question_type_sort_order          | Class 0:  490 | Class 1: 1524
+16. knn_13_num_so_options                    | Class 0:  490 | Class 1: 1524
+17. knn_19_question_type_sort_order          | Class 0:  490 | Class 1: 1524
+18. knn_12_num_so_options                    | Class 0:  490 | Class 1: 1524
+19. knn_14_question_type_sort_order          | Class 0:  490 | Class 1: 1524
+20. knn_13_question_type_sort_order          | Class 0:  490 | Class 1: 1524
 
 FEATURE IMBALANCE BY PREFIX:
- 1. rs                   | Avg Mean Diff: 49.5638 (   9 features)
- 2. user                 | Avg Mean Diff: 19.7396 (  51 features)
- 3. avg                  | Avg Mean Diff: 5.1471 (   1 features)
- 4. attempt              | Avg Mean Diff: 4.5957 (   1 features)
- 5. days                 | Avg Mean Diff: 1.6510 (   2 features)
- 6. revision             | Avg Mean Diff: 1.3945 (   1 features)
- 7. mvec                 | Avg Mean Diff: 1.3631 ( 589 features)
- 8. total                | Avg Mean Diff: 0.9284 (   3 features)
- 9. accuracy             | Avg Mean Diff: 0.5162 (   1 features)
-10. was                  | Avg Mean Diff: 0.4915 (   1 features)
-11. num                  | Avg Mean Diff: 0.1291 (   4 features)
-12. qv                   | Avg Mean Diff: 0.0933 ( 768 features)
-13. question             | Avg Mean Diff: 0.0522 (   5 features)
-14. module               | Avg Mean Diff: 0.0151 (  54 features)
+ 1. days                 | Avg Mean Diff: 2.3537 (   2 features)
+ 2. avg                  | Avg Mean Diff: 2.0593 (   1 features)
+ 3. attempt              | Avg Mean Diff: 1.8148 (   1 features)
+ 4. revision             | Avg Mean Diff: 0.6825 (   1 features)
+ 5. knn                  | Avg Mean Diff: 0.5798 ( 525 features)
+ 6. total                | Avg Mean Diff: 0.4577 (   3 features)
+ 7. num                  | Avg Mean Diff: 0.2479 (   3 features)
+ 8. accuracy             | Avg Mean Diff: 0.2417 (   1 features)
+ 9. was                  | Avg Mean Diff: 0.2000 (   1 features)
+10. user                 | Avg Mean Diff: 0.1634 (  30 features)
+11. question             | Avg Mean Diff: 0.0742 (   4 features)
+12. qv                   | Avg Mean Diff: 0.0724 ( 768 features)

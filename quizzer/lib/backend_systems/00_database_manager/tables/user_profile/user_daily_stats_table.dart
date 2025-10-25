@@ -2,11 +2,15 @@
 // * [x] Handle missing daily records
 // * [x] Update login initialization to verify this table on login 
 
-// * [] TODO Update SUPABASE with table
-// * [] TODO Update SUPABASE with RLS policies
+// * [x] Update SUPABASE with table
+// * [x] Update SUPABASE with RLS policies
 
-// * [] TODO Connect to inbound sync 
-// * [] TODO Connect to outbound sync
+// * [x] Connect to inbound sync 
+// * [x] Connect to outbound sync
+
+// * [] TODO add attempts_over_last_n_hours feature set with range of hours: [1, 3, 6, 9, 12, 15, 18, 21, 24, 48, 72, (7*24), (14*24), (30*24)]
+//    - This feature set would capture the velocity metrics, is the user more active than usual in this last hour?
+// * [] TODO accompanying accuracy over last n hours. Making these a paired set of features
 
 // Consolidated daily user statistics table
 // All user performance metrics aggregated by date in a single table

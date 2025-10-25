@@ -10,6 +10,8 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/question_answ
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pair_management/question_answer_pairs_table.dart';
 import 'package:supabase/supabase.dart'; // For Supabase storage operations
 import 'package:quizzer/backend_systems/00_helper_utils/file_locations.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/ml_models_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
 
 // ==========================================
 // Media Sync Worker (Image Sync)
@@ -109,9 +111,12 @@ class MediaSyncWorker {
     await _processUploads(serverFiles);
     if (!_isRunning) return; // Check if worker was stopped during uploads
     await _processDownloads();
+    if (!_isRunning) return;
+    await _updateMlModels();
     
     QuizzerLogger.logMessage('MediaSyncWorker: _performSync() finished.');
   }
+
 
   /// Brute-force download: Download every file in the Supabase bucket if not present locally
   /// Returns the list of server file names
@@ -281,6 +286,51 @@ class MediaSyncWorker {
     QuizzerLogger.logMessage('MediaSyncWorker: Finished _processDownloads.');
   }
   // ----------------------
+  Future<void> _updateMlModels() async {
+    final models = await getAllMlModels();
+    
+    for (final model in models) {
+      final modelName = model['model_name'] as String;
+      final lastSynced = model['time_last_received_file'] as String?;
+      final lastModified = model['last_modified_timestamp'] as String?;
+      
+      if (lastModified == null) continue;
+      
+      final lastModifiedDate = DateTime.parse(lastModified);
+      final lastSyncedDate = lastSynced != null ? DateTime.parse(lastSynced) : null;
+      
+      if (lastSyncedDate != null && !lastModifiedDate.isAfter(lastSyncedDate)) continue;
+      
+      final supabase = getSessionManager().supabase;
+      final fileName = '$modelName.tflite';
+      
+      final Uint8List modelFileData;      
+      try {
+        modelFileData = await supabase.storage.from('ml_models').download(fileName);
+      } on StorageException catch (e) {
+        QuizzerLogger.logWarning('Storage error downloading model $modelName: ${e.message}');
+        return;
+      } on SocketException catch (e) {
+        QuizzerLogger.logWarning('Network error downloading model $modelName: $e');
+        return;
+      }
+      
+      final localPath = path.join(await getQuizzerMediaPath(), fileName);
+      await Directory(path.dirname(localPath)).create(recursive: true);
+      await File(localPath).writeAsBytes(modelFileData);
+      
+      final db = await getDatabaseMonitor().requestDatabaseAccess();
+      await db!.update(
+        'ml_models',
+        {'time_last_received_file': DateTime.now().toUtc().toIso8601String()},
+        where: 'model_name = ?',
+        whereArgs: [modelName],
+      );
+      getDatabaseMonitor().releaseDatabaseAccess();
+      
+      QuizzerLogger.logSuccess('Updated ML model: $modelName');
+    }
+  }
 
   // --- Network Connectivity Check ---
   Future<bool> _checkConnectivity() async {

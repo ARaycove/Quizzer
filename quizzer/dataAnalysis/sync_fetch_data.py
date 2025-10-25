@@ -6,6 +6,7 @@ from sqlite3 import Connection
 import datetime
 import numpy as np
 import typing
+import asyncio
 
 SUPABASE_URL = "https://yruvxuvzztnahuuiqxit.supabase.co"
 SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlydXZ4dXZ6enRuYWh1dWlxeGl0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQzMTY1NDIsImV4cCI6MjA1OTg5MjU0Mn0.hF1oAILlmzCvsJxFk9Bpjqjs3OEisVdoYVZoZMtTLpo"
@@ -213,14 +214,16 @@ def get_empty_doc_record(db: Connection):
         return None
 
 
-def upsert_records_to_db(records: typing.Union[typing.List[typing.Dict], typing.Dict[str, typing.List[typing.Dict]]], db: sqlite3.Connection) -> None:
+def upsert_records_to_db(records: typing.Union[typing.List[typing.Dict], typing.Dict[str, typing.List[typing.Dict]]], db: sqlite3.Connection, supabase_client) -> None:
     """
     Upserts records into the local SQLite database.
     This function handles both the old format (list of records for question_answer_pairs)
     and new format (dictionary with table names as keys).
+    Automatically syncs schema with Supabase for question_answer_attempts and question_answer_pairs tables.
     Args:
         records: Either a list of records (legacy) or a dictionary with table names as keys.
         db: The SQLite database connection object.
+        supabase_client: The Supabase client for schema synchronization.
     """
     print("\n--- Starting upsert_records_to_db ---")
     
@@ -232,14 +235,16 @@ def upsert_records_to_db(records: typing.Union[typing.List[typing.Dict], typing.
         # New format - dictionary with table names
         records_dict = records
     else:
-        print("Invalid records format. Exiting.")
-        return
+        raise ValueError("Invalid records format. Must be list or dict.")
     
     if not records_dict:
         print("No records dictionary provided. Exiting.")
         return
     
     cursor = db.cursor()
+    
+    # Tables to sync schema with Supabase
+    tables_to_sync = {'question_answer_attempts', 'question_answer_pairs'}
     
     for table_name, table_records in records_dict.items():
         if not table_records:
@@ -248,15 +253,48 @@ def upsert_records_to_db(records: typing.Union[typing.List[typing.Dict], typing.
             
         print(f"Processing {len(table_records)} records for table: {table_name}")
         
-        # Get column names from the first record
+        if table_name in tables_to_sync:
+            print(f"Syncing schema for {table_name} with Supabase...")
+            
+            supabase_columns = set()
+            try:
+                result = supabase_client.table(table_name).select("*").limit(1).execute()
+                if result.data and len(result.data) > 0:
+                    supabase_columns = set(result.data[0].keys())
+                    print(f"Found {len(supabase_columns)} columns in Supabase {table_name}")
+            except Exception as e:
+                print(f"Warning: Could not fetch Supabase schema for {table_name}: {e}")
+            
+            cursor.execute(f"PRAGMA table_info({table_name})")
+            local_columns = {row[1] for row in cursor.fetchall()}
+            
+            missing_columns = supabase_columns - local_columns
+            if missing_columns:
+                print(f"Adding {len(missing_columns)} missing columns to local {table_name}: {missing_columns}")
+                for col in missing_columns:
+                    cursor.execute(f"ALTER TABLE {table_name} ADD COLUMN {col} TEXT")
+                db.commit()
+        
+        if table_name == 'question_answer_pairs':
+            for record in table_records:
+                question_id = record.get('question_id')
+                if not question_id:
+                    continue
+                
+                cursor.execute(f"SELECT question_id FROM {table_name} WHERE question_id = ?", (question_id,))
+                existing_record = cursor.fetchone()
+                
+                if existing_record:
+                    record['question_vector'] = None
+                    record['doc'] = None
+                    record['k_nearest_neighbors'] = None
+        
         columns = list(table_records[0].keys())
         column_names = ', '.join(columns)
         placeholders = ', '.join('?' * len(columns))
         
-        # Build the SQL statement
         upsert_sql = f"REPLACE INTO {table_name} ({column_names}) VALUES ({placeholders})"
         
-        # Create data tuples for bulk upsert
         data_to_upsert = [
             tuple(record.get(col) for col in columns) for record in table_records
         ]
@@ -268,6 +306,7 @@ def upsert_records_to_db(records: typing.Union[typing.List[typing.Dict], typing.
             print(f"Successfully committed {len(table_records)} records to {table_name}.")
         except sqlite3.Error as e:
             print(f"SQLite error during upsert for {table_name}: {e}")
+            raise
     
     print("--- upsert_records_to_db finished ---")
 
@@ -375,15 +414,17 @@ def update_last_sync_date(new_date: typing.Union[str, None]) -> None:
         json.dump(data, f)
 
 def initialize_supabase_session():
-    '''Returns a SyncClient supabase client session object'''
+    """Returns an authenticated Supabase client session"""
     if SUPABASE_URL == "YOUR_SUPABASE_URL" or SUPABASE_KEY == "YOUR_SUPABASE_KEY":
-        print("Error: Supabase credentials are not configured. Please update SUPABASE_URL and SUPABASE_KEY.")
-        return
-    try:
-        supabase_client = supabase.create_client(SUPABASE_URL, SUPABASE_KEY)
-    except Exception as e:
-        print(f"Error connecting to Supabase: {e}")
-        return
+        print("Error: Supabase credentials are not configured.")
+        return None
+    
+    supabase_client = supabase.create_client(SUPABASE_URL, SUPABASE_KEY)
+    
+    supabase_client.auth.sign_in_with_password({
+        "email": "aacra0820@gmail.com",
+        "password": "Starting11Over!"
+    })
     
     return supabase_client
 
@@ -662,6 +703,91 @@ def fetch_data_for_bertopic(db: Connection):
     
     return docs, embeddings, question_ids 
 
+def sync_knn_results_to_supabase(db, supabase_client, reset_knn=False):
+    """
+    Syncs k_nearest_neighbors data from local database to Supabase.
+    Fetches records with null k_nearest_neighbors, updates from local DB, batch upserts.
+    
+    Args:
+        db: SQLite database connection
+        supabase_client: Authenticated Supabase client
+        reset_knn: If True, clears all k_nearest_neighbors in Supabase first
+    """
+    if reset_knn:
+        print("Clearing k_nearest_neighbors from Supabase...")
+        cleared_count = 0
+        while True:
+            # Check if any non-null records exist
+            check = supabase_client.table('question_answer_pairs').select('question_id').not_.is_('k_nearest_neighbors', 'null').limit(1).execute()
+            
+            if not check.data:
+                print(f"Reset complete. Cleared {cleared_count} records")
+                break
+            
+            # Fetch batch to clear
+            response = supabase_client.table('question_answer_pairs').select('*').not_.is_('k_nearest_neighbors', 'null').limit(500).execute()
+            
+            # Clear k_nearest_neighbors
+            clear_data = []
+            for record in response.data:
+                record['k_nearest_neighbors'] = None
+                clear_data.append(record)
+            
+            supabase_client.table('question_answer_pairs').upsert(clear_data).execute()
+            
+            cleared_count += len(clear_data)
+            print(f"Cleared {cleared_count} records...")
+    
+    cursor = db.cursor()
+    total_updated = 0
+    
+    # Get Supabase schema by fetching one record
+    schema_check = supabase_client.table('question_answer_pairs').select('*').limit(1).execute()
+    if schema_check.data:
+        supabase_columns = set(schema_check.data[0].keys())
+    else:
+        print("Error: Could not determine Supabase schema")
+        return
+    
+    print("Starting k-NN sync...")
+    
+    while True:
+        # Fetch 100 records from Supabase where k_nearest_neighbors is null
+        response = supabase_client.table('question_answer_pairs').select('question_id').is_('k_nearest_neighbors', 'null').limit(100).execute()
+        
+        if not response.data:
+            print(f"Sync complete. Total records updated: {total_updated}")
+            break
+        
+        question_ids = [record['question_id'] for record in response.data]
+        print(f"Found {len(question_ids)} records needing k-NN data")
+        
+        # Get full records from local DB for these question_ids
+        placeholders = ','.join('?' * len(question_ids))
+        cursor.execute(f"""
+            SELECT * FROM question_answer_pairs 
+            WHERE question_id IN ({placeholders})
+        """, question_ids)
+        
+        local_records = cursor.fetchall()
+        column_names = [description[0] for description in cursor.description]
+        
+        # Convert to dicts and update timestamp, filter to Supabase columns only
+        now = datetime.datetime.now(datetime.timezone.utc).isoformat()
+        update_data = []
+        for record in local_records:
+            record_dict = {k: v for k, v in zip(column_names, record) if k in supabase_columns}
+            record_dict['last_modified_timestamp'] = now
+            update_data.append(record_dict)
+        
+        if update_data:
+            # Batch upsert
+            supabase_client.table('question_answer_pairs').upsert(update_data).execute()
+            total_updated += len(update_data)
+            print(f"Progress: {total_updated} records synced")
+        else:
+            print("No matching records found in local DB")
+            break
 
 def main():
     fetch_and_save_data_locally()

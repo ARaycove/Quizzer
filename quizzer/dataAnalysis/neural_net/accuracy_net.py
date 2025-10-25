@@ -1,4 +1,5 @@
 import neural_net.attempt_pre_process as ap
+import neural_net.plot_functions as pf
 from neural_net.grid_search import grid_search_quizzer_model
 import os
 import neural_net.reports as rp
@@ -11,6 +12,9 @@ import random
 def pre_process_training_data():
     # Get our unprocessed table and load into a dataframe
     df = ap.get_attempt_dataframe()
+
+    # Remove old data where k_nearest_neighbors is missing
+    df = df[df['knn_performance_vector'].notna()]
 
     # Unpack embedded features
     df = ap.flatten_attempts_dataframe(df)
@@ -27,10 +31,33 @@ def pre_process_training_data():
     # Drop all 0 columns:
     df = ap.drop_zero_columns(df)
 
+    df = ap.drop_features(df, features_to_drop=[
+        "user_stats_total_attempts",
+        "user_stats_total_correct_attempts",
+        "user_stats_total_fitb_attempts",
+        "user_stats_total_fitb_correct_attempts",
+        "user_stats_total_fitb_incorrrect_attempts",
+        "user_stats_total_incorrect_attempts",
+        "user_stats_total_mcq_attempts",
+        "user_stats_total_mcq_correct_attempts",
+        "user_stats_total_mcq_incorrrect_attempts",
+        "user_stats_total_sata_attempts",
+        "user_stats_total_sata_correct_attempts",
+        "user_stats_total_sata_incorrrect_attempts",
+        "user_stats_total_so_attempts",
+        "user_stats_total_so_correct_attempts",
+        "user_stats_total_tf_attempts",
+        "user_stats_total_tf_correct_attempts",
+        "user_stats_total_tf_incorrrect_attempts",
+    ],
+    prefixes_to_drop=[
+        "rs", "module_name"
+    ])
+
     # Save the feature names we kept, for use in ml_models_table.dart
 
     # Run initial reporting and analysis on processed frame
-    rp.question_type_distribution_bar_chart(df)
+    pf.question_type_distribution_bar_chart(df)
     rp.save_feature_analysis(df)
     rp.feature_importance_analysis(df, "response_result")
     rp.analyze_feature_imbalance(df)

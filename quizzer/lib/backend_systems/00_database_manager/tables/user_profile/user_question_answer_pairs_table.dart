@@ -745,7 +745,6 @@ Future<void> batchUpsertUserQuestionAnswerPairs({
 
 /// Fetches all eligible user question answer pairs for a specific user.
 /// Ensures all modules have activation status records before running the query.
-/// Does NOT decode the records.
 Future<List<Map<String, dynamic>>> getEligibleUserQuestionAnswerPairs(String userUuid) async {
   try {
     // Ensure all modules have activation status records before checking eligibility
@@ -761,12 +760,8 @@ Future<List<Map<String, dynamic>>> getEligibleUserQuestionAnswerPairs(String use
     QuizzerLogger.logMessage('Fetching eligible user question answer pairs for user: $userUuid...');
     // Eligible question criteria:
     // 1. The question must be in circulation -> in_circulation = 1
-    // 2. The question must be past due -> next_revision_due < now
-    // 3. The question's module must be active OR it's concept must be active
-    // We have the list of active modules above, so we can use that to filter the questions
-    // We do not have a system for concept activation yet, so we will not filter by concept right now
-    
-    final String now = DateTime.now().toUtc().toIso8601String();
+    // 2. The question must not be flagged -> flagged = 0
+    // 3. The question's module must be active
     
     // Build the query with proper joins and conditions - only select needed fields
     String sql = '''
@@ -775,9 +770,8 @@ Future<List<Map<String, dynamic>>> getEligibleUserQuestionAnswerPairs(String use
         user_question_answer_pairs.question_id,
         user_question_answer_pairs.revision_streak,
         user_question_answer_pairs.last_revised,
-        user_question_answer_pairs.next_revision_due,
-        user_question_answer_pairs.time_between_revisions,
         user_question_answer_pairs.average_times_shown_per_day,
+        user_question_answer_pairs.accuracy_probability,
         user_question_answer_pairs.in_circulation,
         user_question_answer_pairs.total_attempts,
         question_answer_pairs.question_elements,
@@ -793,11 +787,11 @@ Future<List<Map<String, dynamic>>> getEligibleUserQuestionAnswerPairs(String use
       INNER JOIN question_answer_pairs ON user_question_answer_pairs.question_id = question_answer_pairs.question_id
       WHERE user_question_answer_pairs.user_uuid = ?
         AND user_question_answer_pairs.in_circulation = 1
-        AND user_question_answer_pairs.next_revision_due < ?
         AND user_question_answer_pairs.flagged = 0
+        AND user_question_answer_pairs.accuracy_probability IS NOT NULL
     ''';
     
-    List<dynamic> whereArgs = [userUuid, now];
+    List<dynamic> whereArgs = [userUuid];
     
     // Add module filter if there are active modules
     if (activeModuleNames.isNotEmpty) {
@@ -806,9 +800,6 @@ Future<List<Map<String, dynamic>>> getEligibleUserQuestionAnswerPairs(String use
       whereArgs.addAll(activeModuleNames);
     }
     
-    // Add ORDER BY for consistent results
-    sql += ' ORDER BY user_question_answer_pairs.next_revision_due ASC';
-    
     QuizzerLogger.logMessage('Executing eligibility query with ${activeModuleNames.length} active modules');
     final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
       'user_question_answer_pairs', // Use the main table name for the helper
@@ -816,7 +807,6 @@ Future<List<Map<String, dynamic>>> getEligibleUserQuestionAnswerPairs(String use
       customQuery: sql,
       whereArgs: whereArgs,
     );
-
     QuizzerLogger.logSuccess('Fetched ${results.length} eligible records for user: $userUuid (fields pre-filtered in SQL query).');
     return results;
   } catch (e) {

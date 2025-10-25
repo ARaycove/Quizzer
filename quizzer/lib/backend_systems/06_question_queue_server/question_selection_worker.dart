@@ -6,9 +6,8 @@ import 'package:quizzer/backend_systems/09_data_caches/question_queue_cache.dart
 import 'package:quizzer/backend_systems/09_data_caches/answer_history_cache.dart';
 import 'package:quizzer/backend_systems/10_switch_board/switch_board.dart';
 import 'package:quizzer/backend_systems/10_switch_board/sb_question_worker_signals.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/ml_models_table.dart';
 // Table Imports
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_profile_table.dart' as user_profile_table;
-import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pair_management/question_answer_pairs_table.dart' as q_pairs_table;
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_question_answer_pairs_table.dart';
 // Data Consistency Import
 import 'package:quizzer/backend_systems/00_database_manager/data_consistency/compare_question.dart';
@@ -227,7 +226,8 @@ class PresentationSelectionWorker {
       if (!_isRunning) return false;
 
       // 1. Call _selectNextQuestionFromList to get the selected question
-      final Map<String, dynamic> selectedQuestion = await _selectNextQuestionFromList(eligibleQuestions);
+      // selection logic works on a router, for AB testing. Selection logic is now such that we can easily assign users to different selection logic for testing
+      final Map<String, dynamic> selectedQuestion = await _selectNextQuestionFromList(eligibleQuestions, selectionLogic: 4);
       
       // 2. Check if selection was successful
       if (selectedQuestion.isEmpty) {
@@ -274,6 +274,7 @@ class PresentationSelectionWorker {
   }
   
   // --- Internal tracking method ---
+  // Tracks recently selected to prevent duplicate selections. . .
   void _trackSelectedQuestion(String questionId) {
     // Remove if already exists (to move to front)
     _recentlySelectedQuestionIds.remove(questionId);
@@ -286,177 +287,194 @@ class PresentationSelectionWorker {
     QuizzerLogger.logMessage('PSW Tracking: Added $questionId to recently selected list (${_recentlySelectedQuestionIds.length} total)');
   }
 
-  // --- Adapted Selection Logic (Table functions handle their own database access) ---
-
-  Future<Map<String, dynamic>> _selectNextQuestionFromList(List<Map<String, dynamic>> eligibleQuestions) async {
+  // Main router function
+  Future<Map<String, dynamic>> _selectNextQuestionFromList(List<Map<String, dynamic>> eligibleQuestions, {int selectionLogic = 1}) async {
     try {
       QuizzerLogger.logMessage('Entering PresentationSelectionWorker _selectNextQuestionFromList()...');
-      if (!_isRunning) return {}; // Abort if worker was stopped
+      if (!_isRunning) return {};
+      if (eligibleQuestions.isEmpty) return {};
       
-      // QuizzerLogger.logMessage('PSW Algo: Entering _selectNextQuestionFromList with ${eligibleQuestions.length} items.');
-      // Assumes eligibleQuestions is not empty (checked by caller)
-      assert(_sessionManager.userId != null, "User ID must be set for selection.");
-      final userId = _sessionManager.userId!;
-
-      // --- Configuration --- (Keep as is)
-      const double subInterestWeight    = 0.4;
-      const double revisionStreakWeight = 0.3;
-      const double timeDaysWeight       = 0.3;
-      const double bias                 = 0.01;
-      // ---------------------
-
-      Map<String, double> scoreMap = {}; // format {question_id: selectionAlgoScore} (do not unccomment or modify)
-      
-      // Table functions handle their own database access
-      // Get interests directly from DB
-      Map<String, int> userSubjectInterests = await user_profile_table.getUserSubjectInterests(userId);
-      // QuizzerLogger.logValue('PSW Algo: User interests fetched.');
-
-      // Preprocessing: Calculate overdue days and find max
-      double actualMaxOverdueDays = 0.0;
-      final Map<String, double> overdueDaysMap = {}; 
-      for (final question in eligibleQuestions) {
-          final String questionId = question['question_id'];
-          final String nextRevisionDueStr = question['next_revision_due'];
-          final DateTime nextRevisionDue = DateTime.parse(nextRevisionDueStr);
-          final Duration timeDifference = DateTime.now().difference(nextRevisionDue);
-          final double timePastDueInDays = timeDifference.isNegative ? 0.0 : timeDifference.inDays.toDouble();
-          overdueDaysMap[questionId] = timePastDueInDays;
-          if (timePastDueInDays > actualMaxOverdueDays) {
-              actualMaxOverdueDays = timePastDueInDays;
-          }
+      switch (selectionLogic) {
+        case 0:
+          // Selects questions with the lowest revision streak, sorted by lowest probability.
+          return await _selectionLogicZero(eligibleQuestions);
+        case 1:
+          // Selects questions that have a accuracy probability around the ideal threshold of the prediction model
+          return await _selectionLogicOne(eligibleQuestions);
+        case 2:
+          // Selects questions at random out of all possible questions
+          return await _selectionLogicTwo(eligibleQuestions);
+        case 3:
+          // Semi-Random Selection, prioritize new questions over old questions
+          return await _selectionLogicThree(eligibleQuestions,
+          nullRevisedPercent: 0.8, allQuestionsPercent: 0.15, nonNullRevisedPercent: 0.05);
+        case 4:
+          // 50/50 seen/unseen selection
+          return await _selectionLogicFour(eligibleQuestions);
+        default:
+          QuizzerLogger.logWarning('Invalid selectionLogic value: $selectionLogic. Defaulting to logic 1.');
+          return await _selectionLogicOne(eligibleQuestions);
       }
-      // QuizzerLogger.logValue('PSW Algo: Preprocessing complete. Max overdue: $actualMaxOverdueDays');
-
-      final double overallMaxInterest = userSubjectInterests.values.fold(0.0, (max, current) => current > max ? current.toDouble() : max);
-
-      // Loop over eligible questions to calculate scores
-      double totalScore = 0.0;
-      // QuizzerLogger.logMessage('PSW Algo: Calculating scores...');
-      for (final question in eligibleQuestions) {
-        if (!_isRunning) return {}; // Abort if worker was stopped
-        
-        final String questionId = question['question_id'];
-        final int revisionStreak = question['revision_streak'] ?? 0;
-        
-        // Fetch full pair directly from DB - table function handles its own database access
-        Map<String, dynamic> questionDetails;
-        try {
-          questionDetails = await q_pairs_table.getQuestionAnswerPairById(questionId);
-        } catch (e) {
-          // Question was likely deleted by cleanup function, skip this question
-          QuizzerLogger.logWarning('PSW Algo: Question $questionId was deleted during processing, skipping.');
-          continue;
-        }
-        if (!_isRunning) return {}; // Abort if worker was stopped after DB call
-        
-        final String? subjectsCsv = questionDetails['subjects'] as String?;
-
-        final double timePastDueInDays = overdueDaysMap[questionId]!;
-        final int adjustedStreak = (revisionStreak == 0) ? 1 : revisionStreak;
-
-        double subjectInterestHighest = 0.0;
-        if (subjectsCsv != null && subjectsCsv.isNotEmpty) {
-          final List<String> subjects = subjectsCsv.split(',').map((s) => s.trim()).where((s) => s.isNotEmpty).toList();
-          for (final subject in subjects) {
-            final double currentInterest = (userSubjectInterests[subject] ?? 0).toDouble();
-            if (currentInterest > subjectInterestHighest) {
-              subjectInterestHighest = currentInterest;
-            }
-          }
-        } else {
-          subjectInterestHighest = (userSubjectInterests['misc'] ?? 0).toDouble();
-        }
-        
-        final double normalizedInterest = (overallMaxInterest > 0) ? (subjectInterestHighest / overallMaxInterest) : 0.0;
-        final double normalizedStreak = 1.0 / adjustedStreak;
-        final double normalizedTime = (actualMaxOverdueDays > 0) ? (timePastDueInDays / actualMaxOverdueDays) : 0.0;
-
-        final double score = _selectionAlgorithm(subInterestWeight, revisionStreakWeight, timeDaysWeight, normalizedStreak, normalizedTime, normalizedInterest, bias);
-        final double finalScore = max(0.0, score);
-
-        scoreMap[questionId] = finalScore;
-        totalScore += finalScore;
-      }
-      // QuizzerLogger.logValue('PSW Algo: Score calculation complete. Total score: $totalScore');
-
-      if (totalScore <= 0.0) {
-          QuizzerLogger.logWarning("PSW Algo: Total score zero/negative. Selecting randomly."); // Keep this warning
-          final random = Random();
-          return eligibleQuestions[random.nextInt(eligibleQuestions.length)];
-      }
-
-      // Weighted Random Selection
-      // QuizzerLogger.logMessage('PSW Algo: Performing weighted random selection...');
-      if (!_isRunning) return {}; // Abort if worker was stopped
-      
-      // Check if we have any valid questions after filtering
-      if (scoreMap.isEmpty) {
-        QuizzerLogger.logWarning('PSW Algo: No valid questions remaining after filtering, returning empty result.');
-        return {};
-      }
-      
-      final random = Random();
-      double randomThreshold = random.nextDouble() * totalScore;
-      double cumulativeScore = 0.0;
-
-      for (final question in eligibleQuestions) {
-        if (!_isRunning) return {}; // Abort if worker was stopped
-        
-        final String questionId = question['question_id'];
-        // Skip questions that weren't successfully processed
-        if (!scoreMap.containsKey(questionId)) {
-          continue;
-        }
-        final double score = scoreMap[questionId]!;
-        cumulativeScore += score;
-        if (cumulativeScore >= randomThreshold) {
-          // QuizzerLogger.logValue("PSW Algo: Selected $questionId (Score: $score, Cumulative: $cumulativeScore, Threshold: $randomThreshold)");
-          return question;
-        }
-      }
-
-      // Fallback
-      // QuizzerLogger.logError('PSW Algo: Weighted random selection failed! Returning first eligible.'); // Keep this error
-      if (!_isRunning) return {}; // Abort if worker was stopped
-      
-      // Try to find any question that was successfully processed
-      for (final question in eligibleQuestions) {
-        final String questionId = question['question_id'];
-        if (scoreMap.containsKey(questionId)) {
-          return question;
-        }
-      }
-      
-      // If no questions were successfully processed, return empty
-      QuizzerLogger.logWarning('PSW Algo: No questions were successfully processed, returning empty result.');
-      return {};
     } catch (e) {
       QuizzerLogger.logError('Error in PresentationSelectionWorker _selectNextQuestionFromList - $e');
       rethrow;
     }
   }
 
-  // --- Helper for the selection algorithm formula ---
-  double _selectionAlgorithm(
-    double subInterestWeight, 
-    double revisionStreakWeight,
-    double timeDaysWeight,
-    double normalizedStreak, 
-    double normalizedTime,
-    double normalizedInterest,
-    double bias
-  ) {
-    try {
-      return (
-        (subInterestWeight * normalizedInterest) + 
-        (revisionStreakWeight * normalizedStreak) + 
-        (timeDaysWeight * normalizedTime) + 
-        bias
-      );
-    } catch (e) {
-      QuizzerLogger.logError('Error in PresentationSelectionWorker _selectionAlgorithm - $e');
-      rethrow;
+  // Logic 0: Lowest revision streak, then lowest probability
+  Future<Map<String, dynamic>> _selectionLogicZero(List<Map<String, dynamic>> eligibleQuestions) async {
+    QuizzerLogger.logMessage("Selection Logic 0: Lowest revision streak and lowest probability");
+    
+    int lowestStreak = eligibleQuestions.first['revision_streak'] ?? 0;
+    for (final q in eligibleQuestions) {
+      final streak = q['revision_streak'] ?? 0;
+      if (streak < lowestStreak) lowestStreak = streak;
     }
+    
+    final lowestStreakQuestions = eligibleQuestions.where((q) => (q['revision_streak'] ?? 0) == lowestStreak).toList();
+    
+    final selected = lowestStreakQuestions.reduce((a, b) => 
+      ((a['accuracy_probability'] ?? 0.0) < (b['accuracy_probability'] ?? 0.0)) ? a : b
+    );
+    
+    final prob = selected['accuracy_probability'] ?? 0.0;
+    final attempts = selected['total_attempts'] ?? 0;
+    QuizzerLogger.logMessage("Selected question - revision_streak: $lowestStreak, accuracy_probability: $prob, total_attempts: $attempts");
+    return selected;
+  }
+
+  // Logic 1: Probabilistic selection with ML threshold
+  Future<Map<String, dynamic>> _selectionLogicOne(List<Map<String, dynamic>> eligibleQuestions) async {
+    QuizzerLogger.logMessage("Selection Logic 1: Probabilistic with ML threshold");
+    
+    final random = Random();
+    final double roll = random.nextDouble();
+    final double threshold = await getAccuracyNetOptimalThreshold();
+    
+    final highProbQuestions = eligibleQuestions.where((q) => (q['accuracy_probability'] ?? 0.0) >= 0.90).toList();
+    final lowProbQuestions = eligibleQuestions.where((q) => (q['accuracy_probability'] ?? 0.0) < 0.90).toList();
+    
+    final int selectionMode = roll < 0.75 ? 0 : (roll < 0.95 ? 1 : 2);
+    
+    switch (selectionMode) {
+      case 0: // 75% - Select closest to threshold (excluding >= 0.90)
+        if (lowProbQuestions.isEmpty) {
+          return eligibleQuestions[random.nextInt(eligibleQuestions.length)];
+        }
+        
+        double minDistance = double.infinity;
+        List<Map<String, dynamic>> closestQuestions = [];
+        
+        for (final q in lowProbQuestions) {
+          final double prob = q['accuracy_probability'] ?? 0.0;
+          final double distance = (prob - threshold).abs();
+          
+          if (distance < minDistance) {
+            minDistance = distance;
+            closestQuestions = [q];
+          } else if (distance == minDistance) {
+            closestQuestions.add(q);
+          }
+        }
+        
+        return closestQuestions[random.nextInt(closestQuestions.length)];
+      
+      case 1: // 20% - Select lowest probability
+        return eligibleQuestions.reduce((a, b) => 
+          ((a['accuracy_probability'] ?? 0.0) < (b['accuracy_probability'] ?? 0.0)) ? a : b
+        );
+      
+      case 2: // 5% - Select random from high probability (>= 0.90), or highest if none
+        if (highProbQuestions.isEmpty) {
+          return eligibleQuestions.reduce((a, b) => 
+            ((a['accuracy_probability'] ?? 0.0) > (b['accuracy_probability'] ?? 0.0)) ? a : b
+          );
+        }
+        return highProbQuestions[random.nextInt(highProbQuestions.length)];
+      
+      default:
+        return eligibleQuestions.reduce((a, b) => 
+          ((a['accuracy_probability'] ?? 0.0) > (b['accuracy_probability'] ?? 0.0)) ? a : b
+        );
+    }
+  }
+
+  // Logic 2: Completely random selection
+  Future<Map<String, dynamic>> _selectionLogicTwo(List<Map<String, dynamic>> eligibleQuestions) async {
+    QuizzerLogger.logMessage("Selection Logic 2: Completely random selection");
+    final random = Random();
+    final selected = eligibleQuestions[random.nextInt(eligibleQuestions.length)];
+    QuizzerLogger.logMessage("Selected question: $selected");
+    return selected;
+  }
+
+  // Semi-Random selection Exploratory
+  Future<Map<String, dynamic>> _selectionLogicThree(
+    List<Map<String, dynamic>> eligibleQuestions, {
+    double nullRevisedPercent = 0.60,
+    double allQuestionsPercent = 0.39,
+    double nonNullRevisedPercent = 0.01,
+  }) async {
+    final random = Random();
+    final roll = random.nextDouble();
+    
+    List<Map<String, dynamic>> targetPool;
+    
+    if (roll < nullRevisedPercent) {
+      targetPool = eligibleQuestions.where((q) => q['last_revised'] == null).toList();
+      if (targetPool.isEmpty) targetPool = eligibleQuestions;
+    } else if (roll < nullRevisedPercent + allQuestionsPercent) {
+      targetPool = eligibleQuestions;
+    } else if (roll < nullRevisedPercent + allQuestionsPercent + nonNullRevisedPercent) {
+      targetPool = eligibleQuestions.where((q) => q['last_revised'] != null).toList();
+      if (targetPool.isEmpty) targetPool = eligibleQuestions;
+    } else {
+      targetPool = eligibleQuestions;
+    }
+    
+    final selected = targetPool[random.nextInt(targetPool.length)];
+    QuizzerLogger.logMessage("Selected question: $selected");
+    return selected;
+  }
+
+  // Logic 4: 50/50 split between unseen and seen questions
+  Future<Map<String, dynamic>> _selectionLogicFour(List<Map<String, dynamic>> eligibleQuestions) async {
+    QuizzerLogger.logMessage("Selection Logic 3: 50/50 unseen/seen split");
+    
+    final random = Random();
+    
+    // Split questions into unseen (last_revised is null) and seen (last_revised is not null)
+    final unseenQuestions = eligibleQuestions.where((q) => q['last_revised'] == null).toList();
+    final seenQuestions = eligibleQuestions.where((q) => q['last_revised'] != null).toList();
+    
+    // Determine which pool to select from
+    List<Map<String, dynamic>> selectedPool;
+    
+    if (unseenQuestions.isEmpty && seenQuestions.isEmpty) {
+      // No questions available (shouldn't happen but handle it)
+      QuizzerLogger.logWarning("No questions available in either pool");
+      return {};
+    } else if (unseenQuestions.isEmpty) {
+      // Only seen questions available, select from seen
+      QuizzerLogger.logMessage("No unseen questions available, selecting from seen pool (${seenQuestions.length} questions)");
+      selectedPool = seenQuestions;
+    } else if (seenQuestions.isEmpty) {
+      // Only unseen questions available, select from unseen
+      QuizzerLogger.logMessage("No seen questions available, selecting from unseen pool (${unseenQuestions.length} questions)");
+      selectedPool = unseenQuestions;
+    } else {
+      // Both pools have questions, 50/50 choice
+      final bool selectUnseen = random.nextDouble() < 0.5;
+      selectedPool = selectUnseen ? unseenQuestions : seenQuestions;
+      QuizzerLogger.logMessage("Selected ${selectUnseen ? 'unseen' : 'seen'} pool (${selectedPool.length} questions)");
+    }
+    
+    // Randomly select from chosen pool
+    final selected = selectedPool[random.nextInt(selectedPool.length)];
+    final lastRevised = selected['last_revised'];
+    final prob = selected['accuracy_probability'] ?? 0.0;
+    QuizzerLogger.logMessage("Selected question - last_revised: ${lastRevised ?? 'null'}, accuracy_probability: $prob");
+    
+    return selected;
   }
 }

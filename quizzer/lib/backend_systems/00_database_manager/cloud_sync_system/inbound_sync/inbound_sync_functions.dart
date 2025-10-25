@@ -1,3 +1,4 @@
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_daily_stats_table.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:supabase/supabase.dart';
@@ -100,6 +101,9 @@ Future<void> runInboundSync(SessionManager sessionManager) async {
     await batchUpsertUserModuleActivationStatusFromInboundSync(userModuleActivationStatusRecords: tableDataForSync[5], db: txn);
     await batchUpsertSubjectDetails(subjectDetailRecords: tableDataForSync[6], db: txn);
     await batchUpsertMlModelsFromInboundSync(modelRecords: tableDataForSync[7], db: txn);
+    await batchUpsertUserDailyStatsFromInboundSync(userDailyStatsRecords: tableDataForSync[8], db: txn);
+
+
     });
     getDatabaseMonitor().releaseDatabaseAccess();
     QuizzerLogger.logSuccess('Inbound sync completed successfully.');

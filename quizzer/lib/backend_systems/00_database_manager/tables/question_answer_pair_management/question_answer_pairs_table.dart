@@ -91,6 +91,7 @@ final List<Map<String, String>> expectedColumns = [
   {'name': 'last_modified_timestamp',  'type': 'TEXT'},
   {'name': 'has_media',                'type': 'INTEGER DEFAULT NULL'},
   {'name': 'question_vector',          'type': 'TEXT DEFAULT NULL'},
+  {'name': 'k_nearest_neighbors',      'type': 'TEXT DEFAULT NULL'}
 ];
 
 /// Verifies that the question_answer_pairs table exists and creates it if it doesn't.
