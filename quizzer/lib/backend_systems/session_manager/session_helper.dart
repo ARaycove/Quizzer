@@ -1,6 +1,6 @@
 import 'dart:math';
-import 'package:quizzer/backend_systems/08_memory_retention_algo/memory_retention_algorithm.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_attempts_table.dart' as attempt_table;
+import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_attempts_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pair_management/question_answer_pairs_table.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart'; // Logger needed for debugging
 import 'package:supabase/supabase.dart'; // For supabase.Session type
 import 'package:jwt_decode/jwt_decode.dart'; // For decoding JWT
@@ -36,7 +36,7 @@ Future<Map<String, dynamic>?> recordQuestionAnswerAttempt({
     // ===================================
     // Query 1: Question Metadata
     // ===================================
-    final Map<String, dynamic> questionMetadata = await attempt_table.fetchQuestionMetadata(
+    final Map<String, dynamic> questionMetadata = await fetchQuestionMetadata(
       db: db,
       questionId: questionId,
     );
@@ -53,7 +53,7 @@ Future<Map<String, dynamic>?> recordQuestionAnswerAttempt({
     // ===================================
     // Query 2: Individual Question Performance
     // ===================================
-    final Map<String, dynamic> userQuestionPerformance = await attempt_table.fetchUserQuestionPerformance(
+    final Map<String, dynamic> userQuestionPerformance = await fetchUserQuestionPerformance(
       db: db,
       userId: userId,
       questionId: questionId,
@@ -77,7 +77,7 @@ Future<Map<String, dynamic>?> recordQuestionAnswerAttempt({
     // ===================================
     // Query 3: User Stats Vector
     // ===================================
-    final String? userStatsVector = await attempt_table.fetchUserStatsVector(
+    final String? userStatsVector = await fetchUserStatsVector(
       db: db,
       userId: userId,
     );
@@ -87,7 +87,7 @@ Future<Map<String, dynamic>?> recordQuestionAnswerAttempt({
     // ===================================
     const String? modulePerformanceVector = null;
     // TODO - This can't be done until the topic model is tuned
-    // final String? modulePerformanceVector = await attempt_table.fetchModulePerformanceVector(
+    // final String? modulePerformanceVector = await fetchModulePerformanceVector(
     //   db: db,
     //   userId: userId,
     //   timeStamp: timeStamp,
@@ -96,7 +96,7 @@ Future<Map<String, dynamic>?> recordQuestionAnswerAttempt({
     // ===================================
     // Query 5: User Profile Record
     // ===================================
-    final String? userProfileRecord = await attempt_table.fetchUserProfileRecord(
+    final String? userProfileRecord = await fetchUserProfileRecord(
       db: db,
       userId: userId,
     );
@@ -104,7 +104,7 @@ Future<Map<String, dynamic>?> recordQuestionAnswerAttempt({
     // ===================================
     // Query 6: K Nearest Performance Vector
     // ===================================
-    final String? kNearestPerformanceVector = await attempt_table.fetchKNearestPerformanceVector(
+    final String? kNearestPerformanceVector = await fetchKNearestPerformanceVector(
       db: db,
       userId: userId,
       kNearestNeighbors: kNearestNeighbors,
@@ -181,7 +181,7 @@ Future<Map<String, dynamic>?> recordQuestionAnswerAttempt({
       return sampleData;
     } else {
       // Insert the training sample (this function gets its own db access)
-      await attempt_table.addQuestionAnswerAttempt(
+      await addQuestionAnswerAttempt(
         questionId: questionId,
         participantId: userId,
         timeStamp: timeStamp,
@@ -195,40 +195,6 @@ Future<Map<String, dynamic>?> recordQuestionAnswerAttempt({
     QuizzerLogger.logError('Error in recordQuestionAnswerAttempt - $e');
     // Make sure we release the connection even if there's an error
     getDatabaseMonitor().releaseDatabaseAccess();
-    rethrow;
-  }
-}
-
-
-/// Calculates the adjustment factor for time_between_revisions.
-double _calculateTimeBetweenRevisionsAdjustment({
-  required bool isCorrect,
-  required DateTime now,
-  required DateTime currentNextRevisionDue,
-}) {
-  try {
-    QuizzerLogger.logMessage('Entering _calculateTimeBetweenRevisionsAdjustment()...');
-    
-    double adjustment = 0.0;
-    
-    // Check if the due date passed within the last 24 hours from now
-    final bool isDueWithinLast24Hrs = now.difference(currentNextRevisionDue).inHours <= 24 && now.isAfter(currentNextRevisionDue);
-
-    if (isCorrect && !isDueWithinLast24Hrs) {
-      // Apply bonus only if correct AND overdue by > 24 hours
-      adjustment = 0.005;
-      QuizzerLogger.logMessage('Applied bonus adjustment: +0.005 (correct answer, overdue > 24h)');
-    } else if (!isCorrect && isDueWithinLast24Hrs) {
-      // Apply penalty only if incorrect AND it became due within the last 24 hours
-      adjustment = -0.015;
-      QuizzerLogger.logMessage('Applied penalty adjustment: -0.015 (incorrect answer, due within 24h)');
-    } else {
-      QuizzerLogger.logMessage('No adjustment applied (adjustment: $adjustment)');
-    }
-    
-    return adjustment;
-  } catch (e) {
-    QuizzerLogger.logError('Error in _calculateTimeBetweenRevisionsAdjustment - $e');
     rethrow;
   }
 }
@@ -252,68 +218,11 @@ int _calculateStreakAdjustment({
   }
 }
 
-/// Applies adjustment and bounds (0.05 to 1.0) to time_between_revisions.
-double _calculateUpdatedTimeBetweenRevisions({
-  required double currentTimeBetweenRevisions,
-  required double adjustment,
-}) {
-  try {
-    QuizzerLogger.logMessage('Entering _calculateUpdatedTimeBetweenRevisions()...');
-    
-    double updated = currentTimeBetweenRevisions + adjustment;
-    
-    QuizzerLogger.logMessage('Initial calculation: $currentTimeBetweenRevisions + $adjustment = $updated');
-    
-    if (updated > 1.0) {
-      QuizzerLogger.logMessage('Bounding to maximum: 1.0');
-      return 1.0;
-    } else if (updated < 0.05) {
-      QuizzerLogger.logMessage('Bounding to minimum: 0.05');
-      return 0.05;
-    }
-    
-    QuizzerLogger.logMessage('Final time_between_revisions: $updated (within bounds)');
-    return updated;
-  } catch (e) {
-    QuizzerLogger.logError('Error in _calculateUpdatedTimeBetweenRevisions - $e');
-    rethrow;
-  }
-}
-
-/// Calls the SRS algorithm to get next revision date and avg times shown.
-Map<String, dynamic> _calculateNextRevisionDate({
-  required String status,
-  required int updatedStreak,
-  required double updatedTimeBetweenRevisions,
-}) {
-  // TODO This will need to be updated once the probability model is in place
-  try {
-    QuizzerLogger.logMessage('Entering _calculateNextRevisionDate()...');
-    
-    QuizzerLogger.logMessage('Calling SRS algorithm with: status=$status, streak=$updatedStreak, timeBetweenRevisions=$updatedTimeBetweenRevisions');
-    
-    final Map<String, dynamic> result = calculateNextRevisionDate(
-      status,
-      updatedStreak,
-      updatedTimeBetweenRevisions,
-    );
-    
-    QuizzerLogger.logMessage('SRS algorithm returned: next_revision_due=${result['next_revision_due']}, average_times_shown_per_day=${result['average_times_shown_per_day']}');
-    
-    return result;
-  } catch (e) {
-    QuizzerLogger.logError('Error in _calculateNextRevisionDate - $e');
-    rethrow;
-  }
-}
-
-
 // ==========================================
 // Public Helper Function
 // ==========================================
 
 /// Updates the user-specific question record based on the answer correctness.
-/// Calculates new SRS values and directly updates the database.
 /// All updates happen in a single atomic operation.
 Future<void> updateUserQuestionRecordOnAnswer({
   required bool isCorrect,
@@ -331,10 +240,8 @@ Future<void> updateUserQuestionRecordOnAnswer({
     final int currentRevisionStreak = currentUserRecord['revision_streak'] as int;
     final double currentTimeBetweenRevisions = currentUserRecord['time_between_revisions'] as double;
     final int currentTotalAttempts = currentUserRecord['total_attempts'] as int;
-    final String currentNextRevisionDueStr = currentUserRecord['next_revision_due'] as String;
     final double currentAvgReactionTime = (currentUserRecord['avg_reaction_time'] as double?) ?? 0.0;
     final DateTime now = DateTime.now();
-    final DateTime currentNextRevisionDue = DateTime.parse(currentNextRevisionDueStr); 
     
     QuizzerLogger.logMessage('Current values - streak: $currentRevisionStreak, timeBetweenRevisions: $currentTimeBetweenRevisions, totalAttempts: $currentTotalAttempts, isCorrect: $isCorrect');
     
@@ -356,36 +263,12 @@ Future<void> updateUserQuestionRecordOnAnswer({
     final double newQuestionAccuracyRate = newTotalCorrectAttempts / newTotalAttempts;
     final double newQuestionInaccuracyRate = newTotalIncorrectAttempts / newTotalAttempts;
     
-    // Update Revision Streak and Time Between Revisions
-    final double adjustment = _calculateTimeBetweenRevisionsAdjustment(
-      isCorrect: isCorrect,
-      now: now,
-      currentNextRevisionDue: currentNextRevisionDue,
-    );
-    
     final int streakAdjustment = _calculateStreakAdjustment(
       isCorrect: isCorrect,
     );
     
     // Calculate new streak (ensure >= 0)
     final int newRevisionStreak = max(0, currentRevisionStreak + streakAdjustment);
-    
-    // Calculate new time_between_revisions // FIXME Deprecated, there will be no k (time between revision metric once probability model is in place)
-    final double newTimeBetweenRevisions = _calculateUpdatedTimeBetweenRevisions(
-      currentTimeBetweenRevisions: currentTimeBetweenRevisions,
-      adjustment: adjustment,
-    );
-    
-    // Calculate next_revision_due and average_times_shown_per_day
-    final String status = isCorrect ? 'correct' : 'incorrect';
-    
-    final Map<String, dynamic> nextRevisionData = _calculateNextRevisionDate(
-      status: status,
-      updatedStreak: newRevisionStreak,
-      updatedTimeBetweenRevisions: newTimeBetweenRevisions,
-    );
-    final String newNextRevisionDue = nextRevisionData['next_revision_due'] as String;
-    final double newAverageTimesShownPerDay = nextRevisionData['average_times_shown_per_day'] as double;
     
     // Calculate last_revised
     final String newLastRevised = now.toIso8601String();
@@ -409,14 +292,11 @@ Future<void> updateUserQuestionRecordOnAnswer({
       QuizzerLogger.logSuccess('Question removed from circulation and attempts reset to 0');
     }
     
-    QuizzerLogger.logMessage('Final values - streak: $newRevisionStreak, timeBetweenRevisions: $newTimeBetweenRevisions, totalAttempts: $finalTotalAttempts, inCirculation: $finalInCirculation, avgReactionTime: $newAvgReactionTime, correctAttempts: $newTotalCorrectAttempts, incorrectAttempts: $newTotalIncorrectAttempts, accuracyRate: $newQuestionAccuracyRate');
+    QuizzerLogger.logMessage('Final values - streak: $newRevisionStreak, totalAttempts: $finalTotalAttempts, inCirculation: $finalInCirculation, avgReactionTime: $newAvgReactionTime, correctAttempts: $newTotalCorrectAttempts, incorrectAttempts: $newTotalIncorrectAttempts, accuracyRate: $newQuestionAccuracyRate');
     
     Map<String, dynamic> updateData = {
         'revision_streak': newRevisionStreak,
         'last_revised': newLastRevised,
-        'next_revision_due': newNextRevisionDue,
-        'time_between_revisions': newTimeBetweenRevisions,
-        'average_times_shown_per_day': newAverageTimesShownPerDay,
         'in_circulation': finalInCirculation,
         'total_attempts': finalTotalAttempts,
         'avg_reaction_time': newAvgReactionTime,
@@ -427,10 +307,7 @@ Future<void> updateUserQuestionRecordOnAnswer({
         'question_inaccuracy_rate': newQuestionInaccuracyRate,
         'last_prob_calc': DateTime.utc(1970, 1, 1).toIso8601String() // Immediately trigger this question to be re-evaluated by the accuracy net
       };
-    // QuizzerLogger.logMessage("Individual Question Record Updated, feed is:");
-    // updateData.forEach((key, value) {
-    //   QuizzerLogger.logMessage("${key.padRight(20)}, $value");
-    // });
+
     // --- 5. Update Database in Single Atomic Operation ---
     await editUserQuestionAnswerPair(
       userUuid: userId,
@@ -439,6 +316,38 @@ Future<void> updateUserQuestionRecordOnAnswer({
     );
     
     QuizzerLogger.logMessage('Successfully updated user question record in database');
+    
+    // --- 6. Update k_nearest_neighbors to trigger re-evaluation ---
+    final Map<String, dynamic> questionRecord = await getQuestionAnswerPairById(questionId);
+    final dynamic kNearestNeighborsData = questionRecord['k_nearest_neighbors'];
+    
+    if (kNearestNeighborsData != null) {
+      final Map<String, dynamic> kNearestMap = kNearestNeighborsData as Map<String, dynamic>;
+      final List<String> neighborQuestionIds = kNearestMap.keys.toList();
+      
+      if (neighborQuestionIds.isNotEmpty) {
+        QuizzerLogger.logMessage('Triggering re-evaluation for ${neighborQuestionIds.length} nearest neighbors');
+        
+        final db = await getDatabaseMonitor().requestDatabaseAccess();
+        if (db == null) {
+          throw Exception('Failed to acquire database access');
+        }
+        
+        try {
+          final String resetDate = DateTime.utc(1970, 1, 1).toIso8601String();
+          final String placeholders = List.filled(neighborQuestionIds.length, '?').join(',');
+          
+          await db.rawUpdate(
+            'UPDATE user_question_answer_pairs SET last_prob_calc = ? WHERE user_uuid = ? AND question_id IN ($placeholders)',
+            [resetDate, userId, ...neighborQuestionIds],
+          );
+          
+          QuizzerLogger.logSuccess('Triggered re-evaluation for ${neighborQuestionIds.length} nearest neighbor questions');
+        } finally {
+          getDatabaseMonitor().releaseDatabaseAccess();
+        }
+      }
+    }
   } catch (e) {
     QuizzerLogger.logError('Error in updateUserQuestionRecordOnAnswer - $e');
     rethrow;

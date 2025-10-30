@@ -32,6 +32,7 @@ migrate_working_dir/
 /build/
 
 quizzer/google-chrome-stable_current_amd64.deb
+quizzer/QuizzerAppLogs
 
 
 # Symbolication related

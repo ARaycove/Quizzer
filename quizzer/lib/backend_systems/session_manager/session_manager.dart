@@ -1033,7 +1033,13 @@ class SessionManager {
         questionId: questionId,
       );
       
-      double reactionTime = _timeAnswerGiven!.difference(_timeDisplayed!).inMicroseconds / Duration.microsecondsPerSecond;
+      // We got a null check operator error, so there is a potential that one of these two timestamps failed to be generated
+      double reactionTime = (
+        (_timeAnswerGiven ?? DateTime.now())
+        .difference(
+          _timeDisplayed ?? DateTime.now().subtract(const Duration(seconds: 60))
+        )
+      ).inMicroseconds / Duration.microsecondsPerSecond;
 
       // --- 5. Update User-Question Pair Record ---
       // Update user-question pair record (this now handles all DB operations internally)

@@ -35,10 +35,6 @@ class PresentationSelectionWorker {
   final SessionManager            _sessionManager = SessionManager();
   final QuestionQueueCache        _queueCache = QuestionQueueCache();
   // final UnprocessedCache        _unprocessedCache = UnprocessedCache();
-  
-  // --- Internal tracking of recently selected questions ---
-  final List<String> _recentlySelectedQuestionIds = [];
-  static const int _maxRecentlySelectedCount = 5;
 
   // --- Control Methods ---
   void start() {
@@ -120,13 +116,12 @@ class PresentationSelectionWorker {
             final List<Map<String, dynamic>> queueCacheQuestions = await _queueCache.peekAllRecords();
             final List<String> queueCacheQuestionIds = queueCacheQuestions.map((q) => q['question_id'] as String).toList();
             
-            // Remove any questions that were recently answered, recently selected by this worker, or are already in the queue cache
+            // Remove any questions that were recently answered or are already in the queue cache
             filteredEligibleQuestions = filteredEligibleQuestions.where((question) {
               final String questionId = question['question_id'] as String;
               final bool notRecentlyAnswered = recentQuestionIds.isEmpty || !recentQuestionIds.contains(questionId);
-              final bool notRecentlySelected = !_recentlySelectedQuestionIds.contains(questionId);
               final bool notInQueueCache = !queueCacheQuestionIds.contains(questionId);
-              return notRecentlyAnswered && notRecentlySelected && notInQueueCache;
+              return notRecentlyAnswered && notInQueueCache;
             }).toList();
             
             final int removedCount = eligibleQuestions.length - filteredEligibleQuestions.length;
@@ -134,10 +129,8 @@ class PresentationSelectionWorker {
               // Calculate how many were removed due to each reason
               final int recentlyAnsweredCount = eligibleQuestions.where((q) => 
                 recentQuestionIds.contains(q['question_id'] as String)).length;
-              final int recentlySelectedCount = eligibleQuestions.where((q) => 
-                _recentlySelectedQuestionIds.contains(q['question_id'] as String)).length;
-              final int inQueueCacheCount = removedCount - recentlyAnsweredCount - recentlySelectedCount;
-              QuizzerLogger.logMessage('Removed $removedCount questions from eligible list ($recentlyAnsweredCount recently answered, $recentlySelectedCount recently selected, $inQueueCacheCount already in queue cache).');
+              final int inQueueCacheCount = removedCount - recentlyAnsweredCount;
+              QuizzerLogger.logMessage('Removed $removedCount questions from eligible list ($recentlyAnsweredCount recently answered, $inQueueCacheCount already in queue cache).');
             }
           }
           
@@ -161,7 +154,6 @@ class PresentationSelectionWorker {
                 final Map<String, dynamic> questionRecord = filteredEligibleQuestions[i];
                 if (!_isRunning) break; // Abort if worker was stopped
                 await _queueCache.addRecord(questionRecord);
-                
               }
             } else {
               // Use advanced selection logic for the needed cycles
@@ -169,8 +161,14 @@ class PresentationSelectionWorker {
               
               for (int i = 0; i < cyclesNeeded && _isRunning; i++) {
                 if (!_isRunning) break; // Abort if worker was stopped
-                await _selectAndQueueQuestion(filteredEligibleQuestions);
+                if (filteredEligibleQuestions.isEmpty) break; // No more questions to select
                 
+                final String? selectedId = await _selectAndQueueQuestion(filteredEligibleQuestions);
+                
+                // Remove the just-selected question from the list to prevent immediate re-selection
+                if (selectedId != null) {
+                  filteredEligibleQuestions.removeWhere((q) => q['question_id'] == selectedId);
+                }
               }
             }
           }
@@ -220,23 +218,23 @@ class PresentationSelectionWorker {
   }
 
   // --- Core Selection and Queuing Logic ---
-  Future<bool> _selectAndQueueQuestion(List<Map<String, dynamic>> eligibleQuestions) async {
+  Future<String?> _selectAndQueueQuestion(List<Map<String, dynamic>> eligibleQuestions) async {
     try {
       QuizzerLogger.logMessage('Entering PresentationSelectionWorker _selectAndQueueQuestion()...');
-      if (!_isRunning) return false;
+      if (!_isRunning) return null;
 
       // 1. Call _selectNextQuestionFromList to get the selected question
       // selection logic works on a router, for AB testing. Selection logic is now such that we can easily assign users to different selection logic for testing
-      final Map<String, dynamic> selectedQuestion = await _selectNextQuestionFromList(eligibleQuestions, selectionLogic: 4);
+      final Map<String, dynamic> selectedQuestion = await _selectNextQuestionFromList(eligibleQuestions, selectionLogic: 0);
       
       // 2. Check if selection was successful
       if (selectedQuestion.isEmpty) {
         QuizzerLogger.logWarning('PSW Select: No question was selected from eligible questions.');
-        return false;
+        return null;
       }
 
       // 3. Check if worker was stopped before adding to queue
-      if (!_isRunning) return false;
+      if (!_isRunning) return null;
 
       // 4. Call compare function to clean up bad records (non-blocking)
       final String questionId = selectedQuestion['question_id'] as String;
@@ -255,41 +253,29 @@ class PresentationSelectionWorker {
       } catch (e) {
         // Question was likely deleted by cleanup function between selection and queue addition
         QuizzerLogger.logWarning('PSW Select: Question ${selectedQuestion['question_id']} was deleted during processing, skipping.');
-        return false;
+        return null;
       }
       
       if (added) {
-        // 6. Track the selected question in our internal list
-        _trackSelectedQuestion(selectedQuestion['question_id'] as String);
         QuizzerLogger.logSuccess('PSW Select: Successfully added question ${selectedQuestion['question_id']} to QueueCache.');
+        return questionId;
       } else {
         QuizzerLogger.logWarning('PSW Select: Failed to add question ${selectedQuestion['question_id']} to QueueCache.');
+        return null;
       }
-      
-      return added;
     } catch (e) {
       QuizzerLogger.logError('Error in PresentationSelectionWorker _selectAndQueueQuestion - $e');
       rethrow;
     }
   }
   
-  // --- Internal tracking method ---
-  // Tracks recently selected to prevent duplicate selections. . .
-  void _trackSelectedQuestion(String questionId) {
-    // Remove if already exists (to move to front)
-    _recentlySelectedQuestionIds.remove(questionId);
-    // Add to the front (most recent first)
-    _recentlySelectedQuestionIds.insert(0, questionId);
-    // Keep only the last 5
-    if (_recentlySelectedQuestionIds.length > _maxRecentlySelectedCount) {
-      _recentlySelectedQuestionIds.removeRange(_maxRecentlySelectedCount, _recentlySelectedQuestionIds.length);
-    }
-    QuizzerLogger.logMessage('PSW Tracking: Added $questionId to recently selected list (${_recentlySelectedQuestionIds.length} total)');
-  }
-
-  // Main router function
+  /// Main router function
+  /// Determines which selection logic is used from possibilities. This is useful for AB testing
+  /// Selection logic itself is written in _selectionLogic* functions
   Future<Map<String, dynamic>> _selectNextQuestionFromList(List<Map<String, dynamic>> eligibleQuestions, {int selectionLogic = 1}) async {
     try {
+      // FIXME Upward threshold is hardcoded (should add a user setting from which this information is pulled)
+      // FIXME This change will allow us to change what the upward threshold is without needing to update this value in multiple places
       QuizzerLogger.logMessage('Entering PresentationSelectionWorker _selectNextQuestionFromList()...');
       if (!_isRunning) return {};
       if (eligibleQuestions.isEmpty) return {};
@@ -311,6 +297,12 @@ class PresentationSelectionWorker {
         case 4:
           // 50/50 seen/unseen selection
           return await _selectionLogicFour(eligibleQuestions);
+        case 5:
+          // High probability focus with exploration
+          return await _selectionLogicFive(eligibleQuestions);
+        case 6:
+          // Push all questions toward 90%+ probability
+          return await _selectionLogicSix(eligibleQuestions);
         default:
           QuizzerLogger.logWarning('Invalid selectionLogic value: $selectionLogic. Defaulting to logic 1.');
           return await _selectionLogicOne(eligibleQuestions);
@@ -344,59 +336,78 @@ class PresentationSelectionWorker {
   }
 
   // Logic 1: Probabilistic selection with ML threshold
-  Future<Map<String, dynamic>> _selectionLogicOne(List<Map<String, dynamic>> eligibleQuestions) async {
+  Future<Map<String, dynamic>> _selectionLogicOne(
+    List<Map<String, dynamic>> eligibleQuestions, {
+    double highProbThreshold = 0.95,
+    double thresholdSelectionChance = 0.10,
+    double lowestProbSelectionChance = 0.85,
+  }) async {
     QuizzerLogger.logMessage("Selection Logic 1: Probabilistic with ML threshold");
     
     final random = Random();
     final double roll = random.nextDouble();
     final double threshold = await getAccuracyNetOptimalThreshold();
     
-    final highProbQuestions = eligibleQuestions.where((q) => (q['accuracy_probability'] ?? 0.0) >= 0.90).toList();
-    final lowProbQuestions = eligibleQuestions.where((q) => (q['accuracy_probability'] ?? 0.0) < 0.90).toList();
+    final lowProbQuestions = eligibleQuestions.where((q) => (q['accuracy_probability'] ?? 0.0) < highProbThreshold).toList();
     
-    final int selectionMode = roll < 0.75 ? 0 : (roll < 0.95 ? 1 : 2);
+    final int selectionMode;
+    if (roll < thresholdSelectionChance) {
+      selectionMode = 0;
+    } else if (roll < thresholdSelectionChance + lowestProbSelectionChance) {
+      selectionMode = 1;
+    } else {
+      selectionMode = 2;
+    }
+    
+    Map<String, dynamic> selectedQuestion;
     
     switch (selectionMode) {
-      case 0: // 75% - Select closest to threshold (excluding >= 0.90)
+      case 0:
         if (lowProbQuestions.isEmpty) {
-          return eligibleQuestions[random.nextInt(eligibleQuestions.length)];
-        }
-        
-        double minDistance = double.infinity;
-        List<Map<String, dynamic>> closestQuestions = [];
-        
-        for (final q in lowProbQuestions) {
-          final double prob = q['accuracy_probability'] ?? 0.0;
-          final double distance = (prob - threshold).abs();
+          selectedQuestion = eligibleQuestions[random.nextInt(eligibleQuestions.length)];
+        } else {
+          double minDistance = double.infinity;
+          List<Map<String, dynamic>> closestQuestions = [];
           
-          if (distance < minDistance) {
-            minDistance = distance;
-            closestQuestions = [q];
-          } else if (distance == minDistance) {
-            closestQuestions.add(q);
+          for (final q in lowProbQuestions) {
+            final double prob = q['accuracy_probability'] ?? 0.0;
+            final double distance = (prob - threshold).abs();
+            
+            if (distance < minDistance) {
+              minDistance = distance;
+              closestQuestions = [q];
+            } else if (distance == minDistance) {
+              closestQuestions.add(q);
+            }
           }
+          
+          selectedQuestion = closestQuestions[random.nextInt(closestQuestions.length)];
         }
-        
-        return closestQuestions[random.nextInt(closestQuestions.length)];
+        break;
       
-      case 1: // 20% - Select lowest probability
-        return eligibleQuestions.reduce((a, b) => 
+      case 1:
+        selectedQuestion = eligibleQuestions.reduce((a, b) => 
           ((a['accuracy_probability'] ?? 0.0) < (b['accuracy_probability'] ?? 0.0)) ? a : b
         );
+        break;
       
-      case 2: // 5% - Select random from high probability (>= 0.90), or highest if none
-        if (highProbQuestions.isEmpty) {
-          return eligibleQuestions.reduce((a, b) => 
-            ((a['accuracy_probability'] ?? 0.0) > (b['accuracy_probability'] ?? 0.0)) ? a : b
-          );
-        }
-        return highProbQuestions[random.nextInt(highProbQuestions.length)];
+      case 2:
+        selectedQuestion = eligibleQuestions[random.nextInt(eligibleQuestions.length)];
+        break;
       
       default:
-        return eligibleQuestions.reduce((a, b) => 
-          ((a['accuracy_probability'] ?? 0.0) > (b['accuracy_probability'] ?? 0.0)) ? a : b
-        );
+        selectedQuestion = eligibleQuestions[random.nextInt(eligibleQuestions.length)];
+        break;
     }
+    
+    final String questionId = selectedQuestion['question_id']?.toString() ?? 'unknown';
+    final int totalAttempts = selectedQuestion['total_attempts'] ?? 0;
+    final double probability = selectedQuestion['accuracy_probability'] ?? 0.0;
+    final String? lastRevised = selectedQuestion['last_revised']?.toString();
+    
+    QuizzerLogger.logMessage("Selected question:$questionId | Attempts: $totalAttempts | Prob: ${probability.toStringAsFixed(5)} | Last revised: $lastRevised");
+    
+    return selectedQuestion;
   }
 
   // Logic 2: Completely random selection
@@ -477,4 +488,99 @@ class PresentationSelectionWorker {
     
     return selected;
   }
+
+  // Logic 5: High probability focus with exploration
+  Future<Map<String, dynamic>> _selectionLogicFive(List<Map<String, dynamic>> eligibleQuestions) async {
+    QuizzerLogger.logMessage("Selection Logic 5: High probability focus with exploration");
+    
+    final random = Random();
+    final roll = random.nextDouble();
+    
+    List<Map<String, dynamic>> targetPool;
+    
+    if (roll < 0.05) {
+      // 5%: Select from 90%+ probability
+      targetPool = eligibleQuestions.where((q) => (q['accuracy_probability'] ?? 0.0) >= 0.90).toList();
+      if (targetPool.isEmpty) targetPool = eligibleQuestions;
+    } else if (roll < 0.80) {
+      // 75%: Select from 85%-90% probability
+      targetPool = eligibleQuestions.where((q) {
+        final prob = q['accuracy_probability'] ?? 0.0;
+        return prob >= 0.85 && prob < 0.90;
+      }).toList();
+      if (targetPool.isEmpty) targetPool = eligibleQuestions;
+    } else if (roll < 0.85) {
+      // 10%: Select from 50%-85% probability
+      targetPool = eligibleQuestions.where((q) {
+        final prob = q['accuracy_probability'] ?? 0.0;
+        return prob >= 0.50 && prob < 0.85;
+      }).toList();
+      if (targetPool.isEmpty) targetPool = eligibleQuestions;
+    } else {
+      // 10%: Select from 0%-50% probability
+      targetPool = eligibleQuestions.where((q) => (q['accuracy_probability'] ?? 0.0) < 0.50).toList();
+      if (targetPool.isEmpty) targetPool = eligibleQuestions;
+    }
+    
+    final selected = targetPool[random.nextInt(targetPool.length)];
+    final String questionId = selected['question_id']?.toString() ?? 'unknown';
+    final int totalAttempts = selected['total_attempts'] ?? 0;
+    final double probability = selected['accuracy_probability'] ?? 0.0;
+    final String? lastRevised = selected['last_revised']?.toString();
+    
+    QuizzerLogger.logMessage("Selected question:$questionId | Attempts: $totalAttempts | Prob: ${probability.toStringAsFixed(5)} | Last revised: $lastRevised");
+    
+    return selected;
+  }
+
+  // Logic 6: Push all questions toward 95%+ probability
+  Future<Map<String, dynamic>> _selectionLogicSix(List<Map<String, dynamic>> eligibleQuestions) async {
+    QuizzerLogger.logMessage("Selection Logic 6: Push toward 90%+ probability");
+    
+    final random = Random();
+    final roll = random.nextDouble();
+    
+    Map<String, dynamic> selected;
+    
+    if (roll < 0.95) {
+      // 95%: Select closest to 90% but not above
+      final belowThreshold = eligibleQuestions.where((q) => (q['accuracy_probability'] ?? 0.0) < 0.90).toList();
+      
+      if (belowThreshold.isEmpty) {
+        // No questions below 95%, select randomly from all
+        selected = eligibleQuestions[random.nextInt(eligibleQuestions.length)];
+      } else {
+        // Find questions closest to 90% from below
+        double closestProb = 0.0;
+        for (final q in belowThreshold) {
+          final prob = q['accuracy_probability'] ?? 0.0;
+          if (prob > closestProb) closestProb = prob;
+        }
+        
+        // Get all questions at that closest probability
+        final closestQuestions = belowThreshold.where((q) => (q['accuracy_probability'] ?? 0.0) == closestProb).toList();
+        selected = closestQuestions[random.nextInt(closestQuestions.length)];
+      }
+    } else {
+      // 5%: Random selection from above 90%
+      final aboveThreshold = eligibleQuestions.where((q) => (q['accuracy_probability'] ?? 0.0) >= 0.90).toList();
+      
+      if (aboveThreshold.isEmpty) {
+        // No questions above 95%, select randomly from all
+        selected = eligibleQuestions[random.nextInt(eligibleQuestions.length)];
+      } else {
+        selected = aboveThreshold[random.nextInt(aboveThreshold.length)];
+      }
+    }
+    
+    final String questionId = selected['question_id']?.toString() ?? 'unknown';
+    final int totalAttempts = selected['total_attempts'] ?? 0;
+    final double probability = selected['accuracy_probability'] ?? 0.0;
+    final String? lastRevised = selected['last_revised']?.toString();
+    
+    QuizzerLogger.logMessage("Selected question:$questionId | Attempts: $totalAttempts | Prob: ${probability.toStringAsFixed(5)} | Last revised: $lastRevised");
+    
+    return selected;
+  }
+
 }

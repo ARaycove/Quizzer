@@ -12,7 +12,6 @@ import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 Future<void> initializeSyncWorkers() async {
   try {
     // check connection
-    
     QuizzerLogger.logMessage('Initializing sync workers...');
     
     // Start inbound sync worker
