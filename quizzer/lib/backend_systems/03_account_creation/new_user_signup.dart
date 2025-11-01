@@ -45,6 +45,9 @@ Future<Map<String, dynamic>> handleNewUserProfileCreation(Map<String, dynamic> m
                 email: email,
                 password: password,
             );
+
+
+
             QuizzerLogger.logMessage('Supabase signup response received: ${response.user != null ? 'User created' : 'No user returned'}');
             
             // If Supabase signup is successful, create local user profile and sync to Supabase
@@ -62,6 +65,7 @@ Future<Map<String, dynamic>> handleNewUserProfileCreation(Map<String, dynamic> m
                             email: email,
                             password: password,
                         );
+
                         
                         if (authResponse.user != null && authResponse.session != null) {
                             QuizzerLogger.logMessage('Authentication successful, syncing user profile to Supabase');
@@ -129,6 +133,49 @@ Future<Map<String, dynamic>> handleNewUserProfileCreation(Map<String, dynamic> m
         return results;
     } catch (e) {
         QuizzerLogger.logError('Error in handleNewUserProfileCreation - $e');
+        rethrow;
+    }
+}
+
+
+Future<Map<String, dynamic>> handleResetPssword(Map<String, dynamic> message, SupabaseClient supabase) async {
+    try {
+        final email = message['email'] as String;
+        final password = message['password'] as String;
+        final username = message['username'] as String;
+
+        QuizzerLogger.logMessage('Starting reset password process');
+        QuizzerLogger.logMessage('Email: $email');
+        QuizzerLogger.logMessage('Received message map: $message');
+
+        Map<String, dynamic> results = {};
+
+        try {
+            QuizzerLogger.logMessage('Attempting Supabase password reset with email: $email');
+            final response = await supabase.auth.updateUser(
+                UserAttributes(
+                    password: password,
+                ),
+            );
+
+
+
+            QuizzerLogger.logMessage('Supabase password reset response received: ${response.user != null ? 'User updated' : 'No user returned'}');
+
+        } on AuthException catch (e) {
+            // If Supabase returns an authentication error, capture it.
+            QuizzerLogger.logError('Supabase AuthException during password reset: ${e.message}');
+            results = {
+                'success': false,
+                'message': e.message // Return the specific error from Supabase
+            };
+            // Return immediately as signup failed.
+            return results;
+        } // End of allowed try-catch block
+
+        return results;
+    } catch (e) {
+        QuizzerLogger.logError('Error in handleResetPssword - $e');
         rethrow;
     }
 }

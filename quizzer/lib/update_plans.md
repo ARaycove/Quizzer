@@ -7,7 +7,6 @@ Minor updates add features and other visible changes
 Patch updates are for bug fixes that don't add features, or for optimizations that the user does not see
 
 
-# Login Streamline update 2.?.?:
 The goal of this update is to:
 1. Ensure the login and logout flow works properly, that any asynchronous workers are closed, that the state of the app is completely reset for a new login attempt
 2. Ensure no keys are exposed, and security is up to standard

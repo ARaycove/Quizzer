@@ -1,3 +1,8 @@
+import 'dart:developer';
+import 'dart:convert';
+import 'dart:io';
+import 'package:crypto/crypto.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:supabase/supabase.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_profile_table.dart'
@@ -72,6 +77,132 @@ Future<Map<String, dynamic>> attemptSupabaseLogin(
       // Default on failure
     };
   }
+}
+
+Future<Map<String, dynamic>> attemptSupabaseGoogleLogin(SupabaseClient supabase, Box storage) async {
+  try {
+    QuizzerLogger.logMessage('Supabase authentication via Google Sign-In starts....');
+
+    const iosClientId = '840944709865-uqouqdi16cvpm624n3eacufuuk8grpqp.apps.googleusercontent.com';
+    const androidClientId = '840944709865-krhsd92b2ph6k670q1j872c8m5pcqhnk.apps.googleusercontent.com';
+
+    // ✅ Generate a random nonce and SHA256 it
+    final rawNonce = _generateNonce();
+    final hashedNonce = _sha256ofString(rawNonce);
+
+    final GoogleSignIn googleSignIn = GoogleSignIn(
+      clientId: Platform.isIOS
+          ? iosClientId
+          : androidClientId,
+      scopes: ['email', 'profile'],
+    );
+
+    final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+    if (googleUser == null) throw 'Google sign-in canceled';
+
+    final GoogleSignInAuthentication googleAuth =
+    await googleUser.authentication;
+
+    final idToken = googleAuth.idToken;
+    final accessToken = googleAuth.accessToken;
+
+    if (idToken == null || accessToken == null) {
+      throw 'Missing Google token(s)';
+    }
+
+    // ✅ Pass the nonce to Supabase
+    final response = await supabase.auth.signInWithIdToken(
+      provider: OAuthProvider.google,
+      idToken: idToken,
+      accessToken: accessToken,
+      nonce: hashedNonce,
+    );
+
+
+    log('Google Sign-In response: $response');
+
+    QuizzerLogger.logMessage('Attempting Supabase authentication via Google Sign-In, Response: $response');
+
+    final String email = response.user?.email ?? 'unknown_email';
+
+
+    // Success Case
+    QuizzerLogger.logSuccess('Supabase authentication successful for $email');
+    // --- EXTRACT USER ROLE ---
+    final String userRole = determineUserRoleFromSupabaseSession(response.session);
+    // --- END EXTRACT USER ROLE ---
+    final authResult = {
+      'success': true,
+      'message': 'Login successful',
+      'user': response.user, // <-- Keep as Supabase User object
+      'session': response.session, // <-- Keep session as object
+      'user_role': userRole,
+    };
+
+    // Ensure local profile exists immediately after successful Supabase auth
+    await ensureLocalProfileExists(email);
+    // Store offline login data for future offline access
+    await storeOfflineLoginData(email, storage, authResult);
+    // Initialize SessionManager with user data
+    final sessionManager = getSessionManager();
+    // Ensure SessionManager is fully initialized before accessing storage
+    await sessionManager.initializationComplete;
+    // Ensure the local profile exists before trying to fetch its ID
+    await ensureLocalProfileExists(email);
+    String? localUserId;
+    try {
+      // Get the local user ID
+      localUserId = await user_profile.getUserIdByEmail(email);
+    } on StateError {
+      QuizzerLogger.logWarning("No local user ID found for $email, falling back to Supabase ID");
+      // If not found, fallback to Supabase user ID
+      localUserId = response.user!.id;
+      // fallback
+    }
+    sessionManager.userId = localUserId;
+    sessionManager.userEmail = email;
+    sessionManager.userLoggedIn = true;
+    sessionManager.sessionStartTime = DateTime.now();
+    // Ensure it's never null
+    assert(sessionManager.userId != null,
+        "SessionManager.userId must not be null after Supabase login");
+    QuizzerLogger.logSuccess(
+        'SessionManager initialized with userId=${sessionManager.userId}');
+    return authResult;
+  } on AuthException catch (e) {
+    QuizzerLogger.logWarning('Supabase authentication failed via Google: ${e.message}');
+    return {
+      'success': false,
+      'message': e.message,
+      'user_role': 'public_user_unverified',
+      // Default on failure
+    };
+  } catch (e) {
+    QuizzerLogger.logError('Error during Supabase Google Sign-In: $e');
+    return {
+      'success': false,
+      'message': e.toString(),
+      'user_role': 'public_user_unverified',
+      // Default on failure
+    };
+  }
+}
+
+// -------------------------
+// Nonce Helpers
+// -------------------------
+String _generateNonce([int length = 32]) {
+  const charset =
+      '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._';
+  final random = List.generate(length,
+          (_) => charset[(DateTime.now().microsecondsSinceEpoch + _) % charset.length]);
+  return random.join();
+}
+
+String _sha256ofString(String input) {
+  final bytes = utf8.encode(input);
+  final digest = sha256.convert(bytes);
+  return digest.toString();
 }
 
 // Future<Map<String, dynamic>> attemptSupabaseLogin(String email, String password,

@@ -1,34 +1,50 @@
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:hive/hive.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_profile_table.dart';
+import 'package:supabase/supabase.dart';
 
 /// Stores offline login data in Hive storage
 /// 
 /// Stores a structured JSON object containing:
 /// - last_sign_in_at: timestamp of last successful login
-/// - user_id: user's unique identifier
+/// - user_id: user's unique identifier (from local profile)
 /// - user_role: user's role/permissions
 /// - offline_login_count: number of offline logins (starts at 0)
 /// - last_online_sync: timestamp of last online sync
-/// 
+///
 /// Note: Access tokens are NOT stored for security reasons
-Future<void> storeOfflineLoginData(String email, Box storage, Map<String, dynamic> authResult) async {
+Future<void> storeOfflineLoginData(
+    String email,
+    Box storage,
+    Map<String, dynamic> authResult,
+    ) async {
   try {
     QuizzerLogger.logMessage('Storing offline login data for $email');
-    
+
     final user = authResult['user'];
-    
+    final userRole = authResult['user_role'];
+
     // Get the local user profile UUID, not the Supabase user ID
     final localUserId = await getUserIdByEmail(email);
-    
+
+    // Safely extract last_sign_in_at from both User or Map types
+    dynamic lastSignInAt;
+    if (user is User) {
+      lastSignInAt = user.lastSignInAt;
+    } else if (user is Map<String, dynamic>) {
+      lastSignInAt = user['last_sign_in_at'];
+    } else {
+      lastSignInAt = DateTime.now().toIso8601String();
+    }
+
     final loginData = {
-      'last_sign_in_at': user['last_sign_in_at'],
+      'last_sign_in_at': lastSignInAt,
       'user_id': localUserId,
-      'user_role': authResult['user_role'],
+      'user_role': userRole,
       'offline_login_count': 0,
       'last_online_sync': DateTime.now().toIso8601String(),
     };
-    
+
     await storage.put(email, loginData);
     QuizzerLogger.logSuccess('Offline login data stored for $email');
   } catch (e) {

@@ -100,6 +100,55 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  Future<void> submitSocialLogin() async {
+
+    // define the email and password submission
+    final email = _emailController.text.trim();
+    final password = _passwordController.text;
+
+    // Attempt to log in using credentials
+    QuizzerLogger.logMessage('Social Login attempt.');
+
+    Map<String, dynamic> results = await session.attemptGoogleLogin();
+
+    if (results['success']) {
+      // Login successful, keep loading state true until navigation completes
+      QuizzerLogger.logMessage(
+          'Login successful for: $email. Navigating home.');
+      if (!mounted) return;
+      // _loginProgressMessage will be updated by the stream, culminating in "Login Complete!"
+      // Potentially, could set a final success message here if desired before navigation
+      // setState(() { _loginProgressMessage = "Success!"; });
+      Navigator.pushReplacementNamed(context, '/home');
+      // Don't reset loading state here, it disappears on navigation
+    } else {
+      // Display error message from login attempt
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(results['message'] ?? 'Login failed'),
+        ),
+      );
+      // Reset loading state on login failure
+      setState(() {
+        _isLoading = false;
+        _loginProgressMessage = "Login"; // Reset button text
+      });
+      return;
+    }
+    // It's good practice to reset loading state if something unexpected happens,
+    // though ideally the code paths above cover all scenarios.
+    // If the function somehow reaches here without navigating or erroring out,
+    // reset the loading state.
+    if (mounted && _isLoading) {
+      // Check mounted and isLoading before setting state
+      setState(() {
+        _isLoading = false;
+        _loginProgressMessage = "Login"; // Reset button text
+      });
+    }
+  }
+
   // Function to navigate to new user signup page
   void newUserSignUp() {
     // Prevent navigation if already loading
@@ -108,13 +157,19 @@ class _LoginPageState extends State<LoginPage> {
     Navigator.pushNamed(context, '/signup');
   }
 
-  // Function to navigate to reset password page
-  void resetPassword() {
-    // Prevent navigation if already loading
+  // Navigate to reset password and handle return (true => password reset succeeded)
+  void resetPassword() async {
     if (_isLoading) return;
     QuizzerLogger.logMessage('Navigating to reset password page');
-    Navigator.pushNamed(context, '/resetPassword');
+    final result = await Navigator.pushNamed(context, '/resetPassword');
+    if (result is bool && result == true) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Password changed successfully — please log in with your new password')),
+      );
+    }
   }
+
 
   @override
   void dispose() {
@@ -250,9 +305,12 @@ class _LoginPageState extends State<LoginPage> {
     return IconButton(
       icon: Icon(icon),
       onPressed: () {
-        // This would later call the appropriate social login function
-        QuizzerLogger.logWarning(
-            'Social login ($service) not implemented yet.');
+
+        _isLoading ? null : submitSocialLogin();
+
+        // // This would later call the appropriate social login function
+        // QuizzerLogger.logWarning(
+        //     'Social login ($service) not implemented yet.');
       },
     );
   }
