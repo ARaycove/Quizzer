@@ -845,11 +845,11 @@ Future<void> syncUserModuleActivationStatus() async {
 
       if (hasBeenSynced == 0) {
         // This is a new record, use insert
-        QuizzerLogger.logValue('Preparing to insert UserModuleActivationStatus (User: $userId, Module: $moduleName) into $tableName');
+        // QuizzerLogger.logValue('Preparing to insert UserModuleActivationStatus (User: $userId, Module: $moduleName) into $tableName');
         operationSuccess = await pushRecordToSupabase(tableName, mutableRecord);
       } else {
         // This is an existing record with edits, use update
-        QuizzerLogger.logValue('Preparing to update UserModuleActivationStatus (User: $userId, Module: $moduleName) in $tableName');
+        // QuizzerLogger.logValue('Preparing to update UserModuleActivationStatus (User: $userId, Module: $moduleName) in $tableName');
         operationSuccess = await updateRecordWithCompositeKeyInSupabase(
           tableName,
           mutableRecord,

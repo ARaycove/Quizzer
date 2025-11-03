@@ -24,7 +24,7 @@ Future<void> writeDataFrameFeatureMap(DataFrame df, String filename) async {
     };
   }
   
-  QuizzerLogger.logMessage('DataFrame: ${df.rows.length} rows, ${headers.length} cols');
+  // QuizzerLogger.logMessage('DataFrame: ${df.rows.length} rows, ${headers.length} cols');
   
   final jsonString = const JsonEncoder.withIndent('  ').convert(featureMap);
   final logsPath = await getQuizzerLogsPath();
@@ -120,7 +120,7 @@ class AccuracyNetWorker {
 
     final inferenceInputFrame = await transformDataFrameToAccuracyNetInputShape(encodedFrame);
     // TODO, comment out debug print of value order, once resolve
-    await writeDataFrameFeatureMap(inferenceInputFrame, "inference_data.json");
+    // await writeDataFrameFeatureMap(inferenceInputFrame, "inference_data.json");
     final resultsFrame = await runBatchInference(
       interpreter: _interpreter!,
       primaryKeysFrame: primaryKeysFrame,

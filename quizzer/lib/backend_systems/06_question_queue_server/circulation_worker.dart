@@ -30,8 +30,8 @@ class CirculationWorker {
 
   final SessionManager                _sessionManager       = SessionManager();
   final SwitchBoard                   _switchBoard          = SwitchBoard(); // Get SwitchBoard instance
-  static const int    _circulationThreshold = 50;
-  static const int    _removalThresholdMultiplier = 3; // DO NOT PROVIDE A VALUE <= 1
+  static const int    _circulationThreshold = 25;
+  static const int    _removalThresholdMultiplier = 2; // DO NOT PROVIDE A VALUE <= 1
 
   // Data Structures will be filled on init, then updated live in O(2n + 3) time
   // Hashmap table of all links:
@@ -369,7 +369,7 @@ class CirculationWorker {
   /// 4. Determine if question should go to nonCirculatingConnected or nonCirculatingNotConnected
   /// 5. Update neighbors: check if any should move from connected to not connected
   Future<void> _removeQuestionFromCirculation(String userId, String questionId) async {
-    QuizzerLogger.logMessage('Removing question from circulation: $questionId');
+    // QuizzerLogger.logMessage('Removing question from circulation: $questionId');
     
     final db = await getDatabaseMonitor().requestDatabaseAccess();
     if (db == null) throw Exception('Failed to acquire database access');
@@ -425,7 +425,7 @@ class CirculationWorker {
       }
     }
     
-    QuizzerLogger.logSuccess('Question removed from circulation: $questionId');
+    // QuizzerLogger.logSuccess('Question removed from circulation: $questionId');
   }
 
   /// Builds the initial data structures that the circulation worker will update.

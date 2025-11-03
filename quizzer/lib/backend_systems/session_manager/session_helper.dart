@@ -24,7 +24,7 @@ Future<Map<String, dynamic>?> recordQuestionAnswerAttempt({
   }
   
   try {
-    QuizzerLogger.logMessage('Entering recordQuestionAnswerAttempt()...');
+    // QuizzerLogger.logMessage('Entering recordQuestionAnswerAttempt()...');
     
     final db = await getDatabaseMonitor().requestDatabaseAccess();
     if (db == null) {
@@ -177,7 +177,7 @@ Future<Map<String, dynamic>?> recordQuestionAnswerAttempt({
     
     if (forInference) {
       // Return the sample for inference
-      QuizzerLogger.logMessage('Successfully generated inference sample for QID: $questionId');
+      // QuizzerLogger.logMessage('Successfully generated inference sample for QID: $questionId');
       return sampleData;
     } else {
       // Insert the training sample (this function gets its own db access)
@@ -188,7 +188,7 @@ Future<Map<String, dynamic>?> recordQuestionAnswerAttempt({
         additionalFields: sampleData,
       );
       
-      QuizzerLogger.logMessage('Successfully recorded question answer attempt for QID: $questionId');
+      // QuizzerLogger.logMessage('Successfully recorded question answer attempt for QID: $questionId');
       return null;
     }
   } catch (e) {
@@ -205,15 +205,15 @@ int _calculateStreakAdjustment({
   // currentRevisionStreak is no longer needed here
 }) {
   try {
-    QuizzerLogger.logMessage('Entering _calculateStreakAdjustment()...');
+    // QuizzerLogger.logMessage('Entering _calculateStreakAdjustment()...');
     
     final int adjustment = isCorrect ? 1 : -1;
     
-    QuizzerLogger.logMessage('Calculated streak adjustment: $adjustment (isCorrect: $isCorrect)');
+    // QuizzerLogger.logMessage('Calculated streak adjustment: $adjustment (isCorrect: $isCorrect)');
     
     return adjustment;
   } catch (e) {
-    QuizzerLogger.logError('Error in _calculateStreakAdjustment - $e');
+    // QuizzerLogger.logError('Error in _calculateStreakAdjustment - $e');
     rethrow;
   }
 }
@@ -231,20 +231,17 @@ Future<void> updateUserQuestionRecordOnAnswer({
   required double reactionTime,
 }) async {
   try {
-    QuizzerLogger.logMessage('Entering updateUserQuestionRecordOnAnswer()...');
+    // QuizzerLogger.logMessage('Entering updateUserQuestionRecordOnAnswer()...');
     
     // --- 1. Get current user record from database ---
     final Map<String, dynamic> currentUserRecord = await getUserQuestionAnswerPairById(userId, questionId);
     
     // --- 2. Extract necessary current values ---
     final int currentRevisionStreak = currentUserRecord['revision_streak'] as int;
-    final double currentTimeBetweenRevisions = currentUserRecord['time_between_revisions'] as double;
     final int currentTotalAttempts = currentUserRecord['total_attempts'] as int;
     final double currentAvgReactionTime = (currentUserRecord['avg_reaction_time'] as double?) ?? 0.0;
     final DateTime now = DateTime.now();
-    
-    QuizzerLogger.logMessage('Current values - streak: $currentRevisionStreak, timeBetweenRevisions: $currentTimeBetweenRevisions, totalAttempts: $currentTotalAttempts, isCorrect: $isCorrect');
-    
+        
     // --- 3. Calculate Updates ---
     // Calculate correct/incorrect attempt counters
     final int currentTotalCorrectAttempts = (currentUserRecord['total_correct_attempts'] as int?) ?? 0;
@@ -284,15 +281,15 @@ Future<void> updateUserQuestionRecordOnAnswer({
     
     if ((newTotalAttempts >= 2 && newRevisionStreak == 0) || 
         (newTotalAttempts >= 4 && newRevisionStreak == 1)) {
-      QuizzerLogger.logMessage('Removing question from circulation: attempts >= threshold with low streak');
+      // QuizzerLogger.logMessage('Removing question from circulation: attempts >= threshold with low streak');
       
       finalTotalAttempts = 0;
       finalInCirculation = false;
       
-      QuizzerLogger.logSuccess('Question removed from circulation and attempts reset to 0');
+      // QuizzerLogger.logSuccess('Question removed from circulation and attempts reset to 0');
     }
     
-    QuizzerLogger.logMessage('Final values - streak: $newRevisionStreak, totalAttempts: $finalTotalAttempts, inCirculation: $finalInCirculation, avgReactionTime: $newAvgReactionTime, correctAttempts: $newTotalCorrectAttempts, incorrectAttempts: $newTotalIncorrectAttempts, accuracyRate: $newQuestionAccuracyRate');
+    QuizzerLogger.logMessage('Final for updated question values - streak: $newRevisionStreak, totalAttempts: $finalTotalAttempts, inCirculation: $finalInCirculation, avgReactionTime: $newAvgReactionTime, correctAttempts: $newTotalCorrectAttempts, incorrectAttempts: $newTotalIncorrectAttempts, accuracyRate: $newQuestionAccuracyRate');
     
     Map<String, dynamic> updateData = {
         'revision_streak': newRevisionStreak,
@@ -315,7 +312,7 @@ Future<void> updateUserQuestionRecordOnAnswer({
       updates: updateData,
     );
     
-    QuizzerLogger.logMessage('Successfully updated user question record in database');
+    // QuizzerLogger.logMessage('Successfully updated user question record in database');
     
     // --- 6. Update k_nearest_neighbors to trigger re-evaluation ---
     final Map<String, dynamic> questionRecord = await getQuestionAnswerPairById(questionId);
@@ -326,7 +323,7 @@ Future<void> updateUserQuestionRecordOnAnswer({
       final List<String> neighborQuestionIds = kNearestMap.keys.toList();
       
       if (neighborQuestionIds.isNotEmpty) {
-        QuizzerLogger.logMessage('Triggering re-evaluation for ${neighborQuestionIds.length} nearest neighbors');
+        // QuizzerLogger.logMessage('Triggering re-evaluation for ${neighborQuestionIds.length} nearest neighbors');
         
         final db = await getDatabaseMonitor().requestDatabaseAccess();
         if (db == null) {
@@ -342,7 +339,7 @@ Future<void> updateUserQuestionRecordOnAnswer({
             [resetDate, userId, ...neighborQuestionIds],
           );
           
-          QuizzerLogger.logSuccess('Triggered re-evaluation for ${neighborQuestionIds.length} nearest neighbor questions');
+          // QuizzerLogger.logSuccess('Triggered re-evaluation for ${neighborQuestionIds.length} nearest neighbor questions');
         } finally {
           getDatabaseMonitor().releaseDatabaseAccess();
         }

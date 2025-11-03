@@ -29,7 +29,7 @@ class QuestionQueueCache {
   /// Ensures thread safety using a lock.
   Future<bool> addRecord(Map<String, dynamic> record, {bool updateDatabaseLocation = true}) async {
     try {
-      QuizzerLogger.logMessage('Entering QuestionQueueCache addRecord()...');
+      // QuizzerLogger.logMessage('Entering QuestionQueueCache addRecord()...');
       // Assert required key exists
       assert(record.containsKey('question_id'), 'Record added to QuestionQueueCache must contain question_id');
 
@@ -40,7 +40,7 @@ class QuestionQueueCache {
         if (alreadyExists) return false;
         _cache.add(record);
         if (wasEmpty && _cache.isNotEmpty) {
-          QuizzerLogger.logMessage("QuestionQueueCache: Added record $questionId to empty queue.");
+          // QuizzerLogger.logMessage("QuestionQueueCache: Added record $questionId to empty queue.");
           signalQuestionQueueAdded(); // Use unified signal
         }
         return true;
@@ -107,7 +107,7 @@ class QuestionQueueCache {
        QuizzerLogger.logMessage('Entering QuestionQueueCache getAndRemoveRecord()...');
        return await _lock.synchronized(() async {
          if (_cache.isNotEmpty) {
-           final int lengthBeforeRemove = _cache.length;
+          //  final int lengthBeforeRemove = _cache.length;
            
            // Try to find a valid record (one that still exists in the database)
            Map<String, dynamic>? validRecord;
@@ -143,14 +143,14 @@ class QuestionQueueCache {
            
            // If we found a valid record, return it
            if (validRecord != null) {
-             final int lengthAfterRemove = _cache.length;
+            //  final int lengthAfterRemove = _cache.length;
              
              // Signal that a record was removed
              signalQuestionQueueRemoved();
              // Notify if length dropped below the threshold
-             if (lengthBeforeRemove >= queueThreshold && lengthAfterRemove < queueThreshold) {
-                QuizzerLogger.logMessage('QuestionQueueCache: Notifying record removed, length now $lengthAfterRemove.');
-             }
+            //  if (lengthBeforeRemove >= queueThreshold && lengthAfterRemove < queueThreshold) {
+            //     // QuizzerLogger.logMessage('QuestionQueueCache: Notifying record removed, length now $lengthAfterRemove.');
+            //  }
              return validRecord;
            } else {
              // All records in cache were invalid, clear cache and return dummy
@@ -176,7 +176,7 @@ class QuestionQueueCache {
   /// Ensures thread safety using a lock.
   Future<int> getLength() async {
     try {
-      QuizzerLogger.logMessage('Entering QuestionQueueCache getLength()...');
+      // QuizzerLogger.logMessage('Entering QuestionQueueCache getLength()...');
       return await _lock.synchronized(() {
         return _cache.length;
       });

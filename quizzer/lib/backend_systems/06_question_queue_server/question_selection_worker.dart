@@ -225,7 +225,7 @@ class PresentationSelectionWorker {
 
       // 1. Call _selectNextQuestionFromList to get the selected question
       // selection logic works on a router, for AB testing. Selection logic is now such that we can easily assign users to different selection logic for testing
-      final Map<String, dynamic> selectedQuestion = await _selectNextQuestionFromList(eligibleQuestions, selectionLogic: 0);
+      final Map<String, dynamic> selectedQuestion = await _selectNextQuestionFromList(eligibleQuestions, selectionLogic: 5);
       
       // 2. Check if selection was successful
       if (selectedQuestion.isEmpty) {
@@ -493,32 +493,46 @@ class PresentationSelectionWorker {
   Future<Map<String, dynamic>> _selectionLogicFive(List<Map<String, dynamic>> eligibleQuestions) async {
     QuizzerLogger.logMessage("Selection Logic 5: High probability focus with exploration");
     
+    // Configurable probability thresholds
+    const double veryHighThreshold = 0.90;
+    const double highLower = 0.85;
+    const double highUpper = 0.90;
+    const double mediumLower = 0.50;
+    const double mediumUpper = 0.85;
+    const double lowUpper = 0.50;
+    
+    // Configurable selection probabilities (must sum to 1.0)
+    const double veryHighSelectionRate = 0.50;  // 50%: 90%+ probability
+    const double highSelectionRate = 0.40;      // 40%: 85%-90% probability
+    const double mediumSelectionRate = 0.05;    // 5%: 50%-85% probability
+    // const double lowSelectionRate = 0.05;       // 5%: 0%-50% probability
+    
     final random = Random();
     final roll = random.nextDouble();
     
     List<Map<String, dynamic>> targetPool;
     
-    if (roll < 0.05) {
-      // 5%: Select from 90%+ probability
-      targetPool = eligibleQuestions.where((q) => (q['accuracy_probability'] ?? 0.0) >= 0.90).toList();
+    if (roll < veryHighSelectionRate) {
+      // Select from 90%+ probability
+      targetPool = eligibleQuestions.where((q) => (q['accuracy_probability'] ?? 0.0) >= veryHighThreshold).toList();
       if (targetPool.isEmpty) targetPool = eligibleQuestions;
-    } else if (roll < 0.80) {
-      // 75%: Select from 85%-90% probability
+    } else if (roll < veryHighSelectionRate + highSelectionRate) {
+      // Select from 85%-90% probability
       targetPool = eligibleQuestions.where((q) {
         final prob = q['accuracy_probability'] ?? 0.0;
-        return prob >= 0.85 && prob < 0.90;
+        return prob >= highLower && prob < highUpper;
       }).toList();
       if (targetPool.isEmpty) targetPool = eligibleQuestions;
-    } else if (roll < 0.85) {
-      // 10%: Select from 50%-85% probability
+    } else if (roll < veryHighSelectionRate + highSelectionRate + mediumSelectionRate) {
+      // Select from 50%-85% probability
       targetPool = eligibleQuestions.where((q) {
         final prob = q['accuracy_probability'] ?? 0.0;
-        return prob >= 0.50 && prob < 0.85;
+        return prob >= mediumLower && prob < mediumUpper;
       }).toList();
       if (targetPool.isEmpty) targetPool = eligibleQuestions;
     } else {
-      // 10%: Select from 0%-50% probability
-      targetPool = eligibleQuestions.where((q) => (q['accuracy_probability'] ?? 0.0) < 0.50).toList();
+      // Select from 0%-50% probability
+      targetPool = eligibleQuestions.where((q) => (q['accuracy_probability'] ?? 0.0) < lowUpper).toList();
       if (targetPool.isEmpty) targetPool = eligibleQuestions;
     }
     

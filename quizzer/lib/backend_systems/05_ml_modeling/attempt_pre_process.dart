@@ -7,6 +7,7 @@ import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/table_helper.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/ml_models_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_attempts_table.dart';
+import 'package:quizzer/backend_systems/06_question_queue_server/circulation_worker.dart';
 
 /// Loads all training data from the question_answer_attempts table in Supabase
 /// and converts it into an ML DataFrame for model training.
@@ -804,20 +805,60 @@ Future<DataFrame> transformDataFrameToAccuracyNetInputShape(DataFrame processedD
   return DataFrame(inferenceData);
 }
 
+/// Fetches batch inference samples for questions in circulation or connected to circulating questions.
+/// 
+/// Only processes questions that are:
+/// - Currently in circulation, OR
+/// - Not circulating but connected to a circulating question
+/// 
+/// This filtering uses the CirculationWorker's cached data structures for efficiency.
+/// 
+/// Parameters:
+/// - [nRecords]: Maximum number of records to fetch
+/// - [kMinutes]: Time window in minutes - only fetch records not calculated within this period
+/// 
+/// Returns a Map containing:
+/// - 'primary_keys': DataFrame with user_uuid and question_id columns
+/// - 'raw_inference_data': DataFrame with all features needed for inference
 Future<Map<String, DataFrame>> fetchBatchInferenceSamples({required int nRecords, required int kMinutes}) async {
+  // Validate user session
   final userId = getSessionManager().userId;
   if (userId == null) throw Exception('User ID is null');
   
+  // Get eligible questions from CirculationWorker's cached sets
+  // Combines circulating questions and non-circulating questions connected to circulation
+  final circWorker = CirculationWorker();
+  final eligibleQuestions = {...circWorker.circulatingQuestions, ...circWorker.nonCirculatingConnected};
+  
+  // Early return if no eligible questions
+  if (eligibleQuestions.isEmpty) {
+    return {
+      'primary_keys': DataFrame([]),
+      'raw_inference_data': DataFrame([])
+    };
+  }
+  
+  // Acquire database access
   final db = await getDatabaseMonitor().requestDatabaseAccess();
   if (db == null) throw Exception('Failed to acquire database access');
   
+  // Calculate cutoff time for filtering stale calculations
   final cutoffTime = DateTime.now().subtract(Duration(minutes: kMinutes)).toUtc().toIso8601String();
   
-  const pairsQuery = '''
+  // Build IN clause placeholders for eligible questions
+  final placeholders = List.filled(eligibleQuestions.length, '?').join(',');
+  
+  // Query pairs that:
+  // 1. Belong to the current user
+  // 2. Are in the eligible questions set (circulating or connected)
+  // 3. Need recalculation (null or stale last_prob_calc)
+  // 4. Have required ML features (question_vector and k_nearest_neighbors)
+  final pairsQuery = '''
     SELECT user_question_answer_pairs.user_uuid, user_question_answer_pairs.question_id
     FROM user_question_answer_pairs
     INNER JOIN question_answer_pairs ON user_question_answer_pairs.question_id = question_answer_pairs.question_id
     WHERE user_question_answer_pairs.user_uuid = ?
+      AND user_question_answer_pairs.question_id IN ($placeholders)
       AND (user_question_answer_pairs.last_prob_calc IS NULL OR user_question_answer_pairs.last_prob_calc < ?)
       AND question_answer_pairs.question_vector IS NOT NULL
       AND question_answer_pairs.k_nearest_neighbors IS NOT NULL
@@ -825,48 +866,47 @@ Future<Map<String, DataFrame>> fetchBatchInferenceSamples({required int nRecords
     LIMIT ?
   ''';
   
-  final pairs = await db.rawQuery(pairsQuery, [userId, cutoffTime, nRecords]);
+  // Execute query with user_id, all eligible question IDs, cutoff time, and limit
+  final pairs = await db.rawQuery(pairsQuery, [userId, ...eligibleQuestions, cutoffTime, nRecords]);
   
+  // Early return if no pairs found
   if (pairs.isEmpty) {
     getDatabaseMonitor().releaseDatabaseAccess();
-    // QuizzerLogger.logMessage('No records found for batch inference');
     return {
       'primary_keys': DataFrame([]),
       'raw_inference_data': DataFrame([])
     };
   }
   
-  QuizzerLogger.logMessage('Fetched ${pairs.length} user-question pairs for batch inference');
+  // QuizzerLogger.logMessage('Fetched ${pairs.length} user-question pairs for batch inference');
   
+  // Prepare common data needed for all samples
   final timeStamp = DateTime.now().toUtc().toIso8601String();
   final userStatsVector = await fetchUserStatsVector(db: db, userId: userId);
   final userProfileRecord = await fetchUserProfileRecord(db: db, userId: userId);
   
+  // Storage for constructed samples and their primary keys
   final List<Map<String, dynamic>> samples = [];
   final List<List<dynamic>> primaryKeys = [];
   
+  // Build feature vectors for each question-user pair
   for (final pair in pairs) {
     final questionId = pair['question_id'] as String;
-    // QuizzerLogger.logMessage('Processing pair: userId=$userId, questionId=$questionId');
     
+    // Fetch question metadata (type, options, etc.)
     final questionMetadata = await fetchQuestionMetadata(db: db, questionId: questionId);
     
-    final userQuestionPerformance = await fetchUserQuestionPerformance(
-      db: db,
-      userId: userId,
-      questionId: questionId,
-      timeStamp: timeStamp,
-    );
-    final knnPerformanceVector = await fetchKNearestPerformanceVector(
-      db: db,
-      userId: userId,
-      kNearestNeighbors: questionMetadata['k_nearest_neighbors'] as String?,
-      timeStamp: timeStamp,
-    );
+    // Fetch user's performance on this specific question
+    final userQuestionPerformance = await fetchUserQuestionPerformance(db: db, userId: userId, questionId: questionId, timeStamp: timeStamp);
     
+    // Fetch performance on k-nearest neighbor questions
+    final knnPerformanceVector = await fetchKNearestPerformanceVector(db: db, userId: userId, kNearestNeighbors: questionMetadata['k_nearest_neighbors'] as String?, timeStamp: timeStamp);
+    
+    // Store primary key
     primaryKeys.add([userId, questionId]);
     
-    final sampleData = {
+    // Construct complete feature vector for ML inference
+    samples.add({
       'module_name': questionMetadata['module_name'],
       'question_type': questionMetadata['question_type'],
       'num_mcq_options': questionMetadata['num_mcq_options'],
@@ -889,14 +929,13 @@ Future<Map<String, DataFrame>> fetchBatchInferenceSamples({required int nRecords
       'user_stats_vector': userStatsVector,
       'user_profile_record': userProfileRecord,
       'knn_performance_vector': knnPerformanceVector,
-    };
-    
-    samples.add(sampleData);
+    });
   }
   
+  // Release database access
   getDatabaseMonitor().releaseDatabaseAccess();
-  // QuizzerLogger.logSuccess('Generated ${samples.length} complete inference samples');
   
+  // Safety check (should not happen given earlier check)
   if (samples.isEmpty) {
     return {
       'primary_keys': DataFrame([]),
@@ -904,15 +943,14 @@ Future<Map<String, DataFrame>> fetchBatchInferenceSamples({required int nRecords
     };
   }
   
+  // Convert samples to DataFrame format
   final headers = samples.first.keys.toList();
   final rows = samples.map((sample) => headers.map((header) => sample[header]).toList()).toList();
-  final allData = [headers, ...rows];
-  
   final primaryKeysHeaders = ['user_uuid', 'question_id'];
-  final primaryKeysData = [primaryKeysHeaders, ...primaryKeys];
   
+  // Return both primary keys and feature data as DataFrames
   return {
-    'primary_keys': DataFrame(primaryKeysData),
-    'raw_inference_data': DataFrame(allData)
+    'primary_keys': DataFrame([primaryKeysHeaders, ...primaryKeys]),
+    'raw_inference_data': DataFrame([headers, ...rows])
   };
 }

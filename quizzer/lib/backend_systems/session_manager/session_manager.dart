@@ -373,8 +373,8 @@ class SessionManager {
   List<Map<String, dynamic>>  get currentCorrectOrder           => _currentQuestionDetails!['correct_order'] 
   as List<Map<String, dynamic>>; // Parsed in DB layer
 
-  String                      get currentModuleName             => _currentQuestionDetails!['module_name'] 
-  as String;
+  String get currentModuleName                                  => _currentQuestionDetails!['module_name'] 
+  as String? ?? "general";
 
   String?                     get currentCitation               => _currentQuestionDetails!['citation'] 
   as String?;
@@ -450,7 +450,7 @@ class SessionManager {
   /// Reset only the state related to the currently displayed question.
   void _clearQuestionState() {
     try {
-      QuizzerLogger.logMessage('Entering _clearQuestionState()...');
+      // QuizzerLogger.logMessage('Entering _clearQuestionState()...');
       
       _currentQuestionRecord        = null;  // User-specific data
       _currentQuestionDetails       = null;  // Static data (QPair)
@@ -464,7 +464,7 @@ class SessionManager {
       _lastSubmittedUserAnswer = null;
       _lastSubmittedIsCorrect = false;
       
-      QuizzerLogger.logMessage('Successfully cleared question state');
+      // QuizzerLogger.logMessage('Successfully cleared question state');
     } catch (e) {
       QuizzerLogger.logError('Error in _clearQuestionState - $e');
       rethrow;
@@ -875,7 +875,7 @@ class SessionManager {
   ///              This bypasses the queue cache entirely for testing purposes.
   Future<void> requestNextQuestion({Map<String, dynamic>? testDebug}) async {
     try {
-      QuizzerLogger.logMessage('Entering requestNextQuestion()...');
+      // QuizzerLogger.logMessage('Entering requestNextQuestion()...');
       
       if (userId == null) {
          throw StateError('User must be logged in to request a question.');
@@ -929,8 +929,8 @@ class SessionManager {
   /// Returns a map: {success: bool, message: String}
   Future<Map<String, dynamic>> submitAnswer({required dynamic userAnswer}) async {
     try {
-      QuizzerLogger.logMessage('Entering submitAnswer()...');
-      QuizzerLogger.logMessage("Received a userAnswer of $userAnswer");
+      // QuizzerLogger.logMessage('Entering submitAnswer()...');
+      // QuizzerLogger.logMessage("Received a userAnswer of $userAnswer");
       
       // --- ADDED: Check for Dummy Record State --- 
       if (_currentQuestionRecord == null) {
@@ -982,17 +982,17 @@ class SessionManager {
             break;
           case 'true_false':
             // User answer should be 0 (True) or 1 (False)
-            QuizzerLogger.logMessage("Evaluating true/false correctness");
+            // QuizzerLogger.logMessage("Evaluating true/false correctness");
             assert(currentCorrectOptionIndex != null);
-            QuizzerLogger.logMessage("provided answer is: $userAnswer");
-            QuizzerLogger.logMessage("CorrectOptionIndex is: $currentCorrectOptionIndex");
+            // QuizzerLogger.logMessage("provided answer is: $userAnswer");
+            // QuizzerLogger.logMessage("CorrectOptionIndex is: $currentCorrectOptionIndex");
             int finalAnswer = 3; // 3 is not valid and will trigger an error. . .
             if (userAnswer == "true" || userAnswer == true) {
               finalAnswer = 0;
             } else if (userAnswer == "false" || userAnswer == false) {
               finalAnswer = 1;
             }
-            QuizzerLogger.logMessage("$userAnswer transformed in $finalAnswer, passing the value of $finalAnswer into validation");
+            // QuizzerLogger.logMessage("$userAnswer transformed in $finalAnswer, passing the value of $finalAnswer into validation");
             isCorrect = validateTrueFalseAnswer(
               userAnswer: finalAnswer,
               correctIndex: currentCorrectOptionIndex!,
@@ -1026,7 +1026,7 @@ class SessionManager {
       // --- 4. Record Answer Attempt (at time of presentation) ---
       // Keep a copy of the record *before* updates for the attempt log
       
-      // Call the top-level helper function from session_helper.dart //FIXME Need to resolve and ensure our new features are being recorded as intended before we start generating samples.
+      // Call the top-level helper function from session_helper.dart
       await recordQuestionAnswerAttempt(
         isCorrect: isCorrect,
         userId: userId!,
@@ -1073,7 +1073,7 @@ class SessionManager {
       
       // Note: Question was already added to answer history cache when requested
       
-      QuizzerLogger.logMessage('Successfully submitted answer for QID: $questionId, isCorrect: $isCorrect, userAnswer: $userAnswer');
+      // QuizzerLogger.logMessage('Successfully submitted answer for QID: $questionId, isCorrect: $isCorrect, userAnswer: $userAnswer');
       return {'success': true, 'message': 'Answer submitted successfully.'};
     } catch (e) {
       QuizzerLogger.logError('Error in submitAnswer - $e');
@@ -1689,7 +1689,7 @@ class SessionManager {
     required String feedbackContent,
   }) async {
     try {
-      QuizzerLogger.logMessage('Entering submitUserFeedback()...');
+      // QuizzerLogger.logMessage('Entering submitUserFeedback()...');
       
       await initializationComplete;
       // userId can be null if the user is not logged in, which is fine for feedback.
@@ -1701,7 +1701,7 @@ class SessionManager {
         feedbackContent: feedbackContent,
       );
 
-      QuizzerLogger.logMessage('Successfully submitted user feedback with ID: $feedbackId');
+      // QuizzerLogger.logMessage('Successfully submitted user feedback with ID: $feedbackId');
       return feedbackId;
     } catch (e) {
       QuizzerLogger.logError('Error in submitUserFeedback - $e');

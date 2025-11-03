@@ -85,13 +85,13 @@ Future<void> verifyUserModuleActivationStatusTable(dynamic db, String userId) as
       // Add missing columns
       for (String columnName in columnsToAdd) {
         final columnDef = expectedColumns.firstWhere((col) => col['name'] == columnName);
-        QuizzerLogger.logMessage('Adding missing column: $columnName');
+        // QuizzerLogger.logMessage('Adding missing column: $columnName');
         await db.execute('ALTER TABLE user_module_activation_status ADD COLUMN ${columnDef['name']} ${columnDef['type']}');
       }
       
       // Remove unexpected columns (SQLite doesn't support DROP COLUMN directly)
       if (columnsToRemove.isNotEmpty) {
-        QuizzerLogger.logMessage('Removing unexpected columns: ${columnsToRemove.join(', ')}');
+        // QuizzerLogger.logMessage('Removing unexpected columns: ${columnsToRemove.join(', ')}');
         
         // Create temporary table with only expected columns
         String tempTableSQL = 'CREATE TABLE user_module_activation_status_temp(\n';
@@ -303,7 +303,7 @@ Future<Map<String, bool>> getModuleActivationStatus(String userId) async {
       activationStatus[moduleName] = isActive == 1;
     }
     
-    QuizzerLogger.logMessage('Retrieved activation status for ${activationStatus.length} modules for user: $userId');
+    // QuizzerLogger.logMessage('Retrieved activation status for ${activationStatus.length} modules for user: $userId');
     return activationStatus;
   } catch (e) {
     QuizzerLogger.logError('Error getting module activation status for user ID: $userId - $e');
@@ -380,7 +380,7 @@ Future<bool> updateModuleActivationStatus(String userId, String moduleName, bool
 /// Removes activation status records for modules that no longer have any questions.
 Future<void> ensureAllModulesHaveActivationStatus(String userId) async {
   try {
-    QuizzerLogger.logMessage('Ensuring all modules with questions have activation status for user: $userId');
+    // QuizzerLogger.logMessage('Ensuring all modules with questions have activation status for user: $userId');
     
     final db = await getDatabaseMonitor().requestDatabaseAccess();
     if (db == null) {
@@ -397,7 +397,7 @@ Future<void> ensureAllModulesHaveActivationStatus(String userId) async {
         .where((name) => name.isNotEmpty)
         .toList();
     
-    QuizzerLogger.logMessage('Found ${modulesWithQuestions.length} modules with questions in question_answer_pairs table');
+    // QuizzerLogger.logMessage('Found ${modulesWithQuestions.length} modules with questions in question_answer_pairs table');
     
     // Get existing activation status records for this user
     final List<Map<String, dynamic>> existingRecords = await queryAndDecodeDatabase(
@@ -417,7 +417,7 @@ Future<void> ensureAllModulesHaveActivationStatus(String userId) async {
     
     // Remove orphaned activation status records
     if (orphanedModules.isNotEmpty) {
-      QuizzerLogger.logMessage('Removing activation status records for ${orphanedModules.length} modules that no longer have questions');
+      // QuizzerLogger.logMessage('Removing activation status records for ${orphanedModules.length} modules that no longer have questions');
       
       for (final orphanedModule in orphanedModules) {
         final int deletedRows = await db.delete(
@@ -427,14 +427,14 @@ Future<void> ensureAllModulesHaveActivationStatus(String userId) async {
         );
         
         if (deletedRows > 0) {
-          QuizzerLogger.logMessage('Removed activation status record for module without questions: $orphanedModule');
+          // QuizzerLogger.logMessage('Removed activation status record for module without questions: $orphanedModule');
         }
       }
     }
     
     // Create records for missing modules that have questions
     if (missingModules.isNotEmpty) {
-      QuizzerLogger.logMessage('Creating activation status records for ${missingModules.length} missing modules that have questions');
+      // QuizzerLogger.logMessage('Creating activation status records for ${missingModules.length} missing modules that have questions');
       
       for (final moduleName in missingModules) {
         // Normalize the module name
@@ -457,13 +457,13 @@ Future<void> ensureAllModulesHaveActivationStatus(String userId) async {
         );
         
         if (result > 0) {
-          QuizzerLogger.logMessage('Created activation status record for module with questions: $moduleName (normalized: $normalizedModuleName)');
+          // QuizzerLogger.logMessage('Created activation status record for module with questions: $moduleName (normalized: $normalizedModuleName)');
         }
       }
     }
     
     if (missingModules.isEmpty && orphanedModules.isEmpty) {
-      QuizzerLogger.logMessage('All modules with questions already have activation status records, and no orphaned records found for user: $userId');
+      // QuizzerLogger.logMessage('All modules with questions already have activation status records, and no orphaned records found for user: $userId');
     } else {
       QuizzerLogger.logSuccess('Successfully updated activation status records for user: $userId (added ${missingModules.length}, removed ${orphanedModules.length})');
       // Signal SwitchBoard for the changes
@@ -545,7 +545,7 @@ Future<List<Map<String, dynamic>>> getUnsyncedModuleActivationStatusRecords(Stri
       whereArgs: [userId],
     );
 
-    QuizzerLogger.logSuccess('Fetched ${results.length} unsynced module activation status records for user $userId.');
+    // QuizzerLogger.logSuccess('Fetched ${results.length} unsynced module activation status records for user $userId.');
     return results;
   } catch (e) {
     QuizzerLogger.logError('Error getting unsynced module activation status records for user ID: $userId - $e');
@@ -567,7 +567,7 @@ Future<void> updateModuleActivationStatusSyncFlags({
     // Normalize the module name
     final String normalizedModuleName = await normalizeString(moduleName);
     
-    QuizzerLogger.logMessage('Updating sync flags for module activation status (User: $userId, Module: $moduleName -> $normalizedModuleName) -> Synced: $hasBeenSynced, Edits Synced: $editsAreSynced');
+    // QuizzerLogger.logMessage('Updating sync flags for module activation status (User: $userId, Module: $moduleName -> $normalizedModuleName) -> Synced: $hasBeenSynced, Edits Synced: $editsAreSynced');
     final db = await getDatabaseMonitor().requestDatabaseAccess();
     if (db == null) {
       throw Exception('Failed to acquire database access');
