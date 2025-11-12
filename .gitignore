@@ -175,3 +175,5 @@ quizzer/dataAnalysis/global_best_model.keras
 quizzer/QuizzerApp/sqlite/quizzer.db
 quizzer/QuizzerApp/
 quizzer/QuizzerAppLogs
+quizzer/QuizzerAppHive
+quizzer/QuizzerAppMedia

@@ -8,6 +8,7 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/
 // Table Access
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_question_answer_pairs_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/table_helper.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/ml_models_table.dart';
 // Workers
 import 'package:quizzer/backend_systems/10_switch_board/switch_board.dart'; // Import SwitchBoard
 import 'package:quizzer/backend_systems/10_switch_board/sb_question_worker_signals.dart'; // Import worker signals
@@ -30,6 +31,7 @@ class CirculationWorker {
 
   final SessionManager                _sessionManager       = SessionManager();
   final SwitchBoard                   _switchBoard          = SwitchBoard(); // Get SwitchBoard instance
+  late double idealThreshold;
   static const int    _circulationThreshold = 25;
   static const int    _removalThresholdMultiplier = 2; // DO NOT PROVIDE A VALUE <= 1
 
@@ -67,6 +69,7 @@ class CirculationWorker {
 
       // Initialize data structures before starting main loop
       await _initializeDataStructures();
+      idealThreshold = await getAccuracyNetOptimalThreshold();
 
       _runLoop(); // Start the loop asynchronously
     } catch (e) {
@@ -151,7 +154,7 @@ class CirculationWorker {
 
   /// Checks if conditions are met to add a new question to circulation.
   /// Uses cached data structures instead of database queries.
-  /// Only counts questions that meet eligibility criteria: not flagged, accuracy_probability < 0.90, in active modules.
+  /// Only counts questions that meet eligibility criteria: not flagged, accuracy_probability < idealThreshold, in active modules.
   Future<Map<String, dynamic>> _shouldAddNewQuestion() async {
     QuizzerLogger.logMessage('Entering CirculationWorker _shouldAddNewQuestion()...');
     
@@ -171,7 +174,7 @@ class CirculationWorker {
     final db = await getDatabaseMonitor().requestDatabaseAccess();
     if (db == null) throw Exception('Failed to acquire database access');
     
-    List<dynamic> whereArgs = [userId];
+    List<dynamic> whereArgs = [userId, idealThreshold];
     String sql;
     
     if (activeModuleNames.isNotEmpty) {
@@ -184,7 +187,7 @@ class CirculationWorker {
         WHERE user_question_answer_pairs.user_uuid = ?
           AND user_question_answer_pairs.in_circulation = 1
           AND user_question_answer_pairs.flagged = 0
-          AND user_question_answer_pairs.accuracy_probability < 0.90
+          AND user_question_answer_pairs.accuracy_probability < ?
           AND question_answer_pairs.module_name IN ($placeholders)
         LIMIT 101
       ''';
@@ -196,7 +199,7 @@ class CirculationWorker {
         WHERE user_question_answer_pairs.user_uuid = ?
           AND user_question_answer_pairs.in_circulation = 1
           AND user_question_answer_pairs.flagged = 0
-          AND user_question_answer_pairs.accuracy_probability < 0.90
+          AND user_question_answer_pairs.accuracy_probability < ?
         LIMIT 101
       ''';
     }

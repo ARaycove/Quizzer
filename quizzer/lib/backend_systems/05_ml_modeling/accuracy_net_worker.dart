@@ -2,12 +2,12 @@ import 'dart:async';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
 import 'package:quizzer/backend_systems/05_ml_modeling/attempt_pre_process.dart';
-import 'package:quizzer/backend_systems/05_ml_modeling/accuracy_net.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:tflite_flutter/tflite_flutter.dart';
 import 'package:ml_dataframe/ml_dataframe.dart';
 import 'package:quizzer/backend_systems/00_helper_utils/file_locations.dart';
 import 'package:path/path.dart' as path;
+import 'dart:typed_data';
 import 'dart:convert';
 import 'dart:io';
 
@@ -49,6 +49,8 @@ class AccuracyNetWorker {
   static const int loopIntervalSeconds = 1;
   
   bool get isRunning => _isRunning;
+  Interpreter? get predictionModel => _interpreter;
+
   Future<void> start() async {
     QuizzerLogger.logMessage('Entering AccuracyNetWorker start()...');
     
@@ -56,12 +58,14 @@ class AccuracyNetWorker {
       QuizzerLogger.logWarning('AccuracyNetWorker is already running.');
       return;
     }
-    _interpreter = await loadAccuracyNetModel();
+    await loadTensorFlowModel();
     _isRunning = true;
     _stopCompleter = Completer<void>();
     QuizzerLogger.logMessage('AccuracyNetWorker started.');
     _runLoop();
   }
+
+
   Future<void> stop() async {
     QuizzerLogger.logMessage('Entering AccuracyNetWorker stop()...');
     
@@ -87,6 +91,34 @@ class AccuracyNetWorker {
     
     QuizzerLogger.logMessage('AccuracyNetWorker stopped.');
   }
+
+  /// Method to load or reload the prediction net model 
+  /// (if new model is fetched during runtime, this can be called again to reload the model)
+  Future<void> loadTensorFlowModel() async {
+    final localPath = path.join(await getQuizzerMediaPath(), 'accuracy_net.tflite');
+    final file = File(localPath);
+    
+    if (!file.existsSync()) {
+      try {
+        QuizzerLogger.logMessage('Model file not found locally, fetching from Supabase...');
+        
+        final Uint8List bytes = await getSessionManager().supabase.storage
+            .from('ml_models')
+            .download('accuracy_net.tflite');
+        
+        await file.create(recursive: true);
+        await file.writeAsBytes(bytes);
+        
+        QuizzerLogger.logSuccess('Model file downloaded and saved to $localPath');
+      } catch (e) {
+        QuizzerLogger.logError("Failed to download accuracy_net.tflite from Supabase: $e");
+      }
+    }
+    
+    _interpreter = Interpreter.fromFile(file);
+  }
+
+
   Future<void> _runLoop() async {
     QuizzerLogger.logMessage('Entering AccuracyNetWorker _runLoop()...');
     
@@ -96,6 +128,8 @@ class AccuracyNetWorker {
       }
     });
   }
+
+
   Future<void> _runCycle() async {
     if (!_isRunning) return;
     
@@ -121,8 +155,7 @@ class AccuracyNetWorker {
     final inferenceInputFrame = await transformDataFrameToAccuracyNetInputShape(encodedFrame);
     // TODO, comment out debug print of value order, once resolve
     // await writeDataFrameFeatureMap(inferenceInputFrame, "inference_data.json");
-    final resultsFrame = await runBatchInference(
-      interpreter: _interpreter!,
+    final resultsFrame = await _runBatchInference(
       primaryKeysFrame: primaryKeysFrame,
       inputFrame: inferenceInputFrame,
     );
@@ -164,5 +197,85 @@ class AccuracyNetWorker {
     } finally {
       getDatabaseMonitor().releaseDatabaseAccess();
     }
+  }
+
+  Future<DataFrame> _runBatchInference({
+    required DataFrame primaryKeysFrame,
+    required DataFrame inputFrame,
+  }) async {
+    // QuizzerLogger.logMessage('=== Starting runBatchInference ===');
+    final timeStamp = DateTime.now().toUtc().toIso8601String();
+    final numRows = inputFrame.rows.length;
+    final numFeatures = inputFrame.header.length;
+    
+    // QuizzerLogger.logMessage('Batch info: $numRows rows, $numFeatures features');
+    
+    // Validate interpreter state
+    // QuizzerLogger.logMessage('Checking interpreter state...');
+    final inputTensorDetails = AccuracyNetWorker().predictionModel!.getInputTensor(0);
+    // QuizzerLogger.logMessage('Input tensor retrieved successfully');
+    // QuizzerLogger.logMessage('  Expected shape: ${inputTensorDetails.shape}');
+    
+    final expectedInputFeatures = inputTensorDetails.shape[1];
+    // QuizzerLogger.logMessage('Model expects $expectedInputFeatures features, got $numFeatures features');
+    
+    if (expectedInputFeatures != numFeatures) {
+      // QuizzerLogger.logError('SHAPE MISMATCH: Model expects $expectedInputFeatures but data has $numFeatures');
+      throw Exception(
+        'Shape mismatch: Model expects $expectedInputFeatures features but data has $numFeatures. '
+        'The model does not match the input_features in the database. '
+        'Please ensure the model is downloaded during app initialization and matches the expected feature count.'
+      );
+    }
+    
+    // QuizzerLogger.logSuccess('✓ Shape validation passed');
+    
+    final List<List<dynamic>> updatedPrimaryKeyRows = [];
+    final inputRows = inputFrame.rows.toList();
+    
+    // QuizzerLogger.logMessage('Starting inference loop for $numRows samples...');
+    
+    for (int i = 0; i < numRows; i++) {
+      // QuizzerLogger.logMessage('--- Processing sample ${i + 1}/$numRows ---');
+      
+      final inputRow = inputRows[i].toList();
+      final input = List<double>.filled(numFeatures, 0.0);
+      for (int j = 0; j < numFeatures; j++) {
+        final value = inputRow[j];
+        if (value == null) {
+          input[j] = 0.0;
+        } else if (value is num) {
+          input[j] = value.toDouble();
+        } else {
+          input[j] = 0.0;
+        }
+      }
+      
+      final inputTensor = [input];
+      final outputTensor = [List<double>.filled(1, 0.0)];
+      
+      AccuracyNetWorker().predictionModel!.run(inputTensor, outputTensor);
+      // QuizzerLogger.logSuccess('  ✓ Inference completed successfully');
+      
+      final probability = outputTensor[0][0];
+      QuizzerLogger.logMessage('  Predicted probability: $probability');
+      
+      if (probability < 0.0 || probability > 1.0) {
+        QuizzerLogger.logWarning('  WARNING: Probability out of range [0,1]: $probability');
+      }
+      
+      final pkRow = primaryKeysFrame.rows.toList()[i].toList();
+      updatedPrimaryKeyRows.add([...pkRow.sublist(0, 2), probability, timeStamp]);
+    }
+    
+    QuizzerLogger.logSuccess('✓ All $numRows samples processed successfully');
+    
+    final headers = ['user_uuid', 'question_id', 'prob_result', 'last_prob_calc'];
+    final allData = [headers, ...updatedPrimaryKeyRows];
+    
+    final resultFrame = DataFrame(allData);
+    // QuizzerLogger.logMessage('=== runBatchInference completed ===');
+    
+    return resultFrame;
   }
 }

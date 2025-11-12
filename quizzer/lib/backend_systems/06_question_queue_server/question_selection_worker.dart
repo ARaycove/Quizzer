@@ -1,12 +1,12 @@
 import 'dart:async';
 import 'dart:math';
+import 'package:quizzer/backend_systems/06_question_queue_server/circulation_worker.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/backend_systems/09_data_caches/question_queue_cache.dart';
 import 'package:quizzer/backend_systems/09_data_caches/answer_history_cache.dart';
 import 'package:quizzer/backend_systems/10_switch_board/switch_board.dart';
 import 'package:quizzer/backend_systems/10_switch_board/sb_question_worker_signals.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/ml_models_table.dart';
 // Table Imports
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_question_answer_pairs_table.dart';
 // Data Consistency Import
@@ -32,11 +32,15 @@ class PresentationSelectionWorker {
   final SwitchBoard _switchBoard = SwitchBoard();
 
   // --- Dependencies ---
-  final SessionManager            _sessionManager = SessionManager();
-  final QuestionQueueCache        _queueCache = QuestionQueueCache();
-  // final UnprocessedCache        _unprocessedCache = UnprocessedCache();
+  final SessionManager _sessionManager = SessionManager();
+  final QuestionQueueCache _queueCache = QuestionQueueCache();
+  // final UnprocessedCache _unprocessedCache = UnprocessedCache();
 
   // --- Control Methods ---
+
+  /// Starts the PresentationSelectionWorker.
+  /// Clears both QuestionQueueCache and AnswerHistoryCache to ensure clean state,
+  /// then begins the main selection loop that monitors queue levels and adds questions as needed.
   void start() {
     try {
       QuizzerLogger.logMessage('Entering PresentationSelectionWorker start()...');
@@ -63,6 +67,8 @@ class PresentationSelectionWorker {
     }
   }
 
+  /// Stops the PresentationSelectionWorker.
+  /// Sets the running flag to false, clears both caches, and waits for the main loop to complete.
   Future<void> stop() async {
     try {
       QuizzerLogger.logMessage('Entering PresentationSelectionWorker stop()...');
@@ -93,6 +99,12 @@ class PresentationSelectionWorker {
   }
 
   // --- Main Loop Logic ---
+  
+  /// Main worker loop that continuously monitors the question queue and adds questions as needed.
+  /// Checks if queue is below threshold, fetches eligible questions, filters out recently answered
+  /// and already queued questions, then either adds all remaining questions directly (if insufficient)
+  /// or uses advanced selection logic to fill the queue to threshold. Waits for answer/circulation
+  /// signals between cycles.
   Future<void> _runLoop() async {
     try {
       QuizzerLogger.logMessage('Entering PresentationSelectionWorker _runLoop()...');
@@ -179,7 +191,6 @@ class PresentationSelectionWorker {
         
         // Step 5: Wait for either the submitAnswer signal or circulation worker question added signal
         if (_isRunning) {
-          // Use a timeout-based approach to allow checking stop condition
           bool signalReceived = false;
           while (_isRunning && !signalReceived) {
             try {
@@ -218,14 +229,20 @@ class PresentationSelectionWorker {
   }
 
   // --- Core Selection and Queuing Logic ---
+  
+  /// Selects a single question from eligible questions and adds it to the queue cache.
+  /// Uses the configured selection logic (currently logic 7) to pick the best question,
+  /// performs data consistency checks via compareAndUpdateQuestionRecord, then adds
+  /// the selected question to the queue cache.
+  /// Returns the question_id if successful, null otherwise.
   Future<String?> _selectAndQueueQuestion(List<Map<String, dynamic>> eligibleQuestions) async {
     try {
       QuizzerLogger.logMessage('Entering PresentationSelectionWorker _selectAndQueueQuestion()...');
       if (!_isRunning) return null;
 
       // 1. Call _selectNextQuestionFromList to get the selected question
-      // selection logic works on a router, for AB testing. Selection logic is now such that we can easily assign users to different selection logic for testing
-      final Map<String, dynamic> selectedQuestion = await _selectNextQuestionFromList(eligibleQuestions, selectionLogic: 5);
+      // Selection logic #any# is used for AB testing. Selection logic can be changed to assign users different algorithms.
+      final Map<String, dynamic> selectedQuestion = await _selectNextQuestionFromList(eligibleQuestions, selectionLogic: 7);
       
       // 2. Check if selection was successful
       if (selectedQuestion.isEmpty) {
@@ -269,9 +286,10 @@ class PresentationSelectionWorker {
     }
   }
   
-  /// Main router function
-  /// Determines which selection logic is used from possibilities. This is useful for AB testing
-  /// Selection logic itself is written in _selectionLogic* functions
+  /// Router function that determines which selection logic to use.
+  /// Routes to one of the _selectionLogic* functions based on the selectionLogic parameter.
+  /// This architecture enables A/B testing different selection algorithms by assigning different
+  /// logic values to different users. Default is logic 1 if invalid value provided.
   Future<Map<String, dynamic>> _selectNextQuestionFromList(List<Map<String, dynamic>> eligibleQuestions, {int selectionLogic = 1}) async {
     try {
       // FIXME Upward threshold is hardcoded (should add a user setting from which this information is pulled)
@@ -303,6 +321,9 @@ class PresentationSelectionWorker {
         case 6:
           // Push all questions toward 90%+ probability
           return await _selectionLogicSix(eligibleQuestions);
+        case 7:
+          // Revision streak prioritization with probability filtering
+          return await _selectionLogicSeven(eligibleQuestions);
         default:
           QuizzerLogger.logWarning('Invalid selectionLogic value: $selectionLogic. Defaulting to logic 1.');
           return await _selectionLogicOne(eligibleQuestions);
@@ -313,7 +334,10 @@ class PresentationSelectionWorker {
     }
   }
 
-  // Logic 0: Lowest revision streak, then lowest probability
+  /// Selection Logic 0: Lowest revision streak, then lowest probability.
+  /// Finds all questions with the lowest revision_streak value, then among those
+  /// selects the one with the lowest accuracy_probability. Prioritizes questions
+  /// that need the most review attention.
   Future<Map<String, dynamic>> _selectionLogicZero(List<Map<String, dynamic>> eligibleQuestions) async {
     QuizzerLogger.logMessage("Selection Logic 0: Lowest revision streak and lowest probability");
     
@@ -329,13 +353,16 @@ class PresentationSelectionWorker {
       ((a['accuracy_probability'] ?? 0.0) < (b['accuracy_probability'] ?? 0.0)) ? a : b
     );
     
-    final prob = selected['accuracy_probability'] ?? 0.0;
-    final attempts = selected['total_attempts'] ?? 0;
-    QuizzerLogger.logMessage("Selected question - revision_streak: $lowestStreak, accuracy_probability: $prob, total_attempts: $attempts");
+    _logSelection(selected);
     return selected;
   }
 
-  // Logic 1: Probabilistic selection with ML threshold
+  /// Selection Logic 1: Probabilistic selection with ML threshold.
+  /// Uses weighted random selection with three modes:
+  /// - 10% chance: Select questions closest to the ML model's optimal threshold
+  /// - 85% chance: Select question with lowest probability (needs most practice)
+  /// - 5% chance: Random selection for exploration
+  /// Only considers questions below highProbThreshold (default 0.95) for targeted modes.
   Future<Map<String, dynamic>> _selectionLogicOne(
     List<Map<String, dynamic>> eligibleQuestions, {
     double highProbThreshold = 0.95,
@@ -346,7 +373,7 @@ class PresentationSelectionWorker {
     
     final random = Random();
     final double roll = random.nextDouble();
-    final double threshold = await getAccuracyNetOptimalThreshold();
+    final double threshold = CirculationWorker().idealThreshold;
     
     final lowProbQuestions = eligibleQuestions.where((q) => (q['accuracy_probability'] ?? 0.0) < highProbThreshold).toList();
     
@@ -400,26 +427,27 @@ class PresentationSelectionWorker {
         break;
     }
     
-    final String questionId = selectedQuestion['question_id']?.toString() ?? 'unknown';
-    final int totalAttempts = selectedQuestion['total_attempts'] ?? 0;
-    final double probability = selectedQuestion['accuracy_probability'] ?? 0.0;
-    final String? lastRevised = selectedQuestion['last_revised']?.toString();
-    
-    QuizzerLogger.logMessage("Selected question:$questionId | Attempts: $totalAttempts | Prob: ${probability.toStringAsFixed(5)} | Last revised: $lastRevised");
-    
+    _logSelection(selectedQuestion);
     return selectedQuestion;
   }
 
-  // Logic 2: Completely random selection
+  /// Selection Logic 2: Completely random selection.
+  /// Selects a random question from all eligible questions with equal probability.
+  /// Provides baseline for comparing other selection strategies.
   Future<Map<String, dynamic>> _selectionLogicTwo(List<Map<String, dynamic>> eligibleQuestions) async {
     QuizzerLogger.logMessage("Selection Logic 2: Completely random selection");
     final random = Random();
     final selected = eligibleQuestions[random.nextInt(eligibleQuestions.length)];
-    QuizzerLogger.logMessage("Selected question: $selected");
+    _logSelection(selected);
     return selected;
   }
 
-  // Semi-Random selection Exploratory
+  /// Selection Logic 3: Semi-random exploratory selection.
+  /// Weighted random selection across three pools:
+  /// - 60% (default): Unseen questions (last_revised is null)
+  /// - 39% (default): All questions
+  /// - 1% (default): Previously seen questions (last_revised is not null)
+  /// Percentages are configurable parameters. Falls back to all questions if selected pool is empty.
   Future<Map<String, dynamic>> _selectionLogicThree(
     List<Map<String, dynamic>> eligibleQuestions, {
     double nullRevisedPercent = 0.60,
@@ -444,13 +472,16 @@ class PresentationSelectionWorker {
     }
     
     final selected = targetPool[random.nextInt(targetPool.length)];
-    QuizzerLogger.logMessage("Selected question: $selected");
+    _logSelection(selected);
     return selected;
   }
 
-  // Logic 4: 50/50 split between unseen and seen questions
+  /// Selection Logic 4: 50/50 split between unseen and seen questions.
+  /// Randomly selects from either unseen (last_revised is null) or seen (last_revised is not null)
+  /// pools with equal 50% probability. If one pool is empty, selects from the other pool.
+  /// Balances exploration of new material with reinforcement of learned material.
   Future<Map<String, dynamic>> _selectionLogicFour(List<Map<String, dynamic>> eligibleQuestions) async {
-    QuizzerLogger.logMessage("Selection Logic 3: 50/50 unseen/seen split");
+    QuizzerLogger.logMessage("Selection Logic 4: 50/50 unseen/seen split");
     
     final random = Random();
     
@@ -482,14 +513,17 @@ class PresentationSelectionWorker {
     
     // Randomly select from chosen pool
     final selected = selectedPool[random.nextInt(selectedPool.length)];
-    final lastRevised = selected['last_revised'];
-    final prob = selected['accuracy_probability'] ?? 0.0;
-    QuizzerLogger.logMessage("Selected question - last_revised: ${lastRevised ?? 'null'}, accuracy_probability: $prob");
-    
+    _logSelection(selected);
     return selected;
   }
 
-  // Logic 5: High probability focus with exploration
+  /// Selection Logic 5: High probability focus with exploration.
+  /// Weighted random selection targeting different probability ranges:
+  /// - 50%: Very high probability (>= 0.90) - reinforce well-learned material
+  /// - 40%: High probability (0.85-0.90) - maintain strong knowledge
+  /// - 5%: Medium probability (0.50-0.85) - some reinforcement
+  /// - 5%: Low probability (< 0.50) - minimal exploration of weak areas
+  /// Falls back to all questions if selected range is empty.
   Future<Map<String, dynamic>> _selectionLogicFive(List<Map<String, dynamic>> eligibleQuestions) async {
     QuizzerLogger.logMessage("Selection Logic 5: High probability focus with exploration");
     
@@ -537,17 +571,15 @@ class PresentationSelectionWorker {
     }
     
     final selected = targetPool[random.nextInt(targetPool.length)];
-    final String questionId = selected['question_id']?.toString() ?? 'unknown';
-    final int totalAttempts = selected['total_attempts'] ?? 0;
-    final double probability = selected['accuracy_probability'] ?? 0.0;
-    final String? lastRevised = selected['last_revised']?.toString();
-    
-    QuizzerLogger.logMessage("Selected question:$questionId | Attempts: $totalAttempts | Prob: ${probability.toStringAsFixed(5)} | Last revised: $lastRevised");
-    
+    _logSelection(selected);
     return selected;
   }
 
-  // Logic 6: Push all questions toward 95%+ probability
+  /// Selection Logic 6: Push all questions toward 90%+ probability.
+  /// Focuses on getting questions to mastery level:
+  /// - 95%: Select question closest to (but below) 0.90 probability - push toward threshold
+  /// - 5%: Random selection from questions >= 0.90 - maintain mastery
+  /// Strategy emphasizes moving lower-probability questions up to the 90% mastery threshold.
   Future<Map<String, dynamic>> _selectionLogicSix(List<Map<String, dynamic>> eligibleQuestions) async {
     QuizzerLogger.logMessage("Selection Logic 6: Push toward 90%+ probability");
     
@@ -587,14 +619,58 @@ class PresentationSelectionWorker {
       }
     }
     
-    final String questionId = selected['question_id']?.toString() ?? 'unknown';
-    final int totalAttempts = selected['total_attempts'] ?? 0;
-    final double probability = selected['accuracy_probability'] ?? 0.0;
-    final String? lastRevised = selected['last_revised']?.toString();
-    
-    QuizzerLogger.logMessage("Selected question:$questionId | Attempts: $totalAttempts | Prob: ${probability.toStringAsFixed(5)} | Last revised: $lastRevised");
-    
+    _logSelection(selected);
     return selected;
   }
 
+  /// Selection Logic 7: Revision streak prioritization with probability filtering.
+  /// Three-tiered selection strategy focusing on review frequency and accuracy:
+  /// 1. FIRST PRIORITY: All questions with revision_streak = 0 (never successfully reviewed)
+  ///    - Randomly selects from this pool if any exist
+  /// 2. SECOND PRIORITY: Questions with revision_streak > 0 AND probability < 0.90
+  ///    - Finds minimum revision_streak among these questions
+  ///    - Within that streak, finds minimum probability
+  ///    - Selects from questions matching both criteria
+  /// 3. FALLBACK: If no questions < 0.90 probability exist
+  ///    - Selects question with lowest overall probability
+  /// This strategy ensures questions needing review get priority while respecting mastery levels.
+  Future<Map<String, dynamic>> _selectionLogicSeven(List<Map<String, dynamic>> eligibleQuestions) async {
+    QuizzerLogger.logMessage("Selection Logic 7: Revision streak prioritization");
+    
+    final streak0 = eligibleQuestions.where((q) => (q['revision_streak'] ?? 0) == 0).toList();
+
+    if (streak0.isNotEmpty) {
+      final selected = streak0[Random().nextInt(streak0.length)];
+      _logSelection(selected);
+      return selected;
+    }
+    
+    final nonZeroBelowIdealThreshold = eligibleQuestions.where((q) => 
+      (q['revision_streak'] ?? 0) > 0 && (q['accuracy_probability'] ?? 0.0) < CirculationWorker().idealThreshold
+    ).toList();
+    
+    if (nonZeroBelowIdealThreshold.isNotEmpty) {
+      int minStreak = nonZeroBelowIdealThreshold.map((q) => q['revision_streak'] as int? ?? 0).reduce((a, b) => a < b ? a : b);
+      final minStreakQuestions = nonZeroBelowIdealThreshold.where((q) => (q['revision_streak'] ?? 0) == minStreak).toList();
+      double minProb = minStreakQuestions.map((q) => q['accuracy_probability'] as double? ?? 0.0).reduce((a, b) => a < b ? a : b);
+      final candidates = minStreakQuestions.where((q) => (q['accuracy_probability'] ?? 0.0) == minProb).toList();
+      
+      final selected = candidates[Random().nextInt(candidates.length)];
+      _logSelection(selected);
+      return selected;
+    }
+    
+    double minProb = eligibleQuestions.map((q) => q['accuracy_probability'] as double? ?? 0.0).reduce((a, b) => a < b ? a : b);
+    final lowestProb = eligibleQuestions.where((q) => (q['accuracy_probability'] ?? 0.0) == minProb).toList();
+    
+    final selected = lowestProb[Random().nextInt(lowestProb.length)];
+    _logSelection(selected);
+    return selected;
+  }
+
+  /// Logs the selected question details including ID, attempts, probability, last revised date, and revision streak.
+  /// Used by all selection logic functions for consistent logging format.
+  void _logSelection(Map<String, dynamic> question) {
+    QuizzerLogger.logMessage("Selected question:${question['question_id'] ?? 'unknown'} | Attempts: ${question['total_attempts'] ?? 0} | Prob: ${(question['accuracy_probability'] ?? 0.0).toStringAsFixed(5)} | Last revised: ${question['last_revised'] ?? 'null'} | Revision streak: ${question['revision_streak'] ?? 0}");
+  }
 }

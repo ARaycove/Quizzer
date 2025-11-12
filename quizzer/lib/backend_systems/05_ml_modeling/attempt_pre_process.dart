@@ -593,21 +593,20 @@ DataFrame _unpackKnnPerformanceVector(DataFrame dataFrame, String prefix) {
       final List<dynamic> knnList = (knnValue is String)
           ? decodeValueFromDB(knnValue) as List<dynamic>
           : knnValue as List<dynamic>;
-      
-      if (knnList is List) {
-        for (int i = 0; i < knnList.length; i++) {
-          final neighborNum = (i + 1).toString().padLeft(2, '0');
-          final neighbor = knnList[i];
-          if (neighbor is Map) {
-            for (final field in allFields) {
-              final value = neighbor[field];
-              // Convert booleans to integers
-              final processedValue = (value is bool) ? (value ? 1 : 0) : (value ?? 0);
-              rowData['${prefix}_${neighborNum}_$field'] = processedValue;
-            }
+
+      for (int i = 0; i < knnList.length; i++) {
+        final neighborNum = (i + 1).toString().padLeft(2, '0');
+        final neighbor = knnList[i];
+        if (neighbor is Map) {
+          for (final field in allFields) {
+            final value = neighbor[field];
+            // Convert booleans to integers
+            final processedValue = (value is bool) ? (value ? 1 : 0) : (value ?? 0);
+            rowData['${prefix}_${neighborNum}_$field'] = processedValue;
           }
         }
       }
+
     }
     
     // Fill missing values with 0

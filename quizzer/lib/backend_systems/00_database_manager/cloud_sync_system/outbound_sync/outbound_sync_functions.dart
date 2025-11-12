@@ -426,7 +426,7 @@ Future<void> syncQuestionAnswerAttempts() async {
             originalRecord['question_id'] as String,
             originalRecord['time_stamp'] as String,
           );
-          QuizzerLogger.logSuccess('Successfully synced and deleted local attempt record: ${record['question_id']}');
+          // QuizzerLogger.logSuccess('Successfully synced and deleted local attempt record: ${record['question_id']}');
         }
       } catch (e) {
         QuizzerLogger.logError('Failed to sync individual attempt record ${record['question_id']}: $e');

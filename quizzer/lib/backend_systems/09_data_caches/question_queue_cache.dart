@@ -19,7 +19,7 @@ class QuestionQueueCache {
 
   final Lock _lock = Lock();
   final List<Map<String, dynamic>> _cache = [];
-  static const int queueThreshold = 15; // Threshold for number of questions to be stored in the queueCache
+  static const int queueThreshold = 5; // Threshold for number of questions to be stored in the queueCache
 
   // --- Add Record (with duplicate check within this cache only) ---
 

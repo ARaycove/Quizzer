@@ -44,6 +44,8 @@ Future<void> initializeSyncWorkers() async {
     // Start media sync worker
     QuizzerLogger.logMessage('Starting media sync worker...');
     final mediaSyncWorker = MediaSyncWorker();
+    // before main start, check and update ml_models are up to date, then start main image sync
+    await mediaSyncWorker.updateMlModels();
     mediaSyncWorker.start();
     
     QuizzerLogger.logSuccess('Sync workers initialized successfully');

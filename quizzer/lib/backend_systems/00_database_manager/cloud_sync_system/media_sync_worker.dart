@@ -112,7 +112,6 @@ class MediaSyncWorker {
     if (!_isRunning) return; // Check if worker was stopped during uploads
     await _processDownloads();
     if (!_isRunning) return;
-    await _updateMlModels();
     
     QuizzerLogger.logMessage('MediaSyncWorker: _performSync() finished.');
   }
@@ -286,7 +285,7 @@ class MediaSyncWorker {
     QuizzerLogger.logMessage('MediaSyncWorker: Finished _processDownloads.');
   }
   // ----------------------
-  Future<void> _updateMlModels() async {
+  Future<void> updateMlModels() async {
     final models = await getAllMlModels();
     
     for (final model in models) {
