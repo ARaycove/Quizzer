@@ -87,20 +87,20 @@ async def main():
     embedding_model = SentenceTransformer('sentence-transformers/allenai-specter')
     # Define Dimensionality Reduction model for bertopic 
     umap_model              = umap.UMAP(
-            n_neighbors     = 10,
+            n_neighbors     = 25,
             n_components    = 25,
             min_dist        = 0.01,
             spread          = 0.5,
             random_state    = 0,
-            metric          = 'euclidean'
+            metric          = 'manhattan'
         )
 
     if not bypass_model_train:
         # Define hdbscan model
         hdbscan_model           = hdbscan.HDBSCAN(
-            min_cluster_size    = 20,
-            # min_samples         = 10,
-            metric              = 'euclidean',
+            min_cluster_size    = 25,
+            min_samples         = 10,
+            metric              = 'manhattan',
             cluster_selection_method = 'eom',
             # prediction_data     = True
         )
@@ -186,7 +186,7 @@ async def main():
         start = timeit.default_timer()
         topic_model = BERTopic(
             verbose             = True,
-            top_n_words         = 15,
+            top_n_words         = 10,
             embedding_model     = embedding_model,
             umap_model          = umap_model,
             hdbscan_model       = hdbscan_model,
@@ -263,8 +263,8 @@ async def main():
         # # Run comprehensive grid search
         
         start   = timeit.default_timer()
-        n_search = 25
-        grid_search_quizzer_model(X_train, y_train, X_test, y_test, n_search=n_search, batch_size=10)
+        n_search = 1
+        grid_search_quizzer_model(X_train, y_train, X_test, y_test, n_search=n_search, batch_size=25)
         end     = timeit.default_timer()
         grid_search_time = end - start
 
@@ -299,12 +299,12 @@ async def main():
             rp.create_comprehensive_visualizations(metrics, "Quizzer_NN")
             end = timeit.default_timer()
             final_report_time = end - start
-            # ap.push_model_to_supabase( #FIXME Let's get good results before pushing model
-            #     model_name="accuracy_net", 
-            #     metrics=metrics, 
-            #     model_path="global_best_model.tflite", 
-            #     feature_map_path="input_feature_map.json"
-            # )
+            ap.push_model_to_supabase(
+                model_name="accuracy_net", 
+                metrics=metrics, 
+                model_path="global_best_model.tflite", 
+                feature_map_path="input_feature_map.json"
+            )
             
         else:
             print("Grid search failed - no model saved")
@@ -319,6 +319,7 @@ async def main():
         print(f"Bertopic Training took: {topic_model_train_time:.5f} seconds")
         print(f"KNN Analysis took:      {knn_analysis_time:.5f} seconds")
         print(f"Data PreProcessing took:{pre_process_time:.5f} seconds")
+        print(f"Model trained on {X_train.shape[1]} features")
         print(f"Grid Search ran with {n_search} configurations")
         print(f"Grid Search took:       {grid_search_time:.5f} seconds")
         print(f"Final results took:     {final_report_time:.5f}")
