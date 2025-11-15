@@ -67,6 +67,8 @@ dependencies:
   ml_algo: any
   ml_linalg: any
   tflite_flutter: any
+  google_sign_in: ^6.2.2
+  crypto: ^3.0.6
   # llama_cpp_dart: ^0.1.0  # Temporarily disabled due to compilation issues
 dev_dependencies:
   flutter_test:

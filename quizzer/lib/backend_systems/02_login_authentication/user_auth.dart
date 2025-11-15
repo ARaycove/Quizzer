@@ -1,6 +1,12 @@
+import 'dart:developer';
+import 'dart:convert';
+import 'dart:io';
+import 'package:crypto/crypto.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:supabase/supabase.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_profile_table.dart' as user_profile;
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_profile_table.dart'
+    as user_profile;
 import 'package:quizzer/backend_systems/02_login_authentication/offline_login.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'dart:async';
@@ -9,7 +15,8 @@ import 'package:hive/hive.dart';
 
 /// Catches AuthException for known Supabase errors.
 /// On successful login, stores offline login data and initializes SessionManager.
-Future<Map<String, dynamic>> attemptSupabaseLogin(String email, String password, SupabaseClient supabase, Box storage) async {
+Future<Map<String, dynamic>> attemptSupabaseLogin(
+    String email, String password, SupabaseClient supabase, Box storage) async {
   QuizzerLogger.logMessage('Attempting Supabase authentication for $email');
   try {
     QuizzerLogger.logMessage('Attempting Supabase authentication');
@@ -19,47 +26,237 @@ Future<Map<String, dynamic>> attemptSupabaseLogin(String email, String password,
     );
     // Success Case
     QuizzerLogger.logSuccess('Supabase authentication successful for $email');
-    
     // --- EXTRACT USER ROLE ---
-    final String userRole = determineUserRoleFromSupabaseSession(response.session);
+    final String userRole =
+        determineUserRoleFromSupabaseSession(response.session);
     // --- END EXTRACT USER ROLE ---
-
     final authResult = {
-        'success': true,
-        'message': 'Login successful',
-        'user': response.user!.toJson(), 
-        'session': response.session?.toJson(), 
-        'user_role': userRole,
+      'success': true,
+      'message': 'Login successful',
+      'user': response.user!.toJson(),
+      'session': response.session?.toJson(),
+      'user_role': userRole,
     };
     // Ensure local profile exists immediately after successful Supabase auth
     await ensureLocalProfileExists(email);
     // Store offline login data for future offline access
     await storeOfflineLoginData(email, storage, authResult);
-    
     // Initialize SessionManager with user data
     final sessionManager = getSessionManager();
     // Ensure SessionManager is fully initialized before accessing storage
     await sessionManager.initializationComplete;
-    
-
-    
-    // Get the local user ID from the user profile table, not the Supabase user ID
-    final String localUserId = await user_profile.getUserIdByEmail(email);
+    // Ensure the local profile exists before trying to fetch its ID
+    await ensureLocalProfileExists(email);
+    String? localUserId;
+    try {
+      // Get the local user ID
+      localUserId = await user_profile.getUserIdByEmail(email);
+    } on StateError {
+      QuizzerLogger.logWarning(
+          "No local user ID found for $email, falling back to Supabase ID");
+      // If not found, fallback to Supabase user ID
+      localUserId = response.user!.id;
+      // fallback
+    }
     sessionManager.userId = localUserId;
     sessionManager.userEmail = email;
     sessionManager.userLoggedIn = true;
     sessionManager.sessionStartTime = DateTime.now();
-
+    // Ensure it's never null
+    assert(sessionManager.userId != null,
+        "SessionManager.userId must not be null after Supabase login");
+    QuizzerLogger.logSuccess(
+        'SessionManager initialized with userId=${sessionManager.userId}');
     return authResult;
   } on AuthException catch (e) {
     QuizzerLogger.logWarning('Supabase authentication failed: ${e.message}');
     return {
       'success': false,
       'message': e.message,
-      'user_role': 'public_user_unverified', // Default on failure
+      'user_role': 'public_user_unverified',
+      // Default on failure
     };
   }
 }
+
+Future<Map<String, dynamic>> attemptSupabaseGoogleLogin(SupabaseClient supabase, Box storage) async {
+  try {
+    QuizzerLogger.logMessage('Supabase authentication via Google Sign-In starts....');
+
+    const iosClientId = '840944709865-uqouqdi16cvpm624n3eacufuuk8grpqp.apps.googleusercontent.com';
+    const androidClientId = '840944709865-krhsd92b2ph6k670q1j872c8m5pcqhnk.apps.googleusercontent.com';
+
+    // ✅ Generate a random nonce and SHA256 it
+    final rawNonce = _generateNonce();
+    final hashedNonce = _sha256ofString(rawNonce);
+
+    final GoogleSignIn googleSignIn = GoogleSignIn(
+      clientId: Platform.isIOS
+          ? iosClientId
+          : androidClientId,
+      scopes: ['email', 'profile'],
+    );
+
+    final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+    if (googleUser == null) throw 'Google sign-in canceled';
+
+    final GoogleSignInAuthentication googleAuth =
+    await googleUser.authentication;
+
+    final idToken = googleAuth.idToken;
+    final accessToken = googleAuth.accessToken;
+
+    if (idToken == null || accessToken == null) {
+      throw 'Missing Google token(s)';
+    }
+
+    // ✅ Pass the nonce to Supabase
+    final response = await supabase.auth.signInWithIdToken(
+      provider: OAuthProvider.google,
+      idToken: idToken,
+      accessToken: accessToken,
+      nonce: hashedNonce,
+    );
+
+
+    log('Google Sign-In response: $response');
+
+    QuizzerLogger.logMessage('Attempting Supabase authentication via Google Sign-In, Response: $response');
+
+    final String email = response.user?.email ?? 'unknown_email';
+
+
+    // Success Case
+    QuizzerLogger.logSuccess('Supabase authentication successful for $email');
+    // --- EXTRACT USER ROLE ---
+    final String userRole = determineUserRoleFromSupabaseSession(response.session);
+    // --- END EXTRACT USER ROLE ---
+    final authResult = {
+      'success': true,
+      'message': 'Login successful',
+      'user': response.user, // <-- Keep as Supabase User object
+      'session': response.session, // <-- Keep session as object
+      'user_role': userRole,
+    };
+
+    // Ensure local profile exists immediately after successful Supabase auth
+    await ensureLocalProfileExists(email);
+    // Store offline login data for future offline access
+    await storeOfflineLoginData(email, storage, authResult);
+    // Initialize SessionManager with user data
+    final sessionManager = getSessionManager();
+    // Ensure SessionManager is fully initialized before accessing storage
+    await sessionManager.initializationComplete;
+    // Ensure the local profile exists before trying to fetch its ID
+    await ensureLocalProfileExists(email);
+    String? localUserId;
+    try {
+      // Get the local user ID
+      localUserId = await user_profile.getUserIdByEmail(email);
+    } on StateError {
+      QuizzerLogger.logWarning("No local user ID found for $email, falling back to Supabase ID");
+      // If not found, fallback to Supabase user ID
+      localUserId = response.user!.id;
+      // fallback
+    }
+    sessionManager.userId = localUserId;
+    sessionManager.userEmail = email;
+    sessionManager.userLoggedIn = true;
+    sessionManager.sessionStartTime = DateTime.now();
+    // Ensure it's never null
+    assert(sessionManager.userId != null,
+        "SessionManager.userId must not be null after Supabase login");
+    QuizzerLogger.logSuccess(
+        'SessionManager initialized with userId=${sessionManager.userId}');
+    return authResult;
+  } on AuthException catch (e) {
+    QuizzerLogger.logWarning('Supabase authentication failed via Google: ${e.message}');
+    return {
+      'success': false,
+      'message': e.message,
+      'user_role': 'public_user_unverified',
+      // Default on failure
+    };
+  } catch (e) {
+    QuizzerLogger.logError('Error during Supabase Google Sign-In: $e');
+    return {
+      'success': false,
+      'message': e.toString(),
+      'user_role': 'public_user_unverified',
+      // Default on failure
+    };
+  }
+}
+
+// -------------------------
+// Nonce Helpers
+// -------------------------
+String _generateNonce([int length = 32]) {
+  const charset =
+      '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._';
+  final random = List.generate(length,
+          (_) => charset[(DateTime.now().microsecondsSinceEpoch + _) % charset.length]);
+  return random.join();
+}
+
+String _sha256ofString(String input) {
+  final bytes = utf8.encode(input);
+  final digest = sha256.convert(bytes);
+  return digest.toString();
+}
+
+// Future<Map<String, dynamic>> attemptSupabaseLogin(String email, String password,
+//     SupabaseClient supabase, Box storage) async {
+//   QuizzerLogger.logMessage('Attempting Supabase authentication for $email');
+//   try {
+//     QuizzerLogger.logMessage('Attempting Supabase authentication');
+//     final response = await supabase.auth.signInWithPassword(
+//       email: email,
+//       password: password,
+//     );
+//     // Success Case
+//     QuizzerLogger.logSuccess('Supabase authentication successful for $email');
+//
+//     // --- EXTRACT USER ROLE ---
+//     final String userRole = determineUserRoleFromSupabaseSession(
+//         response.session);
+//     // --- END EXTRACT USER ROLE ---
+//
+//     final authResult = {
+//       'success': true,
+//       'message': 'Login successful',
+//       'user': response.user!.toJson(),
+//       'session': response.session?.toJson(),
+//       'user_role': userRole,
+//     };
+//     // Ensure local profile exists immediately after successful Supabase auth
+//     await ensureLocalProfileExists(email);
+//     // Store offline login data for future offline access
+//     await storeOfflineLoginData(email, storage, authResult);
+//
+//     // Initialize SessionManager with user data
+//     final sessionManager = getSessionManager();
+//     // Ensure SessionManager is fully initialized before accessing storage
+//     await sessionManager.initializationComplete;
+//
+//
+//     // Get the local user ID from the user profile table, not the Supabase user ID
+//     final String localUserId = await user_profile.getUserIdByEmail(email);
+//     sessionManager.userId = localUserId;
+//     sessionManager.userEmail = email;
+//     sessionManager.userLoggedIn = true;
+//     sessionManager.sessionStartTime = DateTime.now();
+//
+//     return authResult;
+//   } on AuthException catch (e) {
+//     QuizzerLogger.logWarning('Supabase authentication failed: ${e.message}');
+//     return {
+//       'success': false,
+//       'message': e.message,
+//       'user_role': 'public_user_unverified', // Default on failure
+//     };
+//   }
+// }
 
 /// Ensures a local user profile exists for the given email after successful Supabase auth.
 /// If not found locally, fetches the profile from Supabase. If not found on server either,
@@ -73,25 +270,32 @@ Future<void> ensureLocalProfileExists(String email) async {
     // Check if email is in the list
     bool isEmailInList = emailList.contains(email);
     QuizzerLogger.logMessage("Is user in local profile list -> $isEmailInList");
-    
+
     if (!isEmailInList) {
-      QuizzerLogger.logMessage("User profile not found locally, attempting to fetch from Supabase for $email");
+      QuizzerLogger.logMessage(
+          "User profile not found locally, attempting to fetch from Supabase for $email");
       try {
         await user_profile.fetchAndInsertUserProfileFromSupabase(email);
-        QuizzerLogger.logSuccess("Successfully fetched and inserted user profile from Supabase for $email");
+        QuizzerLogger.logSuccess(
+            "Successfully fetched and inserted user profile from Supabase for $email");
       } catch (e) {
-        QuizzerLogger.logWarning("Failed to fetch user profile from Supabase for $email: $e");
-        QuizzerLogger.logMessage("Creating new local profile for user with Supabase auth but no profile for $email");
-        
+        QuizzerLogger.logWarning(
+            "Failed to fetch user profile from Supabase for $email: $e");
+        QuizzerLogger.logMessage(
+            "Creating new local profile for user with Supabase auth but no profile for $email");
+
         // Generate a username from the email (remove domain and any special characters)
         final String username = _generateUsernameFromEmail(email);
-        
+
         // Create a new profile for users who have Supabase authentication but no profile
-        final bool profileCreated = await user_profile.createNewUserProfile(email, username);
+        final bool profileCreated =
+            await user_profile.createNewUserProfile(email, username);
         if (profileCreated) {
-          QuizzerLogger.logSuccess("Successfully created new local profile for $email with username: $username");
+          QuizzerLogger.logSuccess(
+              "Successfully created new local profile for $email with username: $username");
         } else {
-          QuizzerLogger.logError("Failed to create new local profile for $email");
+          QuizzerLogger.logError(
+              "Failed to create new local profile for $email");
           throw StateError("Failed to create local profile for $email");
         }
       }
@@ -100,14 +304,16 @@ Future<void> ensureLocalProfileExists(String email) async {
     // Verify the profile now exists
     emailList = await user_profile.getAllUserEmails();
     isEmailInList = emailList.contains(email);
-    QuizzerLogger.logMessage("Final check - is user in local profile list -> $isEmailInList");
-    
+    QuizzerLogger.logMessage(
+        "Final check - is user in local profile list -> $isEmailInList");
+
     if (!isEmailInList) {
       throw StateError("Failed to ensure local profile exists for $email");
     }
 
     // FINAL VERIFICATION: Ensure local user ID matches Supabase user ID
-    QuizzerLogger.logMessage("Verifying local user ID matches Supabase user ID for $email");
+    QuizzerLogger.logMessage(
+        "Verifying local user ID matches Supabase user ID for $email");
     try {
       // Get the local user ID
       final String localUserId = await user_profile.getUserIdByEmail(email);
@@ -119,41 +325,51 @@ Future<void> ensureLocalProfileExists(String email) async {
           .select('uuid')
           .eq('email', email)
           .limit(1);
-      
+
       if (supabaseProfile.isEmpty) {
-        QuizzerLogger.logWarning("No Supabase user profile found for $email, skipping user ID verification");
+        QuizzerLogger.logWarning(
+            "No Supabase user profile found for $email, skipping user ID verification");
         return;
       }
-      
+
       final String supabaseUserId = supabaseProfile.first['uuid'] as String;
 
-      QuizzerLogger.logMessage("Local user ID: $localUserId, Supabase user profile UUID: $supabaseUserId");
+      QuizzerLogger.logMessage(
+          "Local user ID: $localUserId, Supabase user profile UUID: $supabaseUserId");
 
       // If they don't match, update the local profile to use the Supabase user profile UUID
       if (localUserId != supabaseUserId) {
-        QuizzerLogger.logWarning("User ID mismatch detected! Local: $localUserId, Supabase: $supabaseUserId");
-        QuizzerLogger.logMessage("Updating local profile to use Supabase user profile UUID for $email");
-        
+        QuizzerLogger.logWarning(
+            "User ID mismatch detected! Local: $localUserId, Supabase: $supabaseUserId");
+        QuizzerLogger.logMessage(
+            "Updating local profile to use Supabase user profile UUID for $email");
+
         // Fetch the profile from Supabase again to ensure we have the correct data
         await user_profile.fetchAndInsertUserProfileFromSupabase(email);
-        
+
         // Verify the update was successful
-        final String updatedLocalUserId = await user_profile.getUserIdByEmail(email);
+        final String updatedLocalUserId =
+            await user_profile.getUserIdByEmail(email);
         if (updatedLocalUserId != supabaseUserId) {
-          throw StateError("Failed to update local profile to match Supabase user profile UUID for $email");
+          throw StateError(
+              "Failed to update local profile to match Supabase user profile UUID for $email");
         }
-        
-        QuizzerLogger.logSuccess("Successfully updated local profile to match Supabase user profile UUID: $supabaseUserId");
+
+        QuizzerLogger.logSuccess(
+            "Successfully updated local profile to match Supabase user profile UUID: $supabaseUserId");
       } else {
-        QuizzerLogger.logSuccess("User ID verification passed - local and Supabase user profile UUIDs match: $localUserId");
+        QuizzerLogger.logSuccess(
+            "User ID verification passed - local and Supabase user profile UUIDs match: $localUserId");
       }
     } catch (e) {
-      QuizzerLogger.logError("Error during user ID verification for $email: $e");
+      QuizzerLogger.logError(
+          "Error during user ID verification for $email: $e");
       // Don't rethrow here - the profile exists, we just couldn't verify the ID match
       // This is a warning, not a critical failure
     }
   } catch (e) {
-    QuizzerLogger.logError('Error ensuring local profile exists for $email - $e');
+    QuizzerLogger.logError(
+        'Error ensuring local profile exists for $email - $e');
     rethrow;
   }
 }
@@ -164,21 +380,23 @@ String _generateUsernameFromEmail(String email) {
   try {
     // Extract the local part of the email (before the @)
     final String localPart = email.split('@')[0];
-    
+
     // Remove any special characters and replace with underscores
-    final String cleanUsername = localPart.replaceAll(RegExp(r'[^a-zA-Z0-9_]'), '_');
-    
+    final String cleanUsername =
+        localPart.replaceAll(RegExp(r'[^a-zA-Z0-9_]'), '_');
+
     // Ensure it's not empty and has a reasonable length
     if (cleanUsername.isEmpty) {
       return 'user_${DateTime.now().millisecondsSinceEpoch}';
     }
-    
+
     // Limit length to 20 characters
-    final String finalUsername = cleanUsername.length > 20 
-        ? cleanUsername.substring(0, 20) 
+    final String finalUsername = cleanUsername.length > 20
+        ? cleanUsername.substring(0, 20)
         : cleanUsername;
-    
-    QuizzerLogger.logMessage("Generated username '$finalUsername' from email '$email'");
+
+    QuizzerLogger.logMessage(
+        "Generated username '$finalUsername' from email '$email'");
     return finalUsername;
   } catch (e) {
     QuizzerLogger.logError('Error generating username from email $email - $e');

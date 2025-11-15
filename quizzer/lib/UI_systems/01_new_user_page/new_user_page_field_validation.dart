@@ -2,7 +2,7 @@ import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 
 String validateEmail(String email) {
     QuizzerLogger.logMessage('Validating email: $email');
-    
+
     if (email.isEmpty) {
         QuizzerLogger.logWarning('Email validation failed: Empty email');
         return 'Email cannot be empty';
@@ -31,7 +31,7 @@ String validateEmail(String email) {
 
 String validateUsername(String username) {
     QuizzerLogger.logMessage('Validating username: $username');
-    
+
     if (username.isEmpty) {
         QuizzerLogger.logWarning('Username validation failed: Empty username');
         return 'Username cannot be empty';
@@ -48,14 +48,14 @@ String validateUsername(String username) {
         QuizzerLogger.logWarning('Username validation failed: Invalid characters');
         return 'Username can only contain letters, numbers, and underscores';
     }
-    
+
     QuizzerLogger.logSuccess('Username validation passed');
     return '';
 }
 
 String validatePassword(String password, String confirmPassword) {
     QuizzerLogger.logMessage('Validating password');
-    
+
     if (password.isEmpty) {
         QuizzerLogger.logWarning('Password validation failed: Empty password');
         return 'Password cannot be empty';
@@ -72,7 +72,7 @@ String validatePassword(String password, String confirmPassword) {
         QuizzerLogger.logWarning('Password validation failed: Missing required characters');
         return 'Password must contain at least one letter and one number';
     }
-    
+
     QuizzerLogger.logSuccess('Password validation passed');
     return '';
 }
