@@ -3,7 +3,7 @@ import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/in
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_profile_table.dart';
 import 'package:quizzer/backend_systems/07_user_question_management/user_question_processes.dart' show validateAllModuleQuestions;
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pair_management/question_answer_pairs_table.dart' as q_pairs_table;
-import 'package:quizzer/backend_systems/03_account_creation/new_user_signup.dart' as account_creation;
+import 'package:quizzer/backend_systems/01_user_auth_login_manager/new_user_signup.dart' as account_creation;
 import 'package:quizzer/backend_systems/04_module_management/module_management.dart' as module_management;
 import 'package:quizzer/backend_systems/04_module_management/rename_modules.dart' as rename_modules;
 import 'package:quizzer/backend_systems/04_module_management/merge_modules.dart' as merge_modules;

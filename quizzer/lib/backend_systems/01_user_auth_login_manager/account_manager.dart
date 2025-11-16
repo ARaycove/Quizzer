@@ -1,0 +1,2 @@
+// TODO create a new singleton object that encapsulates and is solely responsible for updating all things relating to creating user profile records and
+// new user accounts in supabase. Anything related to a user's profile and the information contained therein will be handled by this object.
