@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:quizzer/backend_systems/00_database_manager/quizzer_database.dart';
-import 'package:quizzer/backend_systems/10_switch_board/sb_database_signals.dart';
+import 'package:quizzer/backend_systems/09_switch_board/sb_database_signals.dart';
 
 // Global database monitor instance
 final DatabaseMonitor _globalDatabaseMonitor = DatabaseMonitor._internal();

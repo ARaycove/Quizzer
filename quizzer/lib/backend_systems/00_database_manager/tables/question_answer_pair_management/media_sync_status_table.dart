@@ -5,7 +5,7 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/table_helper.
 import 'package:path/path.dart' as path; // Changed alias to path
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart'; // For Supabase client
 import 'package:supabase/supabase.dart'; // Changed to base supabase package for FileObject and SearchOptions
-import 'package:quizzer/backend_systems/10_switch_board/sb_sync_worker_signals.dart'; // Import sync signals
+import 'package:quizzer/backend_systems/09_switch_board/sb_sync_worker_signals.dart'; // Import sync signals
 import 'package:quizzer/backend_systems/00_helper_utils/file_locations.dart';
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
 

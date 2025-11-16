@@ -7,7 +7,7 @@ import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/table_helper.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/ml_models_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_attempts_table.dart';
-import 'package:quizzer/backend_systems/06_question_queue_server/circulation_worker.dart';
+import 'package:quizzer/backend_systems/05_question_queue_server/circulation_worker.dart';
 
 /// Loads all training data from the question_answer_attempts table in Supabase
 /// and converts it into an ML DataFrame for model training.

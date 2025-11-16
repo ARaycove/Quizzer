@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
-import 'package:quizzer/backend_systems/10_switch_board/switch_board.dart';
-import 'package:quizzer/backend_systems/10_switch_board/sb_sync_worker_signals.dart';
+import 'package:quizzer/backend_systems/09_switch_board/switch_board.dart';
+import 'package:quizzer/backend_systems/09_switch_board/sb_sync_worker_signals.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'inbound_sync_functions.dart';
 import 'dart:io'; // For InternetAddress lookup

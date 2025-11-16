@@ -13,7 +13,7 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/
 import 'package:quizzer/backend_systems/00_database_manager/tables/modules_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/system_data/user_feedback_table.dart'; // Added for user feedback
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_module_activation_status_table.dart';
-import 'package:quizzer/backend_systems/session_manager/answer_validation/text_analysis_tools.dart';
+import 'package:quizzer/backend_systems/12_answer_validator/answer_validation/text_analysis_tools.dart';
 import 'dart:io'; // For SocketException
 
 // ==========================================

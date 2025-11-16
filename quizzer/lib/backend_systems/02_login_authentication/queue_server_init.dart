@@ -1,11 +1,11 @@
-import 'package:quizzer/backend_systems/05_ml_modeling/accuracy_net_worker.dart';
-import 'package:quizzer/backend_systems/06_question_queue_server/circulation_worker.dart';
-import 'package:quizzer/backend_systems/06_question_queue_server/question_selection_worker.dart';
+import 'package:quizzer/backend_systems/04_ml_modeling/accuracy_net_worker.dart';
+import 'package:quizzer/backend_systems/05_question_queue_server/circulation_worker.dart';
+import 'package:quizzer/backend_systems/05_question_queue_server/question_selection_worker.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
-import 'package:quizzer/backend_systems/09_data_caches/question_queue_cache.dart';
+import 'package:quizzer/backend_systems/08_data_caches/question_queue_cache.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_question_answer_pairs_table.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
-import 'package:quizzer/backend_systems/07_user_question_management/user_question_processes.dart';
+import 'package:quizzer/backend_systems/06_user_question_management/user_question_processes.dart';
 
 /// Starts all question queue server workers in the correct order
 /// This function should be called after data caches are initialized

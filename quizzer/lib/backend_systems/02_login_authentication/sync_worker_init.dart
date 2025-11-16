@@ -2,7 +2,7 @@ import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/inbound_sync/inbound_sync_worker.dart';
 import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/outbound_sync/outbound_sync_worker.dart';
 import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/media_sync_worker.dart';
-import 'package:quizzer/backend_systems/10_switch_board/switch_board.dart';
+import 'package:quizzer/backend_systems/09_switch_board/switch_board.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_profile_table.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 

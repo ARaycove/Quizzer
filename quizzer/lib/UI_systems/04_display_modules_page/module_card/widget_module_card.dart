@@ -4,7 +4,7 @@ import 'package:quizzer/UI_systems/04_display_modules_page/module_card/widget_ed
 import 'package:quizzer/UI_systems/04_display_modules_page/module_card/widget_edit_module_dialog.dart';
 import 'package:quizzer/UI_systems/04_display_modules_page/module_card/widget_question_type_counts.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
-import 'package:quizzer/backend_systems/04_module_management/module_management.dart';
+import 'package:quizzer/backend_systems/03_module_management/module_management.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/app_theme.dart';
 import 'package:quizzer/UI_systems/UI_Utils/ui_helper_functions.dart';

@@ -1,11 +1,11 @@
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/table_helper.dart';
-import 'package:quizzer/backend_systems/10_switch_board/sb_sync_worker_signals.dart';
+import 'package:quizzer/backend_systems/09_switch_board/sb_sync_worker_signals.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/modules_table.dart';
-import 'package:quizzer/backend_systems/07_user_question_management/user_question_processes.dart';
-import 'package:quizzer/backend_systems/session_manager/answer_validation/text_analysis_tools.dart';
+import 'package:quizzer/backend_systems/06_user_question_management/user_question_processes.dart';
+import 'package:quizzer/backend_systems/12_answer_validator/answer_validation/text_analysis_tools.dart';
 
 final List<Map<String, String>> expectedColumns = [
   {'name': 'user_id',                   'type': 'TEXT NOT NULL'},

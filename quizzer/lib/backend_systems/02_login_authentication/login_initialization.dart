@@ -1,5 +1,5 @@
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
-import 'package:quizzer/backend_systems/07_user_question_management/user_question_processes.dart';
+import 'package:quizzer/backend_systems/06_user_question_management/user_question_processes.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_profile_table.dart';
 import 'package:quizzer/backend_systems/02_login_authentication/user_auth.dart';
@@ -8,7 +8,7 @@ import 'package:quizzer/backend_systems/02_login_authentication/login_attempts_r
 import 'package:quizzer/backend_systems/02_login_authentication/sync_worker_init.dart';
 import 'package:quizzer/backend_systems/02_login_authentication/queue_server_init.dart';
 import 'dart:async';
-import 'package:quizzer/backend_systems/10_switch_board/sb_other_signals.dart';
+import 'package:quizzer/backend_systems/09_switch_board/sb_other_signals.dart';
 import 'package:supabase/supabase.dart';
 import 'package:hive/hive.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';

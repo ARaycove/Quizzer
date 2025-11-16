@@ -1,12 +1,12 @@
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/inbound_sync/inbound_sync_worker.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_profile_table.dart';
-import 'package:quizzer/backend_systems/07_user_question_management/user_question_processes.dart' show validateAllModuleQuestions;
+import 'package:quizzer/backend_systems/06_user_question_management/user_question_processes.dart' show validateAllModuleQuestions;
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pair_management/question_answer_pairs_table.dart' as q_pairs_table;
 import 'package:quizzer/backend_systems/01_user_auth_login_manager/new_user_signup.dart' as account_creation;
-import 'package:quizzer/backend_systems/04_module_management/module_management.dart' as module_management;
-import 'package:quizzer/backend_systems/04_module_management/rename_modules.dart' as rename_modules;
-import 'package:quizzer/backend_systems/04_module_management/merge_modules.dart' as merge_modules;
+import 'package:quizzer/backend_systems/03_module_management/module_management.dart' as module_management;
+import 'package:quizzer/backend_systems/03_module_management/rename_modules.dart' as rename_modules;
+import 'package:quizzer/backend_systems/03_module_management/merge_modules.dart' as merge_modules;
 import 'package:quizzer/backend_systems/02_login_authentication/login_initialization.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:hive/hive.dart';
@@ -14,14 +14,14 @@ import 'package:supabase/supabase.dart';
 import 'dart:async'; // For Completer and StreamController
 import 'dart:io'; // For Directory
 // Data Caches for Backend management
-import 'package:quizzer/backend_systems/09_data_caches/question_queue_cache.dart';
-import 'package:quizzer/backend_systems/09_data_caches/answer_history_cache.dart';
-import 'package:quizzer/backend_systems/06_question_queue_server/question_selection_worker.dart';
-import 'package:quizzer/backend_systems/10_switch_board/switch_board.dart'; // Import SwitchBoard
-import 'package:quizzer/backend_systems/10_switch_board/sb_question_worker_signals.dart';
+import 'package:quizzer/backend_systems/08_data_caches/question_queue_cache.dart';
+import 'package:quizzer/backend_systems/08_data_caches/answer_history_cache.dart';
+import 'package:quizzer/backend_systems/05_question_queue_server/question_selection_worker.dart';
+import 'package:quizzer/backend_systems/09_switch_board/switch_board.dart'; // Import SwitchBoard
+import 'package:quizzer/backend_systems/09_switch_board/sb_question_worker_signals.dart';
 import 'package:quizzer/backend_systems/session_manager/session_helper.dart';
-import 'package:quizzer/backend_systems/session_manager/answer_validation/session_answer_validation.dart';
-import 'package:quizzer/backend_systems/session_manager/answer_validation/text_validation_functionality.dart';
+import 'package:quizzer/backend_systems/12_answer_validator/answer_validation/session_answer_validation.dart';
+import 'package:quizzer/backend_systems/12_answer_validator/answer_validation/text_validation_functionality.dart';
 import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/outbound_sync/outbound_sync_worker.dart'; // Import the new worker
 import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/media_sync_worker.dart'; // Added import for MediaSyncWorker
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart'; // Import for getDatabaseMonitor
@@ -38,8 +38,8 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/question_answ
 import 'package:quizzer/backend_systems/00_helper_utils/file_locations.dart';
 import 'package:quizzer/backend_systems/00_database_manager/custom_queries.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/modules_table.dart' as modules_table;
-import 'package:quizzer/backend_systems/session_manager/answer_validation/text_analysis_tools.dart' as text_validation;
-import 'package:quizzer/backend_systems/06_question_queue_server/circulation_worker.dart';
+import 'package:quizzer/backend_systems/12_answer_validator/answer_validation/text_analysis_tools.dart' as text_validation;
+import 'package:quizzer/backend_systems/05_question_queue_server/circulation_worker.dart';
 
 class SessionManager {
   // Singleton instance

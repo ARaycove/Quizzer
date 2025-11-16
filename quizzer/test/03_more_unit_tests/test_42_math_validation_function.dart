@@ -1,5 +1,5 @@
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
-import 'package:quizzer/backend_systems/session_manager/answer_validation/text_validation_functionality.dart';
+import 'package:quizzer/backend_systems/12_answer_validator/answer_validation/text_validation_functionality.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 // Assume that the following functions and classes are already imported and available:

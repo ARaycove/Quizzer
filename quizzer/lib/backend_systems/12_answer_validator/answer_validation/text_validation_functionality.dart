@@ -11,8 +11,8 @@
 
 // Based on docks from string_similarity healed and sealed are higher sim than france and FrancE
 // We could maybe use this by normalizing, but It doesn't appear to be what we're looking for. . .
-import 'package:quizzer/backend_systems/session_manager/answer_validation/text_analysis_tools.dart';
-import 'package:quizzer/backend_systems/session_manager/answer_validation/math_validation.dart';
+import 'package:quizzer/backend_systems/12_answer_validator/answer_validation/text_analysis_tools.dart';
+import 'package:quizzer/backend_systems/12_answer_validator/answer_validation/math_validation.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:math_keyboard/math_keyboard.dart';
 

@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/backend_systems/02_login_authentication/login_initialization.dart';
-import 'package:quizzer/backend_systems/09_data_caches/answer_history_cache.dart';
+import 'package:quizzer/backend_systems/08_data_caches/answer_history_cache.dart';
 import '../test_helpers.dart';
 import 'dart:io';
 

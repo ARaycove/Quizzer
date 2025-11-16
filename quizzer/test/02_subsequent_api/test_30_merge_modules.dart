@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/backend_systems/02_login_authentication/login_initialization.dart';
-import 'package:quizzer/backend_systems/session_manager/answer_validation/text_analysis_tools.dart';
+import 'package:quizzer/backend_systems/12_answer_validator/answer_validation/text_analysis_tools.dart';
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
 import '../test_helpers.dart';
 import 'dart:io';

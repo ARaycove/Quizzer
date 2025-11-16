@@ -2,7 +2,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'dart:convert';
 import '../table_helper.dart'; // Import the new helper file
-import 'package:quizzer/backend_systems/10_switch_board/sb_sync_worker_signals.dart'; // Import sync signals
+import 'package:quizzer/backend_systems/09_switch_board/sb_sync_worker_signals.dart'; // Import sync signals
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pair_management/media_sync_status_table.dart'; // Added import
 import 'package:path/path.dart' as path; // Changed alias to path
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart'; // For Supabase client
@@ -10,7 +10,7 @@ import 'dart:typed_data';
 import 'dart:io';
 import 'package:quizzer/backend_systems/00_helper_utils/file_locations.dart';
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
-import 'package:quizzer/backend_systems/session_manager/answer_validation/text_analysis_tools.dart';
+import 'package:quizzer/backend_systems/12_answer_validator/answer_validation/text_analysis_tools.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/modules_table.dart';
 import 'package:quizzer/backend_systems/00_helper_utils/utils.dart';
 

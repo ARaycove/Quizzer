@@ -3,7 +3,7 @@ import '../test_helpers.dart';
 import '../test_expectations.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
-import 'package:quizzer/backend_systems/10_switch_board/switch_board.dart';
+import 'package:quizzer/backend_systems/09_switch_board/switch_board.dart';
 import 'package:quizzer/backend_systems/02_login_authentication/login_initialization.dart';
 import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/inbound_sync/inbound_sync_worker.dart';
 
