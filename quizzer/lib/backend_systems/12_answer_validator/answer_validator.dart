@@ -1,0 +1,2 @@
+// TODO Write a class singleton object that encapsulates all functionality related to validating whether a user response to a question was correct (1)
+// or incorrect (0), validation functions should return true or false booleans.
