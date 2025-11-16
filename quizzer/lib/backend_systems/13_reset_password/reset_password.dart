@@ -1,9 +1,8 @@
 
-
-
 import 'package:supabase/supabase.dart';
-
-import '../logger/quizzer_logging.dart';
+import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
+// We do not use relative imports in this codebase, this is sloppy, if files ever get restructured this breaks down, its fragile and it's sloppy
+// import '../logger/quizzer_logging.dart';
 
 Future<Map<String, dynamic>> handlePasswordRecovery(Map<String, dynamic> message, SupabaseClient supabase) async {
   try {
