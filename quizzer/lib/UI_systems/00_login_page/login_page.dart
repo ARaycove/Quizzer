@@ -69,7 +69,7 @@ class _LoginPageState extends State<LoginPage> {
       if (!mounted) return;
       // _loginProgressMessage will be updated by the stream, culminating in "Login Complete!"
       // Potentially, could set a final success message here if desired before navigation
-      // setState(() { _loginProgressMessage = "Success!"; });
+      setState(() { _loginProgressMessage = "Success!"; });
       Navigator.pushReplacementNamed(context, '/home');
       // Don't reset loading state here, it disappears on navigation
     } else {
@@ -101,10 +101,9 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> submitSocialLogin() async {
-
     // define the email and password submission
     final email = _emailController.text.trim();
-    final password = _passwordController.text;
+    // final password = _passwordController.text;
 
     // Attempt to log in using credentials
     QuizzerLogger.logMessage('Social Login attempt.');
@@ -305,12 +304,7 @@ class _LoginPageState extends State<LoginPage> {
     return IconButton(
       icon: Icon(icon),
       onPressed: () {
-
         _isLoading ? null : submitSocialLogin();
-
-        // // This would later call the appropriate social login function
-        // QuizzerLogger.logWarning(
-        //     'Social login ($service) not implemented yet.');
       },
     );
   }

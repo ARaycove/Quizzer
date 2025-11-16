@@ -142,7 +142,7 @@ Future<Map<String, dynamic>> handleResetPssword(Map<String, dynamic> message, Su
     try {
         final email = message['email'] as String;
         final password = message['password'] as String;
-        final username = message['username'] as String;
+        // final username = message['username'] as String; //TODO Username is not implemented
 
         QuizzerLogger.logMessage('Starting reset password process');
         QuizzerLogger.logMessage('Email: $email');

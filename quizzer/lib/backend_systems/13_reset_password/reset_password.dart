@@ -17,7 +17,7 @@ Future<Map<String, dynamic>> handlePasswordRecovery(Map<String, dynamic> message
 
     try {
       QuizzerLogger.logMessage('Attempting Supabase password recovery with email: $email');
-      final response = await supabase.auth.resetPasswordForEmail(email);
+      await supabase.auth.resetPasswordForEmail(email);
       QuizzerLogger.logMessage('Supabase reset password response received');
 
 

@@ -473,7 +473,7 @@ class SessionManager {
   }
 
   /// Clears all session-specific user state.
-  void _clearSessionState() {
+  Future<void> _clearSessionState() async{
     try {
       QuizzerLogger.logMessage('Entering _clearSessionState()...');
       
@@ -493,12 +493,7 @@ class SessionManager {
   }
 
   // =================================================================================
-  // =================================================================================
   // Public API CALLS
-  // =================================================================================
-  // =================================================================================
-  // =================================================================================
-  // =================================================================================
   // =================================================================================
   //  --------------------------------------------------------------------------------
   /// Creates a new user account with Supabase and local database
@@ -615,10 +610,7 @@ class SessionManager {
         "Starting logout process for $currentUserEmailForLogoutOps (ID: $currentUserIdForLogoutOps)",
       );
 
-      // Flag for preventing late writes
-      bool isLoggingOut = true;
-
-      // 🧩 1️⃣ Stop background workers
+      // Stop background workers
       try {
         QuizzerLogger.logMessage("Stopping background workers...");
         final psw = PresentationSelectionWorker();
@@ -640,7 +632,7 @@ class SessionManager {
         QuizzerLogger.logError("Error stopping background workers: $e\n$st");
       }
 
-      // 🧩 2️⃣ Clear DB queues
+      // Clear DB queues
       try {
         QuizzerLogger.logMessage("Clearing all pending database requests...");
         final databaseMonitor = getDatabaseMonitor();
@@ -650,17 +642,17 @@ class SessionManager {
         QuizzerLogger.logError("Error clearing database queues: $e\n$st");
       }
 
-      // 🧩 3️⃣ Clear local caches safely
+      // Clear local caches safely
       try {
         QuizzerLogger.logMessage("Clearing data caches...");
-        await _safeClearCache(_queueCache);
-        await _safeClearCache(_historyCache);
+        await _queueCache.clear();
+        await _historyCache.clear();
         QuizzerLogger.logSuccess("✅ Data caches cleared.");
       } catch (e, st) {
         QuizzerLogger.logError("Error clearing data caches: $e\n$st");
       }
 
-      // 🧩 4️⃣ Update total study time (optional)
+      // Update total study time (optional)
       if (sessionStartTime != null && currentUserIdForLogoutOps != null) {
         try {
           final elapsedDuration = DateTime.now().difference(sessionStartTime!);
@@ -673,7 +665,7 @@ class SessionManager {
         }
       }
 
-      // 🧩 5️⃣ Google Sign-Out (if active)
+      // Google Sign-Out (if active)
       try {
         QuizzerLogger.logMessage("Checking for active Google Sign-In session...");
         final googleSignIn = GoogleSignIn(scopes: ['email', 'profile']);
@@ -691,7 +683,7 @@ class SessionManager {
         QuizzerLogger.logError("Error during Google Sign-Out: $e\n$st");
       }
 
-      // 🧩 6️⃣ Supabase Sign-Out
+      // Supabase Sign-Out
       try {
         QuizzerLogger.logMessage("Signing out from Supabase...");
         await supabase.auth.signOut();
@@ -700,17 +692,16 @@ class SessionManager {
         QuizzerLogger.logError("Error during Supabase Sign-Out: $e\n$st");
       }
 
-      // 🧩 7️⃣ Clear session state
+      // Clear session state
       try {
         QuizzerLogger.logMessage("Clearing session state...");
-        await _safeClearSessionState();
+        _clearSessionState;
         userLoggedIn = false;
         QuizzerLogger.logSuccess("✅ Session state cleared.");
       } catch (e, st) {
         QuizzerLogger.logError("Error clearing session state: $e\n$st");
       }
 
-      isLoggingOut = false;
       QuizzerLogger.printHeader("✅ User Logout Process Completed.");
       QuizzerLogger.logMessage('Successfully completed logoutUser.');
     } catch (e, st) {
@@ -718,29 +709,6 @@ class SessionManager {
       rethrow;
     }
   }
-
-  /// 🧰 Helper: Safe cache clearing to prevent FileSystemException
-  Future<void> _safeClearCache(dynamic cache) async {
-    try {
-      if (cache == null) return;
-      await cache.clear();
-    } catch (e) {
-      QuizzerLogger.logWarning("Skipped cache clear due to error: $e");
-    }
-  }
-
-  /// 🧰 Helper: Safe session clear to avoid late file writes
-  Future<void> _safeClearSessionState() async {
-    try {
-      _clearSessionState();
-    } on FileSystemException catch (e) {
-      QuizzerLogger.logWarning("File system issue while clearing session: ${e.message}");
-    } catch (e) {
-      QuizzerLogger.logError("Error clearing session: $e");
-    }
-  }
-
-
 
   // =================================================================================
   // Module management Calls

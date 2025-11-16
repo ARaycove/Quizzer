@@ -4,7 +4,6 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
-import 'package:quizzer/app_theme.dart';
 import 'package:supabase/supabase.dart';
 
 class ResetPasswordPage extends StatefulWidget {
@@ -106,7 +105,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   Future<void> _verifyOtp() async {
     supabase = SessionManager().supabase;
 
-    final email = _emailController.text.trim();
+    // final email = _emailController.text.trim();
     final otp = _otpController.text.trim();
     if (otp.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -169,7 +168,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
   Future<void> _submitNewPassword() async {
     final email = _emailController.text.trim();
-    final otp = _otpController.text.trim();
+    // final otp = _otpController.text.trim();
     final newPass = _newPassController.text;
     final confirm = _confirmPassController.text;
 

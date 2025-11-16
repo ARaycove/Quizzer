@@ -242,7 +242,7 @@ class PresentationSelectionWorker {
 
       // 1. Call _selectNextQuestionFromList to get the selected question
       // Selection logic #any# is used for AB testing. Selection logic can be changed to assign users different algorithms.
-      final Map<String, dynamic> selectedQuestion = await _selectNextQuestionFromList(eligibleQuestions, selectionLogic: 7);
+      final Map<String, dynamic> selectedQuestion = await _selectNextQuestionFromList(eligibleQuestions, selectionLogic: 0);
       
       // 2. Check if selection was successful
       if (selectedQuestion.isEmpty) {
@@ -635,6 +635,7 @@ class PresentationSelectionWorker {
   ///    - Selects question with lowest overall probability
   /// This strategy ensures questions needing review get priority while respecting mastery levels.
   Future<Map<String, dynamic>> _selectionLogicSeven(List<Map<String, dynamic>> eligibleQuestions) async {
+    // TODO Update Logic seven to randomly select 5% of the time some question below the current revision streak we are working with
     QuizzerLogger.logMessage("Selection Logic 7: Revision streak prioritization");
     
     final streak0 = eligibleQuestions.where((q) => (q['revision_streak'] ?? 0) == 0).toList();
@@ -649,6 +650,7 @@ class PresentationSelectionWorker {
       (q['revision_streak'] ?? 0) > 0 && (q['accuracy_probability'] ?? 0.0) < CirculationWorker().idealThreshold
     ).toList();
     
+
     if (nonZeroBelowIdealThreshold.isNotEmpty) {
       int minStreak = nonZeroBelowIdealThreshold.map((q) => q['revision_streak'] as int? ?? 0).reduce((a, b) => a < b ? a : b);
       final minStreakQuestions = nonZeroBelowIdealThreshold.where((q) => (q['revision_streak'] ?? 0) == minStreak).toList();

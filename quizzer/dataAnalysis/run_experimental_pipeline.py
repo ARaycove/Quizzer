@@ -336,10 +336,7 @@ async def main():
     # FIXME
 
     # Record in local db
-    # FIXME
-
-    # Push to supabase
-    # FIXME    
+    # FIXME  
 
 if __name__ == "__main__":
     asyncio.run(main())
