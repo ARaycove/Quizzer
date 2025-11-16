@@ -121,7 +121,7 @@ class _QuizzerAppState extends State<QuizzerApp> {
       initialRoute: '/login',
       routes: {
         '/login':           (context) => const LoginPage(),
-        '/resetPassword':           (context) => const ResetPasswordPage(),
+        '/resetPassword':   (context) => const ResetPasswordPage(),
         '/home':            (context) => const HomePage(),
         '/menu':            (context) => const MenuPage(),
         '/add_question':    (context) => const AddQuestionAnswerPage(),

@@ -611,96 +611,68 @@ class SessionManager {
       );
 
       // Stop background workers
-      try {
-        QuizzerLogger.logMessage("Stopping background workers...");
-        final psw = PresentationSelectionWorker();
-        final circWorker = CirculationWorker();
-        final inboundSyncWorker = InboundSyncWorker();
-        final outboundSyncWorker = OutboundSyncWorker();
-        final mediaSyncWorker = MediaSyncWorker();
+      QuizzerLogger.logMessage("Stopping background workers...");
+      final psw = PresentationSelectionWorker();
+      final circWorker = CirculationWorker();
+      final inboundSyncWorker = InboundSyncWorker();
+      final outboundSyncWorker = OutboundSyncWorker();
+      final mediaSyncWorker = MediaSyncWorker();
 
-        await Future.wait([
-          psw.stop(),
-          circWorker.stop(),
-          outboundSyncWorker.stop(),
-          inboundSyncWorker.stop(),
-          mediaSyncWorker.stop(),
-        ]);
+      await Future.wait([
+        psw.stop(),
+        circWorker.stop(),
+        outboundSyncWorker.stop(),
+        inboundSyncWorker.stop(),
+        mediaSyncWorker.stop(),
+      ]);
 
-        QuizzerLogger.logSuccess("✅ Background workers stopped.");
-      } catch (e, st) {
-        QuizzerLogger.logError("Error stopping background workers: $e\n$st");
-      }
+      QuizzerLogger.logSuccess("✅ Background workers stopped.");
 
       // Clear DB queues
-      try {
-        QuizzerLogger.logMessage("Clearing all pending database requests...");
-        final databaseMonitor = getDatabaseMonitor();
-        await databaseMonitor.clearAllQueues();
-        QuizzerLogger.logSuccess("✅ Database request queues cleared.");
-      } catch (e, st) {
-        QuizzerLogger.logError("Error clearing database queues: $e\n$st");
-      }
+      QuizzerLogger.logMessage("Clearing all pending database requests...");
+      final databaseMonitor = getDatabaseMonitor();
+      await databaseMonitor.clearAllQueues();
+      QuizzerLogger.logSuccess("✅ Database request queues cleared.");
 
       // Clear local caches safely
-      try {
-        QuizzerLogger.logMessage("Clearing data caches...");
-        await _queueCache.clear();
-        await _historyCache.clear();
-        QuizzerLogger.logSuccess("✅ Data caches cleared.");
-      } catch (e, st) {
-        QuizzerLogger.logError("Error clearing data caches: $e\n$st");
-      }
+      QuizzerLogger.logMessage("Clearing data caches...");
+      await _queueCache.clear();
+      await _historyCache.clear();
+      QuizzerLogger.logSuccess("✅ Data caches cleared.");
 
       // Update total study time (optional)
       if (sessionStartTime != null && currentUserIdForLogoutOps != null) {
-        try {
-          final elapsedDuration = DateTime.now().difference(sessionStartTime!);
-          final double hoursToAdd = elapsedDuration.inMilliseconds / (1000.0 * 60 * 60);
-          QuizzerLogger.logMessage("Updating total study time for $currentUserIdForLogoutOps...");
-          await updateTotalStudyTime(currentUserIdForLogoutOps, hoursToAdd);
-          QuizzerLogger.logSuccess("✅ Total study time updated.");
-        } catch (e, st) {
-          QuizzerLogger.logError("Error updating total study time: $e\n$st");
-        }
+        final elapsedDuration = DateTime.now().difference(sessionStartTime!);
+        final double hoursToAdd = elapsedDuration.inMilliseconds / (1000.0 * 60 * 60);
+        QuizzerLogger.logMessage("Updating total study time for $currentUserIdForLogoutOps...");
+        await updateTotalStudyTime(currentUserIdForLogoutOps, hoursToAdd);
+        QuizzerLogger.logSuccess("✅ Total study time updated.");
       }
 
       // Google Sign-Out (if active)
-      try {
-        QuizzerLogger.logMessage("Checking for active Google Sign-In session...");
-        final googleSignIn = GoogleSignIn(scopes: ['email', 'profile']);
-        final googleUser = await googleSignIn.signInSilently();
+      QuizzerLogger.logMessage("Checking for active Google Sign-In session...");
+      final googleSignIn = GoogleSignIn(scopes: ['email', 'profile']);
+      final googleUser = await googleSignIn.signInSilently();
 
-        if (googleUser != null) {
-          QuizzerLogger.logMessage("Google user detected (${googleUser.email}), signing out...");
-          await googleSignIn.disconnect();
-          await googleSignIn.signOut();
-          QuizzerLogger.logSuccess("✅ Google Sign-Out successful.");
-        } else {
-          QuizzerLogger.logMessage("No active Google Sign-In session found.");
-        }
-      } catch (e, st) {
-        QuizzerLogger.logError("Error during Google Sign-Out: $e\n$st");
+      if (googleUser != null) {
+        QuizzerLogger.logMessage("Google user detected (${googleUser.email}), signing out...");
+        await googleSignIn.disconnect();
+        await googleSignIn.signOut();
+        QuizzerLogger.logSuccess("✅ Google Sign-Out successful.");
+      } else {
+        QuizzerLogger.logMessage("No active Google Sign-In session found.");
       }
 
       // Supabase Sign-Out
-      try {
-        QuizzerLogger.logMessage("Signing out from Supabase...");
-        await supabase.auth.signOut();
-        QuizzerLogger.logSuccess("✅ Supabase Sign-Out successful.");
-      } catch (e, st) {
-        QuizzerLogger.logError("Error during Supabase Sign-Out: $e\n$st");
-      }
+      QuizzerLogger.logMessage("Signing out from Supabase...");
+      await supabase.auth.signOut();
+      QuizzerLogger.logSuccess("✅ Supabase Sign-Out successful.");
 
       // Clear session state
-      try {
-        QuizzerLogger.logMessage("Clearing session state...");
-        _clearSessionState;
-        userLoggedIn = false;
-        QuizzerLogger.logSuccess("✅ Session state cleared.");
-      } catch (e, st) {
-        QuizzerLogger.logError("Error clearing session state: $e\n$st");
-      }
+      QuizzerLogger.logMessage("Clearing session state...");
+      _clearSessionState;
+      userLoggedIn = false;
+      QuizzerLogger.logSuccess("✅ Session state cleared.");
 
       QuizzerLogger.printHeader("✅ User Logout Process Completed.");
       QuizzerLogger.logMessage('Successfully completed logoutUser.');
