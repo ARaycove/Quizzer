@@ -28,7 +28,7 @@ from sync_fetch_data import (initialize_and_fetch_db, get_last_sync_date, fetch_
 
 
 
-async def main():
+def main():
     # HyperParameters
     reset_question_vector   = False
     reset_doc               = False
@@ -121,54 +121,54 @@ async def main():
         #=======================================
         # Guided Topic Modeling Through Seed Words
         # Load in seed_words.json
-        with open('seed_words.json') as f:
-            seed_words = json.load(f)
-        # Clean up duplicates, convert to lowercase, and sort alphabetically
-        seed_words = sorted(list(set(word.lower() for word in seed_words)))
-        # Write back to json
-        with open('seed_words.json', 'w') as f:
-            f.write('[\n')
-            line = '  '
-            for i, word in enumerate(seed_words):
-                entry = f'"{word}"' + (', ' if i < len(seed_words) - 1 else '')
-                if len(line) + len(entry) > 80:
-                    f.write(line.rstrip() + '\n')
-                    line = '  ' + entry
-                else:
-                    line += entry
-            f.write(line + '\n]\n')
-        print(f"There are {len(seed_words)} seed words")
+        # with open('seed_words.json') as f:
+        #     seed_words = json.load(f)
+        # # Clean up duplicates, convert to lowercase, and sort alphabetically
+        # seed_words = sorted(list(set(word.lower() for word in seed_words)))
+        # # Write back to json
+        # with open('seed_words.json', 'w') as f:
+        #     f.write('[\n')
+        #     line = '  '
+        #     for i, word in enumerate(seed_words):
+        #         entry = f'"{word}"' + (', ' if i < len(seed_words) - 1 else '')
+        #         if len(line) + len(entry) > 80:
+        #             f.write(line.rstrip() + '\n')
+        #             line = '  ' + entry
+        #         else:
+        #             line += entry
+        #     f.write(line + '\n]\n')
+        # print(f"There are {len(seed_words)} seed words")
         #=======================================
 
         #=======================================
         # Guided Topic modeling through pre-defined topics
         # Load seed topics from seed_topics.json
-        with open('seed_topics.json') as f:
-            seed_topics = json.load(f)
-            print(f"Loaded {len(seed_topics)} seed topics")
+        # with open('seed_topics.json') as f:
+        #     seed_topics = json.load(f)
+        #     print(f"Loaded {len(seed_topics)} seed topics")
 
-        # Clean up any topics that have duplicate words in topic list
-        seed_topics = [list(set(topic)) for topic in seed_topics]
+        # # Clean up any topics that have duplicate words in topic list
+        # seed_topics = [list(set(topic)) for topic in seed_topics]
 
-        # Remove any topics that are exact duplicates
-        unique_topics = []
-        seen = set()
-        for topic in seed_topics:
-            topic_sorted = tuple(sorted(topic))
-            if topic_sorted not in seen:
-                seen.add(topic_sorted)
-                unique_topics.append(topic)
+        # # Remove any topics that are exact duplicates
+        # unique_topics = []
+        # seen = set()
+        # for topic in seed_topics:
+        #     topic_sorted = tuple(sorted(topic))
+        #     if topic_sorted not in seen:
+        #         seen.add(topic_sorted)
+        #         unique_topics.append(topic)
 
-        # If any duplicates removed, update json
-        if len(unique_topics) < len(seed_topics):
-            print(f"Removed {len(seed_topics) - len(unique_topics)} duplicate topics")
-            seed_topics = unique_topics
-            with open('seed_topics.json', 'w') as f:
-                json.dump(seed_topics, f, indent=2)
-        else:
-            seed_topics = unique_topics
+        # # If any duplicates removed, update json
+        # if len(unique_topics) < len(seed_topics):
+        #     print(f"Removed {len(seed_topics) - len(unique_topics)} duplicate topics")
+        #     seed_topics = unique_topics
+        #     with open('seed_topics.json', 'w') as f:
+        #         json.dump(seed_topics, f, indent=2)
+        # else:
+        #     seed_topics = unique_topics
 
-        print(f"Final seed topics: {len(seed_topics)}")
+        # print(f"Final seed topics: {len(seed_topics)}")
         #=======================================
 
         # Define c_tf_idf model for bertopic
@@ -339,6 +339,6 @@ async def main():
     # FIXME  
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
 
     

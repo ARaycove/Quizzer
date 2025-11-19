@@ -1,7 +1,7 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'dart:convert';
-import '../table_helper.dart'; // Import the new helper file
+import 'package:quizzer/backend_systems/00_database_manager/tables/table_helper.dart'; // Import the new helper file
 import 'package:quizzer/backend_systems/09_switch_board/sb_sync_worker_signals.dart'; // Import sync signals
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pair_management/media_sync_status_table.dart'; // Added import
 import 'package:path/path.dart' as path; // Changed alias to path
@@ -10,8 +10,6 @@ import 'dart:typed_data';
 import 'dart:io';
 import 'package:quizzer/backend_systems/00_helper_utils/file_locations.dart';
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
-import 'package:quizzer/backend_systems/12_answer_validator/answer_validation/text_analysis_tools.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/modules_table.dart';
 import 'package:quizzer/backend_systems/00_helper_utils/utils.dart';
 
 // ALL question_type:
@@ -79,7 +77,9 @@ final List<Map<String, String>> expectedColumns = [
   {'name': 'qst_reviewer',             'type': 'TEXT'},
   {'name': 'has_been_reviewed',        'type': 'INTEGER'},
   {'name': 'flag_for_removal',         'type': 'INTEGER'},
-  {'name': 'module_name',              'type': 'TEXT'},
+  // Questions can belong to multiple topics
+  {'name': 'topics',                   'type': 'TEXT'}, // Example: '["Topic_1", "Topic_2", "Topic_3"]'
+  // "module_name" removed as a field
   {'name': 'question_type',            'type': 'TEXT'},
   {'name': 'options',                  'type': 'TEXT'},
   {'name': 'correct_option_index',     'type': 'INTEGER'},
@@ -158,9 +158,6 @@ Future<void> verifyQuestionAnswerPairTable(dynamic db) async {
       
       await db.execute(createTableSQL);
       
-      // Create indexes
-      await db.execute('CREATE INDEX idx_question_answer_pairs_module_name ON question_answer_pairs(module_name)');
-      
       QuizzerLogger.logSuccess('question_answer_pairs table created successfully');
     } else {
       // Table exists, check for column differences
@@ -213,18 +210,7 @@ Future<void> verifyQuestionAnswerPairTable(dynamic db) async {
         
         QuizzerLogger.logSuccess('Removed unexpected columns and restructured table');
       }
-      
-      // Check and create indexes if they don't exist
-      final List<Map<String, dynamic>> indexes = await db.rawQuery(
-        "SELECT name FROM sqlite_master WHERE type='index' AND tbl_name='question_answer_pairs'"
-      );
-      final existingIndexes = indexes.map((index) => index['name'] as String).toSet();
-      
-      if (!existingIndexes.contains('idx_question_answer_pairs_module_name')) {
-        await db.execute('CREATE INDEX idx_question_answer_pairs_module_name ON question_answer_pairs(module_name)');
-        QuizzerLogger.logMessage('Created index on module_name');
-      }
-      
+
       if (columnsToAdd.isEmpty && columnsToRemove.isEmpty) {
         QuizzerLogger.logMessage('Table structure is already up to date');
       } else {
@@ -591,7 +577,6 @@ Future<void> registerMediaFiles(Set<String> filenames, {String? qidForLogging}) 
 ///   qstReviewer: Optional reviewer of the question.
 ///   hasBeenReviewed: Optional flag indicating if the question has been reviewed.
 ///   flagForRemoval: Optional flag indicating if the question should be removed.
-///   moduleName: Optional updated module name (will be normalized).
 ///   questionType: Optional updated question type.
 ///   options: Optional updated options for multiple choice/select questions.
 ///   correctOptionIndex: Optional updated correct option index.
@@ -625,7 +610,6 @@ Future<int> editQuestionAnswerPair({
   String? qstReviewer,
   bool? hasBeenReviewed,
   bool? flagForRemoval,
-  String? moduleName,
   String? questionType,
   // Specific field for Multiple Choice/Select All - expecting List<Map<String, dynamic>>
   List<Map<String, dynamic>>? options, 
@@ -657,11 +641,6 @@ Future<int> editQuestionAnswerPair({
     if (qstReviewer != null) valuesToUpdate['qst_reviewer'] = qstReviewer;
     if (hasBeenReviewed != null) valuesToUpdate['has_been_reviewed'] = hasBeenReviewed ? 1 : 0;
     if (flagForRemoval != null) valuesToUpdate['flag_for_removal'] = flagForRemoval ? 1 : 0;
-    if (moduleName != null) {
-      // Normalize the module name before updating
-      final String normalizedModuleName = await normalizeString(moduleName);
-      valuesToUpdate['module_name'] = normalizedModuleName;
-    }
     if (questionType != null) valuesToUpdate['question_type'] = questionType;
     if (options != null) valuesToUpdate['options'] = options;
     if (correctOptionIndex != null) valuesToUpdate['correct_option_index'] = correctOptionIndex;
@@ -711,9 +690,6 @@ Future<int> editQuestionAnswerPair({
     rethrow;
   } finally {
     getDatabaseMonitor().releaseDatabaseAccess();
-    
-    // Validate modules table after editing a question (after db access is released)
-    await ensureAllQuestionModuleNamesHaveCorrespondingModuleRecords();
   }
 }
 
@@ -849,150 +825,6 @@ Future<int> removeQuestionAnswerPair(String timeStamp, String qstContrib) async 
   }
 }
 
-/// Fetches the module name for a specific question ID.
-/// Throws an error if the question ID is not found (Fail Fast).
-Future<String> getModuleNameForQuestionId(String questionId) async {
-  try {
-    final db = await getDatabaseMonitor().requestDatabaseAccess();
-    if (db == null) {
-      throw Exception('Failed to acquire database access');
-    }
-    final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
-      'question_answer_pairs',
-      db,
-      columns: ['module_name'],
-      where: 'question_id = ?',
-      whereArgs: [questionId],
-    );
-    
-    if (results.isEmpty) {
-      QuizzerLogger.logError('No question found with ID: $questionId');
-      throw StateError('Question ID $questionId not found in database');
-    }
-    
-    final String? moduleName = results.first['module_name'] as String?;
-    if (moduleName == null || moduleName.isEmpty) {
-      QuizzerLogger.logWarning('Question $questionId has no module name assigned');
-      return 'Unknown Module';
-    }
-    
-    return moduleName;
-  } catch (e) {
-    QuizzerLogger.logError('Error getting module name for question ID - $e');
-    rethrow;
-  } finally {
-    getDatabaseMonitor().releaseDatabaseAccess();
-  }
-}
-
-/// Fetches all question records for a specific module name.
-/// Returns an empty list if no questions are found for the module.
-/// The module name is automatically normalized (lowercase, underscores to spaces) for matching.
-Future<List<Map<String, dynamic>>> getQuestionRecordsForModule(String moduleName) async {
-  try {
-    final db = await getDatabaseMonitor().requestDatabaseAccess();
-    if (db == null) {
-      throw Exception('Failed to acquire database access');
-    }
-    // Normalize the module name for consistent matching
-    final String normalizedModuleName = await normalizeString(moduleName);
-    
-    final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
-      'question_answer_pairs',
-      db,
-      where: 'module_name = ?',
-      whereArgs: [normalizedModuleName],
-    );
-    
-    QuizzerLogger.logMessage('Found ${results.length} questions for module: $moduleName (normalized: $normalizedModuleName)');
-    return results;
-  } catch (e) {
-    QuizzerLogger.logError('Error getting question records for module - $e');
-    rethrow;
-  } finally {
-    getDatabaseMonitor().releaseDatabaseAccess();
-  }
-}
-
-/// Fetches module names for multiple question IDs in a single database query.
-/// This is more efficient than calling getModuleNameForQuestionId multiple times.
-/// Returns a map of question ID to module name.
-Future<Map<String, String>> getModuleNamesForQuestionIds(List<String> questionIds) async {
-  try {
-    if (questionIds.isEmpty) {
-      return {};
-    }
-    
-    final db = await getDatabaseMonitor().requestDatabaseAccess();
-    if (db == null) {
-      throw Exception('Failed to acquire database access');
-    }
-    // Create placeholders for the IN clause
-    final placeholders = List.filled(questionIds.length, '?').join(',');
-    
-    final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
-      'question_answer_pairs',
-      db,
-      columns: ['question_id', 'module_name'],
-      where: 'question_id IN ($placeholders)',
-      whereArgs: questionIds,
-    );
-    
-    final Map<String, String> questionIdToModuleName = {};
-    for (final row in results) {
-      final String questionId = row['question_id'] as String;
-      final String? moduleName = row['module_name'] as String?;
-      
-      if (moduleName != null && moduleName.isNotEmpty) {
-        questionIdToModuleName[questionId] = moduleName;
-      } else {
-        questionIdToModuleName[questionId] = 'Unknown Module';
-      }
-    }
-    return questionIdToModuleName;
-  } catch (e) {
-    QuizzerLogger.logError('Error getting module names for question IDs - $e');
-    rethrow;
-  } finally {
-    getDatabaseMonitor().releaseDatabaseAccess();
-  }
-}
-
-/// Fetches all question IDs for a specific module name.
-/// Returns an empty list if no questions are found for the module.
-/// The module name is automatically normalized (lowercase, underscores to spaces) for matching.
-Future<List<String>> getQuestionIdsForModule(String moduleName) async {
-  try {
-    final db = await getDatabaseMonitor().requestDatabaseAccess();
-    if (db == null) {
-      throw Exception('Failed to acquire database access');
-    }
-    // Normalize the module name for consistent matching
-    final String normalizedModuleName = await normalizeString(moduleName);
-    
-    final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
-      'question_answer_pairs',
-      db,
-      columns: ['question_id'],
-      where: 'module_name = ?',
-      whereArgs: [normalizedModuleName],
-    );
-    
-    final List<String> questionIds = results
-        .map((row) => row['question_id'] as String)
-        .where((id) => id.isNotEmpty)
-        .toList();
-    
-    QuizzerLogger.logMessage('Found ${questionIds.length} question IDs for module: $moduleName (normalized: $normalizedModuleName)');
-    return questionIds;
-  } catch (e) {
-    QuizzerLogger.logError('Error getting question IDs for module - $e');
-    rethrow;
-  } finally {
-    getDatabaseMonitor().releaseDatabaseAccess();
-  }
-}
-
 /// Updates the synchronization flags for a specific question-answer pair.
 /// 
 /// This function is used by the cloud synchronization system to track the sync status
@@ -1102,7 +934,6 @@ Future<bool> insertOrUpdateQuestionAnswerPair(Map<String, dynamic> questionData)
     final String? timeStamp = questionData['time_stamp'] as String?;
     final String? qstContrib = questionData['qst_contrib'] as String?;
     final String? lastModifiedTimestamp = questionData['last_modified_timestamp'] as String?;
-    final String? moduleName = questionData['module_name'] as String?;
     final String? questionType = questionData['question_type'] as String?;
     final String? questionElementsJson = questionData['question_elements'] as String?;
     final String? answerElementsJson = questionData['answer_elements'] as String?;
@@ -1111,7 +942,6 @@ Future<bool> insertOrUpdateQuestionAnswerPair(Map<String, dynamic> questionData)
     assert(timeStamp != null, 'insertOrUpdateQuestionAnswerPair: time_stamp cannot be null. Data: $questionData');
     assert(qstContrib != null, 'insertOrUpdateQuestionAnswerPair: qst_contrib cannot be null. Data: $questionData');
     assert(lastModifiedTimestamp != null, 'insertOrUpdateQuestionAnswerPair: last_modified_timestamp cannot be null. Data: $questionData');
-    assert(moduleName != null, 'insertOrUpdateQuestionAnswerPair: module_name cannot be null. Data: $questionData');
     assert(questionType != null, 'insertOrUpdateQuestionAnswerPair: question_type cannot be null. Data: $questionData');
     assert(questionElementsJson != null, 'insertOrUpdateQuestionAnswerPair: question_elements cannot be null. Data: $questionData');
     assert(answerElementsJson != null, 'insertOrUpdateQuestionAnswerPair: answer_elements cannot be null. Data: $questionData');
@@ -1119,7 +949,6 @@ Future<bool> insertOrUpdateQuestionAnswerPair(Map<String, dynamic> questionData)
     // Validate the data using the same validation as addQuestion functions
     try {
       _validateQuestionEntry(
-        moduleName: moduleName!,
         questionElements: List<Map<String, dynamic>>.from(decodeValueFromDB(questionElementsJson!)),
         answerElements: List<Map<String, dynamic>>.from(decodeValueFromDB(answerElementsJson!)),
       );
@@ -1145,9 +974,6 @@ Future<bool> insertOrUpdateQuestionAnswerPair(Map<String, dynamic> questionData)
     dataToInsertOrUpdate.remove('concepts');
     dataToInsertOrUpdate.remove('subjects');
     dataToInsertOrUpdate.remove('completed');
-    
-    // Normalize the module name
-    dataToInsertOrUpdate['module_name'] = await normalizeString(moduleName);
     
     // Set sync flags to indicate synced status
     dataToInsertOrUpdate['has_been_synced'] = 1;
@@ -1183,15 +1009,9 @@ Future<bool> insertOrUpdateQuestionAnswerPair(Map<String, dynamic> questionData)
 /// Private helper function to validate general question entry requirements
 /// This validation applies to all question types and complements checkCompletionStatus
 void _validateQuestionEntry({
-  required String moduleName,
   required List<Map<String, dynamic>> questionElements,
   required List<Map<String, dynamic>> answerElements,
 }) {
-  // Validate module name (not done by checkCompletionStatus)
-  if (moduleName.isEmpty) {
-    throw Exception('Module name cannot be empty or whitespace-only.');
-  }
-
   // Validate question elements structure (not done by checkCompletionStatus)
   for (int i = 0; i < questionElements.length; i++) {
     final element = questionElements[i];
@@ -1248,7 +1068,6 @@ void _validateQuestionOptions(List<Map<String, dynamic>> options) {
 /// Adds a new multiple choice question to the database.
 /// 
 /// Args:
-///   moduleName: The name of the module this question belongs to.
 ///   questionElements: A list of maps representing the question content.
 ///   answerElements: A list of maps representing the explanation/answer rationale.
 ///   options: A list of maps representing the multiple choice options.
@@ -1260,7 +1079,6 @@ void _validateQuestionOptions(List<Map<String, dynamic>> options) {
 /// Returns:
 ///   The unique question_id generated for this question (format: timestamp_userId).
 Future<String> addQuestionMultipleChoice({
-  required String moduleName,
   required List<Map<String, dynamic>> questionElements,
   required List<Map<String, dynamic>> answerElements,
   required List<Map<String, dynamic>> options,
@@ -1280,8 +1098,7 @@ Future<String> addQuestionMultipleChoice({
     
     final String timeStamp = DateTime.now().toUtc().toIso8601String();
 
-    // Normalize the module name and trim content fields in place
-    moduleName = await normalizeString(moduleName);
+    // Trim content fields in place
     questionElements = trimContentFields(questionElements);
     answerElements = trimContentFields(answerElements);
     options = trimContentFields(options);
@@ -1300,7 +1117,6 @@ Future<String> addQuestionMultipleChoice({
     
     // Validate general question entry requirements
     _validateQuestionEntry(
-      moduleName: moduleName,
       questionElements: questionElements,
       answerElements: answerElements,
     );
@@ -1328,7 +1144,6 @@ Future<String> addQuestionMultipleChoice({
       'qst_reviewer': '', // Default empty
       'has_been_reviewed': 0, // Changed from false to 0
       'flag_for_removal': 0, // Changed from false to 0
-      'module_name': moduleName,
       'question_type': 'multiple_choice',
       'options': encodeValueForDB(options),
       'correct_option_index': correctOptionIndex,
@@ -1346,7 +1161,6 @@ Future<String> addQuestionMultipleChoice({
         'qst_reviewer': '',
         'has_been_reviewed': 0,
         'flag_for_removal': 0,
-        'module_name': moduleName,
         'question_type': 'multiple_choice',
         'options': encodeValueForDB(options),
         'correct_option_index': correctOptionIndex,
@@ -1367,16 +1181,12 @@ Future<String> addQuestionMultipleChoice({
     rethrow;
   } finally {
     getDatabaseMonitor().releaseDatabaseAccess();
-    
-    // Validate modules table after adding a question (after db access is released)
-    await ensureAllQuestionModuleNamesHaveCorrespondingModuleRecords();
   }
 }
 
 /// Adds a new select all that apply question to the database.
 /// 
 /// Args:
-///   moduleName: The name of the module this question belongs to.
 ///   questionElements: A list of maps representing the question content.
 ///   answerElements: A list of maps representing the explanation/answer rationale.
 ///   options: A list of maps representing the options to choose from.
@@ -1388,7 +1198,6 @@ Future<String> addQuestionMultipleChoice({
 /// Returns:
 ///   The unique question_id generated for this question (format: timestamp_userId).
 Future<String> addQuestionSelectAllThatApply({
-  required String moduleName,
   required List<Map<String, dynamic>> questionElements,
   required List<Map<String, dynamic>> answerElements,
   required List<Map<String, dynamic>> options,
@@ -1418,8 +1227,7 @@ Future<String> addQuestionSelectAllThatApply({
       throw Exception('Question is incomplete. Both question and answer elements must be provided and valid.');
     }
     
-    // Normalize the module name and trim content fields in place
-    moduleName = await normalizeString(moduleName);
+    // Trim content fields in place
     questionElements = trimContentFields(questionElements);
     answerElements = trimContentFields(answerElements);
     options = trimContentFields(options);
@@ -1428,7 +1236,6 @@ Future<String> addQuestionSelectAllThatApply({
     
     // Validate general question entry requirements
     _validateQuestionEntry(
-      moduleName: moduleName,
       questionElements: questionElements,
       answerElements: answerElements,
     );
@@ -1462,7 +1269,6 @@ Future<String> addQuestionSelectAllThatApply({
       'qst_reviewer': '', // Default empty
       'has_been_reviewed': 0, // Changed from false to 0
       'flag_for_removal': 0, // Changed from false to 0
-      'module_name': moduleName,
       'question_type': 'select_all_that_apply',
       'options': encodeValueForDB(options),
       'index_options_that_apply': encodeValueForDB(indexOptionsThatApply),
@@ -1480,7 +1286,6 @@ Future<String> addQuestionSelectAllThatApply({
         'qst_reviewer': '',
         'has_been_reviewed': 0,
         'flag_for_removal': 0,
-        'module_name': moduleName,
         'question_type': 'select_all_that_apply',
         'options': encodeValueForDB(options),
         'index_options_that_apply': encodeValueForDB(indexOptionsThatApply),
@@ -1501,16 +1306,12 @@ Future<String> addQuestionSelectAllThatApply({
     rethrow;
   } finally {
     getDatabaseMonitor().releaseDatabaseAccess();
-    
-    // Validate modules table after adding a question (after db access is released)
-    await ensureAllQuestionModuleNamesHaveCorrespondingModuleRecords();
   }
 }
 
 /// Adds a new true/false question to the database.
 /// 
 /// Args:
-///   moduleName: The name of the module this question belongs to.
 ///   questionElements: A list of maps representing the question content.
 ///   answerElements: A list of maps representing the explanation/answer rationale.
 ///   correctOptionIndex: The index of the correct option (0 for True, 1 for False).
@@ -1521,7 +1322,6 @@ Future<String> addQuestionSelectAllThatApply({
 /// Returns:
 ///   The unique question_id generated for this question (format: timestamp_userId).
 Future<String> addQuestionTrueFalse({
-  required String moduleName,
   required List<Map<String, dynamic>> questionElements,
   required List<Map<String, dynamic>> answerElements,
   required int correctOptionIndex, // 0 for True, 1 for False
@@ -1550,8 +1350,7 @@ Future<String> addQuestionTrueFalse({
       throw Exception('Question is incomplete. Both question and answer elements must be provided and valid.');
     }
     
-    // Normalize the module name and trim content fields in place
-    moduleName = await normalizeString(moduleName);
+    // Trim content fields in place
     questionElements = trimContentFields(questionElements);
     answerElements = trimContentFields(answerElements);
 
@@ -1559,7 +1358,6 @@ Future<String> addQuestionTrueFalse({
     
     // Validate general question entry requirements
     _validateQuestionEntry(
-      moduleName: moduleName,
       questionElements: questionElements,
       answerElements: answerElements,
     );
@@ -1580,7 +1378,6 @@ Future<String> addQuestionTrueFalse({
       'qst_reviewer': '', // Default empty
       'has_been_reviewed': 0, // Changed from false to 0
       'flag_for_removal': 0, // Changed from false to 0
-      'module_name': moduleName,
       'question_type': 'true_false',
       'correct_option_index': correctOptionIndex,
       'question_id': '${timeStamp}_$userId',
@@ -1598,7 +1395,6 @@ Future<String> addQuestionTrueFalse({
         'qst_reviewer': '',
         'has_been_reviewed': 0,
         'flag_for_removal': 0,
-        'module_name': moduleName,
         'question_type': 'true_false',
         'correct_option_index': correctOptionIndex,
         'question_id': '${timeStamp}_$userId',
@@ -1617,16 +1413,12 @@ Future<String> addQuestionTrueFalse({
     rethrow;
   } finally {
     getDatabaseMonitor().releaseDatabaseAccess();
-    
-    // Validate modules table after adding a question (after db access is released)
-    await ensureAllQuestionModuleNamesHaveCorrespondingModuleRecords();
   }
 }
 
 /// Adds a new sort_order question to the database, following existing patterns.
 ///
 /// Args:
-///   moduleName: The name of the module this question belongs to.
 ///   questionElements: A list of maps representing the question content.
 ///   answerElements: A list of maps representing the explanation/answer rationale.
 ///   options: A list of strings representing the items to be sorted, **in the correct final order**.
@@ -1637,7 +1429,6 @@ Future<String> addQuestionTrueFalse({
 /// Returns:
 ///   The unique question_id generated for this question (format: timestamp_userId).
 Future<String> addSortOrderQuestion({
-  required String moduleName,
   required List<Map<String, dynamic>> questionElements,
   required List<Map<String, dynamic>> answerElements,
   required List<Map<String, dynamic>> options, // Items in the correct sorted order
@@ -1667,8 +1458,7 @@ Future<String> addSortOrderQuestion({
       throw Exception('Question is incomplete. Both question and answer elements must be provided and valid.');
     }
     
-    // Normalize the module name and trim content fields in place
-    moduleName = await normalizeString(moduleName);
+    // Trim content fields in place
     questionElements = trimContentFields(questionElements);
     answerElements = trimContentFields(answerElements);
     options = trimContentFields(options);
@@ -1677,7 +1467,6 @@ Future<String> addSortOrderQuestion({
     
     // Validate general question entry requirements
     _validateQuestionEntry(
-      moduleName: moduleName,
       questionElements: questionElements,
       answerElements: answerElements,
     );
@@ -1690,7 +1479,7 @@ Future<String> addSortOrderQuestion({
       throw Exception('Sort order questions must have at least 2 options to sort.');
     }
 
-    QuizzerLogger.logMessage('Adding sort_order question with ID: ${timeStamp}_$userId for module $moduleName');
+    QuizzerLogger.logMessage('Adding sort_order question with ID: ${timeStamp}_$userId');
 
     // Use the universal insert helper (encoding happens inside)
     await insertRawData(
@@ -1705,7 +1494,6 @@ Future<String> addSortOrderQuestion({
         'qst_reviewer': '', // Default
         'has_been_reviewed': 0, // Default
         'flag_for_removal': 0, // Default
-        'module_name': moduleName,
         'question_type': 'sort_order', // Use string literal
         'options': encodeValueForDB(options), // Store correctly ordered list, will be JSON encoded by helper
         'question_id': '${timeStamp}_$userId', // Store the generated ID
@@ -1723,7 +1511,6 @@ Future<String> addSortOrderQuestion({
           'qst_reviewer': '',
           'has_been_reviewed': 0,
           'flag_for_removal': 0,
-          'module_name': moduleName,
           'question_type': 'sort_order',
           'options': encodeValueForDB(options),
           'question_id': '${timeStamp}_$userId',
@@ -1744,9 +1531,6 @@ Future<String> addSortOrderQuestion({
     rethrow;
   } finally {
     getDatabaseMonitor().releaseDatabaseAccess();
-    
-    // Validate modules table after adding a question (after db access is released)
-    await ensureAllQuestionModuleNamesHaveCorrespondingModuleRecords();
   }
 }
 
@@ -1754,7 +1538,6 @@ Future<String> addSortOrderQuestion({
 /// Adds a new fill_in_the_blank question to the database.
 /// 
 /// Args:
-///   moduleName: The name of the module this question belongs to.
 ///   questionElements: A list of maps representing the question content (can include 'blank' type elements).
 ///   answerElements: A list of maps representing the explanation/answer rationale.
 ///   answersToBlanks: A list of maps where each map contains the correct answer and synonyms for each blank.
@@ -1766,7 +1549,6 @@ Future<String> addSortOrderQuestion({
 /// Returns:
 ///   The unique question_id generated for this question (format: timestamp_userId).
 Future<String> addFillInTheBlankQuestion({
-  required String moduleName,
   required List<Map<String, dynamic>> questionElements,
   required List<Map<String, dynamic>> answerElements,
   required List<Map<String, List<String>>> answersToBlanks,
@@ -1813,8 +1595,7 @@ Future<String> addFillInTheBlankQuestion({
     
     final String timeStamp = DateTime.now().toUtc().toIso8601String();
 
-    // Normalize the module name and trim content fields in place
-    moduleName = await normalizeString(moduleName);
+    // Trim content fields in place
     questionElements = trimContentFields(questionElements);
     answerElements = trimContentFields(answerElements);
 
@@ -1822,7 +1603,6 @@ Future<String> addFillInTheBlankQuestion({
     
     // Validate general question entry requirements
     _validateQuestionEntry(
-      moduleName: moduleName,
       questionElements: questionElements,
       answerElements: answerElements,
     );
@@ -1874,7 +1654,6 @@ Future<String> addFillInTheBlankQuestion({
       'qst_reviewer': '',
       'has_been_reviewed': 0,
       'flag_for_removal': 0,
-      'module_name': moduleName,
       'question_type': 'fill_in_the_blank',
       'answers_to_blanks': encodeValueForDB(answersToBlanks),
       'question_id': '${timeStamp}_$userId',
@@ -1891,7 +1670,6 @@ Future<String> addFillInTheBlankQuestion({
         'qst_reviewer': '',
         'has_been_reviewed': 0,
         'flag_for_removal': 0,
-        'module_name': moduleName,
         'question_type': 'fill_in_the_blank',
         'answers_to_blanks': encodeValueForDB(answersToBlanks),
         'question_id': '${timeStamp}_$userId',
@@ -1911,9 +1689,6 @@ Future<String> addFillInTheBlankQuestion({
     rethrow;
   } finally {
     getDatabaseMonitor().releaseDatabaseAccess();
-    
-    // Validate modules table after adding a question (after db access is released)
-    await ensureAllQuestionModuleNamesHaveCorrespondingModuleRecords();
   }
 }
 
@@ -2042,11 +1817,6 @@ Future<void> batchUpsertQuestionAnswerPairs({
         if (record.containsKey(name)) {
           processedRecord[name] = record[name];
         }
-      }
-      
-      // Normalize the module name if it exists
-      if (processedRecord['module_name'] != null) {
-        processedRecord['module_name'] = await normalizeString(processedRecord['module_name']);
       }
       
       // Set sync flags to indicate synced status

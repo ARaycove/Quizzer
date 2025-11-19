@@ -300,8 +300,7 @@ Future<void> updateAllUserDailyStats(String userId, {bool? isCorrect, double? re
       SELECT COUNT(*) as eligible_count
       FROM user_question_answer_pairs uqap
       INNER JOIN question_answer_pairs qap ON uqap.question_id = qap.question_id
-      INNER JOIN user_module_activation_status umas ON uqap.user_uuid = umas.user_id AND qap.module_name = umas.module_name
-      WHERE uqap.user_uuid = ? AND uqap.in_circulation = 1 AND uqap.next_revision_due < ? AND uqap.flagged = 0 AND umas.is_active = 1
+      WHERE uqap.user_uuid = ? AND uqap.in_circulation = 1 AND uqap.next_revision_due < ? AND uqap.flagged = 0
     ''';
     
     final eligibleResults = await db.rawQuery(eligibleQuery, [userId, nowUtc]);
@@ -310,11 +309,10 @@ Future<void> updateAllUserDailyStats(String userId, {bool? isCorrect, double? re
     // Query 2: Circulation counts
     const circulationQuery = '''
       SELECT 
-        SUM(CASE WHEN uqap.in_circulation = 1 AND uqap.flagged = 0 AND umas.is_active = 1 THEN 1 ELSE 0 END) as in_circ_count,
-        SUM(CASE WHEN uqap.in_circulation = 0 AND uqap.flagged = 0 AND umas.is_active = 1 THEN 1 ELSE 0 END) as non_circ_count
+        SUM(CASE WHEN uqap.in_circulation = 1 AND uqap.flagged = 0 THEN 1 ELSE 0 END) as in_circ_count,
+        SUM(CASE WHEN uqap.in_circulation = 0 AND uqap.flagged = 0 THEN 1 ELSE 0 END) as non_circ_count
       FROM user_question_answer_pairs uqap
       INNER JOIN question_answer_pairs qap ON uqap.question_id = qap.question_id
-      INNER JOIN user_module_activation_status umas ON uqap.user_uuid = umas.user_id AND qap.module_name = umas.module_name
       WHERE uqap.user_uuid = ?
     ''';
     
@@ -416,8 +414,7 @@ Future<void> updateAllUserDailyStats(String userId, {bool? isCorrect, double? re
         COUNT(*) as count
       FROM user_question_answer_pairs uqap
       INNER JOIN question_answer_pairs qap ON uqap.question_id = qap.question_id
-      INNER JOIN user_module_activation_status umas ON uqap.user_uuid = umas.user_id AND qap.module_name = umas.module_name
-      WHERE uqap.user_uuid = ? AND uqap.in_circulation = 1 AND uqap.flagged = 0 AND umas.is_active = 1
+      WHERE uqap.user_uuid = ? AND uqap.in_circulation = 1 AND uqap.flagged = 0
       GROUP BY uqap.revision_streak
     ''';
     

@@ -6,8 +6,6 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/question_answ
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_profile_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_question_answer_pairs_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_settings_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/modules_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_module_activation_status_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/academic_archive.dart/subject_details_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/inbound_sync/inbound_sync_helper.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/ml_models_table.dart';
@@ -97,11 +95,9 @@ Future<void> runInboundSync(SessionManager sessionManager) async {
     await batchUpsertUserQuestionAnswerPairs(records: tableDataForSync[1], db: txn);
     await upsertUserProfileFromInboundSync(profileDataList: tableDataForSync[2], db: txn); // user should have only one profile record, so index the first in the list (should be only in the list)
     await batchUpsertUserSettingsFromSupabase(settingsData: tableDataForSync[3], userId: userId, db: txn);
-    await batchUpsertModuleFromInboundSync(moduleRecords: tableDataForSync[4], db: txn);
-    await batchUpsertUserModuleActivationStatusFromInboundSync(userModuleActivationStatusRecords: tableDataForSync[5], db: txn);
-    await batchUpsertSubjectDetails(subjectDetailRecords: tableDataForSync[6], db: txn);
-    await batchUpsertMlModelsFromInboundSync(modelRecords: tableDataForSync[7], db: txn);
-    await batchUpsertUserDailyStatsFromInboundSync(userDailyStatsRecords: tableDataForSync[8], db: txn);
+    await batchUpsertSubjectDetails(subjectDetailRecords: tableDataForSync[4], db: txn);
+    await batchUpsertMlModelsFromInboundSync(modelRecords: tableDataForSync[5], db: txn);
+    await batchUpsertUserDailyStatsFromInboundSync(userDailyStatsRecords: tableDataForSync[6], db: txn);
 
 
     });

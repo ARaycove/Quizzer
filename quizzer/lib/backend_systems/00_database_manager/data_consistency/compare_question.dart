@@ -5,6 +5,8 @@ import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pair_management/question_answer_pairs_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
 
+// TODO This function needs to be tied into the InboundSync mechanism since this functionality is directly related to ensuring that local question answer pair records match the server
+
 /// Compares local and cloud question records.
 /// Returns a map with 'updated' (bool) and 'message' (String).
 Future<Map<String, dynamic>> compareAndUpdateQuestionRecord(String questionId) async {

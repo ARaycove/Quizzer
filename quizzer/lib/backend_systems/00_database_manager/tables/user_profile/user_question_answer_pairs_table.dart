@@ -3,7 +3,6 @@ import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/table_helper.dart';
 import 'package:quizzer/backend_systems/09_switch_board/sb_sync_worker_signals.dart'; // Import sync signals
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_module_activation_status_table.dart';
 import 'package:sqflite/sqflite.dart';
 final List<Map<String, String>> expectedColumns = [
   {'name': 'user_uuid',                       'type': 'TEXT'},
@@ -307,61 +306,6 @@ Future<List<Map<String, dynamic>>> getUserQuestionAnswerPairsByUser(String userU
   }
 }
 
-/// Gets questions in circulation with active modules for a specific user.
-/// Returns questions that are in circulation (in_circulation = 1) and from active modules.
-/// Automatically excludes orphaned records (user records that reference non-existent questions).
-Future<List<Map<String, dynamic>>> getActiveQuestionsInCirculation(String userUuid) async {
-  try {
-    // Get all active module names for the user
-    final List<String> activeModuleNames = await getActiveModuleNames(userUuid);
-    
-    final db = await getDatabaseMonitor().requestDatabaseAccess();
-    if (db == null) {
-      throw Exception('Failed to acquire database access');
-    }
-    QuizzerLogger.logMessage('Fetching active questions in circulation for user: $userUuid...');
-    // Build the query with proper joins and conditions
-    String sql = '''
-      SELECT user_question_answer_pairs.*
-      FROM user_question_answer_pairs
-      INNER JOIN question_answer_pairs ON user_question_answer_pairs.question_id = question_answer_pairs.question_id
-      WHERE user_question_answer_pairs.user_uuid = ?
-        AND user_question_answer_pairs.in_circulation = 1
-        AND user_question_answer_pairs.flagged = 0
-    ''';
-    
-    List<dynamic> whereArgs = [userUuid];
-    
-    // Add module filter if there are active modules
-    if (activeModuleNames.isNotEmpty) {
-      final placeholders = List.filled(activeModuleNames.length, '?').join(',');
-      sql += ' AND question_answer_pairs.module_name IN ($placeholders)';
-      whereArgs.addAll(activeModuleNames);
-    }
-    
-    // Add ORDER BY for consistent results
-    sql += ' ORDER BY user_question_answer_pairs.next_revision_due ASC';
-    
-    QuizzerLogger.logMessage('Executing active questions in circulation query with ${activeModuleNames.length} active modules');
-    
-    // Use the proper table_helper system for encoding/decoding
-    final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
-      'user_question_answer_pairs', // Use the main table name for the helper
-      db,
-      customQuery: sql,
-      whereArgs: whereArgs,
-    );
-    
-    QuizzerLogger.logSuccess('Found ${results.length} active questions in circulation for user: $userUuid.');
-    return results;
-  } catch (e) {
-    QuizzerLogger.logError('Error getting active questions in circulation - $e');
-    rethrow;
-  } finally {
-    getDatabaseMonitor().releaseDatabaseAccess();
-  }
-}
-
 Future<List<Map<String, dynamic>>> getQuestionsInCirculation(String userUuid) async {
   try {
     final db = await getDatabaseMonitor().requestDatabaseAccess();
@@ -464,58 +408,6 @@ Future<void> incrementTotalAttempts(String userUuid, String questionId) async {
     getDatabaseMonitor().releaseDatabaseAccess();
   }
 }
-
-/// Updates the user-specific record for a question's circulation status.
-/// Takes a boolean [isInCirculation] to set the status accordingly.
-/// Throws an Exception if the record is not found, adhering to fail-fast.
-Future<void> setCirculationStatus(String userUuid, String questionId, bool isInCirculation) async {
-  try {
-    final db = await getDatabaseMonitor().requestDatabaseAccess();
-    if (db == null) {
-      throw Exception('Failed to acquire database access');
-    }
-    final String statusString = isInCirculation ? 'IN' : 'OUT OF';
-    QuizzerLogger.logMessage(
-        'DB Table: Setting question $questionId $statusString circulation for user $userUuid');
-    // Perform the update using the universal update helper directly
-    final Map<String, dynamic> updateData = {
-      'in_circulation': isInCirculation, // Pass bool directly
-      'edits_are_synced': 0,
-      'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
-    };
-    
-    final int rowsAffected = await updateRawData(
-      'user_question_answer_pairs',
-      updateData,
-      'user_uuid = ? AND question_id = ?', // where
-      [userUuid, questionId],             // whereArgs
-      db,
-    );
-
-    if (rowsAffected == 0) {
-      // Fail fast if the specific record wasn't found for update
-      QuizzerLogger.logError(
-          'Update circulation status failed: No record found for user $userUuid and question $questionId');
-      // NOTE: Throwing here because if this is called, the record SHOULD exist.
-      throw StateError(
-          'Record not found for user $userUuid and question $questionId during circulation update.');
-    }
-
-    QuizzerLogger.logSuccess(
-        'Successfully set circulation status ($statusString) for question $questionId. Rows affected: $rowsAffected');
-    // Signal SwitchBoard
-    signalOutboundSyncNeeded();
-  } catch (e) {
-    QuizzerLogger.logError('Error setting circulation status - $e');
-    rethrow;
-  } finally {
-    getDatabaseMonitor().releaseDatabaseAccess();
-  }
-}
-
-
-
-
 
 /// Fetches all user-question-answer pairs for a specific user that need outbound synchronization.
 /// This includes records that have never been synced (`has_been_synced = 0`)
@@ -741,92 +633,11 @@ Future<void> batchUpsertUserQuestionAnswerPairs({
   }
 }
 
-
-
-/// Fetches all eligible user question answer pairs for a specific user.
-/// Ensures all modules have activation status records before running the query.
-Future<List<Map<String, dynamic>>> getEligibleUserQuestionAnswerPairs(String userUuid) async {
-  try {
-    // Ensure all modules have activation status records before checking eligibility
-    await ensureAllModulesHaveActivationStatus(userUuid);
-    // Get all active module names for the user
-    final List<String> activeModuleNames = await getActiveModuleNames(userUuid);
-    
-    // Now we can get DB Access and process the query
-    final db = await getDatabaseMonitor().requestDatabaseAccess();
-    if (db == null) {
-      throw Exception('Failed to acquire database access');
-    }
-    QuizzerLogger.logMessage('Fetching eligible user question answer pairs for user: $userUuid...');
-    // Eligible question criteria:
-    // 1. The question must be in circulation -> in_circulation = 1
-    // 2. The question must not be flagged -> flagged = 0
-    // 3. The question's module must be active
-    
-    // Build the query with proper joins and conditions - only select needed fields
-    String sql = '''
-      SELECT 
-        user_question_answer_pairs.user_uuid,
-        user_question_answer_pairs.question_id,
-        user_question_answer_pairs.revision_streak,
-        user_question_answer_pairs.last_revised,
-        user_question_answer_pairs.average_times_shown_per_day,
-        user_question_answer_pairs.accuracy_probability,
-        user_question_answer_pairs.in_circulation,
-        user_question_answer_pairs.total_attempts,
-        question_answer_pairs.question_elements,
-        question_answer_pairs.answer_elements,
-        question_answer_pairs.module_name,
-        question_answer_pairs.question_type,
-        question_answer_pairs.options,
-        question_answer_pairs.correct_option_index,
-        question_answer_pairs.correct_order,
-        question_answer_pairs.index_options_that_apply,
-        question_answer_pairs.answers_to_blanks
-      FROM user_question_answer_pairs
-      INNER JOIN question_answer_pairs ON user_question_answer_pairs.question_id = question_answer_pairs.question_id
-      WHERE user_question_answer_pairs.user_uuid = ?
-        AND user_question_answer_pairs.in_circulation = 1
-        AND user_question_answer_pairs.flagged = 0
-        AND user_question_answer_pairs.accuracy_probability IS NOT NULL
-    ''';
-    
-    List<dynamic> whereArgs = [userUuid];
-    
-    // Add module filter if there are active modules
-    if (activeModuleNames.isNotEmpty) {
-      final placeholders = List.filled(activeModuleNames.length, '?').join(',');
-      sql += ' AND question_answer_pairs.module_name IN ($placeholders)';
-      whereArgs.addAll(activeModuleNames);
-    }
-    
-    QuizzerLogger.logMessage('Executing eligibility query with ${activeModuleNames.length} active modules');
-    final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
-      'user_question_answer_pairs', // Use the main table name for the helper
-      db,
-      customQuery: sql,
-      whereArgs: whereArgs,
-    );
-    QuizzerLogger.logSuccess('Fetched ${results.length} eligible records for user: $userUuid (fields pre-filtered in SQL query).');
-    return results;
-  } catch (e) {
-    QuizzerLogger.logError('Error getting eligible user question answer pairs - $e');
-    rethrow;
-  } finally {
-    getDatabaseMonitor().releaseDatabaseAccess();
-  }
-}
-
 /// Gets the count of eligible questions with revision_score == 0 for a specific user.
 /// Stops counting once it reaches 10 results for performance optimization.
 /// Uses the same eligibility logic as getEligibleUserQuestionAnswerPairs.
 Future<int> getLowRevisionStreakEligibleCount(String userUuid) async {
   try {
-    // Ensure all modules have activation status records before checking eligibility
-    await ensureAllModulesHaveActivationStatus(userUuid);
-    // Get all active module names for the user
-    final List<String> activeModuleNames = await getActiveModuleNames(userUuid);
-    
     final db = await getDatabaseMonitor().requestDatabaseAccess();
     if (db == null) {
       throw Exception('Failed to acquire database access');
@@ -846,21 +657,10 @@ Future<int> getLowRevisionStreakEligibleCount(String userUuid) async {
           AND user_question_answer_pairs.next_revision_due < ?
           AND user_question_answer_pairs.revision_streak = 0
           AND user_question_answer_pairs.flagged = 0
+        ORDER BY user_question_answer_pairs.next_revision_due ASC LIMIT 10) as subquery
     ''';
     
     List<dynamic> whereArgs = [userUuid, now];
-    
-    // Add module filter if there are active modules
-    if (activeModuleNames.isNotEmpty) {
-      final placeholders = List.filled(activeModuleNames.length, '?').join(',');
-      sql += ' AND question_answer_pairs.module_name IN ($placeholders)';
-      whereArgs.addAll(activeModuleNames);
-    }
-    
-    // Add ORDER BY and LIMIT for consistent results
-    sql += ' ORDER BY user_question_answer_pairs.next_revision_due ASC LIMIT 10) as subquery';
-    
-    QuizzerLogger.logMessage('Executing revision_score == 0 count query with ${activeModuleNames.length} active modules');
     final List<Map<String, dynamic>> results = await db.rawQuery(sql, whereArgs);
     
     final int count = results.isNotEmpty ? (results.first['count'] as int) : 0;
@@ -879,11 +679,6 @@ Future<int> getLowRevisionStreakEligibleCount(String userUuid) async {
 /// Uses the same eligibility logic as getEligibleUserQuestionAnswerPairs.
 Future<int> getTotalEligibleCount(String userUuid) async {
   try {
-    // Ensure all modules have activation status records before checking eligibility
-    await ensureAllModulesHaveActivationStatus(userUuid);
-    // Get all active module names for the user
-    final List<String> activeModuleNames = await getActiveModuleNames(userUuid);
-    
     final db = await getDatabaseMonitor().requestDatabaseAccess();
     if (db == null) {
       throw Exception('Failed to acquire database access');
@@ -902,21 +697,10 @@ Future<int> getTotalEligibleCount(String userUuid) async {
           AND user_question_answer_pairs.in_circulation = 1
           AND user_question_answer_pairs.next_revision_due < ?
           AND user_question_answer_pairs.flagged = 0
+        ORDER BY user_question_answer_pairs.next_revision_due ASC LIMIT 100) as subquery
     ''';
     
     List<dynamic> whereArgs = [userUuid, now];
-    
-    // Add module filter if there are active modules
-    if (activeModuleNames.isNotEmpty) {
-      final placeholders = List.filled(activeModuleNames.length, '?').join(',');
-      sql += ' AND question_answer_pairs.module_name IN ($placeholders)';
-      whereArgs.addAll(activeModuleNames);
-    }
-    
-    // Add ORDER BY and LIMIT for consistent results
-    sql += ' ORDER BY user_question_answer_pairs.next_revision_due ASC LIMIT 100) as subquery';
-    
-    QuizzerLogger.logMessage('Executing total eligible count query with ${activeModuleNames.length} active modules');
     final List<Map<String, dynamic>> results = await db.rawQuery(sql, whereArgs);
     
     final int count = results.isNotEmpty ? (results.first['count'] as int) : 0;
@@ -949,12 +733,10 @@ Future<List<Map<String, dynamic>>> getNonCirculatingQuestionsWithDetails(String 
         question_answer_pairs.*
       FROM user_question_answer_pairs
       INNER JOIN question_answer_pairs ON user_question_answer_pairs.question_id = question_answer_pairs.question_id
-      INNER JOIN user_module_activation_status ON user_question_answer_pairs.user_uuid = user_module_activation_status.user_id AND question_answer_pairs.module_name = user_module_activation_status.module_name
       WHERE
         user_question_answer_pairs.user_uuid = ?
         AND user_question_answer_pairs.in_circulation = 0
         AND user_question_answer_pairs.flagged = 0
-        AND user_module_activation_status.is_active = 1
       ORDER BY user_question_answer_pairs.next_revision_due ASC
     ''';
     

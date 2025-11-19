@@ -225,10 +225,9 @@ Future<bool> _isTableEmpty(String tableName, String? userId) async {
 /// syncData[1]   == user_question_answer_pairs \n
 /// syncData[2]   == user_profile \n
 /// syncData[3]   == user_settings \n
-/// syncData[4]   == modules \n
-/// syncData[5]   == user_module_activation_status \n
-/// syncData[6]   == subject_details \n
-/// syncData[7]   == ml_models \n
+/// syncData[4]   == subject_details \n
+/// syncData[5]   == ml_models \n
+/// syncData[6]   == user_daily_stats \n
 Future<List<List<Map<String,dynamic>>>> fetchDataForAllTables(SupabaseClient supabase, String? userId) async {
   // Let's assume you have a SupabaseClient instance named `supabaseClient`.
   // SupabaseClient supabaseClient = SupabaseClient('url', 'key');
@@ -245,12 +244,6 @@ Future<List<List<Map<String,dynamic>>>> fetchDataForAllTables(SupabaseClient sup
     userId: userId, additionalFilters: {'uuid': userId}),
 
     fetchAllRecordsOlderThanLastLogin(supabase: supabase, tableName: 'user_settings',               
-    userId: userId, additionalFilters: {'user_id': userId}),
-
-    fetchAllRecordsOlderThanLastLogin(supabase: supabase, tableName: 'modules',                       
-    userId: null, useLastLogin: false), //Get all modules regardless
-
-    fetchAllRecordsOlderThanLastLogin(supabase: supabase, tableName: 'user_module_activation_status',
     userId: userId, additionalFilters: {'user_id': userId}),
 
     fetchAllRecordsOlderThanLastLogin(supabase: supabase, tableName: 'subject_details',

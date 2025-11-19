@@ -423,119 +423,6 @@ DataFrame _unpackStreakFeatures({
   return DataFrame([newHeaders, ...newRows]);
 }
 
-
-// DataFrame _unpackModulePerformanceVector(DataFrame dataFrame, {required String prefix}) {
-//   if (dataFrame.rows.isEmpty) return dataFrame;
-  
-//   final originalHeaders = dataFrame.header.toList();
-//   final originalRows = dataFrame.rows.map((row) => row.toList()).toList();
-  
-//   final colIndex = originalHeaders.indexOf('module_performance_vector');
-//   if (colIndex == -1) return dataFrame;
-  
-//   // Modules to exclude from unpacking
-//   final excludedModules = {
-//     "dummy module", "multi field test", "new module name", "test module",
-//     "test module 1", "test module 10", "test module 2", "test module 3",
-//     "test module 4", "test module 5", "test module 6", "test module 7",
-//     "test module 8", "test module 9", "test module with underscores",
-//     "testmodule", "testmodule0", "testmodule1", "testmodule2", "testmodule3",
-//     "testmodule4", "algebra 1-3", "algebra & trigonometry", "testmodule0 edited"
-//   };
-  
-//   // Get all unique module names and performance keys
-//   final allModules = <String>{};
-//   final allKeys = <String>{};
-  
-//   for (final row in originalRows) {
-//     final value = row[colIndex];
-//     List<dynamic> moduleData;
-    
-//     if (value is String) {
-//       moduleData = decodeValueFromDB(value) as List<dynamic>;
-//     } else if (value is List) {
-//       moduleData = value;
-//     } else {
-//       continue;
-//     }
-    
-//     for (final module in moduleData) {
-//       if (module is Map<String, dynamic>) {
-//         final moduleName = module['module_name'] as String?;
-//         if (moduleName != null && !excludedModules.contains(moduleName)) {
-//           allModules.add(moduleName);
-//           for (final key in module.keys) {
-//             if (key != 'module_name') {
-//               allKeys.add(key);
-//             }
-//           }
-//         }
-//       }
-//     }
-//   }
-  
-//   final sortedModules = allModules.toList()..sort();
-//   final sortedKeys = allKeys.toList()..sort();
-  
-//   // Build new headers and rows
-//   final newHeaders = <String>[];
-//   final newRows = List.generate(originalRows.length, (i) => <dynamic>[]);
-  
-//   // Add original columns except module_performance_vector
-//   for (int i = 0; i < originalHeaders.length; i++) {
-//     if (i != colIndex) {
-//       newHeaders.add(originalHeaders[i]);
-//       for (int rowIndex = 0; rowIndex < originalRows.length; rowIndex++) {
-//         newRows[rowIndex].add(originalRows[rowIndex][i]);
-//       }
-//     }
-//   }
-  
-//   // Add unpacked module columns with prefix
-//   for (final moduleName in sortedModules) {
-//     for (final key in sortedKeys) {
-//       newHeaders.add('${prefix}_${moduleName}_$key');
-//     }
-//   }
-  
-//   // Extract module performance values
-//   for (int rowIndex = 0; rowIndex < originalRows.length; rowIndex++) {
-//     final value = originalRows[rowIndex][colIndex];
-//     final Map<String, Map<String, dynamic>> moduleMap = {};
-    
-//     if (value != null) {
-//       List<dynamic> moduleData;
-      
-//       if (value is String) {
-//         moduleData = decodeValueFromDB(value) as List<dynamic>;
-//       } else if (value is List) {
-//         moduleData = value;
-//       } else {
-//         moduleData = [];
-//       }
-      
-//       for (final module in moduleData) {
-//         if (module is Map<String, dynamic>) {
-//           final moduleName = module['module_name'] as String?;
-//           if (moduleName != null && !excludedModules.contains(moduleName)) {
-//             moduleMap[moduleName] = module;
-//           }
-//         }
-//       }
-//     }
-    
-//     // Add values for each module-key combination, filling with 0 for missing data
-//     for (final moduleName in sortedModules) {
-//       for (final key in sortedKeys) {
-//         final moduleData = moduleMap[moduleName];
-//         newRows[rowIndex].add(moduleData?[key] ?? 0);
-//       }
-//     }
-//   }
-  
-//   return DataFrame([newHeaders, ...newRows]);
-// }
-
 DataFrame _unpackKnnPerformanceVector(DataFrame dataFrame, String prefix) {
   if (!dataFrame.header.contains('knn_performance_vector')) {
     return dataFrame;
@@ -906,7 +793,6 @@ Future<Map<String, DataFrame>> fetchBatchInferenceSamples({required int nRecords
     
     // Construct complete feature vector for ML inference
     samples.add({
-      'module_name': questionMetadata['module_name'],
       'question_type': questionMetadata['question_type'],
       'num_mcq_options': questionMetadata['num_mcq_options'],
       'num_so_options': questionMetadata['num_so_options'],

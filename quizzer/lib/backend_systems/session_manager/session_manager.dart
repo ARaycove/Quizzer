@@ -1,12 +1,8 @@
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/inbound_sync/inbound_sync_worker.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_profile_table.dart';
-import 'package:quizzer/backend_systems/06_user_question_management/user_question_processes.dart' show validateAllModuleQuestions;
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pair_management/question_answer_pairs_table.dart' as q_pairs_table;
 import 'package:quizzer/backend_systems/01_user_auth_login_manager/new_user_signup.dart' as account_creation;
-import 'package:quizzer/backend_systems/03_module_management/module_management.dart' as module_management;
-import 'package:quizzer/backend_systems/03_module_management/rename_modules.dart' as rename_modules;
-import 'package:quizzer/backend_systems/03_module_management/merge_modules.dart' as merge_modules;
 import 'package:quizzer/backend_systems/02_login_authentication/login_initialization.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:hive/hive.dart';
@@ -33,11 +29,8 @@ import 'package:quizzer/backend_systems/00_database_manager/tables/system_data/u
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_settings_table.dart' as user_settings_table;
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_question_answer_pairs_table.dart'; // Added for direct access
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_daily_stats_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_module_activation_status_table.dart'; // Added import for the new table
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pair_management/question_answer_pair_flags_table.dart'; // Added import for flags table
 import 'package:quizzer/backend_systems/00_helper_utils/file_locations.dart';
-import 'package:quizzer/backend_systems/00_database_manager/custom_queries.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/modules_table.dart' as modules_table;
 import 'package:quizzer/backend_systems/12_answer_validator/answer_validation/text_analysis_tools.dart' as text_validation;
 import 'package:quizzer/backend_systems/05_question_queue_server/circulation_worker.dart';
 
@@ -374,9 +367,6 @@ class SessionManager {
   List<Map<String, dynamic>>  get currentCorrectOrder           => _currentQuestionDetails!['correct_order'] 
   as List<Map<String, dynamic>>; // Parsed in DB layer
 
-  String get currentModuleName                                  => _currentQuestionDetails!['module_name'] 
-  as String? ?? "general";
-
   String?                     get currentCitation               => _currentQuestionDetails!['citation'] 
   as String?;
 
@@ -681,221 +671,6 @@ class SessionManager {
       rethrow;
     }
   }
-
-  // =================================================================================
-  // Module management Calls
-  // =================================================================================
-  // API for loading module names and their activation status
-  Future<Map<String, Map<String, dynamic>>> getModuleData({bool onlyWithQuestions = false}) async {
-    try {
-      QuizzerLogger.logMessage('Entering getModuleData()...');
-      
-      assert(userId != null);
-      final result = await getOptimizedModuleData(userId!);
-      
-      // Filter modules if requested
-      if (onlyWithQuestions) {
-        final Map<String, Map<String, dynamic>> filteredResult = {};
-        for (final entry in result.entries) {
-          final String moduleName = entry.key;
-          final Map<String, dynamic> moduleData = entry.value;
-          final int questionCount = moduleData['total_questions'] as int? ?? 0;
-          if (questionCount > 0) {
-            filteredResult[moduleName] = moduleData;
-          }
-        }
-        QuizzerLogger.logMessage('Successfully loaded modules for user: $userId (filtered: only with questions)');
-        return filteredResult;
-      }
-      
-      QuizzerLogger.logMessage('Successfully loaded modules for user: $userId');
-      return result;
-    } catch (e) {
-      QuizzerLogger.logError('Error in getModuleData - $e');
-      rethrow;
-    }
-  }
-
-  //  --------------------------------------------------------------------------------
-  // API for loading individual module data
-  Future<Map<String, dynamic>?> getModuleDataByName(String moduleName) async {
-    try {
-      QuizzerLogger.logMessage('Entering getModuleDataByName()...');
-      
-      assert(userId != null);
-      
-      // Normalize the module name before lookup
-      final String normalizedModuleName = await text_validation.normalizeString(moduleName);
-      final result = await getIndividualModuleData(userId!, normalizedModuleName);
-      
-      QuizzerLogger.logMessage('Successfully loaded individual module data for module: $moduleName');
-      return result;
-    } catch (e) {
-      QuizzerLogger.logError('Error in getModuleDataByName - $e');
-      rethrow;
-    }
-  }
-
-  //  --------------------------------------------------------------------------------
-  // API for activating or deactivating a module (Updated to use new table)
-  Future<void> toggleModuleActivation(String moduleName, bool activate) async {
-    try {
-      QuizzerLogger.logMessage('Entering toggleModuleActivation()...');
-      
-      assert(userId != null);
-      
-      // Normalize the module name before processing
-      final String normalizedModuleName = await text_validation.normalizeString(moduleName);
-      
-      // Update module activation status using the new table function
-      final bool result = await updateModuleActivationStatus(userId!, normalizedModuleName, activate);
-      
-      if (!result) {
-        throw Exception('Failed to update module activation status for module: $moduleName');
-      }
-      
-      // Clear the question queue cache when module activation changes
-      _queueCache.clear();
-      QuizzerLogger.logMessage('Cleared question queue cache due to module activation change');
-      
-      QuizzerLogger.logMessage('Successfully toggled module activation for module: $moduleName, activate: $activate');
-    } catch (e) {
-      QuizzerLogger.logError('Error in toggleModuleActivation - $e');
-      rethrow;
-    }
-  }
-
-  //  --------------------------------------------------------------------------------
-  // API for getting available categories
-  List<String> getAvailableModuleCategories() {
-    try {
-      QuizzerLogger.logMessage('Entering getAvailableCategories()...');
-      
-      final categories = modules_table.getAvailableCategories();
-      
-      QuizzerLogger.logMessage('Successfully retrieved available categories: $categories');
-      return categories;
-    } catch (e) {
-      QuizzerLogger.logError('Error in getAvailableCategories - $e');
-      rethrow;
-    }
-  }
-
-  //  --------------------------------------------------------------------------------
-  // API for updating a module's categories
-  Future<bool> updateModuleCategories(String moduleName, List<String> categories) async {
-    try {
-      QuizzerLogger.logMessage('Entering updateModuleCategories()...');
-      
-      assert(userId != null);
-      
-      // Normalize the module name before processing
-      final String normalizedModuleName = await text_validation.normalizeString(moduleName);
-      
-      // Use the existing updateModule function from modules_table
-      await modules_table.updateModule(
-        name: normalizedModuleName,
-        categories: categories,
-      );
-      
-      QuizzerLogger.logMessage('Successfully updated module categories for module: $moduleName');
-      return true;
-    } catch (e) {
-      QuizzerLogger.logError('Error in updateModuleCategories - $e');
-      rethrow;
-    }
-  }
-
-  //  --------------------------------------------------------------------------------
-  // API for updating a module's description
-  Future<bool> updateModuleDescription(String moduleName, String newDescription) async {
-    try {
-      QuizzerLogger.logMessage('Entering updateModuleDescription()...');
-      
-      assert(userId != null);
-      
-      // Normalize the module name before processing
-      final String normalizedModuleName = await text_validation.normalizeString(moduleName);
-      
-      final result = await module_management.handleUpdateModuleDescription({
-        'moduleName': normalizedModuleName,
-        'description': newDescription,
-      });
-      
-      QuizzerLogger.logMessage('Successfully updated module description for module: $moduleName');
-      return result;
-    } catch (e) {
-      QuizzerLogger.logError('Error in updateModuleDescription - $e');
-      rethrow;
-    }
-  }
-
-  //  --------------------------------------------------------------------------------
-  // API for renaming a module
-  Future<bool> renameModule(String oldModuleName, String newModuleName) async {
-    try {
-      QuizzerLogger.logMessage('Entering renameModule()...');
-      
-      assert(userId != null);
-      
-      // Normalize both module names before processing
-      final String normalizedOldModuleName = await text_validation.normalizeString(oldModuleName);
-      final String normalizedNewModuleName = await text_validation.normalizeString(newModuleName);
-      
-      // Call the rename function from the module management layer
-      final result = await rename_modules.renameModule(
-        oldModuleName: normalizedOldModuleName,
-        newModuleName: normalizedNewModuleName,
-      );
-      
-      if (result) {
-        QuizzerLogger.logMessage('Successfully renamed module from "$oldModuleName" to "$newModuleName"');
-        // Clear the question queue cache when module is renamed
-        _queueCache.clear();
-        QuizzerLogger.logMessage('Cleared question queue cache due to module rename');
-      } else {
-        QuizzerLogger.logWarning('Module rename operation failed for "$oldModuleName" to "$newModuleName"');
-      }
-      
-      return result;
-    } catch (e) {
-      QuizzerLogger.logError('Error in renameModule - $e');
-      rethrow;
-    }
-  }
-
-  // API for merging two modules
-  Future<bool> mergeModules(String sourceModuleName, String targetModuleName) async {
-    try {
-      QuizzerLogger.logMessage('Entering mergeModules()...');
-      
-      assert(userId != null);
-      
-      // Normalize both module names before processing
-      final String normalizedSourceModuleName = await text_validation.normalizeString(sourceModuleName);
-      final String normalizedTargetModuleName = await text_validation.normalizeString(targetModuleName);
-      
-      // Call the merge function from the module management layer
-      final result = await merge_modules.mergeModules(
-        sourceModuleName: normalizedSourceModuleName,
-        targetModuleName: normalizedTargetModuleName,
-      );
-      
-      if (result) {
-        QuizzerLogger.logMessage('Successfully merged module "$sourceModuleName" into "$targetModuleName"');
-        // Clear the question queue cache when modules are merged
-        _queueCache.clear();
-        QuizzerLogger.logMessage('Cleared question queue cache due to module merge');
-      } else {
-        QuizzerLogger.logWarning('Module merge operation failed for "$sourceModuleName" into "$targetModuleName"');
-      }
-      
-      return result;
-    } catch (e) {
-      QuizzerLogger.logError('Error in mergeModules - $e');
-      rethrow;
-    }
-  }
   // =================================================================================
   // Question Flow API
   // =================================================================================
@@ -1056,7 +831,7 @@ class SessionManager {
       // Note: Submission data (_lastSubmittedUserAnswer, _lastSubmittedIsCorrect, _lastSubmittedCustomOrderIndices) 
       // should be set by widgets BEFORE calling submitAnswer
 
-      // --- 4. Record Answer Attempt (at time of presentation) ---
+      // --- Record Answer Attempt (at time of presentation) ---
       // Keep a copy of the record *before* updates for the attempt log
       
       // Call the top-level helper function from session_helper.dart
@@ -1074,7 +849,7 @@ class SessionManager {
         )
       ).inMicroseconds / Duration.microsecondsPerSecond;
 
-      // --- 5. Update User-Question Pair Record ---
+      // --- Update User-Question Pair Record ---
       // Update user-question pair record (this now handles all DB operations internally)
       await updateUserQuestionRecordOnAnswer(
         isCorrect: isCorrect,
@@ -1083,19 +858,10 @@ class SessionManager {
         reactionTime: reactionTime,
       );
 
-      // --- 6. Update Module Performance Stats ---
-      // Updates after the question record update (module performance is derived from individual quesiton performance)
-      await updateModulePerformanceStats(
-        userId: userId!,
-        moduleName: currentModuleName, // Use getter
-        isCorrect: isCorrect,
-        reactionTime: reactionTime,
-      );
-
-      // --- 7. Update Daily User Stats ---
+      // --- Update Daily User Stats ---
       await updateAllUserDailyStats(userId!, isCorrect: isCorrect, reactionTime: reactionTime, questionId: questionId);
 
-      // --- 8. Signal completion and update in-memory state ---
+      // --- Signal completion and update in-memory state ---
       // Don't send signal until the current question is updated in the DB
       if (isCorrect) {
         signalQuestionAnsweredCorrectly(questionId);
@@ -1123,7 +889,6 @@ class SessionManager {
     required String questionType,
     required List<Map<String, dynamic>> questionElements,
     required List<Map<String, dynamic>> answerElements,
-    required String moduleName,
     // --- Type-specific --- (Add more as needed)
     List<Map<String, dynamic>>?       options, // For MC & SelectAll
     int?                              correctOptionIndex, // For MC & TrueFalse
@@ -1134,21 +899,10 @@ class SessionManager {
       QuizzerLogger.logMessage('Entering addNewQuestion()...');
       QuizzerLogger.logMessage('SessionManager: Attempting to add new question of type $questionType');
       
-      // --- 1. Pre-checks --- 
+      // --- Pre-checks --- 
       assert(userId != null, 'User must be logged in to add a question.'); 
 
-      // --- 2. Validate/Create Module ---
-      QuizzerLogger.logMessage('Validating module exists: $moduleName');
-      final bool moduleValidated = await module_management.validateModuleExists(moduleName, creatorId: userId!);
-      if (!moduleValidated) {
-        throw Exception('Failed to validate or create module: $moduleName');
-      }
-      QuizzerLogger.logMessage('Module validated/created successfully: $moduleName');
-      
-      // Normalize the module name for consistent use throughout the function
-      final String normalizedModuleName = await text_validation.normalizeString(moduleName);
-
-      // --- 3. Database Operation (table functions handle their own DB access) --- 
+      // --- Database Operation (table functions handle their own DB access) --- 
       Map<String, dynamic> response;
 
       switch (questionType) {
@@ -1159,7 +913,6 @@ class SessionManager {
           }
           // Call refactored function with correct args
           await q_pairs_table.addQuestionMultipleChoice(
-            moduleName: normalizedModuleName,
             questionElements: questionElements,
             answerElements: answerElements,
             options: options,
@@ -1174,7 +927,6 @@ class SessionManager {
           }
           // Call refactored function with correct args
           await q_pairs_table.addQuestionSelectAllThatApply(
-            moduleName: normalizedModuleName,
             questionElements: questionElements,
             answerElements: answerElements,
             options: options,
@@ -1191,7 +943,6 @@ class SessionManager {
           
           // Call refactored function with correct args
           await q_pairs_table.addQuestionTrueFalse(
-              moduleName: normalizedModuleName,
               questionElements: questionElements,
               answerElements: answerElements,
               correctOptionIndex: correctOptionIndex, // Already checked non-null
@@ -1205,7 +956,6 @@ class SessionManager {
           }
           // Call the specific function using the correct parameter
           await q_pairs_table.addSortOrderQuestion(
-            moduleName: normalizedModuleName,
             questionElements: questionElements,
             answerElements: answerElements,
             options: options, // Pass the validated List<String>
@@ -1219,7 +969,6 @@ class SessionManager {
           }
           // Call the specific function for fill_in_the_blank
           await q_pairs_table.addFillInTheBlankQuestion(
-            moduleName: normalizedModuleName,
             questionElements: questionElements,
             answerElements: answerElements,
             answersToBlanks: answersToBlanks,
@@ -1229,17 +978,9 @@ class SessionManager {
         default:
           throw UnimplementedError('Adding questions of type \'$questionType\' is not yet supported.');
       }
-
-      // --- 3. Post-question operations (table functions handle their own DB access) ---
-      final bool activationResult = await updateModuleActivationStatus(userId!, normalizedModuleName, true);
-      if (!activationResult) {
-        QuizzerLogger.logWarning('Failed to activate module $normalizedModuleName after adding question');
-      }
-      await validateAllModuleQuestions(userId!);
       
       QuizzerLogger.logMessage('SessionManager.addNewQuestion: Question added successfully.');
-      
-      // --- 4. Return Result ---
+      // --- Return Result ---
       response = {};
       QuizzerLogger.logMessage('Successfully added new question of type: $questionType');
       return response;
@@ -1278,26 +1019,17 @@ class SessionManager {
     String? qstReviewer,
     bool? hasBeenReviewed,
     bool? flagForRemoval,
-    String? moduleName,
     String? questionType,
     List<Map<String, dynamic>>? options,
     int? correctOptionIndex,
     List<Map<String, dynamic>>? correctOrderElements,
     List<Map<String, List<String>>>? answersToBlanks, // Added for fill-in-the-blank
-    String? originalModuleName, // NEW optional parameter
   }) async {
     try {
       QuizzerLogger.logMessage('Entering updateExistingQuestion()...');
       
       // Fail fast if not logged in
       assert(userId != null, 'User must be logged in to update a question.');
-      
-      // Normalize module name if provided
-      String? normalizedModuleName;
-      
-      if (moduleName != null) {
-        normalizedModuleName = await text_validation.normalizeString(moduleName);
-      }
       
       // Table function handles its own database access
       final int result = await q_pairs_table.editQuestionAnswerPair(
@@ -1310,7 +1042,6 @@ class SessionManager {
         qstReviewer: qstReviewer,
         hasBeenReviewed: hasBeenReviewed,
         flagForRemoval: flagForRemoval,
-        moduleName: normalizedModuleName,
         questionType: questionType,
         options: options,
         correctOptionIndex: correctOptionIndex,
@@ -1576,7 +1307,6 @@ class SessionManager {
   ///     'correct_option_index': int?,
   ///     'index_options_that_apply': List<int>?,
   ///     'correct_order': List<Map<String, dynamic>>?,
-  ///     'module_name': String,
   ///     'citation': String?,
   ///     'concepts': String?,
   ///     'subjects': String?,

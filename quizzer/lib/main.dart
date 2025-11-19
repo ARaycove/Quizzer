@@ -2,7 +2,6 @@ import 'dart:async'; // For runZonedGuarded
 import 'package:flutter/foundation.dart'; // For PlatformDispatcher
 import 'package:flutter/material.dart';
 import 'package:quizzer/UI_systems/03_add_question_page/add_question_answer_page.dart';
-import 'package:quizzer/UI_systems/04_display_modules_page/display_modules_page.dart';
 import 'package:quizzer/UI_systems/01_new_user_page/new_user_page.dart';
 import 'package:quizzer/UI_systems/00_login_page/login_page.dart';
 import 'package:quizzer/UI_systems/02_home_page/home_page.dart';
@@ -125,7 +124,8 @@ class _QuizzerAppState extends State<QuizzerApp> {
         '/home':            (context) => const HomePage(),
         '/menu':            (context) => const MenuPage(),
         '/add_question':    (context) => const AddQuestionAnswerPage(),
-        '/display_modules': (context) => const DisplayModulesPage(),
+        
+        // FIXME '/display_topics': (context) => const DisplayTopicsPage(),
         '/signup':          (context) => const NewUserPage(),
         '/admin_panel':     (context) => const AdminPanelPage(),
         '/settings_page':   (context) => SettingsPage(),

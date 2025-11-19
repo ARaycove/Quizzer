@@ -42,7 +42,6 @@ Future<Map<String, dynamic>?> recordQuestionAnswerAttempt({
     );
     
     final String? questionVector = questionMetadata['question_vector'] as String?;
-    final String moduleName = questionMetadata['module_name'] as String;
     final String questionType = questionMetadata['question_type'] as String;
     final int numMcqOptions = questionMetadata['num_mcq_options'] as int;
     final int numSoOptions = questionMetadata['num_so_options'] as int;
@@ -83,18 +82,7 @@ Future<Map<String, dynamic>?> recordQuestionAnswerAttempt({
     );
     
     // ===================================
-    // Query 4: Module Performance Vector
-    // ===================================
-    const String? modulePerformanceVector = null;
-    // TODO - This can't be done until the topic model is tuned
-    // final String? modulePerformanceVector = await fetchModulePerformanceVector(
-    //   db: db,
-    //   userId: userId,
-    //   timeStamp: timeStamp,
-    // );
-    
-    // ===================================
-    // Query 5: User Profile Record
+    // Query 4: User Profile Record
     // ===================================
     final String? userProfileRecord = await fetchUserProfileRecord(
       db: db,
@@ -102,7 +90,7 @@ Future<Map<String, dynamic>?> recordQuestionAnswerAttempt({
     );
 
     // ===================================
-    // Query 6: K Nearest Performance Vector
+    // Query 5: K Nearest Performance Vector
     // ===================================
     final String? kNearestPerformanceVector = await fetchKNearestPerformanceVector(
       db: db,
@@ -115,7 +103,6 @@ Future<Map<String, dynamic>?> recordQuestionAnswerAttempt({
     // Prepare Data for Insert/Return
     // ===================================
     final Map<String, dynamic> sampleData = {
-      'module_name': moduleName,
       'question_type': questionType,
       'num_mcq_options': numMcqOptions,
       'num_so_options': numSoOptions,
@@ -155,11 +142,6 @@ Future<Map<String, dynamic>?> recordQuestionAnswerAttempt({
     // Add user_stats_vector if it exists
     if (userStatsVector != null) {
       sampleData['user_stats_vector'] = userStatsVector;
-    }
-    
-    // Add module_performance_vector if it exists
-    if (modulePerformanceVector != null) {
-      sampleData['module_performance_vector'] = modulePerformanceVector;
     }
     
     // Add user_profile_record if it exists

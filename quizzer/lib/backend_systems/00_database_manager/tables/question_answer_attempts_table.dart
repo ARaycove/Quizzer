@@ -21,7 +21,6 @@ final List<Map<String, String>> expectedColumns = [
   // Question_Metrics (not performance related, what is the question?)
   // ===================================
   {'name': "question_vector",           'type': 'TEXT NOT NULL'}, // What does the transformer say?
-  {'name': "module_name",               'type': 'TEXT NOT NULL'}, // Which module is this question in?
   {'name': "question_type",             'type': 'TEXT NOT NULL'}, // What is the question type?
   {'name': "num_mcq_options",           'type': 'INTEGER NULL DEFAULT 0'}, // How many mcq options does this have (should be 0 if the type is not mcq)
   {'name': "num_so_options",            'type': 'INTEGER NULL DEFAULT 0'},
@@ -50,9 +49,6 @@ final List<Map<String, String>> expectedColumns = [
   // User Stats metrics Vector
   // The current state of global statistics at time of answer, array of maps
   {'name': 'user_stats_vector',         'type': 'TEXT'},
-  // User Modules Metrics Vector
-  // Array of Maps, that contains the user's performance metric for every module in their profile:
-  {'name': 'module_performance_vector',        'type': 'TEXT NULL'},
   // K nearest performance (from closest to further ordered)
   // TODO update record attempt to collect and store this information
   {'name': 'knn_performance_vector',           'type': 'TEXT NULL'},
@@ -344,7 +340,6 @@ Future<Map<String, dynamic>> fetchQuestionMetadata({
   const query = '''
     SELECT 
       question_vector,
-      module_name,
       question_type,
       options,
       question_elements,
@@ -362,7 +357,6 @@ Future<Map<String, dynamic>> fetchQuestionMetadata({
   
   final Map<String, dynamic> questionData = results.first;
   final String? questionVector = questionData['question_vector'] as String?;
-  final String moduleName = questionData['module_name'] as String;
   final String questionType = questionData['question_type'] as String;
   final String? kNearestNeighbors = questionData['k_nearest_neighbors'] as String?;
   
@@ -401,7 +395,6 @@ Future<Map<String, dynamic>> fetchQuestionMetadata({
   
   return {
     'question_vector': questionVector,
-    'module_name': moduleName,
     'question_type': questionType,
     'num_mcq_options': numMcqOptions,
     'num_so_options': numSoOptions,
@@ -500,78 +493,6 @@ Future<Map<String, dynamic>> fetchUserQuestionPerformance({
     'days_since_first_introduced': daysSinceFirstIntroduced,
     'attempt_day_ratio': attemptDayRatio,
   };
-}
-
-// Gather module performance vector
-Future<String?> fetchModulePerformanceVector({
-  required dynamic db,
-  required String userId,
-  required String timeStamp,
-}) async {
-  const modulePerformanceQuery = '''
-    SELECT 
-      module_name,
-      num_mcq,
-      num_fitb,
-      num_sata,
-      num_tf,
-      num_so,
-      num_total,
-      total_seen,
-      percentage_seen,
-      total_correct_attempts,
-      total_incorrect_attempts,
-      total_attempts,
-      overall_accuracy,
-      avg_attempts_per_question,
-      avg_reaction_time
-    FROM user_module_activation_status
-    WHERE user_id = ?
-    ORDER BY module_name
-  ''';
-  
-  final List<Map<String, dynamic>> modulePerformanceResults = await db.rawQuery(modulePerformanceQuery, [userId]);
-  
-  if (modulePerformanceResults.isEmpty) {
-    return null;
-  }
-  
-  final DateTime now = DateTime.parse(timeStamp);
-  
-  const lastSeenQuery = '''
-    SELECT 
-      qap.module_name,
-      MAX(uqap.last_revised) as last_seen_date
-    FROM user_question_answer_pairs uqap
-    INNER JOIN question_answer_pairs qap ON uqap.question_id = qap.question_id
-    WHERE uqap.user_uuid = ?
-    GROUP BY qap.module_name
-  ''';
-  
-  final List<Map<String, dynamic>> lastSeenResults = await db.rawQuery(lastSeenQuery, [userId]);
-  
-  final Map<String, String?> moduleLastSeen = {};
-  for (final result in lastSeenResults) {
-    moduleLastSeen[result['module_name'] as String] = result['last_seen_date'] as String?;
-  }
-  
-  final List<Map<String, dynamic>> processedModuleRecords = [];
-  for (final moduleRecord in modulePerformanceResults) {
-    final Map<String, dynamic> processedRecord = Map<String, dynamic>.from(moduleRecord);
-    final String moduleNameKey = moduleRecord['module_name'] as String;
-    
-    double daysSinceLastSeen = 0.0;
-    final String? lastSeenDateStr = moduleLastSeen[moduleNameKey];
-    if (lastSeenDateStr != null) {
-      final DateTime lastSeenDate = DateTime.parse(lastSeenDateStr);
-      daysSinceLastSeen = now.difference(lastSeenDate).inMicroseconds / Duration.microsecondsPerDay;
-    }
-    
-    processedRecord['days_since_last_seen'] = daysSinceLastSeen;
-    processedModuleRecords.add(processedRecord);
-  }
-  
-  return jsonEncode(processedModuleRecords);
 }
 
 // Gather KNN performance vector

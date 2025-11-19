@@ -164,12 +164,6 @@ class OutboundSyncWorker {
     
     // 9. Check and Sync User Settings
     await syncUserSettings();
-    
-    // 10. Check and Sync Modules
-    await syncModules();
-
-    // 11. Check and Sync User Module Activation Status
-    await syncUserModuleActivationStatus();
 
     // 12. Check and Sync User Feedback
     await syncUserFeedback();
