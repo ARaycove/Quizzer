@@ -143,15 +143,8 @@ class _LoginPageState extends State<LoginPage> {
                 child: TextField(
                   controller: _emailController,
                   enabled: !_isLoading,
-                  style: const TextStyle(
-                    color: Color(0xFF212121), // DingMidGrey
-                    fontSize: 24.0, // 1.5x base size (16 * 1.5)
-                  ),
                   decoration: const InputDecoration(
-                    labelText: "Email Address",
-                    hintText: "Enter your email address to login",
-                    filled: true,
-                    fillColor: Color(0xFFd1d1d1), // DingBrightGrey
+                    hintText: "Email Address",
                   ),
                 ),
               ),
@@ -164,15 +157,8 @@ class _LoginPageState extends State<LoginPage> {
                   controller: _passwordController,
                   obscureText: true,
                   enabled: !_isLoading,
-                  style: const TextStyle(
-                    color: Color(0xFF212121), // DingMidGrey
-                    fontSize: 24.0, // 1.5x base size (16 * 1.5)
-                  ),
                   decoration: const InputDecoration(
-                    labelText: "Password",
-                    hintText: "Enter your account password to login",
-                    filled: true,
-                    fillColor: Color(0xFFd1d1d1), // DingBrightGrey
+                    hintText: "Password"  ,
                   ),
                 ),
               ),
@@ -185,14 +171,6 @@ class _LoginPageState extends State<LoginPage> {
                     : buttonWidth, // Expand to full width when loading
                 child: ElevatedButton(
                   onPressed: _isLoading ? null : submitLogin,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF4d87f2), // BingBlue
-                    foregroundColor: const Color(0xFF212121), // DingMidGrey
-                    textStyle: const TextStyle(
-                      fontSize: 32.0, // 2x base size (16 * 2)
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
                   child: _isLoading
                       ? Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -233,14 +211,6 @@ class _LoginPageState extends State<LoginPage> {
               // New User Sign Up Button
               ElevatedButton(
                 onPressed: _isLoading ? null : newUserSignUp,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF4d87f2), // BingBlue
-                  foregroundColor: const Color(0xFF212121), // DingMidGrey
-                  textStyle: const TextStyle(
-                    fontSize: 32.0, // 2x base size (16 * 2)
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
                 child: const Text("New User"),
               ),
             ],

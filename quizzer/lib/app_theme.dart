@@ -9,14 +9,15 @@ class AppTheme {
   static const Color radScarlet = Color(0xFFb25d7a); // Tertiary accent
 
   static const Color dingBrightGrey =
-      Color(0xFFd1d1d1); // Input backgrounds, light elements
+      Color.fromARGB(255, 228, 228, 228); // Input backgrounds, light elements
   static const Color dingLightGrey =
       Color(0xFFa3a8ae); // Secondary text, borders
   static const Color dingLineGrey =
-      Color(0xFF292929); // Dividers, subtle borders
+      Color.fromARGB(255, 70, 70, 70); // Dividers, subtle borders
   static const Color dingMidGrey =
-      Color(0xFF212121); // Primary text on light backgrounds
-  static const Color dingDarkGrey = Color(0xFF121212); // Deep background
+      Color.fromARGB(255, 60, 60, 60); // Primary text on light backgrounds
+  static const Color dingDarkGrey =
+      Color.fromARGB(255, 32, 32, 32); // Deep background
 
   static const Color duffLightBlue =
       Color(0xFFbce0fb); // Info states, highlights
@@ -56,8 +57,8 @@ class AppTheme {
 
         // Text Theme
         textTheme: const TextTheme(
-          bodyLarge: TextStyle(fontSize: 16.0, color: dingBrightGrey),
-          bodyMedium: TextStyle(fontSize: 16.0, color: dingBrightGrey),
+          bodyLarge: TextStyle(fontSize: 16.0, color: dingMidGrey),
+          bodyMedium: TextStyle(fontSize: 16.0, color: dingMidGrey),
           bodySmall: TextStyle(fontSize: 16.0, color: dingLightGrey),
           titleLarge: TextStyle(
               fontSize: 18.0,
@@ -77,8 +78,8 @@ class AppTheme {
         inputDecorationTheme: const InputDecorationTheme(
           filled: true,
           fillColor: dingBrightGrey,
-          labelStyle: TextStyle(color: dingMidGrey, fontSize: 14.0),
-          hintStyle: TextStyle(color: dingLightGrey, fontSize: 12.0),
+          labelStyle: TextStyle(color: dingMidGrey, fontSize: 16.0),
+          hintStyle: TextStyle(color: dingLightGrey, fontSize: 16.0),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(10.0)),
             borderSide: BorderSide(color: dingLineGrey, width: 1.0),
@@ -106,15 +107,15 @@ class AppTheme {
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
             backgroundColor: bingBlue,
-            foregroundColor: dingMidGrey,
+            foregroundColor: dingLineGrey,
             textStyle:
-                const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+                const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10.0),
             ),
             padding:
-                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-            minimumSize: const Size(80.0, 56.0),
+                const EdgeInsets.symmetric(horizontal: 18.0, vertical: 12.0),
+            minimumSize: const Size(80.0, 40.0),
             elevation: 1.0,
           ),
         ),
@@ -206,6 +207,10 @@ class AppTheme {
   static const SizedBox sizedBoxSml = SizedBox(height: 8.0, width: 8.0);
   static const SizedBox sizedBoxMed = SizedBox(height: 12.0, width: 12.0);
   static const SizedBox sizedBoxLrg = SizedBox(height: 16.0, width: 16.0);
+
+  // Font sizes for text boxes and inputs
+  static const double tbLarge = 28.0;
+  static const double tbMed = 24.0;
 
   // Private constructor to prevent instantiation
   AppTheme._();
