@@ -4,32 +4,43 @@ import 'package:flutter/material.dart';
 /// Theme: "Orbit Dark" - High-contrast dark theme for developer tools and dashboards
 class AppTheme {
   // === NEUTRAL SCALE (Backgrounds & Borders) ===
-  static const Color bgCanvas = Color(0xFF121212); // Deepest void - main background
-  static const Color bgSurface = Color(0xFF1E1E1E); // Soft charcoal - cards, editor
-  static const Color bgElevated = Color(0xFF2D2E30); // Lighter grey - dropdowns, modals
-  static const Color bgInput = Color(0xFF161616); // Input black - text fields, terminal
-  
+  static const Color bgCanvas =
+      Color(0xFF121212); // Deepest void - main background
+  static const Color bgSurface =
+      Color(0xFF1E1E1E); // Soft charcoal - cards, editor
+  static const Color bgElevated =
+      Color(0xFF2D2E30); // Lighter grey - dropdowns, modals
+  static const Color bgInput =
+      Color(0xFF161616); // Input black - text fields, terminal
+
   static const Color borderBase = Color(0xFF333333); // Subtle divider
-  static const Color borderActive = Color(0xFF454545); // Active divider - focus rings
-  
+  static const Color borderActive =
+      Color(0xFF454545); // Active divider - focus rings
+
   // === TYPOGRAPHY ===
   static const Color textPrimary = Color(0xFFEDEDED); // Off-white - main text
-  static const Color textMuted = Color(0xFF9E9E9E); // Neutral grey - labels, secondary
-  static const Color textDisabled = Color(0xFF5F5F5F); // Dark grey - disabled states
-  
+  static const Color textMuted =
+      Color(0xFF9E9E9E); // Neutral grey - labels, secondary
+  static const Color textDisabled =
+      Color(0xFF5F5F5F); // Dark grey - disabled states
+
   // === BRAND & ACTION (The Greens) ===
-  static const Color brandPrimary = Color(0xFF3ECF8E); // Electric mint - primary actions
+  static const Color brandPrimary =
+      Color(0xFF3ECF8E); // Electric mint - primary actions
   static const Color brandHover = Color(0xFF34B27B); // Deep mint - hover states
-  static const Color brandSurface = Color(0xFF003D26); // Dark emerald - subtle fills
+  static const Color brandSurface =
+      Color(0xFF003D26); // Dark emerald - subtle fills
   static const Color brandDark = Color(0xFF006F45); // Run button background
   static const Color brandContrast = Color(0xFF000000); // Text on mint
-  
+
   // === DATA VISUALIZATION (The Accents) ===
   static const Color chartBlue = Color(0xFF669DF6); // Cornflower - info, links
-  static const Color chartPink = Color(0xFFFF4081); // Neon rose - errors, critical
+  static const Color chartPink =
+      Color(0xFFFF4081); // Neon rose - errors, critical
   static const Color chartOrange = Color(0xFFF59E0B); // Amber - warnings
-  static const Color chartPurple = Color(0xFFB794F6); // Lavender - 4th data color
-  
+  static const Color chartPurple =
+      Color(0xFFB794F6); // Lavender - 4th data color
+
   // === UTILITY ===
   static const Color selection = Color(0xFF3A3D41); // Text highlight
 
@@ -40,75 +51,71 @@ class AppTheme {
 
         // Color Scheme
         colorScheme: const ColorScheme.dark(
-          primary: bingBlue, // Primary brand color
-          secondary: powOrange, // Secondary accent
-          tertiary: radScarlet, // Tertiary accent
-          surface: dingDarkGrey, // Primary background
-          surfaceContainerHighest: dingMidGrey, // Elevated surfaces
-          outline: dingLineGrey, // Borders/dividers
-          onPrimary: dingMidGrey, // Text on primary
-          onSecondary: dingMidGrey, // Text on secondary
-          onSurface: dingBrightGrey, // Text on surface
-          error: radScarlet, // Error states
+          primary: brandPrimary, // Electric mint
+          secondary: chartOrange, // Amber accent
+          tertiary: chartPink, // Neon rose
+          surface: bgSurface, // Soft charcoal
+          surfaceContainerHighest: bgElevated, // Lighter grey
+          outline: borderBase, // Subtle divider
+          onPrimary: brandContrast, // Black text on mint
+          onSecondary: textPrimary, // Off-white on orange
+          onSurface: textPrimary, // Off-white on surface
+          error: chartPink, // Neon rose for errors
         ),
 
         // Scaffold
-        scaffoldBackgroundColor: dingDarkGrey,
+        scaffoldBackgroundColor: bgCanvas,
 
         // App Bar
         appBarTheme: const AppBarTheme(
-          backgroundColor: bingBlue,
-          foregroundColor: dingMidGrey,
+          backgroundColor: brandPrimary,
+          foregroundColor: brandContrast,
           titleTextStyle: TextStyle(
-              color: dingMidGrey, fontSize: 18.0, fontWeight: FontWeight.bold),
+              color: brandContrast,
+              fontSize: 18.0,
+              fontWeight: FontWeight.bold),
           elevation: 1.0,
           toolbarHeight: 64.0,
         ),
 
         // Text Theme
         textTheme: const TextTheme(
-          bodyLarge: TextStyle(fontSize: 16.0, color: dingMidGrey),
-          bodyMedium: TextStyle(fontSize: 16.0, color: dingMidGrey),
-          bodySmall: TextStyle(fontSize: 16.0, color: dingLightGrey),
+          bodyLarge: TextStyle(fontSize: 16.0, color: textPrimary),
+          bodyMedium: TextStyle(fontSize: 16.0, color: textPrimary),
+          bodySmall: TextStyle(fontSize: 16.0, color: textMuted),
           titleLarge: TextStyle(
-              fontSize: 18.0,
-              fontWeight: FontWeight.bold,
-              color: dingBrightGrey),
+              fontSize: 18.0, fontWeight: FontWeight.bold, color: textPrimary),
           titleMedium: TextStyle(
-              fontSize: 16.0,
-              fontWeight: FontWeight.bold,
-              color: dingBrightGrey),
+              fontSize: 16.0, fontWeight: FontWeight.bold, color: textPrimary),
           titleSmall: TextStyle(
-              fontSize: 14.0,
-              fontWeight: FontWeight.bold,
-              color: dingLightGrey),
+              fontSize: 14.0, fontWeight: FontWeight.bold, color: textMuted),
         ),
 
         // Input Decoration Theme
         inputDecorationTheme: const InputDecorationTheme(
           filled: true,
-          fillColor: dingBrightGrey,
-          labelStyle: TextStyle(color: dingMidGrey, fontSize: 16.0),
-          hintStyle: TextStyle(color: dingLightGrey, fontSize: 16.0),
+          fillColor: bgInput,
+          labelStyle: TextStyle(color: textMuted, fontSize: 16.0),
+          hintStyle: TextStyle(color: textMuted, fontSize: 16.0),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(10.0)),
-            borderSide: BorderSide(color: dingLineGrey, width: 1.0),
+            borderSide: BorderSide(color: borderBase, width: 1.0),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(10.0)),
-            borderSide: BorderSide(color: dingLineGrey, width: 1.0),
+            borderSide: BorderSide(color: borderBase, width: 1.0),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(10.0)),
-            borderSide: BorderSide(color: bingBlue, width: 2.0),
+            borderSide: BorderSide(color: brandPrimary, width: 2.0),
           ),
           errorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(10.0)),
-            borderSide: BorderSide(color: radScarlet, width: 1.0),
+            borderSide: BorderSide(color: chartPink, width: 1.0),
           ),
           focusedErrorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(10.0)),
-            borderSide: BorderSide(color: radScarlet, width: 2.0),
+            borderSide: BorderSide(color: chartPink, width: 2.0),
           ),
           contentPadding: EdgeInsets.all(12.0),
         ),
@@ -116,8 +123,8 @@ class AppTheme {
         // Elevated Button Theme
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-            backgroundColor: bingBlue,
-            foregroundColor: dingDarkGrey,
+            backgroundColor: brandPrimary,
+            foregroundColor: brandContrast,
             textStyle:
                 const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
             shape: RoundedRectangleBorder(
@@ -132,8 +139,8 @@ class AppTheme {
 
         // Floating Action Button Theme
         floatingActionButtonTheme: FloatingActionButtonThemeData(
-          backgroundColor: powOrangeDim,
-          foregroundColor: dingDarkGrey,
+          backgroundColor: chartOrange,
+          foregroundColor: textPrimary,
           elevation: 1.0,
           extendedTextStyle:
               const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
@@ -146,20 +153,20 @@ class AppTheme {
 
         // Icon Theme
         iconTheme: const IconThemeData(
-          color: dingBrightGrey,
+          color: textPrimary,
           size: 24.0,
         ),
 
         // Text Selection Theme
         textSelectionTheme: const TextSelectionThemeData(
-          cursorColor: dingMidGrey,
-          selectionColor: bingBlue,
-          selectionHandleColor: bingBlue,
+          cursorColor: brandPrimary,
+          selectionColor: selection,
+          selectionHandleColor: brandPrimary,
         ),
 
         // Card Theme
         cardTheme: CardThemeData(
-          color: dingMidGrey,
+          color: bgSurface,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12.0),
           ),
@@ -168,7 +175,7 @@ class AppTheme {
 
         // Dialog Theme
         dialogTheme: DialogThemeData(
-          backgroundColor: dingMidGrey,
+          backgroundColor: bgElevated,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12.0),
           ),
@@ -176,8 +183,8 @@ class AppTheme {
 
         // SnackBar Theme
         snackBarTheme: const SnackBarThemeData(
-          backgroundColor: bingBlue,
-          contentTextStyle: TextStyle(color: dingMidGrey),
+          backgroundColor: brandPrimary,
+          contentTextStyle: TextStyle(color: brandContrast),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(8.0)),
           ),
@@ -185,28 +192,28 @@ class AppTheme {
 
         // Dropdown Menu Theme
         dropdownMenuTheme: const DropdownMenuThemeData(
-          textStyle: TextStyle(color: dingMidGrey),
+          textStyle: TextStyle(color: textPrimary),
           menuStyle: MenuStyle(
-            backgroundColor: WidgetStatePropertyAll(dingBrightGrey),
-            side: WidgetStatePropertyAll(BorderSide(color: dingLineGrey)),
+            backgroundColor: WidgetStatePropertyAll(bgElevated),
+            side: WidgetStatePropertyAll(BorderSide(color: borderBase)),
           ),
           inputDecorationTheme: InputDecorationTheme(
             filled: true,
-            fillColor: dingBrightGrey,
-            labelStyle: TextStyle(color: dingMidGrey, fontSize: 14.0),
-            hintStyle: TextStyle(color: dingLightGrey, fontSize: 12.0),
+            fillColor: bgInput,
+            labelStyle: TextStyle(color: textMuted, fontSize: 14.0),
+            hintStyle: TextStyle(color: textMuted, fontSize: 12.0),
           ),
         ),
 
         // Popup Menu Theme (for dropdown options)
         popupMenuTheme: const PopupMenuThemeData(
-          color: dingBrightGrey,
-          textStyle: TextStyle(color: dingMidGrey),
+          color: bgElevated,
+          textStyle: TextStyle(color: textPrimary),
         ),
 
         // Divider Theme
         dividerTheme: const DividerThemeData(
-          color: dingLineGrey,
+          color: borderBase,
           thickness: 1.0,
           space: 1.0,
         ),

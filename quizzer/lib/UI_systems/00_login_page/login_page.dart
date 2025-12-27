@@ -212,7 +212,7 @@ class _LoginPageState extends State<LoginPage> {
               ElevatedButton(
                 onPressed: _isLoading ? null : newUserSignUp,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.powOrangeDim,
+                  backgroundColor: AppTheme.chartOrange,
                 ),
                 child: const Text("New User"),
               ),

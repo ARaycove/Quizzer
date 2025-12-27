@@ -457,6 +457,12 @@ progress \= completedRequiredSteps / totalRequiredSteps
 - ✅ Increased hint text size to 16.0 for readability
 - ✅ Created font size constants (`tbLarge`, `tbMed`)
 - ✅ Darkened input backgrounds (RGB 228 → 200 for better contrast)
+- ✅ **Migrated to "Orbit Dark" theme (December 27, 2025)**
+  - Unified neutral scale: bgCanvas, bgSurface, bgElevated, bgInput
+  - Balanced accent colors: brandPrimary (Electric Mint #3ECF8E), chartBlue, chartPink, chartOrange
+  - Typography system: textPrimary, textMuted, textDisabled
+  - Eliminated visual vibration with cohesive grey scale
+  - Updated all theme components to use new Orbit Dark palette
 
 ### Current Task 🎯
 
