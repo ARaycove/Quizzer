@@ -5,6 +5,7 @@
 **Branch:** `feature/nj-ui-ux-dev`  
 **Author:** Quizzer Development Team
 
+
 This is really a two part spec, one for the dark theme UI/UX system and the other for the User Profile spec.
 
 ---
@@ -99,7 +100,7 @@ ThemeData.dark().copyWith(
 
 **DO:**
 
-- Use turquoise for: primary buttons, selected states, active toggles, small highlights  
+- Use blue for: primary buttons, selected states, active toggles, small highlights  
 - Use surface elevation/containers for visual hierarchy  
 - Reference colors via `Theme.of(context).colorScheme.*`  
 - Keep text contrast ratios ≥ 4.5:1 (WCAG AA)
@@ -107,7 +108,7 @@ ThemeData.dark().copyWith(
 **DON'T:**
 
 - Hardcode colors in widgets (`color: Colors.grey[900]`) *unless its an easter egg*  
-- Use bright turquoise for body text  
+- Use light grey for body text  
 - Create high-contrast color blocks everywhere  
 - Add new colors without updating `AppColors`
 
@@ -440,16 +441,73 @@ progress \= completedRequiredSteps / totalRequiredSteps
 
 ---
 
-## 3\. Implementation Plan
+## 3\. UI/UX Development Roadmap
 
-### Phase 1: Theme Foundation (Week 1\)
+### Completed Milestones ✅
+
+**Theme Foundation (December 23-27, 2025)**
+- ✅ Updated global color palette in `app_theme.dart`
+  - Implemented BingBlue, PowOrange, RadScarlet, Ding*Grey variants
+  - Added DuffLightBlue, DuffLightGreen for states
+- ✅ Configured `ColorScheme.dark()` with new colors
+- ✅ Updated all theme components (buttons, inputs, cards, dialogs, menus)
+- ✅ Refactored login page to use theme colors exclusively
+- ✅ Fixed text visibility (dark text on light input backgrounds)
+- ✅ Adjusted button heights and padding
+- ✅ Increased hint text size to 16.0 for readability
+- ✅ Created font size constants (`tbLarge`, `tbMed`)
+- ✅ Darkened input backgrounds (RGB 228 → 200 for better contrast)
+
+### Current Task 🎯
+
+**Onboarding Wizard Implementation (Starting December 27, 2025)**
+- [ ] Build step navigation controller with progress tracking
+- [ ] Create welcome screen (privacy overview)
+- [ ] Create identity screen (username, avatar upload)
+- [ ] Create language & education screen
+- [ ] Create interests selection screen
+- [ ] Create notifications preferences screen
+- [ ] Create finish/summary screen
+- [ ] Implement skip/back/next navigation logic
+- [ ] Add resume-to-incomplete behavior
+- [ ] Calculate profile completion percentage
+- [ ] Navigate to onboarding after successful registration
+
+### Upcoming Tasks 📋
+
+**Profile Page (Phase 2)**
+- Build profile header with avatar display
+- Create editable sections reusing wizard components
+- Add stats card (stub with sample data)
+- Implement "Complete your profile" banner
+- Add privacy footer with policy links
+- Enable edit mode (re-enter wizard for specific sections)
+
+**Theme Refinement (Ongoing)**
+- Build theme preview dev screen
+- Audit remaining pages for hardcoded colors
+- Test contrast ratios on physical device
+- Accessibility audit (screen readers, touch targets)
+
+**Advanced Features (Future)**
+- Badges/achievements system
+- Study schedule calendar
+- Data export/deletion tools
+- Advanced profile settings (demographic fields)
+- Cloud sync integration for profiles
+
+---
+
+## 4\. Implementation Plan
+
+### Phase 1: Theme Foundation (Week 1\) ✅ COMPLETED
 
 1. Audit existing color usage  
 2. Create `AppTheme` with `ColorScheme.dark()`  
 3. Build theme preview dev screen  
 4. Refactor top 10 most-used widgets
 
-### Phase 2: Profile Data & Wizard (Week 2\)
+### Phase 2: Profile Data & Wizard (Week 2\) 🎯 IN PROGRESS
 
 1. Implement `UserProfile` model \+ repository  
 2. Build onboarding step screens  
@@ -472,7 +530,7 @@ progress \= completedRequiredSteps / totalRequiredSteps
 
 ---
 
-## 4\. Success Metrics
+## 5\. Success Metrics
 
 ### Theme Quality
 
@@ -493,7 +551,7 @@ progress \= completedRequiredSteps / totalRequiredSteps
 
 ---
 
-## 5\. Non-Functional Requirements
+## 6\. Non-Functional Requirements
 
 ### Performance
 
@@ -515,7 +573,7 @@ progress \= completedRequiredSteps / totalRequiredSteps
 
 ---
 
-## 6\. References
+## 7\. References
 
 - **Material 3 Design:** [https://m3.material.io](https://m3.material.io)  
 - **WCAG Guidelines:** [https://www.w3.org/WAI/WCAG21/quickref/](https://www.w3.org/WAI/WCAG21/quickref/)  
@@ -524,7 +582,7 @@ progress \= completedRequiredSteps / totalRequiredSteps
 
 ---
 
-## 7\. Alignment with Existing Codebase
+## 8\. Alignment with Existing Codebase
 
 ### Database Integration
 
@@ -559,7 +617,7 @@ progress \= completedRequiredSteps / totalRequiredSteps
 
 ---
 
-## 8\. Key Differences from Initial Proposal
+## 9\. Key Differences from Initial Proposal
 
 This spec has been **aligned with the actual Quizzer codebase** and differs from generic approaches:
 
@@ -578,3 +636,13 @@ This spec has been **aligned with the actual Quizzer codebase** and differs from
 **Last Updated:** December 18, 2025  
 **Next Review:** December 25, 2025  
 **Codebase Alignment Check:**  Completed  
+
+**Nathans Notes:** 
+flutter clean
+flutter pub get
+
+# Make sure the emulator is running (Pixel_2_API_28 / emulator-5554)
+flutter devices
+
+# Then run on the Android emulator
+flutter run -d emulator-5554

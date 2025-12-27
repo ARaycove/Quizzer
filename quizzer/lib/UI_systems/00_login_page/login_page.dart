@@ -158,7 +158,7 @@ class _LoginPageState extends State<LoginPage> {
                   obscureText: true,
                   enabled: !_isLoading,
                   decoration: const InputDecoration(
-                    hintText: "Password"  ,
+                    hintText: "Password",
                   ),
                 ),
               ),
@@ -211,6 +211,9 @@ class _LoginPageState extends State<LoginPage> {
               // New User Sign Up Button
               ElevatedButton(
                 onPressed: _isLoading ? null : newUserSignUp,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.powOrangeDim,
+                ),
                 child: const Text("New User"),
               ),
             ],

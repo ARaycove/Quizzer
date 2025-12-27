@@ -1,27 +1,37 @@
 import 'package:flutter/material.dart';
 
 /// Central theme configuration for the Quizzer app.
+/// Theme: "Orbit Dark" - High-contrast dark theme for developer tools and dashboards
 class AppTheme {
-  // New Color Palette
-  static const Color bingBlue = Color(0xFF4d87f2); // Primary brand color
-  static const Color powOrange = Color(0xFFfc9000); // Secondary accent
-  static const Color powOrangeDark = Color(0xFFb85a02); // Dark variant
-  static const Color radScarlet = Color(0xFFb25d7a); // Tertiary accent
-
-  static const Color dingBrightGrey =
-      Color.fromARGB(255, 228, 228, 228); // Input backgrounds, light elements
-  static const Color dingLightGrey =
-      Color(0xFFa3a8ae); // Secondary text, borders
-  static const Color dingLineGrey =
-      Color.fromARGB(255, 70, 70, 70); // Dividers, subtle borders
-  static const Color dingMidGrey =
-      Color.fromARGB(255, 60, 60, 60); // Primary text on light backgrounds
-  static const Color dingDarkGrey =
-      Color.fromARGB(255, 32, 32, 32); // Deep background
-
-  static const Color duffLightBlue =
-      Color(0xFFbce0fb); // Info states, highlights
-  static const Color duffLightGreen = Color(0xFFc9efb7); // Success states
+  // === NEUTRAL SCALE (Backgrounds & Borders) ===
+  static const Color bgCanvas = Color(0xFF121212); // Deepest void - main background
+  static const Color bgSurface = Color(0xFF1E1E1E); // Soft charcoal - cards, editor
+  static const Color bgElevated = Color(0xFF2D2E30); // Lighter grey - dropdowns, modals
+  static const Color bgInput = Color(0xFF161616); // Input black - text fields, terminal
+  
+  static const Color borderBase = Color(0xFF333333); // Subtle divider
+  static const Color borderActive = Color(0xFF454545); // Active divider - focus rings
+  
+  // === TYPOGRAPHY ===
+  static const Color textPrimary = Color(0xFFEDEDED); // Off-white - main text
+  static const Color textMuted = Color(0xFF9E9E9E); // Neutral grey - labels, secondary
+  static const Color textDisabled = Color(0xFF5F5F5F); // Dark grey - disabled states
+  
+  // === BRAND & ACTION (The Greens) ===
+  static const Color brandPrimary = Color(0xFF3ECF8E); // Electric mint - primary actions
+  static const Color brandHover = Color(0xFF34B27B); // Deep mint - hover states
+  static const Color brandSurface = Color(0xFF003D26); // Dark emerald - subtle fills
+  static const Color brandDark = Color(0xFF006F45); // Run button background
+  static const Color brandContrast = Color(0xFF000000); // Text on mint
+  
+  // === DATA VISUALIZATION (The Accents) ===
+  static const Color chartBlue = Color(0xFF669DF6); // Cornflower - info, links
+  static const Color chartPink = Color(0xFFFF4081); // Neon rose - errors, critical
+  static const Color chartOrange = Color(0xFFF59E0B); // Amber - warnings
+  static const Color chartPurple = Color(0xFFB794F6); // Lavender - 4th data color
+  
+  // === UTILITY ===
+  static const Color selection = Color(0xFF3A3D41); // Text highlight
 
   /// Returns the complete app theme configuration
   static ThemeData get darkTheme => ThemeData(
@@ -107,7 +117,7 @@ class AppTheme {
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
             backgroundColor: bingBlue,
-            foregroundColor: dingLineGrey,
+            foregroundColor: dingDarkGrey,
             textStyle:
                 const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
             shape: RoundedRectangleBorder(
@@ -121,10 +131,17 @@ class AppTheme {
         ),
 
         // Floating Action Button Theme
-        floatingActionButtonTheme: const FloatingActionButtonThemeData(
-          backgroundColor: powOrange,
-          foregroundColor: dingMidGrey,
+        floatingActionButtonTheme: FloatingActionButtonThemeData(
+          backgroundColor: powOrangeDim,
+          foregroundColor: dingDarkGrey,
           elevation: 1.0,
+          extendedTextStyle:
+              const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          extendedPadding:
+              const EdgeInsets.symmetric(horizontal: 18.0, vertical: 8.0),
         ),
 
         // Icon Theme
