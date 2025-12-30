@@ -1,206 +1,130 @@
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_profile_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/sql_table.dart';
+import 'package:quizzer/backend_systems/01_account_creation_and_management/account_manager.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/table_helper.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 
-import '../table_helper.dart'; // Import the helper file
-import 'package:quizzer/backend_systems/09_switch_board/sb_sync_worker_signals.dart'; // Import sync signals
-import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
+class LoginAttemptsTable extends SqlTable {
+  static final LoginAttemptsTable _instance = LoginAttemptsTable._internal();
+  factory LoginAttemptsTable() => _instance;
+  LoginAttemptsTable._internal();
 
-/// Verifies that all necessary columns, including sync fields, exist in the login_attempts table.
-/// Adds missing columns if the table exists but is missing them.
-Future<void> verifyLoginAttemptsTable(dynamic db) async {
-  final List<Map<String, dynamic>> tables = await db.rawQuery(
-    "SELECT name FROM sqlite_master WHERE type='table' AND name='login_attempts'"
-  );
-  if (tables.isEmpty) {
-    await db.execute('''
-    CREATE TABLE login_attempts(
-      login_attempt_id TEXT PRIMARY KEY,
-      user_id TEXT,
-      email TEXT NOT NULL,
-      timestamp TEXT NOT NULL,
-      status_code TEXT NOT NULL,
-      ip_address TEXT,
-      device_info TEXT,
-      has_been_synced INTEGER DEFAULT 0,
-      edits_are_synced INTEGER DEFAULT 0,
-      last_modified_timestamp TEXT,
-      FOREIGN KEY (user_id) REFERENCES user_profile(uuid)
-    )
-    ''');
-  }
+  @override
+  bool get isTransient => true;
 
-  // Table exists, check for specific columns.
-  final List<Map<String, dynamic>> columns = await db.rawQuery(
-    "PRAGMA table_info(login_attempts)"
-  );
+  @override
+  bool requiresInboundSync = false;
+
+  @override
+  dynamic get additionalFiltersForInboundSync => null;
+
+  @override
+  bool get useLastLoginForInboundSync => false;
+
+  @override
+  String get tableName => 'login_attempts';
+
+  @override
+  List<String> get primaryKeyConstraints => ['login_attempt_id'];
   
-  final Set<String> columnNames = columns.map((column) => column['name'] as String).toSet();
+  @override
+  List<Map<String, String>> get expectedColumns => [
+    {'name': 'login_attempt_id', 'type': 'TEXT'},
+    {'name': 'user_id', 'type': 'TEXT'},
+    {'name': 'email', 'type': 'TEXT NOT NULL'},
+    {'name': 'timestamp', 'type': 'TEXT NOT NULL'},
+    {'name': 'status_code', 'type': 'TEXT NOT NULL'},
+    {'name': 'ip_address', 'type': 'TEXT'},
+    {'name': 'device_info', 'type': 'TEXT'},
+    {'name': 'has_been_synced', 'type': 'INTEGER DEFAULT 0'},
+    {'name': 'edits_are_synced', 'type': 'INTEGER DEFAULT 0'},
+    {'name': 'last_modified_timestamp', 'type': 'TEXT'},
+  ];
 
-  if (!columnNames.contains('has_been_synced')) {
-    QuizzerLogger.logMessage('Adding has_been_synced column to login_attempts table.');
-    await db.execute('ALTER TABLE login_attempts ADD COLUMN has_been_synced INTEGER DEFAULT 0');
-  }
-  if (!columnNames.contains('edits_are_synced')) {
-    QuizzerLogger.logMessage('Adding edits_are_synced column to login_attempts table.');
-    await db.execute('ALTER TABLE login_attempts ADD COLUMN edits_are_synced INTEGER DEFAULT 0');
-  }
-  if (!columnNames.contains('last_modified_timestamp')) {
-    QuizzerLogger.logMessage('Adding last_modified_timestamp column to login_attempts table.');
-    await db.execute('ALTER TABLE login_attempts ADD COLUMN last_modified_timestamp TEXT');
-  }
-}
+  @override
+  Future<bool> validateRecord(Map<String, dynamic> dataToInsert) async {
+    final String? email = dataToInsert['email'] as String?;
+    final String? statusCode = dataToInsert['status_code'] as String?;
 
-Future<bool> addLoginAttemptRecord({
-  required String email,
-  required String statusCode,
-}) async {
-  try {
-    String? userId;
-    try {
-      userId = await getUserIdByEmail(email);
-    } on StateError catch (e) {
-      if (e.message == "INVALID, NO USERID WITH THAT EMAIL. . .") {
-        QuizzerLogger.logWarning('Failed to record login attempt for email "$email": User email not found in local user_profile table. No login attempt will be recorded.');
-        return false; // Indicate failure to record, do not proceed to insert.
-      } else {
-        // For any other StateError, rethrow as it's unexpected.
-        QuizzerLogger.logError('Unexpected StateError while getting user ID for login attempt: $e');
-        rethrow;
+    if (email == null || email.isEmpty) {
+      QuizzerLogger.logError('Login attempt validation failed: email is missing.');
+      return false;
+    }
+
+    if (statusCode == null || statusCode.isEmpty) {
+      QuizzerLogger.logError('Login attempt validation failed: status_code is missing.');
+      return false;
+    }
+    return true;
+  }
+
+  @override
+  Future<Map<String, dynamic>> finishRecord(Map<String, dynamic> dataToInsert) async {
+    final String email = dataToInsert['email'] as String? ?? '';
+    final String statusCode = dataToInsert['status_code'] as String? ?? '';
+    
+    if (email.isEmpty || statusCode.isEmpty) {
+      QuizzerLogger.logError('Cannot finish login attempt record: missing email or status code.');
+      return dataToInsert;
+    }
+    
+    final String now = DateTime.now().toUtc().toIso8601String();
+    
+    // ALWAYS ensure login_attempt_id exists
+    if (!dataToInsert.containsKey('login_attempt_id') || 
+        dataToInsert['login_attempt_id'] == null || 
+        (dataToInsert['login_attempt_id'] is String && (dataToInsert['login_attempt_id'] as String).isEmpty)) {
+      // Generate a unique ID
+      String? userId;
+      try {
+        userId = await AccountManager().getUserIdByEmail(email);
+      } catch (e) {
+        QuizzerLogger.logMessage("No user logged in, logging attempt anyway. . .\n $e");
       }
-    } catch (e) {
-      // Catch any other unexpected error during getUserIdByEmail
-      QuizzerLogger.logError('Unexpected error while getting user ID for login attempt: $e');
-      rethrow; // Fail fast for other errors
+      
+      final String idSuffix = userId ?? "FailedLoginAttempt"; 
+      dataToInsert['login_attempt_id'] = now + idSuffix;
     }
     
-    final db = await getDatabaseMonitor().requestDatabaseAccess();
-    if (db == null) {
-      throw Exception('Failed to acquire database access');
+    // ALWAYS ensure timestamp exists for new records
+    if (!dataToInsert.containsKey('timestamp') || 
+        dataToInsert['timestamp'] == null || 
+        (dataToInsert['timestamp'] is String && (dataToInsert['timestamp'] as String).isEmpty)) {
+      dataToInsert['timestamp'] = now;
     }
     
-    String ipAddress = await getUserIpAddress();
-    String deviceInfo = await getDeviceInfo();
+    // Fill in other data if missing
+    if (!dataToInsert.containsKey('user_id') || dataToInsert['user_id'] == null) {
+      String? userId;
+      try {
+        userId = await AccountManager().getUserIdByEmail(email);
+      } catch (e) {
+        // Already logged above
+      }
+      dataToInsert['user_id'] = userId;
+    }
     
-    // Current timestamp in ISO 8601 format
-    final String timestamp = DateTime.now().toUtc().toIso8601String();
-    final String loginAttemptId = timestamp + userId;
+    if (!dataToInsert.containsKey('ip_address') || dataToInsert['ip_address'] == null) {
+      dataToInsert['ip_address'] = await getUserIpAddress();
+    }
     
-    // Prepare the raw data map
-    final Map<String, dynamic> data = {
-      'login_attempt_id': loginAttemptId,
-      'user_id': userId, // Can be null if getUserIdByEmail returns invalid
-      'email': email,
-      'timestamp': timestamp,
-      'status_code': statusCode,
-      'ip_address': ipAddress,
-      'device_info': deviceInfo,
-      'has_been_synced': 0,
-      'edits_are_synced': 0,
-      'last_modified_timestamp': timestamp,
-    };
-
-    // Use the universal insert helper
-    final int result = await insertRawData('login_attempts', data, db);
-
-    if (result > 0) {
-      QuizzerLogger.logMessage('Login attempt recorded successfully: $loginAttemptId');
-      // Signal the SwitchBoard that new data might need syncing
-      signalOutboundSyncNeeded();
-      return true;
-    } else {
-      // Log a warning if insert returned 0 (should not happen without conflict algorithm)
-      QuizzerLogger.logWarning('Insert operation for login attempt $loginAttemptId returned 0. This is unexpected.');
-      return false; // Indicate potential failure
+    if (!dataToInsert.containsKey('device_info') || dataToInsert['device_info'] == null) {
+      dataToInsert['device_info'] = await getDeviceInfo();
     }
-  } catch (e) {
-    QuizzerLogger.logError('Error adding login attempt record - $e');
-    rethrow;
-  } finally {
-    getDatabaseMonitor().releaseDatabaseAccess();
+    
+    // For NEW records, set sync flags and timestamps
+    // Check if this looks like a new record (no primary key was provided initially)
+    final bool isNewRecord = !dataToInsert.containsKey('login_attempt_id') || 
+                            dataToInsert['login_attempt_id'] == null ||
+                            (dataToInsert['login_attempt_id'] is String && 
+                            (dataToInsert['login_attempt_id'] as String).isEmpty);
+    
+    if (isNewRecord) {
+      dataToInsert['last_modified_timestamp'] = now;
+      dataToInsert['has_been_synced'] = 0;
+      dataToInsert['edits_are_synced'] = 0;
+    }
+    
+    return dataToInsert;
   }
-}
-
-/// Fetches all login attempts that need outbound synchronization.
-/// This includes records that have never been synced (`has_been_synced = 0`)
-/// or records that have local edits pending sync (`edits_are_synced = 0`).
-/// Login attempts are not typically edited, so `edits_are_synced` might always be 0 or 1 after initial sync.
-/// Does NOT decode the records.
-Future<List<Map<String, dynamic>>> getUnsyncedLoginAttempts() async {
-  try {
-    final db = await getDatabaseMonitor().requestDatabaseAccess();
-    if (db == null) {
-      throw Exception('Failed to acquire database access');
-    }
-    QuizzerLogger.logMessage('Fetching unsynced login attempts...');
-
-    final List<Map<String, dynamic>> results = await db.query(
-      'login_attempts',
-      where: 'has_been_synced = 0 OR edits_are_synced = 0', // Though edits_are_synced might be less relevant here
-    );
-
-    QuizzerLogger.logSuccess('Fetched ${results.length} unsynced login attempts.');
-    return results;
-  } catch (e) {
-    QuizzerLogger.logError('Error getting unsynced login attempts - $e');
-    rethrow;
-  } finally {
-    getDatabaseMonitor().releaseDatabaseAccess();
-  }
-}
-
-// --- Delete Record ---
-
-/// Gets login attempts for a specific user by email
-/// Returns a list of login attempt records for the given email
-Future<List<Map<String, dynamic>>> getLoginAttemptsByEmail(String email) async {
-  try {
-    final db = await getDatabaseMonitor().requestDatabaseAccess();
-    if (db == null) {
-      throw Exception('Failed to acquire database access');
-    }
-    QuizzerLogger.logMessage('Fetching login attempts for email: $email');
-
-    final List<Map<String, dynamic>> results = await db.query(
-      'login_attempts',
-      where: 'email = ?',
-      whereArgs: [email],
-      orderBy: 'timestamp DESC', // Most recent first
-    );
-
-    QuizzerLogger.logSuccess('Fetched ${results.length} login attempts for email: $email');
-    return results;
-  } catch (e) {
-    QuizzerLogger.logError('Error getting login attempts for email: $email - $e');
-    rethrow;
-  } finally {
-    getDatabaseMonitor().releaseDatabaseAccess();
-  }
-}
-
-/// Deletes a specific login attempt record from the local database.
-Future<int> deleteLoginAttemptRecord(String loginAttemptId) async {
-  try {
-    final db = await getDatabaseMonitor().requestDatabaseAccess();
-    if (db == null) {
-      throw Exception('Failed to acquire database access');
-    }
-    QuizzerLogger.logMessage('Deleting local login attempt record: $loginAttemptId');
-    // Remove try-catch, let errors propagate (Fail Fast for local DB ops)
-    final int count = await db.delete(
-      'login_attempts',
-      where: 'login_attempt_id = ?',
-      whereArgs: [loginAttemptId],
-    );
-    if (count == 0) {
-      QuizzerLogger.logWarning('Attempted to delete login attempt $loginAttemptId, but no record was found.');
-    } else {
-      QuizzerLogger.logSuccess('Successfully deleted local login attempt $loginAttemptId.');
-    }
-    return count;
-  } catch (e) {
-    QuizzerLogger.logError('Error deleting login attempt record - $e');
-    rethrow;
-  } finally {
-    getDatabaseMonitor().releaseDatabaseAccess();
-  }
+  
 }

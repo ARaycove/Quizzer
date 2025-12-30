@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:quizzer/backend_systems/05_question_queue_server/circulation_worker.dart';
-import 'package:quizzer/backend_systems/05_question_queue_server/user_question_manager.dart';
+import 'package:quizzer/backend_systems/05_question_queue_server/user_questions/user_question_manager.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/09_switch_board/switch_board.dart';
 import 'package:quizzer/backend_systems/09_switch_board/sb_question_worker_signals.dart';

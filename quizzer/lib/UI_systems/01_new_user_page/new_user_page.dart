@@ -20,7 +20,6 @@ class _NewUserPageState extends State<NewUserPage> {
     final TextEditingController _passwordController = TextEditingController();
     final TextEditingController _confirmPasswordController =
     TextEditingController();
-    SessionManager session = getSessionManager();
 
     @override
     void dispose() {
@@ -65,7 +64,7 @@ class _NewUserPageState extends State<NewUserPage> {
             );
             return;
         }
-        Map<String, dynamic> results = await session.createNewUserAccount(
+        Map<String, dynamic> results = await SessionManager().createNewUserAccount(
             email: email, username: username, password: password);
 
         if (!results['success']) {

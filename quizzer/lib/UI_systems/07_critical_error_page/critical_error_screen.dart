@@ -24,7 +24,6 @@ class _CriticalErrorScreenState extends State<CriticalErrorScreen> { // State cl
   int _pokeCount = 0; // For the Easter egg
   int _emojiOverlayCount = 0; // For the emoji overlay
   final Random _random = Random(); // For selecting random messages
-  final SessionManager _sessionManager = getSessionManager(); // Get SessionManager instance
 
   String? _reportedErrorId;
   bool _isReportingInitialError = false;
@@ -66,7 +65,7 @@ class _CriticalErrorScreenState extends State<CriticalErrorScreen> { // State cl
     QuizzerLogger.logMessage('CriticalErrorScreen: Auto-reporting initial error.');
     String? errorId;
     // No try-catch as per instructions.
-    errorId = await _sessionManager.reportError(
+    await SessionManager().reportError(
       errorMessage: widget.errorDetails.message,
     );
     
@@ -118,9 +117,8 @@ class _CriticalErrorScreenState extends State<CriticalErrorScreen> { // State cl
 
       final String feedbackText = _feedbackController.text;
       QuizzerLogger.logMessage('CriticalErrorScreen: Submitting user feedback for error ID: $_reportedErrorId');
-      
-      // No try-catch as per instructions.
-      await _sessionManager.reportError(
+
+      await SessionManager().reportError(
         id: _reportedErrorId!, // Use the stored ID
         userFeedback: feedbackText,
         // errorMessage and logFile are not needed for an update

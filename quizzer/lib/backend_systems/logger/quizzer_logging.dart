@@ -40,20 +40,14 @@ class QuizzerLogger {
 
   // --- Source Filtering --- 
   static List<String> _excludedSources = [
-    "modules_table.dart",
-    "user_question_answer_pairs_table.dart",
-    "user_question_processes.dart",
-    "database_monitor.dart",
-    "sb_sync_worker_signals.dart",
-    "sb_cache_signals.dart",
-    "sb_database_signals.dart",
-    // "user_module_activation_status_table.dart",
-    "question_answer_attempts_table.dart",
     "media_sync_worker.dart",
-    "login_attempts_table.dart",
-    "question_answer_pair_flags_table.dart",
-    "widget_multiple_choice_question.dart",
-    "stat_update_aggregator.dart"
+    "database_monitor.dart",
+    "sb_database_signals.dart",
+    "file_locations.dart",
+    "question_validator.dart",
+    "sb_sync_worker_signals.dart",
+    "sql_table.dart",
+    "attempt_pre_process.dart",
   ]; // List of source filenames to exclude
 
   // --- Level-Specific Source Lists ---

@@ -16,23 +16,20 @@ import 'package:logging/logging.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart'; // Import logging package
 import 'package:quizzer/UI_systems/10_stats_page/stats_page.dart';
 import 'package:quizzer/app_theme.dart';
-import 'UI_systems/11_reset_password_page/reset_password_page.dart';
-import 'backend_systems/00_database_manager/database_monitor.dart';
-import 'backend_systems/00_database_manager/tables/user_profile/user_profile_table.dart';
+// import 'UI_systems/11_reset_password_page/reset_password_page.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/initialization_table_verification.dart';
 
-// Global Key for NavigatorState - MOVED HERE
+
+// Global Key for NavigatorState
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   // Zone-based error handler
   runZonedGuarded(() async {
     WidgetsFlutterBinding.ensureInitialized();
-    SessionManager session = getSessionManager(); // Force initialization of session at startup
     // Initialize DB and schema before UI starts
-    final db = await getDatabaseMonitor().requestDatabaseAccess();
-    await verifyUserProfileTable(db);
-    getDatabaseMonitor().releaseDatabaseAccess();
-    session.userId; // Just here to get rid of the warning message. . .
+    InitializationTableVerification().verifyOnStartup();
+    SessionManager().userId; // Just here to get rid of the warning message. . .
     QuizzerLogger.setupLogging(level: Level.FINE);
 
     // Global error handler for Flutter framework errors
@@ -120,7 +117,7 @@ class _QuizzerAppState extends State<QuizzerApp> {
       initialRoute: '/login',
       routes: {
         '/login':           (context) => const LoginPage(),
-        '/resetPassword':   (context) => const ResetPasswordPage(),
+        // '/resetPassword':   (context) => const ResetPasswordPage(),
         '/home':            (context) => const HomePage(),
         '/menu':            (context) => const MenuPage(),
         '/add_question':    (context) => const AddQuestionAnswerPage(),

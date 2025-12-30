@@ -1,105 +1,12 @@
 import 'package:ml_dataframe/ml_dataframe.dart';
-import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
-// import 'package:ml_algo/ml_algo.dart';
 import 'package:ml_preprocessing/ml_preprocessing.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
+import 'package:quizzer/backend_systems/04_ml_modeling/ml_model_manager.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
+import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/table_helper.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/ml_models_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_attempts_table.dart';
 import 'package:quizzer/backend_systems/05_question_queue_server/circulation_worker.dart';
-
-/// Loads all training data from the question_answer_attempts table in Supabase
-/// and converts it into an ML DataFrame for model training.
-/// 
-/// Args:
-///   limit: Optional limit on number of records. If null, gets ALL records using pagination.
-///          If 5, gets only 5 records for testing.
-/// 
-/// Returns a DataFrame containing all the attempt records with properly
-/// structured columns for machine learning operations.
-/// 
-/// Throws:
-///   Exception: If Supabase query fails or data conversion issues occur
-Future<DataFrame> loadQuestionAnswerAttemptsFromSupabase({int? limit}) async {
-  try {
-    QuizzerLogger.logMessage('Starting to load question answer attempts from Supabase...');
-    
-    final supabase = getSessionManager().supabase;
-    
-    List<Map<String, dynamic>> processedData = [];
-    
-    if (limit != null) {
-      // Get only 5 records for testing
-      QuizzerLogger.logMessage('Executing limited Supabase query for 5 records...');
-      final List<dynamic> rawData = await supabase
-          .from('question_answer_attempts')
-          .select('*')
-          .order('time_stamp', ascending: false)
-          .limit(limit);
-      
-      processedData = rawData.cast<Map<String, dynamic>>();
-    } else {
-      // Get ALL records using pagination
-      QuizzerLogger.logMessage('Executing paginated Supabase query for ALL records...');
-      
-      const int pageSize = 1000; // Supabase limit
-      int offset = 0;
-      bool hasMoreData = true;
-      
-      while (hasMoreData) {
-        QuizzerLogger.logMessage('Fetching batch starting at offset $offset...');
-        
-        final List<dynamic> batchData = await supabase
-            .from('question_answer_attempts')
-            .select('*')
-            .order('time_stamp', ascending: false)
-            .range(offset, offset + pageSize - 1);
-        
-        if (batchData.isEmpty || batchData.length < pageSize) {
-          hasMoreData = false;
-        }
-        
-        processedData.addAll(batchData.cast<Map<String, dynamic>>());
-        offset += pageSize;
-        
-        QuizzerLogger.logMessage('Fetched ${batchData.length} records, total so far: ${processedData.length}');
-      }
-    }
-    
-    QuizzerLogger.logMessage('Retrieved ${processedData.length} total records from Supabase');
-    
-    if (processedData.isEmpty) {
-      QuizzerLogger.logWarning('No records found in question_answer_attempts table');
-      return DataFrame([]);
-    }
-    
-    QuizzerLogger.logMessage('Processing data for DataFrame conversion...');
-    
-    // Get column headers from the first record
-    final List<String> headers = processedData.first.keys.toList();
-    
-    // Create data rows - each row is a List of values in the same order as headers
-    final List<List<dynamic>> rows = processedData.map((record) {
-      return headers.map((header) => record[header]).toList();
-    }).toList();
-    
-    // Combine headers and data rows
-    final List<List<dynamic>> allData = [headers, ...rows];
-    
-    // Create DataFrame using the standard constructor
-    final DataFrame dataFrame = DataFrame(allData);
-    
-    QuizzerLogger.logSuccess('Successfully created DataFrame with ${dataFrame.rows.length} rows and ${dataFrame.header.length} columns');
-    QuizzerLogger.logValue('DataFrame columns: ${dataFrame.header.join(', ')}');
-    
-    return dataFrame;
-  } catch (e) {
-    QuizzerLogger.logError('Error loading question answer attempts from Supabase - $e');
-    rethrow;
-  }
-}
-
+import 'package:quizzer/backend_systems/05_question_queue_server/user_questions/user_answer_submitter.dart';
 
 /// Converts embedded JSON strings in the DataFrame to proper Dart types
 /// using the existing decodeValueFromDB function from table_helper.dart.
@@ -629,17 +536,12 @@ Future<DataFrame> oneHotEncodeDataFrame(DataFrame inputDataFrame) async {
   return encodedDataFrame;
 }
 
-Future<DataFrame> transformDataFrameToAccuracyNetInputShape(DataFrame processedDataFrame) async {
-  final modelRecord = await getMlModel('accuracy_net');
+Future<DataFrame> reshapeDataFrameToAccuracyNetInputShape(DataFrame processedDataFrame) async {
+  // Use the new MlModelManager to get model information
+  final modelInfo = await MlModelManager().getAccuracyNetModel();
   
-  if (modelRecord == null) {
-    throw Exception('accuracy_net model not found in ml_models table');
-  }
-  
-  final dynamic inputFeaturesData = modelRecord['input_features'];
-  final Map<String, dynamic> featureMap = inputFeaturesData is String 
-      ? decodeValueFromDB(inputFeaturesData) as Map<String, dynamic>
-      : inputFeaturesData as Map<String, dynamic>;
+  // Extract the input features map (already properly decoded by MlModelManager)
+  final Map<String, dynamic> featureMap = modelInfo['input_features'] as Map<String, dynamic>;
   
   final currentHeaders = processedDataFrame.header.toList();
   final currentRows = processedDataFrame.rows.map((row) => row.toList()).toList();
@@ -647,6 +549,7 @@ Future<DataFrame> transformDataFrameToAccuracyNetInputShape(DataFrame processedD
   final List<String> orderedFeatures = [];
   final List<dynamic> defaultValues = [];
   
+  // Sort features by position to maintain correct input order for the model
   final sortedEntries = featureMap.entries.toList()
     ..sort((a, b) {
       final posA = (a.value as Map<String, dynamic>)['pos'] as int;
@@ -654,16 +557,19 @@ Future<DataFrame> transformDataFrameToAccuracyNetInputShape(DataFrame processedD
       return posA.compareTo(posB);
     });
   
+  // Build ordered feature list and default values
   for (final entry in sortedEntries) {
     orderedFeatures.add(entry.key);
     defaultValues.add((entry.value as Map<String, dynamic>)['default_value']);
   }
   
+  // Create index map for quick header lookups
   final Map<String, int> currentHeaderIndex = {};
   for (int i = 0; i < currentHeaders.length; i++) {
     currentHeaderIndex[currentHeaders[i]] = i;
   }
   
+  // Transform each row to match the model's expected input shape
   final List<List<dynamic>> inferenceRows = [];
   
   for (final row in currentRows) {
@@ -674,18 +580,21 @@ Future<DataFrame> transformDataFrameToAccuracyNetInputShape(DataFrame processedD
       
       if (currentHeaderIndex.containsKey(featureName)) {
         final value = row[currentHeaderIndex[featureName]!];
+        // Handle null or invalid values by using defaults
         if (value == null || (value is num && !value.isFinite)) {
           inferenceRow.add(defaultValue);
         } else {
           inferenceRow.add(value);
         }
       } else {
+        // Feature not present in current data, use default
         inferenceRow.add(defaultValue);
       }
     }
     inferenceRows.add(inferenceRow);
   }
   
+  // Create new DataFrame with properly ordered features
   final inferenceData = [orderedFeatures, ...inferenceRows];
   
   return DataFrame(inferenceData);
@@ -707,9 +616,7 @@ Future<DataFrame> transformDataFrameToAccuracyNetInputShape(DataFrame processedD
 /// - 'primary_keys': DataFrame with user_uuid and question_id columns
 /// - 'raw_inference_data': DataFrame with all features needed for inference
 Future<Map<String, DataFrame>> fetchBatchInferenceSamples({required int nRecords, required int kMinutes}) async {
-  // Validate user session
-  final userId = getSessionManager().userId;
-  if (userId == null) throw Exception('User ID is null');
+  if (SessionManager().userId == null) throw Exception('User ID is null');
   
   // Get eligible questions from CirculationWorker's cached sets
   // Combines circulating questions and non-circulating questions connected to circulation
@@ -726,6 +633,7 @@ Future<Map<String, DataFrame>> fetchBatchInferenceSamples({required int nRecords
   
   // Acquire database access
   final db = await getDatabaseMonitor().requestDatabaseAccess();
+
   if (db == null) throw Exception('Failed to acquire database access');
   
   // Calculate cutoff time for filtering stale calculations
@@ -753,10 +661,11 @@ Future<Map<String, DataFrame>> fetchBatchInferenceSamples({required int nRecords
   ''';
   
   // Execute query with user_id, all eligible question IDs, cutoff time, and limit
-  final pairs = await db.rawQuery(pairsQuery, [userId, ...eligibleQuestions, cutoffTime, nRecords]);
+  final pairs = await db.rawQuery(pairsQuery, [SessionManager().userId, ...eligibleQuestions, cutoffTime, nRecords]);
   
   // Early return if no pairs found
   if (pairs.isEmpty) {
+    QuizzerLogger.logMessage("No eligible user-question pairs found for batch inference (prediction net)");
     getDatabaseMonitor().releaseDatabaseAccess();
     return {
       'primary_keys': DataFrame([]),
@@ -768,8 +677,11 @@ Future<Map<String, DataFrame>> fetchBatchInferenceSamples({required int nRecords
   
   // Prepare common data needed for all samples
   final timeStamp = DateTime.now().toUtc().toIso8601String();
-  final userStatsVector = await fetchUserStatsVector(db: db, userId: userId);
-  final userProfileRecord = await fetchUserProfileRecord(db: db, userId: userId);
+  final userStatsVector = await UserAnswerSubmitter().fetchUserStatsVector(db: db, userId: SessionManager().userId!);
+  QuizzerLogger.logMessage("Fetched user stats vector for user ${SessionManager().userId}: $userStatsVector");
+  
+  final userProfileRecord = await UserAnswerSubmitter().fetchUserProfileRecord(db: db, userId: SessionManager().userId!);
+  QuizzerLogger.logMessage("Fetched user profile record for user ${SessionManager().userId}: $userProfileRecord");
   
   // Storage for constructed samples and their primary keys
   final List<Map<String, dynamic>> samples = [];
@@ -780,16 +692,23 @@ Future<Map<String, DataFrame>> fetchBatchInferenceSamples({required int nRecords
     final questionId = pair['question_id'] as String;
     
     // Fetch question metadata (type, options, etc.)
-    final questionMetadata = await fetchQuestionMetadata(db: db, questionId: questionId);
+    final questionMetadata = await UserAnswerSubmitter().fetchQuestionMetadata(db: db, questionId: questionId);
+    QuizzerLogger.logMessage("Fetched question metadata for question $questionId");
     
     // Fetch user's performance on this specific question
-    final userQuestionPerformance = await fetchUserQuestionPerformance(db: db, userId: userId, questionId: questionId, timeStamp: timeStamp);
+    final userQuestionPerformance = await UserAnswerSubmitter().fetchUserQuestionPerformance(
+      db: db, userId: SessionManager().userId!, questionId: questionId, timeStamp: timeStamp);
+    QuizzerLogger.logMessage("Fetched user question performance for user ${SessionManager().userId} on question $questionId: $userQuestionPerformance");
     
     // Fetch performance on k-nearest neighbor questions
-    final knnPerformanceVector = await fetchKNearestPerformanceVector(db: db, userId: userId, kNearestNeighbors: questionMetadata['k_nearest_neighbors'] as String?, timeStamp: timeStamp);
-    
+    final knnPerformanceVector = await UserAnswerSubmitter().fetchKNearestPerformanceVector(
+      db: db, userId: SessionManager().userId!, kNearestNeighbors: questionMetadata['k_nearest_neighbors'] as String?, timeStamp: timeStamp);
+
+    QuizzerLogger.logMessage("Fetched KNN performance vector for user ${SessionManager().userId} on question $questionId");
+
     // Store primary key
-    primaryKeys.add([userId, questionId]);
+    primaryKeys.add([SessionManager().userId, questionId]);
+    QuizzerLogger.logMessage("$primaryKeys were recorded");
     
     // Construct complete feature vector for ML inference
     samples.add({
@@ -816,17 +735,10 @@ Future<Map<String, DataFrame>> fetchBatchInferenceSamples({required int nRecords
       'knn_performance_vector': knnPerformanceVector,
     });
   }
+  QuizzerLogger.logMessage("Constructed ${samples.length} samples for batch inference, now releasing database access");
   
   // Release database access
   getDatabaseMonitor().releaseDatabaseAccess();
-  
-  // Safety check (should not happen given earlier check)
-  if (samples.isEmpty) {
-    return {
-      'primary_keys': DataFrame([]),
-      'raw_inference_data': DataFrame([])
-    };
-  }
   
   // Convert samples to DataFrame format
   final headers = samples.first.keys.toList();

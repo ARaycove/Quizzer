@@ -25,6 +25,7 @@ from sync_fetch_data import (initialize_and_fetch_db, get_last_sync_date, fetch_
                              update_last_sync_date,find_newest_timestamp,upsert_records_to_db, 
                              fetch_data_for_bertopic, initialize_supabase_session, sync_vectors_to_supabase,
                              sync_knn_results_to_supabase)
+from sklearn.mixture import GaussianMixture
 
 
 
@@ -34,7 +35,7 @@ def main():
     reset_doc               = False
     reset_knn               = False   # Reset knn values when new documents come in, which forces update of existing calculations for more accurate data
     bypass_model_train      = False  #topic model
-    bypass_prediction_model = False
+    bypass_prediction_model = True
     bypass_sync_supa        = False
     n_clusters              = 31
     random_state            = 69
@@ -96,19 +97,26 @@ def main():
         )
 
     if not bypass_model_train:
-        # Define hdbscan model
-        hdbscan_model           = hdbscan.HDBSCAN(
-            min_cluster_size    = 25,
-            min_samples         = 10,
-            metric              = 'manhattan',
-            cluster_selection_method = 'eom',
-            # prediction_data     = True
-        )
-
-        clustering_model        = KMeans(
-            n_clusters=n_clusters,
-            random_state=random_state
-        )
+        ######################################
+        # Define What clustering model to use:
+        ######################################
+        cluster_models = [
+            hdbscan.HDBSCAN(
+                min_cluster_size    = 25,
+                min_samples         = 10,
+                metric              = 'manhattan',
+                cluster_selection_method = 'eom',
+                # prediction_data     = True
+            ),
+            # These models require us to know what the number of clusters is before hand, since we don't know this information it presents an issue
+            KMeans(
+                n_clusters=n_clusters,
+                random_state=random_state
+            ),
+            GaussianMixture(n_components=3, random_state=42)
+        ]
+        # Select from list:
+        clustering_model        = cluster_models[0]
 
         # Define which count vectorizer we will use for bertopic
         vectorizer              = CountVectorizer(
@@ -184,16 +192,17 @@ def main():
         
         # Define the bertopic initialization using the models we've defined
         start = timeit.default_timer()
+
         topic_model = BERTopic(
-            verbose             = True,
-            top_n_words         = 10,
-            embedding_model     = embedding_model,
-            umap_model          = umap_model,
-            hdbscan_model       = hdbscan_model,
-            # hdbscan_model       = clustering_model,
-            vectorizer_model    = vectorizer,
-            ctfidf_model        = c_tf_idf,
-            representation_model= representation_model,
+            verbose                 = True,
+            calculate_probabilities = True,
+            top_n_words             = 10,
+            embedding_model         = embedding_model,
+            umap_model              = umap_model,
+            hdbscan_model           = clustering_model,
+            vectorizer_model        = vectorizer,
+            ctfidf_model            = c_tf_idf,
+            representation_model    = representation_model,
             # seed_topic_list     = seed_topics,
         )
 
@@ -211,6 +220,7 @@ def main():
 
         # Generate and save all BERTopic visualizations
         topic_model.visualize_topics().write_html(str(vis_dir / "topics.html"))
+        
         topic_model.visualize_documents(docs, embeddings=embeddings, hide_annotations=True).write_html(str(vis_dir / "documents.html"))
         topic_model.visualize_hierarchy().write_html(str(vis_dir / "hierarchy.html"))
         topic_model.visualize_barchart(top_n_topics=50).write_html(str(vis_dir / "barchart.html"))

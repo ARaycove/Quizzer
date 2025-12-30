@@ -54,180 +54,95 @@
     - For questions that get a probability score of 0.8 or higher, draw the curve until we get an output below 0.8. We draw the curve by starting with some value k(days_since_last_reviewed) = 0, and increment drawing the curve, when the output is < 0.8 collect the k figure and set a timestamp for k days from now. Such user questions will not be recalculated by the model until after that due date (THIS IS NOT A REVIEW SCHEDULE ITS AN OPTIMIZATION SCHEDULE TO REDUCE COMPUTATIONAL LOAD)
 
 */
-import 'package:sqflite/sqflite.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/table_helper.dart';
-import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/sql_table.dart';
 
-final List<Map<String, String>> expectedColumns = [
-  {'name': 'model_name',                'type': 'TEXT PRIMARY KEY'},
-  {'name': 'input_features',            'type': 'TEXT'},
-  {'name': 'optimal_threshold',         'type': 'REAL'}, // [x] update supabase with optimal threshold
-  {'name': 'model_json',                'type': 'TEXT'},
-  {'name': 'last_modified_timestamp',   'type': 'TEXT'},
-  {'name': 'time_last_received_file',   'type': 'TEXT'},
-];
+class MlModelsTable extends SqlTable {
+  static final MlModelsTable _instance = MlModelsTable._internal();
+  factory MlModelsTable() => _instance;
+  MlModelsTable._internal();
 
-Future<void> verifyMlModelsTable(dynamic db) async {
-  try {
-    QuizzerLogger.logMessage('Verifying ml_models table existence');
+  @override
+  bool isTransient = false;
+
+  @override
+  bool requiresInboundSync = true;
+
+  @override
+  dynamic get additionalFiltersForInboundSync => null;
+
+  @override
+  bool get useLastLoginForInboundSync => true;
+
+  @override
+  String get tableName => 'ml_models';
+
+  @override
+  List<String> get primaryKeyConstraints => ['model_name'];
+
+  @override
+  List<Map<String, String>> get expectedColumns => [
+    {'name': 'model_name',                'type': 'TEXT KEY'},
+    {'name': 'input_features',            'type': 'TEXT'},
+    {'name': 'optimal_threshold',         'type': 'REAL'}, // [x] update supabase with optimal threshold
+    {'name': 'model_json',                'type': 'TEXT'},
+    {'name': 'last_modified_timestamp',   'type': 'TEXT'},
+    {'name': 'time_last_received_file',   'type': 'TEXT'},
+  ];
+
+  @override
+  Future<bool> validateRecord(Map<String, dynamic> dataToInsert) async {
+    const requiredFields = [
+      'model_name', 'last_modified_timestamp'
+    ];
+
+    for (final field in requiredFields) {
+      if (!dataToInsert.containsKey(field) || dataToInsert[field] == null) {
+        throw ArgumentError('Required field "$field" is missing or null');
+      }
+    }
+
+    return true;
+  }
+
+  @override
+  Future<Map<String, dynamic>> finishRecord(Map<String, dynamic> dataToInsert) async {
+    // Set last_modified_timestamp if not provided
+    if (!dataToInsert.containsKey('last_modified_timestamp') || dataToInsert['last_modified_timestamp'] == null) {
+      dataToInsert['last_modified_timestamp'] = DateTime.now().toUtc().toIso8601String();
+    }
     
-    final List<Map<String, dynamic>> tables = await db.rawQuery(
-      "SELECT name FROM sqlite_master WHERE type='table' AND name=?",
-      ['ml_models']
-    );
+    return dataToInsert;
+  }
 
-    if (tables.isEmpty) {
-      QuizzerLogger.logMessage('ml_models table does not exist, creating it');
-      
-      String createTableSQL = 'CREATE TABLE ml_models(\n';
-      createTableSQL += expectedColumns.map((col) => '  ${col['name']} ${col['type']}').join(',\n');
-      createTableSQL += '\n)';
-      
-      await db.execute(createTableSQL);
-      QuizzerLogger.logSuccess('ml_models table created successfully');
-    } else {
-      QuizzerLogger.logMessage('ml_models table exists, checking column structure');
-      
-      final List<Map<String, dynamic>> currentColumns = await db.rawQuery(
-        "PRAGMA table_info(ml_models)"
+  // ==================================================
+  // Business Logic Methods
+  // ==================================================
+
+  /// Gets the optimal threshold for the accuracy_net model
+  Future<double> getAccuracyNetOptimalThreshold() async {
+    try {
+      final results = await getRecord(
+        'SELECT optimal_threshold FROM $tableName WHERE model_name = "accuracy_net"'
       );
       
-      final Set<String> currentColumnNames = currentColumns
-          .map((column) => column['name'] as String)
-          .toSet();
-      
-      final Set<String> expectedColumnNames = expectedColumns
-          .map((column) => column['name']!)
-          .toSet();
-      
-      final Set<String> columnsToAdd = expectedColumnNames.difference(currentColumnNames);
-      final Set<String> columnsToRemove = currentColumnNames.difference(expectedColumnNames);
-      
-      for (String columnName in columnsToAdd) {
-        final columnDef = expectedColumns.firstWhere((col) => col['name'] == columnName);
-        QuizzerLogger.logMessage('Adding missing column: $columnName');
-        await db.execute('ALTER TABLE ml_models ADD COLUMN ${columnDef['name']} ${columnDef['type']}');
+      if (results.isEmpty) {
+        throw Exception('accuracy_net model not found');
       }
       
-      if (columnsToRemove.isNotEmpty) {
-        QuizzerLogger.logMessage('Removing unexpected columns: ${columnsToRemove.join(', ')}');
-        
-        String tempTableSQL = 'CREATE TABLE ml_models_temp(\n';
-        tempTableSQL += expectedColumns.map((col) => '  ${col['name']} ${col['type']}').join(',\n');
-        tempTableSQL += '\n)';
-        
-        await db.execute(tempTableSQL);
-        
-        String columnList = expectedColumnNames.join(', ');
-        await db.execute('INSERT INTO ml_models_temp ($columnList) SELECT $columnList FROM ml_models');
-        
-        await db.execute('DROP TABLE ml_models');
-        await db.execute('ALTER TABLE ml_models_temp RENAME TO ml_models');
-        
-        QuizzerLogger.logSuccess('Removed unexpected columns and restructured table');
-      }
-      
-      if (columnsToAdd.isEmpty && columnsToRemove.isEmpty) {
-        QuizzerLogger.logMessage('Table structure is already up to date');
-      } else {
-        QuizzerLogger.logSuccess('Table structure updated successfully');
-      }
+      return results.first['optimal_threshold'] as double;
+    } catch (e) {
+      QuizzerLogger.logError('Error getting accuracy_net optimal threshold - $e');
+      rethrow;
     }
-  } catch (e) {
-    QuizzerLogger.logError('Error verifying ml_models table - $e');
-    rethrow;
   }
 }
 
-Future<Map<String, dynamic>?> getMlModel(String modelName) async {
-  try {
-    final db = await getDatabaseMonitor().requestDatabaseAccess();
-    if (db == null) {
-      throw Exception('Failed to acquire database access');
-    }
-    
-    final List<Map<String, dynamic>> results = await queryAndDecodeDatabase(
-      'ml_models',
-      db,
-      where: 'model_name = ?',
-      whereArgs: [modelName],
-      limit: 1,
-    );
+// ==================================================
+// Removed Functions - Now handled by SqlTable abstract class
+// ==================================================
 
-    if (results.isEmpty) {
-      QuizzerLogger.logMessage('ML model $modelName not found');
-      return null;
-    }
-
-    return results.first;
-  } catch (e) {
-    QuizzerLogger.logError('Error getting ML model - $e');
-    rethrow;
-  } finally {
-    getDatabaseMonitor().releaseDatabaseAccess();
-  }
-}
-
-Future<List<Map<String, dynamic>>> getAllMlModels() async {
-  try {
-    final db = await getDatabaseMonitor().requestDatabaseAccess();
-    if (db == null) {
-      throw Exception('Failed to acquire database access');
-    }
-    
-    return await queryAndDecodeDatabase('ml_models', db);
-  } catch (e) {
-    QuizzerLogger.logError('Error getting all ML models - $e');
-    rethrow;
-  } finally {
-    getDatabaseMonitor().releaseDatabaseAccess();
-  }
-}
-
-Future<void> batchUpsertMlModelsFromInboundSync({
-  required List<Map<String, dynamic>> modelRecords,
-  required dynamic db,
-}) async {
-  try {
-    for (Map<String, dynamic> modelRecord in modelRecords) {
-      final Map<String, dynamic> data = <String, dynamic>{};
-      
-      for (final col in expectedColumns) {
-        final name = col['name'] as String;
-        if (modelRecord.containsKey(name)) {
-          data[name] = modelRecord[name];
-        }
-      }
-      
-      await insertRawData(
-        'ml_models',
-        data,
-        db,
-        conflictAlgorithm: ConflictAlgorithm.replace,
-      );
-    }
-  } catch (e) {
-    QuizzerLogger.logError('Error upserting ML models from inbound sync - $e');
-    rethrow;
-  }
-}
-
-
-// Model Specific:
-
-Future<double> getAccuracyNetOptimalThreshold() async {
-  final db = await getDatabaseMonitor().requestDatabaseAccess();
-  if (db == null) throw Exception('Failed to acquire database access');
-  
-  try {
-    final result = await db.rawQuery(
-      'SELECT optimal_threshold FROM ml_models WHERE model_name = ?',
-      ['accuracy_net']
-    );
-    if (result.isEmpty) throw Exception('accuracy_net model not found');
-    return result.first['optimal_threshold'] as double;
-  } finally {
-    getDatabaseMonitor().releaseDatabaseAccess();
-  }
-}
+// REMOVED: verifyMlModelsTable - Use verifyTable() from SqlTable instead
+// REMOVED: getMlModel - Use getRecord() from SqlTable instead  
+// REMOVED: getAllMlModels - Use getRecord() from SqlTable instead
+// REMOVED: batchUpsertMlModelsFromInboundSync - Use batchUpsertRecords() from SqlTable instead

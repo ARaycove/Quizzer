@@ -69,6 +69,7 @@ dependencies:
   tflite_flutter: any
   google_sign_in: ^6.2.2
   crypto: ^3.0.6
+  sqflite_common: any
 
 dev_dependencies:
   flutter_test:

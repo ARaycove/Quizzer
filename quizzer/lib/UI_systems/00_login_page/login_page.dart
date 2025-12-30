@@ -15,7 +15,6 @@ class _LoginPageState extends State<LoginPage> {
   // Controllers for the text fields
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  SessionManager session = getSessionManager();
   bool _isLoading = false; // Add loading state variable
   String _loginProgressMessage = "Login"; // To hold progress messages
   StreamSubscription?
@@ -24,7 +23,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
-    _progressSubscription = session.loginProgressStream.listen((message) {
+    _progressSubscription = SessionManager().loginProgressStream.listen((message) {
       if (mounted) {
         setState(() {
           _loginProgressMessage = message;
@@ -60,7 +59,10 @@ class _LoginPageState extends State<LoginPage> {
     // Attempt to log in using credentials
     QuizzerLogger.logMessage('Login attempt for: $email');
 
-    Map<String, dynamic> results = await session.attemptLogin(email, password);
+    Map<String, dynamic> results = await SessionManager().attemptLogin(
+      email: email,
+      password: password,
+      authType: "email_login");
 
     if (results['success']) {
       // Login successful, keep loading state true until navigation completes
@@ -100,53 +102,50 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  Future<void> submitSocialLogin() async {
-    // define the email and password submission
-    final email = _emailController.text.trim();
-    // final password = _passwordController.text;
+  // Future<void> submitSocialLogin() async {
+  //   // FIXME FIX GOOGLE LOGIN
+  //   // // Attempt to log in using credentials
+  //   // QuizzerLogger.logMessage('Social Login attempt.');
 
-    // Attempt to log in using credentials
-    QuizzerLogger.logMessage('Social Login attempt.');
+  //   // Map<String, dynamic> results = await SessionManager().attemptLogin(authType: "google_login");
 
-    Map<String, dynamic> results = await session.attemptGoogleLogin();
-
-    if (results['success']) {
-      // Login successful, keep loading state true until navigation completes
-      QuizzerLogger.logMessage(
-          'Login successful for: $email. Navigating home.');
-      if (!mounted) return;
-      // _loginProgressMessage will be updated by the stream, culminating in "Login Complete!"
-      // Potentially, could set a final success message here if desired before navigation
-      // setState(() { _loginProgressMessage = "Success!"; });
-      Navigator.pushReplacementNamed(context, '/home');
-      // Don't reset loading state here, it disappears on navigation
-    } else {
-      // Display error message from login attempt
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(results['message'] ?? 'Login failed'),
-        ),
-      );
-      // Reset loading state on login failure
-      setState(() {
-        _isLoading = false;
-        _loginProgressMessage = "Login"; // Reset button text
-      });
-      return;
-    }
-    // It's good practice to reset loading state if something unexpected happens,
-    // though ideally the code paths above cover all scenarios.
-    // If the function somehow reaches here without navigating or erroring out,
-    // reset the loading state.
-    if (mounted && _isLoading) {
-      // Check mounted and isLoading before setting state
-      setState(() {
-        _isLoading = false;
-        _loginProgressMessage = "Login"; // Reset button text
-      });
-    }
-  }
+  //   // if (results['success']) {
+  //   //   // Login successful, keep loading state true until navigation completes
+  //   //   QuizzerLogger.logMessage(
+  //   //       'Login successful for: $email. Navigating home.');
+  //   //   if (!mounted) return;
+  //   //   // _loginProgressMessage will be updated by the stream, culminating in "Login Complete!"
+  //   //   // Potentially, could set a final success message here if desired before navigation
+  //   //   // setState(() { _loginProgressMessage = "Success!"; });
+  //   //   Navigator.pushReplacementNamed(context, '/home');
+  //   //   // Don't reset loading state here, it disappears on navigation
+  //   // } else {
+  //   //   // Display error message from login attempt
+  //   //   if (!mounted) return;
+  //   //   ScaffoldMessenger.of(context).showSnackBar(
+  //   //     SnackBar(
+  //   //       content: Text(results['message'] ?? 'Login failed'),
+  //   //     ),
+  //   //   );
+  //   //   // Reset loading state on login failure
+  //   //   setState(() {
+  //   //     _isLoading = false;
+  //   //     _loginProgressMessage = "Login"; // Reset button text
+  //   //   });
+  //   //   return;
+  //   }
+  //   // It's good practice to reset loading state if something unexpected happens,
+  //   // though ideally the code paths above cover all scenarios.
+  //   // If the function somehow reaches here without navigating or erroring out,
+  //   // reset the loading state.
+  //   // if (mounted && _isLoading) {
+  //   //   // Check mounted and isLoading before setting state
+  //   //   setState(() {
+  //   //     _isLoading = false;
+  //   //     _loginProgressMessage = "Login"; // Reset button text
+  //   //   });
+  //   // }
+  // }
 
   // Function to navigate to new user signup page
   void newUserSignUp() {
@@ -230,18 +229,19 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
               ),
-              AppTheme.sizedBoxMed,
-              // Reset Password Button
-              SizedBox(
-                width: buttonWidth,
-                child: TextButton(
-                  onPressed: _isLoading ? null : resetPassword,
-                  child: const Text(
-                    "Reset Password",
-                    style: TextStyle(fontSize: 14),
-                  ),
-                ),
-              ),
+              // 
+              // AppTheme.sizedBoxMed,
+              // // Reset Password Button
+              // SizedBox(
+              //   width: buttonWidth,
+              //   child: TextButton(
+              //     onPressed: _isLoading ? null : resetPassword,
+              //     child: const Text(
+              //       "Reset Password",
+              //       style: TextStyle(fontSize: 14),
+              //     ),
+              //   ),
+              // ),
               AppTheme.sizedBoxLrg,
 
               // Submit Button
@@ -304,7 +304,8 @@ class _LoginPageState extends State<LoginPage> {
     return IconButton(
       icon: Icon(icon),
       onPressed: () {
-        _isLoading ? null : submitSocialLogin();
+        QuizzerLogger.logMessage("Disabled social login for now");
+        // _isLoading ? null : submitSocialLogin();
       },
     );
   }

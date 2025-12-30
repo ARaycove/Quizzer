@@ -1,23 +1,20 @@
 import 'dart:async';
 import 'dart:math';
-import 'package:quizzer/backend_systems/05_question_queue_server/user_question_manager.dart';
+import 'package:quizzer/backend_systems/05_question_queue_server/user_questions/user_question_manager.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
-// Caches
-// Table Access
-import 'package:quizzer/backend_systems/00_database_manager/tables/ml_models_table.dart';
 // Workers
 import 'package:quizzer/backend_systems/09_switch_board/switch_board.dart'; // Import SwitchBoard
 import 'package:quizzer/backend_systems/09_switch_board/sb_question_worker_signals.dart'; // Import worker signals
 import 'package:quizzer/backend_systems/09_switch_board/sb_other_signals.dart'; // Import other signals
+import 'package:quizzer/backend_systems/04_ml_modeling/ml_model_manager.dart';
+import 'package:quizzer/backend_systems/06_question_answer_pair_management/question_answer_pair_manager.dart';
 
 // ==========================================
 // Circulation Worker
 // ==========================================
 /// Determines when and which questions should be moved into active circulation.
 class CirculationWorker {
-  // FIXME With the removal of the module_name with it the mechanism by which new relationship user question records would be created. CirculationWorker is now responsible for deciding what new questions to introduce to the user. CirculationWorker will need to ensure that all questionId's in the question_answer_pair table have an accompanying user_question_answer_pair record by which the user is given relationship record with the main question.
-  // FIXME Since this was established through the module system, removing the module system removes the mechanism by which user quesiton answer pairs are created
   // --- Singleton Setup ---
   static final CirculationWorker _instance = CirculationWorker._internal();
   factory CirculationWorker() => _instance;
@@ -33,10 +30,6 @@ class CirculationWorker {
   late double idealThreshold;
   static const int    _circulationThreshold = 25;
   static const int    _removalThresholdMultiplier = 2; // DO NOT PROVIDE A VALUE <= 1
-
-  // FIXME Update the mainGraph to include ALL questions regardless of if a user record exists
-  // Update initializeDataStructures to include ALL
-  // Then when navigating, if the question to be added to circulation does not exist as a user record yet, then create that user record.
 
   // Data Structures will be filled on init, then updated live in O(2n + 3) time
   // Hashmap table of all links:
@@ -72,7 +65,10 @@ class CirculationWorker {
 
       // Initialize data structures before starting main loop
       await _initializeDataStructures();
-      idealThreshold = await getAccuracyNetOptimalThreshold();
+
+      // Get optimal threshold from MlModelManager
+      final modelInfo = await MlModelManager().getAccuracyNetModel();
+      idealThreshold = modelInfo['optimal_threshold'] as double;
 
       _runLoop(); // Start the loop asynchronously
     } catch (e) {
@@ -243,6 +239,7 @@ class CirculationWorker {
     
     // Convert edges to bidirectional and identify newly connected neighbors
     for (final id in questionIds) {
+      // neighbors are question ids
       for (final neighbor in mainGraph[id]!) {
         // Make edge bidirectional (neighbor -> id)
         if (mainGraph.containsKey(neighbor)) {
@@ -252,6 +249,7 @@ class CirculationWorker {
         // Check for neighbors to promote (move from NotConnected to Connected)
         if (nonCirculatingNotConnected.contains(neighbor)) {
           newlyConnectedNeighbors.add(neighbor);
+          UserQuestionManager().ensureUserQuestionRecordExists(neighbor); // Ensure a user question record exists since it will now get included in the probability engine
         }
       }
     }
@@ -274,6 +272,7 @@ class CirculationWorker {
   Future<void> _removeQuestionFromCirculation(List<String> questionIds) async {
     QuizzerLogger.logMessage('Removing questions from circulation: $questionIds');
     await UserQuestionManager().setQuestionsRemoveFromCirculation(questionIds: questionIds);
+    
     // Update local circulation set
     circulatingQuestions = Set.from(circulatingQuestions)..removeAll(questionIds);
     
@@ -285,6 +284,12 @@ class CirculationWorker {
 
     // Update mainGraph: remove reverse links from all neighbors
     for (final id in questionIds) {
+      // SAFETY CHECK: Ensure the question exists in mainGraph before accessing it
+      if (!mainGraph.containsKey(id)) {
+        QuizzerLogger.logWarning('Question $id not found in mainGraph during removal');
+        continue;
+      }
+      
       for (final neighbor in mainGraph[id]!.toList()) {
         if (mainGraph.containsKey(neighbor)) {
           mainGraph[neighbor]!.remove(id); 
@@ -293,9 +298,15 @@ class CirculationWorker {
       }
     }
 
-
     // Determine the new non-circulating pool status (Connected or NotConnected) for the removed questions
     for (final id in questionIds) {
+      // SAFETY CHECK: Ensure the question exists in mainGraph before accessing it
+      if (!mainGraph.containsKey(id)) {
+        // If question doesn't exist in graph, add to not connected (no neighbors)
+        newlyNotConnected.add(id);
+        continue;
+      }
+      
       bool hasCirculatingLink = false;
       for (final neighbor in mainGraph[id]!) {
         if (circulatingQuestions.contains(neighbor)) {
@@ -303,8 +314,11 @@ class CirculationWorker {
           break;
         }
       }
-      if (hasCirculatingLink) {newlyConnected.add(id);} 
-      else {newlyNotConnected.add(id);}
+      if (hasCirculatingLink) {
+        newlyConnected.add(id);
+      } else {
+        newlyNotConnected.add(id);
+      }
     }
     
     // Batch update non-circulating sets
@@ -325,15 +339,15 @@ class CirculationWorker {
             }
           }
         }
-        if (!neighborHasCirculatingLink) {neighborsToDemote.add(neighbor);}
+        if (!neighborHasCirculatingLink) {
+          neighborsToDemote.add(neighbor);
+        }
       }
     }
     
     // Perform the batch demotion
     nonCirculatingConnected = Set.from(nonCirculatingConnected)..removeAll(neighborsToDemote);
     nonCirculatingNotConnected = Set.from(nonCirculatingNotConnected)..addAll(neighborsToDemote);
-    
-    // QuizzerLogger.logSuccess('Question removed from circulation: $questionId');
   }
 
   /// Builds the initial data structures that the circulation worker will update.
@@ -346,8 +360,8 @@ class CirculationWorker {
   /// - nonCirculatingNotConnected: Non-circulating questions with no links to circulation
   /// 
   /// Process:
-  /// 1. Query all circulating questions and build bidirectional graph edges
-  /// 2. Query all non-circulating questions and add their edges
+  /// 1. Query ALL questions from question_answer_pair table and build bidirectional graph edges
+  /// 2. Query circulating questions to populate circulatingQuestions set
   /// 3. Classify non-circulating questions based on connectivity to circulation
   Future<void> _initializeDataStructures() async {
     try {
@@ -359,73 +373,58 @@ class CirculationWorker {
       nonCirculatingNotConnected.clear();
       nonCirculatingConnected.clear();
       
-      // FIXME We will need to change this to query all questions in the question_answer_pair table rather than what currently exists in the user question answer pair records (include all questions)
+      // Query ALL questions from question_answer_pair table
+      final allQuestionsResults = await QuestionAnswerPairManager().getAllQuestionIdsWithNeighbors();
       final circulatingResults = await UserQuestionManager().getCirculatingQuestionsWithNeighbors();
-      final nonCirculatingResults = await UserQuestionManager().getNonCirculatingQuestionsWithNeighbors();
-      // The query will be for all circulating questions, then a second query for all questions that are not circulating (from the question answer pair table not the user question answer pair table)
 
-
-      // Process circulating questions
-      for (final row in circulatingResults) {
+      // Process ALL questions to build the complete graph
+      for (final row in allQuestionsResults) {
         final iQuestionId = row['question_id'] as String;
         final knnMap = row['k_nearest_neighbors'] as Map<String, dynamic>?;
         
-        // Skip questions with no k_nearest_neighbors
-        if (knnMap == null) continue;
-        
-        // Add question to mainGraph if not present
+        // ALWAYS add question to mainGraph, even if it has no neighbors
         mainGraph.putIfAbsent(iQuestionId, () => {});
         
-        // For each neighbor, create bidirectional edges in mainGraph
-        for (final jQuestionId in knnMap.keys) {
-          // Add neighbor to mainGraph if not present
-          mainGraph.putIfAbsent(jQuestionId, () => {});
-          
-          // Add bidirectional edge: j -> i
-          mainGraph[jQuestionId]!.add(iQuestionId);
-          
-          // Add bidirectional edge: i -> j
-          mainGraph[iQuestionId]!.add(jQuestionId);
+        // If there are neighbors, add bidirectional edges
+        if (knnMap != null) {
+          for (final jQuestionId in knnMap.keys) {
+            // Add neighbor to mainGraph if not present
+            mainGraph.putIfAbsent(jQuestionId, () => {});
+            
+            // Add bidirectional edge: j -> i
+            mainGraph[jQuestionId]!.add(iQuestionId);
+            
+            // Add bidirectional edge: i -> j
+            mainGraph[iQuestionId]!.add(jQuestionId);
+          }
         }
-        
-        // Add to circulating questions set
+      }
+      
+      // Process circulating questions to populate circulatingQuestions set
+      for (final row in circulatingResults) {
+        final iQuestionId = row['question_id'] as String;
         circulatingQuestions.add(iQuestionId);
       }
       
-      // Process non-circulating questions
-      for (final row in nonCirculatingResults) {
-        final iQuestionId = row['question_id'] as String;
-        final knnMap = row['k_nearest_neighbors'] as Map<String, dynamic>?;
-        
-        // Skip questions with no k_nearest_neighbors
-        if (knnMap == null) continue;
-        
-        // Add question to mainGraph if not present
-        mainGraph.putIfAbsent(iQuestionId, () => {});
-        
-        // For each neighbor, create unidirectional edges (only j -> i, not i -> j)
-        for (final jQuestionId in knnMap.keys) {
-          // Add neighbor to mainGraph if not present
-          mainGraph.putIfAbsent(jQuestionId, () => {});
-          
-          // Add unidirectional edge: j -> i
-          mainGraph[jQuestionId]!.add(iQuestionId);
-        }
+      // Classify ALL non-circulating questions based on connectivity
+      for (final questionId in mainGraph.keys) {
+        // Skip questions that are already in circulation
+        if (circulatingQuestions.contains(questionId)) continue;
         
         // Check if this non-circulating question is connected to any circulating question
-        bool nonCirculatingNotLinked = true;
-        for (final k in mainGraph[iQuestionId]!) {
-          if (circulatingQuestions.contains(k)) {
-            // Found a link to a circulating question
-            nonCirculatingNotLinked = false;
-            nonCirculatingConnected.add(iQuestionId);
+        bool hasConnectionToCirculation = false;
+        for (final neighbor in mainGraph[questionId]!) {
+          if (circulatingQuestions.contains(neighbor)) {
+            hasConnectionToCirculation = true;
             break;
           }
         }
         
-        // If no links to circulating questions, add to not connected set
-        if (nonCirculatingNotLinked) {
-          nonCirculatingNotConnected.add(iQuestionId);
+        // Add to appropriate set
+        if (hasConnectionToCirculation) {
+          nonCirculatingConnected.add(questionId);
+        } else {
+          nonCirculatingNotConnected.add(questionId);
         }
       }
       
@@ -434,12 +433,6 @@ class CirculationWorker {
       QuizzerLogger.logError('Error in CirculationWorker _initializeDataStructures - $e');
       rethrow;
     }
-  }
-
-  /// Mechanism to create a new user_question_answer_pair record and add it to the mainGraph
-  /// This allows us to create new records during operation after the map dataStructure was initialized
-  Future<void> _addNewUserQuestionToProfile(List<String> questionIds) async {
-
   }
 
 }

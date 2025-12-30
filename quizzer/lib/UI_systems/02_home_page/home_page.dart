@@ -21,7 +21,7 @@ class HomePage extends StatefulWidget { // Change to StatefulWidget
 }
 
 class _HomePageState extends State<HomePage> { // State class
-  final SessionManager session = SessionManager(); // Get session instance once
+  final SessionManager session = SessionManager();
   Map<String, dynamic>? _editedQuestionData; // <-- ADDED State variable for callback data
   ExpressionParser p = GrammarParser();
 
@@ -33,8 +33,6 @@ class _HomePageState extends State<HomePage> { // State class
       _requestNextQuestion();
     });
   }
-
-
 
   // Method to handle requesting the next question and triggering rebuild
   Future<void> _requestNextQuestion() async {

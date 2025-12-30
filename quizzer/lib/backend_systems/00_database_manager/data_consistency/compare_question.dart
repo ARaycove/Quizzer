@@ -1,9 +1,7 @@
 import 'dart:io';
-
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pair_management/question_answer_pairs_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
 
 // TODO This function needs to be tied into the InboundSync mechanism since this functionality is directly related to ensuring that local question answer pair records match the server
 
@@ -12,39 +10,26 @@ import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dar
 Future<Map<String, dynamic>> compareAndUpdateQuestionRecord(String questionId) async {
   try {
     // Get local record with raw query
-    final DatabaseMonitor dbMonitor = getDatabaseMonitor();
-    final db = await dbMonitor.requestDatabaseAccess();
-    if (db == null) {
-      return {
-        'updated': false,
-        'message': 'Error: Failed to acquire database access'
-      };
-    }
-    
-    final List<Map<String, Object?>> localResult = await db.rawQuery(
-      'SELECT * FROM question_answer_pairs WHERE question_id = ?',
-      [questionId]
-    );
+    final List<Map<String, Object?>> localResult = await QuestionAnswerPairsTable().getRecord(
+      'SELECT * FROM question_answer_pairs WHERE question_id = \'$questionId\''
+      );
     
     if (localResult.isEmpty) {
-      getDatabaseMonitor().releaseDatabaseAccess();
       return {
         'updated': false,
         'message': 'Question not found locally'
       };
     }
-    
     // Convert Object? to dynamic and normalize types
     final Map<String, dynamic> localRecord = _normalizeRecord(localResult.first);
-    getDatabaseMonitor().releaseDatabaseAccess();
     
     // Check if this question was created by the current user
     final String? qstContrib = localRecord['qst_contrib'] as String?;
-    final String currentUserId = getSessionManager().userId ?? '';
+    final String currentUserId = SessionManager().userId ?? '';
     final bool isUserCreated = qstContrib == currentUserId;
     
     // Get cloud record with raw query
-    final supabase = getSessionManager().supabase;
+    final supabase = SessionManager().supabase;
     final List<dynamic> cloudResponse = await supabase
         .from('question_answer_pairs')
         .select()
@@ -59,13 +44,9 @@ Future<Map<String, dynamic>> compareAndUpdateQuestionRecord(String questionId) a
           'message': 'Question not found in cloud database but was created by current user - preserving local record'
         };
       } else {
-        final db = await dbMonitor.requestDatabaseAccess();
-        if (db != null) {
-          await db.delete('question_answer_pairs', where: 'question_id = ?', whereArgs: [questionId]);
-          getDatabaseMonitor().releaseDatabaseAccess();
-        }
+        int i = await QuestionAnswerPairsTable().deleteRecord({'question_id': questionId});
         return {
-          'updated': true,
+          'updated': i > 0,
           'message': 'Question not found in cloud database - deleted local record'
         };
       }
@@ -83,11 +64,7 @@ Future<Map<String, dynamic>> compareAndUpdateQuestionRecord(String questionId) a
         'message': 'Records are identical'
       };
     } else {
-      // Use batchUpsertQuestionAnswerPairs like inbound sync does
-      final db2 = await dbMonitor.requestDatabaseAccess();
-      await batchUpsertQuestionAnswerPairs(records: [cloudRecord], db: db2);
-      getDatabaseMonitor().releaseDatabaseAccess();
-
+      await QuestionAnswerPairsTable().batchUpsertRecords(records: [cloudRecord]);
       return {
         'updated': true,
         'message': 'Local record updated with cloud data'

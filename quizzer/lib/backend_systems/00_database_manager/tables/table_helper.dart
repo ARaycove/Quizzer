@@ -366,3 +366,163 @@ Future<String> getAppVersionInfo() async {
   QuizzerLogger.logSuccess('App version fetched: $appVersionString');
   return appVersionString;
 }
+
+/// A generic function to verify the schema of any table.
+///
+/// Args:
+///   db: The database instance (e.g., Sqflite Database or Transaction object).
+///   tableName: The name of the table to verify.
+///   expectedColumns: A list of maps, where each map defines a column:
+///                    `[{'name': 'column_name', 'type': 'SQL_DEFINITION'}, ...]`.
+///                    (e.g., 'TEXT NOT NULL', 'INTEGER DEFAULT 0', etc.).
+///   primaryKeyColumns: A list of column names that form the primary key. This is used to
+///                      construct a table-level 'PRIMARY KEY (colA, colB)' constraint.
+///                      Pass an empty list (`[]`) if there is no table-level primary key.
+///   indicesToCreate: A list of full SQL CREATE INDEX statements to ensure existence.
+Future<void> verifyTable({
+  required dynamic db,
+  required String tableName,
+  required List<Map<String, String>> expectedColumns,
+  required List<String> primaryKeyColumns,
+  List<String> indicesToCreate = const [],
+}) async {
+  try {
+    // Collect expected column names for comparison
+    final Map<String, String> expectedColumnDefinitions = {
+      for (var col in expectedColumns) col['name']!: col['type']!,
+    };
+    final Set<String> expectedColumnNames = expectedColumnDefinitions.keys.toSet();
+
+    // Check if the table exists
+    final List<Map<String, dynamic>> tables = await db.rawQuery(
+      "SELECT name FROM sqlite_master WHERE type='table' AND name=?",
+      [tableName],
+    );
+
+    bool tableExists = tables.isNotEmpty;
+    List<Map<String, dynamic>>? recordsToMigrate;
+
+    // --- Table Rebuild Check (Triggered by column removal) ---
+    if (tableExists) {
+      final List<Map<String, dynamic>> currentColumns = await db.rawQuery(
+        "PRAGMA table_info($tableName)",
+      );
+      final Set<String> currentColumnNames = currentColumns
+          .map((column) => column['name'] as String)
+          .toSet();
+
+      final Set<String> columnsToRemove = currentColumnNames.difference(expectedColumnNames);
+
+      if (columnsToRemove.isNotEmpty) {
+        // Backup data and flag for recreation if unexpected columns are found
+        try {
+          // Only query for columns that are still expected to exist
+          final String columnsToQuery = expectedColumnNames.intersection(currentColumnNames).join(', ');
+          
+          if (columnsToQuery.isNotEmpty) {
+            recordsToMigrate = await db.rawQuery('SELECT $columnsToQuery FROM $tableName');
+          }
+        } catch (_) {
+          recordsToMigrate = null;
+        }
+
+        await db.execute('DROP TABLE IF EXISTS $tableName');
+        tableExists = false;
+      }
+    }
+
+    if (!tableExists) {
+      // Create the table
+      String createTableSQL = 'CREATE TABLE $tableName(\n';
+      List<String> columnDefinitions = expectedColumns
+          .map((col) => '  ${col['name']} ${col['type']}')
+          .toList();
+
+      // Add table-level primary key constraint
+      if (primaryKeyColumns.isNotEmpty) {
+        final String compositeKeySql = 'PRIMARY KEY (${primaryKeyColumns.join(', ')})';
+        columnDefinitions.add('  $compositeKeySql');
+      }
+
+      createTableSQL += columnDefinitions.join(',\n');
+      createTableSQL += '\n)';
+
+      await db.execute(createTableSQL);
+    } else {
+      // Table exists and no rebuild was triggered, only check for column additions
+      final List<Map<String, dynamic>> currentColumns = await db.rawQuery(
+        "PRAGMA table_info($tableName)",
+      );
+
+      final Set<String> currentColumnNames = currentColumns
+          .map((column) => column['name'] as String)
+          .toSet();
+
+      final Set<String> columnsToAdd = expectedColumnNames.difference(currentColumnNames);
+
+      // Add missing columns
+      for (String columnName in columnsToAdd) {
+        final columnDef = expectedColumnDefinitions[columnName]!;
+        await db.execute('ALTER TABLE $tableName ADD COLUMN $columnName $columnDef');
+      }
+    }
+
+    // Re-insert backed-up data if a migration (rebuild) occurred
+    if (recordsToMigrate != null && recordsToMigrate.isNotEmpty) {
+      final List<String> validColumnNames = expectedColumns
+          .map((col) => col['name']!)
+          .toList();
+
+      for (final record in recordsToMigrate) {
+        final Map<String, dynamic> recordToInsert = Map<String, dynamic>.from(record);
+        
+        // Remove keys that are not valid columns (this is defensive, as the query above should filter)
+        recordToInsert.removeWhere((key, value) => !validColumnNames.contains(key));
+        
+        await db.insert(tableName, recordToInsert);
+      }
+    }
+
+    // Ensure indices exist
+    for (String indexSql in indicesToCreate) {
+      await db.execute(indexSql);
+    }
+
+  } catch (e) {
+    rethrow;
+  }
+}
+
+
+/// A generic function to add a record to any table.
+///
+/// Args:
+///   db: The database instance (e.g., Sqflite Database or Transaction object).
+///   tableName: The name of the table to insert into.
+///   data: The map of key-value pairs representing the record to insert.
+///   expectedColumns: The schema definition (used here for data sanitization).
+///   primaryKeyColumns: List of primary key columns (retained for consistent signature).
+///
+/// Returns:
+///   A Future resolving to the row ID of the last row inserted (typically INTEGER).
+Future<int> addRecord({
+  required dynamic db,
+  required String tableName,
+  required Map<String, dynamic> data,
+  required List<Map<String, String>> expectedColumns,
+  required List<String> primaryKeyColumns,
+}) async {
+  final Set<String> validColumnNames = expectedColumns
+      .map((col) => col['name']!)
+      .toSet();
+
+  final Map<String, dynamic> recordToInsert = encodeValueForDB(
+    Map<String, dynamic>.from(data)
+    ..removeWhere((key, value) => !validColumnNames.contains(key)));
+
+  try {
+    return await insertRawData(tableName, recordToInsert, db);
+  } catch (e) {
+    rethrow;
+  }
+}
