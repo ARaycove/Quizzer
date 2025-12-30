@@ -12,7 +12,6 @@ class GeminiApiKeySetting extends StatefulWidget {
 class _GeminiApiKeySettingState extends State<GeminiApiKeySetting> {
   String _apiKey = ''; 
   bool _isLoading = true;
-  final SessionManager _sessionManager = getSessionManager();
 
   @override
   void initState() {
@@ -25,7 +24,7 @@ class _GeminiApiKeySettingState extends State<GeminiApiKeySetting> {
       _isLoading = true;
     });
     try {
-      final dynamic fetchedValue = await _sessionManager.getUserSettings(settingName: 'geminiApiKey');
+      final dynamic fetchedValue = await SessionManager().settings.getUserSettings(settingName: 'geminiApiKey');
       if (fetchedValue is String) {
         _apiKey = fetchedValue;
       } else {
@@ -43,7 +42,7 @@ class _GeminiApiKeySettingState extends State<GeminiApiKeySetting> {
 
   Future<void> _handleSaveApiKey(String newApiKey) async {
     // SessionManager.updateUserSetting will throw on failure which WidgetSettingTemplate can catch.
-    await _sessionManager.updateUserSetting('geminiApiKey', newApiKey);
+    await SessionManager().settings.updateUserSetting('geminiApiKey', newApiKey);
     // If successful, the template will update its own display value.
     // We update our local _apiKey as well for immediate UI consistency if needed, though
     // WidgetSettingTemplate usually re-renders with initialValue which should come from _loadApiKey upon next interaction.

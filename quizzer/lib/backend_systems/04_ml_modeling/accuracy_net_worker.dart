@@ -1,13 +1,14 @@
 import 'dart:async';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
-import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_question_answer_pairs_table.dart';
 import 'package:quizzer/backend_systems/04_ml_modeling/attempt_pre_process.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
+import 'package:quizzer/backend_systems/04_ml_modeling/ml_model_manager.dart';
 import 'package:tflite_flutter/tflite_flutter.dart';
 import 'package:ml_dataframe/ml_dataframe.dart';
 import 'package:quizzer/backend_systems/00_helper_utils/file_locations.dart';
 import 'package:path/path.dart' as path;
-import 'dart:typed_data';
+
 import 'dart:convert';
 import 'dart:io';
 
@@ -25,7 +26,6 @@ Future<void> writeDataFrameFeatureMap(DataFrame df, String filename) async {
   }
   
   // QuizzerLogger.logMessage('DataFrame: ${df.rows.length} rows, ${headers.length} cols');
-  
   final jsonString = const JsonEncoder.withIndent('  ').convert(featureMap);
   final logsPath = await getQuizzerLogsPath();
   final filepath = path.join(logsPath, filename);
@@ -44,9 +44,11 @@ class AccuracyNetWorker {
   Interpreter? _interpreter;
   Timer? _timer;
   
-  static const int batchSize = 5;
+  static const int batchSize = 25;
   static const int updateExclusionMinutes = 60;
   static const int loopIntervalSeconds = 1;
+  bool _cycleIsRunning = false;
+  bool _lastCycleHadData = false;
   
   bool get isRunning => _isRunning;
   Interpreter? get predictionModel => _interpreter;
@@ -58,13 +60,11 @@ class AccuracyNetWorker {
       QuizzerLogger.logWarning('AccuracyNetWorker is already running.');
       return;
     }
-    await loadTensorFlowModel();
     _isRunning = true;
     _stopCompleter = Completer<void>();
     QuizzerLogger.logMessage('AccuracyNetWorker started.');
     _runLoop();
   }
-
 
   Future<void> stop() async {
     QuizzerLogger.logMessage('Entering AccuracyNetWorker stop()...');
@@ -92,39 +92,24 @@ class AccuracyNetWorker {
     QuizzerLogger.logMessage('AccuracyNetWorker stopped.');
   }
 
-  /// Method to load or reload the prediction net model 
-  /// (if new model is fetched during runtime, this can be called again to reload the model)
-  Future<void> loadTensorFlowModel() async {
-    final localPath = path.join(await getQuizzerMediaPath(), 'accuracy_net.tflite');
-    final file = File(localPath);
-    
-    if (!file.existsSync()) {
-      try {
-        QuizzerLogger.logMessage('Model file not found locally, fetching from Supabase...');
-        
-        final Uint8List bytes = await getSessionManager().supabase.storage
-            .from('ml_models')
-            .download('accuracy_net.tflite');
-        
-        await file.create(recursive: true);
-        await file.writeAsBytes(bytes);
-        
-        QuizzerLogger.logSuccess('Model file downloaded and saved to $localPath');
-      } catch (e) {
-        QuizzerLogger.logError("Failed to download accuracy_net.tflite from Supabase: $e");
-      }
-    }
-    
-    _interpreter = Interpreter.fromFile(file);
-  }
-
-
   Future<void> _runLoop() async {
     QuizzerLogger.logMessage('Entering AccuracyNetWorker _runLoop()...');
     
     _timer = Timer.periodic(const Duration(seconds: loopIntervalSeconds), (timer) async {
-      if (_isRunning) {
+      if (!_isRunning) {
+        timer.cancel();
+        return;
+      } 
+      // If last cycle had data and the cycle is not currently running, initiate a new cycle
+      else if (_lastCycleHadData && !_cycleIsRunning) {
         await _runCycle();
+      }
+      // If no data was processed in the last cycle and no cycle is running, wait before checking again
+      else if (!_lastCycleHadData && !_cycleIsRunning) {
+        _cycleIsRunning = true; // prevent re-entrance
+        await Future.delayed(const Duration(seconds: 60));
+        _lastCycleHadData = true; // reset boolean
+        _cycleIsRunning = false; // reset boolean
       }
     });
   }
@@ -132,114 +117,126 @@ class AccuracyNetWorker {
 
   Future<void> _runCycle() async {
     if (!_isRunning) return;
+    _cycleIsRunning = true;
     
-    final userId = getSessionManager().userId;
-    if (userId == null) return;
-    final fetchResult = await fetchBatchInferenceSamples(
-      nRecords: batchSize,
-      kMinutes: updateExclusionMinutes,
-    );
+    if (SessionManager().userId == null) return;
     
-    final primaryKeysFrame = fetchResult['primary_keys']!;
-    final rawSamplesFrame = fetchResult['raw_inference_data']!;
-    if (rawSamplesFrame.rows.isEmpty) return;
-    final decodedFrame = await decodeDataFrameJsonFields(rawSamplesFrame);
-    // QuizzerLogger.logMessage('Decoded DataFrame: ${decodedFrame.rows.length} rows, ${decodedFrame.header.toList().length} cols');
+    try {
+      final fetchResult = await fetchBatchInferenceSamples(
+        nRecords: batchSize,
+        kMinutes: updateExclusionMinutes,
+      );
+      QuizzerLogger.logMessage("Fetched ${fetchResult.length} samples for inference");
+      
+      final primaryKeysFrame = fetchResult['primary_keys']!;
+      final rawSamplesFrame = fetchResult['raw_inference_data']!;
+      
+      if (rawSamplesFrame.rows.isEmpty) {
+        QuizzerLogger.logMessage("No samples to process in this cycle.");
+        _cycleIsRunning = false;
+        _lastCycleHadData = false;
+        // both are set to false so the runLoop knows to wait before next check
+        return;
+      } else { // there is data to process set the flag to true to indicate
+        _lastCycleHadData = true;
+      }
 
-    final unpackedFrame = await unpackDataFrameFeatures(decodedFrame);
-    // QuizzerLogger.logMessage('Unpacked DataFrame: ${unpackedFrame.rows.length} rows, ${unpackedFrame.header.toList().length} cols');
-
-    final encodedFrame = await oneHotEncodeDataFrame(unpackedFrame);
-    // QuizzerLogger.logMessage('Encoded DataFrame: ${encodedFrame.rows.length} rows, ${encodedFrame.header.toList().length} cols');
-
-    final inferenceInputFrame = await transformDataFrameToAccuracyNetInputShape(encodedFrame);
-    // TODO, comment out debug print of value order, once resolve
-    // await writeDataFrameFeatureMap(inferenceInputFrame, "inference_data.json");
-    final resultsFrame = await _runBatchInference(
-      primaryKeysFrame: primaryKeysFrame,
-      inputFrame: inferenceInputFrame,
-    );
-    // QuizzerLogger.logValue('Inference Results:\n$resultsFrame');
-    await _updateDatabaseWithPredictions(resultsFrame);
-  }
-  Future<void> _updateDatabaseWithPredictions(DataFrame resultsFrame) async {
-    final db = await getDatabaseMonitor().requestDatabaseAccess();
-    if (db == null) {
-      throw Exception('Failed to acquire database access');
+      // Get model info from MlModelManager (includes pre-loaded interpreter)
+      final modelInfo = await MlModelManager().getAccuracyNetModel();
+      final interpreter = modelInfo['interpreter'] as Interpreter;
+      final optimalThreshold = modelInfo['optimal_threshold'] as double;
+      
+      // Process data through pipeline
+      QuizzerLogger.logMessage("Processing ${rawSamplesFrame.rows.length} samples through preprocessing pipeline");
+      final decodedFrame = await decodeDataFrameJsonFields(rawSamplesFrame);
+      final unpackedFrame = await unpackDataFrameFeatures(decodedFrame);
+      final encodedFrame = await oneHotEncodeDataFrame(unpackedFrame);
+      final inferenceInputFrame = await reshapeDataFrameToAccuracyNetInputShape(encodedFrame);
+      QuizzerLogger.logMessage("Preprocessing complete. Inference input frame has ${inferenceInputFrame.rows.length} rows and ${inferenceInputFrame.header.length} columns.");
+      
+      // Run inference using the interpreter from MlModelManager
+      final resultsFrame = await _runBatchInference(
+        primaryKeysFrame: primaryKeysFrame,
+        inputFrame: inferenceInputFrame,
+        interpreter: interpreter,
+        optimalThreshold: optimalThreshold,
+      );
+      
+      QuizzerLogger.logMessage("Inference complete. Updating database with predictions.");
+      await _updateDatabaseWithPredictions(resultsFrame);
+      _cycleIsRunning = false;
+    } catch (e) {
+      QuizzerLogger.logError('AccuracyNetWorker cycle error: $e');
+      rethrow; // DO NOT FUCKING SWALLOW THE ERRORS
     }
+  }
+
+  Future<void> _updateDatabaseWithPredictions(DataFrame resultsFrame) async {
     try {
       final headers = resultsFrame.header.toList();
       final userUuidIdx = headers.indexOf('user_uuid');
       final questionIdIdx = headers.indexOf('question_id');
       final probResultIdx = headers.indexOf('prob_result');
       final lastProbCalcIdx = headers.indexOf('last_prob_calc');
+      
       int updateCount = 0;
+      
       for (final row in resultsFrame.rows) {
         final rowList = row.toList();
-        final userUuid = rowList[userUuidIdx];
-        final questionId = rowList[questionIdIdx];
-        final probResult = rowList[probResultIdx];
-        final lastProbCalc = rowList[lastProbCalcIdx];
-        final result = await db.update(
-          'user_question_answer_pairs',
-          {
-            'accuracy_probability': probResult,
-            'last_prob_calc': lastProbCalc,
-          },
-          where: 'user_uuid = ? AND question_id = ?',
-          whereArgs: [userUuid, questionId],
-        );
-        if (result > 0) {
-          updateCount++;
-        }
+        final userUuid = rowList[userUuidIdx] as String;
+        final questionId = rowList[questionIdIdx] as String;
+        final probResult = rowList[probResultIdx] as double;
+        final lastProbCalc = rowList[lastProbCalcIdx] as String;
+        
+        // Use UserQuestionAnswerPairsTable to update the record
+        await UserQuestionAnswerPairsTable().upsertRecord({
+          'user_uuid': userUuid,
+          'question_id': questionId,
+          'accuracy_probability': probResult,
+          'last_prob_calc': lastProbCalc,
+        });
+        
+        updateCount++;
       }
-      QuizzerLogger.logSuccess('Updated $updateCount records in database');
-    } finally {
-      getDatabaseMonitor().releaseDatabaseAccess();
+      
+      if (updateCount > 0) {
+        QuizzerLogger.logSuccess('Updated $updateCount records with new predictions using UserQuestionAnswerPairsTable');
+      }
+    } catch (e) {
+      QuizzerLogger.logError('Error in _updateDatabaseWithPredictions: $e');
+      rethrow;
     }
   }
 
   Future<DataFrame> _runBatchInference({
     required DataFrame primaryKeysFrame,
     required DataFrame inputFrame,
+    required Interpreter interpreter,
+    required double optimalThreshold,
   }) async {
-    // QuizzerLogger.logMessage('=== Starting runBatchInference ===');
     final timeStamp = DateTime.now().toUtc().toIso8601String();
     final numRows = inputFrame.rows.length;
     final numFeatures = inputFrame.header.length;
     
-    // QuizzerLogger.logMessage('Batch info: $numRows rows, $numFeatures features');
-    
-    // Validate interpreter state
-    // QuizzerLogger.logMessage('Checking interpreter state...');
-    final inputTensorDetails = AccuracyNetWorker().predictionModel!.getInputTensor(0);
-    // QuizzerLogger.logMessage('Input tensor retrieved successfully');
-    // QuizzerLogger.logMessage('  Expected shape: ${inputTensorDetails.shape}');
-    
+    // Validate input shape matches model expectations
+    final inputTensorDetails = interpreter.getInputTensor(0);
     final expectedInputFeatures = inputTensorDetails.shape[1];
-    // QuizzerLogger.logMessage('Model expects $expectedInputFeatures features, got $numFeatures features');
     
     if (expectedInputFeatures != numFeatures) {
-      // QuizzerLogger.logError('SHAPE MISMATCH: Model expects $expectedInputFeatures but data has $numFeatures');
       throw Exception(
         'Shape mismatch: Model expects $expectedInputFeatures features but data has $numFeatures. '
-        'The model does not match the input_features in the database. '
-        'Please ensure the model is downloaded during app initialization and matches the expected feature count.'
+        'Please ensure the model matches the expected feature count.'
       );
     }
-    
-    // QuizzerLogger.logSuccess('✓ Shape validation passed');
     
     final List<List<dynamic>> updatedPrimaryKeyRows = [];
     final inputRows = inputFrame.rows.toList();
     
-    // QuizzerLogger.logMessage('Starting inference loop for $numRows samples...');
-    
     for (int i = 0; i < numRows; i++) {
-      // QuizzerLogger.logMessage('--- Processing sample ${i + 1}/$numRows ---');
-      
       final inputRow = inputRows[i].toList();
       final input = List<double>.filled(numFeatures, 0.0);
+      
+      // Convert input to double array
       for (int j = 0; j < numFeatures; j++) {
         final value = inputRow[j];
         if (value == null) {
@@ -251,31 +248,27 @@ class AccuracyNetWorker {
         }
       }
       
+      // Run inference
       final inputTensor = [input];
       final outputTensor = [List<double>.filled(1, 0.0)];
-      
-      AccuracyNetWorker().predictionModel!.run(inputTensor, outputTensor);
-      // QuizzerLogger.logSuccess('  ✓ Inference completed successfully');
+      interpreter.run(inputTensor, outputTensor);
       
       final probability = outputTensor[0][0];
-      QuizzerLogger.logMessage('  Predicted probability: $probability');
       
-      if (probability < 0.0 || probability > 1.0) {
-        QuizzerLogger.logWarning('  WARNING: Probability out of range [0,1]: $probability');
+      // Log if probability is near optimal threshold for monitoring
+      if ((probability - optimalThreshold).abs() < 0.1) {
+        QuizzerLogger.logMessage('Prediction near optimal threshold ($optimalThreshold): $probability');
       }
       
       final pkRow = primaryKeysFrame.rows.toList()[i].toList();
       updatedPrimaryKeyRows.add([...pkRow.sublist(0, 2), probability, timeStamp]);
     }
     
-    QuizzerLogger.logSuccess('✓ All $numRows samples processed successfully');
+    QuizzerLogger.logSuccess('Processed $numRows inference samples');
     
     final headers = ['user_uuid', 'question_id', 'prob_result', 'last_prob_calc'];
     final allData = [headers, ...updatedPrimaryKeyRows];
     
-    final resultFrame = DataFrame(allData);
-    // QuizzerLogger.logMessage('=== runBatchInference completed ===');
-    
-    return resultFrame;
+    return DataFrame(allData);
   }
 }

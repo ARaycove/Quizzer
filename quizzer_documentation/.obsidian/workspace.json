@@ -53,18 +53,30 @@
             "id": "d477a20869bd563d",
             "type": "leaf",
             "state": {
+              "type": "excalidraw",
+              "state": {
+                "file": "Diagrams/quizzer_business_logic.excalidraw.md"
+              },
+              "icon": "excalidraw-icon",
+              "title": "quizzer_business_logic.excalidraw"
+            }
+          },
+          {
+            "id": "1a6ca9c32c967ccb",
+            "type": "leaf",
+            "state": {
               "type": "markdown",
               "state": {
-                "file": "Core Documentation/Chapter 09 - Algorithms and Background Processes/09_01_Central_Algorithms_Overview.md",
+                "file": "Core Documentation/Chapter 11 - Testing and Deployment/10_03_File_Structure.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "09_01_Central_Algorithms_Overview"
+              "title": "10_03_File_Structure"
             }
           }
         ],
-        "currentTab": 3
+        "currentTab": 4
       }
     ],
     "direction": "vertical"
@@ -213,48 +225,48 @@
       "obsidian-excalidraw-plugin:New drawing": false
     }
   },
-  "active": "d477a20869bd563d",
+  "active": "1a6ca9c32c967ccb",
   "lastOpenFiles": [
-    "Core Documentation/Chapter 09 - Algorithms and Background Processes/09_00_Feature_Outline.md",
+    "Core Documentation/Chapter 11 - Testing and Deployment/10_01_Testing_Strategy.md",
+    "Core Documentation/Chapter 11 - Testing and Deployment/10_02_Deployment_Pipeline.md",
+    "Core Documentation/Chapter 11 - Testing and Deployment/10_03_File_Structure.md",
+    "Core Documentation/Chapter 07 - Functions/Database Functions/07_01_01_loadDatabase().md",
+    "Core Documentation/Chapter 07 - Functions/Database Functions/07_01_02_createNewUserProfile(email, username).md",
+    "Core Documentation/Chapter 07 - Functions/Database Functions/07_01_04_generateUserUUID().md",
+    "Core Documentation/Chapter 07 - Functions/Database Functions/07_01_03_verifyUserProfileTable().md",
+    "Core Documentation/Chapter 08 - Database/08_01_01_Question_Answer_Pair_Table.md",
+    "Core Documentation/Chapter 08 - Database/08_01_04_Question_Flags_Table.md",
+    "Core Documentation/Chapter 08 - Database/08_02_02_Login_Attempts_Table.md",
+    "Core Documentation/Chapter 08 - Database/08_03_01_Citation_and_Source_Material_Table.md",
+    "Core Documentation/Chapter 08 - Database/08_03_02_Source_Material_Key_Term_Table.md",
+    "Core Documentation/Chapter 08 - Database/08_02_01_User_Profiles_Table.md",
+    "Core Documentation/Chapter 08 - Database/08_01_05_Subject_Concept_Classification_Results.md",
+    "Core Documentation/Chapter 08 - Database/08_01_03_Question_Answer_Attempts_Table.md",
+    "Core Documentation/Chapter 08 - Database/08_01_02_User_Question_Relationship_Table.md",
     "Core Documentation/Chapter 09 - Algorithms and Background Processes/09_01_Central_Algorithms_Overview.md",
     "Core Documentation/Chapter 09 - Algorithms and Background Processes/09_02_Memory_Retention_Algorithm.md",
-    "Core Documentation/Chapter 09 - Algorithms and Background Processes/09_13_Question_Selection_Background_Process.md",
-    "Core Documentation/Chapter 09 - Algorithms and Background Processes/09_04_Question_Selection_Algorithm.md",
-    "Core Documentation/Chapter 09 - Algorithms and Background Processes/09_12_Geographic_Coordinates_Recording_Background_Process.md",
-    "Core Documentation/Chapter 09 - Algorithms and Background Processes/09_11_Background_Noise_Process.md",
-    "Excalidraw/Drawing 2025-04-17 10.16.39.excalidraw.md",
-    "CSCI_447 Assignment 0.md",
-    "Core Documentation/Chapter 09 - Algorithms and Background Processes/Neural-Net Layer.md",
-    "Pasted image 20250906115039.png",
     "Core Documentation/Chapter 09 - Algorithms and Background Processes/09_03_Question_Circulation_Selection_Algorithm.md",
-    "Core Documentation/Chapter 09 - Algorithms and Background Processes/09_10_Data_Synchronization_Background_Process.md",
-    "Core Documentation/Chapter 09 - Algorithms and Background Processes/Untitled.base",
-    "z_dev_curiosity.md",
+    "Core Documentation/Chapter 09 - Algorithms and Background Processes/09_04_Question_Selection_Algorithm.md",
+    "Diagrams/Quizzer_ML_Pipeline.md",
+    "Diagrams/quizzer_business_logic.excalidraw.md",
+    "Excalidraw/Drawing 2025-04-17 10.16.39.excalidraw.md",
     "Diagrams/Question_Answer_Pair_Generation.md",
     "Diagrams/Quizzer_Flow_Chart.md",
-    "temp_notes.md",
-    "Diagrams/NewUserSignUp-LoginPage.png",
     "Diagrams/LoginPage.png",
-    "Core Documentation/Chapter 05 - User Experience and User Interface Design/05_08_Enter_Source_Material_Page.md",
-    "Core Documentation/Chapter 05 - User Experience and User Interface Design/05_07_Help_With_Research_Page.md",
-    "Core Documentation/Chapter 05 - User Experience and User Interface Design/05_06_Menu_Page.md",
-    "Core Documentation/Chapter 05 - User Experience and User Interface Design/05_06_Add_Question_Answer_Pair_Page.md",
-    "Core Documentation/Chapter 05 - User Experience and User Interface Design/05_05_Home_Page.md",
-    "Core Documentation/Chapter 05 - User Experience and User Interface Design/05_04_New_User_Sign_Up_Page.md",
-    "Core Documentation/Chapter 05 - User Experience and User Interface Design/05_03_Login_Page.md",
-    "Core Documentation/Chapter 05 - User Experience and User Interface Design/05_02_Loading_page.md",
-    "Core Documentation/Chapter 05 - User Experience and User Interface Design/05_01_UI_UX_Philosophy_and_Design.md",
-    "Core Documentation/Chapter 04 - Technical Architecture Philosophy, Design Principles, and Ethical Considerations/04_06_OpenSource.md",
+    "Diagrams/NewUserSignUp-LoginPage.png",
+    "temp_notes.md",
+    "Quizzer_Logo.png",
+    "Pasted image 20250906115039.png",
+    "Pasted image 20250407093838.png",
+    "Core Documentation/Chapter 09 - Algorithms and Background Processes/Untitled.base",
     "Untitled.canvas",
     "Core Documentation/Chapter 00 - Project Overview and Guidelines/general-guidelines.mdc",
     "Core Documentation/Chapter 00 - Project Overview and Guidelines",
     "Core Documentation/Chapter 08 - Database/Question Answer Related Tables",
-    "Pasted image 20250407093838.png",
     "Core Documentation/Chapter 07 - Functions/Redirect Functions",
     "Core Documentation/Chapter 07 - Functions/Database Functions",
     "Core Documentation/Chapter 10 - Data Protection and Privacy",
     "Excalidraw",
-    "Quizzer_Logo.png",
     "Core Documentation/Chapter 07 - Functions",
     "Core Documentation/Chapter 09 - Algorithms and Background Processes"
   ]

@@ -116,10 +116,10 @@ class DatabaseMonitor {
       // Add to appropriate queue based on priority
       if (isSyncRequest) {
         _syncQueue.add(queueEntry);
-        QuizzerLogger.logMessage('Sync database access queued by $caller, waiting for lock release (currently held by: ${_currentLockHolder ?? 'unknown'})');
+        QuizzerLogger.logMessage('Sync database access queued by $caller, waiting for lock release (currently held by: ${_currentLockHolder ?? 'unknown'}), position in sync queue: ${_syncQueue.length}');
       } else {
         _priorityQueue.add(queueEntry);
-        QuizzerLogger.logMessage('Priority database access queued by $caller, waiting for lock release (currently held by: ${_currentLockHolder ?? 'unknown'})');
+        QuizzerLogger.logMessage('Priority database access queued by $caller, waiting for lock release (currently held by: ${_currentLockHolder ?? 'unknown'}), position in priority queue: ${_priorityQueue.length}');
       }
       
       return await completer.future;

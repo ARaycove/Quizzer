@@ -1,45 +1,37 @@
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/inbound_sync/inbound_sync_worker.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_profile_table.dart';
-import 'package:quizzer/backend_systems/06_user_question_management/user_question_processes.dart' show validateAllModuleQuestions;
-import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pair_management/question_answer_pairs_table.dart' as q_pairs_table;
-import 'package:quizzer/backend_systems/01_user_auth_login_manager/new_user_signup.dart' as account_creation;
-import 'package:quizzer/backend_systems/03_module_management/module_management.dart' as module_management;
-import 'package:quizzer/backend_systems/03_module_management/rename_modules.dart' as rename_modules;
-import 'package:quizzer/backend_systems/03_module_management/merge_modules.dart' as merge_modules;
-import 'package:quizzer/backend_systems/02_login_authentication/login_initialization.dart';
-import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
+import 'dart:io';
+import 'dart:async';
 import 'package:hive/hive.dart';
 import 'package:supabase/supabase.dart';
-import 'dart:async'; // For Completer and StreamController
-import 'dart:io'; // For Directory
-// Data Caches for Backend management
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:quizzer/backend_systems/00_helper_utils/utils.dart';
+import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
+import 'package:quizzer/backend_systems/09_switch_board/switch_board.dart';
+import 'package:quizzer/backend_systems/session_manager/session_helper.dart';
+import 'package:quizzer/backend_systems/00_helper_utils/file_locations.dart';
 import 'package:quizzer/backend_systems/08_data_caches/question_queue_cache.dart';
 import 'package:quizzer/backend_systems/08_data_caches/answer_history_cache.dart';
-import 'package:quizzer/backend_systems/05_question_queue_server/question_selection_worker.dart';
-import 'package:quizzer/backend_systems/09_switch_board/switch_board.dart'; // Import SwitchBoard
+import 'package:quizzer/backend_systems/10_settings_manager/settings_manager.dart';
+import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
+import 'package:quizzer/backend_systems/02_login_authentication/login_initializer.dart';
 import 'package:quizzer/backend_systems/09_switch_board/sb_question_worker_signals.dart';
-import 'package:quizzer/backend_systems/session_manager/session_helper.dart';
+import 'package:quizzer/backend_systems/05_question_queue_server/circulation_worker.dart';
+import 'package:quizzer/backend_systems/01_account_creation_and_management/account_manager.dart';
+import 'package:quizzer/backend_systems/05_question_queue_server/question_selection_worker.dart';
+import 'package:quizzer/backend_systems/06_question_answer_pair_management/question_generator.dart';
+import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/media_sync_worker.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/system_data/error_logs_table.dart';
+import 'package:quizzer/backend_systems/12_answer_validator/answer_validation/text_analysis_tools.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/system_data/user_feedback_table.dart';
+import 'package:quizzer/backend_systems/06_question_answer_pair_management/question_review_manager.dart';
+import 'package:quizzer/backend_systems/05_question_queue_server/user_questions/user_question_manager.dart';
+import 'package:quizzer/backend_systems/05_question_queue_server/user_questions/user_answer_submitter.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_daily_stats_table.dart';
+import 'package:quizzer/backend_systems/06_question_answer_pair_management/question_answer_pair_manager.dart';
 import 'package:quizzer/backend_systems/12_answer_validator/answer_validation/session_answer_validation.dart';
 import 'package:quizzer/backend_systems/12_answer_validator/answer_validation/text_validation_functionality.dart';
-import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/outbound_sync/outbound_sync_worker.dart'; // Import the new worker
-import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/media_sync_worker.dart'; // Added import for MediaSyncWorker
-import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart'; // Import for getDatabaseMonitor
-import 'package:quizzer/backend_systems/00_database_manager/review_system/get_send_postgre.dart';
-import 'package:quizzer/backend_systems/00_database_manager/review_system/review_subject_nodes.dart' as subject_review;
-import 'package:quizzer/backend_systems/00_database_manager/review_system/handle_question_flags.dart' as flag_review;
-import 'package:quizzer/backend_systems/00_database_manager/tables/system_data/error_logs_table.dart'; // Direct import
-import 'package:quizzer/backend_systems/00_database_manager/tables/system_data/user_feedback_table.dart'; // Removed alias
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_settings_table.dart' as user_settings_table;
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_question_answer_pairs_table.dart'; // Added for direct access
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_daily_stats_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_module_activation_status_table.dart'; // Added import for the new table
-import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pair_management/question_answer_pair_flags_table.dart'; // Added import for flags table
-import 'package:quizzer/backend_systems/00_helper_utils/file_locations.dart';
-import 'package:quizzer/backend_systems/00_database_manager/custom_queries.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/modules_table.dart' as modules_table;
-import 'package:quizzer/backend_systems/12_answer_validator/answer_validation/text_analysis_tools.dart' as text_validation;
-import 'package:quizzer/backend_systems/05_question_queue_server/circulation_worker.dart';
+import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/inbound_sync/inbound_sync_worker.dart';
+import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/outbound_sync/outbound_sync_worker.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pair_management/question_answer_pair_flags_table.dart';
 
 class SessionManager {
   // Singleton instance
@@ -90,6 +82,7 @@ class SessionManager {
   // --- Setters for User Settings Cache ---
   void setCachedUserSettings(Map<String, dynamic> settings) => _cachedUserSettings = settings;
 
+  // TODO rebuild this update call to use the SettingManager() once the SettingsManager() is made
   void updateCachedUserSetting(String settingName, dynamic value) {
     _cachedUserSettings[settingName] = value;
   }
@@ -144,56 +137,35 @@ class SessionManager {
     return _cachedLastReviewed;
   }
 
-  // --- Setters for Home Page Stat Display Cache ---
-  void setCachedEligibleQuestionsCount(int? value) 
-  => _cachedEligibleQuestionsCount = value;
-
-  void setCachedInCirculationQuestionsCount(int? value) 
-  => _cachedInCirculationQuestionsCount = value;
-
-  void setCachedNonCirculatingQuestionsCount(int? value) 
-  => _cachedNonCirculatingQuestionsCount = value;
-
-  void setCachedLifetimeTotalQuestionsAnswered(int? value) 
-  => _cachedLifetimeTotalQuestionsAnswered = value;
-
-  void setCachedDailyQuestionsAnswered(int? value) 
-  => _cachedDailyQuestionsAnswered = value;
-
-  void setCachedAverageDailyQuestionsLearned(double? value) 
-  => _cachedAverageDailyQuestionsLearned = value;
-
-  void setCachedAverageQuestionsShownPerDay(double? value) 
-  => _cachedAverageQuestionsShownPerDay = value;
-
-  void setCachedDaysLeftUntilQuestionsExhaust(double? value)
-  => _cachedDaysLeftUntilQuestionsExhaust = value;
-
-  void setCachedRevisionStreakScore(int? value) 
-
-  => _cachedRevisionStreakScore = value;
-  void setCachedLastReviewed(DateTime? value) 
-  => _cachedLastReviewed = value;
-
-  // --- Clear all cached stats ---
-  void clearCachedStats() {
-    _cachedEligibleQuestionsCount = null;
-    _cachedInCirculationQuestionsCount = null;
-    _cachedNonCirculatingQuestionsCount = null;
-    _cachedLifetimeTotalQuestionsAnswered = null;
-    _cachedDailyQuestionsAnswered = null;
-    _cachedAverageDailyQuestionsLearned = null;
-    _cachedAverageQuestionsShownPerDay = null;
-    _cachedDaysLeftUntilQuestionsExhaust = null;
-    _cachedRevisionStreakScore = null;
-    _cachedLastReviewed = null;
-  }
-
   // user State
-              bool                            userLoggedIn = false;
-              String?                         userId;
-              String?                         userEmail;
-              String?                         _initialProfileLastModified; // Store initial last_modified_timestamp
+              bool          _userLoggedIn = false;
+              bool    get   userLoggedIn  => _userLoggedIn;
+                      set userLoggedIn(bool value) {
+                        QuizzerLogger.logMessage("Setting userLoggedIn to: $value");
+                        _userLoggedIn = value;
+                        QuizzerLogger.logMessage("userLoggedIn is now: $_userLoggedIn");
+                        assert(_userLoggedIn == value, "Failed to set userLoggedIn to $value");
+                      }
+
+              String?       _userId;
+              String? get   userId        => _userId;
+                      set   userId(String? value) {
+                QuizzerLogger.logMessage("Setting SessionManager.userId to: $value");
+                _userId = value;
+                QuizzerLogger.logMessage("SessionManager.userId is now: $_userId");
+                assert(_userId == value, "Failed to set userId. Expected: $value, Actual: $_userId");
+              }
+
+              String? _userEmail;
+              String? get userEmail => _userEmail;
+                      set userEmail(String? value) {
+                        QuizzerLogger.logMessage("Setting userEmail to: $value");
+                        _userEmail = value;
+                        QuizzerLogger.logMessage("userEmail is now: $_userEmail");
+                        assert(_userEmail == value, "Failed to set userEmail to $value");
+                      }
+
+              String?       _initialProfileLastModified; // Store initial last_modified_timestamp
   // Current Question information and booleans
               Map<String, dynamic>?           _currentQuestionRecord;         // userQuestionRecord
               Map<String, dynamic>?           _currentQuestionDetails;        // questionAnswerPairRecord
@@ -207,27 +179,27 @@ class SessionManager {
               dynamic                         _lastSubmittedUserAnswer; // The actual answer that was submitted
               bool                            _lastSubmittedIsCorrect = false; // Whether the submitted answer was correct
   // MetaData
-              DateTime?                       sessionStartTime;
-  
-          // Cached user role to avoid repeated JWT decoding
-              String?                         _cachedUserRole;
+              DateTime?                       _sessionStartTime;
+              DateTime? get                   sessionStartTime => _sessionStartTime;
+                        set                   sessionStartTime(DateTime? value) {
+                          QuizzerLogger.logMessage("Setting sessionStartTime to: $value");
+                          _sessionStartTime = value;
+                          QuizzerLogger.logMessage("sessionStartTime is now: $_sessionStartTime");
+                          assert(_sessionStartTime == value, "Failed to set sessionStartTime to $value");
+                        }
   
           
   // --- Public Getters for UI State ---
-  Map<String, dynamic>? get currentQuestionUserRecord => _currentQuestionRecord;
-  Map<String, dynamic>? get currentQuestionStaticData => _currentQuestionDetails;
-  String?               get initialProfileLastModified => _initialProfileLastModified;
+  Map<String, dynamic>? get currentQuestionUserRecord   => _currentQuestionRecord;
+  Map<String, dynamic>? get currentQuestionStaticData   => _currentQuestionDetails;
+  String?               get initialProfileLastModified  => _initialProfileLastModified;
   
   // How will a fill in the blank be evaluated?
   String getFillInTheBlankValidationType(primaryAnswer) {
     return getValidationType(primaryAnswer);
   }
-
-  // ADDED: Getter that uses cached user role to avoid repeated JWT decoding
-  String get userRole {
-    _cachedUserRole ??= determineUserRoleFromSupabaseSession(supabase.auth.currentSession);
-    return _cachedUserRole!;
-  }
+  // Decode the JWT everytime to ensure security
+  String get userRole {return SessionHelper.determineUserRoleFromSupabaseSession(supabase.auth.currentSession);}
   
   // --- Public Method for Testing (Password Protected) ---
   Box getBox(String password) {
@@ -244,7 +216,6 @@ class SessionManager {
   
   // Login progress stream is now managed by SwitchBoard
   Stream<String> get loginProgressStream => _switchBoard.onLoginProgress;
-  
   
   // int?                  get optionSelected            => _multipleChoiceOptionSelected;
   DateTime?             get timeQuestionDisplayed     => _timeDisplayed;
@@ -300,7 +271,7 @@ class SessionManager {
   Future<List<String>> getSynonymSuggestions(String word) async {
     try {
       QuizzerLogger.logMessage('Getting synonym suggestions for word: $word');
-      final synonyms = await text_validation.callSynonymAPI(word);
+      final synonyms = await callSynonymAPI(word);  // FIXME Move function to QuestionGenerator
       QuizzerLogger.logSuccess('Retrieved ${synonyms.length} synonym suggestions for "$word"');
       return synonyms;
     } catch (e) {
@@ -374,9 +345,6 @@ class SessionManager {
   List<Map<String, dynamic>>  get currentCorrectOrder           => _currentQuestionDetails!['correct_order'] 
   as List<Map<String, dynamic>>; // Parsed in DB layer
 
-  String get currentModuleName                                  => _currentQuestionDetails!['module_name'] 
-  as String? ?? "general";
-
   String?                     get currentCitation               => _currentQuestionDetails!['citation'] 
   as String?;
 
@@ -409,6 +377,7 @@ class SessionManager {
   // ================================================================================
   // --------------------------------------------------------------------------------
   // SessionManager Constructor (Initializes Supabase and starts async init)
+  // FIXME Move to Initialization object
   SessionManager._internal(): 
         _queueCache             = QuestionQueueCache(),
         _historyCache           = AnswerHistoryCache(),
@@ -431,7 +400,6 @@ class SessionManager {
       // For now, just completing with error lets awaiters handle it.
     });
   }
-
   // Initialize Hive storage (private)
   Future<void> _initializeStorage() async {
     final String hivePath = await getQuizzerHivePath();
@@ -476,12 +444,10 @@ class SessionManager {
   Future<void> _clearSessionState() async{
     try {
       QuizzerLogger.logMessage('Entering _clearSessionState()...');
-      
       userLoggedIn = false;
       userId = null;
       userEmail = null;
       sessionStartTime = null;
-      _cachedUserRole = null; // Clear cached user role
       _clearQuestionState(); // Clear current question state
       // Note: Does not stop workers or clear persistent storage, assumes logout function handles that.
       
@@ -503,10 +469,15 @@ class SessionManager {
     required String username,
     required String password,
   }) async {
+    bool isConnected = await checkConnectivity();
+    if (!isConnected) {return {
+        'success': false,
+        'message': 'Not Connected to the Internet, signup required internet access',
+      };}
     try {
       QuizzerLogger.logMessage('Entering createNewUserAccount()...');
-      
-      final result = await account_creation.handleNewUserProfileCreation({
+
+      final result = await AccountManager().handleNewUserProfileCreation({
         'email': email,
         'username': username,
         'password': password,
@@ -523,71 +494,32 @@ class SessionManager {
   //  --------------------------------------------------------------------------------
     // Login User
   // This initializing spins up sub-system processes that rely on the user profile information
-  Future<Map<String, dynamic>> attemptLogin(String email, String password) async {
+  /// AuthType may be one of ["email_login", "google_login"]
+  Future<Map<String, dynamic>> attemptLogin({required String authType, String? email, String? password}) async {
     try {
       QuizzerLogger.logMessage('Entering attemptLogin()...');
       
       // Ensure async initialization is complete before proceeding
       QuizzerLogger.logMessage("Logging in user with email: $email");
       await initializationComplete;
-
+      // Resolve no email by inserting empty string
+      // email is not required in the case of social login
+      email ??= "";
+      password ??= "";
       // Now it's safe to access _storage
-      final response = await loginInitialization(
+      final response = await LoginInitializer().loginUserAuthenticateAndInitializeCoreQuizzerSystem(
         email: email,
         password: password,
-        supabase: supabase,
-        storage: _storage,
-      );
+        supabase: supabase, 
+        storage: _storage, 
+        authType: authType);
 
       // Response information is for front-end UI, not necessary for backend
       // Send signal to UI that it's ok to login now
       QuizzerLogger.logMessage('Successfully completed attemptLogin for email: $email');
-      return response;
+      return response!;
     } catch (e) {
       QuizzerLogger.logError('Error in attemptLogin - $e');
-      rethrow;
-    }
-  }
-
-
-  //  --------------------------------------------------------------------------------
-  // Google Login User
-  // This initializing spins up sub-system processes that rely on the user profile information
-  Future<Map<String, dynamic>> attemptGoogleLogin() async {
-    try {
-      QuizzerLogger.logMessage('Entering attemptLogin()...');
-
-      // Ensure async initialization is complete before proceeding
-      // QuizzerLogger.logMessage("Logging in user with email: $email");
-      await initializationComplete;
-
-      // Now it's safe to access _storage
-      final response = await googleLoginInitialization(
-        supabase: supabase,
-        storage: _storage,
-      );
-
-      // Response information is for front-end UI, not necessary for backend
-      // Send signal to UI that it's ok to login now
-      QuizzerLogger.logMessage('Successfully completed attemptLogin for Google login');
-      return response;
-    } catch (e) {
-      QuizzerLogger.logError('Error in attemptLogin - $e');
-      rethrow;
-    }
-  }
-
-
-  //  --------------------------------------------------------------------------------
-  /// Clears all Hive storage data (for testing purposes)
-  Future<void> clearStorage() async {
-    try {
-      QuizzerLogger.logMessage('Entering clearStorage()...');
-      await initializationComplete;
-      await _storage.clear();
-      QuizzerLogger.logSuccess('Storage cleared successfully');
-    } catch (e) {
-      QuizzerLogger.logError('Error in clearStorage - $e');
       rethrow;
     }
   }
@@ -618,6 +550,7 @@ class SessionManager {
       final outboundSyncWorker = OutboundSyncWorker();
       final mediaSyncWorker = MediaSyncWorker();
 
+      // TODO Refactor SessionManager to have an Enum or List of a background processes then pass this list to futureWait
       await Future.wait([
         psw.stop(),
         circWorker.stop(),
@@ -638,16 +571,9 @@ class SessionManager {
       QuizzerLogger.logMessage("Clearing data caches...");
       await _queueCache.clear();
       await _historyCache.clear();
-      QuizzerLogger.logSuccess("✅ Data caches cleared.");
+      SettingsManager().clearSettingsCache();
 
-      // Update total study time (optional)
-      if (sessionStartTime != null && currentUserIdForLogoutOps != null) {
-        final elapsedDuration = DateTime.now().difference(sessionStartTime!);
-        final double hoursToAdd = elapsedDuration.inMilliseconds / (1000.0 * 60 * 60);
-        QuizzerLogger.logMessage("Updating total study time for $currentUserIdForLogoutOps...");
-        await updateTotalStudyTime(currentUserIdForLogoutOps, hoursToAdd);
-        QuizzerLogger.logSuccess("✅ Total study time updated.");
-      }
+      QuizzerLogger.logSuccess("✅ Data caches cleared.");
 
       // Google Sign-Out (if active)
       QuizzerLogger.logMessage("Checking for active Google Sign-In session...");
@@ -668,9 +594,9 @@ class SessionManager {
       await supabase.auth.signOut();
       QuizzerLogger.logSuccess("✅ Supabase Sign-Out successful.");
 
-      // Clear session state
+      // Clear session state - FIXED: Added parentheses to call the method
       QuizzerLogger.logMessage("Clearing session state...");
-      _clearSessionState;
+      _clearSessionState(); // Fixed this line
       userLoggedIn = false;
       QuizzerLogger.logSuccess("✅ Session state cleared.");
 
@@ -678,221 +604,6 @@ class SessionManager {
       QuizzerLogger.logMessage('Successfully completed logoutUser.');
     } catch (e, st) {
       QuizzerLogger.logError('Error in logoutUser - $e\n$st');
-      rethrow;
-    }
-  }
-
-  // =================================================================================
-  // Module management Calls
-  // =================================================================================
-  // API for loading module names and their activation status
-  Future<Map<String, Map<String, dynamic>>> getModuleData({bool onlyWithQuestions = false}) async {
-    try {
-      QuizzerLogger.logMessage('Entering getModuleData()...');
-      
-      assert(userId != null);
-      final result = await getOptimizedModuleData(userId!);
-      
-      // Filter modules if requested
-      if (onlyWithQuestions) {
-        final Map<String, Map<String, dynamic>> filteredResult = {};
-        for (final entry in result.entries) {
-          final String moduleName = entry.key;
-          final Map<String, dynamic> moduleData = entry.value;
-          final int questionCount = moduleData['total_questions'] as int? ?? 0;
-          if (questionCount > 0) {
-            filteredResult[moduleName] = moduleData;
-          }
-        }
-        QuizzerLogger.logMessage('Successfully loaded modules for user: $userId (filtered: only with questions)');
-        return filteredResult;
-      }
-      
-      QuizzerLogger.logMessage('Successfully loaded modules for user: $userId');
-      return result;
-    } catch (e) {
-      QuizzerLogger.logError('Error in getModuleData - $e');
-      rethrow;
-    }
-  }
-
-  //  --------------------------------------------------------------------------------
-  // API for loading individual module data
-  Future<Map<String, dynamic>?> getModuleDataByName(String moduleName) async {
-    try {
-      QuizzerLogger.logMessage('Entering getModuleDataByName()...');
-      
-      assert(userId != null);
-      
-      // Normalize the module name before lookup
-      final String normalizedModuleName = await text_validation.normalizeString(moduleName);
-      final result = await getIndividualModuleData(userId!, normalizedModuleName);
-      
-      QuizzerLogger.logMessage('Successfully loaded individual module data for module: $moduleName');
-      return result;
-    } catch (e) {
-      QuizzerLogger.logError('Error in getModuleDataByName - $e');
-      rethrow;
-    }
-  }
-
-  //  --------------------------------------------------------------------------------
-  // API for activating or deactivating a module (Updated to use new table)
-  Future<void> toggleModuleActivation(String moduleName, bool activate) async {
-    try {
-      QuizzerLogger.logMessage('Entering toggleModuleActivation()...');
-      
-      assert(userId != null);
-      
-      // Normalize the module name before processing
-      final String normalizedModuleName = await text_validation.normalizeString(moduleName);
-      
-      // Update module activation status using the new table function
-      final bool result = await updateModuleActivationStatus(userId!, normalizedModuleName, activate);
-      
-      if (!result) {
-        throw Exception('Failed to update module activation status for module: $moduleName');
-      }
-      
-      // Clear the question queue cache when module activation changes
-      _queueCache.clear();
-      QuizzerLogger.logMessage('Cleared question queue cache due to module activation change');
-      
-      QuizzerLogger.logMessage('Successfully toggled module activation for module: $moduleName, activate: $activate');
-    } catch (e) {
-      QuizzerLogger.logError('Error in toggleModuleActivation - $e');
-      rethrow;
-    }
-  }
-
-  //  --------------------------------------------------------------------------------
-  // API for getting available categories
-  List<String> getAvailableModuleCategories() {
-    try {
-      QuizzerLogger.logMessage('Entering getAvailableCategories()...');
-      
-      final categories = modules_table.getAvailableCategories();
-      
-      QuizzerLogger.logMessage('Successfully retrieved available categories: $categories');
-      return categories;
-    } catch (e) {
-      QuizzerLogger.logError('Error in getAvailableCategories - $e');
-      rethrow;
-    }
-  }
-
-  //  --------------------------------------------------------------------------------
-  // API for updating a module's categories
-  Future<bool> updateModuleCategories(String moduleName, List<String> categories) async {
-    try {
-      QuizzerLogger.logMessage('Entering updateModuleCategories()...');
-      
-      assert(userId != null);
-      
-      // Normalize the module name before processing
-      final String normalizedModuleName = await text_validation.normalizeString(moduleName);
-      
-      // Use the existing updateModule function from modules_table
-      await modules_table.updateModule(
-        name: normalizedModuleName,
-        categories: categories,
-      );
-      
-      QuizzerLogger.logMessage('Successfully updated module categories for module: $moduleName');
-      return true;
-    } catch (e) {
-      QuizzerLogger.logError('Error in updateModuleCategories - $e');
-      rethrow;
-    }
-  }
-
-  //  --------------------------------------------------------------------------------
-  // API for updating a module's description
-  Future<bool> updateModuleDescription(String moduleName, String newDescription) async {
-    try {
-      QuizzerLogger.logMessage('Entering updateModuleDescription()...');
-      
-      assert(userId != null);
-      
-      // Normalize the module name before processing
-      final String normalizedModuleName = await text_validation.normalizeString(moduleName);
-      
-      final result = await module_management.handleUpdateModuleDescription({
-        'moduleName': normalizedModuleName,
-        'description': newDescription,
-      });
-      
-      QuizzerLogger.logMessage('Successfully updated module description for module: $moduleName');
-      return result;
-    } catch (e) {
-      QuizzerLogger.logError('Error in updateModuleDescription - $e');
-      rethrow;
-    }
-  }
-
-  //  --------------------------------------------------------------------------------
-  // API for renaming a module
-  Future<bool> renameModule(String oldModuleName, String newModuleName) async {
-    try {
-      QuizzerLogger.logMessage('Entering renameModule()...');
-      
-      assert(userId != null);
-      
-      // Normalize both module names before processing
-      final String normalizedOldModuleName = await text_validation.normalizeString(oldModuleName);
-      final String normalizedNewModuleName = await text_validation.normalizeString(newModuleName);
-      
-      // Call the rename function from the module management layer
-      final result = await rename_modules.renameModule(
-        oldModuleName: normalizedOldModuleName,
-        newModuleName: normalizedNewModuleName,
-      );
-      
-      if (result) {
-        QuizzerLogger.logMessage('Successfully renamed module from "$oldModuleName" to "$newModuleName"');
-        // Clear the question queue cache when module is renamed
-        _queueCache.clear();
-        QuizzerLogger.logMessage('Cleared question queue cache due to module rename');
-      } else {
-        QuizzerLogger.logWarning('Module rename operation failed for "$oldModuleName" to "$newModuleName"');
-      }
-      
-      return result;
-    } catch (e) {
-      QuizzerLogger.logError('Error in renameModule - $e');
-      rethrow;
-    }
-  }
-
-  // API for merging two modules
-  Future<bool> mergeModules(String sourceModuleName, String targetModuleName) async {
-    try {
-      QuizzerLogger.logMessage('Entering mergeModules()...');
-      
-      assert(userId != null);
-      
-      // Normalize both module names before processing
-      final String normalizedSourceModuleName = await text_validation.normalizeString(sourceModuleName);
-      final String normalizedTargetModuleName = await text_validation.normalizeString(targetModuleName);
-      
-      // Call the merge function from the module management layer
-      final result = await merge_modules.mergeModules(
-        sourceModuleName: normalizedSourceModuleName,
-        targetModuleName: normalizedTargetModuleName,
-      );
-      
-      if (result) {
-        QuizzerLogger.logMessage('Successfully merged module "$sourceModuleName" into "$targetModuleName"');
-        // Clear the question queue cache when modules are merged
-        _queueCache.clear();
-        QuizzerLogger.logMessage('Cleared question queue cache due to module merge');
-      } else {
-        QuizzerLogger.logWarning('Module merge operation failed for "$sourceModuleName" into "$targetModuleName"');
-      }
-      
-      return result;
-    } catch (e) {
-      QuizzerLogger.logError('Error in mergeModules - $e');
       rethrow;
     }
   }
@@ -962,8 +673,8 @@ class SessionManager {
   /// Returns a map: {success: bool, message: String}
   Future<Map<String, dynamic>> submitAnswer({required dynamic userAnswer}) async {
     try {
-      // QuizzerLogger.logMessage('Entering submitAnswer()...');
-      // QuizzerLogger.logMessage("Received a userAnswer of $userAnswer");
+      QuizzerLogger.logMessage('Entering submitAnswer()...');
+      QuizzerLogger.logMessage("Received a userAnswer of $userAnswer");
       
       // --- ADDED: Check for Dummy Record State --- 
       if (_currentQuestionRecord == null) {
@@ -1056,11 +767,11 @@ class SessionManager {
       // Note: Submission data (_lastSubmittedUserAnswer, _lastSubmittedIsCorrect, _lastSubmittedCustomOrderIndices) 
       // should be set by widgets BEFORE calling submitAnswer
 
-      // --- 4. Record Answer Attempt (at time of presentation) ---
+      // --- Record Answer Attempt (at time of presentation) ---
       // Keep a copy of the record *before* updates for the attempt log
       
       // Call the top-level helper function from session_helper.dart
-      await recordQuestionAnswerAttempt(
+      await UserAnswerSubmitter().recordQuestionAnswerAttempt(
         isCorrect: isCorrect,
         userId: userId!,
         questionId: questionId,
@@ -1074,39 +785,24 @@ class SessionManager {
         )
       ).inMicroseconds / Duration.microsecondsPerSecond;
 
-      // --- 5. Update User-Question Pair Record ---
+      // --- Update User-Question Pair Record ---
       // Update user-question pair record (this now handles all DB operations internally)
-      await updateUserQuestionRecordOnAnswer(
+      await UserAnswerSubmitter().updateUserQuestionRecordOnAnswer(
         isCorrect: isCorrect,
-        userId: userId!,
         questionId: questionId,
         reactionTime: reactionTime,
       );
 
-      // --- 6. Update Module Performance Stats ---
-      // Updates after the question record update (module performance is derived from individual quesiton performance)
-      await updateModulePerformanceStats(
-        userId: userId!,
-        moduleName: currentModuleName, // Use getter
-        isCorrect: isCorrect,
-        reactionTime: reactionTime,
-      );
+      // --- Update Daily User Stats ---
+      await UserDailyStatsTable().updateAllUserDailyStats(isCorrect: isCorrect, reactionTime: reactionTime, questionId: questionId);
 
-      // --- 7. Update Daily User Stats ---
-      await updateAllUserDailyStats(userId!, isCorrect: isCorrect, reactionTime: reactionTime, questionId: questionId);
-
-      // --- 8. Signal completion and update in-memory state ---
+      // --- Signal completion and update in-memory state ---
       // Don't send signal until the current question is updated in the DB
       if (isCorrect) {
         signalQuestionAnsweredCorrectly(questionId);
       }
       
-      // Note: We no longer update _currentQuestionRecord since the function doesn't return the updated record
-      // The in-memory state will be refreshed when the next question is requested
-      
-      // Note: Question was already added to answer history cache when requested
-      
-      // QuizzerLogger.logMessage('Successfully submitted answer for QID: $questionId, isCorrect: $isCorrect, userAnswer: $userAnswer');
+      QuizzerLogger.logMessage('Successfully submitted answer for QID: $questionId, isCorrect: $isCorrect, userAnswer: $userAnswer');
       return {'success': true, 'message': 'Answer submitted successfully.'};
     } catch (e) {
       QuizzerLogger.logError('Error in submitAnswer - $e');
@@ -1123,32 +819,22 @@ class SessionManager {
     required String questionType,
     required List<Map<String, dynamic>> questionElements,
     required List<Map<String, dynamic>> answerElements,
-    required String moduleName,
     // --- Type-specific --- (Add more as needed)
     List<Map<String, dynamic>>?       options, // For MC & SelectAll
     int?                              correctOptionIndex, // For MC & TrueFalse
     List<int>?                        indexOptionsThatApply, // For select_all_that_apply
     List<Map<String, List<String>>>?  answersToBlanks, // For fill_in_the_blank
   }) async {
+    // TODO Refactor this entire chain of logic into the QuestionGenerator to handle the switch statement internally, then the API layer here 
+    // just needs to collect the data and pass it on, and not worry about routing logic
     try {
       QuizzerLogger.logMessage('Entering addNewQuestion()...');
       QuizzerLogger.logMessage('SessionManager: Attempting to add new question of type $questionType');
       
-      // --- 1. Pre-checks --- 
+      // --- Pre-checks --- 
       assert(userId != null, 'User must be logged in to add a question.'); 
 
-      // --- 2. Validate/Create Module ---
-      QuizzerLogger.logMessage('Validating module exists: $moduleName');
-      final bool moduleValidated = await module_management.validateModuleExists(moduleName, creatorId: userId!);
-      if (!moduleValidated) {
-        throw Exception('Failed to validate or create module: $moduleName');
-      }
-      QuizzerLogger.logMessage('Module validated/created successfully: $moduleName');
-      
-      // Normalize the module name for consistent use throughout the function
-      final String normalizedModuleName = await text_validation.normalizeString(moduleName);
-
-      // --- 3. Database Operation (table functions handle their own DB access) --- 
+      // --- Database Operation (table functions handle their own DB access) --- 
       Map<String, dynamic> response;
 
       switch (questionType) {
@@ -1158,8 +844,7 @@ class SessionManager {
             throw ArgumentError('Missing required fields for multiple_choice: options and correctOptionIndex.');
           }
           // Call refactored function with correct args
-          await q_pairs_table.addQuestionMultipleChoice(
-            moduleName: normalizedModuleName,
+          await QuestionGenerator().addQuestionMultipleChoice(
             questionElements: questionElements,
             answerElements: answerElements,
             options: options,
@@ -1173,8 +858,7 @@ class SessionManager {
             throw ArgumentError('Missing required fields for select_all_that_apply: options and indexOptionsThatApply.');
           }
           // Call refactored function with correct args
-          await q_pairs_table.addQuestionSelectAllThatApply(
-            moduleName: normalizedModuleName,
+          await QuestionGenerator().addQuestionSelectAllThatApply(
             questionElements: questionElements,
             answerElements: answerElements,
             options: options,
@@ -1190,8 +874,7 @@ class SessionManager {
           }
           
           // Call refactored function with correct args
-          await q_pairs_table.addQuestionTrueFalse(
-              moduleName: normalizedModuleName,
+          await QuestionGenerator().addQuestionTrueFalse(
               questionElements: questionElements,
               answerElements: answerElements,
               correctOptionIndex: correctOptionIndex, // Already checked non-null
@@ -1204,8 +887,7 @@ class SessionManager {
             throw ArgumentError('Missing required field for sort_order: sortOrderOptions (List<String>).');
           }
           // Call the specific function using the correct parameter
-          await q_pairs_table.addSortOrderQuestion(
-            moduleName: normalizedModuleName,
+          await QuestionGenerator().addSortOrderQuestion(
             questionElements: questionElements,
             answerElements: answerElements,
             options: options, // Pass the validated List<String>
@@ -1218,8 +900,7 @@ class SessionManager {
             throw ArgumentError('Missing required field for fill_in_the_blank: answersToBlanks.');
           }
           // Call the specific function for fill_in_the_blank
-          await q_pairs_table.addFillInTheBlankQuestion(
-            moduleName: normalizedModuleName,
+          await QuestionGenerator().addFillInTheBlankQuestion(
             questionElements: questionElements,
             answerElements: answerElements,
             answersToBlanks: answersToBlanks,
@@ -1229,17 +910,9 @@ class SessionManager {
         default:
           throw UnimplementedError('Adding questions of type \'$questionType\' is not yet supported.');
       }
-
-      // --- 3. Post-question operations (table functions handle their own DB access) ---
-      final bool activationResult = await updateModuleActivationStatus(userId!, normalizedModuleName, true);
-      if (!activationResult) {
-        QuizzerLogger.logWarning('Failed to activate module $normalizedModuleName after adding question');
-      }
-      await validateAllModuleQuestions(userId!);
       
       QuizzerLogger.logMessage('SessionManager.addNewQuestion: Question added successfully.');
-      
-      // --- 4. Return Result ---
+      // --- Return Result ---
       response = {};
       QuizzerLogger.logMessage('Successfully added new question of type: $questionType');
       return response;
@@ -1256,7 +929,7 @@ class SessionManager {
       QuizzerLogger.logMessage('Entering fetchQuestionDetailsById()...');
       
       // Table function handles its own database access
-      final details = await q_pairs_table.getQuestionAnswerPairById(questionId);
+      final details = await QuestionAnswerPairManager().getQuestionAnswerPairById(questionId);
       
       QuizzerLogger.logMessage('Successfully fetched question details for QID: $questionId');
       return details;
@@ -1278,13 +951,11 @@ class SessionManager {
     String? qstReviewer,
     bool? hasBeenReviewed,
     bool? flagForRemoval,
-    String? moduleName,
     String? questionType,
     List<Map<String, dynamic>>? options,
     int? correctOptionIndex,
     List<Map<String, dynamic>>? correctOrderElements,
     List<Map<String, List<String>>>? answersToBlanks, // Added for fill-in-the-blank
-    String? originalModuleName, // NEW optional parameter
   }) async {
     try {
       QuizzerLogger.logMessage('Entering updateExistingQuestion()...');
@@ -1292,15 +963,8 @@ class SessionManager {
       // Fail fast if not logged in
       assert(userId != null, 'User must be logged in to update a question.');
       
-      // Normalize module name if provided
-      String? normalizedModuleName;
-      
-      if (moduleName != null) {
-        normalizedModuleName = await text_validation.normalizeString(moduleName);
-      }
-      
       // Table function handles its own database access
-      final int result = await q_pairs_table.editQuestionAnswerPair(
+      final int result = await QuestionAnswerPairManager().editQuestionAnswerPair(
         questionId: questionId,
         questionElements: questionElements,
         answerElements: answerElements,
@@ -1310,7 +974,6 @@ class SessionManager {
         qstReviewer: qstReviewer,
         hasBeenReviewed: hasBeenReviewed,
         flagForRemoval: flagForRemoval,
-        moduleName: normalizedModuleName,
         questionType: questionType,
         options: options,
         correctOptionIndex: correctOptionIndex,
@@ -1342,17 +1005,17 @@ class SessionManager {
       assert(userId != null, 'User must be logged in to add a question flag.');
       
       // Table function handles its own database access and validation
-      final int result = await addQuestionAnswerPairFlag(
-        questionId: questionId,
-        flagType: flagType,
-        flagDescription: flagDescription,
-      );
+      final int result = await QuestionAnswerPairFlagsTable().upsertRecord({
+        'question_id': questionId,
+        'flag_type': flagType,
+        'flag_description': flagDescription,
+        'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
+      });
       
       final bool flagAdded = result > 0;
       if (flagAdded) {
         // Also toggle the flagged status in the user_question_answer_pairs table
-        final bool flaggedToggled = await toggleUserQuestionFlaggedStatus(
-          userUuid: userId!,
+        final bool flaggedToggled = await UserQuestionManager().toggleUserQuestionFlaggedStatus(
           questionId: questionId,
         );
         
@@ -1377,293 +1040,15 @@ class SessionManager {
   // =====================================================================
   // --- User Settings API ---
   // =====================================================================
-
-  /// Updates a specific user setting in the local database.
-  /// Triggers outbound sync.
-  Future<void> updateUserSetting(String settingName, dynamic newValue) async {
-    try {
-      QuizzerLogger.logMessage('Entering updateUserSetting()...');
-      
-      assert(userId != null, 'User must be logged in to update a setting.');
-      
-      // Table function handles its own database access
-      await user_settings_table.updateUserSetting(userId!, settingName, newValue);
-      
-      // Update the cache if it exists
-      updateCachedUserSetting(settingName, newValue);
-      
-      QuizzerLogger.logMessage('Successfully updated user setting: $settingName');
-    } catch (e) {
-      QuizzerLogger.logError('Error in updateUserSetting - $e');
-      rethrow;
-    }
-  }
-
-  /// Fetches user settings from the local database.
-  ///
-  /// Can fetch a single setting by [settingName], a list of settings by [settingNames],
-  /// or all settings if [getAll] is true.
-  /// Throws an ArgumentError if more than one mode is specified or if no mode is specified.
-  Future<dynamic> getUserSettings({
-    String? settingName,
-    List<String>? settingNames,
-    bool getAll = false,
-  }) async {
-    try {
-      QuizzerLogger.logMessage('Entering getUserSettings()...');
-      
-      assert(userId != null, 'User must be logged in to get settings.');
-
-      final int modesSpecified = (settingName != null ? 1 : 0) +
-                                 (settingNames != null ? 1 : 0) +
-                                 (getAll ? 1 : 0);
-      if (modesSpecified == 0) {
-        throw ArgumentError('No mode specified for getUserSettings. Provide settingName, settingNames, or set getAll to true.');
-      }
-      if (modesSpecified > 1) {
-        throw ArgumentError('Multiple modes specified for getUserSettings. Only one of settingName, settingNames, or getAll can be used.');
-      }
-
-      final String currentUserRole = userRole; // Get current user's role
-      dynamic resultToReturn;
-
-      String operationMode;
-      if (getAll) {
-        operationMode = "all";
-      } else if (settingName != null) {
-        operationMode = "single";
-      } else { 
-        operationMode = "list";
-      }
-
-      switch (operationMode) {
-        case "all":
-          QuizzerLogger.logMessage('SessionManager: Getting all user settings for user $userId (Role: $currentUserRole).');
-          
-          // DEBUG: Check if data still exists in database before calling getAllUserSettings
-          try {
-            final db = await getDatabaseMonitor().requestDatabaseAccess();
-            if (db != null) {
-              final List<Map<String, dynamic>> debugResults = await db.query('user_settings', where: 'user_id = ?', whereArgs: [userId]);
-              QuizzerLogger.logMessage('SessionManager DEBUG: Database query before getAllUserSettings returned ${debugResults.length} records: $debugResults');
-              getDatabaseMonitor().releaseDatabaseAccess();
-            }
-          } catch (e) {
-            QuizzerLogger.logError('SessionManager DEBUG: Failed to query database before getAllUserSettings: $e');
-          }
-          
-          // Table function handles its own database access
-          final Map<String, Map<String, dynamic>> allSettingsWithFlags = await user_settings_table.getAllUserSettings(userId!);
-          final Map<String, dynamic> filteredSettings = {};
-          allSettingsWithFlags.forEach((key, settingDetails) {
-            final bool isAdminSetting = (settingDetails['is_admin_setting'] as int? ?? 0) == 1;
-            if (!isAdminSetting || currentUserRole == 'admin' || currentUserRole == 'contributor') {
-              filteredSettings[key] = settingDetails['setting_value'];
-            }
-          });
-          // Cache the results
-          setCachedUserSettings(filteredSettings);
-          resultToReturn = filteredSettings;
-          break;
-        case "single":
-          QuizzerLogger.logMessage('SessionManager: Getting setting "$settingName" for user $userId (Role: $currentUserRole).');
-          // Table function handles its own database access
-          final Map<String, dynamic>? settingDetails = await user_settings_table.getSettingValue(userId!, settingName!);
-          if (settingDetails != null) {
-            final bool isAdminSetting = (settingDetails['is_admin_setting'] as int? ?? 0) == 1;
-            if (!isAdminSetting || currentUserRole == 'admin' || currentUserRole == 'contributor') {
-              resultToReturn = settingDetails['setting_value'];
-              // Always update cache for single setting
-              _cachedUserSettings[settingName] = resultToReturn;
-            } else {
-              resultToReturn = null; // Admin setting, non-admin/contributor user
-              QuizzerLogger.logWarning('SessionManager: Access denied for user $userId (Role: $currentUserRole) to admin/contributor setting "$settingName".');
-            }
-          } else {
-            resultToReturn = null; // Setting not found
-          }
-          break;
-        case "list":
-          QuizzerLogger.logMessage('SessionManager: Getting specific settings for user $userId (Role: $currentUserRole): ${settingNames!.join(", ")}.');
-          final Map<String, dynamic> listedResults = {};
-          for (final name in settingNames) {
-            // Table function handles its own database access
-            final Map<String, dynamic>? settingDetails = await user_settings_table.getSettingValue(userId!, name);
-            if (settingDetails != null) {
-              final bool isAdminSetting = (settingDetails['is_admin_setting'] as int? ?? 0) == 1;
-              if (!isAdminSetting || currentUserRole == 'admin' || currentUserRole == 'contributor') {
-                listedResults[name] = settingDetails['setting_value'];
-              }
-              // If it's an admin setting and user is not admin/contributor, we simply don't add it to the map for listedResults.
-            }
-          }
-          resultToReturn = listedResults;
-          // Always update cache for list of settings
-          _cachedUserSettings.addAll(listedResults);
-          break;
-      }
-
-      QuizzerLogger.logMessage('Successfully retrieved user settings for operation mode: $operationMode');
-      QuizzerLogger.logMessage('$resultToReturn');
-      return resultToReturn;
-    } catch (e) {
-      QuizzerLogger.logError('Error in getUserSettings - $e');
-      rethrow;
-    }
-  }
+  /// Expose the SettingsManager() public functions
+  SettingsManager settings = SettingsManager();
 
   // =====================================================================
   // --- Review System Interface ---
+  // =====================================================================
+  /// Expose the QuestionReviewManager() public function
+  QuestionReviewManager questionReviewManager = QuestionReviewManager();
 
-  /// Fetches a random question requiring review from the backend.
-  ///
-  /// Returns a map containing:
-  /// - \'data\': The decoded question data map, or null if none/error.
-  /// - \'source_table\': The name of the table the question came from, or null.
-  /// - \'primary_key\': The map representing the primary key(s) for deletion, or null.
-  /// - \'error\': An error message string if applicable, or null.
-  Future<Map<String, dynamic>> getReviewQuestion() async {
-    QuizzerLogger.logMessage('SessionManager: Requesting a question for review...');
-    // Directly call the function without the alias
-    return getRandomQuestionToBeReviewed();
-  }
-
-  /// Submits a review decision (approve or deny) for a question.
-  ///
-  /// Args:
-  ///   isApproved: Boolean indicating if the question is approved (true) or denied (false).
-  ///   questionDetails: The full, potentially edited, decoded question data map.
-  ///                    **Required only if isApproved is true.**
-  ///   sourceTable: The name of the review table the question originated from.
-  ///   primaryKey: The map representing the primary key(s) to identify the record in the source table.
-  ///
-  /// Returns:
-  ///   `true` if the operation (approve/deny) was successful, `false` otherwise.
-  Future<bool> submitReview({
-    required bool isApproved,
-    Map<String, dynamic>? questionDetails, // Required only for approval
-    required String sourceTable,
-    required Map<String, dynamic> primaryKey,
-  }) async {
-    QuizzerLogger.logMessage('SessionManager: Submitting review decision (Approved: $isApproved) for PK: $primaryKey from $sourceTable');
-
-    if (isApproved) {
-      // Check if questionDetails are provided for approval
-      if (questionDetails == null) {
-        QuizzerLogger.logError('submitReview: questionDetails are required for approving a question.');
-        // Fail Fast: Throw an error if essential data for the operation is missing.
-        throw ArgumentError('questionDetails cannot be null when approving a question.');
-      }
-      // Call the approve function without the alias
-      return approveQuestion(questionDetails, sourceTable, primaryKey);
-    } else {
-      // Call the deny function without the alias
-      return denyQuestion(sourceTable, primaryKey);
-    }
-  }
-
-  /// Fetches a flagged question for review from Supabase.
-  /// 
-  /// Returns a map containing both the question data and the flag record.
-  /// The returned map has the following structure:
-  /// {
-  ///   'question_data': {
-  ///     'question_id': String,
-  ///     'question_type': String,
-  ///     'question_elements': List<Map<String, dynamic>>,
-  ///     'answer_elements': List<Map<String, dynamic>>,
-  ///     'options': List<Map<String, dynamic>>?,
-  ///     'correct_option_index': int?,
-  ///     'index_options_that_apply': List<int>?,
-  ///     'correct_order': List<Map<String, dynamic>>?,
-  ///     'module_name': String,
-  ///     'citation': String?,
-  ///     'concepts': String?,
-  ///     'subjects': String?,
-  ///     // ... other question fields
-  ///   },
-  ///   'report': {
-  ///     'question_id': String,
-  ///     'flag_type': String,
-  ///     'flag_description': String?
-  ///   }
-  /// }
-  /// 
-  /// Returns null if no flagged questions are available for review.
-  Future<Map<String, dynamic>?> getFlaggedQuestionForReview() async {
-    try {
-      QuizzerLogger.logMessage('SessionManager: Requesting a flagged question for review...');
-      
-      final result = await flag_review.getFlaggedQuestionForReview();
-      
-      QuizzerLogger.logMessage('SessionManager: Successfully fetched flagged question for review');
-      return result;
-    } catch (e) {
-      QuizzerLogger.logError('SessionManager: Error fetching flagged question for review - $e');
-      rethrow;
-    }
-  }
-
-  /// Submits a review decision for a flagged question.
-  /// 
-  /// Args:
-  ///   questionId: The ID of the question being reviewed
-  ///   action: Either 'edit' or 'delete'
-  ///   updatedQuestionData: Required for both edit and delete actions. For edit actions, contains the updated question data. For delete actions, contains the original question data to be stored in the old_data_record field.
-  /// 
-  /// Returns:
-  ///   true if the review was successfully submitted, false otherwise
-  Future<bool> submitQuestionFlagReview({
-    required String questionId,
-    required String action, // 'edit' or 'delete'
-    required Map<String, dynamic> updatedQuestionData,
-  }) async {
-    try {
-      QuizzerLogger.logMessage('SessionManager: Submitting question flag review for question: $questionId, action: $action');
-      
-      final result = await flag_review.submitQuestionReview(
-        questionId: questionId,
-        action: action,
-        updatedQuestionData: updatedQuestionData,
-      );
-      
-      QuizzerLogger.logMessage('SessionManager: Successfully submitted question flag review');
-      return result;
-    } catch (e) {
-      QuizzerLogger.logError('SessionManager: Error submitting question flag review - $e');
-      rethrow;
-    }
-  }
-
-  /// Fetches a single subject_details record for review.
-  ///
-  /// Criteria for review:
-  /// - subject_description is null, OR
-  /// - last_modified_timestamp is older than 3 months
-  ///
-  /// Returns a Map containing:
-  /// - 'data': The decoded subject data (Map<String, dynamic>). Null if no subjects found or error.
-  /// - 'primary_key': A Map representing the primary key {'subject': value}. Null if no subjects found.
-  /// - 'error': An error message (String) if no subjects are available. Null otherwise.
-  Future<Map<String, dynamic>> getSubjectForReview() async {
-    QuizzerLogger.logMessage('SessionManager: Requesting a subject for review...');
-    return subject_review.getSubjectForReview();
-  }
-
-  /// Updates a reviewed subject_details record.
-  ///
-  /// Args:
-  ///   subjectDetails: The decoded subject data map (potentially modified by admin).
-  ///   primaryKey: The map representing the primary key {'subject': value}.
-  ///
-  /// Returns:
-  ///   `true` if the update operation succeeds, `false` otherwise.
-  Future<bool> updateReviewedSubject(Map<String, dynamic> subjectDetails, Map<String, dynamic> primaryKey) async {
-    QuizzerLogger.logMessage('SessionManager: Updating reviewed subject with PK: $primaryKey');
-    return subject_review.updateReviewedSubject(subjectDetails, primaryKey);
-  }
-
-  // --- End Review System Interface ---
 
   // Modify/replace the existing reportError or add this as the primary error reporting API
   // ================================================================================
@@ -1680,9 +1065,9 @@ class SessionManager {
   ///
   /// Returns:
   ///   The ID of the created or updated error log record.
-  Future<String> reportError({
-    String? id, 
-    String? errorMessage, 
+  Future<void> reportError({
+    String? id,
+    String? errorMessage,
     String? userFeedback,
   }) async {
     try {
@@ -1695,16 +1080,15 @@ class SessionManager {
         throw ArgumentError('errorMessage must be provided when creating a new error log.');
       }
 
-      // Table function handles its own database access
-      final String resultId = await upsertErrorLog(
-        id: id,
-        userId: userId,
-        errorMessage: errorMessage,
-        userFeedback: userFeedback,
-      );
-
-      QuizzerLogger.logMessage('Successfully reported error with ID: $resultId');
-      return resultId;
+      // Use the table's upsertRecord method
+      await ErrorLogsTable().upsertRecord({
+        if (id != null) 'id': id,
+        'user_id': userId,
+        'error_message': errorMessage,
+        if (userFeedback != null) 'user_feedback': userFeedback,
+      });
+      
+      QuizzerLogger.logMessage('Successfully reported error');
     } catch (e) {
       QuizzerLogger.logError('Error in reportError - $e');
       rethrow;
@@ -1714,28 +1098,21 @@ class SessionManager {
   // ================================================================================
   // --- User Feedback Functionality ---
   // ================================================================================
+  // TODO move to page specific api for the user feedback page, then expose the userFeedbackPage api here
   /// Submits user feedback to the local database.
   ///
   /// Returns the ID of the created feedback record.
-  Future<String> submitUserFeedback({
+  Future<int> submitUserFeedback({
     required String feedbackType,
     required String feedbackContent,
   }) async {
     try {
-      // QuizzerLogger.logMessage('Entering submitUserFeedback()...');
-      
-      await initializationComplete;
-      // userId can be null if the user is not logged in, which is fine for feedback.
-
-      // Table function handles its own database access
-      final String feedbackId = await addUserFeedback(
-        userId: userId, // Pass current userId, can be null
-        feedbackType: feedbackType,
-        feedbackContent: feedbackContent,
-      );
-
-      // QuizzerLogger.logMessage('Successfully submitted user feedback with ID: $feedbackId');
-      return feedbackId;
+      // The table's finishRecord method will handle ID generation and other fields
+      return await UserFeedbackTable().upsertRecord({
+        'user_id': SessionManager().userId, // Can be null for anonymous feedback
+        'feedback_type': feedbackType,
+        'feedback_content': feedbackContent,
+      });
     } catch (e) {
       QuizzerLogger.logError('Error in submitUserFeedback - $e');
       rethrow;
@@ -1746,15 +1123,5 @@ class SessionManager {
   // --- User Stats API (Eligible Questions) ---
   // =====================================================================
   // TODO Since individual stat tables are removed, we have removed all individual api calls, to be replaced with one master api call
-
-
+  // TODO create a stats object that will serve as the api to collect user stats, and expose that object here. (this object should double as a cache of data to be updated whenever the update stats is called, individual stats are already cached in concrete stat objects, so we can just expose those through the stats object)
 }
-
-// Global instance
-final SessionManager _globalSessionManager = SessionManager();
-
-/// Gets the global session manager instance
-SessionManager getSessionManager() => _globalSessionManager;
-
-
-// TODO Fix flag question dialogue to actually work

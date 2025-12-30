@@ -6,14 +6,11 @@ import 'package:quizzer/UI_systems/08_settings_page/widget_user_settings.dart';
 import 'package:quizzer/app_theme.dart';
 
 class SettingsPage extends StatelessWidget {
-  SettingsPage({super.key});
-
-  final SessionManager _sessionManager = getSessionManager();
+  const SettingsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final String userRole = _sessionManager.userRole;
-    final bool isAdminOrContributor = userRole == 'admin' || userRole == 'contributor';
+    final bool isAdminOrContributor = SessionManager().userRole == 'admin' || SessionManager().userRole == 'contributor';
 
     return Scaffold(
       appBar: const GlobalAppBar(

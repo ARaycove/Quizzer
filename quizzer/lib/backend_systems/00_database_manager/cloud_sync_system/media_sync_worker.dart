@@ -2,17 +2,14 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:path/path.dart' as path;
+import 'package:quizzer/backend_systems/00_helper_utils/utils.dart' as utils;
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/09_switch_board/switch_board.dart';
 import 'package:quizzer/backend_systems/09_switch_board/sb_sync_worker_signals.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pair_management/media_sync_status_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pair_management/question_answer_pairs_table.dart';
 import 'package:supabase/supabase.dart'; // For Supabase storage operations
 import 'package:quizzer/backend_systems/00_helper_utils/file_locations.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/ml_models_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
-
 // ==========================================
 // Media Sync Worker (Image Sync)
 // ==========================================
@@ -33,7 +30,6 @@ class MediaSyncWorker {
 
   // --- Dependencies ---
   final SwitchBoard _switchBoard = getSwitchBoard();
-  final SessionManager _sessionManager = getSessionManager();
   final String _supabaseBucketName = 'question-answer-pair-assets';
   // --------------------
 
@@ -42,7 +38,7 @@ class MediaSyncWorker {
   Future<void> start() async {
     QuizzerLogger.logMessage('Entering MediaSyncWorker start()...');
     
-    if (_sessionManager.userId == null) {
+    if (SessionManager().userId == null) {
       QuizzerLogger.logWarning('MediaSyncWorker: Cannot start, no user logged in.');
       return;
     }
@@ -72,7 +68,7 @@ class MediaSyncWorker {
     
     while (_isRunning) {
       // Check connectivity first
-      final bool isConnected = await _checkConnectivity();
+      final bool isConnected = await utils.checkConnectivity();
       if (!isConnected) {
         QuizzerLogger.logMessage('MediaSyncWorker: No network connectivity, waiting 5 minutes before next attempt...');
         await Future.delayed(const Duration(minutes: 5));
@@ -81,7 +77,7 @@ class MediaSyncWorker {
       
       // Process NULL media status pairs
       QuizzerLogger.logMessage('MediaSyncWorker: Checking for question pairs with NULL has_media status.');
-      await processNullMediaStatusPairs();
+      await QuestionAnswerPairsTable().processNullMediaStatusPairs();
       QuizzerLogger.logMessage('MediaSyncWorker: Database access released after processing NULL has_media records.');
       
       // Run media sync
@@ -109,8 +105,6 @@ class MediaSyncWorker {
     // Brute-force download all Supabase media files before selective sync
     final List<String> serverFiles = await _bruteForceDownloadAllSupabaseMedia();
     await _processUploads(serverFiles);
-    if (!_isRunning) return; // Check if worker was stopped during uploads
-    await _processDownloads();
     if (!_isRunning) return;
     
     QuizzerLogger.logMessage('MediaSyncWorker: _performSync() finished.');
@@ -125,7 +119,7 @@ class MediaSyncWorker {
       QuizzerLogger.logMessage('MediaSyncWorker (_bruteForceDownloadAllSupabaseMedia): Worker stopped before starting.');
       return [];
     }
-    final supabase = _sessionManager.supabase;
+    final supabase = SessionManager().supabase;
     const String bucketName = 'question-answer-pair-assets';
     final String localAssetBasePath = await getQuizzerMediaPath();
 
@@ -169,7 +163,7 @@ class MediaSyncWorker {
   Future<void> _processUploads(List<String> serverFiles) async {
     QuizzerLogger.logMessage('MediaSyncWorker: Starting brute force _processUploads using provided server file list.');
 
-    final supabase = _sessionManager.supabase;
+    final supabase = SessionManager().supabase;
 
     // Get list of files in local media directory
     final String localAssetBasePath = await getQuizzerMediaPath();
@@ -231,121 +225,5 @@ class MediaSyncWorker {
       }
     }
     QuizzerLogger.logMessage('MediaSyncWorker: Finished brute force _processUploads.');
-  }
-
-  Future<void> _processDownloads() async {
-    QuizzerLogger.logMessage('MediaSyncWorker: Starting _processDownloads.');
-
-    List<Map<String, dynamic>> filesToDownload = await getExistingExternallyNotLocally(); 
-    QuizzerLogger.logMessage('MediaSyncWorker (_processDownloads): Database access released after reading files to download.');
-
-    if (filesToDownload.isEmpty) {
-      QuizzerLogger.logMessage('MediaSyncWorker: No files found to download.');
-      return;
-    }
-    QuizzerLogger.logValue('MediaSyncWorker: Found \u001b[1m[0m\u001b[1m[0m\u001b[1m${filesToDownload.length}\u001b[0m files to download.');
-
-    final supabase = _sessionManager.supabase;
-    final String localAssetBasePath = await getQuizzerMediaPath();
-
-    for (final record in filesToDownload) {
-      if (!_isRunning) break;
-      final String fileName = record['file_name'] as String;
-      final String localFilePath = path.join(localAssetBasePath, fileName);
-
-      try {
-        QuizzerLogger.logMessage('MediaSyncWorker: Downloading $fileName from Supabase bucket $_supabaseBucketName.');
-        final Uint8List bytes = await supabase.storage
-            .from(_supabaseBucketName)
-            .download(fileName);
-
-        final File localFile = File(localFilePath);
-        await Directory(path.dirname(localFilePath)).create(recursive: true);
-        await localFile.writeAsBytes(bytes);
-        
-        QuizzerLogger.logSuccess('MediaSyncWorker: Successfully downloaded and saved $fileName. Attempting to update DB status.');
-        // Rely on db! for fail-fast if db is null.
-        await updateMediaSyncStatus(fileName: fileName, existsLocally: true);
-        QuizzerLogger.logMessage('MediaSyncWorker (_processDownloads): DB access released after updating status for downloaded file $fileName.');
-
-      } on StorageException catch (e) {
-        if (e.statusCode == '404' || (e.statusCode == '400' && e.message.toLowerCase().contains('not found')) || e.message.toLowerCase().contains('object not found')){
-            QuizzerLogger.logWarning('MediaSyncWorker: File $fileName not found in Supabase for download (StorageException: ${e.message}). Attempting to update DB status.');
-            // Rely on db! for fail-fast if db is null.
-            await updateMediaSyncStatus(fileName: fileName, existsExternally: false);
-            QuizzerLogger.logMessage('MediaSyncWorker (_processDownloads): DB access released after updating status for non-existent Supabase file $fileName.');
-        } else {
-            QuizzerLogger.logError('MediaSyncWorker: Supabase StorageException during download of $fileName: ${e.message} (Code: ${e.statusCode})');
-        }
-      } catch (e) {
-        QuizzerLogger.logError('MediaSyncWorker: Unexpected error during download of $fileName: $e');
-        if (e is! IOException) rethrow;
-      }
-    }
-    QuizzerLogger.logMessage('MediaSyncWorker: Finished _processDownloads.');
-  }
-  // ----------------------
-  Future<void> updateMlModels() async {
-    final models = await getAllMlModels();
-    
-    for (final model in models) {
-      final modelName = model['model_name'] as String;
-      final lastSynced = model['time_last_received_file'] as String?;
-      final lastModified = model['last_modified_timestamp'] as String?;
-      
-      if (lastModified == null) continue;
-      
-      final lastModifiedDate = DateTime.parse(lastModified);
-      final lastSyncedDate = lastSynced != null ? DateTime.parse(lastSynced) : null;
-      
-      if (lastSyncedDate != null && !lastModifiedDate.isAfter(lastSyncedDate)) continue;
-      
-      final supabase = getSessionManager().supabase;
-      final fileName = '$modelName.tflite';
-      
-      final Uint8List modelFileData;      
-      try {
-        modelFileData = await supabase.storage.from('ml_models').download(fileName);
-      } on StorageException catch (e) {
-        QuizzerLogger.logWarning('Storage error downloading model $modelName: ${e.message}');
-        return;
-      } on SocketException catch (e) {
-        QuizzerLogger.logWarning('Network error downloading model $modelName: $e');
-        return;
-      }
-      
-      final localPath = path.join(await getQuizzerMediaPath(), fileName);
-      await Directory(path.dirname(localPath)).create(recursive: true);
-      await File(localPath).writeAsBytes(modelFileData);
-      
-      final db = await getDatabaseMonitor().requestDatabaseAccess();
-      await db!.update(
-        'ml_models',
-        {'time_last_received_file': DateTime.now().toUtc().toIso8601String()},
-        where: 'model_name = ?',
-        whereArgs: [modelName],
-      );
-      getDatabaseMonitor().releaseDatabaseAccess();
-      
-      QuizzerLogger.logSuccess('Updated ML model: $modelName');
-    }
-  }
-
-  // --- Network Connectivity Check ---
-  Future<bool> _checkConnectivity() async {
-    try {
-      final result = await InternetAddress.lookup('google.com');
-      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-        return true;
-      }
-      QuizzerLogger.logWarning('MediaSyncWorker: Network check failed (lookup empty/no address).');
-      return false;
-    } on SocketException catch (_) {
-      QuizzerLogger.logMessage('MediaSyncWorker: Network check failed (SocketException): Likely offline.');
-      return false;
-    } catch (e) {
-      QuizzerLogger.logError('MediaSyncWorker: Unexpected error during network check: $e');
-      return false;
-    }
   }
 }

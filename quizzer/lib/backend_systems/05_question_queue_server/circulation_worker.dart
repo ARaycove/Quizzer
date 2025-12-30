@@ -1,18 +1,14 @@
 import 'dart:async';
 import 'dart:math';
+import 'package:quizzer/backend_systems/05_question_queue_server/user_questions/user_question_manager.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
-import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_module_activation_status_table.dart';
-// Caches
-// Table Access
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_question_answer_pairs_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/table_helper.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/ml_models_table.dart';
 // Workers
 import 'package:quizzer/backend_systems/09_switch_board/switch_board.dart'; // Import SwitchBoard
 import 'package:quizzer/backend_systems/09_switch_board/sb_question_worker_signals.dart'; // Import worker signals
 import 'package:quizzer/backend_systems/09_switch_board/sb_other_signals.dart'; // Import other signals
+import 'package:quizzer/backend_systems/04_ml_modeling/ml_model_manager.dart';
+import 'package:quizzer/backend_systems/06_question_answer_pair_management/question_answer_pair_manager.dart';
 
 // ==========================================
 // Circulation Worker
@@ -30,7 +26,7 @@ class CirculationWorker {
   // --------------------
 
   final SessionManager                _sessionManager       = SessionManager();
-  final SwitchBoard                   _switchBoard          = SwitchBoard(); // Get SwitchBoard instance
+  final SwitchBoard                   _switchBoard          = SwitchBoard();
   late double idealThreshold;
   static const int    _circulationThreshold = 25;
   static const int    _removalThresholdMultiplier = 2; // DO NOT PROVIDE A VALUE <= 1
@@ -69,7 +65,10 @@ class CirculationWorker {
 
       // Initialize data structures before starting main loop
       await _initializeDataStructures();
-      idealThreshold = await getAccuracyNetOptimalThreshold();
+
+      // Get optimal threshold from MlModelManager
+      final modelInfo = await MlModelManager().getAccuracyNetModel();
+      idealThreshold = modelInfo['optimal_threshold'] as double;
 
       _runLoop(); // Start the loop asynchronously
     } catch (e) {
@@ -112,7 +111,7 @@ class CirculationWorker {
         final int excessCount = currentCount - _circulationThreshold;
         QuizzerLogger.logMessage('Count ($currentCount) exceeds threshold * $_removalThresholdMultiplier, removing $excessCount questions');
         
-        final List<Map<String, dynamic>> eligibleQuestions = await getActiveQuestionsInCirculation(userId);
+        final List<Map<String, dynamic>> eligibleQuestions = await UserQuestionManager().getActiveQuestionsInCirculation();
         
         eligibleQuestions.sort((a, b) {
           final double aProb = (a['accuracy_probability'] as double?) ?? 0.0;
@@ -124,11 +123,7 @@ class CirculationWorker {
             .take(excessCount)
             .map((q) => q['question_id'] as String)
             .toList();
-        
-        for (final questionId in questionsToRemove) {
-          await _removeQuestionFromCirculation(userId, questionId);
-        }
-        
+        await _removeQuestionFromCirculation(questionsToRemove);
         if (!_isRunning) break;
       }
 
@@ -157,57 +152,14 @@ class CirculationWorker {
   /// Only counts questions that meet eligibility criteria: not flagged, accuracy_probability < idealThreshold, in active modules.
   Future<Map<String, dynamic>> _shouldAddNewQuestion() async {
     QuizzerLogger.logMessage('Entering CirculationWorker _shouldAddNewQuestion()...');
-    
-    final userId = _sessionManager.userId!;
-    
+    // Check if there are questions left to place into circulation
     final bool hasNonCirculatingQuestions = nonCirculatingConnected.isNotEmpty || nonCirculatingNotConnected.isNotEmpty;
-    
     if (!hasNonCirculatingQuestions) {
       QuizzerLogger.logMessage("No non-circulating questions available, shouldAdd -> false");
       return {"shouldAdd": false, "count": null};
     }
-    
-    // Get active module names
-    final List<String> activeModuleNames = await getActiveModuleNames(userId);
-    
-    // Query to count eligible circulating questions
-    final db = await getDatabaseMonitor().requestDatabaseAccess();
-    if (db == null) throw Exception('Failed to acquire database access');
-    
-    List<dynamic> whereArgs = [userId, idealThreshold];
-    String sql;
-    
-    if (activeModuleNames.isNotEmpty) {
-      final placeholders = List.filled(activeModuleNames.length, '?').join(',');
-      whereArgs.addAll(activeModuleNames);
-      sql = '''
-        SELECT COUNT(*) as count
-        FROM user_question_answer_pairs
-        INNER JOIN question_answer_pairs ON user_question_answer_pairs.question_id = question_answer_pairs.question_id
-        WHERE user_question_answer_pairs.user_uuid = ?
-          AND user_question_answer_pairs.in_circulation = 1
-          AND user_question_answer_pairs.flagged = 0
-          AND user_question_answer_pairs.accuracy_probability < ?
-          AND question_answer_pairs.module_name IN ($placeholders)
-        LIMIT 101
-      ''';
-    } else {
-      sql = '''
-        SELECT COUNT(*) as count
-        FROM user_question_answer_pairs
-        INNER JOIN question_answer_pairs ON user_question_answer_pairs.question_id = question_answer_pairs.question_id
-        WHERE user_question_answer_pairs.user_uuid = ?
-          AND user_question_answer_pairs.in_circulation = 1
-          AND user_question_answer_pairs.flagged = 0
-          AND user_question_answer_pairs.accuracy_probability < ?
-        LIMIT 101
-      ''';
-    }
-    
-    final result = await db.rawQuery(sql, whereArgs);
-    getDatabaseMonitor().releaseDatabaseAccess();
-    
-    final int count = result.first['count'] as int;
+    // If there are check our threshold
+    final int count = await UserQuestionManager().getCountOfLowProbabilityCirculatingQuestions(idealThreshold);
     final bool shouldAdd = count < _circulationThreshold;
     QuizzerLogger.logMessage("shouldAdd To Circulation-> $shouldAdd (count: $count)/(total: ${circulatingQuestions.length})");
     return {"shouldAdd": shouldAdd, "count": count};
@@ -221,36 +173,10 @@ class CirculationWorker {
     
     final List<String> questionIdsToAdd = [];
     
-    final List<String> activeModuleNames = await getActiveModuleNames(userId);
-    
+    // Case 1, there are non-circulating questions connected to circulating ones
     if (nonCirculatingConnected.isNotEmpty) {
-      final List<String> connectedList = nonCirculatingConnected.toList();
-      
-      final db = await getDatabaseMonitor().requestDatabaseAccess();
-      if (db == null) throw Exception('Failed to acquire database access');
-      
-      final placeholders = List.filled(connectedList.length, '?').join(',');
-      List<dynamic> whereArgs = [userId, ...connectedList];
-      String sql = '''
-        SELECT user_question_answer_pairs.question_id, user_question_answer_pairs.accuracy_probability
-        FROM user_question_answer_pairs
-        INNER JOIN question_answer_pairs ON user_question_answer_pairs.question_id = question_answer_pairs.question_id
-        WHERE user_question_answer_pairs.user_uuid = ?
-          AND user_question_answer_pairs.question_id IN ($placeholders)
-          AND user_question_answer_pairs.flagged = 0
-      ''';
-      
-      if (activeModuleNames.isNotEmpty) {
-        final modulePlaceholders = List.filled(activeModuleNames.length, '?').join(',');
-        sql += ' AND question_answer_pairs.module_name IN ($modulePlaceholders)';
-        whereArgs.addAll(activeModuleNames);
-      }
-      
-      final queryResults = await db.rawQuery(sql, whereArgs);
-      getDatabaseMonitor().releaseDatabaseAccess();
-      
-      // Convert to mutable list before sorting
-      final List<Map<String, dynamic>> results = List.from(queryResults);
+      // Get the user question records for the connected but non-circulating questions
+      final List<Map<String, dynamic>> results = await UserQuestionManager().getAccuracyProbabilityOfQuestions(questionIds: nonCirculatingConnected);
       
       results.sort((a, b) {
         final double aProb = (a['accuracy_probability'] as double?) ?? 0.0;
@@ -265,42 +191,16 @@ class CirculationWorker {
       QuizzerLogger.logMessage('Selected ${questionIdsToAdd.length} connected questions with highest accuracy probability');
     }
     
+    // If after queing questions to be added, there are still insufficient questions, select questions to add to circulation that are not directly connected
+    // to the user's knowledge base
     if (questionIdsToAdd.length < numQuestionsToAdd && nonCirculatingNotConnected.isNotEmpty) {
       final int remainingNeeded = numQuestionsToAdd - questionIdsToAdd.length;
-      final List<String> notConnectedList = nonCirculatingNotConnected.toList();
-      
-      final db = await getDatabaseMonitor().requestDatabaseAccess();
-      if (db == null) throw Exception('Failed to acquire database access');
-      
-      final placeholders = List.filled(notConnectedList.length, '?').join(',');
-      List<dynamic> whereArgs = [userId, ...notConnectedList];
-      String sql = '''
-        SELECT user_question_answer_pairs.question_id, user_question_answer_pairs.accuracy_probability
-        FROM user_question_answer_pairs
-        INNER JOIN question_answer_pairs ON user_question_answer_pairs.question_id = question_answer_pairs.question_id
-        WHERE user_question_answer_pairs.user_uuid = ?
-          AND user_question_answer_pairs.question_id IN ($placeholders)
-          AND user_question_answer_pairs.flagged = 0
-      ''';
-      
-      if (activeModuleNames.isNotEmpty) {
-        final modulePlaceholders = List.filled(activeModuleNames.length, '?').join(',');
-        sql += ' AND question_answer_pairs.module_name IN ($modulePlaceholders)';
-        whereArgs.addAll(activeModuleNames);
-      }
-      
-      final queryResults = await db.rawQuery(sql, whereArgs);
-      getDatabaseMonitor().releaseDatabaseAccess();
-      
-      // Convert to mutable list before sorting
-      final List<Map<String, dynamic>> results = List.from(queryResults);
-      
+      final List<Map<String, dynamic>> results = await UserQuestionManager().getAccuracyProbabilityOfQuestions(questionIds: nonCirculatingNotConnected);
       results.sort((a, b) {
         final double aProb = (a['accuracy_probability'] as double?) ?? 0.0;
         final double bProb = (b['accuracy_probability'] as double?) ?? 0.0;
         return bProb.compareTo(aProb);
       });
-      
       final int notConnectedToTake = min(remainingNeeded, results.length);
       questionIdsToAdd.addAll(
         results.take(notConnectedToTake).map((q) => q['question_id'] as String)
@@ -308,13 +208,10 @@ class CirculationWorker {
       QuizzerLogger.logMessage('Added $notConnectedToTake not connected questions with highest accuracy probability');
     }
     
+    // After selecting the questions that should be added, iterate over the selections and call to have them added to circulation
     if (questionIdsToAdd.isNotEmpty) {
-      for (final questionId in questionIdsToAdd) {
-        await _addQuestionToCirculation(userId, questionId);
-      }
-      
+      await _addQuestionsToCirculation(questionIdsToAdd);
       signalCirculationWorkerQuestionAdded();
-      
       QuizzerLogger.logSuccess('Batch added ${questionIdsToAdd.length} questions to circulation');
     } else {
       QuizzerLogger.logWarning('No questions were selected for batch add');
@@ -328,39 +225,40 @@ class CirculationWorker {
   /// 2. Remove from nonCirculating sets and add to circulatingQuestions
   /// 3. Convert unidirectional edges to bidirectional in mainGraph
   /// 4. Update neighbors: move any from nonCirculatingNotConnected to nonCirculatingConnected
-  Future<void> _addQuestionToCirculation(String userId, String questionId) async {
-    QuizzerLogger.logMessage('Adding question to circulation: $questionId');
+  Future<void> _addQuestionsToCirculation(List<String> questionIds) async {
+    QuizzerLogger.logMessage('Adding questions to circulation: $questionIds');
+    await UserQuestionManager().setQuestionsAddToCirculation(questionIds: questionIds);
     
-    final db = await getDatabaseMonitor().requestDatabaseAccess();
-    if (db == null) throw Exception('Failed to acquire database access');
+    // Update sets (using Set.from(...) for immutable-style updates)
+    nonCirculatingConnected = Set.from(nonCirculatingConnected)..removeAll(questionIds);
+    nonCirculatingNotConnected = Set.from(nonCirculatingNotConnected)..removeAll(questionIds);
+    circulatingQuestions = Set.from(circulatingQuestions)..addAll(questionIds);
     
-    await db.rawUpdate(
-      'UPDATE user_question_answer_pairs SET in_circulation = 1 WHERE user_uuid = ? AND question_id = ?',
-      [userId, questionId],
-    );
-    getDatabaseMonitor().releaseDatabaseAccess();
+    // Store neighbors that need promotion (from NotConnected to Connected)
+    final Set<String> newlyConnectedNeighbors = {};
     
-    // Create new sets instead of modifying existing ones
-    nonCirculatingConnected = Set.from(nonCirculatingConnected)..remove(questionId);
-    nonCirculatingNotConnected = Set.from(nonCirculatingNotConnected)..remove(questionId);
-    circulatingQuestions = Set.from(circulatingQuestions)..add(questionId);
-    
-    if (mainGraph.containsKey(questionId)) {
-      for (final neighbor in mainGraph[questionId]!.toList()) {
-        mainGraph[neighbor]!.add(questionId);
-      }
-    }
-    
-    if (mainGraph.containsKey(questionId)) {
-      for (final neighbor in mainGraph[questionId]!) {
+    // Convert edges to bidirectional and identify newly connected neighbors
+    for (final id in questionIds) {
+      // neighbors are question ids
+      for (final neighbor in mainGraph[id]!) {
+        // Make edge bidirectional (neighbor -> id)
+        if (mainGraph.containsKey(neighbor)) {
+          // Use Set.from to respect the immutable style for mainGraph's sets
+          mainGraph[neighbor] = Set.from(mainGraph[neighbor]!)..add(id); 
+        }
+        // Check for neighbors to promote (move from NotConnected to Connected)
         if (nonCirculatingNotConnected.contains(neighbor)) {
-          nonCirculatingNotConnected = Set.from(nonCirculatingNotConnected)..remove(neighbor);
-          nonCirculatingConnected = Set.from(nonCirculatingConnected)..add(neighbor);
+          newlyConnectedNeighbors.add(neighbor);
+          UserQuestionManager().ensureUserQuestionRecordExists(neighbor); // Ensure a user question record exists since it will now get included in the probability engine
         }
       }
     }
+
+    // Perform the batch move for newly connected neighbors
+    nonCirculatingNotConnected = Set.from(nonCirculatingNotConnected)..removeAll(newlyConnectedNeighbors);
+    nonCirculatingConnected = Set.from(nonCirculatingConnected)..addAll(newlyConnectedNeighbors);
     
-    QuizzerLogger.logSuccess('Question added to circulation: $questionId');
+    QuizzerLogger.logSuccess('Successfully added ${questionIds.length} question(s) to circulation.');
   }
 
   /// Removes a single question from circulation and updates all cached data structures.
@@ -371,64 +269,85 @@ class CirculationWorker {
   /// 3. Convert bidirectional edges to unidirectional in mainGraph
   /// 4. Determine if question should go to nonCirculatingConnected or nonCirculatingNotConnected
   /// 5. Update neighbors: check if any should move from connected to not connected
-  Future<void> _removeQuestionFromCirculation(String userId, String questionId) async {
-    // QuizzerLogger.logMessage('Removing question from circulation: $questionId');
+  Future<void> _removeQuestionFromCirculation(List<String> questionIds) async {
+    QuizzerLogger.logMessage('Removing questions from circulation: $questionIds');
+    await UserQuestionManager().setQuestionsRemoveFromCirculation(questionIds: questionIds);
     
-    final db = await getDatabaseMonitor().requestDatabaseAccess();
-    if (db == null) throw Exception('Failed to acquire database access');
+    // Update local circulation set
+    circulatingQuestions = Set.from(circulatingQuestions)..removeAll(questionIds);
     
-    await db.rawUpdate(
-      'UPDATE user_question_answer_pairs SET in_circulation = 0 WHERE user_uuid = ? AND question_id = ?',
-      [userId, questionId],
-    );
-    getDatabaseMonitor().releaseDatabaseAccess();
-    
-    circulatingQuestions = Set.from(circulatingQuestions)..remove(questionId);
-    
-    if (mainGraph.containsKey(questionId)) {
-      for (final neighbor in mainGraph[questionId]!.toList()) {
-        mainGraph[neighbor]!.remove(questionId);
+    // Collect neighbors whose connection status might change
+    final Set<String> affectedNeighbors = {};
+    final Set<String> newlyNotConnected = {};
+    final Set<String> newlyConnected = {};
+    final Set<String> neighborsToDemote = {};
+
+    // Update mainGraph: remove reverse links from all neighbors
+    for (final id in questionIds) {
+      // SAFETY CHECK: Ensure the question exists in mainGraph before accessing it
+      if (!mainGraph.containsKey(id)) {
+        QuizzerLogger.logWarning('Question $id not found in mainGraph during removal');
+        continue;
+      }
+      
+      for (final neighbor in mainGraph[id]!.toList()) {
+        if (mainGraph.containsKey(neighbor)) {
+          mainGraph[neighbor]!.remove(id); 
+          affectedNeighbors.add(neighbor);
+        }
       }
     }
-    
-    bool hasCirculatingLink = false;
-    if (mainGraph.containsKey(questionId)) {
-      for (final neighbor in mainGraph[questionId]!) {
+
+    // Determine the new non-circulating pool status (Connected or NotConnected) for the removed questions
+    for (final id in questionIds) {
+      // SAFETY CHECK: Ensure the question exists in mainGraph before accessing it
+      if (!mainGraph.containsKey(id)) {
+        // If question doesn't exist in graph, add to not connected (no neighbors)
+        newlyNotConnected.add(id);
+        continue;
+      }
+      
+      bool hasCirculatingLink = false;
+      for (final neighbor in mainGraph[id]!) {
         if (circulatingQuestions.contains(neighbor)) {
           hasCirculatingLink = true;
           break;
         }
       }
+      if (hasCirculatingLink) {
+        newlyConnected.add(id);
+      } else {
+        newlyNotConnected.add(id);
+      }
     }
     
-    if (hasCirculatingLink) {
-      nonCirculatingConnected = Set.from(nonCirculatingConnected)..add(questionId);
-    } else {
-      nonCirculatingNotConnected = Set.from(nonCirculatingNotConnected)..add(questionId);
-    }
+    // Batch update non-circulating sets
+    nonCirculatingConnected = Set.from(nonCirculatingConnected)..addAll(newlyConnected);
+    nonCirculatingNotConnected = Set.from(nonCirculatingNotConnected)..addAll(newlyNotConnected);
     
-    if (mainGraph.containsKey(questionId)) {
-      for (final neighbor in mainGraph[questionId]!) {
-        if (nonCirculatingConnected.contains(neighbor)) {
-          bool neighborHasCirculatingLink = false;
-          if (mainGraph.containsKey(neighbor)) {
-            for (final neighborOfNeighbor in mainGraph[neighbor]!) {
-              if (circulatingQuestions.contains(neighborOfNeighbor)) {
-                neighborHasCirculatingLink = true;
-                break;
-              }
+    // Check neighbors for demotion (moving from Connected to NotConnected)
+    for (final neighbor in affectedNeighbors) {
+      if (nonCirculatingConnected.contains(neighbor)) {
+        bool neighborHasCirculatingLink = false;
+        
+        if (mainGraph.containsKey(neighbor)) {
+          for (final neighborOfNeighbor in mainGraph[neighbor]!) {
+            // Check if the neighbor is still linked to any question currently in circulation
+            if (circulatingQuestions.contains(neighborOfNeighbor)) {
+              neighborHasCirculatingLink = true;
+              break;
             }
           }
-          
-          if (!neighborHasCirculatingLink) {
-            nonCirculatingConnected = Set.from(nonCirculatingConnected)..remove(neighbor);
-            nonCirculatingNotConnected = Set.from(nonCirculatingNotConnected)..add(neighbor);
-          }
+        }
+        if (!neighborHasCirculatingLink) {
+          neighborsToDemote.add(neighbor);
         }
       }
     }
     
-    // QuizzerLogger.logSuccess('Question removed from circulation: $questionId');
+    // Perform the batch demotion
+    nonCirculatingConnected = Set.from(nonCirculatingConnected)..removeAll(neighborsToDemote);
+    nonCirculatingNotConnected = Set.from(nonCirculatingNotConnected)..addAll(neighborsToDemote);
   }
 
   /// Builds the initial data structures that the circulation worker will update.
@@ -441,132 +360,71 @@ class CirculationWorker {
   /// - nonCirculatingNotConnected: Non-circulating questions with no links to circulation
   /// 
   /// Process:
-  /// 1. Query all circulating questions and build bidirectional graph edges
-  /// 2. Query all non-circulating questions and add their edges
+  /// 1. Query ALL questions from question_answer_pair table and build bidirectional graph edges
+  /// 2. Query circulating questions to populate circulatingQuestions set
   /// 3. Classify non-circulating questions based on connectivity to circulation
   Future<void> _initializeDataStructures() async {
     try {
       QuizzerLogger.logMessage('Entering CirculationWorker _initializeDataStructures()...');
-      
-      final userId = _sessionManager.userId!;
-      
+
       // Clear all data structures before rebuilding
       mainGraph.clear();
       circulatingQuestions.clear();
       nonCirculatingNotConnected.clear();
       nonCirculatingConnected.clear();
       
-      // Request database access for first query
-      final db = await getDatabaseMonitor().requestDatabaseAccess();
-      if (db == null) throw Exception('Failed to acquire database access');
-      
-      // Query all circulating questions with their k_nearest_neighbors
-      const circulatingQuery = '''
-        SELECT 
-          user_question_answer_pairs.question_id,
-          question_answer_pairs.k_nearest_neighbors
-        FROM user_question_answer_pairs
-        INNER JOIN question_answer_pairs ON user_question_answer_pairs.question_id = question_answer_pairs.question_id
-        WHERE user_question_answer_pairs.user_uuid = ?
-          AND user_question_answer_pairs.in_circulation = 1
-      ''';
-      
-      final circulatingResults = await queryAndDecodeDatabase(
-        'user_question_answer_pairs',
-        db,
-        customQuery: circulatingQuery,
-        whereArgs: [userId],
-      );
-      
-      // Release database access immediately after query completes
-      getDatabaseMonitor().releaseDatabaseAccess();
-      
-      // Process circulating questions
-      for (final row in circulatingResults) {
+      // Query ALL questions from question_answer_pair table
+      final allQuestionsResults = await QuestionAnswerPairManager().getAllQuestionIdsWithNeighbors();
+      final circulatingResults = await UserQuestionManager().getCirculatingQuestionsWithNeighbors();
+
+      // Process ALL questions to build the complete graph
+      for (final row in allQuestionsResults) {
         final iQuestionId = row['question_id'] as String;
         final knnMap = row['k_nearest_neighbors'] as Map<String, dynamic>?;
         
-        // Skip questions with no k_nearest_neighbors
-        if (knnMap == null) continue;
-        
-        // Add question to mainGraph if not present
+        // ALWAYS add question to mainGraph, even if it has no neighbors
         mainGraph.putIfAbsent(iQuestionId, () => {});
         
-        // For each neighbor, create bidirectional edges in mainGraph
-        for (final jQuestionId in knnMap.keys) {
-          // Add neighbor to mainGraph if not present
-          mainGraph.putIfAbsent(jQuestionId, () => {});
-          
-          // Add bidirectional edge: j -> i
-          mainGraph[jQuestionId]!.add(iQuestionId);
-          
-          // Add bidirectional edge: i -> j
-          mainGraph[iQuestionId]!.add(jQuestionId);
+        // If there are neighbors, add bidirectional edges
+        if (knnMap != null) {
+          for (final jQuestionId in knnMap.keys) {
+            // Add neighbor to mainGraph if not present
+            mainGraph.putIfAbsent(jQuestionId, () => {});
+            
+            // Add bidirectional edge: j -> i
+            mainGraph[jQuestionId]!.add(iQuestionId);
+            
+            // Add bidirectional edge: i -> j
+            mainGraph[iQuestionId]!.add(jQuestionId);
+          }
         }
-        
-        // Add to circulating questions set
+      }
+      
+      // Process circulating questions to populate circulatingQuestions set
+      for (final row in circulatingResults) {
+        final iQuestionId = row['question_id'] as String;
         circulatingQuestions.add(iQuestionId);
       }
       
-      // Request database access for second query
-      final db2 = await getDatabaseMonitor().requestDatabaseAccess();
-      if (db2 == null) throw Exception('Failed to acquire database access');
-      
-      // Query all non-circulating questions with their k_nearest_neighbors
-      const nonCirculatingQuery = '''
-        SELECT 
-          user_question_answer_pairs.question_id,
-          question_answer_pairs.k_nearest_neighbors
-        FROM user_question_answer_pairs
-        INNER JOIN question_answer_pairs ON user_question_answer_pairs.question_id = question_answer_pairs.question_id
-        WHERE user_question_answer_pairs.user_uuid = ?
-          AND user_question_answer_pairs.in_circulation = 0
-      ''';
-      
-      final nonCirculatingResults = await queryAndDecodeDatabase(
-        'user_question_answer_pairs',
-        db2,
-        customQuery: nonCirculatingQuery,
-        whereArgs: [userId],
-      );
-      
-      // Release database access immediately after query completes
-      getDatabaseMonitor().releaseDatabaseAccess();
-      
-      // Process non-circulating questions
-      for (final row in nonCirculatingResults) {
-        final iQuestionId = row['question_id'] as String;
-        final knnMap = row['k_nearest_neighbors'] as Map<String, dynamic>?;
-        
-        // Skip questions with no k_nearest_neighbors
-        if (knnMap == null) continue;
-        
-        // Add question to mainGraph if not present
-        mainGraph.putIfAbsent(iQuestionId, () => {});
-        
-        // For each neighbor, create unidirectional edges (only j -> i, not i -> j)
-        for (final jQuestionId in knnMap.keys) {
-          // Add neighbor to mainGraph if not present
-          mainGraph.putIfAbsent(jQuestionId, () => {});
-          
-          // Add unidirectional edge: j -> i
-          mainGraph[jQuestionId]!.add(iQuestionId);
-        }
+      // Classify ALL non-circulating questions based on connectivity
+      for (final questionId in mainGraph.keys) {
+        // Skip questions that are already in circulation
+        if (circulatingQuestions.contains(questionId)) continue;
         
         // Check if this non-circulating question is connected to any circulating question
-        bool nonCirculatingNotLinked = true;
-        for (final k in mainGraph[iQuestionId]!) {
-          if (circulatingQuestions.contains(k)) {
-            // Found a link to a circulating question
-            nonCirculatingNotLinked = false;
-            nonCirculatingConnected.add(iQuestionId);
+        bool hasConnectionToCirculation = false;
+        for (final neighbor in mainGraph[questionId]!) {
+          if (circulatingQuestions.contains(neighbor)) {
+            hasConnectionToCirculation = true;
             break;
           }
         }
         
-        // If no links to circulating questions, add to not connected set
-        if (nonCirculatingNotLinked) {
-          nonCirculatingNotConnected.add(iQuestionId);
+        // Add to appropriate set
+        if (hasConnectionToCirculation) {
+          nonCirculatingConnected.add(questionId);
+        } else {
+          nonCirculatingNotConnected.add(questionId);
         }
       }
       
@@ -576,4 +434,5 @@ class CirculationWorker {
       rethrow;
     }
   }
+
 }

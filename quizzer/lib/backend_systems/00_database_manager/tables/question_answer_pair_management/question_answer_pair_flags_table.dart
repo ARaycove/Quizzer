@@ -1,286 +1,118 @@
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/table_helper.dart';
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
-import 'package:quizzer/backend_systems/09_switch_board/sb_sync_worker_signals.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pair_management/question_answer_pairs_table.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/sql_table.dart';
 
-// Fields
-// question_id | flag_type | flag_description |
-// question_id is a foreign key pointing to the question_id in the question_answer_pair_table
-// flag_type is TEXT, but will be defined as a list of types some starting types ["unclear explanation", "non-sensical", "inappropriate reason*", "nudity", "gore", "etc'"]
-// flag_description is the text content of the report
+class QuestionAnswerPairFlagsTable extends SqlTable {
+  static final QuestionAnswerPairFlagsTable _instance = QuestionAnswerPairFlagsTable._internal();
+  factory QuestionAnswerPairFlagsTable() => _instance;
+  QuestionAnswerPairFlagsTable._internal();
 
-// This records in this table will be synced outbound to the supabase server, then removed, this data is only stored locally as temporary storage until it's synced, so no upsertFromSupabase function is necessary
-// [x] Define Supabase Table
-// [x] add permissions enums
-// [x] update permissions table
-// [x] Define Supabase RLS
-// [x] Connect to outbound sync worker
-// [x] Do not connect to inbound sync worker
-// [x] Update SessionManager API to add
-// [x] Ensure that table calls outbound sync needed signal
-// [x] Flagging a question should mark the local question as flagged
-// [x] flagged questions should not be eligible to be shown until they are resynced with a non-zero flag
+  @override
+  bool get isTransient => true;
 
-// [x] flagged questions should be unflagged after they have been reviewed by an admin (Wait how do we address that?) Probably write an edge function that edits the user_quesiton_answer_pair on the server, then it'll be updated when they next login and sync
+  @override
+  bool get requiresInboundSync => false;
 
-// [x] A review call to get a flagged record
+  @override
+  dynamic get additionalFiltersForInboundSync => null;
 
-// [x] An review call that sends an update (this is the edge function, this call will use the edge function)
+  @override
+  bool get useLastLoginForInboundSync => false;
 
-// [x] Review call that handles both edit and delete scenarios
+  @override
+  String get tableName => 'question_answer_pair_flags';
 
-// ==========================================
-// Question Answer Pair Flags Table
-// ==========================================
+  @override
+  List<String> get primaryKeyConstraints => ['question_id', 'flag_type', 'flag_description'];
 
-// Valid flag types - enum-like list
-const List<String> validFlagTypes = [
-  'factually_incorrect',
-  'misleading_information',
-  'outdated_content',
-  'biased_perspective',
-  'confusing_answer_explanation',
-  'incorrect_answer',
-  'confusing_question',
-  'grammar_spelling_errors',
-  'violent_content',
-  'sexual_content',
-  'hate_speech',
-  'duplicate_question',
-  'poor_quality_image',
-  'broken_media',
-  'copyright_violation',
-  'other'
-];
+  @override
+  List<Map<String, String>> get expectedColumns => [
+    // --- Core Identity (Composite Primary Key) ---
+    {'name': 'question_id', 'type': 'TEXT NOT NULL'},
+    {'name': 'flag_type', 'type': 'TEXT NOT NULL'},
+    {'name': 'flag_description', 'type': 'TEXT'},
 
-// Table name and field constants
-const String questionAnswerPairFlagsTableName = 'question_answer_pair_flags';
-const String questionIdField = 'question_id';
-const String flagTypeField = 'flag_type';
-const String flagDescriptionField = 'flag_description';
+    // --- Sync and Audit Fields ---
+    {'name': 'has_been_synced', 'type': 'INTEGER DEFAULT 0'},
+    {'name': 'edits_are_synced', 'type': 'INTEGER DEFAULT 0'},
+    {'name': 'last_modified_timestamp', 'type': 'TEXT'},
+  ];
 
-// Create table SQL
-const String createQuestionAnswerPairFlagsTableSQL = '''
-  CREATE TABLE IF NOT EXISTS $questionAnswerPairFlagsTableName (
-    $questionIdField TEXT NOT NULL,
-    $flagTypeField TEXT NOT NULL,
-    $flagDescriptionField TEXT,
-    -- Sync Fields --
-    has_been_synced INTEGER DEFAULT 0,
-    edits_are_synced INTEGER DEFAULT 0,
-    last_modified_timestamp TEXT,
-    -- ------------- --
-    PRIMARY KEY ($questionIdField, $flagTypeField)
-  )
-''';
+  // ==========================================
+  // Validation Logic
+  // ==========================================
 
-// Verify table exists and create if needed
-Future<void> verifyQuestionAnswerPairFlagsTable(dynamic db) async {
-  QuizzerLogger.logMessage('Verifying $questionAnswerPairFlagsTableName table existence');
-  final List<Map<String, dynamic>> tables = await db.rawQuery(
-    "SELECT name FROM sqlite_master WHERE type='table' AND name='$questionAnswerPairFlagsTableName'"
-  );
-  
-  if (tables.isEmpty) {
-    QuizzerLogger.logMessage('$questionAnswerPairFlagsTableName table does not exist, creating it');
-    await db.execute(createQuestionAnswerPairFlagsTableSQL);
-    QuizzerLogger.logSuccess('$questionAnswerPairFlagsTableName table created successfully');
-  } else {
-    QuizzerLogger.logMessage('$questionAnswerPairFlagsTableName table exists');
-  }
-}
+  // Valid flag types
+  static const List<String> validFlagTypes = [
+    'factually_incorrect',
+    'misleading_information',
+    'outdated_content',
+    'biased_perspective',
+    'confusing_answer_explanation',
+    'incorrect_answer',
+    'confusing_question',
+    'grammar_spelling_errors',
+    'violent_content',
+    'sexual_content',
+    'hate_speech',
+    'duplicate_question',
+    'poor_quality_image',
+    'broken_media',
+    'copyright_violation',
+    'other'
+  ];
 
-// ==========================================
-// Validation Functions
-// ==========================================
+  @override
+  Future<bool> validateRecord(Map<String, dynamic> dataToInsert) async {
+    final String? questionId = dataToInsert['question_id'] as String?;
+    final String? flagType = dataToInsert['flag_type'] as String?;
+    final String? flagDescription = dataToInsert['flag_description'] as String?;
 
-/// Validates flag data before insertion
-Future<void> _validateFlagData({
-  required String questionId,
-  required String flagType,
-  required String flagDescription,
-}) async {
-  // Validate flag type
-  if (!validFlagTypes.contains(flagType)) {
-    QuizzerLogger.logError('Invalid flag type: $flagType. Valid types are: ${validFlagTypes.join(', ')}');
-    throw StateError('Invalid flag type: $flagType. Valid types are: ${validFlagTypes.join(', ')}');
-  }
-  
-  // Validate flag description is not empty
-  if (flagDescription.trim().isEmpty) {
-    QuizzerLogger.logError('Flag description cannot be empty');
-    throw StateError('Flag description cannot be empty');
-  }
-  
-  // Validate question exists in question_answer_pairs table
-  final db = await getDatabaseMonitor().requestDatabaseAccess();
-  if (db == null) {
-    throw Exception('Failed to acquire database access');
-  }
-  
-  try {
-    await verifyQuestionAnswerPairTable(db);
-    final List<Map<String, dynamic>> results = await db.query(
-      'question_answer_pairs',
-      where: 'question_id = ?',
-      whereArgs: [questionId],
-    );
-    
-    if (results.isEmpty) {
-      QuizzerLogger.logError('Question ID does not exist: $questionId');
-      throw StateError('Question ID does not exist: $questionId');
+    if (questionId == null || questionId.isEmpty) {
+      QuizzerLogger.logError('Validation failed for flag: Missing question_id.');
+      return false;
     }
-  } finally {
-    getDatabaseMonitor().releaseDatabaseAccess();
+    if (flagType == null || !validFlagTypes.contains(flagType)) {
+      QuizzerLogger.logError('Validation failed for flag $questionId: Invalid or missing flag_type: $flagType.');
+      return false;
+    }
+    if (flagDescription == null || flagDescription.trim().isEmpty) {
+      QuizzerLogger.logError('Validation failed for flag $questionId: flag_description cannot be empty.');
+      return false;
+    }
+
+    // Since this table is dependent on 'question_answer_pairs',
+    // we perform the existence check here.
+    return await _checkQuestionExists(questionId);
   }
-}
 
-// ==========================================
-// CRUD Operations
-// ==========================================
-
-/// Adds a new flag for a question answer pair
-Future<int> addQuestionAnswerPairFlag({
-  required String questionId,
-  required String flagType,
-  required String flagDescription,
-}) async {
-  // [x] Write unit test for this function:
-  try {
-    // Validate all input data first
-    await _validateFlagData(
-      questionId: questionId,
-      flagType: flagType,
-      flagDescription: flagDescription,
-    );
-    
-    final db = await getDatabaseMonitor().requestDatabaseAccess();
+  /// Checks for the existence of the question_id in the master table.
+  Future<bool> _checkQuestionExists(String questionId) async {
+    final db = await DatabaseMonitor().requestDatabaseAccess();
     if (db == null) {
-      throw Exception('Failed to acquire database access');
+      QuizzerLogger.logError('Failed to acquire database access to check question existence.');
+      return false;
     }
-    QuizzerLogger.logMessage('Adding flag for question: $questionId, type: $flagType');
-    // Prepare raw data map
-    final Map<String, dynamic> data = {
-      'question_id': questionId,
-      'flag_type': flagType,
-      'flag_description': flagDescription,
-      // Sync Fields
-      'has_been_synced': 0,
-      'edits_are_synced': 0,
-      'last_modified_timestamp': DateTime.now().toUtc().toIso8601String(),
-    };
 
-    // Use universal insert helper
-    final int result = await insertRawData(
-      questionAnswerPairFlagsTableName,
-      data,
-      db,
-    );
+    try {
+      final List<Map<String, dynamic>> results = await db.query(
+        'question_answer_pairs',
+        columns: ['question_id'],
+        where: 'question_id = ?',
+        whereArgs: [questionId],
+        limit: 1,
+      );
 
-    // Log success/failure based on result
-    if (result > 0) {
-      QuizzerLogger.logSuccess('Added flag for question: $questionId, type: $flagType');
-      // Signal SwitchBoard
-      signalOutboundSyncNeeded();
-    } else {
-      QuizzerLogger.logError('Insert operation for flag (question: $questionId, type: $flagType) returned $result.');
-      throw StateError('Failed to insert flag for question: $questionId, type: $flagType');
+      if (results.isEmpty) {
+        QuizzerLogger.logError('Question ID does not exist in master table: $questionId');
+        return false;
+      }
+      return true;
+    } catch (e) {
+      QuizzerLogger.logError('Error checking question existence for flag validation - $e');
+      return false;
+    } finally {
+      DatabaseMonitor().releaseDatabaseAccess();
     }
-    return result;
-  } catch (e) {
-    QuizzerLogger.logError('Error adding question answer pair flag - $e');
-    rethrow;
-  } finally {
-    getDatabaseMonitor().releaseDatabaseAccess();
   }
 }
-
-// Note: This table does not include edit or individual fetch operations because:
-// 1. Flags are temporary local records that get synced to server and then removed
-// 2. Once a flag is created, it should not be modified locally
-// 3. Individual flag retrieval is not needed for the sync workflow
-// 4. The only operations needed are: add, bulk fetch for sync, and delete after sync
-
-
-
-/// Gets all flags that haven't been synced yet
-Future<List<Map<String, dynamic>>> getUnsyncedQuestionAnswerPairFlags() async {
-  // [x] Write unit tests for this function
-  try {
-    final db = await getDatabaseMonitor().requestDatabaseAccess();
-    if (db == null) {
-      throw Exception('Failed to acquire database access');
-    } 
-    // Use universal query helper
-    return await queryAndDecodeDatabase(
-      questionAnswerPairFlagsTableName,
-      db,
-      where: 'has_been_synced = 0',
-    );
-  } catch (e) {
-    QuizzerLogger.logError('Error getting unsynced question answer pair flags - $e');
-    rethrow;
-  } finally {
-    getDatabaseMonitor().releaseDatabaseAccess();
-  }
-}
-
-/// Deletes a specific flag
-Future<int> deleteQuestionAnswerPairFlag(String questionId, String flagType) async {
-  // Set Up:
-  // Clear Table
-
-  // Test 1:
-  // - use invalid questionId
-  // expect failure
-  
-  // Test 2:
-  // - use invalid flagType
-  // expect failure
-
-  // Test 3:
-  // - get 5 random question_ids from question_answer_pair table
-  // - add records for each
-  // - call delete with valid id but invalid flag
-  // - expect failure
-
-  // test 4:
-  // - call delete with invalidId but valid flag
-  // - expect failures
-
-  // Test 5:
-  // - call delete for each record with valid arguments
-  // - expect empty table
-
-  // Clean Up:
-  // clean up was performed by Test 3 if successful
-  try {
-    final db = await getDatabaseMonitor().requestDatabaseAccess();
-    if (db == null) {
-      throw Exception('Failed to acquire database access');
-    }
-    QuizzerLogger.logMessage('Deleting flag for question: $questionId, type: $flagType');
-    final int result = await db.delete(
-      questionAnswerPairFlagsTableName,
-      where: 'question_id = ? AND flag_type = ?',
-      whereArgs: [questionId, flagType],
-    );
-
-    if (result > 0) {
-      QuizzerLogger.logSuccess('Deleted flag for question: $questionId, type: $flagType ($result row affected).');
-      signalOutboundSyncNeeded();
-    } else {
-      QuizzerLogger.logWarning('Delete operation for flag (question: $questionId, type: $flagType) affected 0 rows. Record might not exist.');
-    }
-    return result;
-  } catch (e) {
-    QuizzerLogger.logError('Error deleting question answer pair flag - $e');
-    rethrow;
-  } finally {
-    getDatabaseMonitor().releaseDatabaseAccess();
-  }
-}
-
-
-
