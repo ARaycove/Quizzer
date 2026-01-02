@@ -33,10 +33,10 @@ def main():
     # HyperParameters
     reset_question_vector   = False
     reset_doc               = False
-    reset_knn               = False   # Reset knn values when new documents come in, which forces update of existing calculations for more accurate data
+    # FIXME knn reset should be dynamic
+    # reset_knn               = False   # Reset knn values when new documents come in, which forces update of existing calculations for more accurate data
     bypass_model_train      = False  #topic model
-    bypass_prediction_model = True
-    bypass_sync_supa        = False
+    bypass_prediction_model = False
     n_clusters              = 31
     random_state            = 69
 
@@ -104,7 +104,7 @@ def main():
             hdbscan.HDBSCAN(
                 min_cluster_size    = 25,
                 min_samples         = 10,
-                metric              = 'manhattan',
+                metric              = 'manhattan', #FIXME Evaluate better distance metric
                 cluster_selection_method = 'eom',
                 # prediction_data     = True
             ),
@@ -125,59 +125,6 @@ def main():
             stop_words  = 'english', # keep stopwords, but remove common words
             ngram_range = (1,4)
         )
-
-        #=======================================
-        # Guided Topic Modeling Through Seed Words
-        # Load in seed_words.json
-        # with open('seed_words.json') as f:
-        #     seed_words = json.load(f)
-        # # Clean up duplicates, convert to lowercase, and sort alphabetically
-        # seed_words = sorted(list(set(word.lower() for word in seed_words)))
-        # # Write back to json
-        # with open('seed_words.json', 'w') as f:
-        #     f.write('[\n')
-        #     line = '  '
-        #     for i, word in enumerate(seed_words):
-        #         entry = f'"{word}"' + (', ' if i < len(seed_words) - 1 else '')
-        #         if len(line) + len(entry) > 80:
-        #             f.write(line.rstrip() + '\n')
-        #             line = '  ' + entry
-        #         else:
-        #             line += entry
-        #     f.write(line + '\n]\n')
-        # print(f"There are {len(seed_words)} seed words")
-        #=======================================
-
-        #=======================================
-        # Guided Topic modeling through pre-defined topics
-        # Load seed topics from seed_topics.json
-        # with open('seed_topics.json') as f:
-        #     seed_topics = json.load(f)
-        #     print(f"Loaded {len(seed_topics)} seed topics")
-
-        # # Clean up any topics that have duplicate words in topic list
-        # seed_topics = [list(set(topic)) for topic in seed_topics]
-
-        # # Remove any topics that are exact duplicates
-        # unique_topics = []
-        # seen = set()
-        # for topic in seed_topics:
-        #     topic_sorted = tuple(sorted(topic))
-        #     if topic_sorted not in seen:
-        #         seen.add(topic_sorted)
-        #         unique_topics.append(topic)
-
-        # # If any duplicates removed, update json
-        # if len(unique_topics) < len(seed_topics):
-        #     print(f"Removed {len(seed_topics) - len(unique_topics)} duplicate topics")
-        #     seed_topics = unique_topics
-        #     with open('seed_topics.json', 'w') as f:
-        #         json.dump(seed_topics, f, indent=2)
-        # else:
-        #     seed_topics = unique_topics
-
-        # print(f"Final seed topics: {len(seed_topics)}")
-        #=======================================
 
         # Define c_tf_idf model for bertopic
         c_tf_idf                = ClassTfidfTransformer(
@@ -236,18 +183,29 @@ def main():
 
         # Save data locally
         reduced_embeddings = topic_model.umap_model.embedding_
+
+        # FIXME Extract knn calculation from save to db function
+
+        # FIXME Plot un-normalized distribution (bar chart - num pairs with distance = n)
+
+        # FIXME Normalize all distance values between 0 and 1 (depending on visualization)
+
+        # FIXME Plot normalized distribution (bar chart - num pairs with distance = n)
+
+        # FIXME save only the updated values, if the knn vector has changed from last time then wipe it and it's neighbors (resetting dynamically)
         save_bertopic_results_to_db(topic_model, reduced_embeddings, question_ids, db, k=25)
 
+        # FIXME Collect topic probabilities for each question, {topic_01: p_1, topic_02: p_2, topic_n: p_n}
+        # This will show us how any given question relates to the larger knowledge map, not just it's immediate surroundings
+
+        # FIXME Push topic_proba to Supabase
+        
         # Export to file for sharing
         export_outlier_topics_to_docx(topic_model=topic_model)
 
     # Push knn results to supabase
     start = timeit.default_timer()
-    sync_knn_results_to_supabase(db, supabase_client= supabase_client, reset_knn=reset_knn)
-    if reset_knn:
-        # reset of knn clears these, so ensure we recalculate on this cycle
-        create_docs()
-        vectorize_records()
+    sync_knn_results_to_supabase(db, supabase_client= supabase_client)
     end = timeit.default_timer()
     knn_analysis_time = end - start
 

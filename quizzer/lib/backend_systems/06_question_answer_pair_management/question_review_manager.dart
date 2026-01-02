@@ -17,6 +17,10 @@ class QuestionReviewManager {
   static const String _editsReviewTable = 'question_answer_pair_edits_review';
   static const String _mainPairsTable = 'question_answer_pairs';
   static const String _subjectDetailsTable = 'subject_details';
+
+  int currentNewReviews = 0;
+  int currentEditReviews = 0;
+  int totalReviewCount = 0;
   // ==================================================
   // ----- Review Question Answer Pairs -----
   // ==================================================
@@ -32,17 +36,17 @@ class QuestionReviewManager {
 
     // Get counts for weighting and existence check using the modern .count() method
     // Let potential PostgrestExceptions propagate (Fail Fast)
-    final int newCount = await SessionManager().supabase
+    currentNewReviews = await SessionManager().supabase
         .from(_newReviewTable)
         .count(CountOption.exact);
 
-    final int editsCount = await SessionManager().supabase
+    currentEditReviews = await SessionManager().supabase
         .from(_editsReviewTable)
         .count(CountOption.exact);
 
-    final int totalCount = newCount + editsCount;
+    totalReviewCount = currentNewReviews + currentEditReviews;
 
-    if (totalCount == 0) {
+    if (totalReviewCount == 0) {
       QuizzerLogger.logMessage('No questions available in review tables.');
       return {'data': null, 'source_table': null, 'primary_key': null, 'error': 'No questions available for review.'};
     }
@@ -50,15 +54,15 @@ class QuestionReviewManager {
     // Determine which table to pull from based on weight and availability
     String selectedTable;
     int countForSelectedTable;
-    if (newCount > 0) {
+    if (currentNewReviews > 0) {
       selectedTable = _newReviewTable;
-      countForSelectedTable = newCount;
-    } else if (editsCount > 0) {
+      countForSelectedTable = currentNewReviews;
+    } else if (currentEditReviews > 0) {
       selectedTable = _editsReviewTable;
-      countForSelectedTable = editsCount;
+      countForSelectedTable = currentEditReviews;
     } else {
       // Should be unreachable due to totalCount check, but defensively handle.
-      QuizzerLogger.logError('Review table selection logic error. Total > 0 but individual counts are 0? New: $newCount, Edits: $editsCount');
+      QuizzerLogger.logError('Review table selection logic error. Total > 0 but individual counts are 0? New: $currentNewReviews, Edits: $currentEditReviews');
       return {'data': null, 'source_table': null, 'primary_key': null, 'error': 'Internal error selecting review table.'};
     }
 
