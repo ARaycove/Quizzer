@@ -71,6 +71,7 @@ class _LoginPageState extends State<LoginPage> {
       if (!mounted) return;
       // _loginProgressMessage will be updated by the stream, culminating in "Login Complete!"
       // Potentially, could set a final success message here if desired before navigation
+      // setState(() { _loginProgressMessage = "Success!"; });
       setState(() { _loginProgressMessage = "Success!"; });
       Navigator.pushReplacementNamed(context, '/home');
       // Don't reset loading state here, it disappears on navigation
@@ -204,11 +205,11 @@ class _LoginPageState extends State<LoginPage> {
                 child: TextField(
                   controller: _emailController,
                   enabled: !_isLoading,
+                  style: const TextStyle(color: AppTheme.textPrimary, fontSize: 16.0),
                   style:
                       TextStyle(color: Theme.of(context).colorScheme.onPrimary),
                   decoration: const InputDecoration(
-                    labelText: "Email Address",
-                    hintText: "Enter your email address to login",
+                    hintText: "Email Address",
                   ),
                 ),
               ),
@@ -221,11 +222,11 @@ class _LoginPageState extends State<LoginPage> {
                   controller: _passwordController,
                   obscureText: true,
                   enabled: !_isLoading,
+                  style: const TextStyle(color: AppTheme.textPrimary, fontSize: 16.0),
                   style:
                       TextStyle(color: Theme.of(context).colorScheme.onPrimary),
                   decoration: const InputDecoration(
-                    labelText: "Password",
-                    hintText: "Enter your account password to login",
+                    hintText: "Password",
                   ),
                 ),
               ),
@@ -246,6 +247,9 @@ class _LoginPageState extends State<LoginPage> {
 
               // Submit Button
               SizedBox(
+                width: _isLoading
+                    ? fieldWidth
+                    : buttonWidth, // Expand to full width when loading
                 width: _isLoading ? fieldWidth : buttonWidth,
                 // Expand to full width when loading
                 child: ElevatedButton(
@@ -290,6 +294,9 @@ class _LoginPageState extends State<LoginPage> {
               // New User Sign Up Button
               ElevatedButton(
                 onPressed: _isLoading ? null : newUserSignUp,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.chartOrange,
+                ),
                 child: const Text("New User"),
               ),
             ],
@@ -304,6 +311,9 @@ class _LoginPageState extends State<LoginPage> {
     return IconButton(
       icon: Icon(icon),
       onPressed: () {
+        // This would later call the appropriate social login function
+        QuizzerLogger.logWarning(
+            'Social login ($service) not implemented yet.');
         QuizzerLogger.logMessage("Disabled social login for now");
         // _isLoading ? null : submitSocialLogin();
       },
