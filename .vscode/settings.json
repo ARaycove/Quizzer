@@ -1,6 +1,0 @@
-{
-    "python.analysis.extraPaths": [
-        "./src/build/site-packages/x86"
-    ],
-    "java.configuration.updateBuildConfiguration": "interactive"
-}
