@@ -467,7 +467,6 @@ def create_sql_table_if_not_exists(db) -> None:
         answer_elements TEXT NOT NULL,
         concepts TEXT,
         subjects TEXT,
-        module_name TEXT NOT NULL,
         question_type TEXT NOT NULL,
         options TEXT,
         correct_option_index INTEGER,
@@ -500,7 +499,6 @@ def create_sql_table_if_not_exists(db) -> None:
         total_attempts INTEGER NOT NULL,
         revision_streak INTEGER NOT NULL,
         question_vector TEXT,
-        module_name TEXT,
         question_type TEXT,
         num_mcq_options INTEGER DEFAULT 0,
         num_so_options INTEGER DEFAULT 0,
@@ -703,91 +701,186 @@ def fetch_data_for_bertopic(db: Connection):
     
     return docs, embeddings, question_ids 
 
-def sync_knn_results_to_supabase(db, supabase_client, reset_knn=False):
+def sync_knn_results_to_supabase(db, supabase_client, changed_records):
     """
-    Syncs k_nearest_neighbors data from local database to Supabase.
-    Fetches records with null k_nearest_neighbors, updates from local DB, batch upserts.
+    Syncs ONLY k_nearest_neighbors data from local database to Supabase.
+    
+    Part 1: Reset changed records to null in Supabase (only the ones that changed)
+    Part 2: Fetch 100 at a time null values and fill them with KNN results from local DB
     
     Args:
         db: SQLite database connection
         supabase_client: Authenticated Supabase client
-        reset_knn: If True, clears all k_nearest_neighbors in Supabase first
+        changed_records: list of question_ids that have changed KNN vectors
     """
-    if reset_knn:
-        print("Clearing k_nearest_neighbors from Supabase...")
-        cleared_count = 0
-        while True:
-            # Check if any non-null records exist
-            check = supabase_client.table('question_answer_pairs').select('question_id').not_.is_('k_nearest_neighbors', 'null').limit(1).execute()
-            
-            if not check.data:
-                print(f"Reset complete. Cleared {cleared_count} records")
-                break
-            
-            # Fetch batch to clear
-            response = supabase_client.table('question_answer_pairs').select('*').not_.is_('k_nearest_neighbors', 'null').limit(500).execute()
-            
-            # Clear k_nearest_neighbors
-            clear_data = []
-            for record in response.data:
-                record['k_nearest_neighbors'] = None
-                clear_data.append(record)
-            
-            supabase_client.table('question_answer_pairs').upsert(clear_data).execute()
-            
-            cleared_count += len(clear_data)
-            print(f"Cleared {cleared_count} records...")
-    
     cursor = db.cursor()
     total_updated = 0
     
-    # Get Supabase schema by fetching one record
-    schema_check = supabase_client.table('question_answer_pairs').select('*').limit(1).execute()
-    if schema_check.data:
-        supabase_columns = set(schema_check.data[0].keys())
-    else:
-        print("Error: Could not determine Supabase schema")
-        return
+    # PART 1: Reset changed records to null in Supabase
+    if changed_records:
+        print(f"Resetting {len(changed_records)} changed records to null in Supabase...")
+        
+        batch_size = 100
+        for i in range(0, len(changed_records), batch_size):
+            batch_ids = changed_records[i:i+batch_size]
+            
+            # Update each record with just k_nearest_neighbors = NULL
+            for qid in batch_ids:
+                supabase_client.table('question_answer_pairs')\
+                    .update({'k_nearest_neighbors': None})\
+                    .eq('question_id', qid)\
+                    .execute()
+            
+            print(f"Reset {len(batch_ids)} records to null...")
+        
+        print(f"Reset complete. {len(changed_records)} records set to null in Supabase")
     
-    print("Starting k-NN sync...")
-    
+    print("Starting k-NN sync (filling nulls from local DB)...")
+
+    # PART 2: Fetch null values and fill them with ONLY k_nearest_neighbors from local DB
     while True:
         # Fetch 100 records from Supabase where k_nearest_neighbors is null
-        response = supabase_client.table('question_answer_pairs').select('question_id').is_('k_nearest_neighbors', 'null').limit(100).execute()
+        response = supabase_client.table('question_answer_pairs')\
+            .select('question_id')\
+            .is_('k_nearest_neighbors', 'null')\
+            .limit(100)\
+            .execute()
         
         if not response.data:
             print(f"Sync complete. Total records updated: {total_updated}")
             break
         
         question_ids = [record['question_id'] for record in response.data]
-        print(f"Found {len(question_ids)} records needing k-NN data")
+        print(f"Found {len(question_ids)} records with null k_nearest_neighbors")
         
-        # Get full records from local DB for these question_ids
+        if not question_ids:
+            break
+            
         placeholders = ','.join('?' * len(question_ids))
         cursor.execute(f"""
-            SELECT * FROM question_answer_pairs 
+            SELECT question_id, k_nearest_neighbors FROM question_answer_pairs 
             WHERE question_id IN ({placeholders})
         """, question_ids)
         
         local_records = cursor.fetchall()
-        column_names = [description[0] for description in cursor.description]
         
-        # Convert to dicts and update timestamp, filter to Supabase columns only
-        now = datetime.datetime.now(datetime.timezone.utc).isoformat()
-        update_data = []
-        for record in local_records:
-            record_dict = {k: v for k, v in zip(column_names, record) if k in supabase_columns}
-            record_dict['last_modified_timestamp'] = now
-            update_data.append(record_dict)
+        # Update Supabase with only k_nearest_neighbors data
+        batch_updated = 0
+        for question_id, knn_data in local_records:
+            if knn_data:  # Only update if we have KNN data locally
+                # Update ONLY k_nearest_neighbors and last_modified_timestamp
+                update_data = {
+                    'k_nearest_neighbors': knn_data,
+                    'last_modified_timestamp': datetime.datetime.now(datetime.timezone.utc).isoformat()
+                }
+                
+                supabase_client.table('question_answer_pairs')\
+                    .update(update_data)\
+                    .eq('question_id', question_id)\
+                    .execute()
+                
+                batch_updated += 1
+                if batch_updated % 10 == 0:
+                    print(f"Progress: Updated {batch_updated} records...")
         
-        if update_data:
-            # Batch upsert
-            supabase_client.table('question_answer_pairs').upsert(update_data).execute()
-            total_updated += len(update_data)
-            print(f"Progress: {total_updated} records synced")
-        else:
-            print("No matching records found in local DB")
+        total_updated += batch_updated
+        print(f"Batch complete. Updated {batch_updated} records in this batch.")
+        
+        if batch_updated == 0:
+            print("No more records could be updated. Stopping sync.")
             break
+
+    print(f"k-NN sync finished. Total records updated: {total_updated}")
+
+def clean_deleted_records_locally(db, supabase_client, batch_size=500):
+    """
+    Removes local records that no longer exist on Supabase server.
+    Fetches all existing question_ids from Supabase first, then compares locally.
+    
+    Args:
+        db: SQLite database connection
+        supabase_client: Authenticated Supabase client
+        batch_size: Number of records to fetch from Supabase at a time
+    
+    Returns:
+        tuple: (deleted_pairs_count, deleted_attempts_count)
+    """
+    cursor = db.cursor()
+    
+    # Get total count for reporting
+    cursor.execute("SELECT COUNT(*) FROM question_answer_pairs")
+    total_local_pairs = cursor.fetchone()[0]
+    
+    cursor.execute("SELECT COUNT(*) FROM question_answer_attempts")
+    total_local_attempts = cursor.fetchone()[0]
+    
+    print(f"Checking for deleted records. Local: {total_local_pairs} question pairs, {total_local_attempts} attempts")
+    
+    # STEP 1: Fetch ALL existing question_ids from Supabase (server-side)
+    print("Fetching existing question IDs from Supabase...")
+    existing_ids = set()
+    offset = 0
+    
+    while True:
+        response = supabase_client.table('question_answer_pairs')\
+            .select('question_id')\
+            .range(offset, offset + batch_size - 1)\
+            .execute()
+        
+        if not response.data:
+            break
+            
+        existing_ids.update(record['question_id'] for record in response.data)
+        offset += batch_size
+        print(f"Fetched {len(existing_ids)} IDs so far...")
+    
+    print(f"Total existing records on server: {len(existing_ids)}")
+    
+    # STEP 2: Process local records in batches and delete those not in existing_ids
+    deleted_pairs_count = 0
+    deleted_attempts_count = 0
+    offset = 0
+    
+    while True:
+        cursor.execute("""
+            SELECT question_id FROM question_answer_pairs 
+            LIMIT ? OFFSET ?
+        """, (batch_size, offset))
+        
+        batch = cursor.fetchall()
+        if not batch:
+            break
+            
+        local_ids = [row[0] for row in batch]
+        deleted_ids = [qid for qid in local_ids if qid not in existing_ids]
+        
+        # Delete local records that don't exist on server
+        if deleted_ids:
+            placeholders = ','.join('?' * len(deleted_ids))
+            
+            # Delete from question_answer_pairs
+            cursor.execute(f"""
+                DELETE FROM question_answer_pairs 
+                WHERE question_id IN ({placeholders})
+            """, deleted_ids)
+            deleted_pairs_count += cursor.rowcount
+            
+            # Delete from question_answer_attempts
+            cursor.execute(f"""
+                DELETE FROM question_answer_attempts 
+                WHERE question_id IN ({placeholders})
+            """, deleted_ids)
+            deleted_attempts_count += cursor.rowcount
+        
+        offset += batch_size
+    
+    db.commit()
+    
+    print(f"Cleanup complete. Deleted:")
+    print(f"  - {deleted_pairs_count} question pairs")
+    print(f"  - {deleted_attempts_count} attempt records")
+    
+    return deleted_pairs_count, deleted_attempts_count
 
 def main():
     fetch_and_save_data_locally()

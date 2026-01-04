@@ -6,10 +6,12 @@ from neural_net.neural_net_model import create_quizzer_neural_network, kfold_cro
 from neural_net.attempt_pre_process import apply_smote_balancing
 from sklearn.metrics import f1_score, roc_auc_score, balanced_accuracy_score
 import pandas as pd
-from multiprocessing import Process
+# from multiprocessing import Process
+import multiprocessing
 import random
 from sklearn.metrics import roc_curve
 import os
+from bertopic_helpers import set_process_limits
 
 def train_and_save_batch_configs(config_batch, X_train, y_train, X_test, y_test, input_features, total_iterations=0, n_search=0):
     """
@@ -25,6 +27,7 @@ def train_and_save_batch_configs(config_batch, X_train, y_train, X_test, y_test,
         total_iterations: Number of iterations completed so far (default 0)
         n_search: Total number of searches to perform (default 0)
     """
+    set_process_limits()
     for params in config_batch:
         random.seed(params['random_state'])
         np.random.seed(params['random_state'])
@@ -41,7 +44,7 @@ def train_and_save_batch_configs(config_batch, X_train, y_train, X_test, y_test,
             random_state=params['random_state'],
             k_neighbors=params['k_neighbors']
         )
-        
+        print("Smote Balancing Applied")
         if X_train_smote.isnull().any().any():
             X_train_smote = X_train_smote.fillna(0)
         
@@ -62,6 +65,7 @@ def train_and_save_batch_configs(config_batch, X_train, y_train, X_test, y_test,
             focal_gamma=params['focal_gamma'],
             focal_alpha=params['focal_alpha']
         )
+        print(f"Model Created for paramaeters: {params}")
         
         model.fit(
             X_train_smote,
@@ -311,16 +315,16 @@ def grid_search_quizzer_model(X_train, y_train, X_test, y_test, n_search=200, ba
         'focal_alpha': [0.05, 0.1, 0.15, 0.20, 0.25, 0.30, 0.35, 0.4, 0.45, 0.5],
         
         # SMOTE parameters
-        'sampling_strategy': ['minority', 0.9, 0.95], # 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85,  
+        'sampling_strategy': ['minority', 0.8, 0.85, 0.9, 0.95], # 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85,  
         'k_neighbors': [5, 10], # k >= 6 did not make it into top results
         
         # Training parameters
         # Trying larger epochs, larger batch sizes
         # Based on the output, we need a specific amount of 
         # 5,10,20,30,40, 
-        'epochs': [10,20,30,40,50,60,70,80,90,100,110,120],
+        'epochs': [10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200],
         # ,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,300,400,500,600,700,800,900,1000
-        'batch_size': [256], # 8, 16, 128
+        'batch_size': [64, 128, 256], # 8, 16, 128
         
         # Random seed parameter
         'random_state': [42]
@@ -341,7 +345,9 @@ def grid_search_quizzer_model(X_train, y_train, X_test, y_test, n_search=200, ba
             for i, params in enumerate(config_batch, start=batch_start+1):
                 print(f"  Config {i}: layer_width={params['layer_width']}, reduction={params['reduction_percent']}, dropout={params['dropout_rate']}")
             
-            p = Process(
+            # Use spawn context to avoid HuggingFace tokenizer deadlock
+            ctx = multiprocessing.get_context('spawn')
+            p = ctx.Process(
                 target=train_and_save_batch_configs,
                 args=(config_batch, X_train, y_train, X_test, y_test, input_features)
             )
@@ -379,7 +385,9 @@ def grid_search_quizzer_model(X_train, y_train, X_test, y_test, n_search=200, ba
         
         print(f"Random Sample Batch {batch_start+1}-{batch_end}/{n_search}")
         
-        p = Process(
+        # Use spawn context to avoid HuggingFace tokenizer deadlock
+        ctx = multiprocessing.get_context('spawn')
+        p = ctx.Process(
             target=train_and_save_batch_configs,
             args=(config_batch, X_train, y_train, X_test, y_test, input_features, total_iterations, n_search)
         )

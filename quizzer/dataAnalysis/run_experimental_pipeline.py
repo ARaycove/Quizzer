@@ -1,9 +1,8 @@
 import os
-import json
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
 import umap
 import timeit
 import hdbscan
-import asyncio
 import supabase
 import datetime
 import pandas as pd
@@ -19,23 +18,24 @@ from sklearn.feature_extraction.text import CountVectorizer
 from neural_net.grid_search import grid_search_quizzer_model
 from neural_net.accuracy_net import pre_process_training_data
 from neural_net.grid_search import train_and_save_batch_configs
-from bertopic_helpers import create_docs, save_bertopic_results_to_db, export_outlier_topics_to_docx
+from bertopic_helpers import create_docs, export_outlier_topics_to_docx, set_process_limits
 from bertopic.representation import KeyBERTInspired, MaximalMarginalRelevance
 from sync_fetch_data import (initialize_and_fetch_db, get_last_sync_date, fetch_new_records_from_supabase, 
                              update_last_sync_date,find_newest_timestamp,upsert_records_to_db, 
                              fetch_data_for_bertopic, initialize_supabase_session, sync_vectors_to_supabase,
-                             sync_knn_results_to_supabase)
+                             sync_knn_results_to_supabase, clean_deleted_records_locally)
+
+from knn_utils import (compute_complete_pairwise_distances, plot_distance_distribution, compute_knn_model, update_knn_vectors_locally)
 from sklearn.mixture import GaussianMixture
 
 
 
 def main():
+    set_process_limits()
     # HyperParameters
     reset_question_vector   = False
     reset_doc               = False
-    # FIXME knn reset should be dynamic
-    # reset_knn               = False   # Reset knn values when new documents come in, which forces update of existing calculations for more accurate data
-    bypass_model_train      = False  #topic model
+    bypass_model_train      = False  # topic model
     bypass_prediction_model = False
     n_clusters              = 31
     random_state            = 69
@@ -49,6 +49,8 @@ def main():
         reset_doc=reset_doc
         )
     
+    # Update Database and sync
+    # FIXME Abstract this section of code into it's own function for clarity
     # Fetch new data from server
     last_sync_date: datetime = get_last_sync_date()
     print(f"Got last sync time of: {last_sync_date}")
@@ -58,16 +60,15 @@ def main():
         last_sync_date      =last_sync_date
     )
 
-
-
     # Now we need to save the new records to our local db file:
     upsert_records_to_db(
         records=new_records, 
         db = db,
         supabase_client=supabase_client)
-    
+
     # Assuming we got anything back, update the last sync date for future runs (do this after we have recorded our return values)
     update_last_sync_date(find_newest_timestamp(records=new_records))
+    clean_deleted_records_locally(db=db, supabase_client=supabase_client)
 
     # Ensure all question records have their doc created and placed back into the database
     start = timeit.default_timer()
@@ -106,7 +107,7 @@ def main():
                 min_samples         = 10,
                 metric              = 'manhattan', #FIXME Evaluate better distance metric
                 cluster_selection_method = 'eom',
-                # prediction_data     = True
+                prediction_data     = True
             ),
             # These models require us to know what the number of clusters is before hand, since we don't know this information it presents an issue
             KMeans(
@@ -184,16 +185,14 @@ def main():
         # Save data locally
         reduced_embeddings = topic_model.umap_model.embedding_
 
-        # FIXME Extract knn calculation from save to db function
-
-        # FIXME Plot un-normalized distribution (bar chart - num pairs with distance = n)
-
-        # FIXME Normalize all distance values between 0 and 1 (depending on visualization)
-
-        # FIXME Plot normalized distribution (bar chart - num pairs with distance = n)
-
-        # FIXME save only the updated values, if the knn vector has changed from last time then wipe it and it's neighbors (resetting dynamically)
-        save_bertopic_results_to_db(topic_model, reduced_embeddings, question_ids, db, k=25)
+        # Visualize distance distribution of points (Are all points equally distant?)
+        distance_matrix = compute_complete_pairwise_distances(reduced_embeddings)
+        plot_distance_distribution(distance_matrix)
+        
+        # save only the updated values, if the knn vector has changed from last time then wipe it and it's neighbors (resetting dynamically)
+        knn_model = compute_knn_model(embeddings=reduced_embeddings, k=25)
+        changed_records, total_records = update_knn_vectors_locally(db=db, question_ids=question_ids, knn_model=knn_model, embeddings=reduced_embeddings)
+        print(f"KNN vectors changed for {len(changed_records)}/{total_records} records")
 
         # FIXME Collect topic probabilities for each question, {topic_01: p_1, topic_02: p_2, topic_n: p_n}
         # This will show us how any given question relates to the larger knowledge map, not just it's immediate surroundings
@@ -205,7 +204,7 @@ def main():
 
     # Push knn results to supabase
     start = timeit.default_timer()
-    sync_knn_results_to_supabase(db, supabase_client= supabase_client)
+    sync_knn_results_to_supabase(db, supabase_client= supabase_client, changed_records=changed_records)
     end = timeit.default_timer()
     knn_analysis_time = end - start
 
@@ -231,7 +230,7 @@ def main():
         # # Run comprehensive grid search
         
         start   = timeit.default_timer()
-        n_search = 1
+        n_search = 200
         grid_search_quizzer_model(X_train, y_train, X_test, y_test, n_search=n_search, batch_size=25)
         end     = timeit.default_timer()
         grid_search_time = end - start

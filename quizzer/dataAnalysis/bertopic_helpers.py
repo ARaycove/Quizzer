@@ -5,14 +5,14 @@ from transformers import BlipProcessor, BlipForConditionalGeneration
 from PIL import Image
 import torch
 import pytesseract
-import json
-from sklearn.neighbors import NearestNeighbors
 from docx import Document
-from docx.shared import Pt, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 import re
-from pylatexenc import macrospec, latexwalker, latex2text
+from pylatexenc import macrospec, latexwalker
 from pylatexenc.latexwalker import LatexMacroNode, LatexGroupNode, LatexCharsNode
+import os
+import sys
+import psutil
 
 def convert_latex_to_plain_english(doc: str) -> str:
     """
@@ -410,60 +410,6 @@ def create_docs() -> None:
     db.close()
     print("Database connection closed.")
 
-def save_bertopic_results_to_db(topic_model, embeddings, question_ids, db, k=10):
-    """
-    Extracts topic assignments and k-nearest neighbors from BERTopic model,
-    then saves to question_answer_pairs table.
-    
-    Args:
-        topic_model: Fitted BERTopic model
-        embeddings: Document embeddings used in model (numpy array)
-        question_ids: List of question_ids corresponding to documents
-        db: SQLite database connection
-        k: Number of nearest neighbors to find
-    """
-    cursor = db.cursor()
-    
-    # Ensure columns exist
-    cursor.execute("PRAGMA table_info(question_answer_pairs)")
-    columns = [col[1] for col in cursor.fetchall()]
-    
-    if 'topic_id' not in columns:
-        cursor.execute("ALTER TABLE question_answer_pairs ADD COLUMN topic_id INTEGER")
-    if 'k_nearest_neighbors' not in columns:
-        cursor.execute("ALTER TABLE question_answer_pairs ADD COLUMN k_nearest_neighbors TEXT")
-    
-    db.commit()
-    
-    # Get topic assignments
-    topics = topic_model.topics_
-    
-    # Fit k-NN on original embeddings
-    knn = NearestNeighbors(n_neighbors=k+1, metric='cosine')
-    knn.fit(embeddings)
-    distances, indices = knn.kneighbors(embeddings)
-    
-    # Update database
-    for i, question_id in enumerate(question_ids):
-        topic_id = int(topics[i])
-        neighbor_indices = indices[i][1:]
-        neighbor_distances = distances[i][1:]
-        
-        neighbors_map = {
-            question_ids[idx]: float(dist) 
-            for idx, dist in zip(neighbor_indices, neighbor_distances)
-        }
-        neighbors_json = json.dumps(neighbors_map)
-        
-        cursor.execute("""
-            UPDATE question_answer_pairs 
-            SET topic_id = ?, k_nearest_neighbors = ?
-            WHERE question_id = ?
-        """, (topic_id, neighbors_json, question_id))
-    
-    db.commit()
-    print(f"Updated {len(question_ids)} records with topic_id and {k} nearest neighbors")
-
 def export_outlier_topics_to_docx(topic_model, output_path='outlier_topics.docx'):
     """
     Exports questions with topic_id = -1 to a .docx file with topic info.
@@ -513,3 +459,26 @@ def export_outlier_topics_to_docx(topic_model, output_path='outlier_topics.docx'
     
     doc.save(output_path)
     print(f"Exported {len(outliers)} outlier questions to {output_path}")
+
+def set_process_limits():
+    """
+    Set CPU affinity and process priority for Linux systems.
+    Limits the process to use only half the CPU cores and sets low priority.
+    """
+    if sys.platform != 'linux':
+        return
+    
+    cpu_count = os.cpu_count()
+    if cpu_count is None or cpu_count <= 1:
+        return
+    
+    half_cores = max(1, cpu_count // 2)
+    affinity_cores = list(range(half_cores))
+    
+    p = psutil.Process()
+    p.cpu_affinity(affinity_cores)
+    
+    os.nice(10)
+    
+    print(f"Process limited to {half_cores} CPU cores (out of {cpu_count})")
+    print(f"Process priority set to low (nice value increased by 10)")

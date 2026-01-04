@@ -1,14 +1,14 @@
 ================================================================================
 FEATURE ANALYSIS REPORT
 ================================================================================
-Dataset Shape: 5,752 rows x 1,348 columns
-Total Features: 1,348
-Memory Usage: 59.16 MB
+Dataset Shape: 5,809 rows x 1,350 columns
+Total Features: 1,350
+Memory Usage: 59.83 MB
 
 Feature Type Breakdown:
   Non-numeric: 0
   Integer:     235
-  Float:       1,113
+  Float:       1,115
 
 Null Value Summary:
   Total null values: 0
@@ -1330,9 +1330,11 @@ Null Value Summary:
 | qv_97                                            | -0.8870080709457397          | float64       |
 | qv_98                                            | -1.1475619077682495          | float64       |
 | qv_99                                            | 1.7514995336532593           | float64       |
+| user_stats_avg_daily_questions_learned           | 0.0                          | float64       |
 | user_stats_avg_reaction_time                     | 32.464                       | float64       |
 | user_stats_consecutive_correct_streak            | 4.0                          | float64       |
 | user_stats_consecutive_incorrect_streak          | 0.0                          | float64       |
+| user_stats_days_left_until_questions_exhaust     | 0.0                          | float64       |
 | user_stats_global_accuracy                       | 0.900228                     | float64       |
 | user_stats_global_fitb_accuracy                  | 0.904355                     | float64       |
 | user_stats_global_mcq_accuracy                   | 0.897839                     | float64       |
