@@ -205,7 +205,6 @@ class _LoginPageState extends State<LoginPage> {
                 child: TextField(
                   controller: _emailController,
                   enabled: !_isLoading,
-                  style: const TextStyle(color: AppTheme.textPrimary, fontSize: 16.0),
                   style:
                       TextStyle(color: Theme.of(context).colorScheme.onPrimary),
                   decoration: const InputDecoration(
@@ -222,7 +221,6 @@ class _LoginPageState extends State<LoginPage> {
                   controller: _passwordController,
                   obscureText: true,
                   enabled: !_isLoading,
-                  style: const TextStyle(color: AppTheme.textPrimary, fontSize: 16.0),
                   style:
                       TextStyle(color: Theme.of(context).colorScheme.onPrimary),
                   decoration: const InputDecoration(
@@ -247,9 +245,6 @@ class _LoginPageState extends State<LoginPage> {
 
               // Submit Button
               SizedBox(
-                width: _isLoading
-                    ? fieldWidth
-                    : buttonWidth, // Expand to full width when loading
                 width: _isLoading ? fieldWidth : buttonWidth,
                 // Expand to full width when loading
                 child: ElevatedButton(
