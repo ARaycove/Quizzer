@@ -13,7 +13,6 @@ class ReviewSubjectsPanelWidget extends StatefulWidget {
 }
 
 class _ReviewSubjectsPanelWidgetState extends State<ReviewSubjectsPanelWidget> {
-  final SessionManager _session = SessionManager();
   final TextEditingController _markdownController = TextEditingController();
 
   // Internal state variables
@@ -39,8 +38,7 @@ class _ReviewSubjectsPanelWidgetState extends State<ReviewSubjectsPanelWidget> {
       _isLoading = true;
       _errorMessage = null;
     });
-
-    final result = await _session.getSubjectForReview();
+    final result = await SessionManager().questionReviewManager.getSubjectForReview();
 
     if (mounted) {
       setState(() {
@@ -71,7 +69,7 @@ class _ReviewSubjectsPanelWidgetState extends State<ReviewSubjectsPanelWidget> {
     final Map<String, dynamic> updatedData = Map<String, dynamic>.from(_currentData!);
     updatedData['subject_description'] = _markdownController.text.trim();
 
-    final success = await _session.updateReviewedSubject(updatedData, _primaryKey!);
+    final success = await SessionManager().questionReviewManager.updateReviewedSubject(updatedData, _primaryKey!);
 
     if (mounted) {
       if (success) {

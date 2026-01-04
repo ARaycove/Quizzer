@@ -1,5 +1,6 @@
 import tensorflow as tf
 import numpy as np
+from netcal.metrics import ECE
 # from neural_net_model import create_quizzer_neural_network, kfold_cross_validation
 from neural_net.neural_net_model import create_quizzer_neural_network, kfold_cross_validation
 from neural_net.attempt_pre_process import apply_smote_balancing
@@ -108,20 +109,10 @@ def train_and_save_batch_configs(config_batch, X_train, y_train, X_test, y_test,
         f1_class_1 = f1_score(y_test, y_pred, pos_label=1)
         bacc = balanced_accuracy_score(y_test, y_pred)
         
-        # Calculate Expected Calibration Error (ECE)
-        n_bins = 10
-        bin_boundaries = np.linspace(0, 1, n_bins + 1)
-        bin_lowers = bin_boundaries[:-1]
-        bin_uppers = bin_boundaries[1:]
-        
-        ece = 0.0
-        for bin_lower, bin_upper in zip(bin_lowers, bin_uppers):
-            in_bin = (y_pred_prob_flat > bin_lower) & (y_pred_prob_flat <= bin_upper)
-            prop_in_bin = np.mean(in_bin)
-            if prop_in_bin > 0:
-                accuracy_in_bin = np.mean(y_test[in_bin])
-                avg_confidence_in_bin = np.mean(y_pred_prob_flat[in_bin])
-                ece += np.abs(avg_confidence_in_bin - accuracy_in_bin) * prop_in_bin
+        # Calculate Expected Calibration Error (ECE) using netcal
+        from netcal.metrics import ECE
+        ece_metric = ECE(bins=10)
+        ece = ece_metric.measure(y_pred_prob_flat, np.array(y_test))
         
         # Loss penalty: inverse of (1 + test_loss) to penalize high loss
         loss_penalty = 1 / (1 + test_loss)
@@ -129,7 +120,9 @@ def train_and_save_batch_configs(config_batch, X_train, y_train, X_test, y_test,
         # Normalize mean_discrimination by prob_range for relative separation measure
         mean_discrimination = mean_discrimination / prob_range if prob_range > 0 else 0
         
-        metrics = [roc_auc, f1_class_0, f1_class_1, loss_penalty, mean_discrimination]
+        ece_score = 1 - ece # Invert ECE since lower is better (0 ECE = 1.0 score)
+        
+        metrics = [roc_auc, ece_score]
         if all(m > 0 for m in metrics):
             composite_score = len(metrics) / sum(1/m for m in metrics)
         else:
@@ -325,7 +318,7 @@ def grid_search_quizzer_model(X_train, y_train, X_test, y_test, n_search=200, ba
         # Trying larger epochs, larger batch sizes
         # Based on the output, we need a specific amount of 
         # 5,10,20,30,40, 
-        'epochs': [10,20,30,40,50],
+        'epochs': [10,20,30,40,50,60,70,80,90,100,110,120],
         # ,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,300,400,500,600,700,800,900,1000
         'batch_size': [256], # 8, 16, 128
         

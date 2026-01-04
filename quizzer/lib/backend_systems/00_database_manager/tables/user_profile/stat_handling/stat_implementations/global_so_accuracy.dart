@@ -1,0 +1,78 @@
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/stat_handling/stat_field.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/stat_handling/stat_implementations/total_so_attempts.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/stat_handling/stat_implementations/total_so_correct_attempts.dart';
+import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
+import 'package:sqflite_common/sqlite_api.dart';
+
+class GlobalSoAccuracy extends StatField{
+  static final GlobalSoAccuracy _instance = GlobalSoAccuracy._internal();
+  factory GlobalSoAccuracy() => _instance;
+  GlobalSoAccuracy._internal();
+
+  @override
+  String get name => "global_so_accuracy";
+
+  @override
+  String get type => "REAL";
+
+  @override
+  double get defaultValue => 1.0;
+
+  double _cachedValue = 1.0;
+  @override
+  double get currentValue => _cachedValue;
+
+  set currentValue(double value) {
+    _cachedValue = value;
+  }
+
+  @override
+  String get description => "Global accuracy rate for Sort Order questions (correct/attempts).";
+
+  @override
+  bool get isIncremental => false;
+
+  @override
+  Future<double> recalculateStat({Transaction? txn, bool? isCorrect, double? reactionTime, String? questionId, String? questionType}) async {
+    try {
+      // Get the required stats directly from their singletons
+      final int soCorrect = TotalSoCorrectAttempts().currentValue;
+      final int soAttempts = TotalSoAttempts().currentValue;
+      
+      // Calculate accuracy: so_correct / so_attempts
+      double accuracy = defaultValue;
+      if (soAttempts > 0) {
+        accuracy = soCorrect / soAttempts;
+      }
+      
+      currentValue = accuracy;
+      return currentValue;
+    } catch (e) {
+      QuizzerLogger.logError('Failed to recalculate global_so_accuracy: $e');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<double> calculateCarryForwardValue({
+    Transaction? txn, 
+    Map<String, dynamic>? previousRecord, 
+    Map<String, dynamic>? currentIncompleteRecord
+  }) async {
+    try {
+      if (previousRecord == null) {
+        currentValue = defaultValue;
+        return currentValue;
+      }
+      
+      // For carry-forward, use the previous day's value
+      final double previousValue = (previousRecord[name] as double?) ?? defaultValue;
+      
+      currentValue = previousValue;
+      return currentValue;
+    } catch (e) {
+      QuizzerLogger.logError('Failed to calculate carry-forward for global_so_accuracy: $e');
+      rethrow;
+    }
+  }
+}

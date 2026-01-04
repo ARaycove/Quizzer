@@ -56,13 +56,10 @@ class _FeedbackPageState extends State<FeedbackPage> {
       _submitButtonText = "THANKS!";
     });
 
-    // Get SessionManager instance
-    final SessionManager session = getSessionManager();
-
     try {
       QuizzerLogger.logMessage(
           "Sending feedback via SessionManager: Category: $_selectedCategory, Feedback: ${_feedbackController.text}");
-      session.submitUserFeedback(
+      SessionManager().submitUserFeedback(
         feedbackType: _selectedCategory!, // Assert non-null as it passed validation
         feedbackContent: _feedbackController.text.trim(),
       ); // The Future is intentionally not awaited here to avoid blocking UI

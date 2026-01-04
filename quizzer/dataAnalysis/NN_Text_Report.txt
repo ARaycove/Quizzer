@@ -2,87 +2,87 @@
 ============================================================
 FINAL TEST SET EVALUATION
 ============================================================
-Test Accuracy: 0.7228
-Test Precision: 0.8255
-Test Recall: 0.8039
-Test F1-Score: 0.8146
-Test AUC-ROC: 0.7080
-Brier Score: 0.1960
+Test Accuracy: 0.8080
+Test Precision: 0.8461
+Test Recall: 0.9310
+Test F1-Score: 0.8865
+Test AUC-ROC: 0.7536
+Brier Score: 0.1375
 
 Confusion Matrix:
-[[ 46  52]
- [ 60 246]]
+[[ 67 157]
+ [ 64 863]]
 
 Classification Report:
               precision    recall  f1-score   support
 
-           0       0.43      0.47      0.45        98
-           1       0.83      0.80      0.81       306
+           0       0.51      0.30      0.38       224
+           1       0.85      0.93      0.89       927
 
-    accuracy                           0.72       404
-   macro avg       0.63      0.64      0.63       404
-weighted avg       0.73      0.72      0.73       404
+    accuracy                           0.81      1151
+   macro avg       0.68      0.62      0.63      1151
+weighted avg       0.78      0.81      0.79      1151
 
 
 PREDICTION ANALYSIS:
 ----------------------------------------
 Overall Probability Distribution:
-  Min: 0.0690
-  Max: 0.9989
-  Mean: 0.6908
-  Std: 0.2915
+  Min: 0.2579
+  Max: 0.9948
+  Mean: 0.7702
+  Std: 0.1755
 
 CLASS-SPECIFIC PREDICTION ANALYSIS:
 ----------------------------------------
-INCORRECT ANSWERS (Class 0) - 98 samples:
-  Min: 0.0726
-  Max: 0.9251
-  Mean: 0.5317
-  Std: 0.3237
-  Percentiles [10,25,50,75,90]: [0.09786744 0.18592412 0.55792022 0.8848781  0.9053602 ]
+INCORRECT ANSWERS (Class 0) - 224 samples:
+  Min: 0.2690
+  Max: 0.9645
+  Mean: 0.6385
+  Std: 0.1989
+  Percentiles [10,25,50,75,90]: [0.34784723 0.44461472 0.68988672 0.80803934 0.87059041]
 
-CORRECT ANSWERS (Class 1) - 306 samples:
-  Min: 0.0690
-  Max: 0.9989
-  Mean: 0.7417
-  Std: 0.2606
-  Percentiles [10,25,50,75,90]: [0.23205029 0.66412678 0.89323458 0.90770938 0.91384321]
+CORRECT ANSWERS (Class 1) - 927 samples:
+  Min: 0.2579
+  Max: 0.9948
+  Mean: 0.8020
+  Std: 0.1532
+  Percentiles [10,25,50,75,90]: [0.55127943 0.73339808 0.85292315 0.91261733 0.94545908]
 
 DISCRIMINATION ANALYSIS:
-  Mean probability difference (Correct - Incorrect): 0.2100
-  Overlap analysis: 8757/29988 comparisons (29.20%)
+  Mean probability difference (Correct - Incorrect): 0.1636
+  Overlap analysis: 51150/207648 comparisons (24.63%)
   Perfect separation: False
-  Max Class 0 probability: 0.9251
-  Min Class 1 probability: 0.0690
+  Max Class 0 probability: 0.9645
+  Min Class 1 probability: 0.2579
   ✓ Model assigns higher probabilities to correct answers
 
 Probability Range Distribution:
-  0.0-0.2:  51 samples ( 12.6%)
-  0.2-0.4:  41 samples ( 10.1%)
-  0.4-0.6:  29 samples (  7.2%)
-  0.6-0.8:  44 samples ( 10.9%)
-  0.8-1.0: 239 samples ( 59.2%)
+  0.0-0.2:   0 samples (  0.0%)
+  0.2-0.4:  74 samples (  6.4%)
+  0.4-0.6: 122 samples ( 10.6%)
+  0.6-0.8: 307 samples ( 26.7%)
+  0.8-1.0: 648 samples ( 56.3%)
 
 Sample Predictions (first 20):
 Probability | Actual | Predicted
 -----------------------------------
-    0.9011  |   1    |  Correct
-    0.8552  |   1    |  Correct
-    0.8140  |   1    |  Correct
-    0.9075  |   1    |  Correct
-    0.9232  |   1    |  Correct
-    0.8972  |   0    |  Correct
-    0.4215  |   1    |  Incorrect
-    0.9078  |   1    |  Correct
-    0.6496  |   0    |  Correct
-    0.9107  |   1    |  Correct
-    0.5602  |   1    |  Correct
-    0.8771  |   1    |  Correct
-    0.9095  |   1    |  Correct
-    0.9138  |   1    |  Correct
-    0.9062  |   1    |  Correct
-    0.8926  |   1    |  Correct
-    0.8009  |   1    |  Correct
-    0.9119  |   1    |  Correct
-    0.3472  |   1    |  Incorrect
-    0.8591  |   1    |  Correct
+    0.6850  |   1    |  Correct
+    0.8989  |   1    |  Correct
+    0.8651  |   1    |  Correct
+    0.6980  |   1    |  Correct
+    0.7493  |   1    |  Correct
+    0.7196  |   0    |  Correct
+    0.5892  |   1    |  Correct
+    0.7976  |   0    |  Correct
+    0.4260  |   1    |  Incorrect
+    0.6980  |   1    |  Correct
+    0.8688  |   1    |  Correct
+    0.6179  |   1    |  Correct
+    0.6752  |   1    |  Correct
+    0.8243  |   0    |  Correct
+    0.7424  |   0    |  Correct
+    0.8615  |   1    |  Correct
+    0.8901  |   1    |  Correct
+    0.7561  |   1    |  Correct
+    0.9749  |   1    |  Correct
+    0.8514  |   1    |  Correct

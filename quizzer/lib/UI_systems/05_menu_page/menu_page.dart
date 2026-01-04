@@ -68,16 +68,6 @@ class _MenuPageState extends State<MenuPage> {
             ),
             AppTheme.sizedBoxMed,
 
-            // Display Modules Button
-            _buildMenuButton(
-              icon: Icons.view_module,
-              label: 'Display Modules',
-              onPressed: () {
-                Navigator.pushNamed(context, '/display_modules');
-              },
-            ),
-            AppTheme.sizedBoxMed,
-
             // My Profile Button
             _buildMenuButton(
               icon: Icons.person,

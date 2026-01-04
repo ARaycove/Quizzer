@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:quizzer/UI_systems/03_add_question_page/widgets/widget_module_selection.dart';
 import 'package:quizzer/UI_systems/03_add_question_page/widgets/add_question_widget/widget_add_question.dart';
 import 'package:quizzer/UI_systems/03_add_question_page/widgets/widget_live_preview.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
@@ -26,7 +25,6 @@ class EditQuestionDialog extends StatefulWidget {
 
 class _EditQuestionDialogState extends State<EditQuestionDialog> {
   final SessionManager _session = SessionManager();
-  late final TextEditingController _moduleController;
   late final String _questionType;
 
   // State for editing
@@ -37,8 +35,6 @@ class _EditQuestionDialogState extends State<EditQuestionDialog> {
   List<int> _correctIndicesSATA = [];
   List<Map<String, List<String>>> _answersToBlanks = [];
   int _previewRebuildCounter = 0;
-
-  late final String _originalModuleName; // Track the original module name
   
   // Loading state
   bool _isLoading = true;
@@ -69,8 +65,6 @@ class _EditQuestionDialogState extends State<EditQuestionDialog> {
       if (mounted) {
         setState(() {
           _questionType = data['question_type'] as String;
-          _moduleController = TextEditingController(text: data['module_name'] as String? ?? '');
-          _originalModuleName = data['module_name'] as String? ?? '';
           _questionElements = (data['question_elements'] as List<dynamic>?)?.map((e) => Map<String, dynamic>.from(e as Map)).toList() ?? [];
           _answerElements = (data['answer_elements'] as List<dynamic>?)?.map((e) => Map<String, dynamic>.from(e as Map)).toList() ?? [];
           _options = (data['options'] as List<dynamic>?)?.map((e) => Map<String, dynamic>.from(e as Map)).toList() ?? [];
@@ -368,7 +362,6 @@ class _EditQuestionDialogState extends State<EditQuestionDialog> {
     // This is also the data we want to return to the caller
     final Map<String, dynamic> updatedQuestionDataForSession = {
       'question_id': widget.questionId, // Essential for SessionManager to identify
-      'module_name': _moduleController.text,
       'question_elements': _questionElements,
       'answer_elements': _answerElements,
       'options': _options.isNotEmpty ? _options : null,
@@ -387,7 +380,6 @@ class _EditQuestionDialogState extends State<EditQuestionDialog> {
       QuizzerLogger.logMessage('EditQuestionDialog: Submitting changes to SessionManager.');
       await _session.updateExistingQuestion(
         questionId: widget.questionId,
-        moduleName: _moduleController.text,
         questionElements: _questionElements,
         answerElements: _answerElements,
         options: _options.isNotEmpty ? _options : null,
@@ -395,7 +387,6 @@ class _EditQuestionDialogState extends State<EditQuestionDialog> {
         indexOptionsThatApply: _correctIndicesSATA.isNotEmpty ? _correctIndicesSATA : null,
         questionType: _questionType,
         answersToBlanks: _answersToBlanks.isNotEmpty ? _answersToBlanks : null,
-        originalModuleName: _originalModuleName, // Pass the original module name
       );
     } else {
       QuizzerLogger.logMessage('EditQuestionDialog: Submission disabled, skipping SessionManager update.');
@@ -448,8 +439,6 @@ class _EditQuestionDialogState extends State<EditQuestionDialog> {
           children: [
             const Text('Edit Question'),
             AppTheme.sizedBoxLrg,
-            ModuleSelection(controller: _moduleController),
-            AppTheme.sizedBoxMed,
             AddQuestionWidget(
               questionType: _questionType,
               questionElements: _questionElements,

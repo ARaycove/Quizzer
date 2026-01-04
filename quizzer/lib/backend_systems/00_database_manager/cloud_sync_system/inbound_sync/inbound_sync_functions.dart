@@ -1,19 +1,13 @@
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_daily_stats_table.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:supabase/supabase.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/question_answer_pair_management/question_answer_pairs_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_profile_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_question_answer_pairs_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_settings_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/modules_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_module_activation_status_table.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/academic_archive.dart/subject_details_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/cloud_sync_system/inbound_sync/inbound_sync_helper.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/ml_models_table.dart';
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/initialization_table_verification.dart';
 import 'dart:io'; // For SocketException
 import 'dart:async'; // For Future.delayed
+import 'package:quizzer/backend_systems/00_database_manager/tables/sql_table.dart';
+
 
 Future<T> executeSupabaseCallWithRetry<T>(
   Future<T> Function() supabaseCall, {
@@ -77,36 +71,40 @@ Future<T> executeSupabaseCallWithRetry<T>(
   }
 }
 
-Future<void> runInboundSync(SessionManager sessionManager) async {
+Future<void> runInboundSync() async {
   QuizzerLogger.logMessage('Starting inbound sync aggregator...');
-  final String? userId = sessionManager.userId;
 
-  if (userId == null) {
+  if (SessionManager().userId == null) {
     QuizzerLogger.logError('Cannot run inbound sync: userId is null');
     throw StateError('Cannot run inbound sync: userId is null');
   }
 
   try {
-    QuizzerLogger.logMessage('Starting inbound sync for user $userId...');
-    List<List<Map<String,dynamic>>> tableDataForSync = await fetchDataForAllTables(sessionManager.supabase, userId);
+    QuizzerLogger.logMessage('Starting inbound sync for user ${SessionManager().userId}...');
+    
+    // Get all tables that require inbound sync
+    final List<SqlTable> allTables = InitializationTableVerification.allTables;
+    final List<SqlTable> tablesRequiringSync = allTables.where((table) => table.requiresInboundSync).toList();
+    
+    QuizzerLogger.logMessage('Found ${tablesRequiringSync.length} tables requiring inbound sync');
+    
+    // Fetch data for all tables requiring sync
+    List<List<Map<String,dynamic>>> tableDataForSync = await fetchDataForAllTables(tablesRequiringSync);
 
     // Now batch upsert all records as a single database transaction
     final db = await getDatabaseMonitor().requestDatabaseAccess();
-    db!.transaction((txn) async {
-    await batchUpsertQuestionAnswerPairs(records: tableDataForSync[0], db: txn);
-    await batchUpsertUserQuestionAnswerPairs(records: tableDataForSync[1], db: txn);
-    await upsertUserProfileFromInboundSync(profileDataList: tableDataForSync[2], db: txn); // user should have only one profile record, so index the first in the list (should be only in the list)
-    await batchUpsertUserSettingsFromSupabase(settingsData: tableDataForSync[3], userId: userId, db: txn);
-    await batchUpsertModuleFromInboundSync(moduleRecords: tableDataForSync[4], db: txn);
-    await batchUpsertUserModuleActivationStatusFromInboundSync(userModuleActivationStatusRecords: tableDataForSync[5], db: txn);
-    await batchUpsertSubjectDetails(subjectDetailRecords: tableDataForSync[6], db: txn);
-    await batchUpsertMlModelsFromInboundSync(modelRecords: tableDataForSync[7], db: txn);
-    await batchUpsertUserDailyStatsFromInboundSync(userDailyStatsRecords: tableDataForSync[8], db: txn);
-
-
+    await db!.transaction((txn) async {
+      for (int i = 0; i < tablesRequiringSync.length; i++) {
+        final table = tablesRequiringSync[i];
+        final data = tableDataForSync[i];
+        await table.batchUpsertRecords(records: data, db: txn);
+        QuizzerLogger.logMessage('Upserted ${data.length} records for table ${table.tableName}');
+        // This is properly inserting the records
+      }
     });
     getDatabaseMonitor().releaseDatabaseAccess();
-    QuizzerLogger.logSuccess('Inbound sync completed successfully.');
+    
+    QuizzerLogger.logSuccess('Inbound sync completed successfully for ${tablesRequiringSync.length} tables.');
   } catch (e) {
     QuizzerLogger.logError('Error during inbound sync: $e');
     rethrow;

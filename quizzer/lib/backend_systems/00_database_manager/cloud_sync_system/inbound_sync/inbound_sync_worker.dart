@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
-import 'package:quizzer/backend_systems/10_switch_board/switch_board.dart';
-import 'package:quizzer/backend_systems/10_switch_board/sb_sync_worker_signals.dart';
+import 'package:quizzer/backend_systems/09_switch_board/switch_board.dart';
+import 'package:quizzer/backend_systems/09_switch_board/sb_sync_worker_signals.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'inbound_sync_functions.dart';
 import 'dart:io'; // For InternetAddress lookup
@@ -25,7 +25,6 @@ class InboundSyncWorker {
 
   // --- Dependencies ---
   final SwitchBoard     _switchBoard    = getSwitchBoard();
-  final SessionManager  _sessionManager = getSessionManager();
   // --------------------
 
   // --- Control Methods ---
@@ -33,7 +32,7 @@ class InboundSyncWorker {
   Future<void> start() async {
     QuizzerLogger.logMessage('Entering InboundSyncWorker start()...');
     
-    if (_sessionManager.userId == null) {
+    if (SessionManager().userId == null) {
       QuizzerLogger.logWarning('InboundSyncWorker: Cannot start, no user logged in.');
       return;
     }
@@ -73,7 +72,7 @@ class InboundSyncWorker {
       
       // Run inbound sync
       QuizzerLogger.logMessage('InboundSyncWorker: Running inbound sync...');
-      await runInboundSync(_sessionManager);
+      await runInboundSync();
       QuizzerLogger.logMessage('InboundSyncWorker: Inbound sync completed.');
       
       // Signal that the sync cycle is complete
