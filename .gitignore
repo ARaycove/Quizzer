@@ -6,6 +6,9 @@ __pycache__/
 # C extensions
 *.so
 
+# VS Code
+.vscode/
+
 # Distribution / packaging
 .Python
 build/apk/
@@ -178,7 +181,8 @@ quizzer/QuizzerAppLogs
 
 
 # Misc
-AI Assistant Skills.md
-NJ_NOTES.md
 quizzer/QuizzerAppHive
 quizzer/QuizzerAppMedia
+
+#NJ specific ignores
+.env.nj
