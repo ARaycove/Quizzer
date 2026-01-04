@@ -19,7 +19,10 @@ Future<Map<String, dynamic>> handlePasswordRecovery(Map<String, dynamic> message
       await supabase.auth.resetPasswordForEmail(email);
       QuizzerLogger.logMessage('Supabase reset password response received');
 
-
+      results = {
+        'success': true,
+        'message': 'OTP sent to $email'
+      };
     } on AuthException catch (e) {
       // If Supabase returns an authentication error, capture it.
       QuizzerLogger.logError('Supabase AuthException during signup: ${e.message}');

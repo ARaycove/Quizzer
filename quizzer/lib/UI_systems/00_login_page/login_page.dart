@@ -228,19 +228,19 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
               ),
-              // 
-              // AppTheme.sizedBoxMed,
-              // // Reset Password Button
-              // SizedBox(
-              //   width: buttonWidth,
-              //   child: TextButton(
-              //     onPressed: _isLoading ? null : resetPassword,
-              //     child: const Text(
-              //       "Reset Password",
-              //       style: TextStyle(fontSize: 14),
-              //     ),
-              //   ),
-              // ),
+              
+              AppTheme.sizedBoxMed,
+              // Reset Password Button
+              SizedBox(
+                width: buttonWidth,
+                child: TextButton(
+                  onPressed: _isLoading ? null : resetPassword,
+                  child: const Text(
+                    "Reset Password",
+                    style: TextStyle(fontSize: 14),
+                  ),
+                ),
+              ),
               AppTheme.sizedBoxLrg,
 
               // Submit Button
