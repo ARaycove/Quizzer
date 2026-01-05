@@ -67,6 +67,7 @@ class QuestionAnswerPairManager {
           question_id,
           k_nearest_neighbors
         FROM question_answer_pairs
+        WHERE question_vector IS NOT NULL
       ''');
 
       return results;
