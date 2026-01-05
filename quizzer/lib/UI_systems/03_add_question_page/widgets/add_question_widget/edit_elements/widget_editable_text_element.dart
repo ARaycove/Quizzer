@@ -115,7 +115,6 @@ class _EditableTextElementState extends State<EditableTextElement> {
                    autofocus: true,
                    maxLines: null,
                    keyboardType: TextInputType.multiline,
-                   style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
                    decoration: const InputDecoration(
                       isDense: true,
                       border: InputBorder.none,

@@ -230,7 +230,7 @@ def main():
         # # Run comprehensive grid search
         
         start   = timeit.default_timer()
-        n_search = 200
+        n_search = 5
         grid_search_quizzer_model(X_train, y_train, X_test, y_test, n_search=n_search, batch_size=25)
         end     = timeit.default_timer()
         grid_search_time = end - start
