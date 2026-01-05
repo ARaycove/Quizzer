@@ -475,7 +475,7 @@ class _EditableBlankElementState extends State<EditableBlankElement> {
             // Pass the single, combined focus node to the TextField.
             focusNode: _combinedFocusNode,
             autofocus: true,
-            style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+            // style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
             decoration: const InputDecoration(
               isDense: true,
               border: InputBorder.none,

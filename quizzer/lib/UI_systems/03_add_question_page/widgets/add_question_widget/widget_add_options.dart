@@ -93,7 +93,6 @@ class _AddOptionsState extends State<AddOptions> {
     return TextField(
       controller: controller,
       focusNode: focusNode,
-      style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
 
       // Allow multiple lines for text wrapping
       maxLines: null,

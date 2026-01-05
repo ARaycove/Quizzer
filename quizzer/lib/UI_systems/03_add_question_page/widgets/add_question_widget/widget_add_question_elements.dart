@@ -95,8 +95,6 @@ class _AddQuestionElementsState extends State<AddQuestionElements> {
     return TextField(
       controller: controller,
       focusNode: focusNode,
-      style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
-
       // Allow multiple lines for text wrapping
       maxLines: null,
       keyboardType: TextInputType.multiline, // Improve keyboard for multiline

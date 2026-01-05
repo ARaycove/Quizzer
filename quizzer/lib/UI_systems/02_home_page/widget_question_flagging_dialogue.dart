@@ -140,7 +140,6 @@ class _QuestionFlaggingDialogState extends State<QuestionFlaggingDialog> {
           AppTheme.sizedBoxLrg,
           TextField(
             controller: _flagController,
-            style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
             maxLines: null,
             minLines: 3,
             decoration: const InputDecoration(
