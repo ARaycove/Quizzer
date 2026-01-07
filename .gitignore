@@ -172,13 +172,16 @@ quizzer/lib/main.dart
 quizzer/dataAnalysis/data.db
 quizzer/dataAnalysis/last_sync.json
 quizzer/dataAnalysis/global_best_model.keras
+quizzer/dataAnalysis/changed_records.json
 quizzer/QuizzerApp/sqlite/quizzer.db
+
+# Test Bench files
 quizzer/QuizzerApp/
 quizzer/QuizzerAppLogs
-
+quizzer/QuizzerAppHive
+quizzer/QuizzerAppMedia
 
 # Misc
 AI Assistant Skills.md
 NJ_NOTES.md
-quizzer/QuizzerAppHive
-quizzer/QuizzerAppMedia
+

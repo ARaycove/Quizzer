@@ -6,6 +6,7 @@ from sqlite3 import Connection
 import datetime
 import numpy as np
 import typing
+import random
 import asyncio
 
 SUPABASE_URL = "https://yruvxuvzztnahuuiqxit.supabase.co"
@@ -701,45 +702,47 @@ def fetch_data_for_bertopic(db: Connection):
     
     return docs, embeddings, question_ids 
 
-def sync_knn_results_to_supabase(db, supabase_client, changed_records):
+def sync_knn_results_to_supabase(db, supabase_client, changed_records, timestamp):
     """
-    Syncs ONLY k_nearest_neighbors data from local database to Supabase.
-    
-    Part 1: Reset changed records to null in Supabase (only the ones that changed)
-    Part 2: Fetch 100 at a time null values and fill them with KNN results from local DB
+    Syncs ONLY k_nearest_neighbors data from local database to Supabase using batch operations.
     
     Args:
         db: SQLite database connection
         supabase_client: Authenticated Supabase client
         changed_records: list of question_ids that have changed KNN vectors
+        timestamp: ISO timestamp string to use for 'last_modified_timestamp' field
     """
     cursor = db.cursor()
     total_updated = 0
     
     # PART 1: Reset changed records to null in Supabase
     if changed_records:
+        random.shuffle(changed_records)
+        if len(changed_records) > 1000:
+            changed_records = changed_records[:1000]
+            print(f"Limited to {len(changed_records)} records for resetting")
+
         print(f"Resetting {len(changed_records)} changed records to null in Supabase...")
-        
         batch_size = 100
         for i in range(0, len(changed_records), batch_size):
             batch_ids = changed_records[i:i+batch_size]
             
-            # Update each record with just k_nearest_neighbors = NULL
-            for qid in batch_ids:
-                supabase_client.table('question_answer_pairs')\
-                    .update({'k_nearest_neighbors': None})\
-                    .eq('question_id', qid)\
-                    .execute()
+            # BATCH UPDATE: Set only k_nearest_neighbors to null for these IDs
+            # DO NOT update timestamp here - keeps the main app (NOT THE PIPELINE) from pulling null values unnecessarily
+            supabase_client.table('question_answer_pairs')\
+                .update({'k_nearest_neighbors': None})\
+                .in_('question_id', batch_ids)\
+                .execute()
             
-            print(f"Reset {len(batch_ids)} records to null...")
+            print(f"Reset {len(batch_ids)} records in one batch")
         
         print(f"Reset complete. {len(changed_records)} records set to null in Supabase")
     
     print("Starting k-NN sync (filling nulls from local DB)...")
-
-    # PART 2: Fetch null values and fill them with ONLY k_nearest_neighbors from local DB
+    
+    # PART 2: Find and fill null KNN values in batches
     while True:
-        # Fetch 100 records from Supabase where k_nearest_neighbors is null
+        # Find records with null k_nearest_neighbors
         response = supabase_client.table('question_answer_pairs')\
             .select('question_id')\
             .is_('k_nearest_neighbors', 'null')\
@@ -755,42 +758,45 @@ def sync_knn_results_to_supabase(db, supabase_client, changed_records):
         
         if not question_ids:
             break
-            
+        
+        # Get local KNN data for these IDs
         placeholders = ','.join('?' * len(question_ids))
         cursor.execute(f"""
-            SELECT question_id, k_nearest_neighbors FROM question_answer_pairs 
-            WHERE question_id IN ({placeholders})
+            SELECT question_id, k_nearest_neighbors 
+            FROM question_answer_pairs 
+            WHERE question_id IN ({placeholders}) 
+            AND k_nearest_neighbors IS NOT NULL
         """, question_ids)
         
         local_records = cursor.fetchall()
         
-        # Update Supabase with only k_nearest_neighbors data
+        if not local_records:
+            print("No matching KNN data found locally. Stopping sync.")
+            break
+        
+        # Process in batches - update each record individually but still using batch operations
         batch_updated = 0
         for question_id, knn_data in local_records:
-            if knn_data:  # Only update if we have KNN data locally
-                # Update ONLY k_nearest_neighbors and last_modified_timestamp
-                update_data = {
+            # Update single record with BOTH k_nearest_neighbors AND timestamp
+            supabase_client.table('question_answer_pairs')\
+                .update({
                     'k_nearest_neighbors': knn_data,
-                    'last_modified_timestamp': datetime.datetime.now(datetime.timezone.utc).isoformat()
-                }
-                
-                supabase_client.table('question_answer_pairs')\
-                    .update(update_data)\
-                    .eq('question_id', question_id)\
-                    .execute()
-                
-                batch_updated += 1
-                if batch_updated % 10 == 0:
-                    print(f"Progress: Updated {batch_updated} records...")
+                    'last_modified_timestamp': timestamp
+                })\
+                .eq('question_id', question_id)\
+                .execute()
+            
+            batch_updated += 1
+            total_updated += 1
         
-        total_updated += batch_updated
-        print(f"Batch complete. Updated {batch_updated} records in this batch.")
+        print(f"Updated {batch_updated} records in this batch")
         
-        if batch_updated == 0:
-            print("No more records could be updated. Stopping sync.")
+        if len(question_ids) < 100:
+            print("Last batch processed. Stopping sync.")
             break
-
+    
     print(f"k-NN sync finished. Total records updated: {total_updated}")
+    return total_updated
 
 def clean_deleted_records_locally(db, supabase_client, batch_size=500):
     """
@@ -881,6 +887,40 @@ def clean_deleted_records_locally(db, supabase_client, batch_size=500):
     print(f"  - {deleted_attempts_count} attempt records")
     
     return deleted_pairs_count, deleted_attempts_count
+
+def save_changed_records(changed_records, filename="changed_records.json"):
+    """
+    Saves the list of changed record IDs directly to a local JSON file.
+    
+    Args:
+        changed_records: List of question_ids that have changed
+        filename: Name of the JSON file to save to (default: "changed_records.json")
+    """
+    with open(filename, 'w') as f:
+        json.dump(changed_records, f)  # Save the list directly
+    
+    print(f"Saved {len(changed_records)} changed records to {filename}")
+
+def load_changed_records(filename="changed_records.json"):
+    """
+    Loads the list of changed record IDs directly from a local JSON file.
+    
+    Args:
+        filename: Name of the JSON file to load from (default: "changed_records.json")
+    
+    Returns:
+        List of changed record IDs, or empty list if file doesn't exist or is invalid
+    """
+    if not os.path.exists(filename):
+        return []
+    
+    with open(filename, 'r') as f:
+        try:
+            data = json.load(f)
+            # Ensure we return a list (the saved data should be a list)
+            return data if isinstance(data, list) else []
+        except json.JSONDecodeError:
+            return []
 
 def main():
     fetch_and_save_data_locally()

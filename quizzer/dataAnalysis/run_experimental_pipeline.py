@@ -23,19 +23,61 @@ from bertopic.representation import KeyBERTInspired, MaximalMarginalRelevance
 from sync_fetch_data import (initialize_and_fetch_db, get_last_sync_date, fetch_new_records_from_supabase, 
                              update_last_sync_date,find_newest_timestamp,upsert_records_to_db, 
                              fetch_data_for_bertopic, initialize_supabase_session, sync_vectors_to_supabase,
-                             sync_knn_results_to_supabase, clean_deleted_records_locally)
+                             sync_knn_results_to_supabase, clean_deleted_records_locally,
+                             save_changed_records, load_changed_records)
 
 from knn_utils import (compute_complete_pairwise_distances, plot_distance_distribution, compute_knn_model, update_knn_vectors_locally)
 from sklearn.mixture import GaussianMixture
+# Define Globals
+bypass_model_train      = False  # topic model
+reset_question_vector   = False
+reset_doc               = False
 
+# Timing Globals
+def run_data_sync_process(supabase_client, db):
+    '''
+    Fetches Fresh Data, Syncs new data from models
+    '''
+    last_sync_date: datetime = get_last_sync_date()
+    print(f"Got last sync time of: {last_sync_date}")
+    new_records = fetch_new_records_from_supabase(
+        supabase_client     =supabase_client,
+        last_sync_date      =last_sync_date
+    )
 
+    if len(new_records['question_answer_pairs']) == 0:
+        global bypass_model_train
+        bypass_model_train = True  # No new data, skip model training
+
+    # Now we need to save the new records to our local db file:
+    upsert_records_to_db(
+        records=new_records,
+        db = db,
+        supabase_client=supabase_client)
+    
+    # Assuming we got anything back, update the last sync date for future runs (do this after we have recorded our return values)
+    update_last_sync_date(find_newest_timestamp(records=new_records))
+    clean_deleted_records_locally(db=db, supabase_client=supabase_client)
+
+    # Ensure all question records have their doc created and placed back into the database
+    create_docs() # {question_id: "", ..., doc: ""}
+
+    # Pre-Compute vectors (so we don't have to recalculate 10,000's of records every run)
+    vectorize_records()
+    sync_vectors_to_supabase(reset_attempts_vector=reset_question_vector, reset_question_vector=reset_question_vector)
+
+    changed_records = load_changed_records()
+    sync_knn_results_to_supabase(db, supabase_client, changed_records, get_last_sync_date())
+    # Once results are synced, clear the local changed_records cache (preventing repeats)
+    save_changed_records([])
 
 def main():
     set_process_limits()
     # HyperParameters
-    reset_question_vector   = False
-    reset_doc               = False
-    bypass_model_train      = False  # topic model
+    global bypass_model_train
+
+
+
     bypass_prediction_model = False
     n_clusters              = 31
     random_state            = 69
@@ -49,55 +91,24 @@ def main():
         reset_doc=reset_doc
         )
     
-    # Update Database and sync
-    # FIXME Abstract this section of code into it's own function for clarity
-    # Fetch new data from server
-    last_sync_date: datetime = get_last_sync_date()
-    print(f"Got last sync time of: {last_sync_date}")
-    # Pass that into and then fetch the new question records to be analyzed
-    new_records = fetch_new_records_from_supabase(
-        supabase_client     =supabase_client,
-        last_sync_date      =last_sync_date
-    )
+    run_data_sync_process(supabase_client = supabase_client,
+                          db = db)
 
-    # Now we need to save the new records to our local db file:
-    upsert_records_to_db(
-        records=new_records, 
-        db = db,
-        supabase_client=supabase_client)
-
-    # Assuming we got anything back, update the last sync date for future runs (do this after we have recorded our return values)
-    update_last_sync_date(find_newest_timestamp(records=new_records))
-    clean_deleted_records_locally(db=db, supabase_client=supabase_client)
-
-    # Ensure all question records have their doc created and placed back into the database
     start = timeit.default_timer()
-    create_docs()
-        # {question_id: "", ..., doc: ""}
-    end   = timeit.default_timer()
-    doc_creation_time = end - start
-
-
-    # Pre-Compute vectors (so we don't have to recalculate 10,000's of records every run)
-    start   = timeit.default_timer()
-    vectorize_records()
-    end     = timeit.default_timer()
-    vectorize_records_time = end - start
-
-    sync_vectors_to_supabase(reset_attempts_vector=reset_question_vector, reset_question_vector=reset_question_vector)
-    docs, embeddings, question_ids = fetch_data_for_bertopic(db)
-    embedding_model = SentenceTransformer('sentence-transformers/allenai-specter')
-    # Define Dimensionality Reduction model for bertopic 
-    umap_model              = umap.UMAP(
-            n_neighbors     = 25,
-            n_components    = 25,
-            min_dist        = 0.01,
-            spread          = 0.5,
-            random_state    = 0,
-            metric          = 'manhattan'
-        )
-
+    end = timeit.default_timer()
+    topic_model_train_time = end - start # Set to now in case model doesn't run
     if not bypass_model_train:
+        docs, embeddings, question_ids = fetch_data_for_bertopic(db)
+        embedding_model = SentenceTransformer('sentence-transformers/allenai-specter')
+        # Define Dimensionality Reduction model for bertopic 
+        umap_model              = umap.UMAP(
+                n_neighbors     = 25,
+                n_components    = 25,
+                min_dist        = 0.01,
+                spread          = 0.5,
+                random_state    = 0,
+                metric          = 'manhattan'
+            )
         ######################################
         # Define What clustering model to use:
         ######################################
@@ -131,8 +142,6 @@ def main():
         c_tf_idf                = ClassTfidfTransformer(
             reduce_frequent_words   = True,
             bm25_weighting          = True,
-            # seed_words              = seed_words,
-            seed_multiplier         = 2
             )
 
         # Define the representation model for bertopic
@@ -158,7 +167,6 @@ def main():
         vis_dir = Path("bertopic_visualizations")
         vis_dir.mkdir(exist_ok=True)
 
-        # FIXME work on list of supervised fit for select questions (i.e math related, like the times table)
         # Fit the model
         topics, probabilities = topic_model.fit_transform(docs, embeddings)
 
@@ -194,6 +202,8 @@ def main():
         changed_records, total_records = update_knn_vectors_locally(db=db, question_ids=question_ids, knn_model=knn_model, embeddings=reduced_embeddings)
         print(f"KNN vectors changed for {len(changed_records)}/{total_records} records")
 
+        save_changed_records(changed_records)
+
         # FIXME Collect topic probabilities for each question, {topic_01: p_1, topic_02: p_2, topic_n: p_n}
         # This will show us how any given question relates to the larger knowledge map, not just it's immediate surroundings
 
@@ -202,12 +212,9 @@ def main():
         # Export to file for sharing
         export_outlier_topics_to_docx(topic_model=topic_model)
 
-    # Push knn results to supabase
-    start = timeit.default_timer()
-    sync_knn_results_to_supabase(db, supabase_client= supabase_client, changed_records=changed_records)
-    end = timeit.default_timer()
-    knn_analysis_time = end - start
-
+    # Run the data sync again, so we immediately push new data.
+    run_data_sync_process(supabase_client = supabase_client,
+                          db = db)
     # ================================================================================
     # Begin neural net pipeline
     if not bypass_prediction_model:
@@ -276,34 +283,20 @@ def main():
         else:
             print("Grid search failed - no model saved")
 
-        overall_end = timeit.default_timer()
-        overall_time = overall_end - overall_start
-        print("Final Report")
-        print(f"Got {len(new_records['question_answer_pairs'])} total qa records from supabase")
-        print(f"Got {len(new_records['question_answer_attempts'])} total attempt records from supabase")
-        print(f"Doc Creation took:      {doc_creation_time:.5f} seconds")
-        print(f"Vectorization took:     {vectorize_records_time:.5f} seconds")
-        print(f"Bertopic Training took: {topic_model_train_time:.5f} seconds")
-        print(f"KNN Analysis took:      {knn_analysis_time:.5f} seconds")
-        print(f"Data PreProcessing took:{pre_process_time:.5f} seconds")
-        print(f"Model trained on {X_train.shape[1]} features")
-        print(f"Grid Search ran with {n_search} configurations")
-        print(f"Grid Search took:       {grid_search_time:.5f} seconds")
-        print(f"Final results took:     {final_report_time:.5f}")
-        print(f"Pipeline took:          {overall_time:.5f} seconds from start to finish")
 
 
-    # Post Processing
-    # FIXME
-    # Question answer pair table gets updated, each record gets a new field called topic_relationships
-    # {"topic": {"number": n, "sim_score": k}}
-    # The performance vector calculation for mvec includes all questions who's sim score with said topic exceed 0.90 similarity. This enables a question to contribute to the performance of more than one topic assuming that a question could reasonably belong to multiple topics.
-
-    # Collect information
-    # FIXME
-
-    # Record in local db
-    # FIXME  
+    overall_end = timeit.default_timer()
+    overall_time = overall_end - overall_start
+    print("Final Report")
+    # print(f"Got {len(new_records['question_answer_pairs'])} total qa records from supabase")
+    # print(f"Got {len(new_records['question_answer_attempts'])} total attempt records from supabase")
+    print(f"Bertopic Training took: {topic_model_train_time:.5f} seconds")
+    print(f"Data PreProcessing took:{pre_process_time:.5f} seconds")
+    print(f"Model trained on {X_train.shape[1]} features")
+    print(f"Grid Search ran with {n_search} configurations")
+    print(f"Grid Search took:       {grid_search_time:.5f} seconds")
+    print(f"Final results took:     {final_report_time:.5f}")
+    print(f"Pipeline took:          {overall_time:.5f} seconds from start to finish")
 
 if __name__ == "__main__":
     main()

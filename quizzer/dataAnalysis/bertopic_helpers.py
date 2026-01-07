@@ -468,17 +468,17 @@ def set_process_limits():
     if sys.platform != 'linux':
         return
     
-    cpu_count = os.cpu_count()
-    if cpu_count is None or cpu_count <= 1:
-        return
+    # cpu_count = os.cpu_count()
+    # if cpu_count is None or cpu_count <= 1:
+    #     return
     
-    half_cores = max(1, cpu_count // 2)
-    affinity_cores = list(range(half_cores))
+    # half_cores = max(1, cpu_count // 2)
+    # affinity_cores = list(range(half_cores))
     
-    p = psutil.Process()
-    p.cpu_affinity(affinity_cores)
-    
+    # p = psutil.Process()
+    # p.cpu_affinity(affinity_cores)
+    # print(f"Process limited to {half_cores} CPU cores (out of {cpu_count})")
     os.nice(10)
     
-    print(f"Process limited to {half_cores} CPU cores (out of {cpu_count})")
+
     print(f"Process priority set to low (nice value increased by 10)")
