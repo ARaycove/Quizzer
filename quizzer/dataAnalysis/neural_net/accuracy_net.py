@@ -13,16 +13,14 @@ def pre_process_training_data():
     # Get our unprocessed table and load into a dataframe
     df = ap.get_attempt_dataframe()
 
-    # Remove old data where k_nearest_neighbors is missing
-    df = df[df['knn_performance_vector'].notna()]
-
     # Unpack embedded features
     df = ap.flatten_attempts_dataframe(df)
 
-    # Impute and handle missing values (nulls)
-    df = ap.handle_nulls(df)
+    # # Impute and handle missing values (nulls)
+    # df = ap.handle_nulls(df)
 
     # One Hot Encode now
+    # One Hot Encode does not handle nulls, if value is null, then we do not get a is_missing column
     df = ap.oneHotEncodeDataframe(df)
 
     # Cap reaction times (these have been shown as extreme)
@@ -31,27 +29,9 @@ def pre_process_training_data():
     # Drop all 0 columns:
     df = ap.drop_zero_columns(df)
 
-    df = ap.drop_features(df, features_to_drop=[
-        "user_stats_total_attempts",
-        "user_stats_total_correct_attempts",
-        "user_stats_total_fitb_attempts",
-        "user_stats_total_fitb_correct_attempts",
-        "user_stats_total_fitb_incorrrect_attempts",
-        "user_stats_total_incorrect_attempts",
-        "user_stats_total_mcq_attempts",
-        "user_stats_total_mcq_correct_attempts",
-        "user_stats_total_mcq_incorrrect_attempts",
-        "user_stats_total_sata_attempts",
-        "user_stats_total_sata_correct_attempts",
-        "user_stats_total_sata_incorrrect_attempts",
-        "user_stats_total_so_attempts",
-        "user_stats_total_so_correct_attempts",
-        "user_stats_total_tf_attempts",
-        "user_stats_total_tf_correct_attempts",
-        "user_stats_total_tf_incorrrect_attempts",
-    ],
+    df = ap.drop_features(df,
     prefixes_to_drop=[
-        "rs", "module_name"
+        "module_name"
     ])
 
     # Save the feature names we kept, for use in ml_models_table.dart
@@ -59,7 +39,8 @@ def pre_process_training_data():
     # Run initial reporting and analysis on processed frame
     pf.question_type_distribution_bar_chart(df)
     rp.save_feature_analysis(df)
-    rp.feature_importance_analysis(df, "response_result")
+    # feature importance analysis is deprecated
+    # rp.feature_importance_analysis(df, "response_result")
     rp.analyze_feature_imbalance(df)
     # data should be ready for plotting and analysis
     return df

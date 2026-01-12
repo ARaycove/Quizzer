@@ -1,0 +1,42 @@
+{
+  "qv_611": {
+    "index": 0,
+    "default_value": 0.0
+  },
+  "qv_636": {
+    "index": 1,
+    "default_value": 0.0
+  },
+  "knn_19_num_so_options": {
+    "index": 2,
+    "default_value": 0.0
+  },
+  "qv_459": {
+    "index": 3,
+    "default_value": 0.0
+  },
+  "qv_351": {
+    "index": 4,
+    "default_value": 0.0
+  },
+  "knn_13_accuracy_rate": {
+    "index": 5,
+    "default_value": 0.0
+  },
+  "qv_519": {
+    "index": 6,
+    "default_value": 0.0
+  },
+  "qv_649": {
+    "index": 7,
+    "default_value": 0.0
+  },
+  "qv_653": {
+    "index": 8,
+    "default_value": 0.0
+  },
+  "qv_764": {
+    "index": 9,
+    "default_value": 0.0
+  }
+}

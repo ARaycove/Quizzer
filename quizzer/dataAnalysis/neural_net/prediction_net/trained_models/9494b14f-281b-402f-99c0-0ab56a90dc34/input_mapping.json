@@ -1,0 +1,42 @@
+{
+  "qv_178": {
+    "index": 0,
+    "default_value": 0.0
+  },
+  "knn_01_was_first_attempt": {
+    "index": 1,
+    "default_value": 0.0
+  },
+  "qv_139": {
+    "index": 2,
+    "default_value": 0.0
+  },
+  "rs_6": {
+    "index": 3,
+    "default_value": 0.0
+  },
+  "qv_314": {
+    "index": 4,
+    "default_value": 0.0
+  },
+  "knn_06_question_type_multiple_choice": {
+    "index": 5,
+    "default_value": 0.0
+  },
+  "knn_17_question_type_multiple_choice": {
+    "index": 6,
+    "default_value": 0.0
+  },
+  "knn_15_num_sata_options": {
+    "index": 7,
+    "default_value": 0.0
+  },
+  "qv_510": {
+    "index": 8,
+    "default_value": 0.0
+  },
+  "user_stats_total_tf_attempts": {
+    "index": 9,
+    "default_value": 0.0
+  }
+}

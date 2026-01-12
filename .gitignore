@@ -169,11 +169,17 @@ quizzer/linux/
 quizzer/macos/
 quizzer/google-chrome-stable_current_amd64.deb
 quizzer/lib/main.dart
+
+quizzer/QuizzerApp/sqlite/quizzer.db
+
+# ML Pipeline stuff
+quizzer/dataAnalysis/input_feature_map.json
 quizzer/dataAnalysis/data.db
 quizzer/dataAnalysis/last_sync.json
 quizzer/dataAnalysis/global_best_model.keras
 quizzer/dataAnalysis/changed_records.json
-quizzer/QuizzerApp/sqlite/quizzer.db
+quizzer/dataAnalysis/feature_analysis.txt
+quizzer/dataAnalysis/cluster_ids.json
 
 # Test Bench files
 quizzer/QuizzerApp/

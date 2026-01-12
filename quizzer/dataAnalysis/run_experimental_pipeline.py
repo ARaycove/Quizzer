@@ -25,6 +25,7 @@ from sync_fetch_data import (initialize_and_fetch_db, get_last_sync_date, fetch_
                              fetch_data_for_bertopic, initialize_supabase_session, sync_vectors_to_supabase,
                              sync_knn_results_to_supabase, clean_deleted_records_locally,
                              save_changed_records, load_changed_records)
+from neural_net.prediction_net.model_def import train_question_accuracy_model
 
 from knn_utils import (compute_complete_pairwise_distances, plot_distance_distribution, compute_knn_model, update_knn_vectors_locally)
 from sklearn.mixture import GaussianMixture
@@ -67,6 +68,7 @@ def run_data_sync_process(supabase_client, db):
     sync_vectors_to_supabase(reset_attempts_vector=reset_question_vector, reset_question_vector=reset_question_vector)
 
     changed_records = load_changed_records()
+    #FIXME when syncing knn results, should handle case where no data found by fetching those question answer pair records from supabase
     sync_knn_results_to_supabase(db, supabase_client, changed_records, get_last_sync_date())
     # Once results are synced, clear the local changed_records cache (preventing repeats)
     save_changed_records([])
@@ -237,7 +239,7 @@ def main():
         # # Run comprehensive grid search
         
         start   = timeit.default_timer()
-        n_search = 5
+        n_search = 50
         grid_search_quizzer_model(X_train, y_train, X_test, y_test, n_search=n_search, batch_size=25)
         end     = timeit.default_timer()
         grid_search_time = end - start
@@ -291,11 +293,7 @@ def main():
     # print(f"Got {len(new_records['question_answer_pairs'])} total qa records from supabase")
     # print(f"Got {len(new_records['question_answer_attempts'])} total attempt records from supabase")
     print(f"Bertopic Training took: {topic_model_train_time:.5f} seconds")
-    print(f"Data PreProcessing took:{pre_process_time:.5f} seconds")
-    print(f"Model trained on {X_train.shape[1]} features")
-    print(f"Grid Search ran with {n_search} configurations")
-    print(f"Grid Search took:       {grid_search_time:.5f} seconds")
-    print(f"Final results took:     {final_report_time:.5f}")
+    print(f"Grid Search Took:       {grid_search_time:.5f} seconds")
     print(f"Pipeline took:          {overall_time:.5f} seconds from start to finish")
 
 if __name__ == "__main__":

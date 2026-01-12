@@ -702,6 +702,123 @@ def fetch_data_for_bertopic(db: Connection):
     
     return docs, embeddings, question_ids 
 
+def fetch_and_insert_missing_records(db, supabase_client, question_ids):
+    """
+    Fetches missing records from Supabase and inserts them into the local database.
+    Used to ensure all records on the server are available locally for analysis.
+    
+    Args:
+        db: SQLite database connection
+        supabase_client: Authenticated Supabase client
+        question_ids: List of question_ids that are missing locally
+        
+    Returns:
+        int: Number of records fetched and inserted
+    """
+    cursor = db.cursor()
+    total_inserted = 0
+    
+    if not question_ids:
+        print("No missing records to fetch.")
+        return 0
+    
+    print(f"Fetching {len(question_ids)} missing records from Supabase...")
+    
+    # Process in batches to avoid too many requests
+    batch_size = 100
+    for i in range(0, len(question_ids), batch_size):
+        batch_ids = question_ids[i:i + batch_size]
+        
+        try:
+            # Fetch the missing records from Supabase
+            response = supabase_client.table('question_answer_pairs')\
+                .select('*')\
+                .in_('question_id', batch_ids)\
+                .execute()
+            
+            if not response.data:
+                print(f"No data returned for batch {i//batch_size + 1}")
+                continue
+            
+            # Prepare records for insertion
+            records = []
+            for record in response.data:
+                # Ensure required fields are present
+                if 'question_id' not in record:
+                    continue
+                
+                # Convert to format compatible with upsert_records_to_db
+                processed_record = {}
+                for key, value in record.items():
+                    if value is None:
+                        processed_record[key] = None
+                    elif isinstance(value, dict) or isinstance(value, list):
+                        processed_record[key] = json.dumps(value)
+                    else:
+                        processed_record[key] = value
+                
+                # Set vector fields to None since they'll be computed locally
+                processed_record['question_vector'] = None
+                processed_record['doc'] = None
+                processed_record['k_nearest_neighbors'] = None
+                
+                records.append(processed_record)
+            
+            if records:
+                # Use existing upsert_records_to_db function
+                records_dict = {'question_answer_pairs': records}
+                cursor.execute("BEGIN TRANSACTION")
+                
+                # Insert each record individually
+                for record in records:
+                    # Check if record already exists (shouldn't, but just in case)
+                    cursor.execute(
+                        "SELECT question_id FROM question_answer_pairs WHERE question_id = ?",
+                        (record['question_id'],)
+                    )
+                    
+                    if cursor.fetchone():
+                        # Update existing record (just in case)
+                        update_fields = []
+                        update_values = []
+                        for key, value in record.items():
+                            if key != 'question_id':
+                                update_fields.append(f"{key} = ?")
+                                update_values.append(value)
+                        
+                        if update_fields:
+                            update_values.append(record['question_id'])
+                            query = f"""
+                                UPDATE question_answer_pairs 
+                                SET {', '.join(update_fields)}
+                                WHERE question_id = ?
+                            """
+                            cursor.execute(query, update_values)
+                    else:
+                        # Insert new record
+                        columns = [key for key in record.keys() if key != 'question_id']
+                        columns_str = ', '.join(columns)
+                        placeholders = ', '.join(['?' for _ in columns])
+                        
+                        query = f"""
+                            INSERT INTO question_answer_pairs (question_id, {columns_str})
+                            VALUES (?, {placeholders})
+                        """
+                        values = [record['question_id']] + [record[col] for col in columns]
+                        cursor.execute(query, values)
+                
+                db.commit()
+                total_inserted += len(records)
+                print(f"Batch {i//batch_size + 1}: Inserted {len(records)} records")
+            
+        except Exception as e:
+            print(f"Error fetching/inserting batch {i//batch_size + 1}: {e}")
+            db.rollback()
+            continue
+    
+    print(f"Total records fetched and inserted: {total_inserted}")
+    return total_inserted
+
 def sync_knn_results_to_supabase(db, supabase_client, changed_records, timestamp):
     """
     Syncs ONLY k_nearest_neighbors data from local database to Supabase using batch operations.
@@ -739,7 +856,7 @@ def sync_knn_results_to_supabase(db, supabase_client, changed_records, timestamp
         print(f"Reset complete. {len(changed_records)} records set to null in Supabase")
     
     print("Starting k-NN sync (filling nulls from local DB)...")
-    
+
     # PART 2: Find and fill null KNN values in batches
     while True:
         # Find records with null k_nearest_neighbors
@@ -769,6 +886,23 @@ def sync_knn_results_to_supabase(db, supabase_client, changed_records, timestamp
         """, question_ids)
         
         local_records = cursor.fetchall()
+        
+        # NEW: Check if we're missing any records locally
+        local_question_ids = {record[0] for record in local_records}
+        missing_ids = [qid for qid in question_ids if qid not in local_question_ids]
+        
+        if missing_ids:
+            print(f"Found {len(missing_ids)} records missing locally. Fetching from server...")
+            fetch_and_insert_missing_records(db, supabase_client, missing_ids)
+            
+            # Try fetching again after inserting missing records
+            cursor.execute(f"""
+                SELECT question_id, k_nearest_neighbors 
+                FROM question_answer_pairs 
+                WHERE question_id IN ({placeholders}) 
+                AND k_nearest_neighbors IS NOT NULL
+            """, question_ids)
+            local_records = cursor.fetchall()
         
         if not local_records:
             print("No matching KNN data found locally. Stopping sync.")
@@ -830,6 +964,7 @@ def clean_deleted_records_locally(db, supabase_client, batch_size=500):
     while True:
         response = supabase_client.table('question_answer_pairs')\
             .select('question_id')\
+            .order('question_id')\
             .range(offset, offset + batch_size - 1)\
             .execute()
         

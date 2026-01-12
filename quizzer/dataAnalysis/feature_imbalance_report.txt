@@ -1,102 +1,113 @@
 ================================================================================
 COMPREHENSIVE FEATURE IMBALANCE ANALYSIS
 ================================================================================
-Dataset: 5903 samples, 1349 features
+Dataset: 9164 samples, 1384 features
 Target: response_result
 
 CLASS DISTRIBUTION:
-  Class 1: 4,731 samples (80.1%)
-  Class 0: 1,172 samples (19.9%)
-  Imbalance ratio: 4.0:1
+  Class 1: 7,711 samples (84.1%)
+  Class 0: 1,453 samples (15.9%)
+  Imbalance ratio: 5.3:1
 
 TOP 30 FEATURES WITH HIGHEST CLASS VARIANCE DIFFERENCES:
- 1. knn_08_attempt_day_ratio                           | 942258.845863
- 2. knn_11_attempt_day_ratio                           | 825223.079064
- 3. knn_09_attempt_day_ratio                           | 447196.445696
- 4. knn_21_attempt_day_ratio                           | 441602.584263
- 5. knn_18_attempt_day_ratio                           | 269761.201181
- 6. knn_04_attempt_day_ratio                           | 265244.264666
- 7. knn_10_attempt_day_ratio                           | 188893.124914
- 8. knn_25_attempt_day_ratio                           | 150374.775851
- 9. knn_01_attempt_day_ratio                           | 120980.618500
-10. knn_19_attempt_day_ratio                           | 104525.752815
-11. knn_12_attempt_day_ratio                           | 74866.638709
-12. knn_03_attempt_day_ratio                           | 45317.489455
-13. knn_15_attempt_day_ratio                           | 41907.591462
-14. knn_22_attempt_day_ratio                           | 38942.915991
-15. knn_23_attempt_day_ratio                           | 38779.944689
-16. knn_17_attempt_day_ratio                           | 38561.337187
-17. knn_05_attempt_day_ratio                           | 37367.880975
-18. knn_07_attempt_day_ratio                           | 33040.392784
-19. knn_16_attempt_day_ratio                           | 29920.767642
-20. knn_13_attempt_day_ratio                           | 20578.081260
-21. knn_02_attempt_day_ratio                           | 9181.085339
-22. knn_20_attempt_day_ratio                           | 8301.865707
-23. knn_14_attempt_day_ratio                           | 5519.176289
-24. knn_24_attempt_day_ratio                           | 3843.957805
-25. knn_06_attempt_day_ratio                           | 3637.745435
-26. attempt_day_ratio                                  | 2719.672162
-27. user_stats_today_correct_attempts                  | 2487.215233
-28. user_stats_today_total_attempts                    | 2434.890487
-29. user_stats_today_mcq_total_attempts                | 638.012087
-30. user_stats_today_mcq_correct_attempts              | 633.356463
+ 1. user_stats_total_attempts                          | 2682720.171828
+ 2. user_stats_total_correct_attempts                  | 1922142.153885
+ 3. knn_08_attempt_day_ratio                           | 580042.867642
+ 4. knn_11_attempt_day_ratio                           | 509636.934771
+ 5. user_stats_total_fitb_attempts                     | 502081.431158
+ 6. user_stats_total_mcq_attempts                      | 483715.208428
+ 7. user_stats_total_fitb_correct_attempts             | 394889.526296
+ 8. user_stats_total_mcq_correct_attempts              | 332949.935864
+ 9. knn_09_attempt_day_ratio                           | 274088.312520
+10. knn_21_attempt_day_ratio                           | 271651.959750
+11. rs_0                                               | 177526.347073
+12. knn_18_attempt_day_ratio                           | 166773.809254
+13. knn_04_attempt_day_ratio                           | 161568.927696
+14. knn_10_attempt_day_ratio                           | 114244.159561
+15. knn_25_attempt_day_ratio                           | 90528.030197
+16. knn_01_attempt_day_ratio                           | 73562.081595
+17. user_stats_total_incorrect_attempts                | 63257.647936
+18. knn_19_attempt_day_ratio                           | 62832.247827
+19. knn_12_attempt_day_ratio                           | 45944.190864
+20. knn_05_attempt_day_ratio                           | 40069.947165
+21. user_stats_total_tf_attempts                       | 28378.642464
+22. knn_03_attempt_day_ratio                           | 27034.335115
+23. knn_06_attempt_day_ratio                           | 24095.951172
+24. knn_15_attempt_day_ratio                           | 23620.808072
+25. knn_22_attempt_day_ratio                           | 22338.598352
+26. user_stats_total_tf_correct_attempts               | 20781.395893
+27. knn_17_attempt_day_ratio                           | 19480.432805
+28. knn_23_attempt_day_ratio                           | 18961.426328
+29. rs_1                                               | 18696.102829
+30. knn_07_attempt_day_ratio                           | 18524.294603
 
 FEATURE MEANS BY CLASS (Top 20 differences):
- 1. knn_08_attempt_day_ratio                 | Class 0: 9.1695 | Class 1: 34.9000 | Diff: 25.7306
- 2. knn_21_attempt_day_ratio                 | Class 0: 6.3125 | Class 1: 31.7791 | Diff: 25.4666
- 3. user_stats_today_total_attempts          | Class 0: 112.3055 | Class 1: 137.4287 | Diff: 25.1232
- 4. user_stats_today_correct_attempts        | Class 0: 86.9249 | Class 1: 111.8909 | Diff: 24.9660
- 5. knn_11_attempt_day_ratio                 | Class 0: 4.5264 | Class 1: 28.0733 | Diff: 23.5469
- 6. knn_18_attempt_day_ratio                 | Class 0: 4.6174 | Class 1: 24.3968 | Diff: 19.7795
- 7. knn_10_attempt_day_ratio                 | Class 0: 5.2298 | Class 1: 18.3880 | Diff: 13.1582
- 8. user_stats_today_mcq_total_attempts      | Class 0: 54.2901 | Class 1: 67.1241 | Diff: 12.8340
- 9. user_stats_today_mcq_correct_attempts    | Class 0: 41.3652 | Class 1: 54.0017 | Diff: 12.6365
-10. knn_09_attempt_day_ratio                 | Class 0: 9.6660 | Class 1: 22.0215 | Diff: 12.3554
-11. user_stats_today_fitb_correct_attempts   | Class 0: 26.9181 | Class 1: 38.7392 | Diff: 11.8211
-12. user_stats_today_fitb_total_attempts     | Class 0: 32.9258 | Class 1: 44.6855 | Diff: 11.7597
-13. knn_12_attempt_day_ratio                 | Class 0: 4.1353 | Class 1: 14.0230 | Diff: 9.8877
-14. knn_19_attempt_day_ratio                 | Class 0: 5.8000 | Class 1: 15.1841 | Diff: 9.3841
-15. knn_01_attempt_day_ratio                 | Class 0: 9.1296 | Class 1: 18.1530 | Diff: 9.0234
-16. knn_16_attempt_day_ratio                 | Class 0: 1.4450 | Class 1: 9.1619 | Diff: 7.7169
-17. knn_03_attempt_day_ratio                 | Class 0: 7.4687 | Class 1: 14.9544 | Diff: 7.4857
-18. knn_05_attempt_day_ratio                 | Class 0: 20.8802 | Class 1: 13.6646 | Diff: 7.2156
-19. knn_04_attempt_day_ratio                 | Class 0: 8.6584 | Class 1: 14.2137 | Diff: 5.5553
-20. knn_25_attempt_day_ratio                 | Class 0: 8.5651 | Class 1: 13.5769 | Diff: 5.0118
+ 1. user_stats_total_attempts                | Class 0: 6472.0395 | Class 1: 5576.1275 | Diff: 895.9120
+ 2. user_stats_total_correct_attempts        | Class 0: 5540.2898 | Class 1: 4785.2074 | Diff: 755.0824
+ 3. rs_0                                     | Class 0: 1011.1906 | Class 1: 603.5211 | Diff: 407.6696
+ 4. user_stats_total_mcq_attempts            | Class 0: 2584.5352 | Class 1: 2186.4831 | Diff: 398.0521
+ 5. user_stats_total_fitb_attempts           | Class 0: 3123.4283 | Class 1: 2752.7851 | Diff: 370.6432
+ 6. user_stats_total_mcq_correct_attempts    | Class 0: 2175.5567 | Class 1: 1846.1995 | Diff: 329.3571
+ 7. user_stats_total_fitb_correct_attempts   | Class 0: 2766.2382 | Class 1: 2438.7988 | Diff: 327.4394
+ 8. rs_1                                     | Class 0: 544.9064 | Class 1: 363.1681 | Diff: 181.7383
+ 9. user_stats_total_incorrect_attempts      | Class 0: 931.7496 | Class 1: 790.9201 | Diff: 140.8296
+10. user_stats_total_tf_attempts             | Class 0: 535.9440 | Class 1: 449.9497 | Diff: 85.9944
+11. user_stats_total_tf_correct_attempts     | Class 0: 460.9218 | Class 1: 387.2101 | Diff: 73.7117
+12. user_stats_total_mcq_incorrrect_attempts | Class 0: 408.9785 | Class 1: 340.2836 | Diff: 68.6949
+13. rs_5                                     | Class 0: 220.1851 | Class 1: 161.1817 | Diff: 59.0034
+14. user_stats_total_fitb_incorrrect_attempts | Class 0: 357.1901 | Class 1: 313.9863 | Diff: 43.2038
+15. user_stats_total_sata_attempts           | Class 0: 222.8780 | Class 1: 182.1262 | Diff: 40.7519
+16. user_stats_today_correct_attempts        | Class 0: 109.7288 | Class 1: 137.7765 | Diff: 28.0477
+17. user_stats_today_total_attempts          | Class 0: 135.1370 | Class 1: 159.5600 | Diff: 24.4230
+18. user_stats_total_sata_correct_attempts   | Class 0: 132.5036 | Class 1: 108.3123 | Diff: 24.1913
+19. user_stats_today_fitb_correct_attempts   | Class 0: 43.1571 | Class 1: 64.9007 | Diff: 21.7436
+20. user_stats_today_fitb_total_attempts     | Class 0: 50.4412 | Class 1: 72.1778 | Diff: 21.7366
 
 MISSING VALUE PATTERNS BY CLASS:
+user_stats_today_so_accuracy_rate        | Class 0:   72 | Class 1:  155
+user_stats_today_sata_accuracy_rate      | Class 0:   62 | Class 1:  129
+user_stats_today_tf_accuracy_rate        | Class 0:   64 | Class 1:  130
+user_stats_today_mcq_accuracy_rate       | Class 0:   64 | Class 1:  130
+user_stats_today_fitb_accuracy_rate      | Class 0:   65 | Class 1:  129
+user_stats_today_accuracy_rate           | Class 0:   61 | Class 1:  125
+user_stats_today_fitb_total_attempts     | Class 0:   59 | Class 1:  118
+user_stats_today_sata_correct_attempts   | Class 0:   59 | Class 1:  118
+user_stats_total_tf_incorrrect_attempts  | Class 0:   59 | Class 1:  118
+user_stats_total_tf_attempts             | Class 0:   59 | Class 1:  118
 
 ZERO VALUE PATTERNS BY CLASS (Top 20):
- 1. num_so_options                           | Class 0: 1169 | Class 1: 4730
- 2. question_type_sort_order                 | Class 0: 1169 | Class 1: 4730
- 3. knn_01_num_so_options                    | Class 0: 1168 | Class 1: 4725
- 4. knn_01_question_type_sort_order          | Class 0: 1168 | Class 1: 4725
- 5. knn_02_num_so_options                    | Class 0: 1166 | Class 1: 4723
- 6. knn_02_question_type_sort_order          | Class 0: 1166 | Class 1: 4723
- 7. knn_08_question_type_sort_order          | Class 0: 1168 | Class 1: 4723
- 8. knn_09_question_type_sort_order          | Class 0: 1168 | Class 1: 4723
- 9. knn_09_num_so_options                    | Class 0: 1168 | Class 1: 4723
-10. knn_08_num_so_options                    | Class 0: 1168 | Class 1: 4723
-11. knn_19_question_type_sort_order          | Class 0: 1169 | Class 1: 4723
-12. knn_14_num_so_options                    | Class 0: 1169 | Class 1: 4723
-13. knn_19_num_so_options                    | Class 0: 1169 | Class 1: 4723
-14. knn_22_question_type_sort_order          | Class 0: 1167 | Class 1: 4721
-15. knn_22_num_so_options                    | Class 0: 1167 | Class 1: 4721
-16. knn_25_num_so_options                    | Class 0: 1169 | Class 1: 4723
-17. knn_14_question_type_sort_order          | Class 0: 1169 | Class 1: 4723
-18. knn_25_question_type_sort_order          | Class 0: 1169 | Class 1: 4723
-19. knn_15_num_so_options                    | Class 0: 1170 | Class 1: 4723
-20. knn_18_num_so_options                    | Class 0: 1169 | Class 1: 4722
+ 1. knn_02_num_so_options                    | Class 0: 1447 | Class 1: 7703
+ 2. knn_01_num_so_options                    | Class 0: 1449 | Class 1: 7705
+ 3. knn_02_question_type_sort_order          | Class 0: 1447 | Class 1: 7703
+ 4. knn_01_question_type_sort_order          | Class 0: 1449 | Class 1: 7705
+ 5. num_so_options                           | Class 0: 1450 | Class 1: 7705
+ 6. question_type_sort_order                 | Class 0: 1450 | Class 1: 7705
+ 7. knn_09_question_type_sort_order          | Class 0: 1449 | Class 1: 7703
+ 8. knn_08_question_type_sort_order          | Class 0: 1449 | Class 1: 7703
+ 9. knn_09_num_so_options                    | Class 0: 1449 | Class 1: 7703
+10. knn_08_num_so_options                    | Class 0: 1449 | Class 1: 7703
+11. knn_14_num_so_options                    | Class 0: 1450 | Class 1: 7703
+12. knn_22_num_so_options                    | Class 0: 1448 | Class 1: 7701
+13. knn_14_question_type_sort_order          | Class 0: 1450 | Class 1: 7703
+14. knn_25_num_so_options                    | Class 0: 1450 | Class 1: 7703
+15. knn_22_question_type_sort_order          | Class 0: 1448 | Class 1: 7701
+16. knn_25_question_type_sort_order          | Class 0: 1450 | Class 1: 7703
+17. knn_19_num_so_options                    | Class 0: 1450 | Class 1: 7703
+18. knn_19_question_type_sort_order          | Class 0: 1450 | Class 1: 7703
+19. knn_07_num_so_options                    | Class 0: 1451 | Class 1: 7703
+20. knn_21_question_type_sort_order          | Class 0: 1447 | Class 1: 7699
 
 FEATURE IMBALANCE BY PREFIX:
- 1. attempt              | Avg Mean Diff: 4.4928 (   1 features)
- 2. user                 | Avg Mean Diff: 2.8918 (  37 features)
- 3. days                 | Avg Mean Diff: 1.9872 (   2 features)
- 4. avg                  | Avg Mean Diff: 1.7790 (   1 features)
- 5. revision             | Avg Mean Diff: 1.2173 (   1 features)
- 6. total                | Avg Mean Diff: 0.8409 (   3 features)
- 7. knn                  | Avg Mean Diff: 0.6596 ( 525 features)
- 8. accuracy             | Avg Mean Diff: 0.3746 (   1 features)
- 9. was                  | Avg Mean Diff: 0.2781 (   1 features)
-10. num                  | Avg Mean Diff: 0.1671 (   4 features)
-11. qv                   | Avg Mean Diff: 0.0695 ( 768 features)
-12. question             | Avg Mean Diff: 0.0494 (   5 features)
+ 1. user                 | Avg Mean Diff: 69.0250 (  54 features)
+ 2. rs                   | Avg Mean Diff: 42.4436 (  17 features)
+ 3. attempt              | Avg Mean Diff: 5.4687 (   1 features)
+ 4. avg                  | Avg Mean Diff: 2.1802 (   1 features)
+ 5. days                 | Avg Mean Diff: 1.3151 (   2 features)
+ 6. revision             | Avg Mean Diff: 1.2949 (   1 features)
+ 7. total                | Avg Mean Diff: 0.8889 (   3 features)
+ 8. knn                  | Avg Mean Diff: 0.5384 ( 526 features)
+ 9. accuracy             | Avg Mean Diff: 0.4392 (   1 features)
+10. was                  | Avg Mean Diff: 0.3536 (   1 features)
+11. num                  | Avg Mean Diff: 0.2294 (   4 features)
+12. qv                   | Avg Mean Diff: 0.0812 ( 768 features)
+13. question             | Avg Mean Diff: 0.0686 (   5 features)

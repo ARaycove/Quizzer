@@ -106,7 +106,13 @@ def plot_precision_recall_curve(metrics, save_prefix):
 def plot_confusion_matrix(metrics, save_prefix):
     """Plot confusion matrix."""
     plt.figure(figsize=(6, 5))
-    disp = ConfusionMatrixDisplay(confusion_matrix=metrics['confusion_matrix'], 
+    
+    # Convert confusion_matrix to numpy array if it's a list
+    confusion_matrix_data = metrics['confusion_matrix']
+    if isinstance(confusion_matrix_data, list):
+        confusion_matrix_data = np.array(confusion_matrix_data)
+    
+    disp = ConfusionMatrixDisplay(confusion_matrix=confusion_matrix_data, 
                                   display_labels=['Incorrect', 'Correct'])
     disp.plot(cmap='Blues')
     plt.title('Confusion Matrix')
@@ -276,7 +282,6 @@ def plot_calibration_analysis(metrics, save_prefix):
     plt.tight_layout()
     plt.savefig(f'{save_prefix}_calibration_analysis.png', dpi=300, bbox_inches='tight')
     plt.close()
-
 
 def plot_class_imbalance_analysis(metrics, save_prefix, samples_per_feature_threshold=100):
     """Plot class imbalance analysis."""

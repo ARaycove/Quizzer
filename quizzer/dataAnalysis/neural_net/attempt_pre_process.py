@@ -11,6 +11,7 @@ import numpy as np
 import tensorflow as tf
 from datetime import datetime, timezone
 from sync_fetch_data import initialize_supabase_session
+from sklearn.model_selection import train_test_split
 
 def get_attempt_dataframe() -> pd.DataFrame:
     """
@@ -112,6 +113,10 @@ def flatten_attempts_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     
     processed_df = processed_df.drop(columns=[col for col in columns_to_drop if col in processed_df.columns])
     
+    if 'module_performance_vector' in processed_df.columns:
+        processed_df = processed_df.drop(columns=['module_performance_vector'])
+        print("Dropped 'module_performance_vector' column")
+
     # unpack user_stats_vector
     processed_df = flatten_user_stats_vector(processed_df, "user_stats")
 
@@ -446,8 +451,6 @@ def train_test_split_extraction(df: pd.DataFrame, test_size: float = 0.2, random
     Returns:
         Tuple of (X_train, X_test, y_train, y_test) DataFrames
     """
-    from sklearn.model_selection import train_test_split
-    
     # Separate features and target
     X = df.drop(columns=['response_result'])
     y = df['response_result']
@@ -486,9 +489,9 @@ def apply_smote_balancing(X_train: pd.DataFrame, y_train: pd.Series,
     
     # Check original class distribution
     original_counts = y_train.value_counts().sort_index()
-    print("Original class distribution:")
-    for class_val, count in original_counts.items():
-        print(f"  Class {class_val}: {count} samples ({count/len(y_train)*100:.1f}%)")
+    # print("Original class distribution:")
+    # for class_val, count in original_counts.items():
+    #     print(f"  Class {class_val}: {count} samples ({count/len(y_train)*100:.1f}%)")
     
     # Apply SMOTE with configurable parameters
     smote = SMOTE(
@@ -504,9 +507,9 @@ def apply_smote_balancing(X_train: pd.DataFrame, y_train: pd.Series,
     
     # Check new class distribution
     balanced_counts = y_train_balanced.value_counts().sort_index()
-    print("\nBalanced class distribution:")
-    for class_val, count in balanced_counts.items():
-        print(f"  Class {class_val}: {count} samples ({count/len(y_train_balanced)*100:.1f}%)")
+    # print("\nBalanced class distribution:")
+    # for class_val, count in balanced_counts.items():
+    #     print(f"  Class {class_val}: {count} samples ({count/len(y_train_balanced)*100:.1f}%)")
     
     print(f"\nSMOTE complete: {len(X_train)} → {len(X_train_balanced)} samples")
     
@@ -539,7 +542,6 @@ def load_model_and_transform_test_data(X_train=None, X_test=None, y_train=None, 
     
     X_test_transformed = pd.DataFrame(X_test_transformed, columns=feature_order, index=X_test.index)
     return interpreter, X_test_transformed
-
 
 def push_model_to_supabase(model_name, metrics, model_path='global_best_model.tflite', 
                           feature_map_path='input_feature_map.json'):
@@ -683,7 +685,6 @@ def flatten_knn_performance_vector(df: pd.DataFrame, prefix: str) -> pd.DataFram
         df.drop(columns=['knn_performance_vector']).reset_index(drop=True), 
         flattened_df.reset_index(drop=True)
     ], axis=1)
-
 
 def drop_features(df, features_to_drop=None, prefixes_to_drop=None):
     """

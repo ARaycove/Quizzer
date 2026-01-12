@@ -18,12 +18,13 @@ def create_quizzer_neural_network(input_dim,
                                  reduction_percent=0.50, 
                                  stop_condition=20,
                                  activation='relu',
-                                 loss='binary_crossentropy',
-                                 initial_learning_rate=0.1,
+                                 learning_rate=0.1,
                                  dropout_rate=0.0,
                                  batch_norm=False,
                                  focal_gamma=3.0,
-                                 focal_alpha=0.25):
+                                 focal_alpha=0.25,
+                                 optimizer='nadam',
+                                 l2_regularization=0.0):
     """
     Creates neural network for Quizzer response prediction.
     
@@ -36,12 +37,13 @@ def create_quizzer_neural_network(input_dim,
         reduction_percent: Percentage to reduce layer size each step
         stop_condition: Minimum neurons before output layer
         activation: Activation function for hidden layers
-        loss: Loss function
-        initial_learning_rate: Initial learning rate for cosine decay
+        learning_rate: Learning rate for optimizer
         dropout_rate: Dropout rate
         batch_norm: Whether to use batch normalization
         focal_gamma: Gamma parameter for focal loss (higher = focus on hard examples)
         focal_alpha: Alpha parameter for focal loss (lower = penalize false positives more)
+        optimizer: Optimizer to use ('adam', 'rmsprop', 'sgd', 'nadam')
+        l2_regularization: L2 regularization strength
         
     Returns:
         Compiled TensorFlow model
@@ -50,16 +52,21 @@ def create_quizzer_neural_network(input_dim,
     inputs = tf.keras.Input(shape=(input_dim,))
     x = inputs
     
+    # Create L2 regularizer if specified
+    kernel_regularizer = tf.keras.regularizers.l2(l2_regularization) if l2_regularization > 0 else None
+    
     for i in range(layer_width):
-        x = tf.keras.layers.Dense(input_dim)(x)
+        x = tf.keras.layers.Dense(input_dim, kernel_regularizer=kernel_regularizer)(x)
         
         if batch_norm:
             x = tf.keras.layers.BatchNormalization()(x)
             
         if activation == 'leaky_relu':
             x = tf.keras.layers.LeakyReLU(alpha=0.1)(x)
-        else:
-            x = tf.keras.layers.Activation(activation)(x)
+        elif activation == 'elu':
+            x = tf.keras.layers.ELU()(x)
+        else:  # relu
+            x = tf.keras.layers.Activation('relu')(x)
             
         if dropout_rate > 0:
             x = tf.keras.layers.Dropout(dropout_rate)(x)
@@ -74,15 +81,17 @@ def create_quizzer_neural_network(input_dim,
             next_size = stop_condition
         
         for i in range(layer_width):
-            x = tf.keras.layers.Dense(next_size)(x)
+            x = tf.keras.layers.Dense(next_size, kernel_regularizer=kernel_regularizer)(x)
             
             if batch_norm:
                 x = tf.keras.layers.BatchNormalization()(x)
                 
             if activation == 'leaky_relu':
                 x = tf.keras.layers.LeakyReLU(alpha=0.1)(x)
-            else:
-                x = tf.keras.layers.Activation(activation)(x)
+            elif activation == 'elu':
+                x = tf.keras.layers.ELU()(x)
+            else:  # relu
+                x = tf.keras.layers.Activation('relu')(x)
                 
             if dropout_rate > 0:
                 x = tf.keras.layers.Dropout(dropout_rate)(x)
@@ -93,16 +102,25 @@ def create_quizzer_neural_network(input_dim,
         if current_size <= stop_condition:
             break
     
-    outputs = tf.keras.layers.Dense(1, activation='sigmoid')(x)
+    outputs = tf.keras.layers.Dense(1, activation='sigmoid', kernel_regularizer=kernel_regularizer)(x)
     
     model = tf.keras.models.Model(inputs=inputs, outputs=outputs)
     
     decay_steps = (train_samples // batch_size) * epochs
-    lr_schedule = tf.keras.optimizers.schedules.CosineDecay(
-        initial_learning_rate=initial_learning_rate,
-        decay_steps=decay_steps
-    )
-    opt = tf.keras.optimizers.Nadam(clipnorm=1.0)
+    
+    # Select optimizer
+    if optimizer == 'adam':
+        opt = tf.keras.optimizers.Adam(learning_rate=learning_rate, clipnorm=1.0)
+    elif optimizer == 'rmsprop':
+        opt = tf.keras.optimizers.RMSprop(learning_rate=learning_rate, clipnorm=1.0)
+    elif optimizer == 'sgd':
+        opt = tf.keras.optimizers.SGD(learning_rate=learning_rate, clipnorm=1.0)
+    else:  # nadam (default)
+        lr_schedule = tf.keras.optimizers.schedules.CosineDecay(
+            initial_learning_rate=learning_rate,
+            decay_steps=decay_steps
+        )
+        opt = tf.keras.optimizers.Nadam(learning_rate=lr_schedule, clipnorm=1.0)
     
     model.compile(
         optimizer=opt,
