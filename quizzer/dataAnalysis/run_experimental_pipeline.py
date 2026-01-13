@@ -25,17 +25,18 @@ from sync_fetch_data import (initialize_and_fetch_db, get_last_sync_date, fetch_
                              update_last_sync_date,find_newest_timestamp,upsert_records_to_db, 
                              fetch_data_for_bertopic, initialize_supabase_session, sync_vectors_to_supabase,
                              sync_knn_results_to_supabase)
+from sklearn.mixture import GaussianMixture
 
 
 
-async def main():
+def main():
     # HyperParameters
     reset_question_vector   = False
     reset_doc               = False
-    reset_knn               = False   # Reset knn values when new documents come in, which forces update of existing calculations for more accurate data
+    # FIXME knn reset should be dynamic
+    # reset_knn               = False   # Reset knn values when new documents come in, which forces update of existing calculations for more accurate data
     bypass_model_train      = False  #topic model
     bypass_prediction_model = False
-    bypass_sync_supa        = False
     n_clusters              = 31
     random_state            = 69
 
@@ -87,28 +88,35 @@ async def main():
     embedding_model = SentenceTransformer('sentence-transformers/allenai-specter')
     # Define Dimensionality Reduction model for bertopic 
     umap_model              = umap.UMAP(
-            n_neighbors     = 10,
+            n_neighbors     = 25,
             n_components    = 25,
             min_dist        = 0.01,
             spread          = 0.5,
             random_state    = 0,
-            metric          = 'euclidean'
+            metric          = 'manhattan'
         )
 
     if not bypass_model_train:
-        # Define hdbscan model
-        hdbscan_model           = hdbscan.HDBSCAN(
-            min_cluster_size    = 20,
-            # min_samples         = 10,
-            metric              = 'euclidean',
-            cluster_selection_method = 'eom',
-            # prediction_data     = True
-        )
-
-        clustering_model        = KMeans(
-            n_clusters=n_clusters,
-            random_state=random_state
-        )
+        ######################################
+        # Define What clustering model to use:
+        ######################################
+        cluster_models = [
+            hdbscan.HDBSCAN(
+                min_cluster_size    = 25,
+                min_samples         = 10,
+                metric              = 'manhattan', #FIXME Evaluate better distance metric
+                cluster_selection_method = 'eom',
+                # prediction_data     = True
+            ),
+            # These models require us to know what the number of clusters is before hand, since we don't know this information it presents an issue
+            KMeans(
+                n_clusters=n_clusters,
+                random_state=random_state
+            ),
+            GaussianMixture(n_components=3, random_state=42)
+        ]
+        # Select from list:
+        clustering_model        = cluster_models[0]
 
         # Define which count vectorizer we will use for bertopic
         vectorizer              = CountVectorizer(
@@ -117,59 +125,6 @@ async def main():
             stop_words  = 'english', # keep stopwords, but remove common words
             ngram_range = (1,4)
         )
-
-        #=======================================
-        # Guided Topic Modeling Through Seed Words
-        # Load in seed_words.json
-        with open('seed_words.json') as f:
-            seed_words = json.load(f)
-        # Clean up duplicates, convert to lowercase, and sort alphabetically
-        seed_words = sorted(list(set(word.lower() for word in seed_words)))
-        # Write back to json
-        with open('seed_words.json', 'w') as f:
-            f.write('[\n')
-            line = '  '
-            for i, word in enumerate(seed_words):
-                entry = f'"{word}"' + (', ' if i < len(seed_words) - 1 else '')
-                if len(line) + len(entry) > 80:
-                    f.write(line.rstrip() + '\n')
-                    line = '  ' + entry
-                else:
-                    line += entry
-            f.write(line + '\n]\n')
-        print(f"There are {len(seed_words)} seed words")
-        #=======================================
-
-        #=======================================
-        # Guided Topic modeling through pre-defined topics
-        # Load seed topics from seed_topics.json
-        with open('seed_topics.json') as f:
-            seed_topics = json.load(f)
-            print(f"Loaded {len(seed_topics)} seed topics")
-
-        # Clean up any topics that have duplicate words in topic list
-        seed_topics = [list(set(topic)) for topic in seed_topics]
-
-        # Remove any topics that are exact duplicates
-        unique_topics = []
-        seen = set()
-        for topic in seed_topics:
-            topic_sorted = tuple(sorted(topic))
-            if topic_sorted not in seen:
-                seen.add(topic_sorted)
-                unique_topics.append(topic)
-
-        # If any duplicates removed, update json
-        if len(unique_topics) < len(seed_topics):
-            print(f"Removed {len(seed_topics) - len(unique_topics)} duplicate topics")
-            seed_topics = unique_topics
-            with open('seed_topics.json', 'w') as f:
-                json.dump(seed_topics, f, indent=2)
-        else:
-            seed_topics = unique_topics
-
-        print(f"Final seed topics: {len(seed_topics)}")
-        #=======================================
 
         # Define c_tf_idf model for bertopic
         c_tf_idf                = ClassTfidfTransformer(
@@ -184,16 +139,17 @@ async def main():
         
         # Define the bertopic initialization using the models we've defined
         start = timeit.default_timer()
+
         topic_model = BERTopic(
-            verbose             = True,
-            top_n_words         = 15,
-            embedding_model     = embedding_model,
-            umap_model          = umap_model,
-            hdbscan_model       = hdbscan_model,
-            # hdbscan_model       = clustering_model,
-            vectorizer_model    = vectorizer,
-            ctfidf_model        = c_tf_idf,
-            representation_model= representation_model,
+            verbose                 = True,
+            calculate_probabilities = True,
+            top_n_words             = 10,
+            embedding_model         = embedding_model,
+            umap_model              = umap_model,
+            hdbscan_model           = clustering_model,
+            vectorizer_model        = vectorizer,
+            ctfidf_model            = c_tf_idf,
+            representation_model    = representation_model,
             # seed_topic_list     = seed_topics,
         )
 
@@ -211,6 +167,7 @@ async def main():
 
         # Generate and save all BERTopic visualizations
         topic_model.visualize_topics().write_html(str(vis_dir / "topics.html"))
+        
         topic_model.visualize_documents(docs, embeddings=embeddings, hide_annotations=True).write_html(str(vis_dir / "documents.html"))
         topic_model.visualize_hierarchy().write_html(str(vis_dir / "hierarchy.html"))
         topic_model.visualize_barchart(top_n_topics=50).write_html(str(vis_dir / "barchart.html"))
@@ -226,18 +183,29 @@ async def main():
 
         # Save data locally
         reduced_embeddings = topic_model.umap_model.embedding_
+
+        # FIXME Extract knn calculation from save to db function
+
+        # FIXME Plot un-normalized distribution (bar chart - num pairs with distance = n)
+
+        # FIXME Normalize all distance values between 0 and 1 (depending on visualization)
+
+        # FIXME Plot normalized distribution (bar chart - num pairs with distance = n)
+
+        # FIXME save only the updated values, if the knn vector has changed from last time then wipe it and it's neighbors (resetting dynamically)
         save_bertopic_results_to_db(topic_model, reduced_embeddings, question_ids, db, k=25)
 
+        # FIXME Collect topic probabilities for each question, {topic_01: p_1, topic_02: p_2, topic_n: p_n}
+        # This will show us how any given question relates to the larger knowledge map, not just it's immediate surroundings
+
+        # FIXME Push topic_proba to Supabase
+        
         # Export to file for sharing
         export_outlier_topics_to_docx(topic_model=topic_model)
 
     # Push knn results to supabase
     start = timeit.default_timer()
-    sync_knn_results_to_supabase(db, supabase_client= supabase_client, reset_knn=reset_knn)
-    if reset_knn:
-        # reset of knn clears these, so ensure we recalculate on this cycle
-        create_docs()
-        vectorize_records()
+    sync_knn_results_to_supabase(db, supabase_client= supabase_client)
     end = timeit.default_timer()
     knn_analysis_time = end - start
 
@@ -263,8 +231,8 @@ async def main():
         # # Run comprehensive grid search
         
         start   = timeit.default_timer()
-        n_search = 25
-        grid_search_quizzer_model(X_train, y_train, X_test, y_test, n_search=n_search, batch_size=10)
+        n_search = 1
+        grid_search_quizzer_model(X_train, y_train, X_test, y_test, n_search=n_search, batch_size=25)
         end     = timeit.default_timer()
         grid_search_time = end - start
 
@@ -299,12 +267,12 @@ async def main():
             rp.create_comprehensive_visualizations(metrics, "Quizzer_NN")
             end = timeit.default_timer()
             final_report_time = end - start
-            # ap.push_model_to_supabase( #FIXME Let's get good results before pushing model
-            #     model_name="accuracy_net", 
-            #     metrics=metrics, 
-            #     model_path="global_best_model.tflite", 
-            #     feature_map_path="input_feature_map.json"
-            # )
+            ap.push_model_to_supabase(
+                model_name="accuracy_net", 
+                metrics=metrics, 
+                model_path="global_best_model.tflite", 
+                feature_map_path="input_feature_map.json"
+            )
             
         else:
             print("Grid search failed - no model saved")
@@ -319,6 +287,7 @@ async def main():
         print(f"Bertopic Training took: {topic_model_train_time:.5f} seconds")
         print(f"KNN Analysis took:      {knn_analysis_time:.5f} seconds")
         print(f"Data PreProcessing took:{pre_process_time:.5f} seconds")
+        print(f"Model trained on {X_train.shape[1]} features")
         print(f"Grid Search ran with {n_search} configurations")
         print(f"Grid Search took:       {grid_search_time:.5f} seconds")
         print(f"Final results took:     {final_report_time:.5f}")
@@ -335,12 +304,9 @@ async def main():
     # FIXME
 
     # Record in local db
-    # FIXME
-
-    # Push to supabase
-    # FIXME    
+    # FIXME  
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
 
     

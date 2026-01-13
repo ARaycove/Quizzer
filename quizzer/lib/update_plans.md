@@ -7,7 +7,6 @@ Minor updates add features and other visible changes
 Patch updates are for bug fixes that don't add features, or for optimizations that the user does not see
 
 
-# Login Streamline update 2.?.?:
 The goal of this update is to:
 1. Ensure the login and logout flow works properly, that any asynchronous workers are closed, that the state of the app is completely reset for a new login attempt
 2. Ensure no keys are exposed, and security is up to standard
@@ -23,60 +22,20 @@ The goal of this update is to:
       * [x] Outbound sync worker did not return stoppage, stuck waiting, thus added extra outboundSyncComplete signal for the stop function.
         * Potential delay, if sync worker is in its 30 second wait cycle when logout is clicked.
         * could solve with a new waiting while loop, and an additional method. The method will wait 30 seconds then flip the sentinel value breaking the loop, this would leave us open to flipping the sentinel value ourselves:
-        
-* [] update login page with
-  * [] login with google
-  * [] login with facebook
-  * [] login with github
-  * [] login with . . . (other social accounts as possible)
 
-* [] Add a reset user password page
+
+* [x] Add a reset user password page
   - Currently there is no way for a user to properly reset their password, if they forget their password they get locked out of their account for good.
-  * [] Figure out how to validate user session within the app? Since there is no website domain for quizzer to utilize, so if there's a way to do this without a web app, that would be better
+  * [x] Figure out how to validate user session within the app? Since there is no website domain for quizzer to utilize, so if there's a way to do this without a web app, that would be better
   - Perhaps we can figure out how to send an email out that when clicked opens a specific page on the app itself, thus the only way to access the reset user password section of the app is through the email link?
-  * [] reset password page with authentication setup (webpage?) 
+  * [x] reset password page with authentication setup (webpage?) 
 
-* [] Security sweep
+* [x] Security sweep
   * Ensure all environment variables and access is secure and nothing is exposed that shouldn't be exposed.
   * Currently supabase.client has hardcoded access URL and such
 
 ## Resolve bugs relating to login flow:
 
-# Update ?.?.?: User Profile Page
-The user profile page serves as the first set of features to be fed into the question accuracy prediction model. The following series of updates will setup the data flow such that we can easily get this data and feed it into the model
-
-If you have other suggestions for easily quantifiable metrics that could be included in the user profile page, please do say something.
-
-* [] Need to create the User Profile page, On this page the user will be prompted to fill out there profile with all the fields listed in the user_profile table.
-* [] Profile picture should be at the top of the User profile page. 
-  * [] It should be a round portrait frame, 
-    * [] make sure you write this in such way that it's easy to add on decorations and frames around the profile that will be able to be unlocked through a future planned badge and achievement system.
-  * [] around the profile picture, we will have a progress indicator that wraps around the profile picture
-    * [] when they 100% fill out the profile there should be some form of easter egg, like the bar turning golden or some shit like that. Don't really care, just want the psychological effect of an award being given to the user in some capacity.
-* [] Good UI/UX for filling this out,
-  * [] Perhaps a button that when clicked gives a slide-show style presentation that pops up just what the user hasn't filled out yet, so they don't have to be bothered with filling this information out.
-* [] Info button -> "Why are you asking me for all this personal data? And Why should I give it to you?"
-  * [] I would like some kind of optional info button / FAQ whatever, that can alleviate the data privacy concerns a user might have.If we want user's to provide their data to improve model accuracy we must give them good reasons and be persuasive.
-
-# Update ?.?.?: Training Data Collection:
-For this update we need to rebuild the stat collections metrics.
-* [] Update supabase with the question_vector column
-  * [] Update the ml_pipeline to push the question vector back to supabase
-
-* [] Every module will need to be updated such that we track overall performance on a module by module basis. These stat block will become vectors which will feed into the accuracy prediction model.
-  * [] we will need a user_module_performance_table.dart sql table made to house this data
-
-* [] SubmitAnswer will need to be updated to capture the correct features
-  * [] Repurpose question_answer_attempts table with each field being a "feature" we collect
-  - The goal is that whenever a question is answered, Quizzer generates a complete training data point (approximately)
-  - See quizzer_v04/quizzer_documentation/Core Documentation/Chapter 09 - Algorithms and Background Processes/09_00_Feature_Outline.md for details on the full vector output expected
-
-* [] Update ML pipeline to pull all training data from supabase
-  * [] Export model and write a function that takes the input vector as input, and outputs the result of the model
-  * [] Write a specific function that generates the input vector for running the model locally, taking in just the question_id, and db_txn as input parameters
-  * [] Write unit tests to ensure sub-system works
-  
-Once this is all set up and Quizzer is generating the training data needed for the model we can begin work on rebuilding the UI/UX to be more "pretty" and usable
 
 # Update ?.?.?: UI Overhaul
 For this update we will focus on building new widgets and rebuilding old pages so they are less janky and overall have a proper UI/UX design.
@@ -149,9 +108,9 @@ Some extra tools to make it easier to comb through and review the state of quest
   * [] Should pull the question_id locally and pull the question record from the server directly
 
 ## Bug Fixes:
-* [] Some question answer attempt records ARE NOT syncing and triggering an RLS violation. . .
+* [x] Some question answer attempt records ARE NOT syncing and triggering an RLS violation. . .
   * Appears to be intermittent, as many attempt records do get synced
-* [] Circulation worker does not properly remove excess new questions, allowing too many new questions to overload the user. Should have some kind of mechanism that will remove only revision score 0 questions from circulation
+* [x] Circulation worker does not properly remove excess new questions, allowing too many new questions to overload the user. Should have some kind of mechanism that will remove only revision score 0 questions from circulation
 * [] Math field does not expand to fit the what's entered into it
 
 * [] Math validation should not allow the question to be entered as the answer (assuming the question is to transform the equation into some other form)
@@ -171,7 +130,7 @@ Some extra tools to make it easier to comb through and review the state of quest
 * [] User States: "Android version needs some bottom margin on pages, preventing widgets from getting partially hidden."
   * snackbar pop-ups and margin cutoff on android are blocking the use of the next question button and submit answer buttons. Adding a bottom margin the height of the snackbar would remove this issue
 
-* [] User States: Occasionally we get an app crash if I close my phone, then when I reopen the app I return to an error screen
+* [x] User States: Occasionally we get an app crash if I close my phone, then when I reopen the app I return to an error screen
 
 ## Other minor changes
 * [] Synonym fields in the add question interface should also allow for math expressions

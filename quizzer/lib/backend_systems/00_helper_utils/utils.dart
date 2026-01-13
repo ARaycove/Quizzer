@@ -4,7 +4,8 @@ import 'package:quizzer/backend_systems/00_helper_utils/file_locations.dart';
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/table_helper.dart' show decodeValueFromDB;
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
-
+import 'package:crypto/crypto.dart';
+import 'dart:convert';
 /// Moves an image from the staging directory to the final assets directory
 /// Returns just the filename for storage in the database
 Future<String> moveImageToFinalLocation(String sourcePath) async {
@@ -107,7 +108,66 @@ List<Map<String, dynamic>> trimContentFields(dynamic elements) {
 Future<void> logUserSettingsTableContent() async{
   // DEBUG: Check user_settings table contents before getUserSettings
     final db = await getDatabaseMonitor().requestDatabaseAccess();
-    final List<Map<String, dynamic>> debugResults = await db!.query('user_settings', where: 'user_id = ?', whereArgs: [getSessionManager().userId]);
+    final List<Map<String, dynamic>> debugResults = await db!.query('user_settings', where: 'user_id = ?', whereArgs: [SessionManager().userId]);
     QuizzerLogger.logMessage('Current User Settings Records Are: ${debugResults.length} records: $debugResults');
     getDatabaseMonitor().releaseDatabaseAccess();
+}
+
+String generateNonce([int length = 32]) {
+  const charset =
+      '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._';
+  final random = List.generate(length,
+          (_) => charset[(DateTime.now().microsecondsSinceEpoch) % charset.length]);
+  return random.join();
+}
+
+String sha256ofString(String input) {
+  final bytes = utf8.encode(input);
+  final digest = sha256.convert(bytes);
+  return digest.toString();
+}
+
+
+/// Helper to get Supabase schema for a given table
+/// Return the schema in the same format as expectedColumns
+/// Example format: [{'name': 'id', 'type': 'INTEGER PRIMARY KEY'}, ...]
+Future<List<Map<String, String>>> getSupabaseSchema(String tableName) async {
+  try {
+    // Try to fetch a single record to get the field names
+    final response = await SessionManager().supabase
+        .from(tableName)
+        .select()
+        .limit(1);
+
+    if (response.isEmpty) {
+      // Table is empty, return empty list
+      QuizzerLogger.logMessage('Table $tableName is empty, cannot infer schema');
+      return [];
+    }
+
+    // Get the first record and extract its keys
+    final firstRecord = response.first;
+    final List<Map<String, String>> supabaseColumns = [];
+    
+    for (final key in firstRecord.keys) {
+      // We don't know the actual types from just a record, but we only need column names
+      // for cleaning. Use a placeholder type.
+      supabaseColumns.add({
+        'name': key,
+        'type': 'TEXT', // Placeholder - we only use 'name' in _cleanReshapeRecordSupabase
+      });
+    }
+    
+    QuizzerLogger.logMessage('Inferred schema for $tableName: ${firstRecord.keys}');
+    return supabaseColumns;
+    
+  } on SocketException catch (e) {
+    // Network connectivity issue
+    QuizzerLogger.logWarning('Network error in getSupabaseSchema: $e');
+    return [];
+  } catch (e) {
+    // Any other error
+    QuizzerLogger.logWarning('Failed to fetch schema for $tableName: $e');
+    return [];
+  }
 }

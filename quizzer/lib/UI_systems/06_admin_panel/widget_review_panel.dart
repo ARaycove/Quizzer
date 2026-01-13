@@ -15,7 +15,6 @@ class ReviewPanelWidget extends StatefulWidget {
 }
 
 class _ReviewPanelWidgetState extends State<ReviewPanelWidget> {
-  final SessionManager _session = SessionManager();
   final ScrollController _scrollController = ScrollController();
 
   // Internal state variables
@@ -26,7 +25,7 @@ class _ReviewPanelWidgetState extends State<ReviewPanelWidget> {
   String? _errorMessage;
   bool _isLoading = true;
   int _previewRebuildCounter = 0; // Internal counter for preview refresh
-  bool _moduleNameVerified = false; // Track module name verification
+  bool _questionVerified = false; // Track question verification (renamed from _moduleNameVerified)
 
   @override
   void initState() {
@@ -45,10 +44,10 @@ class _ReviewPanelWidgetState extends State<ReviewPanelWidget> {
       _isLoading = true;
       _errorMessage = null;
       _editedData = null; // Clear edits when fetching new question
-      _moduleNameVerified = false; // Reset module verification for new question
+      _questionVerified = false; // Reset verification for new question
     });
 
-    final result = await _session.getReviewQuestion();
+    final result = await SessionManager().questionReviewManager.getRandomQuestionToBeReviewed();
 
     if (mounted) { // Check if widget is still in the tree
       setState(() {
@@ -64,31 +63,47 @@ class _ReviewPanelWidgetState extends State<ReviewPanelWidget> {
 
   Future<void> _approveQuestion() async {
     if (_currentData == null || _sourceTable == null || _primaryKey == null) {
-       QuizzerLogger.logWarning('Approve pressed but data is missing.');
-       return;
+      QuizzerLogger.logWarning('Approve pressed but data is missing.');
+      return;
     }
-    QuizzerLogger.logMessage('Approving question...');
+    
+    QuizzerLogger.logMessage('=== START APPROVE PROCESS ===');
+    QuizzerLogger.logMessage('Question ID: ${_currentData!['question_id']}');
+    QuizzerLogger.logMessage('Source Table: $_sourceTable');
+    QuizzerLogger.logMessage('Primary Key: $_primaryKey');
+    
     setState(() => _isLoading = true);
 
-    // Use edited data if available, otherwise current data
-    final dataToSubmit = _editedData ?? _currentData!;
+    try {
+      // Use edited data if available, otherwise current data
+      final dataToSubmit = _editedData ?? _currentData!;
+      
+      QuizzerLogger.logMessage('Calling QuestionReviewManager.approveQuestion()...');
+      
+      final success = await SessionManager().questionReviewManager.approveQuestion(
+        dataToSubmit, 
+        _sourceTable!, 
+        _primaryKey!
+      );
 
-    final success = await _session.submitReview(
-      isApproved: true,
-      questionDetails: dataToSubmit,
-      sourceTable: _sourceTable!,
-      primaryKey: _primaryKey!,
-    );
-
-    if (mounted) {
-      if (success) {
-        QuizzerLogger.logSuccess('Approval successful, fetching next question.');
-        _fetchNextQuestion(); // Fetch next on success
-      } else {
-        QuizzerLogger.logError('Approval failed.');
+      if (mounted) {
+        if (success) {
+          QuizzerLogger.logSuccess('Approval successful via approveQuestion() method');
+          _fetchNextQuestion(); // Fetch next on success
+        } else {
+          QuizzerLogger.logError('Approval failed via approveQuestion() method');
+          setState(() {
+            _isLoading = false;
+            _errorMessage = 'Failed to approve question.';
+          });
+        }
+      }
+    } catch (e) {
+      QuizzerLogger.logError('Exception during approve: $e');
+      if (mounted) {
         setState(() {
           _isLoading = false;
-          _errorMessage = 'Failed to approve question.';
+          _errorMessage = 'Error approving question: $e';
         });
       }
     }
@@ -96,27 +111,43 @@ class _ReviewPanelWidgetState extends State<ReviewPanelWidget> {
 
   Future<void> _denyQuestion() async {
     if (_sourceTable == null || _primaryKey == null) {
-       QuizzerLogger.logWarning('Deny pressed but key/table info is missing.');
-       return;
+      QuizzerLogger.logWarning('Deny pressed but key/table info is missing.');
+      return;
     }
-    QuizzerLogger.logMessage('Denying question...');
+    
+    QuizzerLogger.logMessage('=== START DENY PROCESS ===');
+    QuizzerLogger.logMessage('Question ID: ${_currentData!['question_id']}');
+    QuizzerLogger.logMessage('Source Table: $_sourceTable');
+    QuizzerLogger.logMessage('Primary Key: $_primaryKey');
+    
     setState(() => _isLoading = true);
 
-    final success = await _session.submitReview(
-      isApproved: false,
-      sourceTable: _sourceTable!,
-      primaryKey: _primaryKey!,
-    );
+    try {
+      QuizzerLogger.logMessage('Calling QuestionReviewManager.denyQuestion()...');
+      
+      final success = await SessionManager().questionReviewManager.denyQuestion(
+        _sourceTable!, 
+        _primaryKey!
+      );
 
-    if (mounted) {
-      if (success) {
-        QuizzerLogger.logSuccess('Denial successful, fetching next question.');
-        _fetchNextQuestion(); // Fetch next on success
-      } else {
-        QuizzerLogger.logError('Denial failed.');
+      if (mounted) {
+        if (success) {
+          QuizzerLogger.logSuccess('Denial successful via denyQuestion() method');
+          _fetchNextQuestion(); // Fetch next on success
+        } else {
+          QuizzerLogger.logError('Denial failed via denyQuestion() method');
+          setState(() {
+            _isLoading = false;
+            _errorMessage = 'Failed to deny question.';
+          });
+        }
+      }
+    } catch (e) {
+      QuizzerLogger.logError('Exception during deny: $e');
+      if (mounted) {
         setState(() {
           _isLoading = false;
-          _errorMessage = 'Failed to deny question.';
+          _errorMessage = 'Error denying question: $e';
         });
       }
     }
@@ -229,7 +260,7 @@ class _ReviewPanelWidgetState extends State<ReviewPanelWidget> {
               return convertedMap;
             }).toList(),
           ),
-          // --- Module Name Verification Card ---
+          // --- Question Verification Card ---
           AppTheme.sizedBoxSml,
           Card(
             child: Padding(
@@ -238,19 +269,19 @@ class _ReviewPanelWidgetState extends State<ReviewPanelWidget> {
                 children: [
                   Expanded(
                     child: Text(
-                      'Module Name: ${displayData['module_name'] as String? ?? 'N/A'}',
+                      'Confirm question content is correct before approving:',
                       style: Theme.of(context).textTheme.bodyLarge,
                     ),
                   ),
                   const SizedBox(width: 16),
                   Row(
                     children: [
-                      const Text('Is this correct? '),
+                      const Text('Confirmed'),
                       Checkbox(
-                        value: _moduleNameVerified,
+                        value: _questionVerified,
                         onChanged: (bool? value) {
                           setState(() {
-                            _moduleNameVerified = value ?? false;
+                            _questionVerified = value ?? false;
                           });
                         },
                       ),
@@ -260,7 +291,7 @@ class _ReviewPanelWidgetState extends State<ReviewPanelWidget> {
               ),
             ),
           ),
-          // --- END Module Name Verification Card ---
+          // --- END Question Verification Card ---
           AppTheme.sizedBoxMed,
           // Bottom Bar: Skip/Deny/Approve Buttons
           Row(
@@ -291,7 +322,7 @@ class _ReviewPanelWidgetState extends State<ReviewPanelWidget> {
                   constraints: const BoxConstraints(maxWidth: 100),
                   child: ElevatedButton(
                     // Use internal _approveQuestion method
-                    onPressed: _moduleNameVerified ? _approveQuestion : null, 
+                    onPressed: _questionVerified ? _approveQuestion : null, 
                     child: const Text("Approve"),
                   ),
                 ),

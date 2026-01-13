@@ -2,7 +2,6 @@ import 'dart:async'; // For runZonedGuarded
 import 'package:flutter/foundation.dart'; // For PlatformDispatcher
 import 'package:flutter/material.dart';
 import 'package:quizzer/UI_systems/03_add_question_page/add_question_answer_page.dart';
-import 'package:quizzer/UI_systems/04_display_modules_page/display_modules_page.dart';
 import 'package:quizzer/UI_systems/01_new_user_page/new_user_page.dart';
 import 'package:quizzer/UI_systems/00_login_page/login_page.dart';
 import 'package:quizzer/UI_systems/02_home_page/home_page.dart';
@@ -17,16 +16,20 @@ import 'package:logging/logging.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart'; // Import logging package
 import 'package:quizzer/UI_systems/10_stats_page/stats_page.dart';
 import 'package:quizzer/app_theme.dart';
+// import 'UI_systems/11_reset_password_page/reset_password_page.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/initialization_table_verification.dart';
 
-// Global Key for NavigatorState - MOVED HERE
+
+// Global Key for NavigatorState
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   // Zone-based error handler
-  runZonedGuarded(() {
+  runZonedGuarded(() async {
     WidgetsFlutterBinding.ensureInitialized();
-    SessionManager session = getSessionManager(); // Force initialization of session at startup
-    session.userId; // Just here to get rid of the warning message. . .
+    // Initialize DB and schema before UI starts
+    InitializationTableVerification().verifyOnStartup();
+    SessionManager().userId; // Just here to get rid of the warning message. . .
     QuizzerLogger.setupLogging(level: Level.FINE);
 
     // Global error handler for Flutter framework errors
@@ -114,10 +117,12 @@ class _QuizzerAppState extends State<QuizzerApp> {
       initialRoute: '/login',
       routes: {
         '/login':           (context) => const LoginPage(),
+        // '/resetPassword':   (context) => const ResetPasswordPage(),
         '/home':            (context) => const HomePage(),
         '/menu':            (context) => const MenuPage(),
         '/add_question':    (context) => const AddQuestionAnswerPage(),
-        '/display_modules': (context) => const DisplayModulesPage(),
+        
+        // FIXME '/display_topics': (context) => const DisplayTopicsPage(),
         '/signup':          (context) => const NewUserPage(),
         '/admin_panel':     (context) => const AdminPanelPage(),
         '/settings_page':   (context) => SettingsPage(),

@@ -1,8 +1,10 @@
 import 'package:supabase/supabase.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
-import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_profile_table.dart';
+import 'package:quizzer/backend_systems/01_account_creation_and_management/account_manager.dart';
 import 'package:quizzer/backend_systems/00_database_manager/database_monitor.dart';
+import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:quizzer/backend_systems/00_database_manager/tables/sql_table.dart';
 
 /// Calculates the effective initial timestamp for inbound sync filtering.
 /// This is a complex decision that balances data completeness vs performance.
@@ -36,7 +38,7 @@ Future<String> calculateEffectiveInitialTimestamp({
     
     // Table has data - use lastLogin timestamp for incremental sync
     if (useLastLogin && userId != null) {
-      final String? lastLogin = await getLastLoginForUser(userId);
+      final String? lastLogin = await AccountManager().getLastLoginForUser(userId);
       final timestamp = lastLogin ?? DateTime(1970, 1, 1).toUtc().toIso8601String();
       QuizzerLogger.logMessage('Table $tableName has data - using last login timestamp: $timestamp');
       return timestamp;
@@ -75,17 +77,16 @@ Future<String> calculateEffectiveInitialTimestamp({
 /// Returns:
 /// - List<Map<String, dynamic>> containing ALL new and updated records from the table.
 Future<List<Map<String, dynamic>>> fetchAllRecordsOlderThanLastLogin({
-  required SupabaseClient supabase,
   required String tableName,
-  String? userId,
+  required bool useLastLogin,
   String timestampColumn = 'last_modified_timestamp',
   int pageSize = 500,
   Map<String, dynamic>? additionalFilters,
-  bool useLastLogin = true,
 }) async {
-  QuizzerLogger.logMessage('Fetching new records from $tableName using robust sync logic');
+  QuizzerLogger.logMessage('Fetching new records from $tableName');
 
   try {
+    // ================================================================================
     // Hardcoded map to force a full sync for specific tables if local count is low.
     final Map<String, int> forceSyncCounts = {
       'question_answer_pairs': 2200,
@@ -95,9 +96,7 @@ Future<List<Map<String, dynamic>>> fetchAllRecordsOlderThanLastLogin({
     if (forceSyncCounts.containsKey(tableName)) {
       Database? db = await getDatabaseMonitor().requestDatabaseAccess();
       String localCountQuery = 'SELECT COUNT(*) AS count FROM "$tableName"';
-      if (tableName == 'question_answer_pairs') {
-        localCountQuery += ' WHERE qst_reviewer IS NOT NULL';
-      }
+
       final localCountResult = await db!.rawQuery(localCountQuery);
       getDatabaseMonitor().releaseDatabaseAccess();
       final int localCount = localCountResult.first['count'] as int;
@@ -107,20 +106,21 @@ Future<List<Map<String, dynamic>>> fetchAllRecordsOlderThanLastLogin({
         QuizzerLogger.logMessage('Forcing full sync for $tableName based on hardcoded map. Local count: $localCount, Required: ${forceSyncCounts[tableName]}');
       }
     }
-
+    // End full force sync logic
+    // ================================================================================
+    // Now we need to collect when the newest local record is
     String lastLocalTimestamp = '';
     if (!performFullSync) {
       Database? db = await getDatabaseMonitor().requestDatabaseAccess();
       String lastTimestampQuery = 'SELECT MAX($timestampColumn) AS last_ts FROM "$tableName"';
-      if (tableName == 'question_answer_pairs') {
-        lastTimestampQuery += ' WHERE qst_reviewer IS NOT NULL';
-      }
+
       final localTimestampResult = await db!.rawQuery(lastTimestampQuery);
       getDatabaseMonitor().releaseDatabaseAccess();
       lastLocalTimestamp = localTimestampResult.first['last_ts'] as String? ?? '1970-01-01T00:00:00Z';
       
-      QuizzerLogger.logMessage('Using last local timestamp: $lastLocalTimestamp');
+      QuizzerLogger.logMessage('Using last local timestamp for $tableName: $lastLocalTimestamp');
     }
+    // ================================================================================
 
     final List<Map<String, dynamic>> allRecords = [];
     int offset = 0;
@@ -129,7 +129,7 @@ Future<List<Map<String, dynamic>>> fetchAllRecordsOlderThanLastLogin({
     while (hasMoreRecords) {
       QuizzerLogger.logMessage('Fetching page starting at offset: $offset from $tableName');
 
-      var query = supabase.from(tableName).select('*');
+      var query = SessionManager().supabase.from(tableName).select('*');
 
       if (!performFullSync) {
         query = query.gte(timestampColumn, lastLocalTimestamp);
@@ -157,21 +157,10 @@ Future<List<Map<String, dynamic>>> fetchAllRecordsOlderThanLastLogin({
         hasMoreRecords = false;
       }
     }
-
-    // Post-fetch filtering to remove duplicates caused by `gte`
-    final List<Map<String, dynamic>> uniqueRecords = [];
-    final Set<String> seenIds = {};
-
-    for (final record in allRecords) {
-      final String questionId = record['question_id'].toString();
-      if (!seenIds.contains(questionId)) {
-        uniqueRecords.add(record);
-        seenIds.add(questionId);
-      }
-    }
-
-    QuizzerLogger.logSuccess('Successfully fetched ALL ${uniqueRecords.length} new records from $tableName');
-    return uniqueRecords;
+    // This function does not concern itself with whether it collected duplicates or not, just fetch and return.
+    // We handle deduplication at the upsert stage.
+    QuizzerLogger.logSuccess('Successfully fetched ALL ${allRecords.length} new records from $tableName');
+    return allRecords;
 
   } catch (e) {
     QuizzerLogger.logError('Error fetching records from $tableName: $e');
@@ -218,47 +207,49 @@ Future<bool> _isTableEmpty(String tableName, String? userId) async {
   }
 }
 
-
-/// Fetches all data from supabase all at once, in a single batched operations
-/// Tables are indexed as follows: \n
-/// syncData[0]   == question_answer_pairs /n
-/// syncData[1]   == user_question_answer_pairs \n
-/// syncData[2]   == user_profile \n
-/// syncData[3]   == user_settings \n
-/// syncData[4]   == modules \n
-/// syncData[5]   == user_module_activation_status \n
-/// syncData[6]   == subject_details \n
-/// syncData[7]   == ml_models \n
-Future<List<List<Map<String,dynamic>>>> fetchDataForAllTables(SupabaseClient supabase, String? userId) async {
-  // Let's assume you have a SupabaseClient instance named `supabaseClient`.
-  // SupabaseClient supabaseClient = SupabaseClient('url', 'key');
+/// Fetches data for all tables that require inbound sync
+/// 
+/// Parameters:
+/// - tablesRequiringSync: List of tables that have requiresInboundSync = true
+/// 
+/// Returns:
+/// - List of table data in the same order as the input tables
+/// Fetches data for all tables that require inbound sync
+/// 
+/// Parameters:
+/// - tablesRequiringSync: List of tables that have requiresInboundSync = true
+/// 
+/// Returns:
+/// - List of table data in the same order as the input tables
+Future<List<List<Map<String,dynamic>>>> fetchDataForAllTables(List<SqlTable> tablesRequiringSync) async {
+  QuizzerLogger.logMessage('Fetching data for ${tablesRequiringSync.length} tables requiring sync');
   
-  // Create a list of Futures to be executed concurrently.
-  final List<List<Map<String, dynamic>>> allResults = await Future.wait([
-    fetchAllRecordsOlderThanLastLogin(supabase: supabase, tableName: 'question_answer_pairs',         
-    userId: userId),
-
-    fetchAllRecordsOlderThanLastLogin(supabase: supabase, tableName: 'user_question_answer_pairs',    
-    userId: userId, additionalFilters: {'user_uuid': userId}),
-
-    fetchAllRecordsOlderThanLastLogin(supabase: supabase, tableName: 'user_profile',                  
-    userId: userId, additionalFilters: {'uuid': userId}),
-
-    fetchAllRecordsOlderThanLastLogin(supabase: supabase, tableName: 'user_settings',               
-    userId: userId, additionalFilters: {'user_id': userId}),
-
-    fetchAllRecordsOlderThanLastLogin(supabase: supabase, tableName: 'modules',                       
-    userId: null, useLastLogin: false), //Get all modules regardless
-
-    fetchAllRecordsOlderThanLastLogin(supabase: supabase, tableName: 'user_module_activation_status',
-    userId: userId, additionalFilters: {'user_id': userId}),
-
-    fetchAllRecordsOlderThanLastLogin(supabase: supabase, tableName: 'subject_details',
-    userId: null),
-
-    fetchAllRecordsOlderThanLastLogin(supabase: supabase, tableName: 'ml_models'),
-
-    fetchAllRecordsOlderThanLastLogin(supabase: supabase, tableName: 'user_daily_stats'),
-  ]);
+  final List<Future<List<Map<String, dynamic>>>> fetchFutures = [];
+  
+  for (final table in tablesRequiringSync) {
+    
+    // Get the additional filters from the table instance
+    final dynamic additionalFilters = table.additionalFiltersForInboundSync;
+    
+    // Log the sync configuration for this table
+    QuizzerLogger.logMessage('Sync config for ${table.tableName}: filters=$additionalFilters');
+    
+    // Create the fetch future with appropriate parameters
+    // Pass the additionalFilters as-is - table class is responsible for its own filtering logic
+    fetchFutures.add(
+      fetchAllRecordsOlderThanLastLogin(
+        tableName: table.tableName,
+        additionalFilters: additionalFilters is Map<String, dynamic> || additionalFilters is Map<String, String>
+            ? additionalFilters as Map<String, dynamic>?
+            : null,
+        useLastLogin: table.useLastLoginForInboundSync,
+      )
+    );
+  }
+  
+  // Execute all fetch operations concurrently
+  final List<List<Map<String, dynamic>>> allResults = await Future.wait(fetchFutures);
+  
+  QuizzerLogger.logSuccess('Successfully fetched data for ${tablesRequiringSync.length} tables');
   return allResults;
 }

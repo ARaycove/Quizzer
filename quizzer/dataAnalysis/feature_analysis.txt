@@ -1,14 +1,14 @@
 ================================================================================
 FEATURE ANALYSIS REPORT
 ================================================================================
-Dataset Shape: 2,017 rows x 1,341 columns
-Total Features: 1,341
-Memory Usage: 20.64 MB
+Dataset Shape: 5,752 rows x 1,348 columns
+Total Features: 1,348
+Memory Usage: 59.16 MB
 
 Feature Type Breakdown:
   Non-numeric: 0
-  Integer:     234
-  Float:       1,107
+  Integer:     235
+  Float:       1,113
 
 Null Value Summary:
   Total null values: 0
@@ -245,6 +245,7 @@ Null Value Summary:
 | num_blanks                                       | 0                            | int64         |
 | num_mcq_options                                  | 4                            | int64         |
 | num_sata_options                                 | 0                            | int64         |
+| num_so_options                                   | 0                            | int64         |
 | response_result                                  | 1                            | int64         |
 | revision_streak                                  | 0                            | int64         |
 | total_attempts                                   | 1                            | int64         |
@@ -559,6 +560,7 @@ Null Value Summary:
 | question_type_fill_in_the_blank                  | 0.0                          | float64       |
 | question_type_multiple_choice                    | 1.0                          | float64       |
 | question_type_select_all_that_apply              | 0.0                          | float64       |
+| question_type_sort_order                         | 0.0                          | float64       |
 | question_type_true_false                         | 0.0                          | float64       |
 | qv_0                                             | 0.25033658742904663          | float64       |
 | qv_1                                             | 0.5569857358932495           | float64       |
@@ -1353,8 +1355,13 @@ Null Value Summary:
 | user_stats_today_sata_correct_attempts           | 0.0                          | float64       |
 | user_stats_today_sata_incorrect_attempts         | 0.0                          | float64       |
 | user_stats_today_sata_total_attempts             | 0.0                          | float64       |
+| user_stats_today_so_accuracy_rate                | 0.0                          | float64       |
+| user_stats_today_so_correct_attempts             | 0.0                          | float64       |
+| user_stats_today_so_incorrect_attempts           | 0.0                          | float64       |
+| user_stats_today_so_total_attempts               | 0.0                          | float64       |
 | user_stats_today_tf_accuracy_rate                | 0.0                          | float64       |
 | user_stats_today_tf_correct_attempts             | 0.0                          | float64       |
 | user_stats_today_tf_incorrect_attempts           | 0.0                          | float64       |
 | user_stats_today_tf_total_attempts               | 0.0                          | float64       |
 | user_stats_today_total_attempts                  | 7.0                          | float64       |
+| user_stats_total_so_incorrrect_attempts          | 0.0                          | float64       |

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:quizzer/UI_systems/03_add_question_page/widgets/widget_module_selection.dart';
 import 'package:quizzer/UI_systems/03_add_question_page/widgets/widget_question_type_selection.dart';
-import 'package:quizzer/UI_systems/03_add_question_page/widgets/widget_bulk_add_button.dart';
 import 'package:quizzer/UI_systems/global_widgets/widget_global_app_bar.dart';
 import 'package:quizzer/UI_systems/03_add_question_page/widgets/widget_live_preview.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
@@ -26,7 +24,6 @@ class _AddQuestionAnswerPageState extends State<AddQuestionAnswerPage> {
   final SessionManager _session = SessionManager();
 
   // Controllers for selection widgets
-  final _moduleController = TextEditingController();
   final _questionTypeController = TextEditingController();
 
   // --- State for the question being built ---
@@ -47,7 +44,6 @@ class _AddQuestionAnswerPageState extends State<AddQuestionAnswerPage> {
   void _logQuestionData(String operation) {
     final questionData = {
       'questionType': _questionTypeController.text,
-      'moduleName': _moduleController.text,
       'questionElements': _currentQuestionElements,
       'answerElements': _currentAnswerElements,
       'options': _currentOptions,
@@ -65,7 +61,6 @@ class _AddQuestionAnswerPageState extends State<AddQuestionAnswerPage> {
   void initState() {
     super.initState();
     // Initialize controllers and listeners
-    _moduleController.text = 'general'; // Default module
     _questionTypeController.text = 'multiple_choice'; // Default question type
     _questionTypeController.addListener(_onQuestionTypeChanged);
 
@@ -76,7 +71,6 @@ class _AddQuestionAnswerPageState extends State<AddQuestionAnswerPage> {
   @override
   void dispose() {
     _questionTypeController.removeListener(_onQuestionTypeChanged);
-    _moduleController.dispose();
     _questionTypeController.dispose();
     super.dispose();
   }
@@ -643,7 +637,6 @@ class _AddQuestionAnswerPageState extends State<AddQuestionAnswerPage> {
       // Use the potentially modified element lists
       _session.addNewQuestion(
       // Required parameters
-      moduleName: _moduleController.text,
       questionType: _questionTypeController.text,
       questionElements: cleanedQuestionElements, // Use cleaned list without blankId
       answerElements: _currentAnswerElements,   // Use list potentially updated by finalizeStagedImages
@@ -711,9 +704,6 @@ class _AddQuestionAnswerPageState extends State<AddQuestionAnswerPage> {
             ),
             ListView(
               children: [
-                // 2. Module Selection Widget
-                ModuleSelection(controller: _moduleController),
-                AppTheme.sizedBoxMed,
                 // 3. Question Type Selection Widget
                 QuestionTypeSelection(controller: _questionTypeController),
                 AppTheme.sizedBoxLrg,
@@ -777,17 +767,8 @@ class _AddQuestionAnswerPageState extends State<AddQuestionAnswerPage> {
 
                 AppTheme.sizedBoxLrg, // Spacing at the bottom
 
-                // 5. Divider
+                // 5. Divider -> Stating the obvious because it would feel weird not to have a comment here
                 const Divider(),
-                AppTheme.sizedBoxMed,
-
-                // 6. Bulk Add Widget
-                const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    BulkAddButton(),
-                  ],
-                ),
                 AppTheme.sizedBoxMed,
               ],
             ),

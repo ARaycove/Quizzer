@@ -1,0 +1,38 @@
+# sub-model
+
+# Model learns to predict accuracy based on the current state of today's daily stats
+
+
+'''
+Daily Stats:
+user_stats_today_accuracy_rate,
+user_stats_today_correct_attempts,
+user_stats_today_fitb_accuracy_rate,
+user_stats_today_fitb_correct_attempts,
+user_stats_today_fitb_incorrect_attempts,
+user_stats_today_fitb_total_attempts,
+user_stats_today_incorrect_attempts,
+user_stats_today_mcq_accuracy_rate,
+user_stats_today_mcq_correct_attempts,
+user_stats_today_mcq_incorrect_attempts,
+user_stats_today_mcq_total_attempts,
+user_stats_today_sata_accuracy_rate,
+user_stats_today_sata_correct_attempts,
+user_stats_today_sata_incorrect_attempts,
+user_stats_today_sata_total_attempts,
+user_stats_today_so_accuracy_rate,
+user_stats_today_so_correct_attempts,
+user_stats_today_so_total_attempts,
+user_stats_today_tf_accuracy_rate,
+user_stats_today_tf_correct_attempts,
+user_stats_today_tf_incorrect_attempts,
+user_stats_today_tf_total_attempts,
+user_stats_today_total_attempts
+
+What question type is the target we are predicting?
+question_type_fill_in_the_blank,
+question_type_multiple_choice,
+question_type_select_all_that_apply,
+question_type_sort_order,
+question_type_true_false
+'''

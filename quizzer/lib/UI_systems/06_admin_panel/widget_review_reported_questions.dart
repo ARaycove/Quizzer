@@ -12,7 +12,6 @@ class ReviewReportedQuestionsPanelWidget extends StatefulWidget {
 }
 
 class _ReviewReportedQuestionsPanelWidgetState extends State<ReviewReportedQuestionsPanelWidget> {
-  final SessionManager _session = SessionManager();
   final ScrollController _scrollController = ScrollController();
   bool _isLoading = true;
   String? _errorMessage;
@@ -38,7 +37,7 @@ class _ReviewReportedQuestionsPanelWidgetState extends State<ReviewReportedQuest
       _editedQuestionData = null;
     });
     try {
-      final result = await _session.getFlaggedQuestionForReview();
+      final result = await SessionManager().questionReviewManager.getFlaggedQuestionForReview();
       setState(() {
         _flaggedQuestion = result;
         _isLoading = false;
@@ -76,11 +75,11 @@ class _ReviewReportedQuestionsPanelWidgetState extends State<ReviewReportedQuest
     final questionData = _editedQuestionData ?? _flaggedQuestion!['question_data'] as Map<String, dynamic>;
     setState(() { _isLoading = true; });
     try {
-      await _session.submitQuestionFlagReview(
+      await SessionManager().questionReviewManager.submitQuestionReview(
         questionId: questionId,
         action: action,
-        updatedQuestionData: questionData,
-      );
+        updatedQuestionData: questionData
+        );
       await _fetchFlaggedQuestion();
     } catch (e) {
       setState(() {

@@ -104,8 +104,7 @@ class _FillInTheBlankQuestionWidgetState
         if (answersToBlanks != null && blankIndex < answersToBlanks.length) {
           correctAnswer = answersToBlanks[blankIndex].keys.first;
           
-          SessionManager sessionManager = getSessionManager();
-          String valType = sessionManager.getFillInTheBlankValidationType(correctAnswer);
+          String valType = SessionManager().getFillInTheBlankValidationType(correctAnswer);
           if (valType == "math_expression") {
             isMath = true;
             formattedCorrectAnswers.add("\$$correctAnswer\$");

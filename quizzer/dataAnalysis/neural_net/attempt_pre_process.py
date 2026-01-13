@@ -545,21 +545,33 @@ def push_model_to_supabase(model_name, metrics, model_path='global_best_model.tf
                           feature_map_path='input_feature_map.json'):
     """
     Upload TFLite model to Supabase storage and update ml_models table.
-    
-    Args:
-        model_name: Name for the model (used as primary key)
-        metrics: Metrics dictionary from model_analytics_report()
-        model_path: Path to .tflite model file
-        feature_map_path: Path to feature map JSON
-        
-    Returns:
-        Response from database insert/update
+    VALIDATES that model input shape matches feature map count.
     """
-    # Calculate optimal threshold from ROC curve (maximize Youden's J statistic)
+    # Load and validate model input shape
+    interpreter = tf.lite.Interpreter(model_path=model_path)
+    interpreter.allocate_tensors()
+    input_details = interpreter.get_input_details()
+    model_input_shape = input_details[0]['shape'][1]  # [batch, features] -> get features
+    
+    # Load feature map
+    with open(feature_map_path, 'r') as f:
+        feature_map = json.load(f)
+    
+    feature_map_count = len(feature_map)
+    
+    # VALIDATION
+    if model_input_shape != feature_map_count:
+        raise ValueError(
+            f"MODEL MISMATCH: Model expects {model_input_shape} features "
+            f"but feature_map has {feature_map_count} features. "
+        )
+    
+    print(f"✓ Validation passed: Model and feature map both have {model_input_shape} features")
+    
+    # Calculate optimal threshold
     fpr = metrics['roc_fpr']
     tpr = metrics['roc_tpr']
     thresholds = metrics['roc_thresholds']
-    
     j_scores = tpr - fpr
     optimal_idx = np.argmax(j_scores)
     optimal_threshold = float(thresholds[optimal_idx])
@@ -582,10 +594,6 @@ def push_model_to_supabase(model_name, metrics, model_path='global_best_model.tf
     except Exception as e:
         print(f"Error authenticating with Supabase: {e}")
         return None
-    
-    # Read feature map
-    with open(feature_map_path, 'r') as f:
-        feature_map = json.load(f)
     
     # Upload to storage bucket
     filename = f"{model_name}.tflite"

@@ -18,7 +18,7 @@ def create_comprehensive_visualizations(metrics, save_prefix=None):
         metrics: Dictionary from model_analytics_report function
         save_prefix: Prefix for saved files (default: auto-generated timestamp)
     """
-    
+    # FIXME Make sure we save to a dedicated folder instead of crowding the main directory
     # Generate save prefix if not provided
     if save_prefix is None:
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
