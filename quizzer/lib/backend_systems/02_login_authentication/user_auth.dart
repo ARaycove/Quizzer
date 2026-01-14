@@ -8,17 +8,33 @@ import 'package:hive/hive.dart';
 class UserAuth {
   /// Catches AuthException for known Supabase errors.
   /// On successful login, stores offline login data and initializes SessionManager.
-  Future<Map<String, dynamic>> attemptSupabaseLogin(String email,
+  Future<Map<String, dynamic>> attemptSupabaseLogin(String emailOrPhone,
       String password, SupabaseClient supabase, Box storage) async {
-    QuizzerLogger.logMessage('Attempting Supabase authentication for $email');
+    QuizzerLogger.logMessage(
+        'Attempting Supabase authentication for $emailOrPhone');
     try {
       QuizzerLogger.logMessage('Attempting Supabase authentication');
-      final response = await supabase.auth.signInWithPassword(
-        email: email,
-        password: password,
-      );
+      AuthResponse response;
+
+      // Determine if input is Email or Phone
+      if (emailOrPhone.contains('@')) {
+        // Treat as Email
+        response = await supabase.auth.signInWithPassword(
+          email: emailOrPhone,
+          password: password,
+        );
+      } else {
+        // Treat as Phone
+        final cleanPhone = _sanitizePhoneNumber(emailOrPhone);
+        response = await supabase.auth.signInWithPassword(
+          phone: cleanPhone,
+          password: password,
+        );
+      }
+
       // Success Case
-      QuizzerLogger.logSuccess('Supabase authentication successful for $email');
+      QuizzerLogger.logSuccess(
+          'Supabase authentication successful for $emailOrPhone');
       final authResult = {
         'success': true,
         'message': 'Login successful',
@@ -57,31 +73,43 @@ class UserAuth {
     return sanitized;
   }
 
-  /// Sends an OTP to the specified phone number.
+  /// Sends an OTP to the specified phone number or email.
   /// Returns a map with success status and message.
-  Future<Map<String, dynamic>> signInWithPhone(
-      String phoneNumber, SupabaseClient supabase) async {
-    final cleanPhone = _sanitizePhoneNumber(phoneNumber);
-
+  Future<Map<String, dynamic>> sendOtp(
+      String contact, SupabaseClient supabase) async {
+    final isEmail = contact.contains('@');
+    final cleanContact = isEmail ? contact : _sanitizePhoneNumber(contact);
     QuizzerLogger.logMessage(
-        'Attempting Phone authentication for $cleanPhone (raw: $phoneNumber)');
+        'Attempting OTP authentication for $cleanContact (isEmail: $isEmail)');
+
     try {
-      await supabase.auth.signInWithOtp(
-        phone: cleanPhone,
-      );
-      QuizzerLogger.logSuccess('OTP sent successfully to $cleanPhone');
+      if (isEmail) {
+        await supabase.auth.signInWithOtp(
+          email: cleanContact,
+          shouldCreateUser:
+              false, // For password reset, we likely only want existing users, but setting true is safer for "magic link" style flows if we wanted that.
+          // However, for password reset, we usually imply the user exists.
+          // Supabase defaults to creating a user if they don't exist, which might be confusing for "Reset Password".
+          // But effectively, if they don't exist, they claim the account now.
+        );
+      } else {
+        await supabase.auth.signInWithOtp(
+          phone: cleanContact,
+        );
+      }
+      QuizzerLogger.logSuccess('OTP sent successfully to $cleanContact');
       return {
         'success': true,
         'message': 'OTP sent successfully',
       };
     } on AuthException catch (e) {
-      QuizzerLogger.logWarning('Phone authentication failed: ${e.message}');
+      QuizzerLogger.logWarning('OTP authentication failed: ${e.message}');
       return {
         'success': false,
         'message': e.message,
       };
     } catch (e) {
-      QuizzerLogger.logError('Unexpected error in signInWithPhone: $e');
+      QuizzerLogger.logError('Unexpected error in sendOtp: $e');
       return {
         'success': false,
         'message': 'Unexpected error occurred',
@@ -89,27 +117,26 @@ class UserAuth {
     }
   }
 
-  /// Verifies the OTP for the phone number.
+  /// Verifies the OTP for the phone number or email.
   /// On success, the user is logged in.
-  Future<Map<String, dynamic>> verifyPhoneOtp(
-      String phoneNumber, String token, SupabaseClient supabase) async {
-    final cleanPhone = _sanitizePhoneNumber(phoneNumber);
-    QuizzerLogger.logMessage('Verifying OTP for $cleanPhone');
+  Future<Map<String, dynamic>> verifyOtp(
+      String contact, String token, SupabaseClient supabase) async {
+    final isEmail = contact.contains('@');
+    final cleanContact = isEmail ? contact : _sanitizePhoneNumber(contact);
+    QuizzerLogger.logMessage(
+        'Verifying OTP for $cleanContact (isEmail: $isEmail)');
 
     try {
       final response = await supabase.auth.verifyOTP(
-        phone: cleanPhone,
+        email: isEmail ? cleanContact : null,
+        phone: isEmail ? null : cleanContact,
         token: token,
-        type: OtpType.sms,
+        type: isEmail ? OtpType.email : OtpType.sms,
       );
 
       if (response.user != null) {
         QuizzerLogger.logSuccess(
-            'Phone authentication verify successful for $phoneNumber');
-
-        // Ensure SessionManager knows about the role if possible,
-        // essentially similar post-login logic might be needed here.
-        // For now, we return the raw data.
+            'OTP verification successful for $cleanContact');
 
         return {
           'success': true,
@@ -130,7 +157,7 @@ class UserAuth {
         'message': e.message,
       };
     } catch (e) {
-      QuizzerLogger.logError('Unexpected error in verifyPhoneOtp: $e');
+      QuizzerLogger.logError('Unexpected error in verifyOtp: $e');
       return {
         'success': false,
         'message': 'Unexpected error occurred',

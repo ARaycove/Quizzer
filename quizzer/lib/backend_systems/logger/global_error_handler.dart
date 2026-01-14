@@ -31,7 +31,18 @@ final ValueNotifier<CriticalErrorDetails?> globalCriticalErrorNotifier =
 /// Reports a critical error, updating the global notifier and logging the error.
 /// This should be called by global error handlers or by specific services
 /// when an unrecoverable error occurs.
-void reportCriticalError(String message, {dynamic error, StackTrace? stackTrace}) {
+void reportCriticalError(String message,
+    {dynamic error, StackTrace? stackTrace}) {
+  // Filter out known harmless Flutter/Emulator errors
+  final errorString = error?.toString() ?? '';
+  if (errorString.contains("HardwareKeyboard") &&
+      errorString.contains("Failed assertion") &&
+      errorString.contains("_pressedKeys")) {
+    QuizzerLogger.logWarning(
+        "Ignored harmless HardwareKeyboard assertion error: $error");
+    return;
+  }
+
   final details = CriticalErrorDetails(
     message: message,
     error: error,
@@ -49,4 +60,4 @@ void reportCriticalError(String message, {dynamic error, StackTrace? stackTrace}
   QuizzerLogger.logError(logMessage);
 
   globalCriticalErrorNotifier.value = details;
-} 
+}

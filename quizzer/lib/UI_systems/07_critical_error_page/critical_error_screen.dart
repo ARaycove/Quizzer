@@ -1,6 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:quizzer/backend_systems/logger/global_error_handler.dart'; 
+import 'package:quizzer/backend_systems/logger/global_error_handler.dart';
 import 'package:quizzer/app_theme.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart'; // Added for placeholder logging
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart'; // Import SessionManager
@@ -9,16 +9,19 @@ import 'package:quizzer/backend_systems/session_manager/session_manager.dart'; /
 // Critical Error Screen Widget
 // ==========================================
 
-class CriticalErrorScreen extends StatefulWidget { // Changed to StatefulWidget
+class CriticalErrorScreen extends StatefulWidget {
+  // Changed to StatefulWidget
   final CriticalErrorDetails errorDetails;
 
   const CriticalErrorScreen({super.key, required this.errorDetails});
 
   @override
-  State<CriticalErrorScreen> createState() => _CriticalErrorScreenState(); // Create state
+  State<CriticalErrorScreen> createState() =>
+      _CriticalErrorScreenState(); // Create state
 }
 
-class _CriticalErrorScreenState extends State<CriticalErrorScreen> { // State class
+class _CriticalErrorScreenState extends State<CriticalErrorScreen> {
+  // State class
   final TextEditingController _feedbackController = TextEditingController();
   bool _feedbackSubmitted = false; // State variable to track submission
   int _pokeCount = 0; // For the Easter egg
@@ -62,19 +65,21 @@ class _CriticalErrorScreenState extends State<CriticalErrorScreen> { // State cl
       _isReportingInitialError = true;
     });
 
-    QuizzerLogger.logMessage('CriticalErrorScreen: Auto-reporting initial error.');
+    QuizzerLogger.logMessage(
+        'CriticalErrorScreen: Auto-reporting initial error.');
     String? errorId;
     // No try-catch as per instructions.
     await SessionManager().reportError(
       errorMessage: widget.errorDetails.message,
     );
-    
+
     if (!mounted) return;
     setState(() {
       _reportedErrorId = errorId;
       _isReportingInitialError = false;
     });
-    QuizzerLogger.logSuccess('CriticalErrorScreen: Initial error auto-reported. ID: $_reportedErrorId');
+    QuizzerLogger.logSuccess(
+        'CriticalErrorScreen: Initial error auto-reported. ID: $_reportedErrorId');
   }
 
   @override
@@ -89,11 +94,13 @@ class _CriticalErrorScreenState extends State<CriticalErrorScreen> { // State cl
     if (!_feedbackSubmitted) {
       // Check if initial report ID is available
       if (_reportedErrorId == null) {
-        QuizzerLogger.logWarning('CriticalErrorScreen: Feedback submission attempted before initial error ID was received.');
+        QuizzerLogger.logWarning(
+            'CriticalErrorScreen: Feedback submission attempted before initial error ID was received.');
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Initial error report still processing, please wait...'),
+              content:
+                  Text('Initial error report still processing, please wait...'),
             ),
           );
         }
@@ -101,7 +108,7 @@ class _CriticalErrorScreenState extends State<CriticalErrorScreen> { // State cl
       }
       // Check if feedback text is empty
       if (_feedbackController.text.isEmpty) {
-         if (mounted) {
+        if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Please enter your feedback before submitting.'),
@@ -116,7 +123,8 @@ class _CriticalErrorScreenState extends State<CriticalErrorScreen> { // State cl
       });
 
       final String feedbackText = _feedbackController.text;
-      QuizzerLogger.logMessage('CriticalErrorScreen: Submitting user feedback for error ID: $_reportedErrorId');
+      QuizzerLogger.logMessage(
+          'CriticalErrorScreen: Submitting user feedback for error ID: $_reportedErrorId');
 
       await SessionManager().reportError(
         id: _reportedErrorId!, // Use the stored ID
@@ -128,9 +136,10 @@ class _CriticalErrorScreenState extends State<CriticalErrorScreen> { // State cl
       setState(() {
         _feedbackSubmitted = true;
         _isSubmittingFeedback = false;
-        _feedbackController.clear(); 
+        _feedbackController.clear();
       });
-      QuizzerLogger.logSuccess('CriticalErrorScreen: User feedback submitted for ID: $_reportedErrorId.');
+      QuizzerLogger.logSuccess(
+          'CriticalErrorScreen: User feedback submitted for ID: $_reportedErrorId.');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -140,9 +149,11 @@ class _CriticalErrorScreenState extends State<CriticalErrorScreen> { // State cl
       }
     } else {
       // Easter egg: Subsequent pokes
-      final randomMessage = _pokeMessages[_random.nextInt(_pokeMessages.length)]; // Get message before setState
+      final randomMessage = _pokeMessages[
+          _random.nextInt(_pokeMessages.length)]; // Get message before setState
 
-      setState(() { // Single setState to update both pokeCount and emojiOverlayCount
+      setState(() {
+        // Single setState to update both pokeCount and emojiOverlayCount
         _pokeCount++;
         if (_pokeCount > 3) {
           _emojiOverlayCount++;
@@ -150,14 +161,15 @@ class _CriticalErrorScreenState extends State<CriticalErrorScreen> { // State cl
       });
 
       if (mounted) {
-        ScaffoldMessenger.of(context).removeCurrentSnackBar(); 
+        ScaffoldMessenger.of(context).removeCurrentSnackBar();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(randomMessage),
           ),
         );
       }
-      QuizzerLogger.logMessage('CriticalErrorScreen: Button poked. Count: $_pokeCount, Emoji Overlay Count: $_emojiOverlayCount, Message: "$randomMessage"');
+      QuizzerLogger.logMessage(
+          'CriticalErrorScreen: Button poked. Count: $_pokeCount, Emoji Overlay Count: $_emojiOverlayCount, Message: "$randomMessage"');
     }
   }
 
@@ -172,11 +184,14 @@ class _CriticalErrorScreenState extends State<CriticalErrorScreen> { // State cl
     const double hueStepForCycle = 30.0;
 
     if (_pokeCount == 0) {
-      return Colors.grey; // Neutral grey immediately after submission, before any pokes
+      return Colors
+          .grey; // Neutral grey immediately after submission, before any pokes
     } else if (_pokeCount > 0 && _pokeCount <= maxPokesForRedEffect) {
       // Transition to Neon Red
       // _pokeCount starts at 1 for the first poke after submission
-      final double intensity = (_pokeCount.toDouble() / maxPokesForRedEffect.toDouble()).clamp(0.0, 1.0);
+      final double intensity =
+          (_pokeCount.toDouble() / maxPokesForRedEffect.toDouble())
+              .clamp(0.0, 1.0);
       return Color.lerp(Colors.grey, neonRed, intensity) ?? neonRed;
     } else {
       // Cycle colors after reaching max red intensity
@@ -195,8 +210,8 @@ class _CriticalErrorScreenState extends State<CriticalErrorScreen> { // State cl
               width: constraints.maxWidth,
               height: constraints.maxHeight,
               child: Wrap(
-                spacing: 2.0, 
-                runSpacing: 2.0, 
+                spacing: 2.0,
+                runSpacing: 2.0,
                 children: List.generate(_emojiOverlayCount, (index) {
                   return const Text('👉');
                 }),
@@ -215,7 +230,8 @@ class _CriticalErrorScreenState extends State<CriticalErrorScreen> { // State cl
         title: const Text('Critical Application Error'),
         automaticallyImplyLeading: false, // No back button
       ),
-      body: Stack( // Changed to Stack
+      body: Stack(
+        // Changed to Stack
         children: <Widget>[
           // Original content layer
           Center(
@@ -231,7 +247,7 @@ class _CriticalErrorScreenState extends State<CriticalErrorScreen> { // State cl
                     ),
                   ),
                   AppTheme.sizedBoxLrg,
-                  // --- New Detailed Message --- 
+                  // --- New Detailed Message ---
                   const Text(
                     'We take errors very seriously. In an effort to create an awesome user experience, we choose to tackle internal errors aggressively. Providing good feedback on these errors helps Quizzer do better, faster. Thank you for your patience.',
                     textAlign: TextAlign.center,
@@ -267,19 +283,32 @@ class _CriticalErrorScreenState extends State<CriticalErrorScreen> { // State cl
                     controller: _feedbackController,
                     maxLines: 3,
                     decoration: const InputDecoration(
-                      hintText: 'e.g., "I was trying to __________ when the app crashed."',
+                      hintText:
+                          'e.g., "I was trying to __________ when the app crashed."',
                     ),
                   ),
                   AppTheme.sizedBoxMed,
                   Center(
                     child: ElevatedButton(
-                      onPressed: (_isReportingInitialError || _isSubmittingFeedback) ? null : _handleButtonPress,
+                      onPressed:
+                          (_isReportingInitialError || _isSubmittingFeedback)
+                              ? null
+                              : _handleButtonPress,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: _getPokeButtonColor(),
                       ),
-                      child: _isSubmittingFeedback 
+                      child: _isSubmittingFeedback
                           ? const CircularProgressIndicator()
-                          : Text(_feedbackSubmitted ? 'Feedback Sent' : 'Submit Feedback'),
+                          : Text(
+                              _feedbackSubmitted
+                                  ? 'Feedback Sent'
+                                  : 'Submit Feedback',
+                              style: const TextStyle(
+                                  inherit: false,
+                                  fontSize: 14,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600),
+                            ),
                     ),
                   ),
                   AppTheme.sizedBoxLrg,
@@ -292,10 +321,9 @@ class _CriticalErrorScreenState extends State<CriticalErrorScreen> { // State cl
             ),
           ),
           // Emoji overlay layer
-          if (_emojiOverlayCount > 0)
-            _buildEmojiOverlay(),
+          if (_emojiOverlayCount > 0) _buildEmojiOverlay(),
         ],
       ),
     );
   }
-} 
+}

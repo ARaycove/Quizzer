@@ -17,7 +17,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   final SupabaseClient supabase = SessionManager().supabase;
   final UserAuth _userAuth = UserAuth();
 
-  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _contactController = TextEditingController();
   final TextEditingController _otpController = TextEditingController();
   final TextEditingController _newPassController = TextEditingController();
   final TextEditingController _confirmPassController = TextEditingController();
@@ -31,7 +31,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
   @override
   void dispose() {
-    _phoneController.dispose();
+    _contactController.dispose();
     _otpController.dispose();
     _newPassController.dispose();
     _confirmPassController.dispose();
@@ -55,24 +55,25 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
     });
   }
 
-  // Step 1: Send SMS
+  // Step 1: Send OTP
   Future<void> _sendOtp() async {
-    final phone = _phoneController.text.trim();
-    if (phone.isEmpty) {
+    final contact = _contactController.text.trim();
+    if (contact.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter your phone number')),
+        const SnackBar(
+            content: Text('Please enter your phone number or email')),
       );
       return;
     }
 
     setState(() => _isLoading = true);
 
-    final result = await _userAuth.signInWithPhone(phone, supabase);
+    final result = await _userAuth.sendOtp(contact, supabase);
 
     if (mounted) {
       setState(() => _isLoading = false);
       if (result['success'] == true) {
-        QuizzerLogger.logMessage('OTP Sent to $phone');
+        QuizzerLogger.logMessage('OTP Sent to $contact');
         setState(() => _step = 1);
         _startResendCooldown();
       } else {
@@ -85,7 +86,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
   // Step 2: Verify OTP
   Future<void> _verifyOtp() async {
-    final phone = _phoneController.text.trim();
+    final contact = _contactController.text.trim();
     final otp = _otpController.text.trim();
 
     if (otp.isEmpty) {
@@ -97,7 +98,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
     setState(() => _isLoading = true);
 
-    final result = await _userAuth.verifyPhoneOtp(phone, otp, supabase);
+    final result = await _userAuth.verifyOtp(contact, otp, supabase);
 
     if (mounted) {
       setState(() => _isLoading = false);
@@ -200,18 +201,18 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   Widget _buildPhoneInput() {
     return Column(
       children: [
-        const Text('Enter your phone number to receive a verification code.',
+        const Text('Enter your phone number or email to receive a code.',
             style: TextStyle(fontSize: 16)),
         const SizedBox(height: 20),
         TextField(
-          controller: _phoneController,
+          controller: _contactController,
           decoration: const InputDecoration(
-            labelText: 'Phone Number',
-            hintText: '+15551234567',
+            labelText: 'Phone Number or Email',
+            hintText: '+15551234567 or user@example.com',
             border: OutlineInputBorder(),
-            prefixIcon: Icon(Icons.phone),
+            prefixIcon: Icon(Icons.perm_identity),
           ),
-          keyboardType: TextInputType.phone,
+          keyboardType: TextInputType.text,
         ),
         const SizedBox(height: 20),
         SizedBox(
@@ -231,7 +232,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   Widget _buildOtpInput() {
     return Column(
       children: [
-        Text('Enter the 6-digit code sent to ${_phoneController.text}',
+        Text('Enter the 6-digit code sent to ${_contactController.text}',
             style: const TextStyle(fontSize: 16)),
         const SizedBox(height: 20),
         TextField(
