@@ -16,9 +16,8 @@ import 'package:logging/logging.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart'; // Import logging package
 import 'package:quizzer/UI_systems/10_stats_page/stats_page.dart';
 import 'package:quizzer/app_theme.dart';
-// import 'UI_systems/11_reset_password_page/reset_password_page.dart';
+import 'package:quizzer/UI_systems/11_reset_password_page/reset_password_page.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/initialization_table_verification.dart';
-
 
 // Global Key for NavigatorState
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -79,26 +78,30 @@ class _QuizzerAppState extends State<QuizzerApp> {
 
   void _handleCriticalError() {
     if (mounted && globalCriticalErrorNotifier.value != null) {
-      QuizzerLogger.logMessage('_QuizzerAppState: Received critical error notification. Current error: $_criticalError, New error: ${globalCriticalErrorNotifier.value}');
+      QuizzerLogger.logMessage(
+          '_QuizzerAppState: Received critical error notification. Current error: $_criticalError, New error: ${globalCriticalErrorNotifier.value}');
       setState(() {
         _criticalError = globalCriticalErrorNotifier.value;
       });
-      QuizzerLogger.logMessage('_QuizzerAppState: setState completed. _criticalError is now: $_criticalError');
-      
+      QuizzerLogger.logMessage(
+          '_QuizzerAppState: setState completed. _criticalError is now: $_criticalError');
+
       if (_criticalError != null) {
         widget.navigatorKey.currentState?.pushNamedAndRemoveUntil(
-          '/critical_error', 
+          '/critical_error',
           (Route<dynamic> route) => false,
-          arguments: _criticalError, 
+          arguments: _criticalError,
         );
-        QuizzerLogger.logMessage('_QuizzerAppState: Navigation to /critical_error attempted.');
+        QuizzerLogger.logMessage(
+            '_QuizzerAppState: Navigation to /critical_error attempted.');
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    QuizzerLogger.logWarning('_QuizzerAppState: BUILD CALLED. _criticalError is: ${_criticalError?.message}'); // DEBUG LOG
+    QuizzerLogger.logWarning(
+        '_QuizzerAppState: BUILD CALLED. _criticalError is: ${_criticalError?.message}'); // DEBUG LOG
     if (_criticalError != null) {
       // If a critical error has occurred, show the CriticalErrorScreen
       // Using a new MaterialApp instance for the error screen to ensure it's isolated
@@ -116,18 +119,18 @@ class _QuizzerAppState extends State<QuizzerApp> {
       debugShowCheckedModeBanner: false,
       initialRoute: '/login',
       routes: {
-        '/login':           (context) => const LoginPage(),
-        // '/resetPassword':   (context) => const ResetPasswordPage(),
-        '/home':            (context) => const HomePage(),
-        '/menu':            (context) => const MenuPage(),
-        '/add_question':    (context) => const AddQuestionAnswerPage(),
-        
+        '/login': (context) => const LoginPage(),
+        '/resetPassword': (context) => const ResetPasswordPage(),
+        '/home': (context) => const HomePage(),
+        '/menu': (context) => const MenuPage(),
+        '/add_question': (context) => const AddQuestionAnswerPage(),
+
         // FIXME '/display_topics': (context) => const DisplayTopicsPage(),
-        '/signup':          (context) => const NewUserPage(),
-        '/admin_panel':     (context) => const AdminPanelPage(),
-        '/settings_page':   (context) => SettingsPage(),
-        '/feedback':        (context) => const FeedbackPage(),
-        '/stats':           (context) => const StatsPage(),
+        '/signup': (context) => const NewUserPage(),
+        '/admin_panel': (context) => const AdminPanelPage(),
+        '/settings_page': (context) => SettingsPage(),
+        '/feedback': (context) => const FeedbackPage(),
+        '/stats': (context) => const StatsPage(),
         '/critical_error': (context) {
           final args = ModalRoute.of(context)?.settings.arguments;
           if (args is CriticalErrorDetails) {
@@ -135,7 +138,8 @@ class _QuizzerAppState extends State<QuizzerApp> {
           }
           // Fallback if arguments are not correct, this should not happen
           // if _handleCriticalError always passes them.
-          QuizzerLogger.logError('CriticalErrorScreen route was pushed without valid CriticalErrorDetails arguments.');
+          QuizzerLogger.logError(
+              'CriticalErrorScreen route was pushed without valid CriticalErrorDetails arguments.');
           return CriticalErrorScreen(
             errorDetails: CriticalErrorDetails(
               message: 'Error: Critical error details not provided to route.',

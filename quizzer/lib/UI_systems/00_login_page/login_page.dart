@@ -23,7 +23,8 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
-    _progressSubscription = SessionManager().loginProgressStream.listen((message) {
+    _progressSubscription =
+        SessionManager().loginProgressStream.listen((message) {
       if (mounted) {
         setState(() {
           _loginProgressMessage = message;
@@ -60,9 +61,7 @@ class _LoginPageState extends State<LoginPage> {
     QuizzerLogger.logMessage('Login attempt for: $email');
 
     Map<String, dynamic> results = await SessionManager().attemptLogin(
-      email: email,
-      password: password,
-      authType: "email_login");
+        email: email, password: password, authType: "email_login");
 
     if (results['success']) {
       // Login successful, keep loading state true until navigation completes
@@ -72,7 +71,9 @@ class _LoginPageState extends State<LoginPage> {
       // _loginProgressMessage will be updated by the stream, culminating in "Login Complete!"
       // Potentially, could set a final success message here if desired before navigation
       // setState(() { _loginProgressMessage = "Success!"; });
-      setState(() { _loginProgressMessage = "Success!"; });
+      setState(() {
+        _loginProgressMessage = "Success!";
+      });
       Navigator.pushReplacementNamed(context, '/home');
       // Don't reset loading state here, it disappears on navigation
     } else {
@@ -164,11 +165,12 @@ class _LoginPageState extends State<LoginPage> {
     if (result is bool && result == true) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Password changed successfully — please log in with your new password')),
+        const SnackBar(
+            content: Text(
+                'Password changed successfully — please log in with your new password')),
       );
     }
   }
-
 
   @override
   void dispose() {
@@ -205,7 +207,8 @@ class _LoginPageState extends State<LoginPage> {
                 child: TextField(
                   controller: _emailController,
                   enabled: !_isLoading,
-                  style: const TextStyle(color: AppTheme.textPrimary, fontSize: 16.0),
+                  style: const TextStyle(
+                      color: AppTheme.textPrimary, fontSize: 16.0),
                   style:
                       TextStyle(color: Theme.of(context).colorScheme.onPrimary),
                   decoration: const InputDecoration(
@@ -222,7 +225,8 @@ class _LoginPageState extends State<LoginPage> {
                   controller: _passwordController,
                   obscureText: true,
                   enabled: !_isLoading,
-                  style: const TextStyle(color: AppTheme.textPrimary, fontSize: 16.0),
+                  style: const TextStyle(
+                      color: AppTheme.textPrimary, fontSize: 16.0),
                   style:
                       TextStyle(color: Theme.of(context).colorScheme.onPrimary),
                   decoration: const InputDecoration(
@@ -230,19 +234,18 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
               ),
-              // 
-              // AppTheme.sizedBoxMed,
-              // // Reset Password Button
-              // SizedBox(
-              //   width: buttonWidth,
-              //   child: TextButton(
-              //     onPressed: _isLoading ? null : resetPassword,
-              //     child: const Text(
-              //       "Reset Password",
-              //       style: TextStyle(fontSize: 14),
-              //     ),
-              //   ),
-              // ),
+              AppTheme.sizedBoxMed,
+              // Reset Password Button
+              SizedBox(
+                width: buttonWidth,
+                child: TextButton(
+                  onPressed: _isLoading ? null : resetPassword,
+                  child: const Text(
+                    "Reset Password",
+                    style: TextStyle(fontSize: 14),
+                  ),
+                ),
+              ),
               AppTheme.sizedBoxLrg,
 
               // Submit Button
