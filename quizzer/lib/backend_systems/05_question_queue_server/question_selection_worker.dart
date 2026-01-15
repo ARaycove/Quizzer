@@ -113,12 +113,10 @@ class PresentationSelectionWorker {
         const int threshold = QuestionQueueCache.queueThreshold;
         
         if (currentLength < threshold) {
-          // Step 2: Get eligible questions
+          // Get eligible questions
           final List<Map<String, dynamic>> eligibleQuestions = await UserQuestionManager().getEligibleUserQuestionAnswerPairs();
-          
-          // Step 3: Filter out recently answered questions and questions already in queue cache
+
           List<Map<String, dynamic>> filteredEligibleQuestions = List<Map<String, dynamic>>.from(eligibleQuestions);
-          
           if (filteredEligibleQuestions.isNotEmpty) {
             // Get the last 5 questions from answer history cache
             final List<String> recentQuestionIds = await AnswerHistoryCache().getLastFiveAnsweredQuestions();

@@ -2,6 +2,8 @@ import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/00_database_manager/tables/user_profile/user_question_answer_pairs_table.dart';
 import 'package:sqflite_common/sqlite_api.dart';
+import 'package:quizzer/backend_systems/05_question_queue_server/circulation_worker.dart';
+
 
 
 /// The UserQuestionManager encapsulates all functionality related to the user's relationship with the individual question records
@@ -89,73 +91,62 @@ class UserQuestionManager {
     QuizzerLogger.logMessage('${countOnly ? 'Counting' : 'Fetching'} eligible user question answer pairs for user: ${SessionManager().userId}...');
 
     final String userId = SessionManager().userId!;
-    final List<String> whereConditions = [
-      "user_question_answer_pairs.user_uuid = '$userId'",
-      "user_question_answer_pairs.in_circulation = 1",
-      "user_question_answer_pairs.flagged = 0"
-    ];
-
-    String query;
+    
+    // Get circulating question IDs from CirculationWorker's data structure
+    final Set<String> circulatingQuestionIds = CirculationWorker().circulatingQuestions;
+    
     if (countOnly) {
-      query = '''
-        SELECT COUNT(*) as eligible_count
-        FROM user_question_answer_pairs
-        ${includeQuestionPairs ? 'INNER JOIN question_answer_pairs ON user_question_answer_pairs.question_id = question_answer_pairs.question_id' : ''}
-        WHERE ${whereConditions.join(' AND ')}
-      ''';
-    } else {
-      query = '''
-        SELECT 
-          user_question_answer_pairs.user_uuid,
-          user_question_answer_pairs.question_id,
-          user_question_answer_pairs.revision_streak,
-          user_question_answer_pairs.last_revised,
-          user_question_answer_pairs.average_times_shown_per_day,
-          user_question_answer_pairs.accuracy_probability,
-          user_question_answer_pairs.in_circulation,
-          user_question_answer_pairs.total_attempts,
-          ${includeQuestionPairs ? '''
-            question_answer_pairs.question_elements,
-            question_answer_pairs.answer_elements,
-            question_answer_pairs.question_type,
-            question_answer_pairs.options,
-            question_answer_pairs.correct_option_index,
-            question_answer_pairs.correct_order,
-            question_answer_pairs.index_options_that_apply,
-            question_answer_pairs.answers_to_blanks
-          ''' : ''}
-        FROM user_question_answer_pairs
-        ${includeQuestionPairs ? 'INNER JOIN question_answer_pairs ON user_question_answer_pairs.question_id = question_answer_pairs.question_id' : ''}
-        WHERE ${whereConditions.join(' AND ')}
-      ''';
+      final int count = circulatingQuestionIds.length;
+      QuizzerLogger.logSuccess('Counted $count eligible records for user: $userId');
+      return count;
     }
+    
+    if (circulatingQuestionIds.isEmpty) {
+      QuizzerLogger.logMessage('No circulating questions found for user: $userId');
+      return [];
+    }
+
+    // Build IN clause for querying only circulating questions
+    final String inClause = "('${circulatingQuestionIds.join("','")}')";
+    
+    String query = '''
+      SELECT 
+        user_question_answer_pairs.user_uuid,
+        user_question_answer_pairs.question_id,
+        user_question_answer_pairs.revision_streak,
+        user_question_answer_pairs.last_revised,
+        user_question_answer_pairs.average_times_shown_per_day,
+        user_question_answer_pairs.accuracy_probability,
+        user_question_answer_pairs.in_circulation,
+        user_question_answer_pairs.total_attempts,
+        ${includeQuestionPairs ? '''
+          question_answer_pairs.question_elements,
+          question_answer_pairs.answer_elements,
+          question_answer_pairs.question_type,
+          question_answer_pairs.options,
+          question_answer_pairs.correct_option_index,
+          question_answer_pairs.correct_order,
+          question_answer_pairs.index_options_that_apply,
+          question_answer_pairs.answers_to_blanks
+        ''' : ''}
+      FROM user_question_answer_pairs
+      ${includeQuestionPairs ? 'INNER JOIN question_answer_pairs ON user_question_answer_pairs.question_id = question_answer_pairs.question_id' : ''}
+      WHERE user_question_answer_pairs.user_uuid = '$userId'
+        AND user_question_answer_pairs.question_id IN $inClause
+    ''';
 
     try {
       List<Map<String, dynamic>> results;
       if (txn != null) {
-        // Use rawQuery with transaction
-        if (countOnly) {
-          // Remove the quotes around userId parameter for rawQuery
-          final rawQuery = query.replaceFirst("'$userId'", '?');
-          results = await txn.rawQuery(rawQuery, [userId]);
-        } else {
-          results = await txn.rawQuery(query, []);
-        }
+        results = await txn.rawQuery(query, []);
       } else {
-        // Use the table's getRecord method
         results = await UserQuestionAnswerPairsTable().getRecord(query);
       }
 
-      if (countOnly) {
-        final int count = results.isNotEmpty ? (results.first['eligible_count'] as int?) ?? 0 : 0;
-        QuizzerLogger.logSuccess('Counted $count eligible records for user: $userId');
-        return count;
-      } else {
-        QuizzerLogger.logSuccess('Fetched ${results.length} eligible records for user: $userId');
-        return results;
-      }
+      QuizzerLogger.logSuccess('Fetched ${results.length} eligible records for user: $userId');
+      return results;
     } catch (e) {
-      QuizzerLogger.logError('Failed to ${countOnly ? 'count' : 'fetch'} eligible user question answer pairs: $e');
+      QuizzerLogger.logError('Failed to fetch eligible user question answer pairs: $e');
       rethrow;
     }
   }

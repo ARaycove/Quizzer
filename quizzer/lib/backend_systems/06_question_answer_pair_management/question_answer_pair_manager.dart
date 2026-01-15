@@ -77,6 +77,29 @@ class QuestionAnswerPairManager {
     }
   }
 
+  Future<List<String>> getQuestionIdsWithNullVector() async {
+    QuizzerLogger.logMessage('Fetching question IDs with null question_vector...');
+    
+    try {
+      const String query = '''
+        SELECT question_id 
+        FROM question_answer_pairs 
+        WHERE question_vector IS NULL
+      ''';
+      
+      final List<Map<String, dynamic>> results = await QuestionAnswerPairsTable().getRecord(query);
+      final List<String> questionIds = results
+          .map((map) => map['question_id'].toString())
+          .toList();
+      
+      QuizzerLogger.logSuccess('Found ${questionIds.length} questions with null question_vector');
+      return questionIds;
+    } catch (e) {
+      QuizzerLogger.logError('Failed to fetch question IDs with null question_vector: $e');
+      rethrow;
+    }
+  }
+
   // ----- Edit Questions -----
   /// Edits an existing question-answer pair by updating specified fields.
   Future<int> editQuestionAnswerPair({
