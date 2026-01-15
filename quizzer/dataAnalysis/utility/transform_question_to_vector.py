@@ -1,16 +1,16 @@
 from typing import Dict, List, Any
-import load_question_data
+import utility.load_question_data as load_question_data
 import pandas as pd
 import numpy as np
 import time
 from PIL import Image
 import torch
-from data_utils import load_image, text_to_image, combine_images_vertically, get_is_math, get_keywords
+from utility.data_utils import load_image, text_to_image, combine_images_vertically, get_is_math, get_keywords
 from transformers import AutoTokenizer, AutoModel
 import pytesseract
 import torch.nn.functional as F
-from sync_fetch_data import get_empty_vector_record, upsert_question_record, initialize_and_fetch_db
-from load_question_data import pre_process_record
+from utility.sync_fetch_data import get_empty_vector_record, upsert_question_record, initialize_and_fetch_db
+from utility.load_question_data import pre_process_record
 
 
 

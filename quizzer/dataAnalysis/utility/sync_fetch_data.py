@@ -299,16 +299,12 @@ def upsert_records_to_db(records: typing.Union[typing.List[typing.Dict], typing.
         data_to_upsert = [
             tuple(record.get(col) for col in columns) for record in table_records
         ]
-        
-        try:
-            cursor.executemany(upsert_sql, data_to_upsert)
-            print(f"executemany command executed for {table_name}.")
-            db.commit()
-            print(f"Successfully committed {len(table_records)} records to {table_name}.")
-        except sqlite3.Error as e:
-            print(f"SQLite error during upsert for {table_name}: {e}")
-            raise
-    
+
+        cursor.executemany(upsert_sql, data_to_upsert)
+        print(f"executemany command executed for {table_name}.")
+        db.commit()
+        print(f"Successfully committed {len(table_records)} records to {table_name}.")
+
     print("--- upsert_records_to_db finished ---")
 
 def find_newest_timestamp(records: typing.Dict[str, typing.List[typing.Dict]]) -> typing.Union[str, None]:
@@ -831,6 +827,7 @@ def sync_knn_results_to_supabase(db, supabase_client, changed_records, timestamp
     """
     cursor = db.cursor()
     total_updated = 0
+    processed_ids = set()
     
     # PART 1: Reset changed records to null in Supabase
     if changed_records:
@@ -844,9 +841,7 @@ def sync_knn_results_to_supabase(db, supabase_client, changed_records, timestamp
         for i in range(0, len(changed_records), batch_size):
             batch_ids = changed_records[i:i+batch_size]
             
-            # BATCH UPDATE: Set only k_nearest_neighbors to null for these IDs
-            # DO NOT update timestamp here - keeps the main app (NOT THE PIPELINE) from pulling null values unnecessarily
-            supabase_client.table('question_answer_pairs')\
+            response = supabase_client.table('question_answer_pairs')\
                 .update({'k_nearest_neighbors': None})\
                 .in_('question_id', batch_ids)\
                 .execute()
@@ -876,43 +871,94 @@ def sync_knn_results_to_supabase(db, supabase_client, changed_records, timestamp
         if not question_ids:
             break
         
-        # Get local KNN data for these IDs
+        # Get local KNN data for these IDs - only if they have actual KNN data
         placeholders = ','.join('?' * len(question_ids))
         cursor.execute(f"""
             SELECT question_id, k_nearest_neighbors 
             FROM question_answer_pairs 
             WHERE question_id IN ({placeholders}) 
             AND k_nearest_neighbors IS NOT NULL
+            AND k_nearest_neighbors != '[]'
+            AND k_nearest_neighbors != ''
+            AND TRIM(k_nearest_neighbors) != ''
         """, question_ids)
         
-        local_records = cursor.fetchall()
+        local_records_with_knn = cursor.fetchall()
+        local_knn_ids = {record[0] for record in local_records_with_knn}
         
-        # NEW: Check if we're missing any records locally
-        local_question_ids = {record[0] for record in local_records}
-        missing_ids = [qid for qid in question_ids if qid not in local_question_ids]
+        # Check for missing records locally
+        cursor.execute(f"""
+            SELECT question_id 
+            FROM question_answer_pairs 
+            WHERE question_id IN ({placeholders})
+        """, question_ids)
         
+        local_all_ids = {record[0] for record in cursor.fetchall()}
+        missing_ids = [qid for qid in question_ids if qid not in local_all_ids]
+        
+        # Check which records have been processed already and still have null KNN
+        already_processed_still_null = [qid for qid in question_ids if qid in processed_ids and qid not in local_knn_ids]
+        
+        if already_processed_still_null:
+            print(f"Found {len(already_processed_still_null)} records previously processed that still have null KNN.")
+            print("These records need topic modeling. Skipping them to avoid infinite loop.")
+            
+            # Remove already processed records from consideration
+            question_ids = [qid for qid in question_ids if qid not in already_processed_still_null]
+            
+            if not question_ids:
+                print("All remaining records need topic modeling. Stopping sync.")
+                break
+        
+        # NEW: Handle missing records by fetching once only
         if missing_ids:
             print(f"Found {len(missing_ids)} records missing locally. Fetching from server...")
             fetch_and_insert_missing_records(db, supabase_client, missing_ids)
             
-            # Try fetching again after inserting missing records
+            # After fetching, check if they have KNN data
+            placeholders_missing = ','.join('?' * len(missing_ids))
             cursor.execute(f"""
                 SELECT question_id, k_nearest_neighbors 
                 FROM question_answer_pairs 
-                WHERE question_id IN ({placeholders}) 
+                WHERE question_id IN ({placeholders_missing})
                 AND k_nearest_neighbors IS NOT NULL
-            """, question_ids)
-            local_records = cursor.fetchall()
+                AND k_nearest_neighbors != '[]'
+                AND k_nearest_neighbors != ''
+            """, missing_ids)
+            
+            newly_fetched_with_knn = cursor.fetchall()
+            
+            if newly_fetched_with_knn:
+                local_records_with_knn.extend(newly_fetched_with_knn)
+                local_knn_ids.update(record[0] for record in newly_fetched_with_knn)
+                print(f"Fetched {len(newly_fetched_with_knn)} records that have KNN data.")
+            else:
+                print(f"Fetched {len(missing_ids)} records but none have KNN data yet.")
+            
+            # Mark missing records as processed regardless of KNN status
+            for qid in missing_ids:
+                processed_ids.add(qid)
         
-        if not local_records:
-            print("No matching KNN data found locally. Stopping sync.")
+        # Mark local records without KNN as processed
+        local_records_without_knn = [qid for qid in question_ids if qid in local_all_ids and qid not in local_knn_ids]
+        for qid in local_records_without_knn:
+            processed_ids.add(qid)
+        
+        if local_records_without_knn:
+            print(f"Found {len(local_records_without_knn)} records locally that lack KNN data.")
+        
+        # Only process records that have KNN data
+        if not local_records_with_knn:
+            if missing_ids:
+                print("No KNN data available. All fetched records need topic modeling. Stopping sync.")
+            else:
+                print("No KNN data available locally for this batch. Stopping sync.")
             break
         
-        # Process in batches - update each record individually but still using batch operations
+        # Process records with KNN data
         batch_updated = 0
-        for question_id, knn_data in local_records:
-            # Update single record with BOTH k_nearest_neighbors AND timestamp
-            supabase_client.table('question_answer_pairs')\
+        for question_id, knn_data in local_records_with_knn:
+            update_response = supabase_client.table('question_answer_pairs')\
                 .update({
                     'k_nearest_neighbors': knn_data,
                     'last_modified_timestamp': timestamp
@@ -922,11 +968,21 @@ def sync_knn_results_to_supabase(db, supabase_client, changed_records, timestamp
             
             batch_updated += 1
             total_updated += 1
+            processed_ids.add(question_id)
         
         print(f"Updated {batch_updated} records in this batch")
         
+        # Break conditions based on actual data state
         if len(question_ids) < 100:
-            print("Last batch processed. Stopping sync.")
+            print("Last batch from server (less than 100 records).")
+            remaining_without_knn = [qid for qid in question_ids if qid not in processed_ids]
+            if remaining_without_knn:
+                print(f"{len(remaining_without_knn)} records still need topic modeling.")
+            break
+        
+        # If we didn't update anything and all records are processed, break
+        if batch_updated == 0 and all(qid in processed_ids for qid in question_ids):
+            print("No KNN data to sync. All records need topic modeling. Stopping sync.")
             break
     
     print(f"k-NN sync finished. Total records updated: {total_updated}")

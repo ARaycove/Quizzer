@@ -1,6 +1,6 @@
-from sync_fetch_data import initialize_and_fetch_db, get_empty_doc_record, upsert_question_record
-from transform_question_to_vector import simplify_question_record
-from data_utils import load_image
+from utility.sync_fetch_data import initialize_and_fetch_db, get_empty_doc_record, upsert_question_record
+from utility.transform_question_to_vector import simplify_question_record
+from utility.data_utils import load_image
 from transformers import BlipProcessor, BlipForConditionalGeneration
 from PIL import Image
 import torch
@@ -12,7 +12,6 @@ from pylatexenc import macrospec, latexwalker
 from pylatexenc.latexwalker import LatexMacroNode, LatexGroupNode, LatexCharsNode
 import os
 import sys
-import psutil
 
 def convert_latex_to_plain_english(doc: str) -> str:
     """

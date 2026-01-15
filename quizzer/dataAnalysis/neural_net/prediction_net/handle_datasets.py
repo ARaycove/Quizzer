@@ -1,6 +1,6 @@
 from sklearn.model_selection import train_test_split as sk_train_test_split
 from neural_net.attempt_pre_process import apply_smote_balancing
-from sync_fetch_data import initialize_and_fetch_db
+from utility.sync_fetch_data import initialize_and_fetch_db
 import pandas as pd
 import numpy as np
 #######################################
@@ -59,6 +59,7 @@ def find_best_subset_to_train(top_n: int = 100, top_k: int = 1000, top_n_perc: f
         else:
             group_rest.append(record)
     
+    print(f"Sum of all grid searches performed across top {top_k} records is: {total_grid_searches}")
     # Determine target group based on current distribution
     if total_grid_searches == 0:
         # First run - pick highest rank
@@ -199,18 +200,12 @@ def select_random_feature_subsets(current_feature, n, all_features, X_train, com
                 complete_rows = X_train[test_features].dropna()
                 completeness = len(complete_rows) / len(X_train)
                 
-                print(f"  Trying feature '{feature}': completeness = {completeness:.4f} (threshold: {completeness_threshold})")
-                
                 if completeness >= completeness_threshold:
                     # Feature is valid - add it
                     selected_features.append(feature)
                     remaining_features.remove(feature)
                     found_valid_feature = True
-                    print(f"  ✓ Added feature '{feature}' to subset {i+1}")
-                    print(f"  Current subset size: {len(selected_features)}/{subset_size}")
                     break
-                else:
-                    print(f"  ✗ Skipping feature '{feature}' (insufficient data)")
             
             if not found_valid_feature:
                 # No remaining feature can maintain completeness
@@ -250,7 +245,7 @@ def collect_feature_list(df):
 
 def train_test_split(df, test_size=0.2, random_state=42):
     """
-    Splits data into train and test sets, ensuring the test set has no missing values.
+    Deterministic train-test split that ensures the test set has no missing values.
     
     Args:
         df: DataFrame containing features and 'response_result' target column
@@ -260,8 +255,13 @@ def train_test_split(df, test_size=0.2, random_state=42):
     Returns:
         X_train, X_test, y_train, y_test DataFrames/Series
     """
+    # Create local random number generator for complete reproducibility
+    rng = np.random.RandomState(random_state)
     
     # Separate features and target
+    if 'response_result' not in df.columns:
+        raise ValueError("DataFrame must contain 'response_result' column")
+    
     X = df.drop(columns=['response_result'])
     y = df['response_result']
     
@@ -299,8 +299,10 @@ def train_test_split(df, test_size=0.2, random_state=42):
     X_train = pd.concat([X_train_complete, X_train_incomplete], axis=0)
     y_train = pd.concat([y_train_complete, y_train_incomplete], axis=0)
     
-    # Shuffle the combined training set
-    train_indices = np.random.permutation(X_train.index)
+    # FIXED: Deterministic shuffling using local random generator
+    train_indices = X_train.index.values
+    rng.shuffle(train_indices)  # This is now deterministic
+    
     X_train = X_train.loc[train_indices]
     y_train = y_train.loc[train_indices]
     

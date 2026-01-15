@@ -1,7 +1,7 @@
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from sync_fetch_data import initialize_and_fetch_db
+from utility.sync_fetch_data import initialize_and_fetch_db
 from sklearn.preprocessing import OneHotEncoder
 import pandas as pd
 import json
@@ -10,7 +10,7 @@ from imblearn.over_sampling import SMOTE
 import numpy as np
 import tensorflow as tf
 from datetime import datetime, timezone
-from sync_fetch_data import initialize_supabase_session
+from utility.sync_fetch_data import initialize_supabase_session
 from sklearn.model_selection import train_test_split
 
 def get_attempt_dataframe() -> pd.DataFrame:

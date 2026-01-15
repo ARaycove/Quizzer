@@ -4,10 +4,28 @@ import matplotlib.pyplot as plt
 import json
 from pathlib import Path
 from typing import List, Dict, Any
-
+import pickle
+import base64
 # Import the existing database function from sync_fetch_data
-from sync_fetch_data import initialize_and_fetch_db
+from utility.sync_fetch_data import initialize_and_fetch_db
+
+
 # For use in Phase 2 of the pipeline
+def _serialize_weights(weights_list):
+    """Serialize list of numpy arrays to base64 string for database storage."""
+    if weights_list is None:
+        return None
+    # Pickle the list of numpy arrays, then base64 encode
+    weights_bytes = pickle.dumps(weights_list, protocol=pickle.HIGHEST_PROTOCOL)
+    return base64.b64encode(weights_bytes).decode('utf-8')
+
+def _deserialize_weights(weights_str):
+    """Deserialize base64 string back to list of numpy arrays."""
+    if not weights_str:
+        return None
+    weights_bytes = base64.b64decode(weights_str.encode('utf-8'))
+    return pickle.loads(weights_bytes)
+
 def update_submodel_record(new_sub_model: dict, existing_record: dict) -> None:
     """
     Update the database with the better of two sub-models (new vs existing).
@@ -24,18 +42,28 @@ def update_submodel_record(new_sub_model: dict, existing_record: dict) -> None:
     new_score = new_sub_model['best_score']
     new_params = new_sub_model['best_params']
     
+    # Serialize new model weights if they exist (they're list of numpy arrays)
+    new_weights_raw = new_sub_model.get('model_weights')
+    if new_weights_raw and isinstance(new_weights_raw, list):
+        new_weights_serialized = _serialize_weights(new_weights_raw)
+    else:
+        new_weights_serialized = new_weights_raw
+    
     # Check if existing record has saved model weights/config
-    existing_has_model = (existing_record.get('model_weights') is not None and 
-                         existing_record.get('model_config') is not None and
-                         existing_record['model_weights'] != '' and
-                         existing_record['model_config'] != '')
+    existing_weights = existing_record.get('model_weights')
+    existing_config = existing_record.get('model_config')
+    
+    existing_has_model = (existing_weights is not None and 
+                         existing_config is not None and
+                         existing_weights != '' and
+                         existing_config != '')
     
     if not existing_has_model:
         # No existing model, use the new one
         better_score = new_score
         better_params = json.dumps(new_params)
         better_config = json.dumps(new_sub_model.get('model_config', {}))
-        better_weights = new_sub_model.get('model_weights', '')
+        better_weights = new_weights_serialized
         print(f"New model selected (no existing model): {new_score:.4f}")
     else:
         # Compare scores - higher composite score is better
@@ -46,7 +74,7 @@ def update_submodel_record(new_sub_model: dict, existing_record: dict) -> None:
             better_score = new_score
             better_params = json.dumps(new_params)
             better_config = json.dumps(new_sub_model.get('model_config', {}))
-            better_weights = new_sub_model.get('model_weights', '')
+            better_weights = new_weights_serialized
             print(f"New model selected (score: {new_score:.4f} vs existing: {existing_score:.4f})")
         else:
             # Existing model is better
@@ -59,6 +87,11 @@ def update_submodel_record(new_sub_model: dict, existing_record: dict) -> None:
     # Always increment grid search counter
     new_search_count = existing_record.get('num_grid_searches_performed', 0) + 1
     
+    # Ensure all values are strings/ints/floats for SQLite
+    better_params_str = str(better_params) if better_params is not None else '{}'
+    better_config_str = str(better_config) if better_config is not None else '{}'
+    better_weights_str = str(better_weights) if better_weights is not None else ''
+    
     # Update the database record
     cursor.execute('''
     UPDATE sub_model_results 
@@ -69,8 +102,8 @@ def update_submodel_record(new_sub_model: dict, existing_record: dict) -> None:
         num_grid_searches_performed = ?,
         timestamp = CURRENT_TIMESTAMP
     WHERE feature_set = ?
-    ''', (better_score, better_params, better_config, better_weights, 
-          new_search_count, feature_set))
+    ''', (float(better_score), better_params_str, better_config_str, better_weights_str, 
+          int(new_search_count), str(feature_set)))
     
     db_conn.commit()
     db_conn.close()
@@ -92,16 +125,16 @@ def _create_submodel_results_table(db_conn) -> None:
     # First, create table if it doesn't exist
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS sub_model_results (
-        feature_set TEXT PRIMARY KEY,           -- Sorted string representation of features
-        composite_score REAL,                   -- Phase 1 composite score
-        auc_roc REAL,                          -- Phase 2 AUC-ROC score (from run_full_model_eval)
-        num_grid_searches_performed INTEGER DEFAULT 0,  -- Number of grid searches performed on this feature set
-        model_config TEXT,                      -- Best model configuration/hyperparameters (JSON)
-        model_weights TEXT,                     -- Path to model weights file or serialized weights
-        hyperparams TEXT,                       -- JSON string of hyperparameters (Phase 1)
+        feature_set TEXT PRIMARY KEY,           -- Sorted, comma-separated feature list (e.g., "feature1,feature2,feature3")
+        composite_score REAL,                   -- Phase 1 composite score (harmonic mean of ROC AUC and 1-ECE)
+        auc_roc REAL,                          -- Phase 2 AUC-ROC score (when available)
+        num_grid_searches_performed INTEGER DEFAULT 0,  -- Counter of grid search iterations performed
+        model_config TEXT,                      -- JSON-serialized TensorFlow model configuration
+        model_weights TEXT,                     -- JSON-serialized model weights (base64 or pickled)
+        hyperparams TEXT,                       -- JSON-serialized hyperparameters from grid search
         timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-        tier INTEGER DEFAULT 0                  -- Current tier for grid search allocation
-    )
+        tier INTEGER DEFAULT 0                  -- Priority tier (0-2)
+    )    
     ''')
     
     # Check if table exists (it should now, either created above or already existed)
@@ -149,6 +182,10 @@ def _insert_submodel_results(db_conn, sub_model_results: List[Dict[str, Any]]) -
         db_conn: SQLite database connection
         sub_model_results: List of dictionaries with 'composite_score', 'feature_list', and 'hyperparams'
     """
+    if not sub_model_results:
+        return
+    if sub_model_results == []:
+        return
     cursor = db_conn.cursor()
     
     for result in sub_model_results:
@@ -372,7 +409,7 @@ def _print_submodel_analysis(analysis: Dict[str, Any]) -> None:
     
     print(f"{'='*60}")
 
-def report_sub_model_results(sub_model_results: List[Dict[str, Any]]):
+def report_sub_model_results(sub_model_results: List[Dict[str, Any]] = []):
     """
     Record sub-model composite scores in the main SQLite database and generate analysis.
     

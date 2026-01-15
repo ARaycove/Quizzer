@@ -4,7 +4,7 @@ from PIL import Image
 import io
 from torchvision import transforms
 import os
-from sync_fetch_data import initialize_supabase_session
+from utility.sync_fetch_data import initialize_supabase_session
 from supabase import Client
 import torchvision.transforms as transforms
 import yake

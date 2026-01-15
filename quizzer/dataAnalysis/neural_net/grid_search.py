@@ -11,7 +11,7 @@ import multiprocessing
 import random
 from sklearn.metrics import roc_curve
 import os
-from bertopic_helpers import set_process_limits
+from utility.bertopic_helpers import set_process_limits
 
 def train_and_save_batch_configs(config_batch, X_train, y_train, X_test, y_test, input_features, total_iterations=0, n_search=0):
     """

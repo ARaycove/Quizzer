@@ -2,7 +2,7 @@ import pandas as pd
 import json
 import sqlite3
 from sqlite3 import Connection
-from sync_fetch_data import initialize_and_fetch_db
+from utility.sync_fetch_data import initialize_and_fetch_db
 
 def load_question_data() -> pd.DataFrame:
     """

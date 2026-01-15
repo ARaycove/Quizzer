@@ -13,21 +13,21 @@ from neural_net import reports as rp
 from neural_net import attempt_pre_process as ap
 from sentence_transformers import SentenceTransformer
 from bertopic.vectorizers import ClassTfidfTransformer
-from transform_question_to_vector import vectorize_records
+from utility.transform_question_to_vector import vectorize_records
 from sklearn.feature_extraction.text import CountVectorizer
 from neural_net.grid_search import grid_search_quizzer_model
 from neural_net.accuracy_net import pre_process_training_data
 from neural_net.grid_search import train_and_save_batch_configs
-from bertopic_helpers import create_docs, export_outlier_topics_to_docx, set_process_limits
+from utility.bertopic_helpers import create_docs, export_outlier_topics_to_docx, set_process_limits
 from bertopic.representation import KeyBERTInspired, MaximalMarginalRelevance
-from sync_fetch_data import (initialize_and_fetch_db, get_last_sync_date, fetch_new_records_from_supabase, 
+from utility.sync_fetch_data import (initialize_and_fetch_db, get_last_sync_date, fetch_new_records_from_supabase, 
                              update_last_sync_date,find_newest_timestamp,upsert_records_to_db, 
                              fetch_data_for_bertopic, initialize_supabase_session, sync_vectors_to_supabase,
                              sync_knn_results_to_supabase, clean_deleted_records_locally,
                              save_changed_records, load_changed_records)
 from neural_net.prediction_net.model_def import train_question_accuracy_model
 
-from knn_utils import (compute_complete_pairwise_distances, plot_distance_distribution, compute_knn_model, update_knn_vectors_locally)
+from utility.knn_utils import (compute_complete_pairwise_distances, plot_distance_distribution, compute_knn_model, update_knn_vectors_locally)
 from sklearn.mixture import GaussianMixture
 # Define Globals
 bypass_model_train      = False  # topic model
@@ -35,6 +35,7 @@ reset_question_vector   = False
 reset_doc               = False
 
 # Timing Globals
+
 def run_data_sync_process(supabase_client, db):
     '''
     Fetches Fresh Data, Syncs new data from models
@@ -45,11 +46,6 @@ def run_data_sync_process(supabase_client, db):
         supabase_client     =supabase_client,
         last_sync_date      =last_sync_date
     )
-
-    if len(new_records['question_answer_pairs']) == 0:
-        global bypass_model_train
-        bypass_model_train = True  # No new data, skip model training
-
     # Now we need to save the new records to our local db file:
     upsert_records_to_db(
         records=new_records,
@@ -68,7 +64,6 @@ def run_data_sync_process(supabase_client, db):
     sync_vectors_to_supabase(reset_attempts_vector=reset_question_vector, reset_question_vector=reset_question_vector)
 
     changed_records = load_changed_records()
-    #FIXME when syncing knn results, should handle case where no data found by fetching those question answer pair records from supabase
     sync_knn_results_to_supabase(db, supabase_client, changed_records, get_last_sync_date())
     # Once results are synced, clear the local changed_records cache (preventing repeats)
     save_changed_records([])
@@ -211,79 +206,79 @@ def main():
 
         # FIXME Push topic_proba to Supabase
         
-        # Export to file for sharing
-        export_outlier_topics_to_docx(topic_model=topic_model)
+        # # Export to file for sharing
+        # export_outlier_topics_to_docx(topic_model=topic_model)
 
-    # Run the data sync again, so we immediately push new data.
-    run_data_sync_process(supabase_client = supabase_client,
-                          db = db)
+        # Run the data sync again, so we immediately push new data.
+        run_data_sync_process(supabase_client = supabase_client,
+                            db = db)
     # ================================================================================
-    # Begin neural net pipeline
-    if not bypass_prediction_model:
-        # Clear old global best and prior model before retraining. . .
-        if os.path.exists('global_best_model.csv'):
-            os.remove('global_best_model.csv')
-        if os.path.exists('global_best_model.tflite'):
-            os.remove('global_best_model.tflite')
-        print(f"Now starting pre-processing of attempt data for neural net training")
-        seed = 42
+    # # Begin neural net pipeline
+    # if not bypass_prediction_model:
+    #     # Clear old global best and prior model before retraining. . .
+    #     if os.path.exists('global_best_model.csv'):
+    #         os.remove('global_best_model.csv')
+    #     if os.path.exists('global_best_model.tflite'):
+    #         os.remove('global_best_model.tflite')
+    #     print(f"Now starting pre-processing of attempt data for neural net training")
+    #     seed = 42
 
-        # Pre-process, and train test split
-        start = timeit.default_timer()
-        X_train, X_test, y_train, y_test = ap.train_test_split_extraction(pre_process_training_data(), 0.2, random_state=seed)
-        end = timeit.default_timer()
-        pre_process_time = end - start
+    #     # Pre-process, and train test split
+    #     start = timeit.default_timer()
+    #     X_train, X_test, y_train, y_test = ap.train_test_split_extraction(pre_process_training_data(), 0.2, random_state=seed)
+    #     end = timeit.default_timer()
+    #     pre_process_time = end - start
 
-        print(f"Starting comprehensive grid search with {X_train.shape[1]} input features")
-        print(f"Training set: {len(X_train)} samples, Test set: {len(X_test)} samples")
-        # # Run comprehensive grid search
+    #     print(f"Starting comprehensive grid search with {X_train.shape[1]} input features")
+    #     print(f"Training set: {len(X_train)} samples, Test set: {len(X_test)} samples")
+    #     # # Run comprehensive grid search
         
-        start   = timeit.default_timer()
-        n_search = 50
-        grid_search_quizzer_model(X_train, y_train, X_test, y_test, n_search=n_search, batch_size=25)
-        end     = timeit.default_timer()
-        grid_search_time = end - start
+    #     start   = timeit.default_timer()
+    #     n_search = 50
+    #     grid_search_quizzer_model(X_train, y_train, X_test, y_test, n_search=n_search, batch_size=25)
+    #     end     = timeit.default_timer()
+    #     grid_search_time = end - start
 
-        if not os.path.exists('global_best_model.tflite'):
-            if not os.path.exists('grid_search_top_results.csv'):
-                raise FileNotFoundError("No model or top results found")
-            top_results = pd.read_csv('grid_search_top_results.csv')
-            if top_results.empty:
-                raise ValueError("Top results CSV is empty")
-            best_params = [top_results.iloc[0].to_dict()]
-            train_and_save_batch_configs(
-                config_batch=best_params,
-                X_train=X_train,
-                y_train=y_train,
-                X_test=X_test,
-                y_test=y_test,
-                input_features=X_train.shape[1]
-            )
+    #     if not os.path.exists('global_best_model.tflite'):
+    #         if not os.path.exists('grid_search_top_results.csv'):
+    #             raise FileNotFoundError("No model or top results found")
+    #         top_results = pd.read_csv('grid_search_top_results.csv')
+    #         if top_results.empty:
+    #             raise ValueError("Top results CSV is empty")
+    #         best_params = [top_results.iloc[0].to_dict()]
+    #         train_and_save_batch_configs(
+    #             config_batch=best_params,
+    #             X_train=X_train,
+    #             y_train=y_train,
+    #             X_test=X_test,
+    #             y_test=y_test,
+    #             input_features=X_train.shape[1]
+    #         )
 
-        if os.path.exists('global_best_model.tflite'):
-            print(f"\nLoading global best model from disk...")
-            start = timeit.default_timer()
-            interpreter, X_test_transformed = ap.load_model_and_transform_test_data(
-                model_path='global_best_model.tflite',
-                feature_map_path='input_feature_map.json',
-                X_train=X_train,
-                X_test=X_test,
-                y_train=y_train,
-                y_test=y_test
-            )
-            metrics = rp.model_analytics_report(interpreter, X_test_transformed, y_test, filename="NN_Text_Report.txt")
-            rp.create_comprehensive_visualizations(metrics, "Quizzer_NN")
-            end = timeit.default_timer()
-            final_report_time = end - start
-            ap.push_model_to_supabase(
-                model_name="accuracy_net", 
-                metrics=metrics, 
-                model_path="global_best_model.tflite", 
-                feature_map_path="input_feature_map.json"
-            )
+    #     if os.path.exists('global_best_model.tflite'):
+    #         print(f"\nLoading global best model from disk...")
+    #         start = timeit.default_timer()
+    #         interpreter, X_test_transformed = ap.load_model_and_transform_test_data(
+    #             model_path='global_best_model.tflite',
+    #             feature_map_path='input_feature_map.json',
+    #             X_train=X_train,
+    #             X_test=X_test,
+    #             y_train=y_train,
+    #             y_test=y_test
+    #         )
+    #         metrics = rp.model_analytics_report(interpreter, X_test_transformed, y_test, filename="NN_Text_Report.txt")
+    #         rp.create_comprehensive_visualizations(metrics, "Quizzer_NN")
+    #         end = timeit.default_timer()
+    #         final_report_time = end - start
+    #         ap.push_model_to_supabase(
+    #             model_name="accuracy_net", 
+    #             metrics=metrics, 
+    #             model_path="global_best_model.tflite", 
+    #             feature_map_path="input_feature_map.json"
+    #         )
             
-        else:
-            print("Grid search failed - no model saved")
+    #     else:
+    #         print("Grid search failed - no model saved")
 
 
 
@@ -293,7 +288,6 @@ def main():
     # print(f"Got {len(new_records['question_answer_pairs'])} total qa records from supabase")
     # print(f"Got {len(new_records['question_answer_attempts'])} total attempt records from supabase")
     print(f"Bertopic Training took: {topic_model_train_time:.5f} seconds")
-    print(f"Grid Search Took:       {grid_search_time:.5f} seconds")
     print(f"Pipeline took:          {overall_time:.5f} seconds from start to finish")
 
 if __name__ == "__main__":
