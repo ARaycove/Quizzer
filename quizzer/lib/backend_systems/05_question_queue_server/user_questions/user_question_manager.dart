@@ -103,7 +103,7 @@ class UserQuestionManager {
     
     if (circulatingQuestionIds.isEmpty) {
       QuizzerLogger.logMessage('No circulating questions found for user: $userId');
-      return [];
+      return <Map<String, dynamic>>[]; // Explicitly type the empty list
     }
 
     // Build IN clause for querying only circulating questions

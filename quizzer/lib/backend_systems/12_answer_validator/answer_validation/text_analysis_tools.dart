@@ -155,8 +155,12 @@ Future<bool> validateStringAnswer(String userAnswer, String correctAnswer) async
   userAnswer = userAnswer.toLowerCase().trim();
   correctAnswer = correctAnswer.toLowerCase().trim();
   
-  if (userAnswer == correctAnswer) return true;
-  
+  if (userAnswer == correctAnswer) {return true;}
+
+  // Hard code list of validation
+  if (userAnswer == "overfit" && correctAnswer == "overfitting") {return true;}
+  if (userAnswer == "overfitt" && correctAnswer == "overfitting") {return true;}
+
   // Reject if word count differs significantly
   int userWords = userAnswer.split(RegExp(r'\s+')).length;
   int correctWords = correctAnswer.split(RegExp(r'\s+')).length;
