@@ -133,6 +133,7 @@ class UserQuestionManager {
       ${includeQuestionPairs ? 'INNER JOIN question_answer_pairs ON user_question_answer_pairs.question_id = question_answer_pairs.question_id' : ''}
       WHERE user_question_answer_pairs.user_uuid = '$userId'
         AND user_question_answer_pairs.question_id IN $inClause
+        AND user_question_answer_pairs.flagged = 0  -- if the user flagged the question it is no longer eligible
     ''';
 
     try {

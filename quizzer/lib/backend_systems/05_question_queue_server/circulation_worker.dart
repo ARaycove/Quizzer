@@ -374,6 +374,7 @@ class CirculationWorker {
       nonCirculatingConnected.clear();
       
       // Query ALL questions from question_answer_pair table
+      // FIXME Both get calls need to filter out user flagged questions
       final allQuestionsResults = await QuestionAnswerPairManager().getAllQuestionIdsWithNeighbors();
       final circulatingResults = await UserQuestionManager().getCirculatingQuestionsWithNeighbors();
 
