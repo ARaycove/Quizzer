@@ -3,6 +3,7 @@ import 'package:quizzer/backend_systems/logger/quizzer_logging.dart';
 import 'package:quizzer/backend_systems/session_manager/session_manager.dart';
 import 'package:quizzer/app_theme.dart';
 import 'dart:async'; // Import for StreamSubscription
+import 'package:email_validator/email_validator.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -157,14 +158,91 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   // Navigate to reset password and handle return (true => password reset succeeded)
-  void resetPassword() async {
+  void resetPassword() {
     if (_isLoading) return;
-    QuizzerLogger.logMessage('Navigating to reset password page');
-    final result = await Navigator.pushNamed(context, '/resetPassword');
-    if (result is bool && result == true) {
-      if (!mounted) return;
+    QuizzerLogger.logMessage('🔐 [FORGOT PASSWORD] User clicked forgot password button');
+    
+    // Show modal dialog for email entry
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext dialogContext) {
+        return ForgotPasswordDialog(
+          onResetSubmitted: (email) async {
+            QuizzerLogger.logMessage('🔐 [FORGOT PASSWORD] Password reset initiated for: $email');
+            await _handlePasswordResetRequest(email, dialogContext);
+          },
+        );
+      },
+    );
+  }
+
+  /// Handles the password reset request with Supabase
+  Future<void> _handlePasswordResetRequest(String email, BuildContext dialogContext) async {
+    try {
+      QuizzerLogger.logMessage('🔐 [FORGOT PASSWORD] Starting password reset process');
+      QuizzerLogger.logMessage('📧 [FORGOT PASSWORD] Email: $email');
+
+      // Get Supabase instance
+      final supabase = SessionManager().supabase;
+      
+      QuizzerLogger.logMessage('🔐 [FORGOT PASSWORD] Attempting to call resetPasswordForEmail()...');
+      
+      // Call Supabase password recovery
+      await supabase.auth.resetPasswordForEmail(email);
+      
+      QuizzerLogger.logSuccess('✅ [FORGOT PASSWORD] Password reset email sent successfully to: $email');
+      
+      if (!mounted) {
+        QuizzerLogger.logWarning('🔐 [FORGOT PASSWORD] Widget unmounted, skipping UI update');
+        return;
+      }
+
+      // Close the dialog
+      Navigator.of(dialogContext).pop();
+
+      // Show success message
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Password changed successfully — please log in with your new password')),
+        SnackBar(
+          content: Text('Password reset email sent to $email. Check your inbox!'),
+          backgroundColor: Colors.green,
+          duration: const Duration(seconds: 5),
+        ),
+      );
+
+      QuizzerLogger.logMessage('🔐 [FORGOT PASSWORD] Success message displayed to user');
+    } on Exception catch (e) {
+      QuizzerLogger.logError('❌ [FORGOT PASSWORD] Supabase exception: ${e.toString()}');
+      
+      if (!mounted) {
+        QuizzerLogger.logWarning('🔐 [FORGOT PASSWORD] Widget unmounted after error, skipping UI update');
+        return;
+      }
+
+      // Show error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: ${e.toString()}'),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 5),
+        ),
+      );
+
+      QuizzerLogger.logMessage('🔐 [FORGOT PASSWORD] Error message displayed to user');
+    } catch (e) {
+      QuizzerLogger.logError('❌ [FORGOT PASSWORD] Unexpected error: ${e.toString()}');
+      
+      if (!mounted) {
+        QuizzerLogger.logWarning('🔐 [FORGOT PASSWORD] Widget unmounted after unexpected error');
+        return;
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Unexpected error occurred. Please try again.'),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 5),
+        ),
       );
     }
   }
@@ -312,6 +390,146 @@ class _LoginPageState extends State<LoginPage> {
         QuizzerLogger.logMessage("Disabled social login for now");
         // _isLoading ? null : submitSocialLogin();
       },
+    );
+  }
+}
+
+/// ============================================================================
+/// FORGOT PASSWORD DIALOG WIDGET
+/// ============================================================================
+class ForgotPasswordDialog extends StatefulWidget {
+  final Function(String email) onResetSubmitted;
+
+  const ForgotPasswordDialog({
+    super.key,
+    required this.onResetSubmitted,
+  });
+
+  @override
+  State<ForgotPasswordDialog> createState() => _ForgotPasswordDialogState();
+}
+
+class _ForgotPasswordDialogState extends State<ForgotPasswordDialog> {
+  final TextEditingController _emailController = TextEditingController();
+  bool _isLoading = false;
+  String? _errorMessage;
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    super.dispose();
+  }
+
+  /// Validates email and triggers password reset
+  Future<void> _submitReset() async {
+    final email = _emailController.text.trim();
+
+    QuizzerLogger.logMessage('🔐 [FORGOT PASSWORD DIALOG] Submit button pressed');
+    QuizzerLogger.logMessage('🔐 [FORGOT PASSWORD DIALOG] Email input: $email');
+
+    // Validate email is not empty
+    if (email.isEmpty) {
+      QuizzerLogger.logWarning('🔐 [FORGOT PASSWORD DIALOG] Email field is empty');
+      setState(() {
+        _errorMessage = 'Please enter your email address';
+      });
+      return;
+    }
+
+    // Validate email format
+    if (!EmailValidator.validate(email)) {
+      QuizzerLogger.logWarning('🔐 [FORGOT PASSWORD DIALOG] Invalid email format: $email');
+      setState(() {
+        _errorMessage = 'Please enter a valid email address';
+      });
+      return;
+    }
+
+    QuizzerLogger.logMessage('✅ [FORGOT PASSWORD DIALOG] Email validation passed: $email');
+    
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    // Call the parent handler
+    await widget.onResetSubmitted(email);
+
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('🔐 Reset Your Password'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            'Enter the email address associated with your account, and we\'ll send you a password reset link.',
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+          const SizedBox(height: 20),
+          
+          // Email input field
+          TextField(
+            controller: _emailController,
+            enabled: !_isLoading,
+            keyboardType: TextInputType.emailAddress,
+            decoration: InputDecoration(
+              hintText: 'you@example.com',
+              labelText: 'Email Address',
+              border: const OutlineInputBorder(),
+              errorText: _errorMessage,
+              errorBorder: const OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.red),
+              ),
+            ),
+            onSubmitted: (_) {
+              if (!_isLoading) {
+                _submitReset();
+              }
+            },
+          ),
+          
+          if (_errorMessage != null) ...[
+            const SizedBox(height: 12),
+            Text(
+              _errorMessage!,
+              style: TextStyle(
+                color: Colors.red,
+                fontSize: 12,
+              ),
+            ),
+          ],
+        ],
+      ),
+      actions: [
+        // Cancel button
+        TextButton(
+          onPressed: _isLoading ? null : () {
+            QuizzerLogger.logMessage('🔐 [FORGOT PASSWORD DIALOG] User cancelled dialog');
+            Navigator.of(context).pop();
+          },
+          child: const Text('Cancel'),
+        ),
+        
+        // Submit button
+        ElevatedButton(
+          onPressed: _isLoading ? null : _submitReset,
+          child: _isLoading
+              ? const SizedBox(
+                  height: 20,
+                  width: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : const Text('Send Reset Email'),
+        ),
+      ],
     );
   }
 }
